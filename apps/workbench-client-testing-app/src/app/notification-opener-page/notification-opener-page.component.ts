@@ -41,7 +41,7 @@ export default class NotificationOpenerPageComponent {
     cssClass: this._formBuilder.control(''),
   });
 
-  public error: string | undefined;
+  public notificationOpenError: string | undefined;
 
   constructor(view: WorkbenchView,
               private _formBuilder: NonNullableFormBuilder,
@@ -53,7 +53,7 @@ export default class NotificationOpenerPageComponent {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier);
     const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
 
-    this.error = undefined;
+    this.notificationOpenError = undefined;
     this._notificationService.show({
       title: this.form.controls.title.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
       content: this.form.controls.content.value.replace(/\\n/g, '\n') || undefined, // restore line breaks as sanitized by the user agent
@@ -63,7 +63,7 @@ export default class NotificationOpenerPageComponent {
       group: this.form.controls.group.value || undefined,
       cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
     }, qualifier ?? undefined)
-      .catch(error => this.error = stringifyError(error));
+      .catch(error => this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened');
   }
 
   private parseDurationFromUI(): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {

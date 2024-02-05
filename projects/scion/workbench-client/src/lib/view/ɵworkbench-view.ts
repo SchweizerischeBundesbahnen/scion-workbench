@@ -157,7 +157,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
    * @inheritDoc
    */
   public close(): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.id));
+    Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.id)).then();
   }
 
   /**

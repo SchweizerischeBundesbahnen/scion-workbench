@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, getCssClasses, isPresent} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
@@ -21,33 +21,21 @@ export class ViewPO {
   /**
    * Handle to the tab of the view in the tab bar.
    */
-  public readonly viewTab: ViewTabPO;
+  public readonly tab: ViewTabPO;
 
-  constructor(public readonly locator: Locator, viewTab: ViewTabPO) {
-    this.viewTab = viewTab;
+  constructor(public readonly locator: Locator, tab: ViewTabPO) {
+    this.tab = tab;
   }
 
   public async getViewId(): Promise<string> {
-    return this.viewTab.getViewId();
+    return this.tab.getViewId();
   }
 
   /**
    * Handle to the part in which this view is contained.
    */
   public get part(): PartPO {
-    return this.viewTab.part;
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
-  }
-
-  public async isActive(): Promise<boolean> {
-    return await isPresent(this.locator) && await this.viewTab.isActive();
+    return this.tab.part;
   }
 
   public waitUntilAttached(): Promise<void> {
@@ -60,16 +48,5 @@ export class ViewPO {
 
   public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
-  }
-
-  /**
-   * Indicates if this view is contained in the main area.
-   */
-  public isInMainArea(): Promise<boolean> {
-    return isPresent(this.locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this.locator}));
-  }
-
-  public locate(selector: string): Locator {
-    return this.locator.locator(selector);
   }
 }

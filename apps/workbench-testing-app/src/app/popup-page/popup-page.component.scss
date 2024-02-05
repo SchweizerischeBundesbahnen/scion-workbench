@@ -32,11 +32,6 @@
           font-weight: bold;
         }
 
-        &.preferred-overlay-size div.preferred-overlay-size {
-          white-space: pre;
-          font-family: monospace;
-        }
-
         &.return-value input {
           @include sci-design.style-input-field();
         }

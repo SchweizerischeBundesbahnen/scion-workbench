@@ -27,7 +27,7 @@ test.describe('Workbench Dialog', () => {
       // Open a dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee', modality: 'view', context: {viewId: await inputFieldTestPage.view.getViewId()}});
-      await dialogOpenerPage.view.viewTab.close();
+      await dialogOpenerPage.view.tab.close();
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogRect = await dialog.getDialogBoundingBox();

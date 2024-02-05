@@ -9,29 +9,12 @@
  */
 
 import {Locator} from '@playwright/test';
-import {isPresent} from './helper/testing.util';
 
 /**
  * Handle for interacting with a part action.
  */
 export class PartActionPO {
 
-  constructor(private readonly _locator: Locator) {
-  }
-
-  public isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
-  }
-
-  public isVisible(): Promise<boolean> {
-    return this._locator.isVisible();
-  }
-
-  public count(): Promise<number> {
-    return this._locator.count();
-  }
-
-  public locate(selector: string): Locator {
-    return this._locator.locator(selector);
+  constructor(public readonly locator: Locator) {
   }
 }

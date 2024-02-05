@@ -12,18 +12,33 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Workbench View', () => {
+
+  test('should provide the view\'s identity', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    await routerPage.enterPath('/test-view');
+    await routerPage.enterCssClass('testee');
+    await routerPage.enterTarget('view.99');
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+
+    await expect(viewPage.viewId).toHaveText('view.99');
+  });
 
   test('should allow updating the view tab title', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     await viewPage.enterTitle('TITLE');
-    await expect(await viewPage.viewTab.getTitle()).toEqual('TITLE');
+    await expect(viewPage.view.tab.title).toHaveText('TITLE');
 
     await viewPage.enterTitle('title');
-    await expect(await viewPage.viewTab.getTitle()).toEqual('title');
+    await expect(viewPage.view.tab.title).toHaveText('title');
   });
 
   test('should allow updating the view tab heading', async ({appPO, workbenchNavigator}) => {
@@ -33,10 +48,10 @@ test.describe('Workbench View', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     await viewPage.enterHeading('HEADING');
-    await expect(await viewPage.viewTab.getHeading()).toEqual('HEADING');
+    await expect(viewPage.view.tab.heading).toHaveText('HEADING');
 
     await viewPage.enterHeading('heading');
-    await expect(await viewPage.viewTab.getHeading()).toEqual('heading');
+    await expect(viewPage.view.tab.heading).toHaveText('heading');
   });
 
   test('should not display the view tab heading (by default)', async ({appPO, workbenchNavigator}) => {
@@ -44,7 +59,7 @@ test.describe('Workbench View', () => {
 
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.enterHeading('heading');
-    await expect(viewPage.viewTab.heading).not.toBeVisible();
+    await expect(viewPage.view.tab.heading).not.toBeVisible();
   });
 
   test('should not display the view tab heading if the tab height < 3.5rem', async ({appPO, workbenchNavigator}) => {
@@ -53,7 +68,7 @@ test.describe('Workbench View', () => {
 
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.enterHeading('heading');
-    await expect(viewPage.viewTab.heading).not.toBeVisible();
+    await expect(viewPage.view.tab.heading).not.toBeVisible();
   });
 
   test('should display the view tab heading if the tab height >= 3.5rem', async ({appPO, workbenchNavigator}) => {
@@ -62,8 +77,8 @@ test.describe('Workbench View', () => {
 
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.enterHeading('heading');
-    await expect(viewPage.viewTab.heading).toBeVisible();
-    await expect(await viewPage.viewTab.getHeading()).toEqual('heading');
+    await expect(viewPage.view.tab.heading).toBeVisible();
+    await expect(viewPage.view.tab.heading).toHaveText('heading');
   });
 
   test('should allow to mark the view dirty', async ({appPO, workbenchNavigator}) => {
@@ -71,87 +86,83 @@ test.describe('Workbench View', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
-    await expect(await viewPage.viewTab.isDirty()).toBe(false);
+    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(false);
 
     // Mark the view dirty
     await viewPage.checkDirty(true);
-    await expect(await viewPage.viewTab.isDirty()).toBe(true);
+    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
 
     // Mark the view pristine
     await viewPage.checkDirty(false);
-    await expect(await viewPage.viewTab.isDirty()).toBe(false);
+    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(false);
   });
 
   test('should unset the dirty state when navigating to a different route', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTab = viewPage.viewTab;
-    const viewId = await viewTab.getViewId();
+    const viewId = await viewPage.view.getViewId();
 
     // Mark the view dirty
     await viewPage.checkDirty(true);
-    await expect(await viewTab.isDirty()).toBe(true);
+    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
 
     // Navigate to a different route in the same view
-    await routerPage.viewTab.click();
+    await routerPage.view.tab.click();
     await routerPage.enterPath('test-router');
     await routerPage.enterTarget(viewId);
     await routerPage.clickNavigate();
 
     // Expect the view to be pristine
-    await expect(await viewTab.isDirty()).toBe(false);
+    const testeeView = appPO.view({viewId});
+    await expect.poll(() => testeeView.tab.isDirty()).toBe(false);
   });
 
   test('should not unset the dirty state when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTab = viewPage.viewTab;
-    const viewId = await viewTab.getViewId();
 
     // Mark the view dirty
     await viewPage.checkDirty(true);
-    await expect(await viewTab.isDirty()).toBe(true);
+    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
 
     // Update matrix params (does not affect routing)
-    await routerPage.viewTab.click();
+    await routerPage.view.tab.click();
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget(viewId);
+    await routerPage.enterTarget(await viewPage.view.getViewId());
     await routerPage.enterMatrixParams({matrixParam: 'value'});
     await routerPage.clickNavigate();
 
     // Expect the view to still be dirty
-    await expect(await viewTab.isDirty()).toBe(true);
+    await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
 
     // Verify matrix params have changed
-    await viewTab.click();
-    await expect(await viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
+    await viewPage.view.tab.click();
+    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the title when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTab = viewPage.viewTab;
-    const viewId = await viewTab.getViewId();
 
     // Set the title
     await viewPage.enterTitle('TITLE');
-    await expect(await viewTab.getTitle()).toEqual('TITLE');
+    await expect(viewPage.view.tab.title).toHaveText('TITLE');
 
     // Update matrix params (does not affect routing)
-    await routerPage.viewTab.click();
+    await routerPage.view.tab.click();
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget(viewId);
+    await routerPage.enterTarget(await viewPage.view.getViewId());
     await routerPage.enterMatrixParams({matrixParam: 'value'});
     await routerPage.clickNavigate();
 
     // Expect the title has not changed
-    await expect(await viewTab.getTitle()).toEqual('TITLE');
+    await expect(viewPage.view.tab.title).toHaveText('TITLE');
     // Verify matrix params have changed
-    await viewTab.click();
-    await expect(await viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
+    await viewPage.view.tab.click();
+    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
@@ -160,26 +171,22 @@ test.describe('Workbench View', () => {
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewTab = viewPage.viewTab;
-    const viewId = await viewTab.getViewId();
 
     // Set the heading
     await viewPage.enterHeading('HEADING');
-    await expect(await viewTab.getHeading()).toEqual('HEADING');
+    await expect(viewPage.view.tab.heading).toHaveText('HEADING');
 
     // Update matrix params (does not affect routing)
-    await routerPage.viewTab.click();
+    await routerPage.view.tab.click();
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget(viewId);
     await routerPage.enterMatrixParams({matrixParam: 'value'});
     await routerPage.clickNavigate();
 
     // Expect the heading has not changed
-    await expect(await viewTab.getHeading()).toEqual('HEADING');
+    await expect(viewPage.view.tab.heading).toHaveText('HEADING');
 
     // Verify matrix params have changed
-    await viewTab.click();
-    await expect(await viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should remove the closing handle from the view tab', async ({appPO, workbenchNavigator}) => {
@@ -187,15 +194,15 @@ test.describe('Workbench View', () => {
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // View tab expected to be pristine for new views
-    await expect(viewPage.viewTab.closeButton).toBeVisible();
+    await expect(viewPage.view.tab.closeButton).toBeVisible();
 
     // Prevent the view from being closed
     await viewPage.checkClosable(false);
-    await expect(viewPage.viewTab.closeButton).not.toBeVisible();
+    await expect(viewPage.view.tab.closeButton).not.toBeVisible();
 
     // Mark the view closable
     await viewPage.checkClosable(true);
-    await expect(viewPage.viewTab.closeButton).toBeVisible();
+    await expect(viewPage.view.tab.closeButton).toBeVisible();
   });
 
   test('should emit when activating or deactivating a viewtab', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -206,73 +213,71 @@ test.describe('Workbench View', () => {
     const testee1ComponentInstanceId = await testee1ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ViewActivate|ViewDeactivate/})).toEqualIgnoreOrder([
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
+    consoleLogs.clear();
 
     // navigate to testee-2 view
     const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     const testee2ComponentInstanceId = await testee2ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ViewActivate|ViewDeactivate/})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
+    consoleLogs.clear();
 
     // activate testee-1 view
-    await testee1ViewPage.viewTab.click();
-    await testee1ViewPage.isPresent();
+    await testee1ViewPage.view.tab.click();
 
     // assert emitted view active/deactivated events
-    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ViewActivate|ViewDeactivate/})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
+    consoleLogs.clear();
 
     // activate testee-2 view
-    await testee2ViewPage.viewTab.click();
-    await testee2ViewPage.isPresent();
+    await testee2ViewPage.view.tab.click();
 
     // assert emitted view active/deactivated events
-    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ViewActivate|ViewDeactivate/})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
     ]);
+    consoleLogs.clear();
 
     // navigate to testee-3 view
     const testee3ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     const testee3ComponentInstanceId = await testee3ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
-    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ViewActivate|ViewDeactivate/})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee2ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
     ]);
+    consoleLogs.clear();
 
     // activate testee-1 view
-    await testee1ViewPage.viewTab.click();
-    await testee1ViewPage.isPresent();
+    await testee1ViewPage.view.tab.click();
 
     // assert emitted view active/deactivated events
-    await expect(await consoleLogs.get({severity: 'debug', filter: /ViewActivate|ViewDeactivate/, consume: true})).toEqualIgnoreOrder([
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ViewActivate|ViewDeactivate/})).toEqualIgnoreOrder([
       `[ViewDeactivate] [component=ViewPageComponent@${testee3ComponentInstanceId}]`,
       `[ViewActivate] [component=ViewPageComponent@${testee1ComponentInstanceId}]`,
     ]);
+    consoleLogs.clear();
   });
 
   test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
-    await expect(await viewPage.viewTab.isPresent()).toBe(true);
-    await expect(await viewPage.view.isPresent()).toBe(true);
-
     await viewPage.clickClose();
 
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(0);
-    await expect(await viewPage.viewTab.isPresent()).toBe(false);
-    await expect(await viewPage.view.isPresent()).toBe(false);
+    await expect(appPO.views()).toHaveCount(0);
+    await expectView(viewPage).not.toBeAttached();
   });
 
   test(`should disable context menu 'Close tab' for 'non-closable' view`, async ({appPO, workbenchNavigator}) => {
@@ -281,12 +286,12 @@ test.describe('Workbench View', () => {
     // Open test view.
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-    const contextMenu1 = await viewPage.view.viewTab.openContextMenu();
+    const contextMenu1 = await viewPage.view.tab.openContextMenu();
     // Expect menu item to be enabled.
     await expect(contextMenu1.menuItems.closeTab.locator).not.toBeDisabled();
 
     await viewPage.checkClosable(false);
-    const contextMenu2 = await viewPage.view.viewTab.openContextMenu();
+    const contextMenu2 = await viewPage.view.tab.openContextMenu();
     // Expect menu item to be disabled.
     await expect(contextMenu2.menuItems.closeTab.locator).toBeDisabled();
   });
@@ -305,51 +310,60 @@ test.describe('Workbench View', () => {
     await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Close all views via context menu
-    const contextMenu = await viewPage1.viewTab.openContextMenu();
+    const contextMenu = await viewPage1.view.tab.openContextMenu();
     await contextMenu.menuItems.closeAll.click();
 
-    await expect(await appPO.viewIds()).toEqual([viewPage2.viewId]);
+    // Expect view 2 not to be closed because not closable.
+    await expect(appPO.views()).toHaveCount(1);
+    await expectView(viewPage2).toBeActive();
   });
 
   test('should detach view if not active', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open two views.
-    const view1Page = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const view2Page = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Expect view 2 to be visible.
-    await expect(view1Page.locator).not.toBeAttached();
-    await expect(view2Page.locator).toBeVisible();
+    await expectView(viewPage1).toBeInactive();
+    await expectView(viewPage2).toBeActive();
 
     // Activate view 1.
-    await view1Page.viewTab.click();
+    await viewPage1.view.tab.click();
 
     // Expect view 1 to be visible.
-    await expect(view1Page.locator).toBeVisible();
-    await expect(view2Page.locator).not.toBeAttached();
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).toBeInactive();
   });
 
   test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open two views in main area.
-    const view1Page = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const view2Page = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-    // Drag view 1 into peripheral area.
-    await view1Page.viewTab.dragTo({grid: 'workbench', region: 'east'});
-    await expect(view1Page.locator).toBeVisible();
-    await expect(view2Page.locator).toBeVisible();
+    // Capture instance id of view 2
+    const view2ComponentId = await viewPage2.getComponentInstanceId();
+
+    // Drag view 2 into peripheral area.
+    await viewPage2.view.tab.dragTo({grid: 'workbench', region: 'east'});
+
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).toBeActive();
 
     // Maximize the main area.
-    await view2Page.viewTab.dblclick();
-    await expect(view1Page.locator).not.toBeAttached();
-    await expect(view2Page.locator).toBeVisible();
+    await viewPage1.view.tab.dblclick();
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).not.toBeAttached();
 
     // Restore the layout.
-    await view2Page.viewTab.dblclick();
-    await expect(view1Page.locator).toBeVisible();
-    await expect(view2Page.locator).toBeVisible();
+    await viewPage1.view.tab.dblclick();
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).toBeActive();
+
+    // Expect view 2 not to be instantiated anew
+    await expect.poll(() => viewPage2.getComponentInstanceId()).toEqual(view2ComponentId);
   });
 });

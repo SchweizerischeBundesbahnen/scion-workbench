@@ -9,35 +9,38 @@
  */
 
 import {Locator} from '@playwright/test';
-import {DomRect, getCssClasses, hasCssClass, isPresent, isVisible, waitUntilBoundingBoxStable} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench popup.
  */
 export class PopupPO {
 
-  public readonly locator: Locator;
+  private readonly _overlay: Locator;
 
-  constructor(private readonly _overlayLocator: Locator) {
-    this.locator = this._overlayLocator.locator('wb-popup');
+  constructor(public readonly locator: Locator) {
+    this._overlay = this.locator.page().locator('.cdk-overlay-pane.wb-popup', {has: this.locator});
   }
 
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
+  /**
+   * Retrieves the bounding box of the popup. By default, includes borders ('border-box').
+   *
+   * @param options - Specifies whether to include borders ('border-box') or not ('content-box').
+   */
+  public async getBoundingBox(options?: {box?: 'border-box' | 'content-box'}): Promise<DomRect> {
+    const locator = options?.box === 'content-box' ? this.locator : this._overlay;
+    return fromRect(await locator.boundingBox());
   }
 
-  public async isVisible(): Promise<boolean> {
-    return isVisible(this.locator);
-  }
-
-  public async getBoundingBox(selector: 'cdk-overlay' | 'wb-popup' = 'wb-popup'): Promise<DomRect> {
-    const locator = selector === 'cdk-overlay' ? this._overlayLocator : this.locator;
-    await locator.waitFor({state: 'visible'});
-    return waitUntilBoundingBoxStable(locator);
+  /**
+   * Returns the computed style of the popup element.
+   */
+  public getComputedStyle(): Promise<CSSStyleDeclaration> {
+    return this.locator.evaluate((popupElement: HTMLElement) => getComputedStyle(popupElement));
   }
 
   public async getAlign(): Promise<'east' | 'west' | 'north' | 'south'> {
-    const cssClasses = await getCssClasses(this._overlayLocator);
+    const cssClasses = await getCssClasses(this._overlay);
     if (cssClasses.includes('wb-east')) {
       return 'east';
     }
@@ -53,36 +56,11 @@ export class PopupPO {
     throw Error('[PopupAlignError] Popup not aligned.');
   }
 
-  public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this.locator);
-  }
-
   public hasVerticalOverflow(): Promise<boolean> {
     return hasCssClass(this.locator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.vertical'), 'overflow');
   }
 
   public hasHorizontalOverflow(): Promise<boolean> {
     return hasCssClass(this.locator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
-  }
-
-  public locate(selector: string): Locator {
-    return this.locator.locator(selector);
-  }
-
-  public async waitUntilClosed(): Promise<void> {
-    await this.locator.waitFor({state: 'detached'});
-  }
-
-  public async waitUntilAttached(): Promise<void> {
-    await this.locator.waitFor({state: 'attached'});
-  }
-
-  public async pressEscape(): Promise<void> {
-    await this.locator.click();
-    await this.locator.press('Escape');
-  }
-
-  public async waitUntilVisible(): Promise<void> {
-    await this.locator.waitFor({state: 'visible'});
   }
 }

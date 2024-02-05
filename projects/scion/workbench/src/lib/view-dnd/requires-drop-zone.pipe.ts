@@ -21,7 +21,7 @@ import {isGridElementVisible} from '../layout/ɵworkbench-layout';
 @Pipe({name: 'wbRequiresDropZone', standalone: true})
 export class RequiresDropZonePipe implements PipeTransform {
 
-  public transform(element: MTreeNode | MPart, region: 'north' | 'south' | 'east' | 'west', log?: boolean): boolean {
+  public transform(element: MTreeNode | MPart, region: 'north' | 'south' | 'east' | 'west'): boolean {
     return requiresDropZone(element, region);
   }
 }

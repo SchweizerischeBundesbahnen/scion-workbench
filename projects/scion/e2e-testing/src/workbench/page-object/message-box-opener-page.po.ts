@@ -10,37 +10,35 @@
 
 import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
 import {WorkbenchMessageBoxOptions} from '@scion/workbench';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
  */
-export class MessageBoxOpenerPagePO {
+export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly closeAction: Locator;
   public readonly error: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
   private readonly _openButton: Locator;
 
-  constructor(private _appPO: AppPO, public viewId: string) {
-    this.view = this._appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.locator = this.view.locate('app-message-box-opener-page');
+  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.locator = this.view.locator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');
     this.error = this.locator.locator('output.e2e-message-box-error');
     this._openButton = this.locator.locator('button.e2e-open');
   }
 
   public async open(message: string, options?: WorkbenchMessageBoxOptions): Promise<void>;
-  public async open(component: 'component:inspect-message-box', options?: WorkbenchMessageBoxOptions): Promise<void>;
-  public async open(content: string | 'component:inspect-message-box', options?: WorkbenchMessageBoxOptions): Promise<void> {
+  public async open(component: 'component:message-box-page', options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(content: string | 'component:message-box-page', options?: WorkbenchMessageBoxOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }
@@ -98,8 +96,8 @@ export class MessageBoxOpenerPagePO {
   }
 
   private async waitUntilMessageBoxAttached(options?: WorkbenchMessageBoxOptions): Promise<void> {
-    const cssClasses = coerceArray(options?.cssClass).filter(Boolean);
-    const messagebox = this._appPO.messagebox({cssClass: cssClasses});
+    const cssClass = coerceArray(options?.cssClass).filter(Boolean);
+    const messagebox = this._appPO.messagebox({cssClass});
     await messagebox.locator.waitFor({state: 'attached'});
   }
 }

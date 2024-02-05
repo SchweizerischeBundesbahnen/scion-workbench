@@ -10,22 +10,19 @@
 
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {ViewTabPO} from '../../../view-tab.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
+import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
+import {ViewPO} from '../../../view.po';
 
-export class ViewPropertiesTestPagePO {
+export class ViewPropertiesTestPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
-  public readonly viewTab: ViewTabPO;
+  public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
   constructor(appPO: AppPO, viewId: string) {
-    this.viewTab = appPO.view({viewId}).viewTab;
+    this.view = appPO.view({viewId});
     this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
     this.locator = this.outlet.frameLocator.locator('app-view-properties-test-page');
-  }
-
-  public async waitUntilPresent(): Promise<void> {
-    await this.locator.waitFor({state: 'attached'});
   }
 }

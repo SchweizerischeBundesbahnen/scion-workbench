@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {StandaloneViewTestPagePO} from './page-object/test-pages/standalone-view-test-page.po';
 import {NonStandaloneViewTestPagePO} from './page-object/test-pages/non-standalone-view-test-page.po';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Browser Reload', () => {
 
@@ -23,14 +23,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/component');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser reload ({loadComponent: () => component})', async ({appPO, workbenchNavigator}) => {
@@ -38,14 +38,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/load-component');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser reload ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
@@ -53,14 +53,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/module');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser reload ({loadChildren: () => routes})', async ({appPO, workbenchNavigator}) => {
@@ -68,14 +68,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/routes');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser reload ({children: routes})', async ({appPO, workbenchNavigator}) => {
@@ -83,14 +83,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/children');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(standaloneViewTestPage).toBeActive();
     });
   });
 
@@ -101,14 +101,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/non-standalone-view-test-page/component');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(nonStandaloneViewTestPage).toBeActive();
     });
 
     test('should display non-standalone view component after browser reload ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
@@ -116,14 +116,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/non-standalone-view-test-page/load-children/module');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(nonStandaloneViewTestPage).toBeActive();
     });
 
     test('should display non-standalone view component after browser reload ({children: routes})', async ({appPO, workbenchNavigator}) => {
@@ -131,14 +131,14 @@ test.describe('Browser Reload', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/non-standalone-view-test-page/children');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
+      await routerPage.enterTarget('view.101');
       await routerPage.clickNavigate();
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
+      await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.reload();
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(nonStandaloneViewTestPage).toBeActive();
     });
   });
 });

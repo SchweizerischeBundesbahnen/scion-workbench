@@ -24,7 +24,7 @@ test.describe('Workbench', () => {
     // Register Angular routes.
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.registerRoute({outlet: 'view', path: '', component: 'view-page'});
-    await layoutPage.viewTab.close();
+    await layoutPage.view.tab.close();
 
     // Register perspective.
     const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
@@ -38,7 +38,7 @@ test.describe('Workbench', () => {
         {id: 'view', partId: 'left', activateView: true},
       ],
     });
-    await perspectivePage.viewTab.close();
+    await perspectivePage.view.tab.close();
 
     // Activate the perspective.
     await appPO.switchPerspective('perspective');
@@ -57,15 +57,15 @@ test.describe('Workbench', () => {
     await routerPage.enterCssClass('view-2');
     await routerPage.checkActivate(false);
     await routerPage.clickNavigate();
-    await routerPage.viewTab.close();
+    await routerPage.view.tab.close();
 
     // Move view 2 to the right of view 1.
     const view1 = appPO.view({cssClass: 'view-1'});
     const view2 = appPO.view({cssClass: 'view-2'});
-    await view2.viewTab.dragTo({partId: await view1.part.getPartId(), region: 'east'});
+    await view2.tab.dragTo({partId: await view1.part.getPartId(), region: 'east'});
 
-    const view1Id = await view1.getViewId();
-    const view2Id = await view2.getViewId();
+    const viewId1 = await view1.getViewId();
+    const viewId2 = await view2.getViewId();
 
     // Expect the workbench layout.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -86,38 +86,38 @@ test.describe('Workbench', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            views: [{id: view1Id}],
-            activeViewId: view1Id,
+            views: [{id: viewId1}],
+            activeViewId: viewId1,
           }),
           child2: new MPart({
-            views: [{id: view2Id}],
-            activeViewId: view2Id,
+            views: [{id: viewId2}],
+            activeViewId: viewId2,
           }),
         }),
       },
     });
 
     // Maximize the main area.
-    await view2.viewTab.dblclick();
+    await view2.tab.dblclick();
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            views: [{id: view1Id}],
-            activeViewId: view1Id,
+            views: [{id: viewId1}],
+            activeViewId: viewId1,
           }),
           child2: new MPart({
-            views: [{id: view2Id}],
-            activeViewId: view2Id,
+            views: [{id: viewId2}],
+            activeViewId: viewId2,
           }),
         }),
       },
     });
 
     // Restore the main area.
-    await view2.viewTab.dblclick();
+    await view2.tab.dblclick();
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
@@ -136,12 +136,12 @@ test.describe('Workbench', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            views: [{id: view1Id}],
-            activeViewId: view1Id,
+            views: [{id: viewId1}],
+            activeViewId: viewId1,
           }),
           child2: new MPart({
-            views: [{id: view2Id}],
-            activeViewId: view2Id,
+            views: [{id: viewId2}],
+            activeViewId: viewId2,
           }),
         }),
       },

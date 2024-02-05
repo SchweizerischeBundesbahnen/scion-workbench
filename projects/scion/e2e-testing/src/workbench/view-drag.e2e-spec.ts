@@ -13,6 +13,7 @@ import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('View Drag', () => {
 
@@ -28,15 +29,16 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the center quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.viewTab.dragTo({partId, region: 'center'}, {steps: 1, performDrop: false});
+      await viewPage2.view.tab.dragTo({partId, region: 'center'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await viewPage1.view.isActive()).toBe(true);
-      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
+      await expectView(viewPage1).toBeActive();
+      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
 
-      // Expect view 2 to be deactivated
-      expect(await viewPage2.view.isActive()).toBe(false);
-      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
+      // Expect view 2 not to be attached
+      await expect(viewPage2.view.locator).not.toBeAttached();
+      await expect(viewPage2.view.tab.locator).not.toBeVisible();
+      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the north', async ({appPO, workbenchNavigator}) => {
@@ -50,15 +52,16 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the north quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.viewTab.dragTo({partId, region: 'north'}, {steps: 1, performDrop: false});
+      await viewPage2.view.tab.dragTo({partId, region: 'north'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await viewPage1.view.isActive()).toBe(true);
-      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
+      await expectView(viewPage1).toBeActive();
+      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
 
-      // Expect view 2 to be deactivated
-      expect(await viewPage2.view.isActive()).toBe(false);
-      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
+      // Expect view 2 not to be attached
+      await expect(viewPage2.view.locator).not.toBeAttached();
+      await expect(viewPage2.view.tab.locator).not.toBeVisible();
+      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the east', async ({appPO, workbenchNavigator}) => {
@@ -70,17 +73,18 @@ test.describe('View Drag', () => {
       // Open view 2
       const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-      // Drag view 2 to the center quickly
+      // Drag view 2 to the east quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.viewTab.dragTo({partId, region: 'east'}, {steps: 1, performDrop: false});
+      await viewPage2.view.tab.dragTo({partId, region: 'east'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await viewPage1.view.isActive()).toBe(true);
-      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
+      await expectView(viewPage1).toBeActive();
+      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
 
-      // Expect view 2 to be deactivated
-      expect(await viewPage2.view.isActive()).toBe(false);
-      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
+      // Expect view 2 not to be attached
+      await expect(viewPage2.view.locator).not.toBeAttached();
+      await expect(viewPage2.view.tab.locator).not.toBeVisible();
+      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the south', async ({appPO, workbenchNavigator}) => {
@@ -94,15 +98,16 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the south quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.viewTab.dragTo({partId, region: 'south'}, {steps: 1, performDrop: false});
+      await viewPage2.view.tab.dragTo({partId, region: 'south'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await viewPage1.view.isActive()).toBe(true);
-      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
+      await expectView(viewPage1).toBeActive();
+      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
 
-      // Expect view 2 to be deactivated
-      expect(await viewPage2.view.isActive()).toBe(false);
-      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
+      // Expect view 2 not to be attached
+      await expect(viewPage2.view.locator).not.toBeAttached();
+      await expect(viewPage2.view.tab.locator).not.toBeVisible();
+      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
     });
 
     test('should deactivate view when moving it quickly to the west', async ({appPO, workbenchNavigator}) => {
@@ -116,15 +121,16 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the west quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.viewTab.dragTo({partId, region: 'west'}, {steps: 1, performDrop: false});
+      await viewPage2.view.tab.dragTo({partId, region: 'west'}, {steps: 1, performDrop: false});
 
       // Expect view 1 to be activated
-      expect(await viewPage1.view.isActive()).toBe(true);
-      expect(await viewPage1.view.part.getPartId()).toEqual(partId);
+      await expectView(viewPage1).toBeActive();
+      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
 
-      // Expect view 2 to be deactivated
-      expect(await viewPage2.view.isActive()).toBe(false);
-      expect(await viewPage2.view.part.getPartId()).toEqual(partId);
+      // Expect view 2 not to be attached
+      await expect(viewPage2.view.locator).not.toBeAttached();
+      await expect(viewPage2.view.tab.locator).not.toBeVisible();
+      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
     });
   });
 
@@ -144,7 +150,7 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to the center.
-      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'center'});
+      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'center'});
 
       // Expect view 2 not to be moved.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -173,7 +179,7 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the west.
-      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'west'});
+      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -211,7 +217,7 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the east.
-      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'east'});
+      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -252,7 +258,7 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the north.
-      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'north'});
+      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -293,7 +299,7 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the south.
-      await view2.viewTab.dragTo({partId: await view2.part.getPartId(), region: 'south'});
+      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -340,7 +346,7 @@ test.describe('View Drag', () => {
       await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to the center of the initial part.
-      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'center'});
+      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'center'});
 
       // Expect view 2 to be moved to the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -384,7 +390,7 @@ test.describe('View Drag', () => {
       await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the west of the initial part.
-      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'west'});
+      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -437,7 +443,7 @@ test.describe('View Drag', () => {
       await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the east of the initial part.
-      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'east'});
+      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -493,7 +499,7 @@ test.describe('View Drag', () => {
       await layoutPage.addView('view.3', {partId: 'xyz'});
 
       // Move view 2 to a new part in the north of the initial part.
-      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'north'});
+      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -549,7 +555,7 @@ test.describe('View Drag', () => {
       await layoutPage.addView('view.3', {partId: 'another'});
 
       // Move view 2 to a new part in the south of the initial part.
-      await view2.viewTab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'south'});
+      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south of the initial part.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({

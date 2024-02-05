@@ -15,7 +15,7 @@ import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/op
 import {ComponentPortal} from '@angular/cdk/portal';
 import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupErrorResult} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
-import {Arrays, Dictionaries, Objects, Observables} from '@scion/toolkit/util';
+import {Dictionaries, Objects, Observables} from '@scion/toolkit/util';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
 import {PopupComponent} from './popup.component';
@@ -115,7 +115,6 @@ export class PopupService {
       panelClass: [
         'wb-popup',
         `wb-${align}`,
-        ...Arrays.coerce(config.cssClass),
       ],
       hasBackdrop: false,
       positionStrategy: overlayPositionStrategy,

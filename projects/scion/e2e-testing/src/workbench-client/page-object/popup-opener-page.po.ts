@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, isPresent, rejectWhenAttached, waitUntilBoundingBoxStable} from '../../helper/testing.util';
+import {coerceArray, DomRect, rejectWhenAttached, waitUntilBoundingBoxStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
@@ -18,23 +18,25 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
-import {ViewTabPO} from '../../view-tab.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 
 /**
  * Page object to interact with {@link PopupOpenerPageComponent}.
  */
-export class PopupOpenerPagePO {
+export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
   public readonly outlet: SciRouterOutletPO;
+  public readonly returnValue: Locator;
+  public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, public viewId: string) {
-    this.view = _appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.outlet = new SciRouterOutletPO(_appPO, {name: viewId});
+  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-popup-opener-page');
+    this.returnValue = this.locator.locator('output.e2e-return-value');
+    this.error = this.locator.locator('output.e2e-popup-error');
   }
 
   public async enterQualifier(qualifier: Qualifier): Promise<void> {
@@ -135,42 +137,24 @@ export class PopupOpenerPagePO {
     await accordion.collapse();
   }
 
-  public async clickOpen(): Promise<void> {
+  public async open(): Promise<void> {
     await this.locator.locator('button.e2e-open').click();
-    const cssClasses = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      this._appPO.popup({cssClass: cssClasses}).waitUntilAttached(),
-      rejectWhenAttached(this.locator.locator('output.e2e-popup-error')),
+      this.waitUntilPopupAttached(),
+      rejectWhenAttached(this.error),
     ]);
   }
 
-  public async getPopupCloseAction(): Promise<PopupCloseAction> {
-    if (await isPresent(this.locator.locator('output.e2e-return-value'))) {
-      return {
-        type: 'closed-with-value',
-        value: await this.locator.locator('output.e2e-return-value').innerText(),
-      };
-    }
-    if (await isPresent(this.locator.locator('output.e2e-popup-error'))) {
-      return {
-        type: 'closed-with-error',
-        value: await this.locator.locator('output.e2e-popup-error').innerText(),
-      };
-    }
-    return {
-      type: 'closed',
-    };
+  private async waitUntilPopupAttached(): Promise<void> {
+    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+    const popup = this._appPO.popup({cssClass});
+    await popup.locator.waitFor({state: 'attached'});
   }
 
-  public async getAnchorElementClientRect(): Promise<DomRect> {
+  public async getAnchorElementBoundingBox(): Promise<DomRect> {
     const buttonLocator = this.locator.locator('button.e2e-open');
     return waitUntilBoundingBoxStable(buttonLocator);
   }
-}
-
-export interface PopupCloseAction {
-  type: 'closed' | 'closed-with-value' | 'closed-with-error';
-  value?: string;
 }

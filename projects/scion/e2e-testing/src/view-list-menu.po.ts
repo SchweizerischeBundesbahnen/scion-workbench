@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {isPresent} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 
 /**
@@ -16,13 +15,6 @@ import {Locator} from '@playwright/test';
  */
 export class ViewListMenuPO {
 
-  constructor(private _locator: Locator) {
-  }
-
-  /**
-   * Indicates whether the menu is opened.
-   */
-  public isOpened(): Promise<boolean> {
-    return isPresent(this._locator);
+  constructor(public locator: Locator) {
   }
 }

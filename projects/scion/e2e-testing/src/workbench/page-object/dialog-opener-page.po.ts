@@ -17,11 +17,12 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {DialogPO} from '../../dialog.po';
 import {PopupPO} from '../../popup.po';
 import {WorkbenchDialogOptions} from '@scion/workbench';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
  */
-export class DialogOpenerPagePO {
+export class DialogOpenerPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly returnValue: Locator;
@@ -62,7 +63,7 @@ export class DialogOpenerPagePO {
     }
   }
 
-  public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page' | 'blank', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
+  public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }

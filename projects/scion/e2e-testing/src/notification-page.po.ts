@@ -8,47 +8,31 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from './app.po';
 import {NotificationPO} from './notification.po';
-import {coerceArray, isPresent} from './helper/testing.util';
+import {coerceArray} from './helper/testing.util';
 import {Locator} from '@playwright/test';
+import {WorkbenchNotificationPagePO} from './workbench/page-object/workbench-notification-page.po';
 
 /**
- * Page object to interact with {@link InspectNotificationComponent}.
+ * Page object to interact with {@link NotificationPageComponent}.
  */
-export class InspectNotificationComponentPO {
+export class NotificationPagePO implements WorkbenchNotificationPagePO {
 
   public readonly locator: Locator;
-  public readonly notification: NotificationPO;
+  public readonly input: Locator;
 
-  constructor(appPO: AppPO, public cssClass: string) {
-    this.notification = appPO.notification({cssClass: cssClass});
-    this.locator = this.notification.locator('app-inspect-notification');
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
-  }
-
-  public async getComponentInstanceId(): Promise<string> {
-    return this.locator.locator('span.e2e-component-instance-id').innerText();
-  }
-
-  public async getInput(): Promise<string> {
-    return this.locator.locator('output.e2e-input').innerText();
+  constructor(public notification: NotificationPO) {
+    this.locator = this.notification.locator.locator('app-notification-page');
+    this.input = this.locator.locator('output.e2e-input');
   }
 
   public async getInputAsKeyValueObject(): Promise<Record<string, any>> {
-    const rawContent = await this.getInput();
+    const rawContent = await this.input.innerText();
     const dictionary: Record<string, any> = {};
 
     // Sample Map content:
     // {"$implicit" => undefined}
-    // {"component" => "inspector"}
+    // {"component" => "notification-page"}
     // {"ɵAPP_SYMBOLIC_NAME" => "workbench-client-testing-app1"}
     // {"ɵCLIENT_ID" => "ff94819f-0b89-42da-8ed4-843698041b2a"}
     // {"ɵMESSAGE_ID" => "f12d4268-cd79-4356-ac5f-4e4e62a6e87e"}
@@ -79,14 +63,6 @@ export class InspectNotificationComponentPO {
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
-
-  /**
-   * Waits for the notification to be closed.
-   * Throws an error if not closed after `duration` milliseconds.
-   */
-  public async waitUntilClosed(duration: number): Promise<void> {
-    await this.locator.waitFor({state: 'detached', timeout: duration});
   }
 }
 

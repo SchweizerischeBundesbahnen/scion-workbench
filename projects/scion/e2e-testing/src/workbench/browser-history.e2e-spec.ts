@@ -8,21 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {StandaloneViewTestPagePO} from './page-object/test-pages/standalone-view-test-page.po';
 import {NonStandaloneViewTestPagePO} from './page-object/test-pages/non-standalone-view-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
+import {expectView} from '../matcher/view-matcher';
+import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('Browser History', () => {
 
   test('should put workbench grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
-
-    const view1 = appPO.view({cssClass: 'e2e-test-view-1'});
-    const view2 = appPO.view({cssClass: 'e2e-test-view-2'});
 
     // Add part to the workbench grid
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
@@ -31,166 +29,160 @@ test.describe('Browser History', () => {
     // Add view-1 to the left part
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({cssClass: 'e2e-test-view-1'});
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterBlankPartId('left');
     await routerPage.clickNavigate();
 
     // Expect view-1 to be active
-    await expect(await view1.isActive()).toBe(true);
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expectView(testee1ViewPage).toBeActive();
 
     // Add view-2 to the left part
     await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({cssClass: 'e2e-test-view-2'});
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterBlankPartId('left');
     await routerPage.clickNavigate();
 
     // Expect view-2 to be active
-    await expect(await view1.isActive()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // Activate view-1
-    await view1.viewTab.click();
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await testee1ViewPage.view.tab.click();
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // Close view-1
-    await view1.viewTab.close();
-    await expect(await view1.isPresent()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await testee1ViewPage.view.tab.close();
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect view-1 and view-2 to be present and view-1 to be active
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect view-1 and view-2 to be present and view-2 to be active
-    await expect(await view1.isActive()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect view-2 not to be present
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isPresent()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).not.toBeAttached();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect no test views to be present
-    await expect(await view1.isPresent()).toBe(false);
-    await expect(await view2.isPresent()).toBe(false);
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).not.toBeAttached();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-1 to be present
-    await expect(await view1.isPresent()).toBe(true);
-    await expect(await view2.isPresent()).toBe(false);
-    await expect(await view1.isActive()).toBe(true);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).not.toBeAttached();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-1 and view-2 to be present
-    await expect(await view1.viewTab.isPresent()).toBe(true);
-    await expect(await view2.isPresent()).toBe(true);
-    await expect(await view1.isActive()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-1 to be active
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-1 to be closed
-    await expect(await view1.isPresent()).toBe(false);
-    await expect(await view2.isPresent()).toBe(true);
-    await expect(await view2.isActive()).toBe(true);
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
   });
 
   test('should put main-area grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const view1 = appPO.view({cssClass: 'e2e-test-view-1'});
-    const view2 = appPO.view({cssClass: 'e2e-test-view-2'});
-
     // Add view-1
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({cssClass: 'e2e-test-view-1'});
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.checkActivate(false);
     await routerPage.enterInsertionIndex('end');
     await routerPage.clickNavigate();
 
     // Add view-2
     await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({cssClass: 'e2e-test-view-2'});
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.checkActivate(false);
     await routerPage.enterInsertionIndex('end');
     await routerPage.clickNavigate();
 
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+
     // Activate view-1
-    await view1.viewTab.click();
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await testee1ViewPage.view.tab.click();
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // Activate view-2
-    await view2.viewTab.click();
-    await expect(await view1.isActive()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await testee2ViewPage.view.tab.click();
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // Activate view-1
-    await view1.viewTab.click();
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await testee1ViewPage.view.tab.click();
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // Close view-1
-    await view1.viewTab.close();
-    await expect(await view1.isPresent()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await testee1ViewPage.view.tab.close();
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect view-1 and view-2 to be present and view-1 to be active
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect view-1 and view-2 to be present and view-2 to be active
-    await expect(await view1.isActive()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // WHEN: Performing navigation back
     await appPO.navigateBack();
     // THEN: Expect view-1 and view-2 to be present and view-1 to be active
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-2 to be active
-    await expect(await view1.isActive()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await expectView(testee1ViewPage).toBeInactive();
+    await expectView(testee2ViewPage).toBeActive();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-1 to be active
-    await expect(await view1.isActive()).toBe(true);
-    await expect(await view2.isActive()).toBe(false);
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).toBeInactive();
 
     // WHEN: Performing navigation forward
     await appPO.navigateForward();
     // THEN: Expect view-1 to be active
-    await expect(await view1.isPresent()).toBe(false);
-    await expect(await view2.isActive()).toBe(true);
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
   });
 
   test.describe('Standalone Component', () => {
@@ -200,21 +192,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/component');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(standaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser back/forward navigation ({loadComponent: () => component})', async ({appPO, workbenchNavigator}) => {
@@ -222,21 +214,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/load-component');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(standaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser back/forward navigation ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
@@ -244,21 +236,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/module');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(standaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser back/forward navigation ({loadChildren: () => routes})', async ({appPO, workbenchNavigator}) => {
@@ -266,21 +258,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/routes');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(standaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
     });
 
     test('should display standalone view component after browser back/forward navigation ({children: routes})', async ({appPO, workbenchNavigator}) => {
@@ -288,21 +280,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/standalone-view-test-page/children');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(standaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await standaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(standaloneViewTestPage).toBeActive();
     });
   });
 
@@ -313,21 +305,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/non-standalone-view-test-page/component');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(nonStandaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(nonStandaloneViewTestPage).toBeActive();
     });
 
     test('should display non-standalone view component after browser back/forward navigation ({loadChildren: () => module})', async ({appPO, workbenchNavigator}) => {
@@ -335,21 +327,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/non-standalone-view-test-page/load-children/module');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(nonStandaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(nonStandaloneViewTestPage).toBeActive();
     });
 
     test('should display non-standalone view component after browser back/forward navigation ({children: routes})', async ({appPO, workbenchNavigator}) => {
@@ -357,21 +349,21 @@ test.describe('Browser History', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-pages/non-standalone-view-test-page/children');
-      await routerPage.enterMatrixParams({cssClass: 'e2e-test-view'});
-      await routerPage.enterTarget(routerPage.viewId);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'e2e-test-view'});
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(nonStandaloneViewTestPage).toBeActive();
 
       await appPO.navigateBack();
-      await expect(await routerPage.isVisible()).toBe(true);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(false);
+      await expectView(routerPage).toBeActive();
+      await expectView(nonStandaloneViewTestPage).not.toBeAttached();
 
       await appPO.navigateForward();
-      await expect(await routerPage.isVisible()).toBe(false);
-      await expect(await nonStandaloneViewTestPage.isVisible()).toBe(true);
+      await expectView(routerPage).not.toBeAttached();
+      await expectView(nonStandaloneViewTestPage).toBeActive();
     });
   });
 });

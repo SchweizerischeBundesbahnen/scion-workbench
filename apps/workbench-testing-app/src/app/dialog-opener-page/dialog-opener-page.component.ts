@@ -101,8 +101,6 @@ export default class DialogOpenerPageComponent {
         return FocusTestPageComponent;
       case 'input-field-test-page':
         return InputFieldTestPageComponent;
-      case 'blank':
-        return BlankTestPageComponent;
       default:
         throw Error(`[IllegalDialogComponent] Dialog component not supported: ${this.form.controls.component.value}`);
     }

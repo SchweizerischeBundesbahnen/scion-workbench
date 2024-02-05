@@ -33,7 +33,7 @@ test.describe('View Drag Workbench Grid', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to the west of the workbench grid.
-      await view2.viewTab.dragTo({grid: 'workbench', region: 'west'});
+      await view2.tab.dragTo({grid: 'workbench', region: 'west'});
 
       // Expect view 2 to be moved to the west of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -80,7 +80,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Move view 2 to the west of the workbench grid.
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      await view2.viewTab.dragTo({grid: 'workbench', region: 'west'});
+      await view2.tab.dragTo({grid: 'workbench', region: 'west'});
 
       // Expect view 2 to be moved to the west of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -138,7 +138,7 @@ test.describe('View Drag Workbench Grid', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to the east of the workbench grid.
-      await view2.viewTab.dragTo({grid: 'workbench', region: 'east'});
+      await view2.tab.dragTo({grid: 'workbench', region: 'east'});
 
       // Expect view 2 to be moved to the east of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -185,7 +185,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Move view 2 to the east of the workbench grid.
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      await view2.viewTab.dragTo({grid: 'workbench', region: 'east'});
+      await view2.tab.dragTo({grid: 'workbench', region: 'east'});
 
       // Expect view 2 to be moved to the east of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -246,7 +246,7 @@ test.describe('View Drag Workbench Grid', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to the south of the workbench grid.
-      await view2.viewTab.dragTo({grid: 'workbench', region: 'south'});
+      await view2.tab.dragTo({grid: 'workbench', region: 'south'});
 
       // Expect view 2 to be moved to the south of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -296,7 +296,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Move view 2 to the south of the workbench grid.
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      await view2.viewTab.dragTo({grid: 'workbench', region: 'south'});
+      await view2.tab.dragTo({grid: 'workbench', region: 'south'});
 
       // Expect view 2 to be moved to the south of the workbench grid.
       await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -356,13 +356,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
       await layoutPage.addView('view.3', {partId: 'right', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -381,13 +381,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom'});
       await layoutPage.addView('view.3', {partId: 'bottom', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -408,13 +408,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addView('view.3', {partId: 'bottom-left', activateView: true});
       await layoutPage.addView('view.4', {partId: 'right', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -435,13 +435,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addView('view.3', {partId: 'bottom-right', activateView: true});
       await layoutPage.addView('view.4', {partId: 'left', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -467,13 +467,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addView('view.4', {partId: 'left', activateView: true});
       await layoutPage.addView('view.5', {partId: 'bottom', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -501,13 +501,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addView('view.5', {partId: 'bottom', activateView: true});
       await layoutPage.addView('view.6', {partId: 'right', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -528,13 +528,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addPart('bottom-middle', {relativeTo: MAIN_AREA, align: 'bottom'});
       await layoutPage.addView('view.3', {partId: 'bottom-middle', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(true);
     });
 
     /**
@@ -556,13 +556,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addPart('right-bottom', {relativeTo: 'right-top', align: 'bottom'});
       await layoutPage.addView('view.3', {partId: 'right-bottom', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -582,13 +582,13 @@ test.describe('View Drag Workbench Grid', () => {
       await layoutPage.addPart('right', {relativeTo: MAIN_AREA, align: 'right'});
       await layoutPage.addView('view.3', {partId: 'right', activateView: true});
 
-      const viewTab2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).viewTab;
-      await viewTab2.moveTo({grid: 'workbench'});
+      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await view2.tab.moveTo({grid: 'workbench'});
 
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'east'})).toBe(false);
     });
 
     /**
@@ -615,7 +615,7 @@ test.describe('View Drag Workbench Grid', () => {
       const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Press mouse button on the view tab.
-      await viewPage2.viewTab.mousedown();
+      await viewPage2.view.tab.mousedown();
 
       // Move tab to the center of the tabbar of the 'bottom' part.
       await page.mouse.move(bottomTabbarBounds.hcenter, bottomTabbarBounds.vcenter, {steps: 100});
@@ -624,7 +624,7 @@ test.describe('View Drag Workbench Grid', () => {
       await page.mouse.move(0, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Expect the drop zone to be inactive.
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
     });
 
     /**
@@ -651,7 +651,7 @@ test.describe('View Drag Workbench Grid', () => {
       const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Press mouse button on the view tab.
-      await viewPage2.viewTab.mousedown();
+      await viewPage2.view.tab.mousedown();
 
       // Move tab into drop zone.
       await page.mouse.move(0, 0, {steps: 1});
@@ -660,7 +660,7 @@ test.describe('View Drag Workbench Grid', () => {
       await page.mouse.move(0, bottomTabbarBounds.vcenter, {steps: 100});
 
       // Expect the drop zone to be active.
-      await expect(await appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
+      await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);
     });
   });
 });

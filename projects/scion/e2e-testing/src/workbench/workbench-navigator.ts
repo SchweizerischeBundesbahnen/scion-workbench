@@ -65,40 +65,40 @@ export class WorkbenchNavigator {
 
   public async openInNewTab(page: Type<any>): Promise<any> {
     const startPage = await this._appPO.openNewViewTab();
-    const viewId = startPage.viewId!;
+    const viewId = await startPage.view.getViewId();
 
     switch (page) {
       case MessageBoxOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-message-box-opener');
-        return new MessageBoxOpenerPagePO(this._appPO, viewId);
+        return new MessageBoxOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-message-box-opener'});
       }
       case DialogOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-dialog-opener');
-        return new DialogOpenerPagePO(this._appPO, startPage.view!);
+        return new DialogOpenerPagePO(this._appPO, this._appPO.view({viewId, cssClass: 'e2e-test-dialog-opener'}));
       }
       case NotificationOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-notification-opener');
-        return new NotificationOpenerPagePO(this._appPO, viewId);
+        return new NotificationOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-notification-opener'});
       }
       case PopupOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-popup-opener');
-        return new PopupOpenerPagePO(this._appPO, startPage.view!);
+        return new PopupOpenerPagePO(this._appPO, this._appPO.view({viewId, cssClass: 'e2e-test-popup-opener'}));
       }
       case RouterPagePO: {
         await startPage.openWorkbenchView('e2e-test-router');
-        return new RouterPagePO(this._appPO, viewId);
+        return new RouterPagePO(this._appPO, {viewId, cssClass: 'e2e-test-router'});
       }
       case LayoutPagePO: {
         await startPage.openWorkbenchView('e2e-test-layout');
-        return new LayoutPagePO(this._appPO, viewId);
+        return new LayoutPagePO(this._appPO, {viewId, cssClass: 'e2e-test-layout'});
       }
       case PerspectivePagePO: {
         await startPage.openWorkbenchView('e2e-test-perspective');
-        return new PerspectivePagePO(this._appPO, viewId);
+        return new PerspectivePagePO(this._appPO, {viewId, cssClass: 'e2e-test-perspective'});
       }
       case ViewPagePO: {
         await startPage.openWorkbenchView('e2e-test-view');
-        return new ViewPagePO(this._appPO, viewId);
+        return new ViewPagePO(this._appPO, {viewId, cssClass: 'e2e-test-view'});
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);

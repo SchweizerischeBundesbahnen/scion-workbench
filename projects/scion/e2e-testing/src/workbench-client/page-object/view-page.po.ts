@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, isPresent} from '../../helper/testing.util';
+import {DomRect, fromRect} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
@@ -19,47 +19,29 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
-import {ViewTabPO} from '../../view-tab.po';
+import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 
 /**
  * Page object to interact with {@link ViewPageComponent} of workbench-client testing app.
  */
-export class ViewPagePO {
+export class ViewPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
+  public readonly viewId: Locator;
   public readonly outlet: SciRouterOutletPO;
+  public readonly path: Locator;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.view = appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-view-page');
-  }
-
-  public async waitUntilAttached(): Promise<void> {
-    await this.locator.waitFor({state: 'attached'});
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return await this.view.viewTab.isPresent() && await isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return await this.view.isVisible() && await this.locator.isVisible();
-  }
-
-  public async getViewId(): Promise<string> {
-    return this.locator.locator('span.e2e-view-id').innerText();
+    this.viewId = this.locator.locator('span.e2e-view-id');
+    this.path = this.locator.locator('span.e2e-path');
   }
 
   public async getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
-  }
-
-  public async getPath(): Promise<string> {
-    return this.locator.locator('span.e2e-path').innerText();
   }
 
   public async getAppInstanceId(): Promise<string> {
@@ -162,9 +144,8 @@ export class ViewPagePO {
     // do not close the accordion as this action removes the iframe from the DOM.
   }
 
-  public async getSize(): Promise<Size> {
-    const {width, height} = fromRect(await this.locator.boundingBox());
-    return {width, height};
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
   }
 
   public async navigateSelf(params: Params, options?: {paramsHandling?: 'merge' | 'replace'; navigatePerParam?: boolean}): Promise<void> {
@@ -186,9 +167,4 @@ export class ViewPagePO {
   public async sendKeys(key: string): Promise<void> {
     await this.locator.locator('input.e2e-title').press(key);
   }
-}
-
-export interface Size {
-  width: number;
-  height: number;
 }

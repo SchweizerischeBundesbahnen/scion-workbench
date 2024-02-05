@@ -8,14 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, inject, NgZone} from '@angular/core';
 import {filter} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe, DOCUMENT, NgIf} from '@angular/common';
 import {WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
+import {fromEvent} from 'rxjs';
+import {subscribeInside} from '@scion/toolkit/operators';
 
 @Component({
   selector: 'app-root',
@@ -40,8 +42,11 @@ export class AppComponent {
   @HostBinding('attr.data-navigationid')
   protected navigationId: string | undefined;
 
-  constructor(private _router: Router, protected workbenchStartup: WorkbenchStartup) {
+  constructor(private _router: Router,
+              private _zone: NgZone,
+              protected workbenchStartup: WorkbenchStartup) {
     this.installRouterEventListeners();
+    this.installPropagatedKeyboardEventLogger();
   }
 
   private installRouterEventListeners(): void {
@@ -52,6 +57,24 @@ export class AppComponent {
       )
       .subscribe(() => {
         this.navigationId = UUID.randomUUID();
+      });
+  }
+
+  /**
+   * Logs propagated keyboard events, i.e., keyboard events propagated across iframe boundaries.
+   *
+   * Do not install via host listener to not trigger change detection for each keyboard event.
+   */
+  private installPropagatedKeyboardEventLogger(): void {
+    fromEvent<KeyboardEvent>(inject(DOCUMENT), 'keydown')
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntilDestroyed(),
+      )
+      .subscribe((event: KeyboardEvent) => {
+        if (!event.isTrusted && (event.target as Element).tagName === 'SCI-ROUTER-OUTLET') {
+          console.debug(`[AppComponent][synth-event][event=${event.type}][key=${event.key}][key.control=${event.ctrlKey}][key.shift=${event.shiftKey}][key.alt=${event.altKey}][key.meta=${event.metaKey}]`);
+        }
       });
   }
 }

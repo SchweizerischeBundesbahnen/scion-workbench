@@ -12,16 +12,19 @@ import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchNavigator} from '../../workbench-navigator';
 import {RouterPagePO} from '../router-page.po';
+import {WorkbenchViewPagePO} from '../workbench-view-page.po';
+import {ViewPO} from '../../../view.po';
 
-export class WorkbenchThemeTestPagePO {
+export class WorkbenchThemeTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
-
+  public readonly view: ViewPO;
   public readonly theme: Locator;
   public readonly colorScheme: Locator;
 
-  constructor(private _appPO: AppPO, viewId: string) {
-    this.locator = this._appPO.view({viewId}).locate('app-workbench-theme-test-page');
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.locator = this.view.locator.locator('app-workbench-theme-test-page');
 
     this.theme = this.locator.locator('span.e2e-theme');
     this.colorScheme = this.locator.locator('span.e2e-color-scheme');
@@ -29,12 +32,14 @@ export class WorkbenchThemeTestPagePO {
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<WorkbenchThemeTestPagePO> {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewId = await routerPage.view.getViewId();
+
     await routerPage.enterPath('test-pages/workbench-theme-test-page');
-    await routerPage.enterTarget(routerPage.viewId);
+    await routerPage.enterTarget(viewId);
     await routerPage.clickNavigate();
 
-    const view = appPO.view({cssClass: 'e2e-test-workbench-theme', viewId: routerPage.viewId});
+    const view = appPO.view({cssClass: 'e2e-test-workbench-theme', viewId});
     await view.waitUntilAttached();
-    return new WorkbenchThemeTestPagePO(appPO, await view.getViewId());
+    return new WorkbenchThemeTestPagePO(appPO, {viewId});
   }
 }

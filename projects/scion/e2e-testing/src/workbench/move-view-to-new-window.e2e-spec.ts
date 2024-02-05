@@ -18,6 +18,7 @@ import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {WorkbenchNavigator} from './workbench-navigator';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {getPerspectiveId} from '../helper/testing.util';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Workbench View', () => {
 
@@ -33,7 +34,7 @@ test.describe('Workbench View', () => {
     await layoutPage.registerRoute({path: '', component: 'view-page', outlet: 'testee'});
 
     // Move test view to new window.
-    const contextMenu = await appPO.view({viewId: 'testee'}).viewTab.openContextMenu();
+    const contextMenu = await appPO.view({viewId: 'testee'}).tab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
       contextMenu.menuItems.moveToNewWindow.click(),
@@ -46,7 +47,7 @@ test.describe('Workbench View', () => {
     // Register route for named view.
     const newWindowLayoutPage = await newWindow.workbenchNavigator.openInNewTab(LayoutPagePO);
     await newWindowLayoutPage.registerRoute({path: '', component: 'view-page', outlet: 'testee'});
-    await newWindowLayoutPage.viewTab.close();
+    await newWindowLayoutPage.view.tab.close();
 
     // Expect test view to be moved to the new window.
     await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -62,7 +63,8 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    await expect(new ViewPagePO(newWindow.appPO, 'testee').locator).toBeVisible();
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: 'testee'});
+    await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -76,8 +78,8 @@ test.describe('Workbench View', () => {
       },
       mainAreaGrid: {
         root: new MPart({
-          views: [{id: layoutPage.viewId}],
-          activeViewId: layoutPage.viewId,
+          views: [{id: await layoutPage.view.getViewId()}],
+          activeViewId: await layoutPage.view.getViewId(),
         }),
       },
     });
@@ -98,13 +100,13 @@ test.describe('Workbench View', () => {
     await routerPage.enterBlankPartId('left');
     await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
-    await routerPage.viewTab.close();
+    await routerPage.view.tab.close();
 
     const testViewPage = appPO.view({cssClass: 'testee'});
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await appPO.view({viewId: testViewId}).viewTab.openContextMenu();
+    const contextMenu = await appPO.view({viewId: testViewId}).tab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
       contextMenu.menuItems.moveToNewWindow.click(),
@@ -127,7 +129,8 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    await expect(new ViewPagePO(newWindow.appPO, testViewId).locator).toBeVisible();
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: testViewId});
+    await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -141,8 +144,8 @@ test.describe('Workbench View', () => {
       },
       mainAreaGrid: {
         root: new MPart({
-          views: [{id: layoutPage.viewId}],
-          activeViewId: layoutPage.viewId,
+          views: [{id: await layoutPage.view.getViewId()}],
+          activeViewId: await layoutPage.view.getViewId(),
         }),
       },
     });
@@ -157,12 +160,12 @@ test.describe('Workbench View', () => {
 
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('<empty>');
+    await routerPage.enterPath('');
     await routerPage.enterTarget('testee');
     await routerPage.clickNavigate();
 
     // Move test view to new window.
-    const contextMenu = await appPO.view({viewId: 'testee'}).viewTab.openContextMenu();
+    const contextMenu = await appPO.view({viewId: 'testee'}).tab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
       contextMenu.menuItems.moveToNewWindow.click(),
@@ -175,7 +178,7 @@ test.describe('Workbench View', () => {
     // Register route for named view.
     const newWindowLayoutPage = await newWindow.workbenchNavigator.openInNewTab(LayoutPagePO);
     await newWindowLayoutPage.registerRoute({path: '', component: 'view-page', outlet: 'testee'});
-    await newWindowLayoutPage.viewTab.close();
+    await newWindowLayoutPage.view.tab.close();
 
     // Expect test view to be moved to the new window.
     await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -191,7 +194,8 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    await expect(new ViewPagePO(newWindow.appPO, 'testee').locator).toBeVisible();
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: 'testee'});
+    await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -200,8 +204,11 @@ test.describe('Workbench View', () => {
       },
       mainAreaGrid: {
         root: new MPart({
-          views: [{id: layoutPage.viewId}, {id: routerPage.viewId}],
-          activeViewId: routerPage.viewId,
+          views: [
+            {id: await layoutPage.view.getViewId()},
+            {id: await routerPage.view.getViewId()},
+          ],
+          activeViewId: await routerPage.view.getViewId(),
         }),
       },
     });
@@ -220,7 +227,7 @@ test.describe('Workbench View', () => {
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await testViewPage.viewTab.openContextMenu();
+    const contextMenu = await testViewPage.tab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
       contextMenu.menuItems.moveToNewWindow.click(),
@@ -243,7 +250,8 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    await expect(new ViewPagePO(newWindow.appPO, testViewId).locator).toBeVisible();
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: testViewId});
+    await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
     await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -252,8 +260,8 @@ test.describe('Workbench View', () => {
       },
       mainAreaGrid: {
         root: new MPart({
-          views: [{id: routerPage.viewId}],
-          activeViewId: routerPage.viewId,
+          views: [{id: await routerPage.view.getViewId()}],
+          activeViewId: await routerPage.view.getViewId(),
         }),
       },
     });
@@ -267,11 +275,12 @@ test.describe('Workbench View', () => {
     await routerPage.enterPath('test-view');
     await routerPage.enterCssClass('test-view');
     await routerPage.clickNavigate();
+
     const testViewPage = appPO.view({cssClass: 'test-view'});
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await testViewPage.viewTab.openContextMenu();
+    const contextMenu = await testViewPage.tab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
       contextMenu.menuItems.moveToNewWindow.click(),
@@ -288,12 +297,12 @@ test.describe('Workbench View', () => {
     await newAppRouterPage.enterCssClass('peripheral-view');
     await newAppRouterPage.enterTarget('blank');
     await newAppRouterPage.clickNavigate();
-    await newAppRouterPage.viewTab.close();
+    await newAppRouterPage.view.tab.close();
 
     // Move peripheral view to workbench grid.
     const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
     const peripheralViewId = await peripheralViewPage.getViewId();
-    await peripheralViewPage.viewTab.dragTo({grid: 'workbench', region: 'east'});
+    await peripheralViewPage.tab.dragTo({grid: 'workbench', region: 'east'});
 
     // Expect peripheral view to be dragged to the workbench grid.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -328,7 +337,7 @@ test.describe('Workbench View', () => {
       },
       parts: [{id: MAIN_AREA}],
     });
-    await perspectivePage.viewTab.close();
+    await perspectivePage.view.tab.close();
 
     // Switch to the new perspective.
     await newWindow.appPO.switchPerspective('test-blank');
@@ -379,11 +388,12 @@ test.describe('Workbench View', () => {
     await routerPage.enterPath('test-view');
     await routerPage.enterCssClass('test-view');
     await routerPage.clickNavigate();
+
     const testViewPage = appPO.view({cssClass: 'test-view'});
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await testViewPage.viewTab.openContextMenu();
+    const contextMenu = await testViewPage.tab.openContextMenu();
     const [newAppPO] = await Promise.all([
       appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
       contextMenu.menuItems.moveToNewWindow.click(),
@@ -399,12 +409,12 @@ test.describe('Workbench View', () => {
     await newAppRouterPage.enterCssClass('peripheral-view');
     await newAppRouterPage.enterTarget('blank');
     await newAppRouterPage.clickNavigate();
-    await newAppRouterPage.viewTab.close();
+    await newAppRouterPage.view.tab.close();
 
     // Move peripheral view to workbench grid.
     const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
     const peripheralViewId = await peripheralViewPage.getViewId();
-    await peripheralViewPage.viewTab.dragTo({grid: 'workbench', region: 'east'});
+    await peripheralViewPage.tab.dragTo({grid: 'workbench', region: 'east'});
 
     // Expect peripheral view to be dragged to the workbench grid.
     await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({

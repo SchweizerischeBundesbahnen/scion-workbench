@@ -23,14 +23,14 @@ test.describe('Workbench Part', () => {
 
     // Open view list menu.
     const viewListMenu = await testPage.view.part.openViewListMenu();
-    await expect(await viewListMenu.isOpened()).toBe(true);
+    await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the view.
     await testPage.clickInputField();
     // Expect the view list menu to be closed.
-    await expect(await viewListMenu.isOpened()).toBe(false);
+    await expect(viewListMenu.locator).not.toBeAttached();
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(await testPage.isInputFieldActiveElement()).toBe(true);
+    await expect(testPage.input).toBeFocused();
   });
 
   test('should close view list menu when popup gains focus', async ({appPO, workbenchNavigator}) => {
@@ -44,13 +44,13 @@ test.describe('Workbench Part', () => {
 
     // Open view list menu.
     const viewListMenu = await viewPage.view.part.openViewListMenu();
-    await expect(await viewListMenu.isOpened()).toBe(true);
+    await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the popup.
     await testPage.clickInputField();
     // Expect the view list menu to be closed.
-    await expect(await viewListMenu.isOpened()).toBe(false);
+    await expect(viewListMenu.locator).not.toBeAttached();
     // Expect focus to remain in the input field that caused focus loss of the menu.
-    await expect(await testPage.isInputFieldActiveElement()).toBe(true);
+    await expect(testPage.input).toBeFocused();
   });
 });

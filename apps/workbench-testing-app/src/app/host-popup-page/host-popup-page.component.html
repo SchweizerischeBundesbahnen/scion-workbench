@@ -66,15 +66,14 @@
     </sci-accordion>
 
     <sci-accordion *ngIf="popup.capability.properties.size | appNullIfEmpty as preferredSize"
-                   title="Preferred Overlay Size"
-                   class="preferred-overlay-size e2e-preferred-overlay-size"
+                   class="preferred-popup-size"
                    variant="solid">
       <ng-template sciAccordionItem [panel]="panel_size">
-        <header>Preferred Overlay Size</header>
+        <header>Preferred Popup Size</header>
       </ng-template>
       <ng-template #panel_size>
         <sci-viewport>
-          <div class="preferred-overlay-size e2e-preferred-overlay-size">{{preferredSize | json}}</div>
+          <div class="preferred-popup-size">{{preferredSize | json}}</div>
         </sci-viewport>
       </ng-template>
     </sci-accordion>

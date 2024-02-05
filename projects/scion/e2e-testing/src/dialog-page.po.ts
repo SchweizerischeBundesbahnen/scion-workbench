@@ -13,17 +13,18 @@ import {SciAccordionPO} from './@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from './@scion/components.internal/checkbox.po';
 import {DialogPO} from './dialog.po';
 import {WorkbenchDialogSize} from '@scion/workbench';
+import {WorkbenchDialogPagePO} from './workbench/page-object/workbench-dialog-page.po';
 
 /**
  * Page object to interact with {@link DialogPageComponent}.
  */
-export class DialogPagePO {
+export class DialogPagePO implements WorkbenchDialogPagePO {
 
   public readonly locator: Locator;
   public readonly input: Locator;
 
-  constructor(private _dialog: DialogPO) {
-    this.locator = this._dialog.locator.locator('app-dialog-page');
+  constructor(public dialog: DialogPO) {
+    this.locator = this.dialog.locator.locator('app-dialog-page');
     this.input = this.locator.locator('input.e2e-input');
   }
 
@@ -82,10 +83,10 @@ export class DialogPagePO {
     }
 
     if (options?.closeWithError) {
-      await new SciCheckboxPO(this._dialog.footer.locator('sci-checkbox.e2e-close-with-error')).toggle(true);
+      await new SciCheckboxPO(this.dialog.footer.locator('sci-checkbox.e2e-close-with-error')).toggle(true);
     }
 
-    await this._dialog.footer.locator('button.e2e-close').click();
+    await this.dialog.footer.locator('button.e2e-close').click();
   }
 
   private async enterReturnValue(returnValue: string): Promise<void> {

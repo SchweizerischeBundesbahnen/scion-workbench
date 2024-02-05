@@ -26,6 +26,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
+import {Dictionaries} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -97,20 +98,20 @@ export default class PopupOpenerPageComponent {
         onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,
         onEscape: this.form.controls.closeStrategy.controls.onEscape.value,
       },
-      size: undefinedIfEmpty<PopupSize>({
+      size: undefinedIfEmpty(Dictionaries.withoutUndefinedEntries({
         width: this.form.controls.size.controls.width.value || undefined,
         height: this.form.controls.size.controls.height.value || undefined,
         minWidth: this.form.controls.size.controls.minWidth.value || undefined,
         maxWidth: this.form.controls.size.controls.maxWidth.value || undefined,
         minHeight: this.form.controls.size.controls.minHeight.value || undefined,
         maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
-      }),
+      } satisfies PopupSize)),
       context: {
         viewId: this.parseContextualViewIdInput(),
       },
     })
       .then(result => this.returnValue = result)
-      .catch(error => this.popupError = stringifyError(error) || 'Popup was closed with an error');
+      .catch(error => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
   }
 
   private parsePopupComponentInput(): Type<PopupPageComponent | FocusTestPageComponent | BlankTestPageComponent> {

@@ -11,25 +11,23 @@
 import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {Params} from '@angular/router';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link RouterPageComponent}.
  */
-export class RouterPagePO {
+export class RouterPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
 
-  constructor(private _appPO: AppPO, public viewId: string) {
-    this.view = this._appPO.view({viewId});
-    this.viewTab = this.view.viewTab;
-    this.locator = this.view.locate('app-router-page');
+  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.locator = this.view.locator.locator('app-router-page');
   }
 
   public async enterPath(path: string): Promise<void> {
@@ -84,16 +82,13 @@ export class RouterPagePO {
 
   /**
    * Clicks on a button to navigate via {@link WorkbenchRouter}.
-   *
-   * @param options - Controls how to navigate.
-   *        @property probeInternal - Time to wait in ms until navigation is stable. Useful when performing many navigations simultaneously.
    */
-  public async clickNavigate(options?: {probeInterval?: number}): Promise<void> {
+  public async clickNavigate(): Promise<void> {
     await this.locator.locator('button.e2e-router-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilStable(() => this._appPO.getCurrentNavigationId(), options),
+      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }
@@ -105,9 +100,5 @@ export class RouterPagePO {
     await this.locator.locator('a.e2e-router-link-navigate').click({modifiers});
     // Wait until navigation completed.
     await waitUntilStable(() => this._appPO.getCurrentNavigationId());
-  }
-
-  public isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
   }
 }

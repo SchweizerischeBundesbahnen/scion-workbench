@@ -22,12 +22,12 @@ test.describe('Navigational State', () => {
       // navigate to the test view
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-view');
+      await routerPage.enterTarget('view.100');
       await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data emitted undefined as state
-      const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
-      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=view.100, state=undefined]`,
       ]);
     });
 
@@ -38,12 +38,12 @@ test.describe('Navigational State', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-view');
       await routerPage.enterNavigationalState({'some': 'state'});
+      await routerPage.enterTarget('view.100');
       await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
-      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=view.100, state={"some":"state"}]`,
       ]);
     });
 
@@ -54,18 +54,20 @@ test.describe('Navigational State', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.enterPath('test-view');
       await routerPage.enterNavigationalState({'some': 'state'});
+      await routerPage.enterTarget('view.100');
       await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data emitted the passed state
-      const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
-      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state={"some":"state"}]`,
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=view.100, state={"some":"state"}]`,
       ]);
+      consoleLogs.clear();
 
       await appPO.reload();
+
       // expect ActivatedRoute.data emitting undefined as state after page reload
-      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=view.100, state=undefined]`,
       ]);
     });
 
@@ -78,23 +80,23 @@ test.describe('Navigational State', () => {
       await routerPage.enterPath('test-view');
       await routerPage.enterTarget('blank');
       await routerPage.enterMatrixParams({'param': 'value 1'});
+      await routerPage.enterTarget('view.100');
       await routerPage.clickNavigate();
 
-      const testeeViewId = await appPO.activePart({inMainArea: true}).activeView.getViewId();
-
       // expect ActivatedRoute.data emitted undefined as state
-      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=${testeeViewId}, state=undefined]`,
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
+        `[ActivatedRouteDataChange] [viewId=view.100, state=undefined]`,
       ]);
+      consoleLogs.clear();
 
       // update matrix param
-      await routerPage.viewTab.click();
+      await routerPage.view.tab.click();
       await routerPage.enterMatrixParams({'param': 'value 2'});
-      await routerPage.enterTarget(testeeViewId);
+      await routerPage.enterTarget('view.100');
       await routerPage.clickNavigate();
 
       // expect ActivatedRoute.data not to emit
-      await expect(await consoleLogs.get({severity: 'debug', filter: /ActivatedRouteDataChange/, consume: true})).toEqual([]);
+      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([]);
     });
   });
 });

@@ -9,34 +9,25 @@
  */
 
 import {Locator} from '@playwright/test';
-import {DomRect, fromRect, getCssClasses, isPresent} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench notification.
  */
 export class NotificationPO {
 
-  constructor(private readonly _locator: Locator) {
-  }
+  public title: Locator;
 
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return this._locator.isVisible();
+  constructor(public readonly locator: Locator) {
+    this.title = this.locator.locator('header.e2e-title');
   }
 
   public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this._locator.boundingBox());
-  }
-
-  public async getTitle(): Promise<string> {
-    return this._locator.locator('header.e2e-title').innerText();
+    return fromRect(await this.locator.boundingBox());
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error' | null> {
-    const cssClasses = await getCssClasses(this._locator);
+    const cssClasses = await getCssClasses(this.locator);
     if (cssClasses.includes('e2e-severity-info')) {
       return 'info';
     }
@@ -49,32 +40,11 @@ export class NotificationPO {
     return null;
   }
 
-  public async getDuration(): Promise<'short' | 'medium' | 'long' | 'infinite' | null> {
-    const cssClasses = await getCssClasses(this._locator);
-    if (cssClasses.includes('e2e-duration-short')) {
-      return 'short';
-    }
-    else if (cssClasses.includes('e2e-duration-medium')) {
-      return 'medium';
-    }
-    else if (cssClasses.includes('e2e-duration-long')) {
-      return 'long';
-    }
-    else if (cssClasses.includes('infinite')) {
-      return 'infinite';
-    }
-    return null;
-  }
-
-  public async clickClose(): Promise<void> {
-    await this._locator.locator('.e2e-close').click();
+  public async close(): Promise<void> {
+    await this.locator.locator('.e2e-close').click();
   }
 
   public getCssClasses(): Promise<string[]> {
-    return getCssClasses(this._locator);
-  }
-
-  public locator(selector?: string): Locator {
-    return selector ? this._locator.locator(selector) : this._locator;
+    return getCssClasses(this.locator);
   }
 }

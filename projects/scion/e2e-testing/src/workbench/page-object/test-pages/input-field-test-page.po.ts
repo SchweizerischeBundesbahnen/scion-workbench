@@ -10,22 +10,26 @@
 
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
-import {isActiveElement} from '../../../helper/testing.util';
 import {WorkbenchNavigator} from '../../workbench-navigator';
 import {RouterPagePO} from '../router-page.po';
 import {ViewPO} from '../../../view.po';
 import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {PopupPO} from '../../../popup.po';
 import {DialogPO} from '../../../dialog.po';
+import {WorkbenchDialogPagePO} from '../workbench-dialog-page.po';
+import {WorkbenchViewPagePO} from '../workbench-view-page.po';
+import {WorkbenchPopupPagePO} from '../workbench-popup-page.po';
 
-export class InputFieldTestPagePO {
+export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPagePO, WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
   public readonly checkbox: Locator;
+  public readonly input: Locator;
 
-  constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
+  constructor(private _locateBy: ViewPO | DialogPO | PopupPO) {
     this.locator = this._locateBy.locator.locator('app-input-field-test-page');
     this.checkbox = this.locator.locator('input.e2e-checkbox');
+    this.input = this.locator.locator('input.e2e-input');
   }
 
   public get view(): ViewPO {
@@ -34,15 +38,6 @@ export class InputFieldTestPagePO {
     }
     else {
       throw Error('[PageObjectError] Test page not opened in a view.');
-    }
-  }
-
-  public get popup(): PopupPO {
-    if (this._locateBy instanceof PopupPO) {
-      return this._locateBy;
-    }
-    else {
-      throw Error('[PageObjectError] Test page not opened in a popup.');
     }
   }
 
@@ -55,22 +50,33 @@ export class InputFieldTestPagePO {
     }
   }
 
-  public async clickInputField(): Promise<void> {
-    await this.locator.locator('input.e2e-input').click();
+  public get popup(): PopupPO {
+    if (this._locateBy instanceof PopupPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a popup.');
+    }
   }
 
-  public async isInputFieldActiveElement(): Promise<boolean> {
-    return isActiveElement(this.locator.locator('input.e2e-input'));
+  public async enterText(text: string): Promise<void> {
+    await this.input.fill(text);
+  }
+
+  public async clickInputField(): Promise<void> {
+    await this.input.click();
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<InputFieldTestPagePO> {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewId = await routerPage.view.getViewId();
+
     await routerPage.enterPath('test-pages/input-field-test-page');
-    await routerPage.enterTarget(routerPage.viewId);
+    await routerPage.enterTarget(viewId);
     await routerPage.enterCssClass('input-field-test-page');
     await routerPage.clickNavigate();
 
-    const view = appPO.view({cssClass: 'input-field-test-page', viewId: routerPage.viewId});
+    const view = appPO.view({cssClass: 'input-field-test-page', viewId});
     await view.waitUntilAttached();
     return new InputFieldTestPagePO(view);
   }
@@ -81,11 +87,11 @@ export class InputFieldTestPagePO {
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
     await popupOpenerPage.enterCssClass('input-field-test-page');
     await popupOpenerPage.selectPopupComponent('input-field-test-page');
-    await popupOpenerPage.clickOpen();
+    await popupOpenerPage.open();
 
     // Create the page object.
     const popup = appPO.popup({cssClass: 'input-field-test-page'});
-    await popup.waitUntilAttached();
+    await popup.locator.waitFor({state: 'attached'});
     return new InputFieldTestPagePO(popup);
   }
 }

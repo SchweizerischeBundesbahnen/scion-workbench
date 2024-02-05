@@ -32,7 +32,7 @@ test.describe('HTML base HREF', () => {
 
     // Expect the icon font to be loaded.
     const iconFontLoaded = (await response).ok();
-    await expect(iconFontLoaded).toBe(true);
+    expect(iconFontLoaded).toBe(true);
   });
 
   /**
@@ -56,6 +56,6 @@ test.describe('HTML base HREF', () => {
 
     // Expect the icon font to be loaded.
     const iconFontLoaded = (await response).ok();
-    await expect(iconFontLoaded).toBe(true);
+    expect(iconFontLoaded).toBe(true);
   });
 });

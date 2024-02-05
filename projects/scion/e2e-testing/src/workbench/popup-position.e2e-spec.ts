@@ -12,31 +12,31 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {fromRect} from '../helper/testing.util';
-import {ViewTabPO} from '../view-tab.po';
 import {PopupPO} from '../popup.po';
+import {ViewPO} from '../view.po';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
 
 test.describe('Workbench Popup Position', () => {
 
-  let northViewTab: ViewTabPO;
-  let westViewTab: ViewTabPO;
-  let eastViewTab: ViewTabPO;
-  let southViewTab: ViewTabPO;
+  let northView: ViewPO;
+  let westView: ViewPO;
+  let eastView: ViewPO;
+  let southView: ViewPO;
   let popupOpenerPage: PopupOpenerPagePO;
-  let centerViewTab: ViewTabPO;
+  let centerView: ViewPO;
   let popup: PopupPO;
 
   test.beforeEach(async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open views
-    northViewTab = (await appPO.openNewViewTab()).view!.viewTab;
-    westViewTab = (await appPO.openNewViewTab()).view!.viewTab;
-    eastViewTab = (await appPO.openNewViewTab()).view!.viewTab;
-    southViewTab = (await appPO.openNewViewTab()).view!.viewTab;
+    northView = (await appPO.openNewViewTab()).view;
+    westView = (await appPO.openNewViewTab()).view;
+    eastView = (await appPO.openNewViewTab()).view;
+    southView = (await appPO.openNewViewTab()).view;
     popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    centerViewTab = popupOpenerPage.view.viewTab;
+    centerView = popupOpenerPage.view;
 
     // Arrange views according to the following layout
     // +------------------------------+
@@ -48,17 +48,17 @@ test.describe('Workbench Popup Position', () => {
     // +--------+------------+--------+
     // |             SOUTH            |
     // +------------------------------+
-    await northViewTab.dragTo({partId: await northViewTab.part.getPartId(), region: 'north'});
-    await southViewTab.dragTo({partId: await southViewTab.part.getPartId(), region: 'south'});
-    await westViewTab.dragTo({partId: await westViewTab.part.getPartId(), region: 'west'});
-    await eastViewTab.dragTo({partId: await eastViewTab.part.getPartId(), region: 'east'});
+    await northView.tab.dragTo({partId: await northView.part.getPartId(), region: 'north'});
+    await southView.tab.dragTo({partId: await southView.part.getPartId(), region: 'south'});
+    await westView.tab.dragTo({partId: await westView.part.getPartId(), region: 'west'});
+    await eastView.tab.dragTo({partId: await eastView.part.getPartId(), region: 'east'});
 
     // Enlarge center part size
     const {width, height} = appPO.page.viewportSize()!;
-    await centerViewTab.part.sash.drag('top', -.3 * height);
-    await centerViewTab.part.sash.drag('left', -.25 * width);
-    await centerViewTab.part.sash.drag('right', .1 * width);
-    await centerViewTab.part.sash.drag('bottom', .1 * height);
+    await centerView.part.sash.drag('top', -.3 * height);
+    await centerView.part.sash.drag('left', -.25 * width);
+    await centerView.part.sash.drag('right', .1 * width);
+    await centerView.part.sash.drag('bottom', .1 * height);
 
     await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.selectPopupComponent('blank-test-page');
@@ -73,82 +73,71 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterPosition({top: 100, left: 100});
       await popupOpenerPage.selectAlign('east');
       await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-      expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('top', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('top', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('bottom', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('bottom', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('left', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('left', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('right', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('right', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width + 100, height: height + 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width - 100, height: height - 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
     });
 
@@ -156,82 +145,71 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterPosition({top: 100, right: 100});
       await popupOpenerPage.selectAlign('west');
       await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-      expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('top', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('top', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('bottom', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('bottom', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('left', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('left', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('right', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('right', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width + 100, height: height + 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width - 100, height: height - 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
     });
 
@@ -239,82 +217,71 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterPosition({bottom: 100, right: 100});
       await popupOpenerPage.selectAlign('west');
       await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-      expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('top', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('top', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('bottom', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('bottom', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('left', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('left', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('right', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await centerView.part.sash.drag('right', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('increase viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width + 100, height: height + 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
 
       await test.step('decrease viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width - 100, height: height - 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(page.viewportSize()!.width - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(page.viewportSize()!.width - 100, 0);
       });
     });
 
@@ -322,82 +289,71 @@ test.describe('Workbench Popup Position', () => {
       await popupOpenerPage.enterPosition({bottom: 100, left: 100});
       await popupOpenerPage.selectAlign('east');
       await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-      expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('top', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('top', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('bottom', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('bottom', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('left', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('left', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('right', 25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await centerView.part.sash.drag('right', -25);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('increase viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width + 100, height: height + 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
 
       await test.step('decrease viewport size', async () => {
         const {width, height} = page.viewportSize()!;
         await page.setViewportSize({width: width - 100, height: height - 100});
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(page.viewportSize()!.height - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(page.viewportSize()!.height - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(100, 0);
       });
     });
   });
@@ -407,300 +363,264 @@ test.describe('Workbench Popup Position', () => {
     test('should stick to the top-left view corner', async () => {
       await popupOpenerPage.enterPosition({top: 100, left: 100});
       await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-      expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
+        await centerView.part.sash.drag('top', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
+        await centerView.part.sash.drag('top', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
+        await centerView.part.sash.drag('bottom', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
+        await centerView.part.sash.drag('bottom', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
+        await centerView.part.sash.drag('left', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
+        await centerView.part.sash.drag('left', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
+        await centerView.part.sash.drag('right', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
+        await centerView.part.sash.drag('right', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
     });
 
     test('should stick to the top-right view corner', async () => {
       await popupOpenerPage.enterPosition({top: 100, right: 100});
       await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-      expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
+        await centerView.part.sash.drag('top', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
+        await centerView.part.sash.drag('top', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
+        await centerView.part.sash.drag('bottom', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
+        await centerView.part.sash.drag('bottom', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
+        await centerView.part.sash.drag('left', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
+        await centerView.part.sash.drag('left', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
+        await centerView.part.sash.drag('right', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
+        await centerView.part.sash.drag('right', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.top + 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.top + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
     });
 
     test('should stick to the bottom-right view corner', async () => {
       await popupOpenerPage.enterPosition({bottom: 100, right: 100});
       await popupOpenerPage.selectAlign('west');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-      expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
+        await centerView.part.sash.drag('top', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
+        await centerView.part.sash.drag('top', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
+        await centerView.part.sash.drag('bottom', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
+        await centerView.part.sash.drag('bottom', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
+        await centerView.part.sash.drag('left', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
+        await centerView.part.sash.drag('left', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
+        await centerView.part.sash.drag('right', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
+        await centerView.part.sash.drag('right', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.right + POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.right - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.right - 100, 0);
       });
     });
 
     test('should stick to the bottom-left view corner', async () => {
       await popupOpenerPage.enterPosition({bottom: 100, left: 100});
       await popupOpenerPage.selectAlign('east');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
       const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-      const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-      expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-      expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+      await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
 
       await test.step('increase view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', -25);
+        await centerView.part.sash.drag('top', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view height by moving top-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('top', 25);
+        await centerView.part.sash.drag('top', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('increase view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', -25);
+        await centerView.part.sash.drag('bottom', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view height by moving bottom-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('bottom', 25);
+        await centerView.part.sash.drag('bottom', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('increase view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', 25);
+        await centerView.part.sash.drag('left', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view width by moving left-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('left', -25);
+        await centerView.part.sash.drag('left', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('increase view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', 25);
+        await centerView.part.sash.drag('right', 25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
 
       await test.step('decrease view width by moving right-edge of the part', async () => {
-        await centerViewTab.part.sash.drag('right', -25);
+        await centerView.part.sash.drag('right', -25);
         const centerViewBounds = fromRect(await popupOpenerPage.view.getBoundingBox());
-        const popupBounds = fromRect(await popup.getBoundingBox('cdk-overlay'));
-        expect(popupBounds.vcenter).toBeCloseTo(centerViewBounds.bottom - 100, 0);
-        expect(popupBounds.left - POPUP_DIAMOND_ANCHOR_SIZE).toBeCloseTo(centerViewBounds.left + 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(centerViewBounds.bottom - 100, 0);
+        await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(centerViewBounds.left + 100, 0);
       });
     });
   });

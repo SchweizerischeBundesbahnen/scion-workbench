@@ -67,8 +67,8 @@ export default class RouterPageComponent {
               public workbenchService: WorkbenchService) {
     this.routerLinkCommands$ = this.form.valueChanges
       .pipe(
-        map(() => this.constructRouterLinkCommands()),
-        share({connector: () => new BehaviorSubject(this.constructRouterLinkCommands())}),
+        map(() => this.constructNavigationCommands()),
+        share({connector: () => new BehaviorSubject(this.constructNavigationCommands())}),
       );
 
     this.navigationExtras$ = this.form.valueChanges
@@ -91,7 +91,7 @@ export default class RouterPageComponent {
 
   public onRouterNavigate(): void {
     this.navigateError = undefined;
-    const commands: any[] = this.constructRouterLinkCommands();
+    const commands: any[] = this.constructNavigationCommands();
     const extras: WorkbenchNavigationExtras = this.constructNavigationExtras();
 
     this._wbRouter.navigate(commands, extras)
@@ -99,10 +99,10 @@ export default class RouterPageComponent {
       .catch(error => this.navigateError = error);
   }
 
-  private constructRouterLinkCommands(): any[] {
+  private constructNavigationCommands(): any[] {
     const matrixParams: Params | null = SciKeyValueFieldComponent.toDictionary(this.form.controls.matrixParams);
     const path = this.form.controls.path.value;
-    const commands: any[] = path === '<empty>' ? [] : path.split('/');
+    const commands: any[] = path === '' ? [] : path.split('/');
 
     // When tokenizing the path into segments, an empty segment is created for the leading slash (if any).
     if (path.startsWith('/')) {

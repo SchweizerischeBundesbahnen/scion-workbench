@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {isPresent} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 
 /**
@@ -17,19 +16,12 @@ import {Locator} from '@playwright/test';
 export class ViewTabContextMenuPO {
 
   public readonly menuItems = {
-    closeTab: new ContextMenuItem(this._locator.locator('button.e2e-close-tab')),
-    closeAll: new ContextMenuItem(this._locator.locator('button.e2e-close-all-tabs')),
-    moveToNewWindow: new ContextMenuItem(this._locator.locator('button.e2e-move-to-new-window')),
+    closeTab: new ContextMenuItem(this.locator.locator('button.e2e-close-tab')),
+    closeAll: new ContextMenuItem(this.locator.locator('button.e2e-close-all-tabs')),
+    moveToNewWindow: new ContextMenuItem(this.locator.locator('button.e2e-move-to-new-window')),
   };
 
-  constructor(private _locator: Locator) {
-  }
-
-  /**
-   * Indicates whether the context menu is opened.
-   */
-  public isOpened(): Promise<boolean> {
-    return isPresent(this._locator);
+  constructor(public locator: Locator) {
   }
 }
 

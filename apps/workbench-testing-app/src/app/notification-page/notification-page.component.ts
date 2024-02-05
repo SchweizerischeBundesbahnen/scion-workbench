@@ -10,7 +10,6 @@
 
 import {Component} from '@angular/core';
 import {Notification} from '@scion/workbench';
-import {UUID} from '@scion/toolkit/uuid';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NgIf} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -20,9 +19,9 @@ import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
-  selector: 'app-inspect-notification',
-  templateUrl: './inspect-notification.component.html',
-  styleUrls: ['./inspect-notification.component.scss'],
+  selector: 'app-notification-page',
+  templateUrl: './notification-page.component.html',
+  styleUrls: ['./notification-page.component.scss'],
   standalone: true,
   imports: [
     NgIf,
@@ -32,9 +31,8 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
     SciViewportComponent,
   ],
 })
-export class InspectNotificationComponent {
+export class NotificationPageComponent {
 
-  public uuid = UUID.randomUUID();
   public form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),

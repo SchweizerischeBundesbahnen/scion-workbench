@@ -8,7 +8,7 @@ $diamond-height: 8;
  * Provides SCION workbench popup styles.
  */
 @mixin install-global-styles() {
-  .wb-popup {
+  .cdk-overlay-pane.wb-popup {
     background-color: var(--sci-color-background-elevation);
     color: var(--sci-color-text);
     border-radius: var(--sci-corner);

@@ -8,41 +8,29 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, isPresent} from '../../helper/testing.util';
+import {coerceArray} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
-import {ViewTabPO} from '../../view-tab.po';
 import {Locator} from '@playwright/test';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
+import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.
  */
-export class ViewPagePO {
+export class ViewPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
-  public readonly viewTab: ViewTabPO;
+  public readonly viewId: Locator;
 
-  constructor(appPO: AppPO, public viewId: string) {
-    this.view = appPO.view({viewId});
-    this.viewTab = appPO.view({viewId}).viewTab;
-    this.locator = this.view.locate('app-view-page');
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return await this.viewTab.isPresent() && await isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return await this.view.isVisible() && await this.locator.isVisible();
-  }
-
-  public async getViewId(): Promise<string> {
-    return this.locator.locator('span.e2e-view-id').innerText();
+  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.locator = this.view.locator.locator('app-view-page');
+    this.viewId = this.locator.locator('span.e2e-view-id');
   }
 
   public async getComponentInstanceId(): Promise<string> {
@@ -99,14 +87,6 @@ export class ViewPagePO {
     finally {
       await accordion.collapse();
     }
-  }
-
-  public async enterFreeText(text: string): Promise<void> {
-    await this.locator.locator('input.e2e-free-text').fill(text);
-  }
-
-  public getFreeText(): Promise<string> {
-    return this.locator.locator('input.e2e-free-text').inputValue();
   }
 }
 

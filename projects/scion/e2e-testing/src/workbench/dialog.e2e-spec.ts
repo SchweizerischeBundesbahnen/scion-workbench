@@ -17,6 +17,7 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
+import {expectDialog} from '../matcher/dialog-matcher';
 
 test.describe('Workbench Dialog', () => {
 
@@ -27,10 +28,12 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee'});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.view.getBoundingBox()]));
     });
 
@@ -41,7 +44,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
 
       // Expect to error when opening the dialog.
-      await expect(dialogOpenerPage.open('blank', {modality: 'view', context: {viewId: 'non-existent'}})).rejects.toThrow('[NullViewError] View \'non-existent\' not found.');
+      await expect(dialogOpenerPage.open('dialog-page', {modality: 'view', context: {viewId: 'non-existent'}})).rejects.toThrow('[NullViewError] View \'non-existent\' not found.');
 
       // Expect no error to be logged to the console.
       await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
@@ -53,20 +56,20 @@ test.describe('Workbench Dialog', () => {
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
-      const dialog = appPO.dialog({cssClass: 'testee'});
 
+      const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
+
       const componentInstanceId = await dialogPage.getComponentInstanceId();
-      await expect(dialog.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Activate another view.
       await appPO.openNewViewTab();
-      await expect(dialog.locator).not.toBeVisible();
-      await expect(dialog.locator).toBeAttached();
+      await expectDialog(dialogPage).toBeHidden();
 
       // Re-activate the view.
-      await dialogOpenerPage.view.viewTab.click();
-      await expect(dialog.locator).toBeVisible();
+      await dialogOpenerPage.view.tab.click();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Expect the component not to be constructed anew.
       await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -82,26 +85,24 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
 
       // Drag dialog opener view into peripheral area.
-      await dialogOpenerPage.view.viewTab.dragTo({grid: 'workbench', region: 'east'});
+      await dialogOpenerPage.view.tab.dragTo({grid: 'workbench', region: 'east'});
 
       // Open dialog.
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
+
       const componentInstanceId = await dialogPage.getComponentInstanceId();
-      await expect(dialog.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Maximize the main area.
-      await viewPageInMainArea.viewTab.dblclick();
-      await expect(dialogOpenerPage.view.locator).not.toBeVisible();
-      await expect(dialog.locator).not.toBeVisible();
-      await expect(dialog.locator).toBeAttached();
+      await viewPageInMainArea.view.tab.dblclick();
+      await expectDialog(dialogPage).toBeHidden();
 
       // Restore the layout.
-      await viewPageInMainArea.viewTab.dblclick();
-      await expect(dialogOpenerPage.view.locator).toBeVisible();
-      await expect(dialog.locator).toBeVisible();
+      await viewPageInMainArea.view.tab.dblclick();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Expect the component not to be constructed anew.
       await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -110,35 +111,34 @@ test.describe('Workbench Dialog', () => {
     test('should allow opening a dialog in any view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      const viewTab1 = (await appPO.openNewViewTab()).view!.viewTab;
-      const viewTab2 = (await appPO.openNewViewTab()).view!.viewTab;
-      const viewTab3 = (await appPO.openNewViewTab()).view!.viewTab;
+      const view1 = (await appPO.openNewViewTab()).view;
+      const view2 = (await appPO.openNewViewTab()).view;
+      const view3 = (await appPO.openNewViewTab()).view;
 
       // Open the dialog in view 2.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', modality: 'view', context: {viewId: await viewTab2.getViewId()}});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', modality: 'view', context: {viewId: await view2.getViewId()}});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
-      await expect(dialog.locator).not.toBeVisible();
-      await expect(dialog.locator).toBeAttached();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expect(appPO.dialogs).toHaveCount(1);
+      await expectDialog(dialogPage).toBeHidden();
 
       // Activate view 1.
-      await viewTab1.click();
-      await expect(dialog.locator).not.toBeVisible();
-      await expect(dialog.locator).toBeAttached();
-      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
+      await view1.tab.click();
+      await expectDialog(dialogPage).toBeHidden();
+      await expect(appPO.dialogs).toHaveCount(1);
 
       // Activate view 2.
-      await viewTab2.click();
-      await expect(dialog.locator).toBeVisible();
-      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
+      await view2.tab.click();
+      await expectDialog(dialogPage).toBeVisible();
+      await expect(appPO.dialogs).toHaveCount(1);
 
       // Activate view 3.
-      await viewTab3.click();
-      await expect(dialog.locator).not.toBeVisible();
-      await expect(dialog.locator).toBeAttached();
-      await expect.poll(() => appPO.getDialogCount()).toEqual(1);
+      await view3.tab.click();
+      await expectDialog(dialogPage).toBeHidden();
+      await expect(appPO.dialogs).toHaveCount(1);
     });
 
     test('should prevent closing a view if it displays a dialog with view modality', async ({page, appPO, workbenchNavigator}) => {
@@ -146,32 +146,34 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee'});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
+
       const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
 
       // Expect close button not to be visible.
-      await expect(dialogOpenerPage.view.viewTab.closeButton).not.toBeVisible();
+      await expect(dialogOpenerPage.view.tab.closeButton).not.toBeVisible();
 
       // Expect context menu item to be disabled.
-      const viewTabContextMenu = await dialogOpenerPage.view.viewTab.openContextMenu();
+      const viewTabContextMenu = await dialogOpenerPage.view.tab.openContextMenu();
       await expect(viewTabContextMenu.menuItems.closeTab.locator).toBeDisabled();
 
       // Expect closing the view via keystroke not to close the view.
       await page.keyboard.press('Control+K');
-      await expect(dialogOpenerPage.view.viewTab.locator).toBeVisible();
-      await expect(dialog.locator).toBeVisible();
+      await expect(dialogOpenerPage.view.tab.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Expect closing all views via keystroke not to close the view.
       await page.keyboard.press('Control+Shift+Alt+K');
-      await expect(dialogOpenerPage.view.viewTab.locator).toBeVisible();
-      await expect(dialog.locator).toBeVisible();
+      await expect(dialogOpenerPage.view.tab.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Expect view to be closable when dialog is closed.
       await dialog.close();
-      await expect(dialogOpenerPage.view.viewTab.closeButton).toBeVisible();
+      await expect(dialogOpenerPage.view.tab.closeButton).toBeVisible();
 
-      await dialogOpenerPage.view.viewTab.close();
-      await expect(dialogOpenerPage.view.viewTab.locator).not.toBeAttached();
+      await dialogOpenerPage.view.tab.close();
+      await expect(dialogOpenerPage.view.tab.locator).not.toBeAttached();
     });
 
     test('should propagate view context', async ({appPO, workbenchNavigator}) => {
@@ -182,12 +184,12 @@ test.describe('Workbench Dialog', () => {
 
       // Open dialog in target view.
       const dialogOpenerPage1 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage1.open('dialog-opener-page', {cssClass: 'testee-1', modality: 'view', context: {viewId: dialogTargetViewPage.viewId}});
+      await dialogOpenerPage1.open('dialog-opener-page', {cssClass: 'testee-1', modality: 'view', context: {viewId: await dialogTargetViewPage.view.getViewId()}});
       const dialog1 = appPO.dialog({cssClass: 'testee-1'});
       await expect(dialog1.locator).not.toBeVisible();
 
       // Activate target view.
-      await dialogTargetViewPage.viewTab.click();
+      await dialogTargetViewPage.view.tab.click();
       await expect(dialog1.locator).toBeVisible();
 
       // Open another dialog from the dialog (inherit dialog's view context).
@@ -199,14 +201,14 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog2.locator).toBeVisible();
 
       // Activate other view.
-      await dialogOpenerPage1.view.viewTab.click();
+      await dialogOpenerPage1.view.tab.click();
 
       // Expect dialog 1 and dialog 2 not to be visible because contextual view is not active.
       await expect(dialog1.locator).not.toBeVisible();
       await expect(dialog2.locator).not.toBeVisible();
 
       // Activate contextual view of the dialogs.
-      await dialogTargetViewPage.viewTab.click();
+      await dialogTargetViewPage.view.tab.click();
 
       // Expect dialog 1 and dialog 2 to be visible.
       await expect(dialog1.locator).toBeVisible();
@@ -221,10 +223,12 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', viewContextActive: false});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', viewContextActive: false});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -236,10 +240,12 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', viewContextActive: true, modality: 'application'});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', viewContextActive: true, modality: 'application'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -252,10 +258,12 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', modality: 'application'});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', modality: 'application'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         appPO.viewportBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -282,14 +290,16 @@ test.describe('Workbench Dialog', () => {
       // Expect view-modal dialog to be attached only after all application-modal dialogs are closed.
       await dialogOpenerDialogPage.open('dialog-page', {cssClass: 'testee', modality: 'view', context: {viewId: contextualViewId}, waitUntilOpened: false});
 
-      const testeeDialog = appPO.dialog({cssClass: 'testee'});
-      await expect(testeeDialog.locator).not.toBeAttached();
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).not.toBeAttached();
 
       await applicationModalDialog2.close();
-      await expect(testeeDialog.locator).not.toBeAttached();
+      await expectDialog(dialogPage).not.toBeAttached();
 
       await applicationModalDialog1.close();
-      await expect(testeeDialog.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
     });
 
     test('should hide application-modal dialog when unmounting the workbench', async ({appPO, workbenchNavigator}) => {
@@ -301,17 +311,17 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
+
       const componentInstanceId = await dialogPage.getComponentInstanceId();
-      await expect(dialog.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
 
       // Unmount the workbench component by navigating the primary router outlet.
       await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
-      await expect(dialog.locator).not.toBeVisible();
-      await expect(dialog.locator).toBeAttached();
+      await expectDialog(dialogPage).toBeHidden();
 
       // Re-mount the workbench component by navigating the primary router.
       await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
-      await expect(dialog.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -331,8 +341,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
 
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
+      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
       await expect(focusTestPage.firstField).toBeFocused();
     });
 
@@ -343,8 +352,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
 
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
+      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       await page.keyboard.press('Tab');
       await expect(focusTestPage.middleField).toBeFocused();
@@ -362,8 +370,7 @@ test.describe('Workbench Dialog', () => {
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
+      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       await page.keyboard.press('Shift+Tab');
       await expect(focusTestPage.lastField).toBeFocused();
@@ -381,8 +388,7 @@ test.describe('Workbench Dialog', () => {
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
+      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       // Move focus.
       await page.keyboard.press('Tab');
@@ -393,7 +399,7 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage.middleField).not.toBeFocused();
 
       // Re-activate the dialog view.
-      await dialogOpenerPage.view.viewTab.click();
+      await dialogOpenerPage.view.tab.click();
       await expect(focusTestPage.middleField).toBeFocused();
     });
 
@@ -403,8 +409,7 @@ test.describe('Workbench Dialog', () => {
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const focusTestPage = new FocusTestPagePO(dialog);
+      const focusTestPage = new FocusTestPagePO(appPO.dialog({cssClass: 'testee'}));
 
       // Move focus.
       await page.keyboard.press('Tab');
@@ -426,20 +431,17 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee', count: 3});
 
-      const dialog1 = appPO.dialog({cssClass: 'testee', nth: 0});
-      const dialog2 = appPO.dialog({cssClass: 'testee', nth: 1});
-      const dialog3 = appPO.dialog({cssClass: 'testee', nth: 2});
-      const focusTestPage1 = new FocusTestPagePO(dialog1);
-      const focusTestPage2 = new FocusTestPagePO(dialog2);
-      const focusTestPage3 = new FocusTestPagePO(dialog3);
+      const focusTestPage1 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 0}));
+      const focusTestPage2 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 1}));
+      const focusTestPage3 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 2}));
 
       await expect(focusTestPage1.firstField).not.toBeFocused();
       await expect(focusTestPage2.firstField).not.toBeFocused();
       await expect(focusTestPage3.firstField).toBeFocused();
 
       // Close top-most dialog.
-      await dialog3.close();
-      await expect(dialog3.locator).not.toBeAttached();
+      await focusTestPage3.dialog.close();
+      await expectDialog(focusTestPage3).not.toBeAttached();
       await expect(focusTestPage1.firstField).not.toBeFocused();
       await expect(focusTestPage2.firstField).toBeFocused();
     });
@@ -451,12 +453,9 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee', count: 3});
 
-      const dialog1 = appPO.dialog({cssClass: 'testee', nth: 0});
-      const dialog2 = appPO.dialog({cssClass: 'testee', nth: 1});
-      const dialog3 = appPO.dialog({cssClass: 'testee', nth: 2});
-      const focusTestPage1 = new FocusTestPagePO(dialog1);
-      const focusTestPage2 = new FocusTestPagePO(dialog2);
-      const focusTestPage3 = new FocusTestPagePO(dialog3);
+      const focusTestPage1 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 0}));
+      const focusTestPage2 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 1}));
+      const focusTestPage3 = new FocusTestPagePO(appPO.dialog({cssClass: 'testee', nth: 2}));
 
       await expect(focusTestPage1.firstField).not.toBeFocused();
       await expect(focusTestPage2.firstField).not.toBeFocused();
@@ -469,7 +468,7 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage3.firstField).not.toBeFocused();
 
       // Re-activate the dialog view.
-      await dialogOpenerPage.view.viewTab.click();
+      await dialogOpenerPage.view.tab.click();
       await expect(focusTestPage1.firstField).not.toBeFocused();
       await expect(focusTestPage2.firstField).not.toBeFocused();
       await expect(focusTestPage3.firstField).toBeFocused();
@@ -516,6 +515,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
+
       await dialogPage.enterTitle('TITLE');
 
       // Expect the title to be set.
@@ -551,8 +551,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('dialog-page', {inputs: {input: 'ABC'}, cssClass: 'testee'});
 
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogPage = new DialogPagePO(dialog);
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
 
       await expect(dialogPage.input).toHaveValue('ABC');
     });
@@ -565,14 +564,16 @@ test.describe('Workbench Dialog', () => {
 
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee'});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
 
       // Close the dialog.
       await dialog.close();
-      await expect(dialog.locator).not.toBeAttached();
+      await expectDialog(dialogPage).not.toBeAttached();
     });
 
     test('should close the dialog on escape keystroke', async ({page, appPO, workbenchNavigator}) => {
@@ -583,11 +584,13 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
 
       // Close the dialog by Escape keystroke.
       await page.keyboard.press('Escape');
-      await expect(dialog.locator).not.toBeAttached();
+      await expectDialog(dialogPage).not.toBeAttached();
     });
 
     test('should allow non-closable dialog', async ({appPO, workbenchNavigator}) => {
@@ -598,9 +601,10 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-      await expect(dialog.locator).toBeVisible();
-
       const dialogPage = new DialogPagePO(dialog);
+
+      await expectDialog(dialogPage).toBeVisible();
+
       await dialogPage.setClosable(false);
 
       // Expect the close button not to be visible.
@@ -614,15 +618,14 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogPage = new DialogPagePO(dialog);
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
       await dialogPage.setClosable(false);
 
       // Try closing the dialog by Escape keystroke.
       await page.keyboard.press('Escape');
 
       // Expect dialog not to be closed.
-      await expect(dialog.locator).toBeVisible();
+      await expectDialog(dialogPage).toBeVisible();
     });
 
     test('should allow closing the dialog with a result', async ({appPO, workbenchNavigator}) => {
@@ -632,8 +635,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
-      const dialog = appPO.dialog({cssClass: 'testee'});
-      const dialogPage = new DialogPagePO(dialog);
+      const dialogPage = new DialogPagePO(appPO.dialog({cssClass: 'testee'}));
       await dialogPage.close({returnValue: 'SUCCESS'});
 
       await expect(dialogOpenerPage.returnValue).toHaveText('SUCCESS');
@@ -648,6 +650,7 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
+
       await dialogPage.close({returnValue: 'ERROR', closeWithError: true});
 
       await expect(dialogOpenerPage.error).toHaveText('ERROR');
@@ -661,26 +664,29 @@ test.describe('Workbench Dialog', () => {
 
       // Open 3 dialogs.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.open('blank', {cssClass: 'testee', count: 3});
+      await dialogOpenerPage.open('dialog-page', {cssClass: 'testee', count: 3});
 
       const dialog1 = appPO.dialog({cssClass: 'testee', nth: 0});
-      const dialog1Bounds = await dialog1.getDialogBoundingBox();
+      const dialogPage1 = new DialogPagePO(dialog1);
+      const dialogBounds1 = await dialog1.getDialogBoundingBox();
 
       const dialog2 = appPO.dialog({cssClass: 'testee', nth: 1});
-      const dialog2Bounds = await dialog2.getDialogBoundingBox();
+      const dialogPage2 = new DialogPagePO(dialog2);
+      const dialogBounds2 = await dialog2.getDialogBoundingBox();
 
       const dialog3 = appPO.dialog({cssClass: 'testee', nth: 2});
-      const dialog3Bounds = await dialog3.getDialogBoundingBox();
+      const dialogPage3 = new DialogPagePO(dialog3);
+      const dialogBounds3 = await dialog3.getDialogBoundingBox();
 
-      await expect(dialog1.locator).toBeVisible();
-      await expect(dialog2.locator).toBeVisible();
-      await expect(dialog3.locator).toBeVisible();
+      await expectDialog(dialogPage1).toBeVisible();
+      await expectDialog(dialogPage2).toBeVisible();
+      await expectDialog(dialogPage3).toBeVisible();
 
       // Expect the dialogs to be displayed offset.
-      expect(dialog2Bounds.left - dialog1Bounds.left).toEqual(10);
-      expect(dialog2Bounds.top - dialog1Bounds.top).toEqual(10);
-      expect(dialog3Bounds.left - dialog2Bounds.left).toEqual(10);
-      expect(dialog3Bounds.top - dialog2Bounds.top).toEqual(10);
+      expect(dialogBounds2.left - dialogBounds1.left).toEqual(10);
+      expect(dialogBounds2.top - dialogBounds1.top).toEqual(10);
+      expect(dialogBounds3.left - dialogBounds2.left).toEqual(10);
+      expect(dialogBounds3.top - dialogBounds2.top).toEqual(10);
     });
 
     test('should allow interaction only with top dialog from the stack [animate=false]', async ({appPO, workbenchNavigator}) => {
@@ -691,13 +697,17 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('input-field-test-page', {cssClass: 'testee', count: 3, animate: false});
 
       const firstDialog = appPO.dialog({cssClass: 'testee', nth: 0});
-      await expect(firstDialog.locator).toBeVisible();
+      const firstDialogPage = new InputFieldTestPagePO(firstDialog);
+      await expectDialog(firstDialogPage).toBeVisible();
 
       const middleDialog = appPO.dialog({cssClass: 'testee', nth: 1});
-      await expect(middleDialog.locator).toBeVisible();
+      const middleDialogPage = new InputFieldTestPagePO(middleDialog);
+      await expectDialog(middleDialogPage).toBeVisible();
 
       const topDialog = appPO.dialog({cssClass: 'testee', nth: 2});
-      await expect(topDialog.locator).toBeVisible();
+      const topDialogPage = new InputFieldTestPagePO(topDialog);
+
+      await expectDialog(topDialogPage).toBeVisible();
       await topDialog.moveDialog('bottom-right-corner');
 
       // Expect first dialog not to be interactable.
@@ -722,13 +732,16 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('input-field-test-page', {cssClass: 'testee', count: 3, animate: true});
 
       const firstDialog = appPO.dialog({cssClass: 'testee', nth: 0});
-      await expect(firstDialog.locator).toBeVisible();
+      const firstDialogPage = new InputFieldTestPagePO(firstDialog);
+      await expectDialog(firstDialogPage).toBeVisible();
 
       const middleDialog = appPO.dialog({cssClass: 'testee', nth: 1});
-      await expect(middleDialog.locator).toBeVisible();
+      const middleDialogPage = new InputFieldTestPagePO(middleDialog);
+      await expectDialog(middleDialogPage).toBeVisible();
 
       const topDialog = appPO.dialog({cssClass: 'testee', nth: 2});
-      await expect(topDialog.locator).toBeVisible();
+      const topDialogPage = new InputFieldTestPagePO(topDialog);
+      await expectDialog(topDialogPage).toBeVisible();
       await topDialog.moveDialog('bottom-right-corner');
 
       // Expect first dialog not to be interactable.
@@ -913,7 +926,6 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-
       const dialogPage = new DialogPagePO(dialog);
       await dialogPage.setResizable(false);
 
@@ -958,8 +970,8 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});
-
       const dialogPage = new DialogPagePO(dialog);
+
       await dialogPage.enterDialogSize({
         minWidth: '500px',
         maxWidth: '400px',
@@ -1133,6 +1145,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1167,6 +1180,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1233,6 +1247,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1267,6 +1282,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1333,6 +1349,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1367,6 +1384,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1433,6 +1451,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1467,6 +1486,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1533,6 +1553,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1567,6 +1588,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1635,6 +1657,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1669,6 +1692,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1737,6 +1761,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1771,6 +1796,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1839,6 +1865,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({height: '500px', width: '500px'});
         const dialogBounds = await dialog.getDialogBoundingBox();
 
@@ -1873,6 +1900,7 @@ test.describe('Workbench Dialog', () => {
 
         const dialog = appPO.dialog({cssClass: 'testee'});
         const dialogPage = new DialogPagePO(dialog);
+
         await dialogPage.enterDialogSize({
           height: '400px',
           width: '400px',
@@ -1939,7 +1967,9 @@ test.describe('Workbench Dialog', () => {
       // Open the dialog.
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       await dialogOpenerPage.open('focus-test-page', {cssClass: 'testee'});
+
       const dialog = appPO.dialog({cssClass: 'testee'});
+
       await dialog.moveDialog('bottom-right-corner');
 
       // Expect interaction with contextual view to be blocked.
@@ -1996,13 +2026,15 @@ test.describe('Workbench Dialog', () => {
       await popupOpenerViewPage.enterCssClass('testee');
       await popupOpenerViewPage.enterPosition({bottom: 0, left: 0});
       await popupOpenerViewPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerViewPage.clickOpen();
+      await popupOpenerViewPage.open();
       const popup = appPO.popup({cssClass: 'testee'});
 
       // Open dialog from popup.
       const dialogOpenerPopupPage = new DialogOpenerPagePO(appPO, popup);
       await dialogOpenerPopupPage.open('focus-test-page', {cssClass: 'testee'});
+
       const dialog = appPO.dialog({cssClass: 'testee'});
+
       await dialog.moveDialog('bottom-right-corner');
 
       // Expect interaction with contextual view to be blocked.
@@ -2020,7 +2052,7 @@ test.describe('Workbench Dialog', () => {
       // Expect glass panes
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await popupOpenerViewPage.view.getBoundingBox(),
-        await popup.getBoundingBox('wb-popup'),
+        await popup.getBoundingBox({box: 'content-box'}),
       ]));
     });
 
@@ -2030,7 +2062,7 @@ test.describe('Workbench Dialog', () => {
       // Open two dialog opener views side by side.
       const dialogOpenerViewPage1 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       const dialogOpenerViewPage2 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerViewPage2.view.viewTab.dragTo({partId: await dialogOpenerViewPage2.view.viewTab.part.getPartId(), region: 'east'});
+      await dialogOpenerViewPage2.view.tab.dragTo({partId: await dialogOpenerViewPage2.view.part.getPartId(), region: 'east'});
 
       // Open dialog 1.
       await dialogOpenerViewPage1.open('focus-test-page', {cssClass: 'testee-1'});
@@ -2056,14 +2088,14 @@ test.describe('Workbench Dialog', () => {
       ]));
 
       // Expect dialog 1 to be interactable
-      const focusDialog1TestPage = new FocusTestPagePO(dialog1);
-      await focusDialog1TestPage.clickField('middle-field');
-      await expect(focusDialog1TestPage.middleField).toBeFocused();
+      const focusDialogTestPage1 = new FocusTestPagePO(dialog1);
+      await focusDialogTestPage1.clickField('middle-field');
+      await expect(focusDialogTestPage1.middleField).toBeFocused();
 
       // Expect dialog 2 to be interactable
-      const focusDialog2TestPage = new FocusTestPagePO(dialog2);
-      await focusDialog2TestPage.clickField('middle-field');
-      await expect(focusDialog2TestPage.middleField).toBeFocused();
+      const focusDialogTestPage2 = new FocusTestPagePO(dialog2);
+      await focusDialogTestPage2.clickField('middle-field');
+      await expect(focusDialogTestPage2.middleField).toBeFocused();
     });
 
     test('should block workbench', async ({appPO, workbenchNavigator}) => {
@@ -2072,16 +2104,19 @@ test.describe('Workbench Dialog', () => {
       // Open router view and dialog opener view side by side.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.view.viewTab.dragTo({partId: await dialogOpenerPage.view.viewTab.part.getPartId(), region: 'east'});
+      await dialogOpenerPage.view.tab.dragTo({partId: await dialogOpenerPage.view.part.getPartId(), region: 'east'});
 
       // Navigate to FocusTestPageComponent
       await routerPage.enterPath('/test-pages/focus-test-page');
-      await routerPage.clickNavigateViaRouterLink();
-      const focusTestPage = new FocusTestPagePO(routerPage.view);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('focus-page');
+      await routerPage.clickNavigate();
 
       // Open application-modal dialog.
       await dialogOpenerPage.open('dialog-page', {modality: 'application', cssClass: 'testee'});
+
       const dialog = appPO.dialog({cssClass: 'testee'});
+      const focusTestPage = new FocusTestPagePO(appPO.view({cssClass: 'focus-page'}));
 
       // Expect interaction with FocusTestPageComponent to be blocked.
       await expect(focusTestPage.clickField('middle-field', {timeout: 1000})).rejects.toThrowError();
@@ -2090,7 +2125,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
-        await routerPage.view.getBoundingBox(),
+        await focusTestPage.view.getBoundingBox(),
       ]));
     });
 
@@ -2100,16 +2135,19 @@ test.describe('Workbench Dialog', () => {
       // Open router view and dialog opener view side by side.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.view.viewTab.dragTo({partId: await dialogOpenerPage.view.viewTab.part.getPartId(), region: 'east'});
+      await dialogOpenerPage.view.tab.dragTo({partId: await dialogOpenerPage.view.part.getPartId(), region: 'east'});
 
       // Navigate to FocusTestPageComponent
       await routerPage.enterPath('/test-pages/focus-test-page');
-      await routerPage.clickNavigateViaRouterLink();
-      const focusTestPage = new FocusTestPagePO(routerPage.view);
+      await routerPage.enterTarget(await routerPage.view.getViewId());
+      await routerPage.enterCssClass('focus-page');
+      await routerPage.clickNavigate();
 
       // Open application-modal dialog.
       await dialogOpenerPage.open('dialog-page', {modality: 'application', cssClass: 'testee'});
+
       const dialog = appPO.dialog({cssClass: 'testee'});
+      const focusTestPage = new FocusTestPagePO(appPO.view({cssClass: 'focus-page'}));
 
       // Expect interaction with FocusTestPageComponent to be blocked.
       await expect(focusTestPage.clickField('middle-field', {timeout: 1000})).rejects.toThrowError();
@@ -2118,7 +2156,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         appPO.viewportBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
-        await routerPage.view.getBoundingBox(),
+        await focusTestPage.view.getBoundingBox(),
       ]));
     });
   });

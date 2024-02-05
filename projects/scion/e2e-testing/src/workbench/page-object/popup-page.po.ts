@@ -8,32 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, isPresent, withoutUndefinedEntries} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
+import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {PopupPO} from '../../popup.po';
 import {PopupReferrer, PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
+import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
  */
-export class PopupPagePO {
+export class PopupPagePO implements WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
-  public readonly popup: PopupPO;
+  public readonly input: Locator;
 
-  constructor(appPO: AppPO, locateBy: {cssClass: string}) {
-    this.popup = appPO.popup({cssClass: locateBy.cssClass});
-    this.locator = this.popup.locate('app-popup-page');
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
+  constructor(public popup: PopupPO) {
+    this.locator = this.popup.locator.locator('app-popup-page');
+    this.input = this.locator.locator('output.e2e-input');
   }
 
   public async getComponentInstanceId(): Promise<string> {
@@ -49,12 +41,12 @@ export class PopupPagePO {
     await this.locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
   }
 
-  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
+  public async close(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }
 
-    if (options?.closeWithError === true) {
+    if (options?.closeWithError) {
       await this.locator.locator('button.e2e-close-with-error').click();
     }
     else {
@@ -73,10 +65,6 @@ export class PopupPagePO {
     }
   }
 
-  public async getInput(): Promise<string> {
-    return this.locator.locator('output.e2e-input').innerText();
-  }
-
   public async getReferrer(): Promise<PopupReferrer> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
     await accordion.expand();
@@ -89,25 +77,4 @@ export class PopupPagePO {
       await accordion.collapse();
     }
   }
-
-  public async getPreferredOverlaySize(): Promise<PopupSize> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-preferred-overlay-size'));
-    await accordion.expand();
-    try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-preferred-overlay-size').innerText());
-    }
-    finally {
-      await accordion.collapse();
-    }
-  }
-
-  public async getSize(): Promise<Size> {
-    const {width, height} = fromRect(await this.locator.boundingBox());
-    return {width, height};
-  }
-}
-
-export interface Size {
-  width: number;
-  height: number;
 }

@@ -16,9 +16,9 @@ import {DomRect, fromRect} from './helper/testing.util';
  * PO for interacting with a workbench message box.
  */
 export class MessageBoxPO {
+
   public readonly locator: Locator;
   public readonly title: Locator;
-  public readonly message: Locator;
   public readonly actions: Locator;
 
   private readonly _header: Locator;
@@ -30,7 +30,6 @@ export class MessageBoxPO {
     this._footer = this._dialog.footer.locator('wb-message-box-footer');
     this.title = this._header.locator('span.e2e-title');
     this.actions = this._footer.locator('button.e2e-action');
-    this.message = this.locator.locator('div.e2e-message');
   }
 
   public async getSeverity(): Promise<'info' | 'warn' | 'error'> {
@@ -49,27 +48,9 @@ export class MessageBoxPO {
 
   public async clickActionButton(action: string): Promise<void> {
     await this.actions.locator(`:scope[data-action="${action}"]`).click();
-    await this.locator.waitFor({state: 'detached'});
   }
 
-  public async isContentSelectable(): Promise<boolean> {
-    const text = await this.message.innerText();
-
-    await this.message.dblclick();
-    const selection: string | undefined = await this._page.evaluate(() => window.getSelection()?.toString());
-
-    return selection?.length && text.includes(selection) || false;
-  }
-
-  public async getMessageBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.message.boundingBox());
-  }
-
-  public async getMessageBoxBoundingBox(): Promise<DomRect> {
+  public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this._dialog.getDialogBoundingBox());
-  }
-
-  public async waitUntilAttached(): Promise<void> {
-    await this.locator.waitFor({state: 'attached'});
   }
 }

@@ -11,13 +11,15 @@
 import {Locator} from '@playwright/test';
 import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
+import {retryOnError} from '../helper/testing.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
  */
 export async function toEqualWorkbenchLayout(locator: Locator, expected: ExpectedWorkbenchLayout): Promise<ExpectationResult> {
   try {
-    await assertWorkbenchLayout(expected, locator);
+    // Retry assertion to behave like a Playwright web-first assertion, i.e., wait and retry until the expected condition is met.
+    await retryOnError(() => assertWorkbenchLayout(expected, locator));
     return {pass: true, message: () => 'passed'};
   }
   catch (error: unknown) {

@@ -9,23 +9,23 @@ export const workbenchManifest: Manifest = {
   capabilities: [
     {
       type: WorkbenchCapabilities.MessageBox,
-      qualifier: {component: 'inspector'},
+      qualifier: {component: 'message-box-page'},
       private: false,
       params: [
         {name: 'param1', required: true},
         {name: 'param2', required: false},
       ],
-      description: 'Allows inspecting a message box.',
+      description: 'Allows interacting with a message box.',
     },
     {
       type: WorkbenchCapabilities.Notification,
-      qualifier: {component: 'inspector'},
+      qualifier: {component: 'notification-page'},
       private: false,
       params: [
         {name: 'param1', required: true},
         {name: 'param2', required: false},
       ],
-      description: 'Allows inspecting a notification.',
+      description: 'Allows interacting with a notification.',
     },
     // TODO [#271]: Remove this popup capability when implemented the issue #271
     {

@@ -10,7 +10,7 @@
 
 import {AppPO} from '../../app.po';
 import {FrameLocator, Locator} from '@playwright/test';
-import {DomRect, fromRect} from '../../helper/testing.util';
+import {DomRect, fromRect, getCssClasses} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link SciRouterOutletElement}.
@@ -31,22 +31,30 @@ export class SciRouterOutletPO {
    */
   public readonly splash: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {name?: string; cssClass?: string | string[]}) {
-    this.locator = this._appPO.page.locator(this.createRouterOutletSelector(locateBy));
+  constructor(appPO: AppPO, locateBy: {name?: string; cssClass?: string | string[]; locator?: Locator}) {
+    this.locator = locateBy.locator ?? appPO.page.locator(this.createRouterOutletSelector(locateBy));
     this.frameLocator = this.locator.frameLocator('iframe');
     this.splash = this.locator.locator('wb-microfrontend-splash');
   }
 
-  public getCapabilityId(): Promise<string | null> {
-    return this.locator.getAttribute('data-capabilityid');
+  public async getName(): Promise<string> {
+    return (await this.locator.getAttribute('name'))!;
   }
 
-  public getAppSymbolicName(): Promise<string | null> {
-    return this.locator.getAttribute('data-app');
+  public async getCapabilityId(): Promise<string> {
+    return (await this.locator.getAttribute('data-capabilityid'))!;
+  }
+
+  public async getAppSymbolicName(): Promise<string> {
+    return (await this.locator.getAttribute('data-app'))!;
   }
 
   public async getBoundingBox(): Promise<DomRect> {
     return fromRect(await this.locator.boundingBox());
+  }
+
+  public getCssClasses(): Promise<string[]> {
+    return getCssClasses(this.locator);
   }
 
   private createRouterOutletSelector(locateBy: {name?: string; cssClass?: string | string[]}): string {

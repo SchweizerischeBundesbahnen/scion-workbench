@@ -21,10 +21,13 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: await popupOpenerPage.view.getViewId()});
     });
 
@@ -32,17 +35,20 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const startPage = await appPO.openNewViewTab();
-      const startPageViewId = startPage.viewId!;
+      const startPageViewId = await startPage.view.getViewId();
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterContextualViewId(startPageViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      await startPage.view!.viewTab.click();
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      await startPage.view.tab.click();
+
       await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: startPageViewId});
     });
 
@@ -50,11 +56,14 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterContextualViewId('<null>');
-      await popupOpenerPage.clickOpen();
+      await popupOpenerPage.open();
 
-      const popupPage = new PopupPagePO(appPO, {cssClass: 'testee'});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
       await expect.poll(() => popupPage.getReferrer()).toEqual({});
     });
   });

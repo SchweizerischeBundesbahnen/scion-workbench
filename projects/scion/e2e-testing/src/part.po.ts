@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect, isPresent, waitUntilStable} from './helper/testing.util';
+import {DomRect, fromRect} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
@@ -43,10 +43,6 @@ export class PartPO {
     return (await this._locator.getAttribute('data-partid'))!;
   }
 
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this._locator);
-  }
-
   /**
    * Opens the view list menu of this part.
    */
@@ -67,12 +63,10 @@ export class PartPO {
    * Returns the ids of the views contained in this part in the order as displayed in the tab bar.
    */
   public async getViewIds(locateBy?: {cssClass?: string}): Promise<string[]> {
-    const viewTabsLocator = locateBy?.cssClass ? this._locator.locator(`wb-view-tab.${locateBy.cssClass}`) : this._locator.locator('wb-view-tab');
-    await waitUntilStable(() => viewTabsLocator.count());
-
+    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy?.cssClass}` : ':scope';
     const viewIds = [];
-    for (let i = 0; i < await viewTabsLocator.count(); i++) {
-      viewIds.push((await viewTabsLocator.nth(i).getAttribute('data-viewid'))!);
+    for (const viewTabLocator of await this._locator.locator('wb-view-tab').locator(locateByCssClass).all()) {
+      viewIds.push((await viewTabLocator.getAttribute('data-viewid'))!);
     }
     return viewIds;
   }
@@ -80,16 +74,9 @@ export class PartPO {
   /**
    * Indicates if this part is contained in the main area.
    */
-  public isInMainArea(): Promise<boolean> {
-    return isPresent(this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}));
-  }
-
-  /**
-   * Returns whether the tab bar is displaying.
-   * The tab bar is displayed when this part contains at least one view or action.
-   */
-  public async isPartBarPresent(): Promise<boolean> {
-    return isPresent(this._partBarLocator);
+  public async isInMainArea(): Promise<boolean> {
+    const count = await this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}).count();
+    return count > 0;
   }
 
   /**
@@ -104,9 +91,5 @@ export class PartPO {
    */
   public async closeViewTabs(): Promise<void> {
     await this._partBarLocator.locator('wb-view-tab').first().press('Control+Alt+Shift+K');
-  }
-
-  public locator(selector: string): Locator {
-    return this._locator.locator(selector);
   }
 }

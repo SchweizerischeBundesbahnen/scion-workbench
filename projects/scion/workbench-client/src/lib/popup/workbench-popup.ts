@@ -87,7 +87,7 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
     this.capability = this._context.capability;
     this.params = coerceMap(this._context.params);
     this.referrer = this._context.referrer;
-    this.requestFocus();
+    this.requestFocus().then();
   }
 
   /**
@@ -101,7 +101,7 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
    * @inheritDoc
    */
   public close<R = any>(result?: R | undefined): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result);
+    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result).then();
   }
 
   /**
@@ -110,7 +110,7 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
   public closeWithError(error: Error | string): void {
     Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), readErrorMessage(error), {
       headers: new Map().set(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR, true),
-    });
+    }).then();
   }
 
   /**

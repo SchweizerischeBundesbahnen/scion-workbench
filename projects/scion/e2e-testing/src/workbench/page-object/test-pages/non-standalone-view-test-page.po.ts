@@ -11,18 +11,15 @@
 import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
+import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 
-export class NonStandaloneViewTestPagePO {
+export class NonStandaloneViewTestPagePO implements WorkbenchViewPagePO {
 
-  private readonly locator: Locator;
+  public readonly locator: Locator;
   public readonly view: ViewPO;
 
   constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
-    this.view = appPO.view(locateBy);
-    this.locator = this.view.locate('app-non-standalone-view-test-page');
-  }
-
-  public isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.locator = this.view.locator.locator('app-non-standalone-view-test-page');
   }
 }

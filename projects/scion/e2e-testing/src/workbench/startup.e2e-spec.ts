@@ -11,6 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Startup', () => {
 
@@ -29,17 +30,17 @@ test.describe('Startup', () => {
     await appPO.waitUntilWorkbenchStarted();
 
     // Expect two browser dialogs having been accepted.
-    await expect(browserDialogs.get()).toEqual([
+    expect(browserDialogs.get()).toEqual([
       {type: 'alert', message: 'Click to continue Workbench Startup.'},
       {type: 'alert', message: 'Click to continue Workbench Startup.'},
     ]);
 
     // Expect the test view not to error.
-    await expect(await consoleLogs.get({severity: 'error'})).toEqual([]);
+    await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // Expect the test view to show.
-    const testingView = appPO.view({cssClass: 'e2e-test-view'});
-    await expect(await testingView.isPresent()).toBe(true);
-    await expect(await appPO.activePart({inMainArea: true}).getViewIds()).toHaveLength(1);
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'e2e-test-view'});
+    await expectView(testeeViewPage).toBeActive();
+    await expect(appPO.views()).toHaveCount(1);
   });
 });

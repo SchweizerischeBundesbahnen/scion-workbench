@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {isPresent, withoutUndefinedEntries} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
+import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
@@ -17,6 +16,7 @@ import {WorkbenchPopupCapability, WorkbenchPopupReferrer} from '@scion/workbench
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {Locator} from '@playwright/test';
+import {WorkbenchPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
 
 /**
  * Page object to interact with {@link HostPopupPageComponent}.
@@ -24,22 +24,12 @@ import {Locator} from '@playwright/test';
  * Note that {@link HostPopupPageComponent} is not an actual microfrontend that is integrated via an iframe,
  * but is rendered directly in the host app.
  */
-export class HostPopupPagePO {
+export class HostPopupPagePO implements WorkbenchPopupPagePO {
 
   public readonly locator: Locator;
-  public readonly popup: PopupPO;
 
-  constructor(appPO: AppPO, cssClass: string) {
-    this.popup = appPO.popup({cssClass});
-    this.locator = this.popup.locate('app-host-popup-page');
-  }
-
-  public async isPresent(): Promise<boolean> {
-    return isPresent(this.locator);
-  }
-
-  public async isVisible(): Promise<boolean> {
-    return this.locator.isVisible();
+  constructor(public popup: PopupPO) {
+    this.locator = this.popup.locator.locator('app-host-popup-page');
   }
 
   public async getComponentInstanceId(): Promise<string> {
@@ -113,7 +103,7 @@ export class HostPopupPagePO {
     }
   }
 
-  public async clickClose(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
+  public async close(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {
     if (options?.returnValue !== undefined) {
       await this.enterReturnValue(options.returnValue);
     }

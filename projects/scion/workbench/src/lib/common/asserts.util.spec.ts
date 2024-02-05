@@ -42,7 +42,7 @@ describe('Asserts', () => {
       class Type2 {
       }
 
-      expect(assertType(new Type1(), {toBeOneOf: [Type1, Type2]})).toBeUndefined();
+      expect(() => assertType(new Type1(), {toBeOneOf: [Type1, Type2]})).not.toThrowError();
     });
   });
 
@@ -59,15 +59,15 @@ describe('Asserts', () => {
     });
 
     it('should not throw for falsy values', () => {
-      expect(assertNotNullish(0)).toBeUndefined();
-      expect(assertNotNullish('')).toBeUndefined();
-      expect(assertNotNullish(false)).toBeUndefined();
+      expect(() => assertNotNullish(0)).not.toThrowError();
+      expect(() => assertNotNullish('')).not.toThrowError();
+      expect(() => assertNotNullish(false)).not.toThrowError();
     });
 
     it('should not throw for truthy values', () => {
-      expect(assertNotNullish(1)).toBeUndefined();
-      expect(assertNotNullish('some value')).toBeUndefined();
-      expect(assertNotNullish(true)).toBeUndefined();
+      expect(() => assertNotNullish(1)).not.toThrowError();
+      expect(() => assertNotNullish('some value')).not.toThrowError();
+      expect(() => assertNotNullish(true)).not.toThrowError();
     });
   });
 });

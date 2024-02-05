@@ -44,7 +44,7 @@ declare global {
        * });
        * ```
        */
-      toEqualWorkbenchLayout(expected: ExpectedWorkbenchLayout): R;
+      toEqualWorkbenchLayout(expected: ExpectedWorkbenchLayout): Promise<R>;
     }
   }
 }
