@@ -834,4 +834,31 @@ test.describe('Workbench View', () => {
     await expect.poll(() => viewPage.outlet.getCapabilityId()).toEqual(capability.metadata!.id);
     await expect.poll(() => viewPage.outlet.getAppSymbolicName()).toEqual(capability.metadata!.appSymbolicName);
   });
+
+  test('should update Angular bindings for inactive views', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const capability = await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+        title: 'Testee',
+        cssClass: 'testee',
+      },
+    });
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.enterQualifier({component: 'testee'});
+    await routerPage.enterTarget('view.100');
+    await routerPage.checkActivate(false);
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await expect.poll(() => viewPage.outlet.getName()).toEqual('view.100');
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
+    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
+    await expect.poll(() => viewPage.outlet.getCapabilityId()).toEqual(capability.metadata!.id);
+    await expect.poll(() => viewPage.outlet.getAppSymbolicName()).toEqual(capability.metadata!.appSymbolicName);
+  });
 });

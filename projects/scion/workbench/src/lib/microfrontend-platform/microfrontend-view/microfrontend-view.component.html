@@ -1,10 +1,13 @@
 <wb-content-as-overlay [overlayHost]="iframeHostRef.ref$ | async">
-  <div class="microfrontend-view" [class.workbench-drag]="isWorkbenchDrag" wbGlassPane>
+  <div class="microfrontend-view"
+       [class.workbench-drag]="isWorkbenchDrag"
+       [attr.data-viewid]="view.id"
+       wbGlassPane>
     <sci-router-outlet #router_outlet
-                       [name]="viewId"
-                       [attr.data-capabilityid]="viewCapability && viewCapability.metadata!.id"
-                       [attr.data-app]="viewCapability && viewCapability.metadata!.appSymbolicName"
-                       [ngClass]="viewCssClasses" class="e2e-view"
+                       [name]="view.id"
+                       [attr.data-capabilityid]="viewCapability?.metadata!.id"
+                       [attr.data-app]="viewCapability?.metadata!.appSymbolicName"
+                       [ngClass]="view.cssClasses"
                        (focuswithin)="onFocusWithin($event)"
                        [keystrokes]="keystrokesToBubble$ | async">
       <ng-container *ngComponentOutlet="splash"></ng-container>

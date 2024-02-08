@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, OnDestroy, Provider, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostBinding, OnDestroy, Provider, ViewChild} from '@angular/core';
 import {AsyncSubject, combineLatest} from 'rxjs';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -85,7 +85,6 @@ export class ViewComponent implements OnDestroy {
   constructor(private _view: ɵWorkbenchView,
               private _logger: Logger,
               private _host: ElementRef<HTMLElement>,
-              private _cd: ChangeDetectorRef,
               private _viewDragService: ViewDragService,
               viewContextMenuService: ViewMenuService) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
@@ -118,9 +117,6 @@ export class ViewComponent implements OnDestroy {
       .concat(Arrays.coerce(RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.cssClass)))
       .concat(Arrays.coerce(route.snapshot.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalViewStates.cssClass]))
       .concat(this._view.cssClasses);
-    if (!this._view.active) {
-      this._cd.detectChanges();
-    }
   }
 
   public onDeactivateRoute(): void {

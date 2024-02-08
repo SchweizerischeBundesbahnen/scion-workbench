@@ -862,6 +862,20 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
   });
 
+  test('should allow setting CSS class(es) via router (inactive view)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterTarget('view.99');
+    await routerPage.enterPath('test-view');
+    await routerPage.enterCssClass('testee');
+    await routerPage.checkActivate(false);
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
+  });
+
   test('should open a new view if no present view can be found [target=auto]', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
