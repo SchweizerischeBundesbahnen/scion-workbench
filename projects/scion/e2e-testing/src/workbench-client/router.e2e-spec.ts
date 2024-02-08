@@ -2023,6 +2023,21 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
   });
 
+  test('should allow setting CSS class(es) via router (inactive view)', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.enterQualifier({component: 'view', app: 'app1'});
+    await routerPage.enterTarget('view.99');
+    await routerPage.enterCssClass('testee');
+    await routerPage.checkActivate(false);
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
+    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
+  });
+
   test('should substitute named parameter in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
