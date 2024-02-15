@@ -18,6 +18,7 @@
     padding: .6em 1.5em;
     font-size: smaller;
     position: relative; // positioning context for separator pseudo element
+    user-select: none;
 
     > div.text {
       flex: auto;
