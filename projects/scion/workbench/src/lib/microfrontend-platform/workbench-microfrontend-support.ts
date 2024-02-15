@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,7 @@ import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-p
 import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
@@ -29,6 +29,8 @@ import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {Defined} from '@scion/toolkit/util';
+import {MicrofrontendDialogIntentInterceptor} from './microfrontend-dialog/microfrontend-dialog-intent-interceptor.service';
+import {MicrofrontendDialogCapabilityInterceptor} from './microfrontend-dialog/microfrontend-dialog-capability-interceptor.service';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -69,8 +71,10 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     },
     MicrofrontendViewIntentInterceptor,
     MicrofrontendPopupIntentInterceptor,
+    MicrofrontendDialogIntentInterceptor,
     MicrofrontendViewCapabilityInterceptor,
     MicrofrontendPopupCapabilityInterceptor,
+    MicrofrontendDialogCapabilityInterceptor,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideMicrofrontendRoute(),
@@ -114,6 +118,7 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {provide: WorkbenchRouter, useFactory: () => Beans.get(WorkbenchRouter)},
     {provide: WorkbenchPopupService, useFactory: () => Beans.get(WorkbenchPopupService)},
+    {provide: WorkbenchDialogService, useFactory: () => Beans.get(WorkbenchDialogService)},
     {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
   ]);

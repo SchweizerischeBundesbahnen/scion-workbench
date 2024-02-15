@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@
 import {AppPO} from '../app.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
-import {RegisterWorkbenchCapabilityPagePO, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
@@ -19,6 +19,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {MessagingPagePO} from './page-object/messaging-page.po';
 import {Capability, Intention} from '@scion/microfrontend-platform';
+import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 
 export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
   new(...args: any[]): T;
@@ -65,6 +66,10 @@ export class MicrofrontendNavigator {
    */
   public openInNewTab(page: Type<PopupOpenerPagePO>, app: 'app1' | 'app2'): Promise<PopupOpenerPagePO>;
   /**
+   * Opens the page to open dialog in a new workbench tab.
+   */
+  public openInNewTab(page: Type<DialogOpenerPagePO>, app: 'app1' | 'app2'): Promise<DialogOpenerPagePO>;
+  /**
    * Opens the page to exchange messages in a new workbench tab.
    */
   public openInNewTab(page: Type<MessagingPagePO>, app: 'app1' | 'app2'): Promise<MessagingPagePO>;
@@ -106,6 +111,10 @@ export class MicrofrontendNavigator {
         await startPage.openMicrofrontendView('e2e-test-popup-opener', app);
         return new PopupOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-popup-opener'});
       }
+      case DialogOpenerPagePO: {
+        await startPage.openMicrofrontendView('e2e-test-dialog-opener', app);
+        return new DialogOpenerPagePO(this._appPO, {viewId, cssClass: 'e2e-test-dialog-opener'});
+      }
       case MessagingPagePO: {
         await startPage.openMicrofrontendView('e2e-messaging', app);
         return new MessagingPagePO(this._appPO, {viewId, cssClass: 'e2e-messaging'});
@@ -119,7 +128,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench capability.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
     const registerCapabilityPage = await this.openInNewTab(RegisterWorkbenchCapabilityPagePO, app);
     try {
       return await registerCapabilityPage.registerCapability(capability);
@@ -132,7 +141,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench intention.
    */
-  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'view' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
+  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
     const registerIntentionPage = await this.openInNewTab(RegisterWorkbenchIntentionPagePO, app);
     try {
       return await registerIntentionPage.registerIntention(intention);

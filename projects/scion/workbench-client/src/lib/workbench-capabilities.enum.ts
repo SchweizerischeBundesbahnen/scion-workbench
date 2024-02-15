@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,12 @@ export enum WorkbenchCapabilities {
    * A popup is a visual workbench component for displaying content above other content.
    */
   Popup = 'popup',
+  /**
+   * Allows contributing a microfrontend for display in workbench dialog.
+   *
+   * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
+   */
+  Dialog = 'dialog',
   /**
    * Allows contributing a message box provider in the host app.
    *

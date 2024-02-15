@@ -11,16 +11,15 @@
 import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Application, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵTHEME_CONTEXT_KEY, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {Popup} from '../../popup/popup.config';
 import {NgClass, NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {WorkbenchService} from '../../workbench.service';
-import {WorkbenchTheme} from '../../workbench.model';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import '../microfrontend-platform.config';
+import {MicrofrontendThemePropagator} from '../theme/microfrontend-theme-propagtor.service';
 
 /**
  * Displays the microfrontend of a popup capability inside a workbench popup.
@@ -31,6 +30,9 @@ import '../microfrontend-platform.config';
   templateUrl: './microfrontend-popup.component.html',
   standalone: true,
   imports: [NgClass, NgComponentOutlet],
+  providers: [
+    {provide: MicrofrontendThemePropagator},
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
 export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
@@ -60,7 +62,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
               private _messageClient: MessageClient,
               private _destroyRef: DestroyRef,
               private _workbenchLayoutService: WorkbenchLayoutService,
-              private _workbenchService: WorkbenchService,
+              private _microfrontendThemePropagator: MicrofrontendThemePropagator,
               private _logger: Logger) {
     this._popupContext = this.popup.input!;
     this.popupCapability = this._popupContext.capability;
@@ -102,7 +104,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       showSplash: this.popupCapability.properties.showSplash,
     }).then();
 
-    this.installThemePropagator();
+    this._microfrontendThemePropagator.install(this.routerOutletElement.nativeElement);
   }
 
   public onFocusWithin(event: Event): void {
@@ -141,24 +143,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed())
       .subscribe(event => {
         this.isWorkbenchDrag = (event === 'start');
-      });
-  }
-
-  /**
-   * Propagates the current theme and color scheme to embedded content.
-   */
-  private installThemePropagator(): void {
-    this._workbenchService.theme$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(theme => {
-        if (theme) {
-          this.routerOutletElement.nativeElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
-          this.routerOutletElement.nativeElement.setContextValue('color-scheme', theme.colorScheme);
-        }
-        else {
-          this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
-          this.routerOutletElement.nativeElement.removeContextValue('color-scheme');
-        }
       });
   }
 
