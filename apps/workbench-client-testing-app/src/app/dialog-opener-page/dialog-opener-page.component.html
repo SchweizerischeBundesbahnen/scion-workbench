@@ -1,0 +1,49 @@
+<form [formGroup]="form">
+  <section>
+    <sci-form-field label="Qualifier">
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+    </sci-form-field>
+
+    <sci-form-field label="Params">
+      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <sci-form-field label="Modality">
+      <select [formControl]="form.controls.options.controls.modality" class="e2e-modality">
+        <option value="application">application</option>
+        <option value="view">view</option>
+        <option value="">default</option>
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Contextual View ID">
+      <input [formControl]="form.controls.options.controls.contextualViewId" class="e2e-contextual-view-id">
+    </sci-form-field>
+
+    <sci-form-field label="Animate">
+      <sci-checkbox [formControl]="form.controls.options.controls.animate" class="e2e-animate"></sci-checkbox>
+    </sci-form-field>
+
+    <sci-form-field label="CSS Class(es)">
+      <input [formControl]="form.controls.options.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
+</form>
+
+<button (click)="onDialogOpen()" class="open e2e-open" [disabled]="form.invalid" sci-primary>
+  Open dialog
+</button>
+
+@if (returnValue) {
+  <output class="return-value e2e-return-value">
+    {{returnValue}}
+  </output>
+}
+
+@if (dialogError) {
+  <output class="dialog-error e2e-dialog-error">
+    {{dialogError}}
+  </output>
+}

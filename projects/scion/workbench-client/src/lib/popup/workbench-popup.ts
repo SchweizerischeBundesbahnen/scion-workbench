@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -85,7 +85,7 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
 
   constructor(private _context: ɵPopupContext) {
     this.capability = this._context.capability;
-    this.params = coerceMap(this._context.params);
+    this.params = this._context.params;
     this.referrer = this._context.referrer;
     this.requestFocus().then();
   }
@@ -150,20 +150,6 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
  */
 export enum ɵWorkbenchPopupMessageHeaders {
   CLOSE_WITH_ERROR = 'ɵWORKBENCH-POPUP:CLOSE_WITH_ERROR',
-}
-
-/**
- * Coerces the given Map-like object to a `Map`.
- *
- * Data sent from one JavaScript realm to another is serialized with the structured clone algorithm.
- * Altought the algorithm supports the `Map` data type, a deserialized map object cannot be checked to be instance of `Map`.
- * This is most likely because the serialization takes place in a different realm.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
- * @see http://man.hubwiz.com/docset/JavaScript.docset/Contents/Resources/Documents/developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm.html
- */
-function coerceMap<K, V>(mapLike: Map<K, V>): Map<K, V> {
-  return new Map(mapLike);
 }
 
 /**

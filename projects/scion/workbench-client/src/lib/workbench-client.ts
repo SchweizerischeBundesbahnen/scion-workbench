@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,8 @@ import {WorkbenchMessageBoxService} from './message-box/workbench-message-box-se
 import {WorkbenchNotificationService} from './notification/workbench-notification-service';
 import {WorkbenchThemeMonitor} from './theme/workbench-theme-monitor';
 import {ɵWorkbenchThemeMonitor} from './theme/ɵworkbench-theme-monitor';
+import {WorkbenchDialogInitializer} from './dialog/workbench-dialog-initializer';
+import {WorkbenchDialogService} from './dialog/workbench-dialog-service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -29,7 +31,13 @@ import {ɵWorkbenchThemeMonitor} from './theme/ɵworkbench-theme-monitor';
  * #### Core services include:
  *
  * - {@link WorkbenchRouter} for navigating to a microfrontend in a workbench view.
- * - {@link WorkbenchView} for interacting with the workbench view, such as setting view tab properties or closing the view.
+ * - {@link WorkbenchView} for the microfrontend to interact with the view.
+ * - {@link WorkbenchDialogService} for displaying a microfrontend in a dialog.
+ * - {@link WorkbenchDialog} for the microfrontend to interact with the dialog.
+ * - {@link WorkbenchPopupService} for displaying a microfrontend in a popup.
+ * - {@link WorkbenchPopup} for the microfrontend to interact with the popup.
+ * - {@link WorkbenchNotificationService} for displaying a notification.
+ * - {@link WorkbenchMessageBoxService} for displaying a message.
  * - `MessageClient` for sending or receiving messages between micro applications.
  * - `IntentClient` for issuing or receiving intents between micro applications.
  * - `ManifestService` for reading and registering capabilities at runtime.
@@ -107,9 +115,11 @@ export class WorkbenchClient {
     Beans.register(WorkbenchPopupService);
     Beans.register(WorkbenchMessageBoxService);
     Beans.register(WorkbenchNotificationService);
+    Beans.register(WorkbenchDialogService);
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
+    Beans.registerInitializer({useClass: WorkbenchDialogInitializer});
     await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
   }
 }

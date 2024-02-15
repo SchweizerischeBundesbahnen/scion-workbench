@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
-import {merge, MonoTypeOperatorFunction, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
+import {merge, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 import {ManifestService, mapToBody, Message, MessageClient, MessageHeaders, MicrofrontendPlatformClient, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
@@ -50,7 +50,6 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.id))
       .pipe(
         mapToBody(),
-        coerceMap(),
         shareReplay({refCount: false, bufferSize: 1}),
         decorateObservable(),
         takeUntil(merge(this._beforeUnload$, this._destroy$)),
@@ -229,22 +228,6 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
  * @see {@link ContextService}
  */
 export const ɵVIEW_ID_CONTEXT_KEY = 'ɵworkbench.view.id';
-
-/**
- * Coerces the given Map-like object to a `Map`.
- *
- * Data sent from one JavaScript realm to another is serialized with the structured clone algorithm.
- * Altought the algorithm supports the `Map` data type, a deserialized map object cannot be checked to be instance of `Map`.
- * This is most likely because the serialization takes place in a different realm.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
- * @see http://man.hubwiz.com/docset/JavaScript.docset/Contents/Resources/Documents/developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm.html
- *
- * @ignore
- */
-function coerceMap<K, V>(): MonoTypeOperatorFunction<Map<K, V>> {
-  return map(mapLike => new Map(mapLike));
-}
 
 /**
  * Looks up the corresponding view capability for each capability id emitted by the source Observable.

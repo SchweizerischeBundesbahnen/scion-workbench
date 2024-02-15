@@ -33,20 +33,7 @@ test.describe('Workbench View Capability', () => {
     expect(capability1.metadata!.id).toEqual(capability2.metadata!.id);
   });
 
-  test('should error if qualifier is missing', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    const capability = microfrontendNavigator.registerCapability('app1', {
-      type: 'view',
-      qualifier: undefined!,
-      properties: {
-        path: 'test-pages/microfrontend-test-page',
-      },
-    });
-    await expect(capability).rejects.toThrow(/NullQualifierError/);
-  });
-
-  test('should error if qualifier is empty', async ({appPO, microfrontendNavigator}) => {
+  test('should error if not having a qualifier', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const capability = microfrontendNavigator.registerCapability('app1', {

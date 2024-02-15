@@ -45,20 +45,7 @@ test.describe('Workbench Popup Capability', () => {
     }));
   });
 
-  test('should error if qualifier is missing', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    const registeredCapability = microfrontendNavigator.registerCapability('app1', {
-      type: 'popup',
-      qualifier: undefined!,
-      properties: {
-        path: 'test-pages/microfrontend-test-page',
-      },
-    });
-    await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);
-  });
-
-  test('should error if qualifier is empty', async ({appPO, microfrontendNavigator}) => {
+  test('should error if not having a qualifier', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const registeredCapability = microfrontendNavigator.registerCapability('app1', {

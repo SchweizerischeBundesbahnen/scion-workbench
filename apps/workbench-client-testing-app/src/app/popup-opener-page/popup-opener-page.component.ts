@@ -21,6 +21,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -61,7 +62,7 @@ export default class PopupOpenerPageComponent {
       width: this._formBuilder.control<number | undefined>(undefined),
       height: this._formBuilder.control<number | undefined>(undefined),
     }),
-    contextualViewId: this._formBuilder.control('<default>', Validators.required),
+    contextualViewId: this._formBuilder.control(''),
     align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
     cssClass: this._formBuilder.control(''),
     closeStrategy: this._formBuilder.group({
@@ -100,23 +101,11 @@ export default class PopupOpenerPageComponent {
       }),
       cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
       context: {
-        viewId: this.parseContextualViewIdInput(),
+        viewId: parseTypedString(this.form.controls.contextualViewId.value || undefined),
       },
     })
       .then(result => this.returnValue = result)
       .catch(error => this.popupError = stringifyError(error) || 'Popup was closed with an error');
-  }
-
-  private parseContextualViewIdInput(): string | null | undefined {
-    const viewId = this.form.controls.contextualViewId.value;
-    switch (viewId) {
-      case '<default>':
-        return undefined;
-      case '<null>':
-        return null;
-      default:
-        return viewId;
-    }
   }
 
   private observePopupOrigin$(): Observable<PopupOrigin> {

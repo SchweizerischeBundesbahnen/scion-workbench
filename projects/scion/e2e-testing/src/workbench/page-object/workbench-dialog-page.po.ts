@@ -9,6 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
+import {SciRouterOutletPO} from '../../workbench-client/page-object/sci-router-outlet.po';
 import {DialogPO} from '../../dialog.po';
 
 /**
@@ -23,4 +24,14 @@ export interface WorkbenchDialogPagePO {
    * Locates the page displayed in the workbench dialog.
    */
   readonly locator: Locator;
+}
+
+/**
+ * Represents a workbench dialog displaying a microfrontend.
+ */
+export interface MicrofrontendDialogPagePO extends WorkbenchDialogPagePO {
+  /**
+   * Locates the outlet displaying the microfrontend.
+   */
+  readonly outlet: SciRouterOutletPO;
 }

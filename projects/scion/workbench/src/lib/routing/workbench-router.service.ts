@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,7 @@ import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from './wo
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Commands, ViewState, ViewStates} from './routing.model';
+import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -497,6 +498,10 @@ export interface WorkbenchNavigationContext {
    * Popups added or removed by the current navigation.
    */
   popupDiff: WorkbenchPopupDiff;
+  /**
+   * Dialogs added or removed by the current navigation.
+   */
+  dialogDiff: WorkbenchDialogDiff;
 }
 
 /**

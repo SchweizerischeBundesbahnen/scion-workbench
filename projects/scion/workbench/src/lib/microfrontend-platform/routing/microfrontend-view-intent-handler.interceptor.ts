@@ -20,12 +20,13 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 
 /**
- * Handles microfrontend view intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
+ * Handles microfrontend view intents, instructing the workbench to navigate to the microfrontend of the resolved capability.
  *
- * View intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench. They are not transported to the providing application.
+ * View intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
+ * that are not connected to the SCION Workbench.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
+export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
   constructor(private _workbenchRouter: WorkbenchRouter,
               private _viewRegistry: WorkbenchViewRegistry,
