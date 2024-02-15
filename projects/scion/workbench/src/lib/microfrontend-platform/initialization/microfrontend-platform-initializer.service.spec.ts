@@ -10,8 +10,8 @@
 
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Handler, IntentInterceptor, IntentMessage} from '@scion/microfrontend-platform';
-import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
-import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
+import {MicrofrontendViewIntentHandler} from '../routing/microfrontend-view-intent-handler.interceptor';
+import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MICROFRONTEND_PLATFORM_PRE_STARTUP, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchTestingModule} from '../../testing/workbench-testing.module';
@@ -51,7 +51,7 @@ describe('Microfrontend Platform Initializer', () => {
 
     // Expect app-specific interceptor to be installed first.
     expect(Beans.all(IntentInterceptor)[0]).toBeInstanceOf(CustomIntentInterceptor);
-    expect(Beans.all(IntentInterceptor)[1]).toBeInstanceOf(MicrofrontendViewIntentInterceptor);
-    expect(Beans.all(IntentInterceptor)[2]).toBeInstanceOf(MicrofrontendPopupIntentInterceptor);
+    expect(Beans.all(IntentInterceptor)[1]).toBeInstanceOf(MicrofrontendViewIntentHandler);
+    expect(Beans.all(IntentInterceptor)[2]).toBeInstanceOf(MicrofrontendPopupIntentHandler);
   });
 });

@@ -22,7 +22,7 @@ export function expectView(viewPage: WorkbenchViewPagePO | MicrofrontendViewPage
 }
 
 /**
- * Returns a {@ViewMatcher} to expect the workbench view.
+ * Returns a {@link ViewMatcher} to expect the workbench view.
  */
 function expectWorkbenchView(viewPage: WorkbenchViewPagePO): ViewMatcher {
   return {
@@ -49,7 +49,7 @@ function expectWorkbenchView(viewPage: WorkbenchViewPagePO): ViewMatcher {
 }
 
 /**
- * Returns a {@ViewMatcher} to expect the microfrontend view.
+ * Returns a {@link ViewMatcher} to expect the microfrontend view.
  */
 function expectMicrofrontendView(viewPage: MicrofrontendViewPagePO): ViewMatcher {
   return {

@@ -24,12 +24,15 @@ import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/micro
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 
 /**
- * Handles microfrontend popup intents, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
+ * Handles popup intents, instructing the workbench to open a popup with the microfrontend declared on the resolved capability.
  *
- * Popup intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench. They are not transported to the providing application.
+ * Microfrontends of the host are displayed in {@link MicrofrontendHostPopupComponent}, microfrontends of other applications in {@link MicrofrontendPopupComponent}.
+ *
+ * Popup intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
+ * that are not connected to the SCION Workbench.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
+export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
   private _openedPopups = new Set<string>();
 
@@ -77,7 +80,7 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
   }
 
   /**
-   * Opens a workbench popup for displaying the microfrontend of a popup capability.
+   * Opens the microfrontend declared by the resolved capability in a popup.
    */
   private async openPopup(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<any> {
     const command = message.body!;

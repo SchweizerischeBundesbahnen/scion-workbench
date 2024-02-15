@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,25 +16,6 @@ import {VIEW_ID_PREFIX} from '../workbench.constants';
  * Provides utility functions for router operations.
  */
 export const RouterUtils = {
-
-  /**
-   * Replaces named parameters in the given path with values contained in the given {@link Map}.
-   * Named parameters begin with a colon (`:`) and are allowed in path segments, query parameters, matrix parameters
-   * and the fragment part.
-   *
-   * Some examples about the usage of named parameters:
-   * /segment/:param1/segment/:param2 // path params
-   * /segment/segment;matrixParam1=:param1;matrixParam2=:param2 // matrix params
-   * /segment/segment?queryParam1=:param1&queryParam2=:param2 // query params
-   */
-  substituteNamedParameters: (path: string | null, params?: Map<string, any>): string | null => {
-    if (!path || !params?.size) {
-      return path;
-    }
-    // A named parameter can be followed by another path segment (`/`), by a query param (`?` or `&`), by a matrix param (`;`)
-    // or by the fragment part (`#`).
-    return path.replace(/:([^/;&?#]+)/g, (match, $1) => params.has($1) ? params.get($1) : match) ?? path;
-  },
 
   /**
    * Converts URL segments into an array of routable commands to be passed to the Angular router for navigation.

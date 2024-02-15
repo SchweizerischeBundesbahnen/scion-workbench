@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018-2022 Swiss Federal Railways
+* Copyright (c) 2018-2024 Swiss Federal Railways
 *
 * This program and the accompanying materials are made
 * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.guard';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
+import {WorkbenchDialogDiffer} from './workbench-dialog-differ';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -53,6 +54,7 @@ export class WorkbenchUrlObserver {
               private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
               private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
               private _workbenchPopupDiffer: WorkbenchPopupDiffer,
+              private _workbenchDialogDiffer: WorkbenchDialogDiffer,
               private _logger: Logger) {
     this.installRouterEventListeners();
   }
@@ -60,10 +62,11 @@ export class WorkbenchUrlObserver {
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
     const context = this.createWorkbenchNavigationContext(event.url);
-    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, popupDiff=${context.popupDiff.toString()}]`);
+    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, popupDiff=${context.popupDiff.toString()},  dialogDiff=${context.dialogDiff.toString()}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
     this.registerAddedViewAuxiliaryRoutes();
     this.registerAddedPopupAuxiliaryRoutes();
+    this.registerAddedDialogAuxiliaryRoutes();
   }
 
   /** Invoked upon successful navigation */
@@ -82,6 +85,7 @@ export class WorkbenchUrlObserver {
     this.undoAuxiliaryRoutesRegistration();
     this.undoWorkbenchLayoutDiffer();
     this.undoWorkbenchPopupDiffer();
+    this.undoWorkbenchDialogDiffer();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -91,6 +95,7 @@ export class WorkbenchUrlObserver {
     this.undoAuxiliaryRoutesRegistration();
     this.undoWorkbenchLayoutDiffer();
     this.undoWorkbenchPopupDiffer();
+    this.undoWorkbenchDialogDiffer();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -136,6 +141,7 @@ export class WorkbenchUrlObserver {
       layout,
       layoutDiff: this._workbenchLayoutDiffer.diff(layout, urlTree),
       popupDiff: this._workbenchPopupDiffer.diff(urlTree),
+      dialogDiff: this._workbenchDialogDiffer.diff(urlTree),
     };
   }
 
@@ -168,6 +174,19 @@ export class WorkbenchUrlObserver {
   }
 
   /**
+   * For each added dialog, registers auxiliary routes of all primary routes.
+   */
+  public registerAddedDialogAuxiliaryRoutes(): void {
+    const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
+    const addedDialogOutlets = navigationContext.dialogDiff.addedDialogOutlets;
+
+    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedDialogOutlets);
+    if (newAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
+    }
+  }
+
+  /**
    * Reverts the workbench layout differ to the state before the navigation.
    *
    * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
@@ -189,6 +208,16 @@ export class WorkbenchUrlObserver {
   }
 
   /**
+   * Reverts the dialog outlet differ to the state before the navigation.
+   *
+   * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
+   */
+  private undoWorkbenchDialogDiffer(): void {
+    const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
+    this._workbenchDialogDiffer.diff(prevNavigateUrl);
+  }
+
+  /**
    * Undoes the registration of auxiliary routes.
    *
    * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
@@ -196,7 +225,8 @@ export class WorkbenchUrlObserver {
   private undoAuxiliaryRoutesRegistration(): void {
     const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
     const popupDiff = this._workbenchRouter.getCurrentNavigationContext().popupDiff;
-    const addedOutlets: string[] = [...layoutDiff.addedViewOutlets, ...popupDiff.addedPopupOutlets];
+    const dialogDiff = this._workbenchRouter.getCurrentNavigationContext().dialogDiff;
+    const addedOutlets: string[] = [...layoutDiff.addedViewOutlets, ...popupDiff.addedPopupOutlets, ...dialogDiff.addedDialogOutlets];
     if (addedOutlets.length) {
       this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(addedOutlets);
       this._logger.debug(() => `Undo auxiliary routes registration for outlet(s): ${addedOutlets}`, LoggerNames.ROUTING);
@@ -245,7 +275,8 @@ export class WorkbenchUrlObserver {
   private unregisterRemovedOutletAuxiliaryRoutes(): void {
     const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
     const popupDiff = this._workbenchRouter.getCurrentNavigationContext().popupDiff;
-    const removedOutlets: string[] = [...layoutDiff.removedViewOutlets, ...popupDiff.removedPopupOutlets];
+    const dialogDiff = this._workbenchRouter.getCurrentNavigationContext().dialogDiff;
+    const removedOutlets: string[] = [...layoutDiff.removedViewOutlets, ...popupDiff.removedPopupOutlets, ...dialogDiff.removedDialogOutlets];
     if (removedOutlets.length) {
       this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);
       this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(removedOutlets);

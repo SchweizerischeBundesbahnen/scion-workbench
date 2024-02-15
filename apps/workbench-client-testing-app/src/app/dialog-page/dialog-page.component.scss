@@ -1,0 +1,53 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  > sci-viewport.content {
+    flex: 1 1 0;
+
+    &::part(content) {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      padding: 1em;
+    }
+
+    > sci-accordion {
+      header {
+        font-weight: bold;
+      }
+
+      &.dialog-capability sci-viewport {
+        max-height: 200px;
+
+        div.capability {
+          white-space: pre;
+          font-family: monospace;
+        }
+      }
+
+      &.return-value input {
+        @include sci-design.style-input-field();
+      }
+    }
+  }
+
+  > footer {
+    flex: none;
+    border-top: 1px solid var(--sci-color-border);
+    padding: .5em 1em;
+    display: flex;
+    gap: 2em;
+    align-items: center;
+    justify-content: space-between;
+
+    > label.close-with-error {
+      display: flex;
+      align-items: center;
+      gap: .5em;
+    }
+  }
+}

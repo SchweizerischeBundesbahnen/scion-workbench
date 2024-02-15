@@ -3,6 +3,7 @@
     <sci-form-field label="Type">
       <select [formControl]="form.controls.type" class="e2e-type">
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
+        <option [value]="WorkbenchCapabilities.Dialog">DIALOG</option>
         <option [value]="WorkbenchCapabilities.Popup">POPUP</option>
         <option [value]="WorkbenchCapabilities.MessageBox">MESSAGE BOX</option>
         <option [value]="WorkbenchCapabilities.Notification">NOTIFICATION</option>
@@ -14,13 +15,17 @@
     </sci-form-field>
   </section>
 
-  <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid">Register</button>
+  <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid" sci-primary>Register</button>
 
-  <output class="intention-id e2e-register-response" *ngIf="intentionId">
-    Intention ID: <span class="e2e-intention-id">{{intentionId}}</span>
-  </output>
+  @if (intentionId) {
+    <output class="intention-id e2e-register-response">
+      Intention ID: <span class="e2e-intention-id">{{intentionId}}</span>
+    </output>
+  }
 
-  <output class="register-error e2e-register-error" *ngIf="registerError">
-    {{registerError}}
-  </output>
+  @if (registerError) {
+    <output class="register-error e2e-register-error">
+      {{registerError}}
+    </output>
+  }
 </form>

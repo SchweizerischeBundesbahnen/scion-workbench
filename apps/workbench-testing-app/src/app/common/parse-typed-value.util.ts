@@ -22,11 +22,11 @@ import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion
  * - '<json>{"key": "value"}</json>' => {"key": "value"}
  * - 'value' => 'value'
  */
-export function parseTypedString(value: string): string | number | boolean | object | undefined | null {
-  if ('<undefined>' === value) {
+export function parseTypedString(value: string | undefined | null): any {
+  if (value === '<undefined>' || value === undefined) {
     return undefined;
   }
-  else if ('<null>' === value) {
+  else if (value === '<null>' || value === null) {
     return null;
   }
   const paramMatch = value.match(/<(?<type>.+)>(?<value>.+)<\/\k<type>>/);

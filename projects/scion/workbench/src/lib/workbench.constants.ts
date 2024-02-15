@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,6 +31,11 @@ export const VIEW_ID_PREFIX = 'view.';
 export const POPUP_ID_PREFIX = 'popup.';
 
 /**
+ * Represents the id prefix of dialogs.
+ */
+export const DIALOG_ID_PREFIX = 'dialog.';
+
+/**
  * Name of the query parameter that contains the layout of the main area.
  */
 export const MAIN_AREA_LAYOUT_QUERY_PARAM = 'main_area';
@@ -48,7 +53,6 @@ export type ViewTabRenderingContext = 'tab' | 'list-item' | 'drag-image';
  * DI token to inject the context in which the view tab is rendered.
  */
 export const VIEW_TAB_RENDERING_CONTEXT = new InjectionToken<ViewTabRenderingContext>('VIEW_TAB_RENDERING_CONTEXT');
-
 
 /**
  * DI token representing the configured workbench layout.

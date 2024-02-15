@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Component, Optional} from '@angular/core';
-import {WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchDialog, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -24,26 +24,20 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class SignalReadyTestPageComponent {
 
-  constructor(@Optional() view: WorkbenchView, @Optional() popup: WorkbenchPopup) {
-    this.installViewReadySignaler(view);
-    this.installPopupReadySignaler(popup);
+  constructor(@Optional() view: WorkbenchView, @Optional() popup: WorkbenchPopup, @Optional() dialog: WorkbenchDialog) {
+    this.installReadySignaler(view ?? popup ?? dialog);
   }
 
-  private installViewReadySignaler(view: WorkbenchView | undefined): void {
-    if (!view) {
+  private installReadySignaler(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | undefined): void {
+    if (!handle) {
       return;
     }
-    Beans.get(MessageClient).observe$(`signal-ready/${view.id}`)
+    Beans.get(MessageClient).observe$(`signal-ready/${isView(handle) ? handle.id : handle.capability.metadata!.id}`)
       .pipe(takeUntilDestroyed())
-      .subscribe(() => view.signalReady());
+      .subscribe(() => handle.signalReady());
   }
+}
 
-  private installPopupReadySignaler(popup: WorkbenchPopup | undefined): void {
-    if (!popup) {
-      return;
-    }
-    Beans.get(MessageClient).observe$(`signal-ready/${popup.capability.metadata!.id}`)
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => popup.signalReady());
-  }
+function isView(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog): handle is WorkbenchView {
+  return (handle as WorkbenchView).id !== undefined;
 }
