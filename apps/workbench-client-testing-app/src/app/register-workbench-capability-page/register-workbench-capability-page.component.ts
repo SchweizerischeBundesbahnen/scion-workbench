@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,11 @@ import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
+import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {JsonPipe, NgIf} from '@angular/common';
+import {JsonPipe} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -30,7 +30,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   styleUrls: ['./register-workbench-capability-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     JsonPipe,
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -71,6 +70,23 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       pinToStartPage: this._formBuilder.control(false),
       cssClass: this._formBuilder.control(''),
     }),
+    dialogProperties: this._formBuilder.group({
+      path: this._formBuilder.control(''),
+      size: this._formBuilder.group({
+        minHeight: this._formBuilder.control(''),
+        height: this._formBuilder.control(''),
+        maxHeight: this._formBuilder.control(''),
+        minWidth: this._formBuilder.control(''),
+        width: this._formBuilder.control(''),
+        maxWidth: this._formBuilder.control(''),
+      }),
+      title: this._formBuilder.control(''),
+      closable: this._formBuilder.control(true),
+      resizable: this._formBuilder.control(true),
+      showSplash: this._formBuilder.control(false),
+      pinToStartPage: this._formBuilder.control(false),
+      cssClass: this._formBuilder.control(''),
+    }),
   });
 
   public capability: Capability | undefined;
@@ -90,6 +106,8 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           return this.readViewCapabilityFromUI();
         case WorkbenchCapabilities.Popup:
           return this.readPopupCapabilityFromUI();
+        case WorkbenchCapabilities.Dialog:
+          return this.readDialogCapabilityFromUI();
         default:
           throw Error('[IllegalArgumentError] Capability expected to be a workbench capability, but was not.');
       }
@@ -121,7 +139,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: this.readPathFromUI(this.form.controls.viewProperties.controls.path.value)!,
+        path: parseNullOrUndefined(this.form.controls.viewProperties.controls.path.value)!,
         title: this.form.controls.viewProperties.controls.title.value || undefined,
         heading: this.form.controls.viewProperties.controls.heading.value || undefined,
         cssClass: this.form.controls.viewProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
@@ -144,7 +162,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: this.readPathFromUI(this.form.controls.popupProperties.controls.path.value)!,
+        path: parseNullOrUndefined(this.form.controls.popupProperties.controls.path.value)!,
         size: undefinedIfEmpty<PopupSize>({
           width: this.form.controls.popupProperties.controls.size.controls.width.value || undefined,
           height: this.form.controls.popupProperties.controls.size.controls.height.value || undefined,
@@ -160,14 +178,45 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     };
   }
 
-  private readPathFromUI(path: string): string | null | undefined {
-    switch (path) {
-      case '<null>':
-        return null;
-      case '<undefined>':
-        return undefined;
-      default:
-        return path;
-    }
+  private readDialogCapabilityFromUI(): WorkbenchDialogCapability & {properties: {pinToStartPage: boolean}} {
+    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    return {
+      type: WorkbenchCapabilities.Dialog,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
+      private: this.form.controls.private.value,
+      properties: {
+        path: parseNullOrUndefined(this.form.controls.dialogProperties.controls.path.value)!,
+        size: undefinedIfEmpty<WorkbenchDialogSize>({
+          width: parseNullOrUndefined(this.form.controls.dialogProperties.controls.size.controls.width.value)!, // allow undefined for testing the capability interceptor.
+          height: parseNullOrUndefined(this.form.controls.dialogProperties.controls.size.controls.height.value)!, // allow undefined for testing the capability interceptor.
+          minWidth: this.form.controls.dialogProperties.controls.size.controls.minWidth.value || undefined,
+          maxWidth: this.form.controls.dialogProperties.controls.size.controls.maxWidth.value || undefined,
+          minHeight: this.form.controls.dialogProperties.controls.size.controls.minHeight.value || undefined,
+          maxHeight: this.form.controls.dialogProperties.controls.size.controls.maxHeight.value || undefined,
+        })!, // allow undefined for testing the capability interceptor.
+        title: this.form.controls.dialogProperties.controls.title.value || undefined,
+        closable: this.form.controls.dialogProperties.controls.closable.value,
+        resizable: this.form.controls.dialogProperties.controls.resizable.value,
+        showSplash: this.form.controls.dialogProperties.controls.showSplash.value,
+        pinToStartPage: this.form.controls.dialogProperties.controls.pinToStartPage.value,
+        cssClass: this.form.controls.dialogProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      },
+    };
+  }
+}
+
+function parseNullOrUndefined(value: string): string | null | undefined {
+  switch (value) {
+    case '<null>':
+      return null;
+    case '<undefined>':
+      return undefined;
+    default:
+      return value;
   }
 }

@@ -78,6 +78,10 @@ export const routes: Routes = [
     loadComponent: () => import('./host-popup-page/host-popup-page.component'),
   },
   {
+    path: 'test-host-dialog',
+    loadComponent: () => import('./host-dialog-page/host-dialog-page.component'),
+  },
+  {
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },

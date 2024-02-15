@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,6 +21,8 @@ import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microf
 import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {MicrofrontendDialogIntentInterceptor} from '../microfrontend-dialog/microfrontend-dialog-intent-interceptor.service';
+import {MicrofrontendDialogCapabilityInterceptor} from '../microfrontend-dialog/microfrontend-dialog-capability-interceptor.service';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -35,8 +37,10 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
               private _ngZoneObservableDecorator: NgZoneObservableDecorator,
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
+              private _microfrontendDialogIntentInterceptor: MicrofrontendDialogIntentInterceptor,
               private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
               private _microfrontendPopupCapabilityInterceptor: MicrofrontendPopupCapabilityInterceptor,
+              private _microfrontendDialogCapabilityInterceptor: MicrofrontendDialogCapabilityInterceptor,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -78,11 +82,17 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Register popup intent interceptor to translate popup intents into workbench popup commands.
     Beans.register(IntentInterceptor, {useValue: this._microfrontendPopupIntentInterceptor, multi: true});
 
+    // Register dialog intent interceptor to translate dialog intents into workbench dialog commands.
+    Beans.register(IntentInterceptor, {useValue: this._microfrontendDialogIntentInterceptor, multi: true});
+
     // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendViewCapabilityInterceptor, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPopupCapabilityInterceptor, multi: true});
+
+    // Register dialog capability interceptor to assert required dialog capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendDialogCapabilityInterceptor, multi: true});
 
     // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.

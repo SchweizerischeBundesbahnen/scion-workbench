@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,12 @@ export {WorkbenchPopupConfig, CloseStrategy} from './lib/popup/workbench-popup.c
 export {WorkbenchPopupReferrer} from './lib/popup/workbench-popup-referrer';
 export {Point, TopLeftPoint, TopRightPoint, BottomLeftPoint, BottomRightPoint, PopupOrigin} from './lib/popup/popup.origin';
 export {ɵPopupContext, ɵPOPUP_CONTEXT} from './lib/popup/workbench-popup-context';
+export {WorkbenchDialogCapability, WorkbenchDialogSize} from './lib/dialog/workbench-dialog-capability';
+export {WorkbenchDialog} from './lib/dialog/workbench-dialog';
+export {WorkbenchDialogService} from './lib/dialog/workbench-dialog-service';
+export {WorkbenchDialogOptions} from './lib/dialog/workbench-dialog.options';
+export {ɵDialogContext, ɵDIALOG_CONTEXT} from './lib/dialog/ɵworkbench-dialog-context';
+export {ɵWorkbenchDialogMessageHeaders} from './lib/dialog/ɵworkbench-dialog';
 export {WorkbenchMessageBoxCapability} from './lib/message-box/workbench-message-box-capability';
 export {WorkbenchMessageBoxService} from './lib/message-box/workbench-message-box-service';
 export {WorkbenchMessageBoxConfig} from './lib/message-box/workbench-message-box.config';

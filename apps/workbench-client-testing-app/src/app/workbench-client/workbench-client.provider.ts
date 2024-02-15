@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 
 import {APP_INITIALIZER, EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, runInInjectionContext} from '@angular/core';
 import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
-import {WorkbenchClient, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchClient, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
@@ -47,6 +47,8 @@ export function provideWorkbenchClient(): EnvironmentProviders | [] {
     {provide: WorkbenchView, useFactory: () => Beans.opt(WorkbenchView)},
     {provide: WorkbenchPopupService, useFactory: () => Beans.get(WorkbenchPopupService)},
     {provide: WorkbenchPopup, useFactory: () => Beans.opt(WorkbenchPopup)},
+    {provide: WorkbenchDialogService, useFactory: () => Beans.get(WorkbenchDialogService)},
+    {provide: WorkbenchDialog, useFactory: () => Beans.opt(WorkbenchDialog)},
     {provide: WorkbenchMessageBoxService, useFactory: () => Beans.get(WorkbenchMessageBoxService)},
     {provide: WorkbenchNotificationService, useFactory: () => Beans.get(WorkbenchNotificationService)},
     {provide: WorkbenchThemeMonitor, useFactory: () => Beans.get(WorkbenchThemeMonitor)},
