@@ -119,14 +119,8 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   }
 
   /** @inheritDoc */
-  public close(result?: R): void {
-    this._result = result;
-    this.destroy();
-  }
-
-  /** @inheritDoc */
-  public closeWithError(error: Error | string): void {
-    this._result = new ɵDialogErrorResult(error);
+  public close(result?: R | Error): void {
+    this._result = result instanceof Error ? new ɵDialogErrorResult(result) : result;
     this.destroy();
   }
 

@@ -54,14 +54,9 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract cssClass: string | string[];
 
   /**
-   * Closes the dialog. Optionally, pass a result to the dialog opener.
+   * Closes the dialog. Optionally, pass a result or an error to the dialog opener.
    */
-  public abstract close(result?: R): void;
-
-  /**
-   * Closes the dialog returning the given error to the dialog opener.
-   */
-  public abstract closeWithError(error: Error | string): void;
+  public abstract close(result?: R | Error): void;
 }
 
 /**

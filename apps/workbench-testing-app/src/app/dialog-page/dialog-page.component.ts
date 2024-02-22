@@ -79,12 +79,8 @@ export class DialogPageComponent {
   }
 
   public onClose(): void {
-    if (this.form.controls.closeWithError.value) {
-      this.dialog.closeWithError(this.form.controls.result.value);
-    }
-    else {
-      this.dialog.close(this.form.controls.result.value);
-    }
+    const result = this.form.controls.closeWithError.value ? new Error(this.form.controls.result.value) : this.form.controls.result.value;
+    this.dialog.close(result);
   }
 
   private installPropertyUpdater(): void {
