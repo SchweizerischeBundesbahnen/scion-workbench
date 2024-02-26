@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, HostListener} from '@angular/core';
+import {Component, HostBinding, HostListener, Injector, runInInjectionContext} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {Observable, OperatorFunction} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -45,7 +45,8 @@ export class ViewMenuComponent {
   public menuItemGroups$: Observable<MenuItemGroups>;
 
   constructor(private _overlayRef: OverlayRef,
-              private _view: ɵWorkbenchView) {
+              private _view: ɵWorkbenchView,
+              private _injector: Injector) {
     this.menuItemGroups$ = this._view.menuItems$.pipe(groupMenuItems());
   }
 
@@ -53,7 +54,7 @@ export class ViewMenuComponent {
     if (menuItem.isDisabled?.()) {
       return;
     }
-    menuItem.onAction();
+    runInInjectionContext(this._injector, () => menuItem.onAction());
     this._overlayRef.dispose();
   }
 

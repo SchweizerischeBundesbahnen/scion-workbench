@@ -79,7 +79,9 @@ export interface WorkbenchMenuItem {
    */
   portal: TemplatePortal | ComponentPortal<any>;
   /**
-   * Sets the listener invoked when the user performs the menu action, either by clicking the menu or via keyboard accelerator, if any.
+   * Specifies the callback triggered when clicking this menu item.
+   *
+   * The function can call `inject` to get any required dependencies.
    */
   onAction: () => void;
   /**

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, Injectable, Injector} from '@angular/core';
+import {ElementRef, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
@@ -125,7 +125,7 @@ export class ViewMenuService {
           takeUntil(unsubscribe$),
         )
         .subscribe((menuItem: WorkbenchMenuItem) => {
-          menuItem.onAction();
+          runInInjectionContext(this._injector, () => menuItem.onAction());
         });
 
       return (): void => unsubscribe$.next();
