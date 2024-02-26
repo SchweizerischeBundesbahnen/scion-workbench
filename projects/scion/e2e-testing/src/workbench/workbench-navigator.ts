@@ -74,7 +74,7 @@ export class WorkbenchNavigator {
       }
       case DialogOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-dialog-opener');
-        return new DialogOpenerPagePO(this._appPO, this._appPO.view({viewId, cssClass: 'e2e-test-dialog-opener'}));
+        return new DialogOpenerPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-dialog-opener'}));
       }
       case NotificationOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-notification-opener');
@@ -82,7 +82,7 @@ export class WorkbenchNavigator {
       }
       case PopupOpenerPagePO: {
         await startPage.openWorkbenchView('e2e-test-popup-opener');
-        return new PopupOpenerPagePO(this._appPO, this._appPO.view({viewId, cssClass: 'e2e-test-popup-opener'}));
+        return new PopupOpenerPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-popup-opener'}));
       }
       case RouterPagePO: {
         await startPage.openWorkbenchView('e2e-test-router');

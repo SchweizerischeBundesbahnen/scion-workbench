@@ -35,7 +35,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await expect.poll(() => popupPage.getReferrer()).toEqual({
         viewId: await popupOpenerPage.view.getViewId(),
@@ -67,7 +67,7 @@ test.describe('Workbench Popup', () => {
       await startPage.view.tab.click();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await expect.poll(() => popupPage.getReferrer()).toEqual({viewId: startPageViewId});
     });
@@ -96,7 +96,7 @@ test.describe('Workbench Popup', () => {
       await microfrontendPage.view.tab.click();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await expect.poll(() => popupPage.getReferrer()).toEqual({
         viewId: microfrontendViewId,
@@ -122,7 +122,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await expect.poll(() => popupPage.getReferrer()).toEqual({});
     });

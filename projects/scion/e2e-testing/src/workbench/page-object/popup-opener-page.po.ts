@@ -29,7 +29,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
   public readonly error: Locator;
   public readonly openButton: Locator;
 
-  constructor(private _appPO: AppPO, private _locateBy: ViewPO | PopupPO | DialogPO) {
+  constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-popup-opener-page');
     this.openButton = this.locator.locator('button.e2e-open');
     this.returnValue = this.locator.locator('output.e2e-return-value');
@@ -192,7 +192,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
 
   private async waitUntilPopupAttached(): Promise<void> {
     const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    const popup = this._appPO.popup({cssClass});
+    const popup = new AppPO(this.locator.page()).popup({cssClass});
     await popup.locator.waitFor({state: 'attached'});
   }
 

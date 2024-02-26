@@ -19,8 +19,8 @@ export class MicrofrontendPopupTestPagePO implements MicrofrontendPopupPagePO {
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(appPO: AppPO, public popup: PopupPO) {
-    this.outlet = new SciRouterOutletPO(appPO, {locator: this.popup.locator.locator('sci-router-outlet')});
+  constructor(public popup: PopupPO) {
+    this.outlet = new SciRouterOutletPO(new AppPO(popup.locator.page()), {locator: this.popup.locator.locator('sci-router-outlet')});
     this.locator = this.outlet.frameLocator.locator('app-microfrontend-test-page');
   }
 }

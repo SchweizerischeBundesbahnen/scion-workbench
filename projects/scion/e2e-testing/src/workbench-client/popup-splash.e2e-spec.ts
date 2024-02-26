@@ -36,7 +36,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // Expect splash to display.
     await expect(popupPage.outlet.splash).toBeVisible();
@@ -70,7 +70,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // Expect splash not to display.
     await expect(popupPage.outlet.splash).not.toBeVisible();
@@ -95,7 +95,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // Expect splash not to display.
     await expect(popupPage.outlet.splash).not.toBeVisible();

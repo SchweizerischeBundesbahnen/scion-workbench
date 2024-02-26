@@ -33,7 +33,7 @@ test.describe('Workbench Popup Capability', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect the popup of this app to display
     await expect.poll(() => popupPage.getPopupCapability()).toEqual(expect.objectContaining({

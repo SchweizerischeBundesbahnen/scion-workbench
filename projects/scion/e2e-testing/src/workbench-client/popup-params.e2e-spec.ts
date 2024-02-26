@@ -37,7 +37,7 @@ test.describe('Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect qualifier to be contained in popup params
     await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123'}));
@@ -61,7 +61,7 @@ test.describe('Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect qualifier to be contained in popup params
     await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({entity: 'products'}));
@@ -89,7 +89,7 @@ test.describe('Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect qualifier values not to be overwritten by params
     await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', mode: 'new'}));
@@ -120,7 +120,7 @@ test.describe('Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect named params to be substituted
     await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee', seg1: 'SEG1', seg3: 'SEG3', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'}));

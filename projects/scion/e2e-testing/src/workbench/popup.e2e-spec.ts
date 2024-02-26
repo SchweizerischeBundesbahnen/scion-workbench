@@ -580,7 +580,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup1 = appPO.popup({cssClass: 'testee-1'});
-      const popupPopupOpenerPage1 = new PopupOpenerPagePO(appPO, popup1);
+      const popupPopupOpenerPage1 = new PopupOpenerPagePO(popup1);
 
       await expectPopup(popupPopupOpenerPage1).toBeHidden();
 
