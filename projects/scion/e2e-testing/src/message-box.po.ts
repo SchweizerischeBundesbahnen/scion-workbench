@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Locator} from '@playwright/test';
 import {DialogPO} from './dialog.po';
 import {DomRect, fromRect} from './helper/testing.util';
 
@@ -24,7 +24,7 @@ export class MessageBoxPO {
   private readonly _header: Locator;
   private readonly _footer: Locator;
 
-  constructor(private _dialog: DialogPO, private _page: Page) {
+  constructor(private _dialog: DialogPO) {
     this.locator = this._dialog.locator.locator('wb-message-box');
     this._header = this._dialog.header.locator('wb-message-box-header');
     this._footer = this._dialog.footer.locator('wb-message-box-footer');

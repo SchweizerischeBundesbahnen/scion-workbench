@@ -40,7 +40,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
     await expect.poll(() => popup.getAlign()).toEqual('north');
@@ -66,7 +66,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
     await expect.poll(() => popup.getAlign()).toEqual('north');
@@ -92,7 +92,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
     await expect.poll(() => popup.getAlign()).toEqual('south');
@@ -118,7 +118,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
     await expect.poll(() => popup.getAlign()).toEqual('east');
@@ -144,7 +144,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
     await expect.poll(() => popup.getAlign()).toEqual('west');
@@ -168,7 +168,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await popupPage.close({returnValue: 'RETURN VALUE'});
     await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
@@ -192,7 +192,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await popupPage.close({returnValue: 'ERROR', closeWithError: true});
     await expect(popupOpenerPage.error).toHaveText('ERROR');
@@ -293,7 +293,6 @@ test.describe('Workbench Popup', () => {
     await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 400);
   });
 
-
   test.describe('view context', () => {
 
     test('should hide the popup when its contextual view (if any) is deactivated, and then display the popup again when activating it', async ({appPO, microfrontendNavigator}) => {
@@ -315,7 +314,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
 
@@ -347,7 +346,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
       const componentInstanceId = await popupPage.getComponentInstanceId();
 
       await expectPopup(popupPage).toBeVisible();
@@ -383,7 +382,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await expectPopup(popupPage).toBeVisible();
 
@@ -422,7 +421,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await popupPage.waitForFocusIn();
       await popupOpenerPage.view.tab.click();
@@ -448,7 +447,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await popupPage.waitForFocusIn();
       await popupOpenerPage.view.tab.click();
@@ -475,7 +474,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await popupPage.waitForFocusIn();
 
@@ -520,7 +519,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       await popupPage.waitForFocusIn();
 
@@ -557,7 +556,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       // Expect popup to have focus.
       await popupPage.waitForFocusIn();
@@ -597,7 +596,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.open();
 
       const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(appPO, popup);
+      const popupPage = new PopupPagePO(popup);
 
       // Expect popup to have focus.
       await popupPage.waitForFocusIn();

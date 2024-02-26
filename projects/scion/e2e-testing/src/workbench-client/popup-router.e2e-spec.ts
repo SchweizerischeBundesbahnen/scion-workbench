@@ -36,7 +36,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect popup to display
     await expectPopup(popupPage).toBeVisible();
@@ -61,7 +61,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect popup to display
     await expectPopup(popupPage).toBeVisible();
@@ -90,7 +90,7 @@ test.describe('Popup Router', () => {
     await expect(popupOpenerPage.open()).rejects.toThrow(/NullProviderError/);
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect popup not to display
     await expectPopup(popupPage).not.toBeAttached();
@@ -119,7 +119,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
   });
@@ -144,7 +144,7 @@ test.describe('Popup Router', () => {
     await expect(popupOpenerPage.open()).rejects.toThrow(/NotQualifiedError/);
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect popup not to display
     await expectPopup(popupPage).not.toBeAttached();
@@ -184,7 +184,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage1.open();
 
     const popup1 = appPO.popup({cssClass: 'testee-1'});
-    const popupPage1 = new PopupPagePO(appPO, popup1);
+    const popupPage1 = new PopupPagePO(popup1);
 
     // expect the popup of this app to display
     await expectPopup(popupPage1).toBeVisible();
@@ -199,7 +199,7 @@ test.describe('Popup Router', () => {
 
     // expect popup to display
     const popup2 = appPO.popup({cssClass: 'testee-2'});
-    const popupPage2 = new PopupPagePO(appPO, popup2);
+    const popupPage2 = new PopupPagePO(popup2);
 
     // expect the popup of this app to display
     await expectPopup(popupPage2).toBeVisible();
@@ -214,7 +214,7 @@ test.describe('Popup Router', () => {
 
     // expect popup to display
     const popup3 = appPO.popup({cssClass: 'testee-3'});
-    const popupPage3 = new PopupPagePO(appPO, popup3);
+    const popupPage3 = new PopupPagePO(popup3);
 
     // expect the popup of this app to display
     await expectPopup(popupPage3).toBeVisible();
@@ -239,7 +239,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new MicrofrontendPopupTestPagePO(appPO, popup);
+    const popupPage = new MicrofrontendPopupTestPagePO(popup);
 
     // expect popup to display
     await expectPopup(popupPage).toBeVisible();
@@ -275,7 +275,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect the popup of this app to display
     await expectPopup(popupPage).toBeVisible();
@@ -308,7 +308,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect the popup of this app to display
     await expectPopup(popupPage).toBeVisible();
@@ -345,7 +345,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect first popup to display
     await expectPopup(popupPage).toBeVisible();
@@ -379,7 +379,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     // expect first popup to display
     await expectPopup(popupPage).toBeVisible();
@@ -407,7 +407,7 @@ test.describe('Popup Router', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
 

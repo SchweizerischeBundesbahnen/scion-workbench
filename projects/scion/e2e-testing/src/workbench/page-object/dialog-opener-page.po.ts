@@ -29,7 +29,7 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
   public readonly error: Locator;
   public readonly openButton: Locator;
 
-  constructor(private _appPO: AppPO, private _locateBy: ViewPO | PopupPO | DialogPO) {
+  constructor(private _locateBy: ViewPO | PopupPO | DialogPO) {
     this.locator = this._locateBy.locator.locator('app-dialog-opener-page');
     this.returnValue = this.locator.locator('output.e2e-return-value');
     this.error = this.locator.locator('output.e2e-dialog-error');
@@ -119,7 +119,7 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
     const cssClasses = coerceArray(options?.cssClass).filter(Boolean);
 
     for (let i = 0; i < (options?.count ?? 1); i++) {
-      const dialog = this._appPO.dialog({cssClass: [`index-${i}`].concat(cssClasses)});
+      const dialog = new AppPO(this.locator.page()).dialog({cssClass: [`index-${i}`].concat(cssClasses)});
       await dialog.locator.waitFor({state: 'attached'});
     }
   }

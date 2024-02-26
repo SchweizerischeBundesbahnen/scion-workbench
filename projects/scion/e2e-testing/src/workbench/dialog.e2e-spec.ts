@@ -193,7 +193,7 @@ test.describe('Workbench Dialog', () => {
       await expect(dialog1.locator).toBeVisible();
 
       // Open another dialog from the dialog (inherit dialog's view context).
-      const dialogOpenerPage2 = new DialogOpenerPagePO(appPO, dialog1);
+      const dialogOpenerPage2 = new DialogOpenerPagePO(dialog1);
       await dialogOpenerPage2.open('dialog-page', {cssClass: 'testee-2'});
       const dialog2 = appPO.dialog({cssClass: 'testee-2'});
 
@@ -283,7 +283,7 @@ test.describe('Workbench Dialog', () => {
       await expect(applicationModalDialog1.locator).toBeVisible();
       await expect(applicationModalDialog2.locator).toBeVisible();
 
-      const dialogOpenerDialogPage = new DialogOpenerPagePO(appPO, applicationModalDialog2);
+      const dialogOpenerDialogPage = new DialogOpenerPagePO(applicationModalDialog2);
       const contextualViewId = await dialogOpenerViewPage.view.getViewId();
 
       // Open view-modal dialog.
@@ -943,7 +943,7 @@ test.describe('Workbench Dialog', () => {
       const dialogBoundingBox = await dialog.getDialogBoundingBox();
 
       // Block the dialog by opening another dialog.
-      const dialogOpenerDialogPage = new DialogOpenerPagePO(appPO, dialog);
+      const dialogOpenerDialogPage = new DialogOpenerPagePO(dialog);
       await dialogOpenerDialogPage.open('dialog-page', {cssClass: 'top-dialog'});
       const topDialog = appPO.dialog({cssClass: 'top-dialog'});
       await topDialog.moveDialog('bottom-right-corner');
@@ -1992,7 +1992,7 @@ test.describe('Workbench Dialog', () => {
       await dialog1.moveDialog('bottom-left-corner');
 
       // Open dialog 2 from dialog 1.
-      const dialogOpenerDialogPage = new DialogOpenerPagePO(appPO, dialog1);
+      const dialogOpenerDialogPage = new DialogOpenerPagePO(dialog1);
       await dialogOpenerDialogPage.open('focus-test-page', {cssClass: 'testee-2'});
       const dialog2 = appPO.dialog({cssClass: 'testee-2'});
       await dialog2.moveDialog('bottom-right-corner');
@@ -2030,7 +2030,7 @@ test.describe('Workbench Dialog', () => {
       const popup = appPO.popup({cssClass: 'testee'});
 
       // Open dialog from popup.
-      const dialogOpenerPopupPage = new DialogOpenerPagePO(appPO, popup);
+      const dialogOpenerPopupPage = new DialogOpenerPagePO(popup);
       await dialogOpenerPopupPage.open('focus-test-page', {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});

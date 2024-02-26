@@ -9,7 +9,6 @@
  */
 
 import {withoutUndefinedEntries} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
 import {PopupPO} from '../../popup.po';
 import {PopupSize} from '@scion/workbench';
 import {Params} from '@angular/router';
@@ -19,6 +18,7 @@ import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
+import {AppPO} from '../../app.po';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -29,8 +29,8 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
   public readonly outlet: SciRouterOutletPO;
   private readonly _hasFocusLocator: Locator;
 
-  constructor(appPO: AppPO, public popup: PopupPO) {
-    this.outlet = new SciRouterOutletPO(appPO, {locator: popup.locator.locator('sci-router-outlet')});
+  constructor(public popup: PopupPO) {
+    this.outlet = new SciRouterOutletPO(new AppPO(popup.locator.page()), {locator: popup.locator.locator('sci-router-outlet')});
     this.locator = this.outlet.frameLocator.locator('app-popup-page');
     this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
   }

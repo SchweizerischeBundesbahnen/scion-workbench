@@ -114,7 +114,7 @@ test.describe('Workbench Popup', () => {
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await popupPage.enterComponentSize({
       width: '600px',

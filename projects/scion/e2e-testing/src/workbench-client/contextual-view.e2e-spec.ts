@@ -36,7 +36,7 @@ test.describe('Contextual Workbench View', () => {
     await popupOpenerView.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
 
@@ -76,7 +76,7 @@ test.describe('Contextual Workbench View', () => {
     await popupOpenerView.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(appPO, popup);
+    const popupPage = new PopupPagePO(popup);
 
     await expectPopup(popupPage).toBeVisible();
 

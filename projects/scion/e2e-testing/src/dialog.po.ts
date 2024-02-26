@@ -30,7 +30,7 @@ export class DialogPO {
     horizontal: Locator;
   };
 
-  constructor(private _appPO: AppPO, public readonly locator: Locator) {
+  constructor(public readonly locator: Locator) {
     this._dialog = this.locator.locator('div.e2e-dialog');
     this.header = this._dialog.locator('header.e2e-dialog-header');
     this.title = this.header.locator('div.e2e-title > span');
@@ -80,7 +80,7 @@ export class DialogPO {
 
   public async moveDialog(distance: {x: number; y: number} | 'top-left-corner' | 'top-right-corner' | 'bottom-right-corner' | 'bottom-left-corner'): Promise<void> {
     const dialogBoundingBox = await this.getDialogBoundingBox();
-    const viewportBoundingBox = this._appPO.viewportBoundingBox();
+    const viewportBoundingBox = new AppPO(this.locator.page()).viewportBoundingBox();
 
     switch (distance) {
       case 'top-left-corner': {
