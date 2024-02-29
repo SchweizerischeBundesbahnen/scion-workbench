@@ -14,7 +14,7 @@ import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} 
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe, DOCUMENT, NgIf} from '@angular/common';
-import {WorkbenchStartup} from '@scion/workbench';
+import {WORKBENCH_ID, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeInside} from '@scion/toolkit/operators';
@@ -29,9 +29,13 @@ import {subscribeInside} from '@scion/toolkit/operators';
     AsyncPipe,
     RouterOutlet,
     HeaderComponent,
+    WorkbenchViewMenuItemDirective,
   ],
 })
 export class AppComponent {
+
+  @HostBinding('attr.data-workbench-id')
+  public workbenchId = inject(WORKBENCH_ID);
 
   /**
    * Unique id that is set after a navigation has been performed.

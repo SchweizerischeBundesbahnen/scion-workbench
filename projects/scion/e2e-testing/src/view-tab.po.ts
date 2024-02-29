@@ -8,10 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
-import {Locator} from '@playwright/test';
+import {fromRect, getCssClasses, getPerspectiveId, hasCssClass} from './helper/testing.util';
+import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
+import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
+import {AppPO} from './app.po';
 
 /**
  * Handle for interacting with a workbench view tab.
@@ -87,11 +89,11 @@ export class ViewTabPO {
   }
 
   /**
-   * Moves this view tab to the center of the specified part or grid without releasing the mouse button.
+   * Activates drop zones on the specified target by moving the tab over the specified target.
    */
-  public async moveTo(target: {partId: string}, options?: {steps?: number}): Promise<void>;
-  public async moveTo(target: {grid: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void>;
-  public async moveTo(target: {partId?: string; grid?: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void> {
+  public async activateDropZones(target: {partId: string}, options?: {steps?: number}): Promise<void>;
+  public async activateDropZones(target: {grid: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void>;
+  public async activateDropZones(target: {partId?: string; grid?: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void> {
     // 1. Perform a "mousedown" on the view tab.
     const mouse = this.locator.page().mouse;
     await this.mousedown();
@@ -112,6 +114,47 @@ export class ViewTabPO {
   }
 
   /**
+   * Moves this view to a new browser window.
+   */
+  public async moveToNewWindow(): Promise<AppPO> {
+    const contextMenu = await this.openContextMenu();
+
+    // Wait for the specified window to open; must be invoked prior to opening the window.
+    const newPagePredicate = async (page: Page): Promise<boolean> => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null;
+    const [newPage] = await Promise.all([
+      this.locator.page().waitForEvent('popup', {predicate: newPagePredicate}),
+      contextMenu.menuItems.moveToNewWindow.click(),
+    ]);
+
+    // Wait until the workbench in the new page completed startup.
+    const newAppPO = new AppPO(newPage);
+    await newAppPO.waitUntilWorkbenchStarted();
+    return newAppPO;
+  }
+
+  /**
+   * Moves this view to a different or new part in the specified region.
+   *
+   * Unlike the {@link dragTo} method, this operation does not perform a drag and drop operation but
+   * moves the view programmatically. Use this method to move a view to another window as not supported
+   * by Playwright.
+   */
+  public async moveTo(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): Promise<void> {
+    await this.click();
+
+    const contextMenu = await this.openContextMenu();
+    await contextMenu.menuItems.moveView.click();
+
+    const dialog = new AppPO(this.locator.page()).dialog({cssClass: 'e2e-move-view'});
+
+    const dialogPage = new ViewMoveDialogTestPagePO(dialog);
+    await dialogPage.enterWorkbenchId(options?.workbenchId ?? '');
+    await dialogPage.enterPartId(partId);
+    await dialogPage.enterRegion(options?.region ?? '');
+    await dialogPage.pressOK();
+  }
+
+  /**
    * Drags this view tab to the specified region of specified part or grid.
    *
    * @param target - Specifies the part or grid where to drop this view tab.
@@ -129,10 +172,10 @@ export class ViewTabPO {
     // For this reason, we first perform a "mousedown" on the view tab, move the mouse to the specified region of the target element, and then perform a "mouseup".
     // 1. Activate drop zones by moving the mouse over the specified target.
     if (target.partId) {
-      await this.moveTo({partId: target.partId}, {steps: options?.steps});
+      await this.activateDropZones({partId: target.partId}, {steps: options?.steps});
     }
     else {
-      await this.moveTo({grid: target.grid!}, {steps: options?.steps});
+      await this.activateDropZones({grid: target.grid!}, {steps: options?.steps});
     }
 
     // 2. Locate the drop zone.

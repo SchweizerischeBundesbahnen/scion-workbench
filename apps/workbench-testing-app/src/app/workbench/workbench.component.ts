@@ -15,8 +15,9 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {WorkbenchDialogService, WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
+import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
 
 @Component({
   selector: 'app-workbench',
@@ -34,6 +35,7 @@ export class WorkbenchComponent implements OnDestroy {
 
   constructor(private _route: ActivatedRoute,
               private _wbRouter: WorkbenchRouter,
+              private _dialogService: WorkbenchDialogService,
               protected workbenchService: WorkbenchService) {
     console.debug('[WorkbenchComponent#construct]');
     this.installStickyStartViewTab();
@@ -45,6 +47,14 @@ export class WorkbenchComponent implements OnDestroy {
   protected isPartInMainArea = (part: WorkbenchPart): boolean => {
     return part.isInMainArea;
   };
+
+  protected onMoveView(view: WorkbenchView): void {
+    this._dialogService.open(ViewMoveDialogTestPageComponent, {
+      inputs: {view},
+      cssClass: 'e2e-move-view',
+      context: {viewId: view.id},
+    });
+  }
 
   /**
    * If enabled, installs the handler to automatically open the start tab when the user closes the last tab.

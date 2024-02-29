@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, Inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {GridElementComponent} from '../grid-element/grid-element.component';
-import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
@@ -21,6 +20,7 @@ import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementVisiblePipe} from '../../common/grid-element-visible.pipe';
 import {NgIf} from '@angular/common';
+import {WORKBENCH_ID} from '../../workbench-id';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -67,8 +67,8 @@ export class MainAreaLayoutComponent {
     return this._part.id;
   }
 
-  constructor(private _part: ɵWorkbenchPart,
-              private _workbenchService: ɵWorkbenchService,
+  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
+              private _part: ɵWorkbenchPart,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _viewDragService: ViewDragService) {
   }
@@ -85,15 +85,15 @@ export class MainAreaLayoutComponent {
   public onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
-        appInstanceId: event.dragData.appInstanceId,
+        workbenchId: event.dragData.workbenchId,
         partId: event.dragData.partId,
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
       target: {
-        appInstanceId: this._workbenchService.appInstanceId,
+        workbenchId: this._workbenchId,
         elementId: this.root instanceof MPart ? this.root.id : this.root.nodeId,
-        region: event.dropRegion,
+        region: event.dropRegion as 'west' | 'east' | 'south', // north and center drop zones not installed
         newPart: {ratio: .2},
       },
     });

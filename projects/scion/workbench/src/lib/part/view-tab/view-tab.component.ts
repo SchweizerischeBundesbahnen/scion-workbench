@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding, HostListener, inject, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, ElementRef, HostBinding, HostListener, Inject, inject, Injector, Input, IterableChanges, IterableDiffers, NgZone, OnChanges, SimpleChanges} from '@angular/core';
 import {fromEvent, merge, Subject, withLatestFrom} from 'rxjs';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {filter, map, switchMap} from 'rxjs/operators';
@@ -23,9 +23,9 @@ import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
-import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {NgIf} from '@angular/common';
+import {WORKBENCH_ID} from '../../workbench-id';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -69,7 +69,7 @@ export class ViewTabComponent implements OnChanges {
   }
 
   constructor(host: ElementRef<HTMLElement>,
-              private _workbenchService: ɵWorkbenchService,
+              @Inject(WORKBENCH_ID) private _workbenchId: string,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _viewRegistry: WorkbenchViewRegistry,
               private _router: WorkbenchRouter,
@@ -154,7 +154,7 @@ export class ViewTabComponent implements OnChanges {
         viewTabPointerOffsetY: event.offsetY,
         viewTabWidth: this.host.getBoundingClientRect().width,
         viewTabHeight: this.host.getBoundingClientRect().height,
-        appInstanceId: this._workbenchService.appInstanceId,
+        workbenchId: this._workbenchId
       });
     });
   }

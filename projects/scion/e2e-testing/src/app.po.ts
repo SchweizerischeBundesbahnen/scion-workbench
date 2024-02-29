@@ -269,8 +269,17 @@ export class AppPO {
    *
    * This flag is set in `app.component.ts` in the 'workbench-testing-app'.
    */
-  public getCurrentNavigationId(): Promise<string | null> {
-    return this.page.locator('app-root').getAttribute('data-navigationid');
+  public getCurrentNavigationId(): Promise<string | undefined> {
+    return this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ?? undefined);
+  }
+
+  /**
+   * Returns the unique id of this workbench.
+   *
+   * @see WORKBENCH_ID
+   */
+  public getWorkbenchIdId(): Promise<string | undefined> {
+    return this.page.locator('app-root').getAttribute('data-workbench-id').then(value => value ?? undefined);
   }
 
   /**
@@ -289,26 +298,6 @@ export class AppPO {
     const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
     const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
     return fromRect(await dropZoneLocator.boundingBox());
-  }
-
-  /**
-   * Waits for the specified window to open; must be invoked prior to opening the window.
-   *
-   * Example:
-   *
-   * ```ts
-   * const [newAppPO] = await Promise.all([
-   *   appPO.waitForWindow(async page => (await getPerspectiveName(page)) === 'testee'),
-   *   buttonPO.openInNewWindow(),
-   * ]);
-   * ```
-   */
-  public async waitForWindow(predicate: (page: Page) => Promise<boolean>): Promise<AppPO> {
-    const page = await this.page.waitForEvent('popup', {predicate});
-    const newAppPO = new AppPO(page);
-    // Wait until the workbench completed startup.
-    await newAppPO.waitUntilWorkbenchStarted();
-    return newAppPO;
   }
 
   /**

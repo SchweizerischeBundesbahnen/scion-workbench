@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, inject, Injector, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, inject, Injector, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {combineLatestWith, EMPTY, from, fromEvent, merge, mergeMap, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {take} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
-import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {Logger, LoggerNames} from '../logging';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
@@ -24,6 +23,7 @@ import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WORKBENCH_ID} from '../workbench-id';
 
 @Component({
   selector: 'wb-part',
@@ -64,7 +64,7 @@ export class PartComponent implements OnInit, OnDestroy {
     return this.part.active;
   }
 
-  constructor(private _workbenchService: ɵWorkbenchService,
+  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
               private _viewRegistry: WorkbenchViewRegistry,
               private _viewDragService: ViewDragService,
               private _injector: Injector,
@@ -90,15 +90,15 @@ export class PartComponent implements OnInit, OnDestroy {
   public onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
-        appInstanceId: event.dragData.appInstanceId,
+        workbenchId: event.dragData.workbenchId,
         partId: event.dragData.partId,
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
       target: {
-        appInstanceId: this._workbenchService.appInstanceId,
+        workbenchId: this._workbenchId,
         elementId: this.part.id,
-        region: event.dropRegion,
+        region: event.dropRegion === 'center' ? undefined : event.dropRegion,
       },
     });
   }

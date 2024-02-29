@@ -34,11 +34,7 @@ test.describe('Workbench View', () => {
     await layoutPage.registerRoute({path: '', component: 'view-page', outlet: 'testee'});
 
     // Move test view to new window.
-    const contextMenu = await appPO.view({viewId: 'testee'}).tab.openContextMenu();
-    const [newAppPO] = await Promise.all([
-      appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenu.menuItems.moveToNewWindow.click(),
-    ]);
+    const newAppPO = await appPO.view({viewId: 'testee'}).tab.moveToNewWindow();
     const newWindow = {
       appPO: newAppPO,
       workbenchNavigator: new WorkbenchNavigator(newAppPO),
@@ -106,14 +102,7 @@ test.describe('Workbench View', () => {
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await appPO.view({viewId: testViewId}).tab.openContextMenu();
-    const [newAppPO] = await Promise.all([
-      appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenu.menuItems.moveToNewWindow.click(),
-    ]);
-    const newWindow = {
-      appPO: newAppPO,
-    };
+    const newAppPO = await appPO.view({viewId: testViewId}).tab.moveToNewWindow();
 
     // Expect test view to be moved to the new window.
     await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
@@ -129,7 +118,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: testViewId});
+    const viewPage = new ViewPagePO(newAppPO, {viewId: testViewId});
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -165,11 +154,7 @@ test.describe('Workbench View', () => {
     await routerPage.clickNavigate();
 
     // Move test view to new window.
-    const contextMenu = await appPO.view({viewId: 'testee'}).tab.openContextMenu();
-    const [newAppPO] = await Promise.all([
-      appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenu.menuItems.moveToNewWindow.click(),
-    ]);
+    const newAppPO = await appPO.view({viewId: 'testee'}).tab.moveToNewWindow();
     const newWindow = {
       appPO: newAppPO,
       workbenchNavigator: new WorkbenchNavigator(newAppPO),
@@ -227,17 +212,10 @@ test.describe('Workbench View', () => {
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await testViewPage.tab.openContextMenu();
-    const [newAppPO] = await Promise.all([
-      appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenu.menuItems.moveToNewWindow.click(),
-    ]);
-    const newWindow = {
-      appPO: newAppPO,
-    };
+    const newAppPO = await testViewPage.tab.moveToNewWindow();
 
     // Expect test view to be moved to the new window.
-    await expect(newWindow.appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
@@ -250,7 +228,7 @@ test.describe('Workbench View', () => {
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: testViewId});
+    const viewPage = new ViewPagePO(newAppPO, {viewId: testViewId});
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -267,6 +245,68 @@ test.describe('Workbench View', () => {
     });
   });
 
+  test('should allow moving a view to another window', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view 1
+    const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+    // Open view 2
+    const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+
+    // Move view 1 to a new window
+    const newAppPO = await view1.tab.moveToNewWindow();
+    // Expect view 1 to be moved to the new window.
+    await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [
+            {id: 'view.1'},
+          ],
+          activeViewId: 'view.1',
+        }),
+      },
+    });
+    // Expect view 1 to be removed from the original window.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [
+            {id: 'view.2'},
+          ],
+          activeViewId: 'view.2',
+        }),
+      },
+    });
+
+    // Move view 2 to the new window
+    await view2.tab.moveTo(await newAppPO.activePart({inMainArea: true}).getPartId(), {
+      workbenchId: await newAppPO.getWorkbenchIdId(),
+    });
+    // Expect view 2 to be moved to the new window.
+    await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [
+            {id: 'view.1'},
+            {id: 'view.2'},
+          ],
+          activeViewId: 'view.2',
+        }),
+      },
+    });
+    // Expect view 2 to be removed from the original window.
+    await expect(appPO.views()).toHaveCount(0);
+  });
+
   test('should memoize layout of anonymous perspective', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
@@ -280,11 +320,7 @@ test.describe('Workbench View', () => {
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await testViewPage.tab.openContextMenu();
-    const [newAppPO] = await Promise.all([
-      appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenu.menuItems.moveToNewWindow.click(),
-    ]);
+    const newAppPO = await testViewPage.tab.moveToNewWindow();
     const newWindow = {
       appPO: newAppPO,
       page: newAppPO.page,
@@ -393,11 +429,7 @@ test.describe('Workbench View', () => {
     const testViewId = await testViewPage.getViewId();
 
     // Move test view to new window.
-    const contextMenu = await testViewPage.tab.openContextMenu();
-    const [newAppPO] = await Promise.all([
-      appPO.waitForWindow(async page => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null),
-      contextMenu.menuItems.moveToNewWindow.click(),
-    ]);
+    const newAppPO = await testViewPage.tab.moveToNewWindow();
     const newWindow = {
       appPO: newAppPO,
       workbenchNavigator: new WorkbenchNavigator(newAppPO),

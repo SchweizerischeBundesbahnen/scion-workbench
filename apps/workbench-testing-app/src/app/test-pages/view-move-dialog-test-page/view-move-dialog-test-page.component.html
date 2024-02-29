@@ -1,0 +1,37 @@
+<form autocomplete="off" [formGroup]="form">
+  <!-- Workbench ID -->
+  <sci-form-field label="Workbench ID" direction="column">
+    <input [formControl]="form.controls.workbenchId" class="e2e-workbench-id" list="target">
+    <datalist id="target">
+      <option value="new-window">new-window</option>
+    </datalist>
+  </sci-form-field>
+
+  @if (form.controls.workbenchId.value !== 'new-window') {
+    <!-- Part ID -->
+    <sci-form-field label="Part ID" direction="column">
+      <input [formControl]="form.controls.partId" class="e2e-part-id">
+    </sci-form-field>
+
+    <!-- Region -->
+    <sci-form-field label="Region" direction="column">
+      <select [formControl]="form.controls.region" class="e2e-region">
+        <option value="east">east</option>
+        <option value="west">west</option>
+        <option value="north">north</option>
+        <option value="south">south</option>
+        <option value=""></option>
+      </select>
+    </sci-form-field>
+  }
+</form>
+
+<!-- OK button -->
+<ng-template wbDialogAction>
+  <button (click)="onOk()" [disabled]="form.invalid" class="e2e-ok">OK</button>
+</ng-template>
+
+<!-- Cancel button -->
+<ng-template wbDialogAction>
+  <button (click)="onCancel()">Cancel</button>
+</ng-template>

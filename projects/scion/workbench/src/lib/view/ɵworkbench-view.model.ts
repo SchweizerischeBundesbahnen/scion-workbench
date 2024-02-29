@@ -36,9 +36,11 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {provideViewContext} from './view-context-provider';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
+import {WORKBENCH_ID} from '../workbench-id';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
+  private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
@@ -205,23 +207,29 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     }
   }
 
-  public move(region: 'north' | 'south' | 'west' | 'east' | 'blank-window'): Promise<boolean> {
-    const moveToNewWindow = region === 'blank-window';
+  public move(target: 'new-window'): void;
+  public move(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void;
+  public move(target: 'new-window' | string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void {
+    const source = {
+      workbenchId: this._workbenchId,
+      partId: this.part.id,
+      viewId: this.id,
+      viewUrlSegments: this.urlSegments,
+    };
 
-    this._viewDragService.dispatchViewMoveEvent({
-      source: {
-        appInstanceId: this._workbenchService.appInstanceId,
-        partId: this.part.id,
-        viewId: this.id,
-        viewUrlSegments: this.urlSegments,
-      },
-      target: {
-        appInstanceId: moveToNewWindow ? 'new' : this._workbenchService.appInstanceId,
-        elementId: moveToNewWindow ? undefined : this.part.id,
-        region: moveToNewWindow ? undefined : region,
-      },
-    });
-    return Promise.resolve(true);
+    if (target === 'new-window') {
+      this._viewDragService.dispatchViewMoveEvent({source, target: {workbenchId: 'new-window'}});
+    }
+    else {
+      this._viewDragService.dispatchViewMoveEvent({
+        source,
+        target: {
+          elementId: target,
+          region: options!.region,
+          workbenchId: options!.workbenchId ?? this._workbenchId,
+        },
+      });
+    }
   }
 
   public get urlSegments(): UrlSegment[] {

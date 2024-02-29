@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, ElementRef, HostListener, NgZone, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, DestroyRef, ElementRef, HostListener, Inject, NgZone, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {filter, map, mergeMap, startWith, switchMap, take, takeUntil} from 'rxjs/operators';
@@ -20,13 +20,13 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {filterArray, mapArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {ɵWorkbenchService} from '../../ɵworkbench.service';
 import {SciDimensionModule} from '@scion/components/dimension';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {fromDimension$} from '@scion/toolkit/observable';
+import {WORKBENCH_ID} from '../../workbench-id';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -137,7 +137,7 @@ export class PartBarComponent implements OnInit {
     );
 
   constructor(host: ElementRef<HTMLElement>,
-              private _workbenchService: ɵWorkbenchService,
+              @Inject(WORKBENCH_ID) private _workbenchId: string,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _router: WorkbenchRouter,
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
@@ -301,13 +301,13 @@ export class PartBarComponent implements OnInit {
     const dropIndex = this.dropTargetViewTab === 'end' ? undefined : this._viewTabs.indexOf(this.dropTargetViewTab!);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
-        appInstanceId: this._dragData!.appInstanceId,
+        workbenchId: this._dragData!.workbenchId,
         partId: this._dragData!.partId,
         viewId: this._dragData!.viewId,
         viewUrlSegments: this._dragData!.viewUrlSegments,
       },
       target: {
-        appInstanceId: this._workbenchService.appInstanceId,
+        workbenchId: this._workbenchId,
         insertionIndex: dropIndex,
         elementId: this._part.id,
       },
