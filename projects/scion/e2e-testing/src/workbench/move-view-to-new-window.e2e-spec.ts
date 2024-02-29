@@ -248,10 +248,17 @@ test.describe('Workbench View', () => {
   test('should allow moving a view to another window', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Open view 1
+    // Open view 1 (path-based view)
     const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-    // Open view 2
+    // Open view 2 (path-based view)
     const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+    // Open view 3 (empty-path view)
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('');
+    await routerPage.enterTarget('outlet'); // TODO [WB-LAYOUT] Create test views via layout
+    await routerPage.clickNavigate();
+    await routerPage.view.tab.close();
+    const view3 = appPO.view({viewId: 'outlet'});
 
     // Move view 1 to a new window
     const newAppPO = await view1.tab.moveToNewWindow();
@@ -278,8 +285,9 @@ test.describe('Workbench View', () => {
         root: new MPart({
           views: [
             {id: 'view.2'},
+            {id: 'outlet'},
           ],
-          activeViewId: 'view.2',
+          activeViewId: 'outlet',
         }),
       },
     });
@@ -304,6 +312,41 @@ test.describe('Workbench View', () => {
       },
     });
     // Expect view 2 to be removed from the original window.
+    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [
+            {id: 'outlet'},
+          ],
+          activeViewId: 'outlet',
+        }),
+      },
+    });
+
+    // Move view 3 (empty-path view) to the new window
+    await view3.tab.moveTo(await newAppPO.activePart({inMainArea: true}).getPartId(), {
+      workbenchId: await newAppPO.getWorkbenchIdId(),
+    });
+    // Expect view 3 to be moved to the new window.
+    await expect(newAppPO.workbenchLocator).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [
+            {id: 'view.1'},
+            {id: 'view.2'},
+            {id: 'outlet'},
+          ],
+          activeViewId: 'outlet',
+        }),
+      },
+    });
+    // Expect view 3 to be removed from the original window.
     await expect(appPO.views()).toHaveCount(0);
   });
 
