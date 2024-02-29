@@ -81,7 +81,7 @@ export class ViewMoveHandler {
         return {
           layout: layout.addView(newViewId, {
             partId: Defined.orElseThrow(event.target.elementId, () => Error(`[IllegalArgumentError] Target part mandatory for region 'center'.`)),
-            position: event.target.insertionIndex,
+            position: event.target.position ?? 'after-active-view',
             activateView: true,
             activatePart: true,
           }),
@@ -145,7 +145,7 @@ export class ViewMoveHandler {
     else {
       const targetPartId = Defined.orElseThrow(event.target.elementId, () => Error(`[IllegalArgumentError] Target part mandatory for region 'center'.`));
       await this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, targetPartId, {
-        position: event.target.insertionIndex,
+        position: event.target.position ?? (event.source.partId === targetPartId ? undefined : 'after-active-view'),
         activateView: true,
         activatePart: true,
       }));
