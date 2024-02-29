@@ -11,6 +11,7 @@
 export {WorkbenchModuleConfig, MenuItemConfig, ViewMenuItemsConfig} from './workbench-module-config';
 export {WorkbenchModule} from './workbench.module';
 export {WorkbenchService} from './workbench.service';
+export {WORKBENCH_ID} from './workbench-id';
 export {WorkbenchViewPreDestroy, WorkbenchPartAction, WorkbenchTheme, CanMatchPartFn, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
 export {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from './workbench.constants';

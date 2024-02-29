@@ -19,6 +19,7 @@ export class ViewTabContextMenuPO {
     closeTab: new ContextMenuItem(this.locator.locator('button.e2e-close-tab')),
     closeAll: new ContextMenuItem(this.locator.locator('button.e2e-close-all-tabs')),
     moveToNewWindow: new ContextMenuItem(this.locator.locator('button.e2e-move-to-new-window')),
+    moveView: new ContextMenuItem(this.locator.locator('button.e2e-move-view')),
   };
 
   constructor(public locator: Locator) {

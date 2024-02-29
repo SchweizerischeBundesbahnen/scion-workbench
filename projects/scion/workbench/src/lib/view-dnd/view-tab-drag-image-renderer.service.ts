@@ -257,7 +257,7 @@ class DragImageWorkbenchView implements WorkbenchView {
     throw Error('[UnsupportedOperationError]');
   }
 
-  public move(region: 'north' | 'south' | 'west' | 'east'): Promise<boolean> {
+  public move(target: 'new-window' | string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void {
     throw Error('[UnsupportedOperationError]');
   }
 

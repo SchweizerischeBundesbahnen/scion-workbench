@@ -11,7 +11,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
-import {UUID} from '@scion/toolkit/uuid';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
@@ -28,11 +27,6 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
-
-  /**
-   * A unique ID per instance of the app. If opened in a different browser tab, it has a different instance ID.
-   */
-  public readonly appInstanceId = UUID.randomUUID();
 
   public readonly perspectives$: Observable<readonly ɵWorkbenchPerspective[]>;
   public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;

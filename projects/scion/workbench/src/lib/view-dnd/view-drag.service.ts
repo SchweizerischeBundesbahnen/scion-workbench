@@ -273,7 +273,7 @@ export interface ViewDragData {
   partId: string;
   viewTabWidth: number;
   viewTabHeight: number;
-  appInstanceId: string;
+  workbenchId: string;
 }
 
 /**
@@ -284,15 +284,15 @@ export interface ViewMoveEvent {
     viewId: string;
     partId: string;
     viewUrlSegments: UrlSegment[];
-    appInstanceId: string;
+    workbenchId: string;
   };
   target: {
     /**
      * Part (or node) where (or relative to which) to add the view.
      *
      * Rules for different regions:
-     * - For region 'center', the 'elementId' is mandatory and must reference a part.
-     * - For regions 'north', 'south', 'east', or 'west', the 'elementId' can reference a part or node,
+     * - If not specifying a region, {@link elementId} is mandatory and must reference a part.
+     * - For regions `north`, `south`, `east`, or `west`, {@link elementId} can reference a part or node,
      *   relative to which to align the view. If not set, the view is aligend relative to the root of
      *   the entire layout.
      *
@@ -300,19 +300,23 @@ export interface ViewMoveEvent {
      */
     elementId?: string;
     /**
-     * Region where to add the view. For regions 'north', 'south', 'east', or 'west', creates a new part in that region.
+     * Region of {@link elementId} where to add the view (in a new part).
      *
-     * Note: Property is ignored when moving the view to a new window. If not set, it defaults to 'center'.
+     * If not specified, {@link elementId} must reference a part to which to add the view.
+     *
+     * Note:
+     * - Property is ignored when moving the view to a new window.
+     * - Property is required if {@link elementId} is a node.
      */
-    region?: 'north' | 'east' | 'south' | 'west' | 'center';
+    region?: 'north' | 'east' | 'south' | 'west';
     /**
      * Tab index in the tabbar where to add the view tab. If not set, the view tab is added as last view tab.
      */
     insertionIndex?: number;
     /**
-     * Identifier of the target application, or 'new' to move the view to a new browser window.
+     * Identifier of the target workbench, or 'new-window' to move the view to a new browser window.
      */
-    appInstanceId: string | 'new';
+    workbenchId: string | 'new-window';
     /**
      * Describes the part to be created if the region is 'north', 'east', 'south', or 'west'.
      */

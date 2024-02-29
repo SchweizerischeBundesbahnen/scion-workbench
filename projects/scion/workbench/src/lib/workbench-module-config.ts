@@ -198,7 +198,7 @@ export interface ViewMenuItemsConfig {
   moveRight?: MenuItemConfig;
   moveDown?: MenuItemConfig;
   moveLeft?: MenuItemConfig;
-  moveBlank?: MenuItemConfig;
+  moveToNewWindow?: MenuItemConfig;
 }
 
 export interface MenuItemConfig {

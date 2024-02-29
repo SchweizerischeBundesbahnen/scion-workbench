@@ -8,20 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {GridElementComponent} from './grid-element/grid-element.component';
 import {NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {MPart, MTreeNode} from './workbench-layout.model';
 import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementVisiblePipe} from '../common/grid-element-visible.pipe';
+import {WORKBENCH_ID} from '../workbench-id';
 
 /**
  * Renders the layout of the workbench.
@@ -67,9 +67,9 @@ export class WorkbenchLayoutComponent {
   public layout: ɵWorkbenchLayout | undefined;
   public root: MTreeNode | MPart | undefined;
 
-  constructor(workbenchLayoutService: WorkbenchLayoutService,
-              private _workbenchService: ɵWorkbenchService,
-              private _viewDragService: ViewDragService) {
+  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
+              private _viewDragService: ViewDragService,
+              workbenchLayoutService: WorkbenchLayoutService) {
     workbenchLayoutService.layout$
       .pipe(takeUntilDestroyed())
       .subscribe(layout => {
@@ -81,15 +81,15 @@ export class WorkbenchLayoutComponent {
   public onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
-        appInstanceId: event.dragData.appInstanceId,
+        workbenchId: event.dragData.workbenchId,
         partId: event.dragData.partId,
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
       target: {
-        appInstanceId: this._workbenchService.appInstanceId,
+        workbenchId: this._workbenchId,
         elementId: this.root instanceof MPart ? this.root.id : this.root!.nodeId,
-        region: event.dropRegion,
+        region: event.dropRegion as 'west' | 'east' | 'south', // north and center drop zones not installed
         newPart: {ratio: .2},
       },
     });

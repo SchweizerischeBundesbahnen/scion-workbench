@@ -1,4 +1,4 @@
-import {Injectable, Injector} from '@angular/core';
+import {Inject, Injectable, Injector} from '@angular/core';
 import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
 import {UUID} from '@scion/toolkit/uuid';
 import {Router} from '@angular/router';
@@ -6,12 +6,12 @@ import {LocationStrategy} from '@angular/common';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {RouterUtils} from '../routing/router.util';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Defined} from '@scion/toolkit/util';
 import {generatePerspectiveWindowName} from '../perspective/workbench-perspective.service';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
+import {WORKBENCH_ID} from '../workbench-id';
 
 /**
  * Updates the workbench layout when the user moves a view.
@@ -19,7 +19,7 @@ import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class ViewMoveHandler {
 
-  constructor(private _workbenchService: ɵWorkbenchService,
+  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
               private _workbenchRouter: WorkbenchRouter,
               private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
               private _viewDragService: ViewDragService,
@@ -30,56 +30,40 @@ export class ViewMoveHandler {
   }
 
   private installViewMoveListener(): void {
-    const appInstanceId = this._workbenchService.appInstanceId;
-
     this._viewDragService.viewMove$
       .pipe(takeUntilDestroyed())
       .subscribe(async (event: ViewMoveEvent) => { // eslint-disable-line rxjs/no-async-subscribe
-        // Check if this app instance takes part in the view drag operation. If not, do nothing.
-        if (event.source.appInstanceId !== appInstanceId && event.target.appInstanceId !== appInstanceId) {
+        // Check if this workbench instance takes part in the view drag operation. If not, do nothing.
+        if (event.source.workbenchId !== this._workbenchId && event.target.workbenchId !== this._workbenchId) {
           return;
         }
 
-        const crossAppInstanceViewDrag = (event.source.appInstanceId !== event.target.appInstanceId);
+        const crossWorkbenchViewDrag = (event.source.workbenchId !== event.target.workbenchId);
 
-        // Check if the user dropped the view into the center of the view's part. If so, do nothing.
-        if (!crossAppInstanceViewDrag && event.source.partId === event.target.elementId && event.target.region === 'center') {
-          await this.activateView(event.source.viewId);
-          return;
-        }
-
-        // Set default values.
-        event = structuredClone(event);
-        event.target.region ??= 'center';
-
-        // Check if to remove the view from this app instance if being moved to another app instance.
-        if (crossAppInstanceViewDrag && event.source.appInstanceId === appInstanceId) {
+        // Check if to remove the view from this workbench instance if being moved to another workbench instance.
+        if (crossWorkbenchViewDrag && event.source.workbenchId === this._workbenchId) {
           // Check if to add the view to a new browser window.
-          if (event.target.appInstanceId === 'new') {
+          if (event.target.workbenchId === 'new-window') {
             await this.moveViewToNewWindow(event);
           }
           else {
             await this.removeView(event);
           }
         }
-        // Check if to add the view to this app instance if being moved from another app instance to this app instance.
-        else if (crossAppInstanceViewDrag && event.target.appInstanceId === appInstanceId) {
+        // Check if to add the view to this workbench instance if being moved from another workbench instance to this workbench instance.
+        else if (crossWorkbenchViewDrag && event.target.workbenchId === this._workbenchId) {
           await this.addView(event);
         }
-        // Move the view within the same app instance.
+        // Move the view within the same workbench instance.
         else {
           await this.moveView(event);
         }
       });
   }
 
-  private async activateView(viewId: string): Promise<void> {
-    await this._workbenchRouter.ɵnavigate(layout => layout.activateView(viewId, {activatePart: true}));
-  }
-
   private async addView(event: ViewMoveEvent): Promise<void> {
     const region = event.target.region;
-    const addToNewPart = region !== 'center';
+    const addToNewPart = !!region;
     const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
 
     await this._workbenchRouter.ɵnavigate(layout => {
@@ -150,7 +134,7 @@ export class ViewMoveHandler {
   }
 
   private async moveView(event: ViewMoveEvent): Promise<void> {
-    const addToNewPart = event.target.region !== 'center';
+    const addToNewPart = !!event.target.region;
     if (addToNewPart) {
       const newPartId = event.target.newPart?.id ?? UUID.randomUUID();
       await this._workbenchRouter.ɵnavigate(layout => layout

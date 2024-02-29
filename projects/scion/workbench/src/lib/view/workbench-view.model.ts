@@ -125,9 +125,17 @@ export abstract class WorkbenchView {
   public abstract close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean>;
 
   /**
-   * Moves this view to a new part in the specified region, or to a new browser window if 'blank-window'.
+   * Moves this view to a new browser window.
    */
-  public abstract move(region: 'north' | 'south' | 'west' | 'east' | 'blank-window'): Promise<boolean>;
+  public abstract move(target: 'new-window'): void;
+
+  /**
+   * Moves this view to a different or new part in the specified region.
+   *
+   * Specifying a target workbench identifier allows the view to be moved to a workbench in a different browser window.
+   * The target workbench ID is available via {@link WORKBENCH_ID} DI token in the target application.
+   */
+  public abstract move(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void;
 
   /**
    * Registers a menu item which is added to the context menu of the view tab.

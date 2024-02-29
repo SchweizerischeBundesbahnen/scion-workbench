@@ -23,11 +23,11 @@ import {MAIN_AREA} from './workbench-layout';
 import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
 import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {MPart, MTreeNode} from './workbench-layout.model';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
+import {WORKBENCH_ID} from '../workbench-id';
 
 describe('WorkbenchLayout', () => {
 
@@ -163,13 +163,13 @@ describe('WorkbenchLayout', () => {
     // WHEN moving view.3 to position 0
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         insertionIndex: 0,
       },
@@ -183,13 +183,13 @@ describe('WorkbenchLayout', () => {
     // WHEN moving view.3 to position 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         insertionIndex: 1,
       },
@@ -203,13 +203,13 @@ describe('WorkbenchLayout', () => {
     // WHEN moving view.3 to position 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         insertionIndex: 2,
       },
@@ -223,13 +223,13 @@ describe('WorkbenchLayout', () => {
     // WHEN moving view.3 to position 3
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         insertionIndex: 3,
       },
@@ -243,13 +243,13 @@ describe('WorkbenchLayout', () => {
     // WHEN moving view.3 to position 4
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         insertionIndex: undefined,
       },
@@ -305,13 +305,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -379,13 +379,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST'},
@@ -453,13 +453,13 @@ describe('WorkbenchLayout', () => {
     // Move view 1 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'north',
         newPart: {id: 'NORTH'},
@@ -527,13 +527,13 @@ describe('WorkbenchLayout', () => {
     // Move view 1 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -601,15 +601,14 @@ describe('WorkbenchLayout', () => {
     // Move view 1 to a new part in the center
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        region: 'center',
       },
     });
     await waitUntilStable();
@@ -687,13 +686,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view-3', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -722,15 +721,14 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to the new part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST',
-        region: 'center',
       },
     });
     await waitUntilStable();
@@ -755,15 +753,14 @@ describe('WorkbenchLayout', () => {
     // Move view 1 to the new part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.1',
         viewUrlSegments: [new UrlSegment('view-1', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST',
-        region: 'center',
       },
     });
     await waitUntilStable();
@@ -826,13 +823,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST-1'},
@@ -859,13 +856,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east of part EAST-1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST-2'},
@@ -933,13 +930,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -966,13 +963,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the west of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST-2'},
@@ -1040,13 +1037,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -1072,13 +1069,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the north of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'north',
         newPart: {id: 'NORTH'},
@@ -1146,13 +1143,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -1178,13 +1175,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -1270,13 +1267,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view-3', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -1305,13 +1302,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south of part 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST',
         region: 'south',
         newPart: {id: 'SOUTH-EAST'},
@@ -1344,13 +1341,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'SOUTH-EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         newPart: {id: 'SOUTH-WEST'},
         region: 'south',
@@ -1425,13 +1422,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -1457,15 +1454,14 @@ describe('WorkbenchLayout', () => {
     // Move view 2 back to the main part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'SOUTH',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        region: 'center',
       },
     });
     await waitUntilStable();
@@ -1525,13 +1521,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -1557,13 +1553,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -1631,13 +1627,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST'},
@@ -1663,13 +1659,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'WEST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -1855,13 +1851,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST-1'},
@@ -1909,13 +1905,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view-3', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST-1',
         region: 'east',
         newPart: {id: 'EAST-2'},
@@ -1977,13 +1973,13 @@ describe('WorkbenchLayout', () => {
     // Move view 4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-2',
         viewId: 'view.4',
         viewUrlSegments: [new UrlSegment('view-4', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST-1'},
@@ -2023,13 +2019,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-2',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view-3', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'WEST-1',
         region: 'west',
         newPart: {id: 'WEST-2'},
@@ -2069,13 +2065,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view-2', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'north',
         newPart: {id: 'NORTH-1'},
@@ -2222,13 +2218,13 @@ describe('WorkbenchLayout', () => {
     // Move view.2 to the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'right'},
@@ -2253,13 +2249,13 @@ describe('WorkbenchLayout', () => {
     // Move view.3 to the north of view.2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'right',
         region: 'north',
         newPart: {id: 'top-right'},
@@ -2332,13 +2328,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -2363,13 +2359,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the west of the main part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST-2'},
@@ -2443,13 +2439,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST-1'},
@@ -2475,13 +2471,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST-1',
         region: 'east',
         newPart: {id: 'EAST-2'},
@@ -2512,13 +2508,13 @@ describe('WorkbenchLayout', () => {
     // Move view 4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.4',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST-1'},
@@ -2554,13 +2550,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-2',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'WEST-1',
         region: 'west',
         newPart: {id: 'WEST-2'},
@@ -2596,13 +2592,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'north',
         newPart: {id: 'NORTH-1'},
@@ -2732,13 +2728,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -2763,13 +2759,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the south of EAST part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -2799,13 +2795,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the north of EAST part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST',
         region: 'north',
         newPart: {id: 'NORTH'},
@@ -2878,13 +2874,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -2909,13 +2905,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the north of EAST part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'EAST',
         region: 'north',
         newPart: {id: 'NORTH'},
@@ -2945,13 +2941,13 @@ describe('WorkbenchLayout', () => {
     // Move view 3 to a new part in the south of NORTH part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.3',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'NORTH',
         region: 'south',
         newPart: {id: 'SOUTH'},
@@ -3018,13 +3014,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'east',
         newPart: {id: 'EAST'},
@@ -3048,13 +3044,13 @@ describe('WorkbenchLayout', () => {
     // Move view 2 to a new part in the west of main part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
         viewUrlSegments: [new UrlSegment('view', {})],
       },
       target: {
-        appInstanceId: TestBed.inject(ɵWorkbenchService).appInstanceId,
+        workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
         region: 'west',
         newPart: {id: 'WEST'},

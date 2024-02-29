@@ -251,8 +251,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first && view.last,
-        onAction: (): void => void view.move('east').then(),
+        isDisabled: () => view.first && view.last,
+        onAction: () => view.move(view.part.id, {region: 'east'}),
       };
     });
   }
@@ -272,8 +272,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first && view.last,
-        onAction: (): void => void view.move('west').then(),
+        isDisabled: () => view.first && view.last,
+        onAction: () => view.move(view.part.id, {region: 'west'}),
       };
     });
   }
@@ -293,8 +293,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first && view.last,
-        onAction: (): void => void view.move('north').then(),
+        isDisabled: () => view.first && view.last,
+        onAction: () => view.move(view.part.id, {region: 'north'}),
       };
     });
   }
@@ -314,15 +314,15 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first && view.last,
-        onAction: (): void => void view.move('south').then(),
+        isDisabled: () => view.first && view.last,
+        onAction: () => view.move(view.part.id, {region: 'south'}),
       };
     });
   }
 
   private registerMoveToNewWindowMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Move to new window', group: 'open', cssClass: 'e2e-move-to-new-window'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveBlank;
+    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveToNewWindow;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -335,7 +335,7 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        onAction: (): void => void view.move('blank-window').then(),
+        onAction: () => view.move('new-window'),
       };
     });
   }
