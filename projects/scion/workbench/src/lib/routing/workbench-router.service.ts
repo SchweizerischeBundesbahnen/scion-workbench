@@ -316,6 +316,10 @@ export class WorkbenchRouter implements OnDestroy {
    * The resulting commands are in their absolute form and may be used for the effective navigation to target a named router outlet.
    */
   private normalizeCommands(commands: Commands, relativeTo?: ActivatedRoute | null): Commands {
+    if (!commands.length) {
+      return [];
+    }
+
     // Ensure to run in Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.normalizeCommands(commands, relativeTo));
