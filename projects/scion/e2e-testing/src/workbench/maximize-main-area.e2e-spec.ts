@@ -68,7 +68,7 @@ test.describe('Workbench', () => {
     const viewId2 = await view2.getViewId();
 
     // Expect the workbench layout.
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -99,7 +99,7 @@ test.describe('Workbench', () => {
 
     // Maximize the main area.
     await view2.tab.dblclick();
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -118,7 +118,7 @@ test.describe('Workbench', () => {
 
     // Restore the main area.
     await view2.tab.dblclick();
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',

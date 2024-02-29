@@ -32,7 +32,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
       this.locator = this._view.locator.locator('app-start-page');
     }
     else {
-      this.locator = this._appPO.workbenchLocator.locator('app-start-page');
+      this.locator = this._appPO.workbench.locator('app-start-page');
     }
     this._tabbarLocator = this.locator.locator('sci-tabbar');
     this._tabbar = new SciTabbarPO(this._tabbarLocator);

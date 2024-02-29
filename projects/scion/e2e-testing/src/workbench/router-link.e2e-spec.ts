@@ -388,7 +388,7 @@ test.describe('Workbench RouterLink', () => {
     await appPO.switchPerspective('test');
 
     // Expect layout to match the perspective definition.
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -411,7 +411,7 @@ test.describe('Workbench RouterLink', () => {
 
     // Expect new view to be opened in active part of the contextual view i.e. left
     const testeeViewId = await testeeViewPage.view.getViewId();
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
