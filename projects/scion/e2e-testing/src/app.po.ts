@@ -31,7 +31,7 @@ export class AppPO {
   /**
    * Locates the 'wb-workbench' element.
    */
-  public readonly workbenchLocator = this.page.locator('wb-workbench');
+  public readonly workbench = this.page.locator('wb-workbench');
 
   /**
    * Locates workbench notifications.
@@ -196,7 +196,7 @@ export class AppPO {
    * Returns bounding box of the 'wb-workbench' element.
    */
   public async workbenchBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.workbenchLocator.boundingBox());
+    return fromRect(await this.workbench.boundingBox());
   }
 
   /**
@@ -305,7 +305,7 @@ export class AppPO {
    */
   public async setDesignToken(name: string, value: string): Promise<void> {
     const pageFunction = (workbenchElement: HTMLElement, token: {name: string; value: string}): void => workbenchElement.style.setProperty(token.name, token.value);
-    await this.workbenchLocator.evaluate(pageFunction, {name, value});
+    await this.workbench.evaluate(pageFunction, {name, value});
   }
 }
 

@@ -27,7 +27,7 @@ test.describe('Workbench Layout Migration', () => {
     await page.goto(`/?${WorkenchStartupQueryParams.STANDALONE}=true/#/(view.3:test-view//view.2:test-view//view.1:test-view)?parts=eyJyb290Ijp7Im5vZGVJZCI6IjhkMWQ4MzA1LTgxYzItNDllOC05NWE3LWFlYjNlODM1ODFhMSIsImNoaWxkMSI6eyJ2aWV3SWRzIjpbInZpZXcuMSJdLCJwYXJ0SWQiOiIzOGY5MTU0MS03ZmRjLTRjNzEtYmVjMi0xZDVhZDc1MjNiZWUiLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjEifSwiY2hpbGQyIjp7InZpZXdJZHMiOlsidmlldy4yIiwidmlldy4zIl0sInBhcnRJZCI6ImZlZDM4MDExLTY2YjctNDZjZC1iYjQyLTMwY2U2ZjBmODA3MSIsImFjdGl2ZVZpZXdJZCI6InZpZXcuMyJ9LCJkaXJlY3Rpb24iOiJyb3ciLCJyYXRpbyI6MC41fSwiYWN0aXZlUGFydElkIjoiMzhmOTE1NDEtN2ZkYy00YzcxLWJlYzItMWQ1YWQ3NTIzYmVlIiwidXVpZCI6IjFlMjIzN2U1LWE3MzAtNDk1NC1iYWJmLWNkMzRjMjM3OWI1ZSJ9`);
     await appPO.waitUntilWorkbenchStarted();
 
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MPart({
           id: MAIN_AREA,

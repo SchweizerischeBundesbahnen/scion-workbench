@@ -25,8 +25,8 @@ test.describe('Workbench', () => {
       await expect(testPage.theme).toHaveText('scion-light');
       await expect(testPage.colorScheme).toHaveText('light');
 
-      await expect(appPO.workbenchLocator).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-      await expect(appPO.workbenchLocator).toHaveCSS('color-scheme', 'light');
+      await expect(appPO.workbench).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+      await expect(appPO.workbench).toHaveCSS('color-scheme', 'light');
     });
 
     await test.step('dark theme', async () => {
@@ -35,8 +35,8 @@ test.describe('Workbench', () => {
       await expect(testPage.theme).toHaveText('scion-dark');
       await expect(testPage.colorScheme).toHaveText('dark');
 
-      await expect(appPO.workbenchLocator).toHaveCSS('background-color', 'rgb(29, 29, 29)');
-      await expect(appPO.workbenchLocator).toHaveCSS('color-scheme', 'dark');
+      await expect(appPO.workbench).toHaveCSS('background-color', 'rgb(29, 29, 29)');
+      await expect(appPO.workbench).toHaveCSS('color-scheme', 'dark');
     });
   });
 });

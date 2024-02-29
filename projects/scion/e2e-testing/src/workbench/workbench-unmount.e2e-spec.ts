@@ -26,7 +26,7 @@ test.describe('Workbench Component', () => {
     await appPO.openNewViewTab();
 
     // Expect the workbench component to be constructed.
-    await expect(appPO.workbenchLocator).toBeVisible();
+    await expect(appPO.workbench).toBeVisible();
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchComponent#construct/})).toHaveLength(1);
     await expect.poll(() => appPO.views().count()).toBeGreaterThan(0);
     consoleLogs.clear();
@@ -35,7 +35,7 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
 
     // Expect the workbench component to be destroyed.
-    await expect(appPO.workbenchLocator).not.toBeAttached();
+    await expect(appPO.workbench).not.toBeAttached();
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchComponent#destroy/})).toHaveLength(1);
   });
 
@@ -102,14 +102,14 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
 
     // Expect the DOM not to contain workbench elements.
-    await expect(appPO.workbenchLocator).not.toBeAttached();
+    await expect(appPO.workbench).not.toBeAttached();
     await expectView(viewPage).not.toBeAttached();
 
     // Re-mount the workbench component by navigating the primary router.
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Expect the view and the microfrontend to display.
-    await expect(appPO.workbenchLocator).toBeVisible();
+    await expect(appPO.workbench).toBeVisible();
     await expectView(viewPage).toBeActive();
   });
 

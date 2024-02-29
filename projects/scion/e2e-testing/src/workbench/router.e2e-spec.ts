@@ -1107,7 +1107,7 @@ test.describe('Workbench Router', () => {
     await routerPage.clickNavigate();
 
     // Expect the view to be opened in the left part.
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -1140,7 +1140,7 @@ test.describe('Workbench Router', () => {
     await appPO.navigateTo({url, microfrontendSupport: false, perspectives: ['perspective']});
 
     // THEN: Expect the workbench layout to be restored.
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -1187,7 +1187,7 @@ test.describe('Workbench Router', () => {
     await routerPage.clickNavigate();
 
     // Expect the view to be opened in the left part.
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -1229,7 +1229,7 @@ test.describe('Workbench Router', () => {
     await routerPage.clickNavigate();
 
     // Expect the view to be opened in the left part.
-    await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MPart({id: MAIN_AREA}),
       },

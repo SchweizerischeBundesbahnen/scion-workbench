@@ -41,7 +41,7 @@ test.describe('View Drag Main Area', () => {
       await view2.tab.dragTo({grid: 'mainArea', region: 'west'});
 
       // Expect view 2 to be moved to the west of the main area.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MPart({
             id: MAIN_AREA,
@@ -97,7 +97,7 @@ test.describe('View Drag Main Area', () => {
       await view2.tab.dragTo({grid: 'mainArea', region: 'east'});
 
       // Expect view 2 to be moved to the east of the main area.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MPart({
             id: MAIN_AREA,
@@ -153,7 +153,7 @@ test.describe('View Drag Main Area', () => {
       await view2.tab.dragTo({grid: 'mainArea', region: 'south'});
 
       // Expect view 2 to be moved to the south of the main area.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MPart({
             id: MAIN_AREA,

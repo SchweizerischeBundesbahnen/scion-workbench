@@ -153,7 +153,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'center'});
 
       // Expect view 2 not to be moved.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MPart({
             id: await view1.part.getPartId(),
@@ -182,7 +182,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -220,7 +220,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -261,7 +261,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
@@ -302,7 +302,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
@@ -349,7 +349,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'center'});
 
       // Expect view 2 to be moved to the initial part.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -393,7 +393,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'west'});
 
       // Expect view 2 to be moved to a new part in the west of the initial part.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -446,7 +446,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'east'});
 
       // Expect view 2 to be moved to a new part in the east of the initial part.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -502,7 +502,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'north'});
 
       // Expect view 2 to be moved to a new part in the north of the initial part.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -558,7 +558,7 @@ test.describe('View Drag', () => {
       await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'south'});
 
       // Expect view 2 to be moved to a new part in the south of the initial part.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',

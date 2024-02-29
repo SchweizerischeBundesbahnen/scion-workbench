@@ -36,7 +36,7 @@ test.describe('View Drag Workbench Grid', () => {
       await view2.tab.dragTo({grid: 'workbench', region: 'west'});
 
       // Expect view 2 to be moved to the west of the workbench grid.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -83,7 +83,7 @@ test.describe('View Drag Workbench Grid', () => {
       await view2.tab.dragTo({grid: 'workbench', region: 'west'});
 
       // Expect view 2 to be moved to the west of the workbench grid.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -141,7 +141,7 @@ test.describe('View Drag Workbench Grid', () => {
       await view2.tab.dragTo({grid: 'workbench', region: 'east'});
 
       // Expect view 2 to be moved to the east of the workbench grid.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -188,7 +188,7 @@ test.describe('View Drag Workbench Grid', () => {
       await view2.tab.dragTo({grid: 'workbench', region: 'east'});
 
       // Expect view 2 to be moved to the east of the workbench grid.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -249,7 +249,7 @@ test.describe('View Drag Workbench Grid', () => {
       await view2.tab.dragTo({grid: 'workbench', region: 'south'});
 
       // Expect view 2 to be moved to the south of the workbench grid.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MTreeNode({
             direction: 'column',
@@ -299,7 +299,7 @@ test.describe('View Drag Workbench Grid', () => {
       await view2.tab.dragTo({grid: 'workbench', region: 'south'});
 
       // Expect view 2 to be moved to the south of the workbench grid.
-      await expect(appPO.workbenchLocator).toEqualWorkbenchLayout({
+      await expect(appPO.workbench).toEqualWorkbenchLayout({
         workbenchGrid: {
           root: new MTreeNode({
             direction: 'column',
