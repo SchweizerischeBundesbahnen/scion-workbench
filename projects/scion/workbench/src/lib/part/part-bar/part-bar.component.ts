@@ -298,7 +298,6 @@ export class PartBarComponent implements OnInit {
    * Method invoked when the user drops a tab in this tabbar.
    */
   private onTabbarDrop(): void {
-    const dropIndex = this.dropTargetViewTab === 'end' ? undefined : this._viewTabs.indexOf(this.dropTargetViewTab!);
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: this._dragData!.workbenchId,
@@ -308,7 +307,7 @@ export class PartBarComponent implements OnInit {
       },
       target: {
         workbenchId: this._workbenchId,
-        insertionIndex: dropIndex,
+        position: this.dropTargetViewTab === 'end' ? 'end' : this._viewTabs.indexOf(this.dropTargetViewTab!),
         elementId: this._part.id,
       },
     });

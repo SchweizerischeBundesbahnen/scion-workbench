@@ -47,7 +47,7 @@ export interface WorkbenchLayout {
    *        @property activatePart - Controls whether to activate the part that contains the view. If not set, defaults to `false`.
    * @return a copy of this layout with the view added.
    */
-  addView(id: string, options: {partId: string; position?: number; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout;
+  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout;
 
   /**
    * Removes given view from the layout.

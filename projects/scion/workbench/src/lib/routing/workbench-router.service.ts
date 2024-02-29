@@ -131,14 +131,13 @@ export class WorkbenchRouter implements OnDestroy {
         if (extras.blankPartId && layout.hasPart(extras.blankPartId)) {
           return extras.blankPartId;
         }
-
         return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
       })();
 
       return {
         layout: layout.addView(viewId, {
           partId,
-          position: layout.computeViewInsertionIndex(extras.blankInsertionIndex, partId),
+          position: extras.blankInsertionIndex ?? 'after-active-view',
           activateView: extras.activate ?? true,
         }),
         viewOutlets: commands.length ? {[viewId]: commands} : {},

@@ -63,7 +63,7 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
  * @see assertPartGridElement
  */
 async function assertGridElement(expectedGridElement: MTreeNode | MPart, gridElementLocator: Locator, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
-  await throwIfAbsent(gridElementLocator, () => Error(`[DOMAssertError] Expected grid element to be present, but is not'. [${expectedGridElement.type}=${JSON.stringify(expectedGridElement)}, locator=${gridElementLocator}]`));
+  await throwIfAbsent(gridElementLocator, () => Error(`[DOMAssertError] Expected grid element to be present, but is not. [${expectedGridElement.type}=${JSON.stringify(expectedGridElement)}, locator=${gridElementLocator}]`));
 
   if (expectedGridElement instanceof MTreeNode) {
     await assertNodeGridElement(expectedGridElement, gridElementLocator, expectedWorkbenchLayout);
@@ -154,7 +154,7 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
   if (expectedPart.views) {
     const expectedViewIds = expectedPart.views.map(view => view.id);
     const actualViewIds = new Array<string>();
-    for (const viewTabLocator of await partLocator.locator('wb-part-bar wb-view-tab').all()) {
+    for (const viewTabLocator of await partLocator.locator('wb-part-bar wb-view-tab:not(.drag-source)').all()) {
       actualViewIds.push((await viewTabLocator.getAttribute('data-viewid'))!);
     }
     if (!isEqualArray(actualViewIds, expectedViewIds)) {

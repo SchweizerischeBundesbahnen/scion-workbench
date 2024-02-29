@@ -310,9 +310,9 @@ export interface ViewMoveEvent {
      */
     region?: 'north' | 'east' | 'south' | 'west';
     /**
-     * Tab index in the tabbar where to add the view tab. If not set, the view tab is added as last view tab.
+     * Position where to insert the view. The position is zero-based. If not set, adds the view after the active view.
      */
-    insertionIndex?: number;
+    position?: number | 'start' | 'end';
     /**
      * Identifier of the target workbench, or 'new-window' to move the view to a new browser window.
      */

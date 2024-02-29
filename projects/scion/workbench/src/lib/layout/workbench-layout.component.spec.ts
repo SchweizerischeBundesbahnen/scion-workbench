@@ -171,7 +171,7 @@ describe('WorkbenchLayout', () => {
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        insertionIndex: 0,
+        position: 'start',
       },
     });
     await waitUntilStable();
@@ -191,7 +191,7 @@ describe('WorkbenchLayout', () => {
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        insertionIndex: 1,
+        position: 1,
       },
     });
     await waitUntilStable();
@@ -211,7 +211,7 @@ describe('WorkbenchLayout', () => {
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        insertionIndex: 2,
+        position: 2,
       },
     });
     await waitUntilStable();
@@ -231,7 +231,7 @@ describe('WorkbenchLayout', () => {
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        insertionIndex: 3,
+        position: 3,
       },
     });
     await waitUntilStable();
@@ -251,7 +251,7 @@ describe('WorkbenchLayout', () => {
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         elementId: 'main',
-        insertionIndex: undefined,
+        position: 'end',
       },
     });
     await waitUntilStable();

@@ -195,7 +195,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * @inheritDoc
    */
-  public addView(id: string, options: {partId: string; position?: number; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
+  public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
     return this.workingCopy().__addView(id, options);
   }
 
@@ -212,13 +212,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param id - The id of the view to be moved.
    * @param targetPartId - The id of the part to which to move the view.
    * @param options - Controls how to move the view in the layout.
-   *        @property position - Specifies the position where to move the view in the target part. The position is zero-based. If not set, moves the view to the end.
+   *        @property position - Specifies the position where to move the view in the target part. The position is zero-based. If not set and moving the view to a different part, adds it at the end.
    *        @property activateView - Controls whether to activate the view. If not set, defaults to `false`.
    *        @property activatePart - Controls whether to activate the target part. If not set, defaults to `false`.
    *
    * @return a copy of this layout with the view moved.
    */
-  public moveView(id: string, targetPartId: string, options?: {position?: number; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
+  public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
     return this.workingCopy().__moveView(id, targetPartId, options);
   }
 
@@ -230,7 +230,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Activates the subsequent view if it exists, or the preceding view otherwise.
+   * Activates the preceding view if it exists, or the subsequent view otherwise.
    *
    * @param id - The id of the view for which to activate its adjacent view.
    * @param options - Controls view activation.
@@ -282,28 +282,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       }
     }
     return VIEW_ID_PREFIX.concat(`${ids.size + 1}`);
-  }
-
-  /**
-   * Computes the index for 'start' or 'last' literals, or, if `undefined`, returns the position after the currently active view.
-   */
-  public computeViewInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined, partId: string): number {
-    switch (insertionIndex) {
-      case undefined: {  // index after the active view, if any, or after the last view otherwise
-        const part = this.part({by: {partId}});
-        const activeViewIndex = part.views.findIndex(view => view.id === part.activeViewId);
-        return (activeViewIndex > -1 ? activeViewIndex + 1 : part.views.length);
-      }
-      case 'start': {
-        return 0;
-      }
-      case 'end': {
-        return this.part({by: {partId}}).views.length;
-      }
-      default: {
-        return insertionIndex;
-      }
-    }
   }
 
   /**
@@ -409,13 +387,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addView(id: string, options: {partId: string; position?: number; activateView?: boolean; activatePart?: boolean}): this {
+  private __addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): this {
     if (this.views().find(view => view.id === id)) {
       throw Error(`[IllegalArgumentError] View id must be unique. The layout already contains a view with the id '${id}'.`);
     }
 
     const part = this.part({by: {partId: options.partId}});
-    part.views.splice(options.position ?? part.views.length, 0, {id});
+    const position = coercePosition(options.position ?? 'end', part);
+    part.views.splice(position, 0, {id});
 
     // Activate view and part.
     if (options.activateView) {
@@ -430,24 +409,20 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __moveView(id: string, targetPartId: string, options?: {position?: number; activateView?: boolean; activatePart?: boolean}): this {
+  private __moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): this {
     const sourcePart = this.part({by: {viewId: id}});
     const targetPart = this.part({by: {partId: targetPartId}});
-    const position = options?.position;
 
     // Move the view.
     if (sourcePart !== targetPart) {
       this.__removeView(id);
-      this.__addView(id, {partId: targetPartId, position});
+      this.__addView(id, {partId: targetPartId, position: options?.position});
     }
-    else if (position === undefined) {
+    else if (options?.position !== undefined) {
+      const position = coercePosition(options.position, targetPart);
+      const referenceView: MView | undefined = sourcePart.views.at(position);
       sourcePart.views.splice(sourcePart.views.findIndex(view => view.id === id), 1);
-      sourcePart.views.push({id});
-    }
-    else {
-      const referenceView = sourcePart.views[position];
-      sourcePart.views.splice(sourcePart.views.findIndex(view => view.id === id), 1);
-      sourcePart.views.splice(sourcePart.views.findIndex(view => view.id === referenceView.id), 0, {id});
+      sourcePart.views.splice(referenceView ? sourcePart.views.indexOf(referenceView) : sourcePart.views.length, 0, {id});
     }
 
     // Activate view and part.
@@ -515,7 +490,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private __activateAdjacentView(id: string, options?: {activatePart?: boolean}): this {
     const part = this.part({by: {viewId: id}});
     const viewIndex = part.views.findIndex(view => view.id === id);
-    part.activeViewId = (part.views[viewIndex + 1] || part.views[viewIndex - 1])?.id; // is `undefined` if it is the last view of the part
+    part.activeViewId = (part.views[viewIndex - 1] || part.views[viewIndex + 1])?.id; // is `undefined` if it is the last view of the part
 
     // Activate the part.
     if (options?.activatePart) {
@@ -741,6 +716,31 @@ export function isGridElementVisible(element: MTreeNode | MPart): boolean {
     return element.id === MAIN_AREA || element.views.length > 0;
   }
   return isGridElementVisible(element.child1) || isGridElementVisible(element.child2);
+}
+
+/**
+ * Returns the position if a number, or computes it from the given literal otherwise.
+ */
+function coercePosition(position: number | 'start' | 'end' | 'before-active-view' | 'after-active-view', part: MPart): number {
+  switch (position) {
+    case 'start': {
+      return 0;
+    }
+    case 'end': {
+      return part.views.length;
+    }
+    case 'before-active-view': {
+      const activeViewIndex = part.views.findIndex(view => view.id === part.activeViewId);
+      return (activeViewIndex > -1 ? activeViewIndex : part.views.length);
+    }
+    case 'after-active-view': {
+      const activeViewIndex = part.views.findIndex(view => view.id === part.activeViewId);
+      return (activeViewIndex > -1 ? activeViewIndex + 1 : part.views.length);
+    }
+    default: {
+      return position;
+    }
+  }
 }
 
 /**
