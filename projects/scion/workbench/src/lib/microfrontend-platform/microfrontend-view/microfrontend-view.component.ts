@@ -9,14 +9,14 @@
  */
 
 import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, OnDestroy, OnInit, Provider, ViewChild} from '@angular/core';
-import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, convertToParamMap, Params} from '@angular/router';
 import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
 import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
 import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
-import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵTHEME_CONTEXT_KEY, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchTheme, WorkbenchViewPreDestroy} from '../../workbench.model';
+import {WorkbenchViewPreDestroy} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -33,11 +33,12 @@ import {AsyncPipe, NgClass, NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {WorkbenchService} from '../../workbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import '../microfrontend-platform.config';
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
+import {MicrofrontendThemePropagator} from '../theme/microfrontend-theme-propagtor.service';
+import {NamedParameters} from '../common/named-parameters.util';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -53,6 +54,9 @@ import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-p
     ContentAsOverlayComponent,
     NgComponentOutlet,
     GlassPaneDirective,
+  ],
+  providers: [
+    {provide: MicrofrontendThemePropagator},
   ],
   viewProviders: [
     configureMicrofrontendGlassPane(),
@@ -96,7 +100,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
               private _viewContextMenuService: ViewMenuService,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _workbenchRouter: WorkbenchRouter,
-              private _workbenchService: WorkbenchService,
+              private _microfrontendThemePropagator: MicrofrontendThemePropagator,
               private _cd: ChangeDetectorRef,
               public view: ɵWorkbenchView,
               @Inject(IFRAME_HOST) protected iframeHostRef: ViewContainerReference) {
@@ -134,7 +138,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
       )
       .subscribe();
 
-    this.installThemePropagator();
+    this._microfrontendThemePropagator.install(this.routerOutletElement.nativeElement);
   }
 
   private async onNavigate(prevRouteSnapshot: ActivatedMicrofrontendRouteSnapshot | undefined, currRouteSnapshot: ActivatedMicrofrontendRouteSnapshot): Promise<void> {
@@ -241,8 +245,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
   private setViewProperties(viewCapability: WorkbenchViewCapability, activatedRoute: ActivatedRouteSnapshot, params: Params): void {
-    this.view.title = substituteNamedParameters(viewCapability.properties.title, params) ?? null;
-    this.view.heading = substituteNamedParameters(viewCapability.properties.heading, params) ?? null;
+    this.view.title = NamedParameters.substitute(viewCapability.properties.title, convertToParamMap(params)) ?? null;
+    this.view.heading = NamedParameters.substitute(viewCapability.properties.heading, convertToParamMap(params)) ?? null;
     this.view.cssClass = new Array<string>()
       .concat(Arrays.coerce(viewCapability.properties.cssClass))
       .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalViewStates.cssClass]));
@@ -332,24 +336,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
       });
   }
 
-  /**
-   * Propagates the current theme and color scheme to embedded content.
-   */
-  private installThemePropagator(): void {
-    this._workbenchService.theme$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(theme => {
-        if (theme) {
-          this.routerOutletElement.nativeElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
-          this.routerOutletElement.nativeElement.setContextValue('color-scheme', theme.colorScheme);
-        }
-        else {
-          this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
-          this.routerOutletElement.nativeElement.removeContextValue('color-scheme');
-        }
-      });
-  }
-
   public ngOnDestroy(): void {
     // Instruct the message broker to delete retained messages to free resources.
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true}).then();
@@ -384,13 +370,6 @@ interface ActivatedMicrofrontendRouteSnapshot {
   activatedRoute: ActivatedRouteSnapshot;
   params: Params;
   viewCapability?: WorkbenchViewCapability;
-}
-
-/**
- * Replaces named parameters with values of the contained {@link Params}.
- */
-function substituteNamedParameters(value: string | null | undefined, params: Params): string | null {
-  return value?.replace(/:(\w+)/g, (match, paramName) => params[paramName] ?? match) || null;
 }
 
 /**

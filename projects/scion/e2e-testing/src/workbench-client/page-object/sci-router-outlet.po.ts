@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms from the Eclipse Public License 2.0
@@ -25,7 +25,6 @@ export class SciRouterOutletPO {
    * Use to locate elements in the iframe of the <sci-router-outlet>.
    */
   public readonly frameLocator: FrameLocator;
-
   /**
    * Use to locate the splash displayed for microfrontends signaling ready.
    */

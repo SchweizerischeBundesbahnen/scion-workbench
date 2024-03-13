@@ -9,12 +9,15 @@
  */
 
 import {expect} from '@playwright/test';
-import {WorkbenchDialogPagePO} from '../workbench/page-object/workbench-dialog-page.po';
+import {MicrofrontendDialogPagePO, WorkbenchDialogPagePO} from '../workbench/page-object/workbench-dialog-page.po';
 
 /**
  * Asserts state and presence of a dialog.
  */
-export function expectDialog(dialogPage: WorkbenchDialogPagePO): DialogMatcher {
+export function expectDialog(dialogPage: WorkbenchDialogPagePO | MicrofrontendDialogPagePO): DialogMatcher {
+  if (isMicrofrontendDialog(dialogPage)) {
+    return expectMicrofrontendDialog(dialogPage);
+  }
   return expectWorkbenchDialog(dialogPage);
 }
 
@@ -44,6 +47,35 @@ function expectWorkbenchDialog(dialogPage: WorkbenchDialogPagePO): DialogMatcher
 }
 
 /**
+ * Returns a {@link DialogMatcher} to expect the microfrontend dialog.
+ */
+function expectMicrofrontendDialog(dialogPage: MicrofrontendDialogPagePO): DialogMatcher {
+  return {
+    toBeVisible: async (): Promise<void> => {
+      await expect(dialogPage.dialog.locator).toBeVisible();
+      await expect(dialogPage.locator).toBeVisible();
+      await expect(dialogPage.outlet.locator).toBeVisible();
+    },
+    toBeHidden: async (): Promise<void> => {
+      await expect(dialogPage.dialog.locator).toBeAttached();
+      await expect(dialogPage.dialog.locator).not.toBeVisible();
+      await expect(dialogPage.outlet.locator).toBeAttached();
+      await expect(dialogPage.outlet.locator).not.toBeVisible();
+      await expect(dialogPage.locator).toBeVisible(); // iframe content is always visible, but not displayed because the outlet is hidden
+      await expect.poll(() => dialogPage.dialog.locator.boundingBox()).not.toBeNull(); //  assert to use `visibility: hidden` and not `display: none` to preserve the dimension of the dialog.
+      await expect.poll(() => dialogPage.outlet.locator.boundingBox()).not.toBeNull(); //  assert to use `visibility: hidden` and not `display: none` to preserve the dimension of the dialog.
+    },
+    not: {
+      toBeAttached: async (): Promise<void> => {
+        await expect(dialogPage.dialog.locator).not.toBeAttached();
+        await expect(dialogPage.locator).not.toBeAttached();
+        await expect(dialogPage.outlet.locator).not.toBeAttached();
+      },
+    },
+  };
+}
+
+/**
  * Asserts state and presence of a dialog.
  */
 export interface DialogMatcher {
@@ -63,4 +95,8 @@ export interface DialogMatcher {
      */
     toBeAttached(): Promise<void>;
   };
+}
+
+function isMicrofrontendDialog(dialogPage: WorkbenchDialogPagePO | MicrofrontendDialogPagePO): dialogPage is MicrofrontendDialogPagePO {
+  return !!(dialogPage as MicrofrontendDialogPagePO).outlet;
 }

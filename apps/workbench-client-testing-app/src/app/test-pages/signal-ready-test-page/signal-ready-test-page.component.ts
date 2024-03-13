@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {Component, Optional} from '@angular/core';
-import {WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchDialog, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -24,9 +24,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class SignalReadyTestPageComponent {
 
-  constructor(@Optional() view: WorkbenchView, @Optional() popup: WorkbenchPopup) {
+  constructor(@Optional() view: WorkbenchView, @Optional() popup: WorkbenchPopup, @Optional() dialog: WorkbenchDialog) {
     this.installViewReadySignaler(view);
     this.installPopupReadySignaler(popup);
+    this.installDialogReadySignaler(dialog);
   }
 
   private installViewReadySignaler(view: WorkbenchView | undefined): void {
@@ -45,5 +46,14 @@ export default class SignalReadyTestPageComponent {
     Beans.get(MessageClient).observe$(`signal-ready/${popup.capability.metadata!.id}`)
       .pipe(takeUntilDestroyed())
       .subscribe(() => popup.signalReady());
+  }
+
+  private installDialogReadySignaler(dialog: WorkbenchDialog | undefined): void {
+    if (!dialog) {
+      return;
+    }
+    Beans.get(MessageClient).observe$(`signal-ready/${dialog.capability.metadata!.id}`)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => dialog.signalReady());
   }
 }

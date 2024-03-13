@@ -13,7 +13,6 @@ import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 
@@ -23,7 +22,6 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
   styleUrls: ['./register-workbench-intention-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,

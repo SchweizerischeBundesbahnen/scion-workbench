@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,6 +45,10 @@ export class DialogPO {
 
   public async getDialogBoundingBox(): Promise<DomRect> {
     return fromRect(await this._dialog.boundingBox());
+  }
+
+  public getComputedStyle(): Promise<CSSStyleDeclaration> {
+    return this._dialog.evaluate((dialogElement: HTMLElement) => getComputedStyle(dialogElement));
   }
 
   public async getGlassPaneBoundingBoxes(): Promise<Set<DomRect>> {
