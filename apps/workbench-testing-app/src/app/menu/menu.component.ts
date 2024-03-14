@@ -15,6 +15,7 @@ import {MenuItem, MenuItemSeparator} from './menu-item';
 import {KeyValuePipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {InstanceofPipe} from '../common/instanceof.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 
 /**
  * DI token to provide menu items to the menu.
@@ -32,6 +33,7 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
     NgClass,
     KeyValuePipe,
     InstanceofPipe,
+    SciMaterialIconDirective,
   ],
 })
 export class MenuComponent implements OnInit {

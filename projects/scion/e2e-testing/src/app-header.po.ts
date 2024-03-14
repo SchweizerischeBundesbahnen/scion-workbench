@@ -41,12 +41,23 @@ export class AppHeaderPO {
   /**
    * Opens the application menu and clicks the specified menu item.
    */
-  public async clickMenuItem(locateBy: {cssClass: string}): Promise<void> {
+  public async clickMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
     await this._locator.locator('button.e2e-menu-button').click();
-    await this._locator.page()
+
+    const menuItem = this._locator.page()
       .locator('.e2e-application-menu') // CDK overlay
       .locator('app-menu')
-      .locator(`button.e2e-menu-item.${locateBy.cssClass}`)
-      .click();
+      .locator(`button.e2e-menu-item.${locateBy.cssClass}`);
+
+    if (await menuItem.isHidden()) {
+      throw Error(`[PageObjectError] Menu item not found [cssClass=${locateBy.cssClass}]`);
+    }
+
+    // Do not toggle the menu item if already in the expected state.
+    if (options?.check !== undefined && (await menuItem.locator('span.e2e-check-mark').isVisible()) === options.check) {
+      return this._locator.page().keyboard.press('Escape');
+    }
+
+    return menuItem.click();
   }
 }

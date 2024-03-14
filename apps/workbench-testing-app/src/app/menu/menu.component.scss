@@ -9,10 +9,13 @@
 
   > button.menu-item {
     all: unset;
-    padding: .6em 1.5em;
+    padding: .6em 1.5em .6em .6em;
     font-size: smaller;
     user-select: none;
     position: relative; // positioning context for separator pseudo element
+    display: inline-flex;
+    align-items: center;
+    gap: .5em;
 
     &:hover {
       background-color: var(--sci-color-background-elevation-hover);
@@ -22,6 +25,15 @@
     &.disabled {
       opacity: .5;
       pointer-events: none;
+    }
+
+    > span.check-mark {
+      font-size: 1.5em;
+      user-select: none;
+    }
+
+    &:not(.checked) > span.check-mark {
+      visibility: hidden;
     }
 
     // separator

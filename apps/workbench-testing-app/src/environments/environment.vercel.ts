@@ -28,5 +28,6 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 
 export const environment = {
   animationEnabled: true,
+  logAngularChangeDetectionCycles: false,
   microfrontendPlatformConfig,
 };

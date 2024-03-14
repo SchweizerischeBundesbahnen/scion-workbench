@@ -21,7 +21,7 @@ type LogLevelStrings = keyof typeof LogLevel;
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `Logger` DI token. */)
 export class ɵLogger implements Logger {
 
-  private _logLevel!: LogLevel;
+  public logLevel!: LogLevel;
 
   constructor(@Inject(LogAppender) @Optional() private _logAppenders: LogAppender[],
               router: Router,
@@ -29,7 +29,7 @@ export class ɵLogger implements Logger {
     this.observeLogLevelQueryParam$(router)
       .pipe(takeUntilDestroyed())
       .subscribe((queryParamLogLevel: LogLevel | undefined) => {
-        this._logLevel = queryParamLogLevel ?? logLevel;
+        this.logLevel = queryParamLogLevel ?? logLevel;
       });
   }
 
@@ -54,7 +54,7 @@ export class ɵLogger implements Logger {
       return;
     }
 
-    if (event.level < this._logLevel) {
+    if (event.level < this.logLevel) {
       return;
     }
 

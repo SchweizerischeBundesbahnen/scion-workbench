@@ -8,23 +8,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, Injectable, Injector, runInInjectionContext} from '@angular/core';
+import {ElementRef, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {filter, map, switchMap, takeUntil, tap} from 'rxjs/operators';
-import {firstValueFrom, fromEvent, merge, Observable, Subject, TeardownLogic} from 'rxjs';
+import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
+import {firstValueFrom, fromEvent, Observable, Subject, TeardownLogic} from 'rxjs';
 import {coerceElement} from '@angular/cdk/coercion';
 import {TEXT, TextComponent} from '../view-context-menu/text.component';
 import {MenuItemConfig, WorkbenchModuleConfig} from '../../workbench-module-config';
 import {WorkbenchService} from '../../workbench.service';
-import {Arrays} from '@scion/toolkit/util';
-import {filterArray} from '@scion/toolkit/operators';
+import {filterArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {provideViewContext} from '../../view/view-context-provider';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -39,6 +39,7 @@ export class ViewMenuService {
 
   constructor(private _overlay: Overlay,
               private _injector: Injector,
+              private _zone: NgZone,
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchService: WorkbenchService,
               private _workbenchModuleConfig: WorkbenchModuleConfig) {
@@ -100,32 +101,44 @@ export class ViewMenuService {
 
       view.menuItems$
         .pipe(
-          // skip menu items which have no accelerator configured
-          filterArray((menuItem: WorkbenchMenuItem) => !!menuItem.accelerator && menuItem.accelerator.length > 0),
-          // register the menu item keyboard accelerators
-          switchMap((menuItems: WorkbenchMenuItem[]): Observable<WorkbenchMenuItem> => {
-            const accelerators$ = menuItems.map(menuItem => {
-              const key = Arrays.last(menuItem.accelerator!);
-              const modifierKeys = menuItem.accelerator!.slice(0, -1);
-
-              return fromEvent<KeyboardEvent>(coerceElement(target), 'keydown')
-                .pipe(
-                  filter(event => event.key?.toLowerCase() === key!.toLowerCase()), // ignore the shift modifier when comparing the pressed key
-                  filter(event => Arrays.isEqual(modifierKeys, getModifierState(event), {exactOrder: false})), // check the modifier state of the pressed key
-                  tap(event => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  }),
-                  map(() => menuItem),
-                );
-            });
-            return merge(...accelerators$);
+          // Skip menu items which have no accelerator configured.
+          filterArray((menuItem: WorkbenchMenuItem) => !!menuItem.accelerator?.length),
+          filter(menuItems => menuItems.length > 0),
+          // Subscribe for keyboard events.
+          switchMap((menuItems: WorkbenchMenuItem[]): Observable<{event: KeyboardEvent; menuItems: WorkbenchMenuItem[]}> => {
+            return fromEvent<KeyboardEvent>(coerceElement(target), 'keydown').pipe(map(event => ({event, menuItems})));
           }),
-          filter((menuItem: WorkbenchMenuItem) => !menuItem.isDisabled || !menuItem.isDisabled()),
+          map(({event, menuItems}) => ({
+            event,
+            menuItems: menuItems
+              .filter(menuItem => !menuItem.isDisabled?.())
+              .filter(menuItem => {
+                const accelerator = menuItem.accelerator!;
+                const key = accelerator.at(-1)!;
+                const modifierKeys = accelerator.slice(0, -1);
+
+                // Compare key.
+                if (event.key.toLowerCase() !== key.toLowerCase()) {
+                  return false;
+                }
+                // Compare modifiers.
+                if (!Arrays.isEqual(modifierKeys, getModifierState(event), {exactOrder: false})) {
+                  return false;
+                }
+                return true;
+              }),
+          })),
+          filter(({menuItems}) => menuItems.length > 0),
+          subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+          observeInside(fn => this._zone.run(fn)),
           takeUntil(unsubscribe$),
         )
-        .subscribe((menuItem: WorkbenchMenuItem) => {
-          runInInjectionContext(this._injector, () => menuItem.onAction());
+        .subscribe(({event, menuItems}) => {
+          event.preventDefault();
+          event.stopPropagation();
+          runInInjectionContext(this._injector, () => {
+            menuItems.forEach(menuItem => menuItem.onAction());
+          });
         });
 
       return (): void => unsubscribe$.next();

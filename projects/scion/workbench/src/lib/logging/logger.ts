@@ -9,7 +9,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {LoggerName} from './logging.model';
+import {LoggerName, LogLevel} from './logging.model';
 import {ɵLogger} from './ɵlogger';
 
 /**
@@ -29,6 +29,12 @@ import {ɵLogger} from './ɵlogger';
  */
 @Injectable({providedIn: 'root', useClass: ɵLogger})
 export abstract class Logger {
+
+  /**
+   * Log level of the workbench logger.
+   */
+  public abstract readonly logLevel: LogLevel;
+
   /**
    * Logs a message with debug severity.
    *

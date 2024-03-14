@@ -15,11 +15,12 @@ import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
-import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {Logger, LogLevel, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
+import {SettingsService} from '../settings.service';
 
 @Component({
   selector: 'app-header',
@@ -43,6 +44,8 @@ export class HeaderComponent {
   constructor(private _router: Router,
               private _wbRouter: WorkbenchRouter,
               private _menuService: MenuService,
+              private _settingsService: SettingsService,
+              private _logger: Logger,
               protected workbenchService: WorkbenchService) {
     this.installThemeSwitcher();
   }
@@ -62,6 +65,8 @@ export class HeaderComponent {
         ...this.contributeStartupMenuItems(),
         new MenuItemSeparator(),
         ...this.contributeNavigationMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeSettingsMenuItems(),
       ],
     );
   }
@@ -81,18 +86,22 @@ export class HeaderComponent {
     return [
       new MenuItem({
         text: 'Change log level to DEBUG',
+        checked: this._logger.logLevel === LogLevel.DEBUG,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'debug'}, queryParamsHandling: 'merge'}),
       }),
       new MenuItem({
         text: 'Change log level to INFO',
+        checked: this._logger.logLevel === LogLevel.INFO,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'info'}, queryParamsHandling: 'merge'}),
       }),
       new MenuItem({
         text: 'Change log level to WARN',
+        checked: this._logger.logLevel === LogLevel.WARN,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'warn'}, queryParamsHandling: 'merge'}),
       }),
       new MenuItem({
         text: 'Change log level to ERROR',
+        checked: this._logger.logLevel === LogLevel.ERROR,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'error'}, queryParamsHandling: 'merge'}),
       }),
     ];
@@ -177,4 +186,16 @@ export class HeaderComponent {
         this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark').then();
       });
   }
+
+  private contributeSettingsMenuItems(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Log Angular change detection cycles',
+        cssClass: 'e2e-log-angular-change-detection-cycles',
+        checked: this._settingsService.isEnabled('logAngularChangeDetectionCycles'),
+        onAction: () => this._settingsService.toggle('logAngularChangeDetectionCycles'),
+      }),
+    ];
+  }
+
 }
