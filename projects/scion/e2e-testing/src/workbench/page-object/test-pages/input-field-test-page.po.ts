@@ -59,8 +59,13 @@ export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialo
     }
   }
 
-  public async enterText(text: string): Promise<void> {
-    await this.input.fill(text);
+  public async enterText(text: string, options?: {pressSequentially?: boolean}): Promise<void> {
+    if (options?.pressSequentially) {
+      await this.input.pressSequentially(text);
+    }
+    else {
+      await this.input.fill(text);
+    }
   }
 
   public async clickInputField(): Promise<void> {

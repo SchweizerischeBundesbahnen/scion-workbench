@@ -3,7 +3,9 @@
           class="menu-item e2e-menu-item"
           [ngClass]="menuItem.cssClass"
           [class.disabled]="menuItem.disabled"
+          [class.checked]="menuItem.checked"
           (click)="onMenuItemClick(menuItem)">
+    <span sciMaterialIcon class="check-mark e2e-check-mark">check</span>
     {{menuItem.text}}
   </button>
   <ng-template #separator_template>

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, NgZone} from '@angular/core';
+import {Component, DoCheck, HostBinding, inject, NgZone} from '@angular/core';
 import {filter} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -18,6 +18,7 @@ import {WORKBENCH_ID, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@s
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeInside} from '@scion/toolkit/operators';
+import {SettingsService} from './settings.service';
 
 @Component({
   selector: 'app-root',
@@ -32,7 +33,9 @@ import {subscribeInside} from '@scion/toolkit/operators';
     WorkbenchViewMenuItemDirective,
   ],
 })
-export class AppComponent {
+export class AppComponent implements DoCheck {
+
+  private _logAngularChangeDetectionCycles = false;
 
   @HostBinding('attr.data-workbench-id')
   public workbenchId = inject(WORKBENCH_ID);
@@ -46,11 +49,22 @@ export class AppComponent {
   @HostBinding('attr.data-navigationid')
   protected navigationId: string | undefined;
 
-  constructor(private _router: Router,
+  constructor(settingsService: SettingsService,
+              private _router: Router,
               private _zone: NgZone,
               protected workbenchStartup: WorkbenchStartup) {
     this.installRouterEventListeners();
     this.installPropagatedKeyboardEventLogger();
+
+    settingsService.observe$('logAngularChangeDetectionCycles')
+      .pipe(takeUntilDestroyed())
+      .subscribe(enabled => this._logAngularChangeDetectionCycles = enabled);
+  }
+
+  public ngDoCheck(): void {
+    if (this._logAngularChangeDetectionCycles) {
+      console.log('[AppComponent] Angular change detection cycle');
+    }
   }
 
   private installRouterEventListeners(): void {

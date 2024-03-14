@@ -25,6 +25,10 @@ export class MenuItem {
    */
   public disabled?: boolean;
   /**
+   * Indicates whether to display a check mark left to the menu item.
+   */
+  public checked?: boolean;
+  /**
    * Specifies CSS class(es) to be added to the menu item, useful in end-to-end tests for locating the menu item.
    */
   public cssClass?: string | string[];
@@ -34,6 +38,7 @@ export class MenuItem {
     this.onAction = menuItem.onAction;
     this.disabled = menuItem.disabled;
     this.cssClass = menuItem.cssClass;
+    this.checked = menuItem.checked;
   }
 }
 
