@@ -20,7 +20,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('View Drag', () => {
 
-  test.describe('should deactivate view when moving it quickly out of the tabbar', () => {
+  test.describe('view (de-)activation on drag', () => {
     test('should deactivate view when moving it quickly to the center', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -137,7 +137,7 @@ test.describe('View Drag', () => {
     });
   });
 
-  test.describe('should allow dragging a view to a region of its own part', () => {
+  test.describe('drag to own part', () => {
 
     /**
      * +-----------------+    +-----------------+
@@ -327,7 +327,7 @@ test.describe('View Drag', () => {
     });
   });
 
-  test.describe('should allow dragging a view to a region of another part', () => {
+  test.describe('drag to another part', () => {
 
     /**
      * +----------+------------------+    +------------------+----------+
@@ -592,7 +592,7 @@ test.describe('View Drag', () => {
     });
   });
 
-  test.describe('should drop view on start page', () => {
+  test.describe('drag to start page', () => {
 
     test('should drop view on start page of the main area (grid root is MPart)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -665,6 +665,56 @@ test.describe('View Drag', () => {
       // Expect view to be moved to the main area.
       await expectView(testeeViewPage).toBeActive();
       await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+    });
+  });
+
+  test.describe('drag image', () => {
+
+    test('should render drag image', async ({appPO, workbenchNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+      await viewPage.enterTitle('Title');
+
+      // Start dragging the view.
+      await viewPage.view.tab.dragTo({partId: await viewPage.view.part.getPartId(), region: 'center'}, {performDrop: false});
+
+      // Expect drag image to have title.
+      await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');
+      await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-heading')).toBeHidden();
+    });
+
+    test('should render multi-line drag image', async ({appPO, workbenchNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
+
+      const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+      await viewPage.enterTitle('Title');
+      await viewPage.enterHeading('Heading');
+
+      // Start dragging the view.
+      await viewPage.view.tab.dragTo({partId: await viewPage.view.part.getPartId(), region: 'center'}, {performDrop: false});
+
+      // Expect drag image to have title and heading.
+      await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');
+      await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-heading')).toHaveText('Heading');
+    });
+
+    test('should render tab content when dragging the tab quickly into the window', async ({appPO, workbenchNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+      await viewPage.enterTitle('Title');
+
+      // Move view tab out of the window.
+      await viewPage.view.tab.mousedown();
+      await page.mouse.move(-500, appPO.viewportBoundingBox().vcenter, {steps: 100});
+
+      // Move view tab quickly into the window.
+      await page.mouse.move(appPO.viewportBoundingBox().hcenter, appPO.viewportBoundingBox().vcenter, {steps: 1});
+
+      // Expect view tab to render content.
+      await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');
     });
   });
 });
