@@ -132,13 +132,15 @@ export class ViewTabDragImageRenderer {
       },
     });
     this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
-    this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
+    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
       parent: this._injector,
       providers: [
         {provide: WorkbenchView, useValue: new DragImageWorkbenchView(dragData)},
         {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'drag-image' satisfies ViewTabRenderingContext},
       ],
     })));
+    // Detect for changes because constructed outside of Angular.
+    componentRef.changeDetectorRef.detectChanges();
   }
 
   private disposeDragImage(): void {
