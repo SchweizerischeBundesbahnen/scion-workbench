@@ -11,23 +11,27 @@
 import {LoggerName} from './logging.model';
 
 /**
- * Set of logger names used by the workbench.
+ * Enumerates logger names used by the workbench.
  */
-export namespace LoggerNames {
+export const LoggerNames = {
+
   /**
    * Use this logger name to log messages related to workbench routing.
    */
-  export const ROUTING = new LoggerName('workbench:router');
+  ROUTING: new LoggerName('workbench:router'),
+
   /**
    * Use this logger name to log messages related to the workbench lifecycle.
    */
-  export const LIFECYCLE = new LoggerName('workbench:lifecycle');
+  LIFECYCLE: new LoggerName('workbench:lifecycle'),
+
   /**
    * Use this logger name to log messages related to the microfrontend integration.
    */
-  export const MICROFRONTEND = new LoggerName('workbench:microfrontend');
+  MICROFRONTEND: new LoggerName('workbench:microfrontend'),
+
   /**
    * Use this logger name to log messages related to the microfrontend routing.
    */
-  export const MICROFRONTEND_ROUTING = new LoggerName('workbench:microfrontend/routing');
-}
+  MICROFRONTEND_ROUTING: new LoggerName('workbench:microfrontend/routing'),
+} as const;

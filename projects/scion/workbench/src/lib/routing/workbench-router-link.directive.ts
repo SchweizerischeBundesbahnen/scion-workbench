@@ -17,7 +17,6 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {filter, takeUntil} from 'rxjs/operators';
 import {Defined} from '@scion/toolkit/util';
 import {RouterUtils} from './router.util';
-import isPrimaryRouteTarget = RouterUtils.isPrimaryRouteTarget;
 
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
@@ -97,7 +96,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
         }
         // Navigate the contextual view only if it is the target of primary routes.
         const contextualViewId = contextualView?.id;
-        if (contextualViewId && isPrimaryRouteTarget(contextualViewId)) {
+        if (contextualViewId && RouterUtils.isPrimaryRouteTarget(contextualViewId)) {
           return contextualViewId;
         }
         return undefined;

@@ -13,9 +13,10 @@
  *
  * State can be read from {@link ActivatedRoute.data} using the {@link WorkbenchRouteData.state} key.
  */
-export namespace MicrofrontendNavigationalStates {
+export const MicrofrontendNavigationalStates = {
+
   /**
    * Key for associating transient parameters with a navigation.
    */
-  export const transientParams = 'ɵtransientParams';
-}
+  transientParams: 'ɵtransientParams',
+} as const;
