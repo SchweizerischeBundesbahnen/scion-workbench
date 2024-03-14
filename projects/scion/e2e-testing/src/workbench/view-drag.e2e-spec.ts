@@ -14,6 +14,9 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectView} from '../matcher/view-matcher';
+import {PerspectivePagePO} from './page-object/perspective-page.po';
+import {MAIN_AREA} from '../workbench.model';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('View Drag', () => {
 
@@ -589,4 +592,79 @@ test.describe('View Drag', () => {
     });
   });
 
+  test.describe('should drop view on start page', () => {
+
+    test('should drop view on start page of the main area (grid root is MPart)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Create perspective with a left and right part.
+      const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
+      await perspectivePage.registerPerspective({
+        id: 'perspective',
+        parts: [
+          {id: MAIN_AREA},
+          {id: 'left', align: 'left'},
+        ],
+      });
+      await perspectivePage.view.tab.close();
+      await appPO.switchPerspective('perspective');
+
+      // TODO [WB-LAYOUT] Open test view via perspective definition.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.enterPath('test-view');
+      await routerPage.enterCssClass('testee');
+      await routerPage.enterTarget('blank');
+      await routerPage.enterBlankPartId('left');
+      await routerPage.clickNavigate();
+      await routerPage.view.tab.close();
+
+      // Drop view on the start page of the main area.
+      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      await testeeViewPage.view.tab.dragTo({grid: 'mainArea', region: 'center'});
+
+      // Expect view to be moved to the main area.
+      await expectView(testeeViewPage).toBeActive();
+      await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+    });
+
+    test('should drop view on start page of the main area (grid root is MTreeNode)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Create perspective with a part left to the main area.
+      const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
+      await perspectivePage.registerPerspective({
+        id: 'perspective',
+        parts: [
+          {id: MAIN_AREA},
+          {id: 'left', align: 'left'},
+        ],
+      });
+      await perspectivePage.view.tab.close();
+      await appPO.switchPerspective('perspective');
+
+      // Change the grid root of the main area to a `MTreeNode`.
+      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+      const mainAreaActivePartId = await layoutPage.view.part.getPartId();
+      await layoutPage.addPart('main-left', {relativeTo: mainAreaActivePartId, align: 'left'});
+      await layoutPage.addPart('main-right', {relativeTo: mainAreaActivePartId, align: 'right'});
+      await layoutPage.view.tab.close();
+
+      // TODO [WB-LAYOUT] Open test view via perspective definition.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.enterPath('test-view');
+      await routerPage.enterCssClass('testee');
+      await routerPage.enterTarget('blank');
+      await routerPage.enterBlankPartId('left');
+      await routerPage.clickNavigate();
+      await routerPage.view.tab.close();
+
+      // Drop view on the start page of the main area.
+      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      await testeeViewPage.view.tab.dragTo({grid: 'mainArea', region: 'center'});
+
+      // Expect view to be moved to the main area.
+      await expectView(testeeViewPage).toBeActive();
+      await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+    });
+  });
 });

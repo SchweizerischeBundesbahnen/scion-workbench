@@ -13,14 +13,17 @@ import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {isGridElementVisible} from '../layout/ɵworkbench-layout';
 
 /**
- * Tests if given element is visible.
+ * Returns given grid element, but only if visible.
  *
  * @see isGridElementVisible
  */
-@Pipe({name: 'wbGridElementVisible', standalone: true})
-export class GridElementVisiblePipe implements PipeTransform {
+@Pipe({name: 'wbGridElementIfVisible', standalone: true})
+export class GridElementIfVisiblePipe implements PipeTransform {
 
-  public transform(gridElement: MTreeNode | MPart | null | undefined): gridElement is (MTreeNode | MPart) {
-    return !!gridElement && isGridElementVisible(gridElement);
+  public transform(gridElement: MTreeNode | MPart | null | undefined): MTreeNode | MPart | null {
+    if (gridElement && isGridElementVisible(gridElement)) {
+      return gridElement;
+    }
+    return null;
   }
 }
