@@ -217,7 +217,6 @@ export class ViewDragService implements OnDestroy {
     (isDragging ? this.viewDragEnd$ : of(undefined))
       .pipe(take(1))
       .subscribe(() => this._viewMoveBroadcastChannel.postMessage(event));
-
   }
 
   /**
@@ -280,57 +279,67 @@ export interface ViewDragData {
  * Event emitted when moving a view.
  */
 export interface ViewMoveEvent {
-  source: {
-    viewId: string;
-    partId: string;
-    viewUrlSegments: UrlSegment[];
-    workbenchId: string;
-  };
-  target: {
+  source: ViewMoveEventSource;
+  target: ViewMoveEventTarget;
+}
+
+/**
+ * Describes a view to be moved to another location.
+ */
+export interface ViewMoveEventSource {
+  viewId: string;
+  partId: string;
+  viewUrlSegments: UrlSegment[];
+  workbenchId: string;
+}
+
+/**
+ * Describes the target location for moving a view.
+ */
+export interface ViewMoveEventTarget {
+  /**
+   * Part (or node) where (or relative to which) to add the view.
+   *
+   * Rules for different regions:
+   * - If not specifying a region, {@link elementId} is mandatory and must reference a part.
+   * - For regions `north`, `south`, `east`, or `west`, {@link elementId} can reference a part or node,
+   *   relative to which to align the view. If not set, the view is aligned relative to the root of
+   *   the entire layout.
+   *
+   * Note: Property is ignored when moving the view to a new window.
+   */
+  elementId?: string;
+  /**
+   * Region of {@link elementId} where to add the view (in a new part).
+   *
+   * If not specified, {@link elementId} must reference a part to which to add the view.
+   *
+   * Note:
+   * - Property is ignored when moving the view to a new window.
+   * - Property is required if {@link elementId} is a node.
+   */
+  region?: 'north' | 'east' | 'south' | 'west';
+  /**
+   * Position where to insert the view. The position is zero-based. If not set, adds the view after the active view.
+   */
+  position?: number | 'start' | 'end';
+  /**
+   * Identifier of the target workbench, or 'new-window' to move the view to a new browser window.
+   */
+  workbenchId: string | 'new-window';
+  /**
+   * Describes the part to be created if the region is 'north', 'east', 'south', or 'west'.
+   */
+  newPart?: {
     /**
-     * Part (or node) where (or relative to which) to add the view.
-     *
-     * Rules for different regions:
-     * - If not specifying a region, {@link elementId} is mandatory and must reference a part.
-     * - For regions `north`, `south`, `east`, or `west`, {@link elementId} can reference a part or node,
-     *   relative to which to align the view. If not set, the view is aligend relative to the root of
-     *   the entire layout.
-     *
-     * Note: Property is ignored when moving the view to a new window.
+     * Identity of the new part. If not set, assigns a UUID.
      */
-    elementId?: string;
+    id?: string;
     /**
-     * Region of {@link elementId} where to add the view (in a new part).
-     *
-     * If not specified, {@link elementId} must reference a part to which to add the view.
-     *
-     * Note:
-     * - Property is ignored when moving the view to a new window.
-     * - Property is required if {@link elementId} is a node.
+     * Proportional size of the part relative to the reference part.
+     * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.
      */
-    region?: 'north' | 'east' | 'south' | 'west';
-    /**
-     * Position where to insert the view. The position is zero-based. If not set, adds the view after the active view.
-     */
-    position?: number | 'start' | 'end';
-    /**
-     * Identifier of the target workbench, or 'new-window' to move the view to a new browser window.
-     */
-    workbenchId: string | 'new-window';
-    /**
-     * Describes the part to be created if the region is 'north', 'east', 'south', or 'west'.
-     */
-    newPart?: {
-      /**
-       * Identity of the new part. If not set, assigns a UUID.
-       */
-      id?: string;
-      /**
-       * Proportional size of the part relative to the reference part.
-       * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.
-       */
-      ratio?: number;
-    };
+    ratio?: number;
   };
 }
 

@@ -15,13 +15,14 @@ import {GridElementComponent} from './grid-element/grid-element.component';
 import {NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {MPart, MTreeNode} from './workbench-layout.model';
+import {MPartGrid} from './workbench-layout.model';
 import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {GridElementVisiblePipe} from '../common/grid-element-visible.pipe';
+import {GridElementIfVisiblePipe} from '../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../workbench-id';
+import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
 
 /**
  * Renders the layout of the workbench.
@@ -56,7 +57,7 @@ import {WORKBENCH_ID} from '../workbench-id';
     NgIf,
     RouterOutlet,
     GridElementComponent,
-    GridElementVisiblePipe,
+    GridElementIfVisiblePipe,
     ViewDropZoneDirective,
     RequiresDropZonePipe,
     SciViewportComponent,
@@ -65,7 +66,7 @@ import {WORKBENCH_ID} from '../workbench-id';
 export class WorkbenchLayoutComponent {
 
   public layout: ɵWorkbenchLayout | undefined;
-  public root: MTreeNode | MPart | undefined;
+  protected grid: MPartGrid | undefined;
 
   constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
               private _viewDragService: ViewDragService,
@@ -74,11 +75,11 @@ export class WorkbenchLayoutComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(layout => {
         this.layout = layout;
-        this.root = layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid.root : layout.workbenchGrid.root;
+        this.grid = layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid : layout.workbenchGrid;
       });
   }
 
-  public onViewDrop(event: WbViewDropEvent): void {
+  protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,
@@ -86,12 +87,11 @@ export class WorkbenchLayoutComponent {
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
-      target: {
+      target: GridDropTargets.resolve({
+        grid: this.grid!,
         workbenchId: this._workbenchId,
-        elementId: this.root instanceof MPart ? this.root.id : this.root!.nodeId,
-        region: event.dropRegion as 'west' | 'east' | 'south', // north and center drop zones not installed
-        newPart: {ratio: .2},
-      },
+        dropRegion: event.dropRegion,
+      }),
     });
   }
 }

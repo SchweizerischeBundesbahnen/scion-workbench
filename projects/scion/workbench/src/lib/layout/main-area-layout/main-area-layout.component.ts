@@ -10,7 +10,7 @@
 
 import {Component, HostBinding, Inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
-import {MPart, MTreeNode} from '../workbench-layout.model';
+import {MPartGrid} from '../workbench-layout.model';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {GridElementComponent} from '../grid-element/grid-element.component';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
@@ -18,9 +18,10 @@ import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-z
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {GridElementVisiblePipe} from '../../common/grid-element-visible.pipe';
+import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
 import {NgIf} from '@angular/common';
 import {WORKBENCH_ID} from '../../workbench-id';
+import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -57,13 +58,13 @@ import {WORKBENCH_ID} from '../../workbench-id';
     RequiresDropZonePipe,
     RouterOutlet,
     SciViewportComponent,
-    GridElementVisiblePipe,
+    GridElementIfVisiblePipe,
   ],
 })
 export class MainAreaLayoutComponent {
 
   @HostBinding('attr.data-partid')
-  public get partId(): string {
+  protected get partId(): string {
     return this._part.id;
   }
 
@@ -73,16 +74,13 @@ export class MainAreaLayoutComponent {
               private _viewDragService: ViewDragService) {
   }
 
-  /**
-   * Root element of the main area layout.
-   */
-  public get root(): MTreeNode | MPart {
+  protected get mainAreaGrid(): MPartGrid {
     // It is critical that both `WorkbenchLayoutComponent` and `MainAreaLayoutComponent` operate on the same layout,
     // so we do not subscribe to the layout but reference it directly.
-    return this._workbenchLayoutService.layout!.mainAreaGrid!.root;
+    return this._workbenchLayoutService.layout!.mainAreaGrid!;
   }
 
-  public onViewDrop(event: WbViewDropEvent): void {
+  protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,
@@ -90,12 +88,11 @@ export class MainAreaLayoutComponent {
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
       },
-      target: {
+      target: GridDropTargets.resolve({
+        grid: this.mainAreaGrid,
         workbenchId: this._workbenchId,
-        elementId: this.root instanceof MPart ? this.root.id : this.root.nodeId,
-        region: event.dropRegion as 'west' | 'east' | 'south', // north and center drop zones not installed
-        newPart: {ratio: .2},
-      },
+        dropRegion: event.dropRegion,
+      }),
     });
   }
 }
