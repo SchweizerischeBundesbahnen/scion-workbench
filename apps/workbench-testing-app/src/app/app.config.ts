@@ -19,7 +19,7 @@ import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecy
 import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor.service';
 import {provideMessageBoxPage} from './message-box-page/message-box-page-intent-handler.service';
 import {provideNotificationPage} from './notification-page/notification-page-intent-handler.service';
-import {providePerspectiveRoutes} from './workbench.perspectives';
+import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 
@@ -37,7 +37,7 @@ export const appConfig: ApplicationConfig = {
     provideMessageBoxPage(),
     provideNotificationPage(),
     provideAnimationsIfEnabled(),
-    providePerspectiveRoutes(),
+    Perspectives.provideRoutes(),
   ],
 };
 

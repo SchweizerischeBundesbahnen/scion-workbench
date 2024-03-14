@@ -14,30 +14,25 @@ import {Navigation, NavigationExtras} from '@angular/router';
 /**
  * Provides methods to associate {@link WorkbenchNavigationalState} with a navigation.
  */
-export namespace WorkbenchNavigationalStates {
-
-  /**
-   * Key for associating workbench-specific state with a navigation.
-   */
-  const WORKBENCH_NAVIGATION_STATE_KEY = 'ɵworkbench';
+export const WorkbenchNavigationalStates = {
 
   /**
    * Returns workbench-specific state associated with given navigation, or `null` if not a workbench navigation.
    */
-  export function fromNavigation(navigation: Navigation): WorkbenchNavigationalState | null {
+  fromNavigation: (navigation: Navigation): WorkbenchNavigationalState | null => {
     return navigation.extras?.state?.[WORKBENCH_NAVIGATION_STATE_KEY] ?? null;
-  }
+  },
 
   /**
    * Associates workbench-specific state with given navigation extras.
    */
-  export function addToNavigationExtras(extras: NavigationExtras, state: WorkbenchNavigationalState): void {
+  addToNavigationExtras: (extras: NavigationExtras, state: WorkbenchNavigationalState): void => {
     extras.state = {
       ...extras.state,
       [WORKBENCH_NAVIGATION_STATE_KEY]: state,
     };
-  }
-}
+  },
+} as const;
 
 /**
  * Represents workbench-specific state associated with a navigation.
@@ -65,9 +60,16 @@ export interface WorkbenchNavigationalState {
 /**
  * Keys for associating state with a view navigation.
  */
-export namespace WorkbenchNavigationalViewStates {
+export const WorkbenchNavigationalViewStates = {
   /**
    * Key for associating CSS class(es) with a view state.
    */
-  export const cssClass = 'ɵcssClass';
-}
+  cssClass: 'ɵcssClass',
+} as const;
+
+/**
+ * Key for associating workbench-specific state with a navigation.
+ *
+ * @private
+ */
+const WORKBENCH_NAVIGATION_STATE_KEY = 'ɵworkbench';

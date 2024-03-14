@@ -13,19 +13,23 @@
  *
  * @see Route.data
  */
-export namespace WorkbenchRouteData {
+export const WorkbenchRouteData = {
+
   /**
    * Key to define the title of a view in {@link Route.data}.
    */
-  export const title = 'ɵworkbenchViewTitle';
+  title: 'ɵworkbenchViewTitle',
+
   /**
    * Key to define the heading of a view in {@link Route.data}.
    */
-  export const heading = 'ɵworkbenchViewHeading';
+  heading: 'ɵworkbenchViewHeading',
+
   /**
    * Key to associate CSS class(es) with a view in {@link Route.data}, useful in end-to-end tests for locating views and view tabs.
    */
-  export const cssClass = 'ɵworkbenchViewCssClass';
+  cssClass: 'ɵworkbenchViewCssClass',
+
   /**
    * Key for reading view-specific navigational state from {@link ActivatedRoute.data}.
    *
@@ -33,5 +37,5 @@ export namespace WorkbenchRouteData {
    *
    * @see WorkbenchNavigationalState
    */
-  export const state = 'ɵworkbenchViewState';
-}
+  state: 'ɵworkbenchViewState',
+} as const;

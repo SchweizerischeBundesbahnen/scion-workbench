@@ -10,7 +10,7 @@
 
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {environment} from '../environments/environment';
-import {PerspectiveDefinitions} from './workbench.perspectives';
+import {Perspectives} from './workbench.perspectives';
 import {WorkbenchModuleConfig} from '@scion/workbench';
 
 /**
@@ -22,11 +22,8 @@ export const workbenchModuleConfig: WorkbenchModuleConfig = {
   },
   microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendPlatformConfig,
   layout: {
-    perspectives: [
-      ...PerspectiveDefinitions.perspectives,
-      ...PerspectiveDefinitions.perspectivesFromQueryParam,
-    ],
-    initialPerspective: PerspectiveDefinitions.initialPerspective,
+    perspectives: Perspectives.provideDefinitions(),
+    initialPerspective: Perspectives.initialPerspective,
   },
   dialog: {
     modalityScope: WorkbenchStartupQueryParams.dialogModalityScope(),

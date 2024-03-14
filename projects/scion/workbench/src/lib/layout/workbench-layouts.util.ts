@@ -10,21 +10,22 @@
 import {MPart, MTreeNode} from './workbench-layout.model';
 
 /**
- * Recursively collects all parts of a given element and its descendants.
- */
-function collectParts(element: MPart | MTreeNode): MPart[] {
-  const parts = new Array<MPart>();
-  if (element instanceof MPart) {
-    parts.push(element);
-  }
-  else {
-    parts.push(...collectParts(element.child1));
-    parts.push(...collectParts(element.child2));
-  }
-  return parts;
-}
-
-/**
  * Provides helper functions for operating on a workbench layout.
  */
-export const WorkbenchLayouts = {collectParts} as const;
+export const WorkbenchLayouts = {
+
+  /**
+   * Recursively collects all parts of a given element and its descendants.
+   */
+  collectParts: (element: MPart | MTreeNode): MPart[] => {
+    const parts = new Array<MPart>();
+    if (element instanceof MPart) {
+      parts.push(element);
+    }
+    else {
+      parts.push(...WorkbenchLayouts.collectParts(element.child1));
+      parts.push(...WorkbenchLayouts.collectParts(element.child2));
+    }
+    return parts;
+  },
+} as const;

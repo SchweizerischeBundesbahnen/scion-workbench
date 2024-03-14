@@ -15,25 +15,31 @@ import {Dictionaries, Dictionary} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
 
-export namespace MicrofrontendViewRoutes {
+/**
+ * Provides microfrontend-related routing constants and functions.
+ */
+export const MicrofrontendViewRoutes = {
 
   /**
    * Route prefix to identify routes of microfrontends.
    */
-  export const ROUTE_PREFIX = '~';
+  ROUTE_PREFIX: '~',
 
-  export function isMicrofrontendRoute(route: ActivatedRouteSnapshot | UrlSegment[]): boolean {
+  /**
+   * Tests if given route is a microfrontend route.
+   */
+  isMicrofrontendRoute: (route: ActivatedRouteSnapshot | UrlSegment[]): boolean => {
     const segments = Array.isArray(route) ? route : route.url;
-    return segments.length === 2 && segments[0].path === ROUTE_PREFIX;
-  }
+    return segments.length === 2 && segments[0].path === MicrofrontendViewRoutes.ROUTE_PREFIX;
+  },
 
   /**
    * Parses the params of a given microfrontend route. Throws if not a valid microfrontend route.
    *
    * Note that transient parameters are not part of the URL segments and are only returned if passing a {@link ActivatedRouteSnapshot} object.
    */
-  export function parseParams(route: ActivatedRouteSnapshot | UrlSegment[]): MicrofrontendRouteParams {
-    if (!isMicrofrontendRoute(route)) {
+  parseParams: (route: ActivatedRouteSnapshot | UrlSegment[]): MicrofrontendRouteParams => {
+    if (!MicrofrontendViewRoutes.isMicrofrontendRoute(route)) {
       throw Error(`[NullMicrofrontendRouteError] Given URL segments do not match a microfrontend route. [segments=${route.toString()}]`);
     }
 
@@ -44,14 +50,14 @@ export namespace MicrofrontendViewRoutes {
       urlParams: segments[1].parameters,
       transientParams: Array.isArray(route) ? {} : route.data[WorkbenchRouteData.state]?.[MicrofrontendNavigationalStates.transientParams] || {},
     };
-  }
+  },
 
   /**
    * Splits given params into two groups of URL and transient params.
    *
    * URL params are passed with the URL, transient params via transient state. Transient params do not survive a page reload.
    */
-  export function splitParams(params: Map<string, any> | Dictionary | undefined, viewCapability: WorkbenchViewCapability): {urlParams: Dictionary; transientParams: Dictionary} {
+  splitParams: (params: Map<string, any> | Dictionary | undefined, viewCapability: WorkbenchViewCapability): {urlParams: Dictionary; transientParams: Dictionary} => {
     const transientParamNames = new Set(viewCapability.params?.filter(param => param.transient).map(param => param.name));
 
     return Object.entries(Dictionaries.coerce(params)).reduce((groups, [name, value]) => {
@@ -63,18 +69,18 @@ export namespace MicrofrontendViewRoutes {
       }
       return groups;
     }, {urlParams: {} as Dictionary, transientParams: {} as Dictionary});
-  }
+  },
 
   /**
    * Builds the command array to be passed to the workbench router for navigating to a microfrontend view.
    *
    * Format: ['~', {qualifier}, '<viewCapabilityId>', {params}]
    */
-  export function buildRouterNavigateCommand(viewCapabilityId: string, qualifier: Qualifier, params: Params): any[] {
+  buildRouterNavigateCommand: (viewCapabilityId: string, qualifier: Qualifier, params: Params): any[] => {
     const paramsCommand = Object.keys(params).length > 0 ? [params] : [];
-    return [ROUTE_PREFIX, qualifier, viewCapabilityId, ...paramsCommand];
-  }
-}
+    return [MicrofrontendViewRoutes.ROUTE_PREFIX, qualifier, viewCapabilityId, ...paramsCommand];
+  },
+} as const;
 
 export interface MicrofrontendRouteParams {
   viewCapabilityId: string;
