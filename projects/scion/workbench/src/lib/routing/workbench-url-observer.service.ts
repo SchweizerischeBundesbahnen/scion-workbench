@@ -31,6 +31,7 @@ import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.gua
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchDialogDiffer} from './workbench-dialog-differ';
+import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -55,6 +56,7 @@ export class WorkbenchUrlObserver {
               private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
               private _workbenchPopupDiffer: WorkbenchPopupDiffer,
               private _workbenchDialogDiffer: WorkbenchDialogDiffer,
+              private _workbenchMessageBoxDiffer: WorkbenchMessageBoxDiffer,
               private _logger: Logger) {
     this.installRouterEventListeners();
   }
@@ -62,11 +64,9 @@ export class WorkbenchUrlObserver {
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
     const context = this.createWorkbenchNavigationContext(event.url);
-    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, popupDiff=${context.popupDiff.toString()},  dialogDiff=${context.dialogDiff.toString()}]`);
+    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, popupDiff=${context.popupDiff.toString()}, dialogDiff=${context.dialogDiff.toString()}, messageBoxDiff=${context.messageBoxDiff.toString()}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
-    this.registerAddedViewAuxiliaryRoutes();
-    this.registerAddedPopupAuxiliaryRoutes();
-    this.registerAddedDialogAuxiliaryRoutes();
+    this.registerAddedOutletAuxiliaryRoutes();
   }
 
   /** Invoked upon successful navigation */
@@ -83,9 +83,7 @@ export class WorkbenchUrlObserver {
   private onNavigationCancel(event: NavigationCancel): void {
     this._logger.debug(() => 'onNavigationCancel', LoggerNames.ROUTING, event);
     this.undoAuxiliaryRoutesRegistration();
-    this.undoWorkbenchLayoutDiffer();
-    this.undoWorkbenchPopupDiffer();
-    this.undoWorkbenchDialogDiffer();
+    this.undoWorkbenchDiffers();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -93,9 +91,7 @@ export class WorkbenchUrlObserver {
   private onNavigationError(event: NavigationError): void {
     this._logger.debug(() => 'onNavigationError', LoggerNames.ROUTING, event);
     this.undoAuxiliaryRoutesRegistration();
-    this.undoWorkbenchLayoutDiffer();
-    this.undoWorkbenchPopupDiffer();
-    this.undoWorkbenchDialogDiffer();
+    this.undoWorkbenchDiffers();
     this._workbenchRouter.setCurrentNavigationContext(null);
   }
 
@@ -142,79 +138,55 @@ export class WorkbenchUrlObserver {
       layoutDiff: this._workbenchLayoutDiffer.diff(layout, urlTree),
       popupDiff: this._workbenchPopupDiffer.diff(urlTree),
       dialogDiff: this._workbenchDialogDiffer.diff(urlTree),
+      messageBoxDiff: this._workbenchMessageBoxDiffer.diff(urlTree),
     };
   }
 
   /**
-   * For each added view, registers auxiliary routes of all primary routes.
+   * For each added view, popup, dialog and message box registers auxiliary routes of all primary routes.
    */
-  private registerAddedViewAuxiliaryRoutes(): void {
+  private registerAddedOutletAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const addedViewOutlets = navigationContext.layoutDiff.addedViewOutlets;
+    const addedPopupOutlets = navigationContext.popupDiff.addedPopupOutlets;
+    const addedDialogOutlets = navigationContext.dialogDiff.addedDialogOutlets;
+    const addedMessageBoxOutlets = navigationContext.messageBoxDiff.addedMessageBoxOutlets;
 
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {
+    const newViewAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(navigationContext.layoutDiff.addedViewOutlets, {
       canDeactivate: [canDeactivateWorkbenchView],
     });
-    if (newAuxiliaryRoutes.length) {
-      this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
+    if (newViewAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, newViewAuxiliaryRoutes);
+    }
+
+    const newPopupAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedDialogOutlets);
+    if (newPopupAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, newPopupAuxiliaryRoutes);
+    }
+
+    const newDialogAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedPopupOutlets);
+    if (newDialogAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupOutlets}`, LoggerNames.ROUTING, newDialogAuxiliaryRoutes);
+    }
+
+    const newMessageBoxAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedMessageBoxOutlets);
+    if (newDialogAuxiliaryRoutes.length) {
+      this._logger.debug(() => `Registered auxiliary routes for popups: ${addedMessageBoxOutlets}`, LoggerNames.ROUTING, newMessageBoxAuxiliaryRoutes);
     }
   }
 
   /**
-   * For each added popup, registers auxiliary routes of all primary routes.
-   */
-  public registerAddedPopupAuxiliaryRoutes(): void {
-    const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const addedPopupOutlets = navigationContext.popupDiff.addedPopupOutlets;
-
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedPopupOutlets);
-    if (newAuxiliaryRoutes.length) {
-      this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
-    }
-  }
-
-  /**
-   * For each added dialog, registers auxiliary routes of all primary routes.
-   */
-  public registerAddedDialogAuxiliaryRoutes(): void {
-    const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const addedDialogOutlets = navigationContext.dialogDiff.addedDialogOutlets;
-
-    const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedDialogOutlets);
-    if (newAuxiliaryRoutes.length) {
-      this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
-    }
-  }
-
-  /**
-   * Reverts the workbench layout differ to the state before the navigation.
+   * Reverts the workbench differs to the state before the navigation.
    *
    * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
    */
-  private undoWorkbenchLayoutDiffer(): void {
+  private undoWorkbenchDiffers(): void {
     const prevNavigateLayout = this._workbenchLayoutService.layout; // Layout in `WorkbenchLayoutService` is only updated after successful navigation
     const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
     this._workbenchLayoutDiffer.diff(prevNavigateLayout, prevNavigateUrl);
-  }
-
-  /**
-   * Reverts the popup outlet differ to the state before the navigation.
-   *
-   * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
-   */
-  private undoWorkbenchPopupDiffer(): void {
-    const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
     this._workbenchPopupDiffer.diff(prevNavigateUrl);
-  }
-
-  /**
-   * Reverts the dialog outlet differ to the state before the navigation.
-   *
-   * Invoke this method after navigation failure or cancellation. The navigation is cancelled when guards perform a redirect or reject navigation.
-   */
-  private undoWorkbenchDialogDiffer(): void {
-    const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
     this._workbenchDialogDiffer.diff(prevNavigateUrl);
+    this._workbenchMessageBoxDiffer.diff(prevNavigateUrl);
   }
 
   /**
@@ -226,7 +198,13 @@ export class WorkbenchUrlObserver {
     const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
     const popupDiff = this._workbenchRouter.getCurrentNavigationContext().popupDiff;
     const dialogDiff = this._workbenchRouter.getCurrentNavigationContext().dialogDiff;
-    const addedOutlets: string[] = [...layoutDiff.addedViewOutlets, ...popupDiff.addedPopupOutlets, ...dialogDiff.addedDialogOutlets];
+    const messageBoxDiff = this._workbenchRouter.getCurrentNavigationContext().messageBoxDiff;
+    const addedOutlets: string[] = [
+      ...layoutDiff.addedViewOutlets,
+      ...popupDiff.addedPopupOutlets,
+      ...dialogDiff.addedDialogOutlets,
+      ...messageBoxDiff.addedMessageBoxOutlets,
+    ];
     if (addedOutlets.length) {
       this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(addedOutlets);
       this._logger.debug(() => `Undo auxiliary routes registration for outlet(s): ${addedOutlets}`, LoggerNames.ROUTING);
@@ -276,7 +254,13 @@ export class WorkbenchUrlObserver {
     const layoutDiff = this._workbenchRouter.getCurrentNavigationContext().layoutDiff;
     const popupDiff = this._workbenchRouter.getCurrentNavigationContext().popupDiff;
     const dialogDiff = this._workbenchRouter.getCurrentNavigationContext().dialogDiff;
-    const removedOutlets: string[] = [...layoutDiff.removedViewOutlets, ...popupDiff.removedPopupOutlets, ...dialogDiff.removedDialogOutlets];
+    const messageBoxDiff = this._workbenchRouter.getCurrentNavigationContext().messageBoxDiff;
+    const removedOutlets: string[] = [
+      ...layoutDiff.removedViewOutlets,
+      ...popupDiff.removedPopupOutlets,
+      ...dialogDiff.removedDialogOutlets,
+      ...messageBoxDiff.removedMessageBoxOutlets,
+    ];
     if (removedOutlets.length) {
       this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);
       this._auxRoutesRegistrator.unregisterOutletAuxiliaryRoutes(removedOutlets);

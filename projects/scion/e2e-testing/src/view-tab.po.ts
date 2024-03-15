@@ -48,8 +48,8 @@ export class ViewTabPO {
     return (await this.locator.getAttribute('data-viewid'))!;
   }
 
-  public async click(): Promise<void> {
-    await this.locator.click();
+  public async click(options?: {timeout?: number}): Promise<void> {
+    await this.locator.click(options);
   }
 
   public async dblclick(): Promise<void> {

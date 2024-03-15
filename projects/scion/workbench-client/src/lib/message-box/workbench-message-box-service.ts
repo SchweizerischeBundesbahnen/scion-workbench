@@ -9,12 +9,13 @@
  */
 
 import {IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
-import {WorkbenchMessageBoxConfig} from './workbench-message-box.config';
+import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Maps} from '@scion/toolkit/util';
 import {WorkbenchView} from '../view/workbench-view';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {lastValueFrom} from 'rxjs';
+import {MESSAGE_BOX_CONTENT_PARAM} from './workbench-message-box-capability';
 
 /**
  * Allows displaying a message to the user in a workbench message box.
@@ -56,32 +57,21 @@ import {lastValueFrom} from 'rxjs';
 export class WorkbenchMessageBoxService {
 
   /**
-   * Presents the user with a message that is displayed in a message box based on the given qualifier.
-   *
-   * The qualifier identifies the provider to display the message box. The build-in message box to display a plain text message requires
-   * no qualifier.
-   *
-   * By default, when the message box is opened in the context of a workbench view, it is opened as a view-modal message box.
-   *
-   * @param  message - Configures the content and appearance of the message.
-   * @param  qualifier - Identifies the message box provider.
-   *
-   * @return Promise that resolves to the key of the action button that the user pressed to close the message box.
-   *         Depending on the message box provider, additional data may be included, such as user's input when prompting the user to
-   *         enter data. The Promise rejects if opening the message box failed, e.g., if missing the message box intention, or because
-   *         no message box provider could be found that provides a message box under the specified qualifier.
+   * TODO
    */
-  public async open<R = string>(message: string | WorkbenchMessageBoxConfig, qualifier?: Qualifier): Promise<R> {
-    const config: WorkbenchMessageBoxConfig = typeof message === 'string' ? {content: message} : message;
-    const params = Maps.coerce(config.params);
-
-    config.context = {
-      ...config.context,
-      viewId: config.context?.viewId ?? Beans.opt(WorkbenchView)?.id,
+  public async open<R = string>(message: string | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<R> {
+    const qualifier = typeof message === 'string' ? {} : message;
+    const params = typeof message === 'string' ? new Map().set(MESSAGE_BOX_CONTENT_PARAM, message) : Maps.coerce(options?.params);
+    const intent = {type: WorkbenchCapabilities.MessageBox, qualifier, params};
+    const body: WorkbenchMessageBoxOptions = {
+      ...options,
+      context: {viewId: options?.context?.viewId ?? Beans.opt(WorkbenchView)?.id},
+      params: undefined, // passed via intent
     };
-    const openMessageBox$ = Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config);
+
+    const closeResult$ = Beans.get(IntentClient).request$<R>(intent, body);
     try {
-      return await lastValueFrom(openMessageBox$.pipe(mapToBody()));
+      return await lastValueFrom(closeResult$.pipe(mapToBody()));
     }
     catch (error) {
       throw (error instanceof RequestError ? error.message : error);

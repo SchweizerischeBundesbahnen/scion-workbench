@@ -62,6 +62,15 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'message-box-test-page',
+    children: [
+      {
+        path: ':segment1/segment2',
+        loadComponent: () => import('../message-box-page/message-box-page.component'),
+      },
+    ],
+  },
+  {
     path: 'view-test-page',
     children: [
       {

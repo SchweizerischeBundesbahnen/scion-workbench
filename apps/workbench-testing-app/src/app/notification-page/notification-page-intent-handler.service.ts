@@ -1,6 +1,6 @@
 import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, NotificationService} from '@scion/workbench';
-import {WorkbenchCapabilities, WorkbenchMessageBoxConfig, WorkbenchNotificationConfig} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchNotificationConfig} from '@scion/workbench-client';
 import {IntentClient} from '@scion/microfrontend-platform';
 import {Maps} from '@scion/toolkit/util';
 import {NotificationPageComponent} from './notification-page.component';
@@ -12,7 +12,7 @@ import {NotificationPageComponent} from './notification-page.component';
 class NotificationPageIntentHandler {
 
   constructor(intentClient: IntentClient, notificationService: NotificationService) {
-    intentClient.onIntent<WorkbenchMessageBoxConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'notification-page'}}, request => {
+    intentClient.onIntent<WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'notification-page'}}, request => {
       const config: WorkbenchNotificationConfig = request.body!;
 
       notificationService.notify({

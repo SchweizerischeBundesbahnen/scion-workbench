@@ -20,6 +20,7 @@ import {WorkbenchThemeMonitor} from './theme/workbench-theme-monitor';
 import {ɵWorkbenchThemeMonitor} from './theme/ɵworkbench-theme-monitor';
 import {WorkbenchDialogInitializer} from './dialog/workbench-dialog-initializer';
 import {WorkbenchDialogService} from './dialog/workbench-dialog-service';
+import {WorkbenchMessageBoxInitializer} from './message-box/workbench-message-box-initializer';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -112,6 +113,7 @@ export class WorkbenchClient {
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     Beans.registerInitializer({useClass: WorkbenchDialogInitializer});
+    Beans.registerInitializer({useClass: WorkbenchMessageBoxInitializer});
     await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
   }
 }

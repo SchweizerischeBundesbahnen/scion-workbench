@@ -1,0 +1,8 @@
+<sci-router-outlet #router_outlet
+                   [name]="outletId"
+                   [attr.data-capabilityid]="capability.metadata!.id"
+                   [attr.data-app]="capability.metadata!.appSymbolicName"
+                   class="e2e-message-box"
+                   keystrokes="keydown.escape">
+  <ng-container *ngComponentOutlet="splash"></ng-container>
+</sci-router-outlet>

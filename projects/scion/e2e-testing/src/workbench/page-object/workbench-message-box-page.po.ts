@@ -10,6 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {MessageBoxPO} from '../../message-box.po';
+import {SciRouterOutletPO} from '../../workbench-client/page-object/sci-router-outlet.po';
 
 /**
  * Represents a workbench message box.
@@ -23,4 +24,14 @@ export interface WorkbenchMessageBoxPagePO {
    * Locates the page displayed in the workbench message box.
    */
   readonly locator: Locator;
+}
+
+/**
+ * Represents a workbench message box displaying a microfrontend.
+ */
+export interface MicrofrontendMessageBoxPagePO extends WorkbenchMessageBoxPagePO {
+  /**
+   * Locates the outlet displaying the microfrontend.
+   */
+  readonly outlet: SciRouterOutletPO;
 }

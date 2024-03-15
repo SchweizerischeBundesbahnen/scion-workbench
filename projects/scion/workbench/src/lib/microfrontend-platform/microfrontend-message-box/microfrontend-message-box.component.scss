@@ -1,0 +1,25 @@
+:host {
+  --ɵmessage-box-min-height: initial;
+  --ɵmessage-box-height: initial;
+  --ɵmessage-box-max-height: initial;
+  --ɵmessage-box-min-width: initial;
+  --ɵmessage-box-width: initial;
+  --ɵmessage-box-max-width: initial;
+  display: grid;
+  min-height: var(--ɵmessage-box-min-height);
+  height: var(--ɵmessage-box-height);
+  max-height: var(--ɵmessage-box-max-height);
+  min-width: var(--ɵmessage-box-min-width);
+  width: var(--ɵmessage-box-width);
+  max-width: var(--ɵmessage-box-max-width);
+
+  // Prevent the microfrontend (iframe) from consuming pointer events during a workbench drag operation. Otherwise, moving a part splitter
+  // over the message-box would not work because the events are consumed by the iframe.
+  &.workbench-drag > sci-router-outlet {
+    pointer-events: none;
+  }
+
+  > sci-router-outlet::part(splash) {
+    display: grid;
+  }
+}

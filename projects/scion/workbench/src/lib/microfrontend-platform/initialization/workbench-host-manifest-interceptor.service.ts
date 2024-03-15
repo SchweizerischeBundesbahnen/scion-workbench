@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HostManifestInterceptor, Intention, Manifest} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, MESSAGE_BOX_CONTENT_PARAM} from '@scion/workbench-client';
 
 /**
  * Intercepts the host manifest, registering workbench-specific intentions and capabilities.
@@ -50,12 +50,14 @@ function provideBuiltInNotificationCapability(): WorkbenchNotificationCapability
 /**
  * Provides the built-in message box capability.
  *
- * @see MicrofrontendMessageBoxIntentHandler
+ * @see MicrofrontendMessageBoxIntentInterceptor
  */
 function provideBuiltInMessageBoxCapability(): WorkbenchMessageBoxCapability {
   return {
     type: WorkbenchCapabilities.MessageBox,
     qualifier: {},
+    params: [{name: MESSAGE_BOX_CONTENT_PARAM, required: true, description: 'Text to be displayed in the message box.'}],
+    properties: {path: ''},
     private: false,
     description: 'Allows displaying a simple message to the user.',
   };

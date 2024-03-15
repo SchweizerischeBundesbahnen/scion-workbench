@@ -22,6 +22,7 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Commands, ViewState, ViewStates} from './routing.model';
 import {WorkbenchDialogDiff} from './workbench-dialog-differ';
+import {WorkbenchMessageBoxDiff} from './workbench-message-box-differ';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -502,6 +503,10 @@ export interface WorkbenchNavigationContext {
    * Dialogs added or removed by the current navigation.
    */
   dialogDiff: WorkbenchDialogDiff;
+  /**
+   * Message boxes added or removed by the current navigation.
+   */
+  messageBoxDiff: WorkbenchMessageBoxDiff;
 }
 
 /**

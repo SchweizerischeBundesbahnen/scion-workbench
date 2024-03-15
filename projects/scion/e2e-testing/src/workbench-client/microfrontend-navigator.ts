@@ -11,7 +11,7 @@
 import {AppPO} from '../app.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
-import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
@@ -128,7 +128,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench capability.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
     const registerCapabilityPage = await this.openInNewTab(RegisterWorkbenchCapabilityPagePO, app);
     try {
       return await registerCapabilityPage.registerCapability(capability);

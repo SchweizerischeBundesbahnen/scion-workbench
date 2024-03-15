@@ -1,0 +1,39 @@
+<section class="content">
+
+  <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
+    <input class="e2e-component-instance-id" [value]="uuid" disabled>
+  </sci-form-field>
+
+  <sci-accordion class="message-box-capability e2e-message-box-capability" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_capability">
+      <header>Message Box Capability</header>
+    </ng-template>
+    <ng-template #panel_capability>
+      <sci-viewport>
+        <div class="capability e2e-message-box-capability">{{messageBox.capability | json}}</div>
+      </sci-viewport>
+    </ng-template>
+  </sci-accordion>
+
+  @if (messageBox.params | appNullIfEmpty; as params) {
+    <sci-accordion class="message-box-params e2e-message-box-params" variant="solid">
+      <ng-template sciAccordionItem [panel]="panel_message_box_params">
+        <header>Message Box Params</header>
+      </ng-template>
+      <ng-template #panel_message_box_params>
+        <sci-key-value [object]="params" class="e2e-message-box-params"></sci-key-value>
+      </ng-template>
+    </sci-accordion>
+  }
+
+  @if (route.params | async | appNullIfEmpty; as params) {
+    <sci-accordion variant="solid" class="e2e-route-params">
+      <ng-template sciAccordionItem [panel]="panel_route_params">
+        <header>Route Params</header>
+      </ng-template>
+      <ng-template #panel_route_params>
+        <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
+      </ng-template>
+    </sci-accordion>
+  }
+</section>

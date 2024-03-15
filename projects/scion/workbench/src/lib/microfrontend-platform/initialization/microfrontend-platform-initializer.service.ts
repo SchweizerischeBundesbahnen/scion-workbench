@@ -21,8 +21,10 @@ import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microf
 import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendDialogIntentInterceptor} from '../microfrontend-dialog/microfrontend-dialog-intent-interceptor.service';
 import {MicrofrontendDialogCapabilityInterceptor} from '../microfrontend-dialog/microfrontend-dialog-capability-interceptor.service';
+import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -37,10 +39,12 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
               private _ngZoneObservableDecorator: NgZoneObservableDecorator,
               private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
               private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
+              private _messageBoxIntentHandler: MicrofrontendMessageBoxIntentHandler,
               private _microfrontendDialogIntentInterceptor: MicrofrontendDialogIntentInterceptor,
               private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
               private _microfrontendPopupCapabilityInterceptor: MicrofrontendPopupCapabilityInterceptor,
               private _microfrontendDialogCapabilityInterceptor: MicrofrontendDialogCapabilityInterceptor,
+              private _messageBoxCapabilityValidator: MicrofrontendMessageBoxCapabilityValidator,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -85,6 +89,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Register dialog intent interceptor to translate dialog intents into workbench dialog commands.
     Beans.register(IntentInterceptor, {useValue: this._microfrontendDialogIntentInterceptor, multi: true});
 
+    // Register message box intent interceptor to translate message box intents into workbench message box commands.
+    Beans.register(IntentInterceptor, {useValue: this._messageBoxIntentHandler, multi: true});
+
     // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendViewCapabilityInterceptor, multi: true});
 
@@ -93,6 +100,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Register dialog capability interceptor to assert required dialog capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._microfrontendDialogCapabilityInterceptor, multi: true});
+
+    // Register message box capability interceptor to assert required capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._messageBoxCapabilityValidator, multi: true});
 
     // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.

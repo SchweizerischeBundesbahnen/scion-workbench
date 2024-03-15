@@ -1,21 +1,30 @@
 <form [formGroup]="form">
   <section>
-    <sci-form-field label="Qualifier">
-      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+    <sci-form-field label="Capability Provider">
+      <select [formControl]="form.controls.capabilityProvider" class="e2e-capability-provider">
+        <option value="microfrontend">microfrontend</option>
+        <option value="">built-in</option>
+      </select>
     </sci-form-field>
 
-    <sci-form-field label="Params">
-      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
-    </sci-form-field>
+    @if (isUseQualifier()) {
+      <sci-form-field label="Qualifier">
+        <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+      </sci-form-field>
+
+      <sci-form-field label="Params">
+        <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
+      </sci-form-field>
+    } @else {
+      <sci-form-field label="Message">
+        <input [formControl]="form.controls.message" class="e2e-message">
+      </sci-form-field>
+    }
   </section>
 
   <section>
     <sci-form-field label="Title">
       <input [formControl]="form.controls.title" class="e2e-title">
-    </sci-form-field>
-
-    <sci-form-field label="Content">
-      <input [formControl]="form.controls.content" class="e2e-content">
     </sci-form-field>
 
     <sci-form-field label="Actions">
@@ -39,18 +48,16 @@
       </select>
     </sci-form-field>
 
+    <sci-form-field label="Contextual View ID">
+      <input [formControl]="form.controls.contextualViewId" class="e2e-contextual-view-id">
+    </sci-form-field>
+
     <sci-form-field label="Content Selectable">
       <sci-checkbox [formControl]="form.controls.contentSelectable" class="e2e-content-selectable"></sci-checkbox>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
       <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
-    </sci-form-field>
-  </section>
-
-  <section>
-    <sci-form-field label="View Context Active">
-      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"></sci-checkbox>
     </sci-form-field>
   </section>
 </form>

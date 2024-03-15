@@ -18,7 +18,6 @@ import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificatio
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
-import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler.service';
 import {MicrofrontendViewIntentInterceptor} from './routing/microfrontend-view-intent-interceptor.service';
 import {MicrofrontendPopupIntentInterceptor} from './microfrontend-popup/microfrontend-popup-intent-interceptor.service';
@@ -29,8 +28,10 @@ import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {Defined} from '@scion/toolkit/util';
+import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendDialogIntentInterceptor} from './microfrontend-dialog/microfrontend-dialog-intent-interceptor.service';
 import {MicrofrontendDialogCapabilityInterceptor} from './microfrontend-dialog/microfrontend-dialog-capability-interceptor.service';
+import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -57,11 +58,6 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     },
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: MicrofrontendMessageBoxIntentHandler,
-      multi: true,
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
       useClass: MicrofrontendNotificationIntentHandler,
       multi: true,
     },
@@ -71,10 +67,12 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     },
     MicrofrontendViewIntentInterceptor,
     MicrofrontendPopupIntentInterceptor,
+    MicrofrontendMessageBoxIntentHandler,
     MicrofrontendDialogIntentInterceptor,
     MicrofrontendViewCapabilityInterceptor,
     MicrofrontendPopupCapabilityInterceptor,
     MicrofrontendDialogCapabilityInterceptor,
+    MicrofrontendMessageBoxCapabilityValidator,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideMicrofrontendRoute(),

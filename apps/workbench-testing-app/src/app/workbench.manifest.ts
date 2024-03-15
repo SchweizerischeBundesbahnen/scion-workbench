@@ -8,16 +8,6 @@ export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
     {
-      type: WorkbenchCapabilities.MessageBox,
-      qualifier: {component: 'message-box-page'},
-      private: false,
-      params: [
-        {name: 'param1', required: true},
-        {name: 'param2', required: false},
-      ],
-      description: 'Allows interacting with a message box.',
-    },
-    {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'notification-page'},
       private: false,
@@ -85,6 +75,21 @@ export const workbenchManifest: Manifest = {
           minWidth: '495px',
           maxWidth: '505px',
         },
+      },
+    },
+    // TODO [#271]: Remove this message-box capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'host-message-box',
+      },
+      private: false,
+      description: 'Represents a message box provided by the host app.',
+      params: [
+        {name: 'param1', required: false},
+      ],
+      properties: {
+        path: 'test-host-message-box;matrixParam1=:param1',
       },
     },
   ],

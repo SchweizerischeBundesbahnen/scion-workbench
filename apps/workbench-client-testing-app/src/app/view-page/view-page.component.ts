@@ -97,8 +97,7 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
       return;
     }
 
-    const action = await this._messageBoxService.open({
-      content: 'Do you want to close this view?',
+    const action = await this._messageBoxService.open('Do you want to close this view?',{
       severity: 'info',
       actions: {
         yes: 'Yes',

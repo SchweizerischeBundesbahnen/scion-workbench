@@ -82,6 +82,10 @@ export const routes: Routes = [
     loadComponent: () => import('./host-dialog-page/host-dialog-page.component'),
   },
   {
+    path: 'test-host-message-box',
+    loadComponent: () => import('./host-message-box-page/host-message-box-page.component'),
+  },
+  {
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },
