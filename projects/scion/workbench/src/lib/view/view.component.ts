@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding, OnDestroy, Provider, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostBinding, inject, OnDestroy, Provider, ViewChild} from '@angular/core';
 import {AsyncSubject, combineLatest} from 'rxjs';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -18,7 +18,8 @@ import {Logger, LoggerNames} from '../logging';
 import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
+import {WorkbenchView} from './workbench-view.model';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -102,10 +103,15 @@ export class ViewComponent implements OnDestroy {
 /**
  * Blocks this view when dialog(s) overlay it.
  */
-function configureViewGlassPane(): Provider {
-  return {
-    provide: GLASS_PANE_BLOCKABLE,
-    useExisting: ɵWorkbenchView,
-  };
+function configureViewGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useExisting: ɵWorkbenchView,
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-viewid': inject(WorkbenchView).id}}),
+    },
+  ];
 }
-

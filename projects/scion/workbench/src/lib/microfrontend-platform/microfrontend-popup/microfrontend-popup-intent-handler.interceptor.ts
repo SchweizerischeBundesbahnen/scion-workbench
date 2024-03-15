@@ -69,10 +69,12 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
     this._openedPopups.add(popupId);
     try {
       const result = await this.openPopup(message);
-      await Beans.get(MessageClient).publish(replyTo, result, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
+      // Use 'Beans.opt' to not error if the platform is destroyed, e.g., in tests if not closing popups.
+      await Beans.opt(MessageClient)?.publish(replyTo, result, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
     }
     catch (error) {
-      await Beans.get(MessageClient).publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
+      // Use 'Beans.opt' to not error if the platform is destroyed, e.g., in tests if not closing popups.
+      await Beans.opt(MessageClient)?.publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
     }
     finally {
       this._openedPopups.delete(popupId);
@@ -100,6 +102,7 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
     };
 
     return this._popupService.open({
+      id: command.popupId,
       component: isHostProvider ? MicrofrontendHostPopupComponent : MicrofrontendPopupComponent,
       input: popupContext,
       anchor: this.observePopupOrigin$(command),

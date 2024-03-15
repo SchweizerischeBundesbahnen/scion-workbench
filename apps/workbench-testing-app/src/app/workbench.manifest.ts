@@ -1,4 +1,4 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Manifest} from '@scion/microfrontend-platform';
 
 /**
@@ -7,16 +7,6 @@ import {Manifest} from '@scion/microfrontend-platform';
 export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
-    {
-      type: WorkbenchCapabilities.MessageBox,
-      qualifier: {component: 'message-box-page'},
-      private: false,
-      params: [
-        {name: 'param1', required: true},
-        {name: 'param2', required: false},
-      ],
-      description: 'Allows interacting with a message box.',
-    } satisfies WorkbenchMessageBoxCapability,
     {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'notification-page'},
@@ -84,6 +74,41 @@ export const workbenchManifest: Manifest = {
         },
       },
     } satisfies WorkbenchDialogCapability,
+    // TODO [#271]: Remove this messagebox capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'host-message-box',
+      },
+      private: false,
+      description: 'Represents a message box provided by the host app.',
+      params: [
+        {name: 'param', required: false},
+      ],
+      properties: {
+        path: 'test-host-message-box;matrixParam=:param',
+      },
+    },
+    // TODO [#271]: Remove this messagebox capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'custom-host-message-box',
+      },
+      private: false,
+      description: 'Represents a massage box provided by the host app with pre-defined custom size.',
+      properties: {
+        path: 'test-host-message-box',
+        size: {
+          height: '500px',
+          minHeight: '495px',
+          maxHeight: '505px',
+          width: '350px',
+          minWidth: '345px',
+          maxWidth: '355px',
+        },
+      },
+    },
   ],
   intentions: [
     // allow opening test views

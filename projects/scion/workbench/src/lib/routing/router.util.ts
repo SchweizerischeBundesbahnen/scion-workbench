@@ -10,7 +10,7 @@
 
 import {ActivatedRoute, ActivatedRouteSnapshot, OutletContext, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
-import {DIALOG_ID_PREFIX, POPUP_ID_PREFIX} from '../workbench.constants';
+import {DIALOG_ID_PREFIX, MESSAGE_BOX_ID_PREFIX, POPUP_ID_PREFIX} from '../workbench.constants';
 import {inject} from '@angular/core';
 import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
@@ -111,6 +111,13 @@ export const RouterUtils = {
    */
   isDialogOutlet: (outlet: string | undefined | null): outlet is `dialog.${string}` => {
     return outlet?.startsWith(DIALOG_ID_PREFIX) ?? false;
+  },
+
+  /**
+   * Tests if the given outlet matches the format of a message box outlet.
+   */
+  isMessageBoxOutlet: (outlet: string | undefined | null): outlet is `messagebox.${string}` => {
+    return outlet?.startsWith(MESSAGE_BOX_ID_PREFIX) ?? false;
   },
 
   /**

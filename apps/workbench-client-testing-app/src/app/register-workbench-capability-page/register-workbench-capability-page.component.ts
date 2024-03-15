@@ -12,7 +12,7 @@ import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
+import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchMessageBoxCapability, WorkbenchMessageBoxSize, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -88,7 +88,19 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       resizable: this._formBuilder.control<boolean | null>(null),
       padding: this._formBuilder.control<boolean | null>(null),
       showSplash: this._formBuilder.control<boolean | null>(null),
-      pinToStartPage: this._formBuilder.control(false),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+    }),
+    messageBoxProperties: this._formBuilder.group({
+      path: this._formBuilder.control(''),
+      size: this._formBuilder.group({
+        minHeight: this._formBuilder.control(''),
+        height: this._formBuilder.control(''),
+        maxHeight: this._formBuilder.control(''),
+        minWidth: this._formBuilder.control(''),
+        width: this._formBuilder.control(''),
+        maxWidth: this._formBuilder.control(''),
+      }),
+      showSplash: this._formBuilder.control(false),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
   });
@@ -112,6 +124,8 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           return this.readPopupCapabilityFromUI();
         case WorkbenchCapabilities.Dialog:
           return this.readDialogCapabilityFromUI();
+        case WorkbenchCapabilities.MessageBox:
+          return this.readMessageBoxCapabilityFromUI();
         default:
           throw Error('Capability expected to be a workbench capability, but was not.');
       }
@@ -182,7 +196,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     };
   }
 
-  private readDialogCapabilityFromUI(): WorkbenchDialogCapability & {properties: {pinToStartPage: boolean}} {
+  private readDialogCapabilityFromUI(): WorkbenchDialogCapability {
     const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {
@@ -208,8 +222,34 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         resizable: this.form.controls.dialogProperties.controls.resizable.value ?? undefined,
         padding: this.form.controls.dialogProperties.controls.padding.value ?? undefined,
         showSplash: this.form.controls.dialogProperties.controls.showSplash.value ?? undefined,
-        pinToStartPage: this.form.controls.dialogProperties.controls.pinToStartPage.value,
         cssClass: this.form.controls.dialogProperties.controls.cssClass.value,
+      },
+    };
+  }
+
+  private readMessageBoxCapabilityFromUI(): WorkbenchMessageBoxCapability {
+    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    return {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
+      private: this.form.controls.private.value,
+      properties: {
+        path: parseTypedString(this.form.controls.messageBoxProperties.controls.path.value)!,
+        size: undefinedIfEmpty<WorkbenchMessageBoxSize>({
+          width: this.form.controls.messageBoxProperties.controls.size.controls.width.value || undefined,
+          height: this.form.controls.messageBoxProperties.controls.size.controls.height.value || undefined,
+          minWidth: this.form.controls.messageBoxProperties.controls.size.controls.minWidth.value || undefined,
+          maxWidth: this.form.controls.messageBoxProperties.controls.size.controls.maxWidth.value || undefined,
+          minHeight: this.form.controls.messageBoxProperties.controls.size.controls.minHeight.value || undefined,
+          maxHeight: this.form.controls.messageBoxProperties.controls.size.controls.maxHeight.value || undefined,
+        }),
+        showSplash: this.form.controls.messageBoxProperties.controls.showSplash.value,
+        cssClass: this.form.controls.messageBoxProperties.controls.cssClass.value,
       },
     };
   }

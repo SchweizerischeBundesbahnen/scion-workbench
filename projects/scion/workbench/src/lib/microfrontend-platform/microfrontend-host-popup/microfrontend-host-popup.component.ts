@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,11 +13,12 @@ import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
 import {RouterUtils} from '../../routing/router.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
-import {Popup} from '../../popup/popup.config';
+import {Popup, ɵPopup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';
 import {Defined} from '@scion/toolkit/util';
 import {POPUP_ID_PREFIX} from '../../workbench.constants';
 import {Microfrontends} from '../common/microfrontend.util';
+import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -40,14 +41,16 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   public readonly outletName: string;
   public readonly outletInjector: Injector;
 
-  constructor(popup: Popup<ɵPopupContext>,
+  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
+
+  constructor(popup: ɵPopup<ɵPopupContext>,
               private _injector: Injector,
               private _router: Router) {
     const popupContext = popup.input!;
     const capability = popupContext.capability;
     const path = Defined.orElseThrow(capability.properties.path, () => Error(`[PopupProviderError] Missing required path for popup capability: ${JSON.stringify(capability)}`));
     const params = popupContext.params;
-    this.outletName = POPUP_ID_PREFIX.concat(popupContext.popupId);
+    this.outletName = POPUP_ID_PREFIX.concat(popup.id);
     this.outletInjector = Injector.create({
       parent: this._injector,
       providers: [provideWorkbenchPopupHandle(popupContext)],
@@ -56,7 +59,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     // Perform navigation in the named router outlet.
     this.navigate(path, {outletName: this.outletName, params}).then(success => {
       if (!success) {
-        popup.closeWithError(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard.'));
+        popup.closeWithError(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
     });
   }
@@ -69,7 +72,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
-    return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'});
+    return this._singleNavigationExecutor.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 
   public ngOnDestroy(): void {

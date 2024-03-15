@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,83 +8,60 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
-import {WorkbenchMessageBoxConfig} from './workbench-message-box.config';
-import {Beans} from '@scion/toolkit/bean-manager';
-import {Maps} from '@scion/toolkit/util';
-import {WorkbenchView} from '../view/workbench-view';
-import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
-import {lastValueFrom} from 'rxjs';
+import {Qualifier} from '@scion/microfrontend-platform';
+import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 
 /**
- * Allows displaying a message to the user in a workbench message box.
+ * Displays a microfrontend in a message box.
  *
- * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
- * message and one or more buttons.
+ * A message box is a standardized dialog for presenting a message to the user, such as an info, warning or alert,
+ * or for prompting the user for confirmation.
  *
- * The workbench supports the following two modality types:
+ * A microfrontend provided as a `messagebox` capability can be opened in a message box. The qualifier differentiates between different
+ * message box capabilities. An application can open the public message box capabilities of other applications if it manifests a respective
+ * intention.
  *
- * - **Application-modal:**
- *   An application-modal message box blocks the entire workbench. The user cannot switch between views, close or open views,
- *   or arrange views in the workbench layout.
+ * Displayed on top of other content, a message box blocks interaction with other parts of the application. Multiple message boxes are stacked,
+ * and only the topmost message box in each modality stack can be interacted with.
  *
- * - **View-modal:**
- *   A view-modal message box blocks only the view in which it was opened. In contrast to application-modal message boxes, the user
- *   can interact with other views, close them or open new views, or arrange them any other way. A view-modal message box sticks to
- *   its view; that is, it is displayed only when the view is visible. By default, if opening the message box in the context of a
- *   view, it is opened as a view-modal message box. If opened outside a view, setting the modality to 'view' has no effect.
+ * A message box can be view-modal or application-modal. A view-modal message box blocks only a specific view, allowing the user to interact
+ * with other views. An application-modal message box blocks the workbench, or the browser's viewport if configured in the workbench
+ * host application.
  *
- * The built-in message box supports the display of a plain text message and is available as 'messagebox' capability without a qualifier.
- * Other message box capabilities can be contributed in the host app, e.g., to display structured content or to provide out-of-the-box
- * message templates. The use of a qualifier distinguishes different message box providers.
- *
- * Applications need to declare an intention in their application manifest for displaying a message box to the user, as illustrated below:
- *
- * ```json
- * {
- *   "intentions": [
- *     { "type": "messagebox" }
- *   ]
- * }
- * ```
- *
- * Unlike views, message boxes are not part of the persistent workbench navigation, meaning that message boxes do not survive a page reload.
- *
- * @see WorkbenchMessageBoxCapability
  * @category MessageBox
+ * @see WorkbenchMessageBoxCapability
  */
-export class WorkbenchMessageBoxService {
+export abstract class WorkbenchMessageBoxService {
 
   /**
-   * Presents the user with a message that is displayed in a message box based on the given qualifier.
+   * Displays the specified message in a message box.
    *
-   * The qualifier identifies the provider to display the message box. The build-in message box to display a plain text message requires
-   * no qualifier.
+   * By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked.
+   * To open the message box with a different modality, specify the modality in {@link WorkbenchMessageBoxOptions.modality}.
    *
-   * By default, when the message box is opened in the context of a workbench view, it is opened as a view-modal message box.
+   * **This API requires the following intention: `{"type": "messagebox"}`**
    *
-   * @param  message - Configures the content and appearance of the message.
-   * @param  qualifier - Identifies the message box provider.
-   *
-   * @return Promise that resolves to the key of the action button that the user pressed to close the message box.
-   *         Depending on the message box provider, additional data may be included, such as user's input when prompting the user to
-   *         enter data. The Promise rejects if opening the message box failed, e.g., if missing the message box intention, or because
-   *         no message box provider could be found that provides a message box under the specified qualifier.
+   * @param message - Specifies the text to display.
+   * @param options - Controls the appearance and behavior of the message box.
+   * @returns Promise that resolves to the key of the action button that the user clicked to close the message box,
+   *          or that rejects if the message box couldn't be opened, e.g., because of missing the intention.
    */
-  public async open<R = string>(message: string | WorkbenchMessageBoxConfig, qualifier?: Qualifier): Promise<R> {
-    const config: WorkbenchMessageBoxConfig = typeof message === 'string' ? {content: message} : message;
-    const params = Maps.coerce(config.params);
+  public abstract open(message: string, options?: WorkbenchMessageBoxOptions): Promise<string>;
 
-    config.context = {
-      ...config.context,
-      viewId: config.context?.viewId ?? Beans.opt(WorkbenchView)?.id,
-    };
-    const openMessageBox$ = Beans.get(IntentClient).request$<R>({type: WorkbenchCapabilities.MessageBox, qualifier, params}, config);
-    try {
-      return await lastValueFrom(openMessageBox$.pipe(mapToBody()));
-    }
-    catch (error) {
-      throw (error instanceof RequestError ? error.message : error);
-    }
-  }
+  /**
+   * Opens the microfrontend of a `messagebox` capability in a workbench message box based on the given qualifier and options.
+   *
+   * By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked.
+   * To open the message box with a different modality, specify the modality in {@link WorkbenchMessageBoxOptions.modality}.
+   *
+   * @param qualifier - Identifies the `messagebox` capability that provides the microfrontend to open in a message box.
+   * @param options - Controls the appearance and behavior of the message box.
+   * @returns Promise that resolves to the key of the action button that the user clicked to close the message box,
+   *          or that rejects if the message box couldn't be opened, e.g., because of missing the intention or because no `messagebox`
+   *          capability matching the qualifier and visible to the application was found.
+   *
+   * @see WorkbenchMessageBoxCapability
+   * @see WorkbenchMessageBox
+   */
+  public abstract open(qualifier: Qualifier, options?: WorkbenchMessageBoxOptions): Promise<string>;
 }

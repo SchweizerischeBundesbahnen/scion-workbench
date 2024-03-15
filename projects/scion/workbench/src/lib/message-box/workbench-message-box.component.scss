@@ -5,7 +5,7 @@
   padding-inline: var(--sci-workbench-messagebox-padding);
   padding-bottom: var(--sci-workbench-messagebox-padding);
 
-  &.has-title:not(:empty) {
+  &.has-title:not(.empty) {
     padding-top: var(--sci-workbench-messagebox-padding);
   }
 
@@ -13,7 +13,7 @@
     user-select: none;
   }
 
-  > div.message {
+  > div.message.text {
     overflow-wrap: break-word;
     white-space: pre-line;
     text-align: var(--sci-workbench-messagebox-text-align);

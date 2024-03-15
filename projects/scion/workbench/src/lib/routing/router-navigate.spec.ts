@@ -14,10 +14,11 @@ import {provideRouter, Routes} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {advance, clickElement, styleFixture} from '../testing/testing.util';
+import {advance, clickElement, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.directive';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {firstValueFrom, noop, Subject} from 'rxjs';
 
 /**
  * Test setup:
@@ -287,6 +288,52 @@ describe('Router', () => {
 
     discardPeriodicTasks();
   }));
+
+  it('should allow parallel navigation to views', async () => {
+    const canActivateView1 = new Subject<true>();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('left')
+            .addPart('right', {align: 'right'})
+            .addView('view.1', {partId: 'left', activateView: true})
+            .addView('view.2', {partId: 'right', activateView: true})
+            .activatePart('right'),
+        }),
+        provideRouter([
+          {path: 'path/to/view/1', canActivate: [() => firstValueFrom(canActivateView1)], component: SpecView1Component},
+          {path: 'path/to/view/2', component: SpecView2Component},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+
+    // Start navigation in view 1.
+    workbenchRouter.navigate(['path/to/view/1'], {target: 'view.1'}).then(noop);
+    await waitUntilStable();
+
+    // Start parallel navigation in view 2.
+    workbenchRouter.navigate(['path/to/view/2'], {target: 'view.2'}).then(noop);
+    await waitUntilStable();
+
+    // First navigation should be blocked by the canActivate guard.
+    expect(fixture).not.toShow(SpecView1Component);
+    // Second navigation should be blocked by the first one.
+    expect(fixture).not.toShow(SpecView2Component);
+
+    // Unblock first navigation.
+    canActivateView1.next(true);
+    await waitUntilStable();
+
+    // Both views should be visible.
+    expect(fixture).toShow(SpecView1Component);
+    expect(fixture).toShow(SpecView2Component);
+  });
 });
 
 /****************************************************************************************************
@@ -420,3 +467,22 @@ const routesFeatureB: Routes = [
   {path: 'view-1', component: FeatureB_View1Component},
   {path: 'view-2', component: FeatureB_View2Component},
 ];
+
+/****************************************************************************************************
+ * View Spec Components                                                                             *
+ ****************************************************************************************************/
+@Component({
+  selector: 'spec-view-1',
+  template: '',
+  standalone: true,
+})
+class SpecView1Component {
+}
+
+@Component({
+  selector: 'spec-view-2',
+  template: '',
+  standalone: true,
+})
+class SpecView2Component {
+}

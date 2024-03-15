@@ -54,10 +54,12 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
 
     try {
       const result = await this.openDialog(message);
-      await Beans.get(MessageClient).publish(replyTo, result, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
+      // Use 'Beans.opt' to not error if the platform is destroyed, e.g., in tests if not closing dialogs.
+      await Beans.opt(MessageClient)?.publish(replyTo, result, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
     }
     catch (error) {
-      await Beans.get(MessageClient).publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
+      // Use 'Beans.opt' to not error if the platform is destroyed, e.g., in tests if not closing dialogs.
+      await Beans.opt(MessageClient)?.publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
     }
   }
 
@@ -65,16 +67,14 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
    * Opens the microfrontend declared by the resolved capability in a dialog.
    */
   private async openDialog(message: IntentMessage<WorkbenchDialogOptions>): Promise<unknown> {
-    const options = message.body!;
+    const options = message.body ?? {};
     const capability = message.capability as WorkbenchDialogCapability;
+    const params = message.intent.params ?? new Map();
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
 
     return this._dialogService.open(isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
-      inputs: {
-        capability,
-        params: message.intent.params ?? new Map(),
-      },
+      inputs: {capability, params},
       modality: options.modality,
       context: options.context,
       animate: options.animate,

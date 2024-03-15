@@ -17,7 +17,7 @@ import {WorkbenchDialogOptions} from './workbench-dialog.options';
  * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
  * The user can move or resize a dialog.
  *
- * A microfrontend provided as a dialog capability can be opened in a dialog. The qualifier differentiates between different
+ * A microfrontend provided as a `dialog` capability can be opened in a dialog. The qualifier differentiates between different
  * dialog capabilities. An application can open the public dialog capabilities of other applications if it manifests a respective
  * intention.
  *
@@ -34,16 +34,16 @@ import {WorkbenchDialogOptions} from './workbench-dialog.options';
 export abstract class WorkbenchDialogService {
 
   /**
-   * Opens a microfrontend of a dialog capability in a workbench dialog based on the given qualifier and options.
+   * Opens the microfrontend of a `dialog` capability in a workbench dialog based on the given qualifier and options.
    *
    * By default, the calling context determines the modality of the dialog. If the dialog is opened from a view, only this view is blocked.
    * To open the dialog with a different modality, specify the modality in {@link WorkbenchDialogOptions.modality}.
    *
    * @param qualifier - Identifies the dialog capability that provides the microfrontend to open in a dialog.
    * @param options - Controls how to open the dialog.
-   * @returns Promise that resolves to the dialog result, if any, or that rejects if the dialog couldn't be opened or was closed with an error.
-   *
-   * @category Dialog
+   * @returns Promise that resolves to the dialog result, if any, or that rejects if the dialog was closed with an error or couldn't be opened,
+   *          e.g., because of missing the intention or because no `dialog` capability matching the qualifier and visible to the application
+   *          was found.
    *
    * @see WorkbenchDialogCapability
    * @see WorkbenchDialog

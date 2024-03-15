@@ -33,9 +33,13 @@ export {ɵWorkbenchDialogService} from './lib/dialog/ɵworkbench-dialog-service'
 export {WorkbenchDialogOptions} from './lib/dialog/workbench-dialog.options';
 export {ɵDialogContext, ɵDIALOG_CONTEXT} from './lib/dialog/ɵworkbench-dialog-context';
 export {ɵWorkbenchDialogMessageHeaders} from './lib/dialog/ɵworkbench-dialog';
-export {WorkbenchMessageBoxCapability} from './lib/message-box/workbench-message-box-capability';
+export {WorkbenchMessageBoxCapability, WorkbenchMessageBoxSize, eMESSAGE_BOX_MESSAGE_PARAM} from './lib/message-box/workbench-message-box-capability';
 export {WorkbenchMessageBoxService} from './lib/message-box/workbench-message-box-service';
-export {WorkbenchMessageBoxConfig} from './lib/message-box/workbench-message-box.config';
+export {ɵWorkbenchMessageBoxService} from './lib/message-box/ɵworkbench-message-box-service';
+export {WorkbenchMessageBoxOptions} from './lib/message-box/workbench-message-box.options';
+export {WorkbenchMessageBoxLegacyOptions} from './lib/message-box/workbench-message-box-legacy.options';
+export {WorkbenchMessageBox} from './lib/message-box/workbench-message-box';
+export {ɵMessageBoxContext, ɵMESSAGE_BOX_CONTEXT} from './lib/message-box/ɵworkbench-message-box-context';
 export {WorkbenchNotificationCapability} from './lib/notification/workbench-notification-capability';
 export {WorkbenchNotificationService} from './lib/notification/workbench-notification-service';
 export {WorkbenchNotificationConfig} from './lib/notification/workbench-notification.config';

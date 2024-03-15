@@ -34,12 +34,12 @@
   </sci-accordion>
 
   @if (dialog.params | appNullIfEmpty; as params) {
-    <sci-accordion class="dialog-params e2e-dialog-params" variant="solid">
+    <sci-accordion class="e2e-dialog-params" variant="solid">
       <ng-template sciAccordionItem [panel]="panel_dialog_params">
         <header>Dialog Params</header>
       </ng-template>
       <ng-template #panel_dialog_params>
-        <sci-key-value [object]="params" class="e2e-dialog-params"></sci-key-value>
+        <sci-key-value [object]="params" class="e2e-dialog-params"/>
       </ng-template>
     </sci-accordion>
   }
@@ -50,7 +50,7 @@
         <header>Route Params</header>
       </ng-template>
       <ng-template #panel_route_params>
-        <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
+        <sci-key-value [object]="params" class="e2e-route-params"/>
       </ng-template>
     </sci-accordion>
   }
@@ -67,7 +67,7 @@
 
 <ng-template wbDialogAction align="start">
   <label>
-    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"></sci-checkbox>
+    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"/>
     Close with error
   </label>
 </ng-template>

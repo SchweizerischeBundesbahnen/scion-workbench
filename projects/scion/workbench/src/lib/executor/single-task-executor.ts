@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AsyncSubject, lastValueFrom, Subject} from 'rxjs';
+import {asapScheduler, AsyncSubject, lastValueFrom, Subject} from 'rxjs';
 import {serializeExecution} from '../common/operators';
-import {catchError, takeUntil} from 'rxjs/operators';
+import {catchError, observeOn} from 'rxjs/operators';
+import {DestroyRef, inject, InjectionToken} from '@angular/core';
+import {ɵDestroyRef} from '../common/ɵdestroy-ref';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+
+/**
+ * Serializes navigation requests to the Angular Router to prevent cancelling of parallel navigations or race conditions when modifying the currently active workbench layout.
+ */
+export const SINGLE_NAVIGATION_EXECUTOR = new InjectionToken<SingleTaskExecutor>('SINGLE_NAVIGATION_EXECUTOR', {
+  providedIn: 'root',
+  factory: () => {
+    const executor = new SingleTaskExecutor();
+    inject(DestroyRef).onDestroy(() => executor.destroy());
+    return executor;
+  },
+});
 
 /**
  * Allows the serial execution of tasks.
@@ -21,14 +36,19 @@ import {catchError, takeUntil} from 'rxjs/operators';
 export class SingleTaskExecutor {
 
   private _task$ = new Subject<Task>();
-  private _destroy$ = new Subject<void>();
+  private _destroyRef = new ɵDestroyRef();
 
   constructor() {
     this._task$
       .pipe(
+        // Schedule the task asynchronously so that it is not executed if the executor is destroyed in the same "call stack",
+        // happening, for example, when destroying the Testbed in unit tests. Angular destroys contexts from the bottom up,
+        // i.e., child contexts are destroyed before parent contexts. If a task is scheduled in a destroy lifecycle hook of
+        // a child context, the task would still be executed because the executor is not destroyed yet.
+        observeOn(asapScheduler),
         serializeExecution(task => task.execute()),
         catchError((error, caught) => caught),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(this._destroyRef),
       )
       .subscribe();
   }
@@ -48,7 +68,7 @@ export class SingleTaskExecutor {
    * Destroys this executor.
    */
   public destroy(): void {
-    this._destroy$.next();
+    this._destroyRef.destroy();
   }
 }
 

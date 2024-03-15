@@ -16,7 +16,6 @@ import {provideConfirmWorkbenchStartupInitializer} from './workbench/confirm-wor
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor.service';
-import {provideMessageBoxPage} from './message-box-page/message-box-page-intent-handler.service';
 import {provideNotificationPage} from './notification-page/notification-page-intent-handler.service';
 import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
@@ -34,7 +33,6 @@ export const appConfig: ApplicationConfig = {
     provideThrottleCapabilityLookupInterceptor(),
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
-    provideMessageBoxPage(),
     provideNotificationPage(),
     provideAnimationsIfEnabled(),
     Perspectives.provideRoutes(),

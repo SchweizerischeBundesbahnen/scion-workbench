@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2018-2024 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {Component, ElementRef, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {WorkbenchMessageBox, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
+import {RouterUtils} from '../../routing/router.util';
+import {Commands} from '../../routing/routing.model';
+import {Router, RouterOutlet} from '@angular/router';
+import {NgTemplateOutlet} from '@angular/common';
+import {MESSAGE_BOX_ID_PREFIX} from '../../workbench.constants';
+import {UUID} from '@scion/toolkit/uuid';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
+import {Microfrontends} from '../common/microfrontend.util';
+import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
+import {setStyle} from '../../common/dom.util';
+
+/**
+ * Navigates to the microfrontend of a given {@link WorkbenchMessageBoxCapability} via {@link Router}.
+ *
+ * Unlike {@link MicrofrontendMessageBoxComponent}, this component uses a `<router-outlet>` instead of a `<sci-router-outlet>`
+ * to allow direct integration of the content provided by the workbench host application via the Angular router.
+ *
+ * This component is designed to be displayed in a workbench message box.
+ */
+@Component({
+  selector: 'wb-microfrontend-host-message-box',
+  styleUrls: ['./microfrontend-host-message-box.component.scss'],
+  templateUrl: './microfrontend-host-message-box.component.html',
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    NgTemplateOutlet,
+  ],
+})
+export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
+
+  @Input({required: true})
+  public capability!: WorkbenchMessageBoxCapability;
+
+  @Input({required: true})
+  public params!: Map<string, unknown>;
+
+  protected outletName: string;
+  protected outletInjector!: Injector;
+
+  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
+
+  constructor(private _host: ElementRef<HTMLElement>,
+              private _dialog: ɵWorkbenchDialog,
+              private _injector: Injector,
+              private _router: Router) {
+    this.outletName = MESSAGE_BOX_ID_PREFIX.concat(UUID.randomUUID());
+  }
+
+  public ngOnInit(): void {
+    this.setSizeProperties();
+    this.createOutletInjector();
+    this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
+      if (!success) {
+        this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+      }
+    });
+  }
+
+  /**
+   * Performs navigation in the named outlet, substituting path params if any. To clear navigation, pass `null` as the path.
+   */
+  private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
+    path = Microfrontends.substituteNamedParameters(path, extras?.params);
+
+    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path!)) : null);
+    const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
+    return this._singleNavigationExecutor.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
+  }
+
+  private createOutletInjector(): void {
+    this.outletInjector = Injector.create({
+      parent: this._injector,
+      providers: [provideWorkbenchClientMessageBoxHandle(this.capability, this.params)],
+    });
+  }
+
+  private setSizeProperties(): void {
+    setStyle(this._host, {
+      'width': this.capability.properties.size?.width ?? null,
+      'min-width': this.capability.properties.size?.minWidth ?? null,
+      'max-width': this.capability.properties.size?.maxWidth ?? null,
+      'height': this.capability.properties.size?.height ?? null,
+      'min-height': this.capability.properties.size?.minHeight ?? null,
+      'max-height': this.capability.properties.size?.maxHeight ?? null,
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this.navigate(null).then(); // Remove the outlet from the URL
+  }
+}
+
+/**
+ * Provides the {WorkbenchMessageBox} handle to the routed component.
+ */
+export function provideWorkbenchClientMessageBoxHandle(capability: WorkbenchMessageBoxCapability, params: Map<string, unknown>): StaticProvider {
+  return {
+    provide: WorkbenchMessageBox,
+    useFactory: (): WorkbenchMessageBox => {
+
+      return new class implements WorkbenchMessageBox {
+        public readonly capability = capability;
+        public readonly params = params;
+
+        public signalReady(): void {
+          // nothing to do since not an iframe-based microfrontend
+        }
+      };
+    },
+  };
+}

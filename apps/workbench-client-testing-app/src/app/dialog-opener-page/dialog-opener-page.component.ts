@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {WorkbenchDialogService, WorkbenchView, ViewId} from '@scion/workbench-client';
+import {ViewId, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchView} from '@scion/workbench-client';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -65,23 +65,29 @@ export default class DialogOpenerPageComponent {
   }
 
   protected async onDialogOpen(): Promise<void> {
-    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
-    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.params);
-
     this.dialogError = undefined;
     this.returnValue = undefined;
 
-    this._dialogService.open<string>(qualifier, {
-      params: params ?? undefined,
-      modality: this.form.controls.options.controls.modality.value || undefined,
-      animate: this.form.controls.options.controls.animate.value,
-      context: {
-        viewId: this.form.controls.options.controls.contextualViewId.value || undefined,
-      },
-      cssClass: this.form.controls.options.controls.cssClass.value,
-    })
+    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
+    this._dialogService.open<string>(qualifier, this.readOptions())
       .then(result => this.returnValue = result)
       .catch(error => this.dialogError = stringifyError(error) || 'Dialog was closed with an error');
+  }
+
+  /**
+   * Reads options from the UI.
+   */
+  private readOptions(): WorkbenchDialogOptions {
+    const options = this.form.controls.options.controls;
+    return {
+      params: SciKeyValueFieldComponent.toDictionary(options.params) ?? undefined,
+      modality: options.modality.value || undefined,
+      animate: options.animate.value,
+      context: {
+        viewId: options.contextualViewId.value || undefined,
+      },
+      cssClass: options.cssClass.value,
+    };
   }
 
   /**

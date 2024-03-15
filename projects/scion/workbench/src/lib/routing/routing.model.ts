@@ -15,6 +15,7 @@ import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {WorkbenchPopupDiff} from './workbench-popup-differ';
 import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
+import {WorkbenchMessageBoxDiff} from './workbench-message-box-differ';
 
 /**
  * Options to control the navigation.
@@ -102,6 +103,11 @@ export interface WorkbenchNavigationContext {
    * Dialogs added or removed by the current navigation.
    */
   dialogDiff: WorkbenchDialogDiff;
+
+  /**
+   * Message boxes added or removed by the current navigation.
+   */
+  messageBoxDiff: WorkbenchMessageBoxDiff;
 }
 
 /**

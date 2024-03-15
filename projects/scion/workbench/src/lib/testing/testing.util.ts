@@ -9,9 +9,9 @@
  */
 
 import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
-import {ApplicationRef, Type} from '@angular/core';
+import {NgZone, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {animationFrameScheduler, firstValueFrom} from 'rxjs';
+import {animationFrameScheduler, exhaustMap, firstValueFrom, timer} from 'rxjs';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {filter} from 'rxjs/operators';
@@ -40,17 +40,25 @@ export async function waitForInitialWorkbenchLayout(): Promise<void> {
 }
 
 /**
- * Waits for the application to become stable.
+ * Waits until Angular zone has stabilized and all elapsed macrotasks (setTimeout) have been executed.
  */
 export async function waitUntilStable(): Promise<void> {
-  await firstValueFrom(TestBed.inject(ApplicationRef).isStable.pipe(filter(Boolean)));
+  return waitForCondition(async () => {
+    await new Promise<void>(resolve => animationFrameScheduler.schedule(() => setTimeout(resolve)));
+    return TestBed.inject(NgZone).isStable;
+  });
 }
 
 /**
- * Waits until all elapsed macrotasks (setTimeout) have been executed.
+ * Waits for a condition to be fulfilled.
  */
-export async function flushMacrotasks(): Promise<void> {
-  return new Promise<void>(resolve => animationFrameScheduler.schedule(() => setTimeout(resolve)));
+export async function waitForCondition(predicate: () => Promise<boolean>): Promise<void> {
+  const value$ = timer(0, 100)
+    .pipe(
+      exhaustMap(async () => await predicate()),
+      filter(Boolean),
+    );
+  await firstValueFrom(value$);
 }
 
 /**

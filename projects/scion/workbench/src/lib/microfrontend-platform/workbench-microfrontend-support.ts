@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import './microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
@@ -18,12 +19,11 @@ import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificatio
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
-import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler.service';
 import {MicrofrontendViewIntentHandler} from './routing/microfrontend-view-intent-handler.interceptor';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
-import {Route, ROUTES} from '@angular/router';
+import {CanMatchFn, Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityValidator} from './routing/microfrontend-view-capability-validator.interceptor';
@@ -31,9 +31,14 @@ import {MicrofrontendViewCapabilityIdAssigner} from './routing/microfrontend-vie
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
+import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
+import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
-import './microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-routes-registrator.service';
+import {RouterUtils} from '../routing/router.util';
+import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
+import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -60,11 +65,6 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     },
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: MicrofrontendMessageBoxIntentHandler,
-      multi: true,
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
       useClass: MicrofrontendNotificationIntentHandler,
       multi: true,
     },
@@ -75,13 +75,17 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendViewIntentHandler,
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
+    MicrofrontendMessageBoxLegacyIntentTranslator,
+    MicrofrontendMessageBoxIntentHandler,
     MicrofrontendViewCapabilityValidator,
     MicrofrontendViewCapabilityIdAssigner,
     MicrofrontendPopupCapabilityValidator,
     MicrofrontendDialogCapabilityValidator,
+    MicrofrontendMessageBoxCapabilityValidator,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
-    provideMicrofrontendRoute(),
+    provideBuiltInTextMessageBoxCapabilityRoute(),
+    provideMicrofrontendViewRoute(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
   ]);
@@ -129,9 +133,9 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
 }
 
 /**
- * Provides the route for integrating microfrontends.
+ * Provides the route for integrating microfrontend views.
  */
-function provideMicrofrontendRoute(): EnvironmentProviders {
+function provideMicrofrontendViewRoute(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {
       provide: ROUTES,
@@ -143,4 +147,31 @@ function provideMicrofrontendRoute(): EnvironmentProviders {
       }),
     },
   ]);
+}
+
+/**
+ * Provides route for built-in {@link WorkbenchMessageBoxCapability}.
+ */
+function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: ROUTES,
+      multi: true,
+      useValue: {
+        path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
+        loadComponent: () => import('./microfrontend-host-message-box/text-message/text-message.component'),
+        canMatch: [canMatchWorkbenchMessageBox()],
+      } satisfies Route,
+    },
+  ]);
+}
+
+/**
+ * Matches the route if target of a workbench message box.
+ */
+function canMatchWorkbenchMessageBox(): CanMatchFn {
+  return () => {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+    return RouterUtils.isMessageBoxOutlet(outlet);
+  };
 }

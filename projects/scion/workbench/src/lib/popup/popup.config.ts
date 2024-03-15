@@ -19,6 +19,7 @@ import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {ViewId} from '../view/workbench-view.model';
+import {randomUUID} from '../common/uuid.util';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -28,6 +29,12 @@ import {ViewId} from '../view/workbench-view.model';
  * moves when the anchor element moves.
  */
 export abstract class PopupConfig {
+  /**
+   * Specifies the unique identity of the popup. If not specified, assigns the popup a UUID.
+   *
+   * @internal
+   */
+  public abstract readonly id?: string;
   /**
    * Controls where to open the popup.
    *
@@ -212,8 +219,11 @@ export abstract class Popup<T = any> {
 /**
  * @internal
  */
-export class ɵPopup<R = unknown> implements Popup, Blockable {
-
+export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
+  /**
+   * Unique identity of this popup.
+   */
+  public readonly id: string;
   public readonly destroyRef = new ɵDestroyRef();
   public readonly cssClasses: string[];
 
@@ -221,9 +231,10 @@ export class ɵPopup<R = unknown> implements Popup, Blockable {
    * Indicates whether this popup is blocked by dialog(s) that overlay it.
    */
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
-  public result: R | ɵPopupErrorResult | undefined;
+  public result: unknown | ɵPopupErrorResult | undefined;
 
   constructor(private _config: PopupConfig, public readonly referrer: PopupReferrer) {
+    this.id = this._config.id ?? randomUUID();
     this.cssClasses = Arrays.coerce(this._config.cssClass);
     this.blockWhenDialogOpened();
   }
@@ -244,8 +255,8 @@ export class ɵPopup<R = unknown> implements Popup, Blockable {
   }
 
   /** @inheritDoc */
-  public close(result?: unknown | undefined): void {
-    this.result = result as R;
+  public close<R = any>(result?: R | undefined): void {
+    this.result = result;
     this.destroy();
   }
 
@@ -256,7 +267,7 @@ export class ɵPopup<R = unknown> implements Popup, Blockable {
   }
 
   /** @inheritDoc */
-  public get input(): unknown | undefined {
+  public get input(): T | undefined {
     return this._config.input;
   }
 

@@ -1,29 +1,31 @@
 <form [formGroup]="form">
   <section>
     <sci-form-field label="Qualifier">
-      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
-    <sci-form-field label="Params">
-      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
-    </sci-form-field>
+    @if (isEmptyQualifier) {
+      <sci-form-field label="Message">
+        <input [formControl]="form.controls.message" class="e2e-message">
+      </sci-form-field>
+    } @else {
+      <sci-form-field label="Params">
+        <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
+      </sci-form-field>
+    }
   </section>
 
   <section>
     <sci-form-field label="Title">
-      <input [formControl]="form.controls.title" class="e2e-title">
-    </sci-form-field>
-
-    <sci-form-field label="Content">
-      <input [formControl]="form.controls.content" class="e2e-content">
+      <input [formControl]="form.controls.options.controls.title" class="e2e-title">
     </sci-form-field>
 
     <sci-form-field label="Actions">
-      <sci-key-value-field [keyValueFormArray]="form.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"/>
     </sci-form-field>
 
     <sci-form-field label="Severity">
-      <select [formControl]="form.controls.severity" class="e2e-severity">
+      <select [formControl]="form.controls.options.controls.severity" class="e2e-severity">
         <option value="info">info</option>
         <option value="warn">warn</option>
         <option value="error">error</option>
@@ -32,25 +34,23 @@
     </sci-form-field>
 
     <sci-form-field label="Modality">
-      <select [formControl]="form.controls.modality" class="e2e-modality">
+      <select [formControl]="form.controls.options.controls.modality" class="e2e-modality">
         <option value="application">application</option>
         <option value="view">view</option>
         <option value="">default</option>
       </select>
     </sci-form-field>
 
+    <sci-form-field label="Contextual View ID">
+      <input [formControl]="form.controls.options.controls.contextualViewId" class="e2e-contextual-view-id">
+    </sci-form-field>
+
     <sci-form-field label="Content Selectable">
-      <sci-checkbox [formControl]="form.controls.contentSelectable" class="e2e-content-selectable"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.options.controls.contentSelectable" class="e2e-content-selectable"></sci-checkbox>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <app-css-class [formControl]="form.controls.cssClass"/>
-    </sci-form-field>
-  </section>
-
-  <section>
-    <sci-form-field label="View Context Active">
-      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"></sci-checkbox>
+      <app-css-class [formControl]="form.controls.options.controls.cssClass"/>
     </sci-form-field>
   </section>
 </form>
@@ -59,10 +59,14 @@
   Open message box
 </button>
 
-<output class="close-action e2e-close-action" *ngIf="closeAction">
-  {{closeAction}}
-</output>
+@if (closeAction) {
+  <output class="close-action e2e-close-action">
+    {{closeAction}}
+  </output>
+}
 
-<output class="open-error e2e-open-error" *ngIf="openError">
-  {{openError}}
-</output>
+@if (openError) {
+  <output class="open-error e2e-open-error">
+    {{openError}}
+  </output>
+}

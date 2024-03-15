@@ -17,7 +17,7 @@ import {By} from '@angular/platform-browser';
 import {inject} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
-import {delay, of} from 'rxjs';
+import {firstValueFrom, Subject, timer} from 'rxjs';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
@@ -77,6 +77,8 @@ describe('Workbench Perspective', () => {
    * resulting in only the main area being displayed.
    */
   it('should display the perspective also for asynchronous/slow initial navigation', async () => {
+    const canActivate = new Subject<true>();
+
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
@@ -91,9 +93,7 @@ describe('Workbench Perspective', () => {
             path: '',
             canMatch: [canMatchWorkbenchView('navigator')],
             component: TestComponent,
-            canActivate: [
-              () => of(true).pipe(delay(1000)), // simulate slow initial navigation
-            ],
+            canActivate: [() => firstValueFrom(canActivate)],
           },
         ]),
       ],
@@ -101,6 +101,11 @@ describe('Workbench Perspective', () => {
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
+
+    // Delay activation of the perspective.
+    await firstValueFrom(timer(1000));
+    canActivate.next(true);
+    await waitUntilStable();
 
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       workbenchGrid: {
