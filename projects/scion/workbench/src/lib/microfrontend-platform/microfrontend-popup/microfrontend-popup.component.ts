@@ -12,7 +12,7 @@ import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, 
 import {Application, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
-import {Popup} from '../../popup/popup.config';
+import {ɵPopup} from '../../popup/popup.config';
 import {NgClass, NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -53,7 +53,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
-  constructor(public popup: Popup<ɵPopupContext>,
+  constructor(public popup: ɵPopup<ɵPopupContext>,
               private _host: ElementRef<HTMLElement>,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
@@ -78,7 +78,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     }
 
     // Listen to popup close requests.
-    this._messageClient.observe$<any>(ɵWorkbenchCommands.popupCloseTopic(this.popupId))
+    this._messageClient.observe$<any>(ɵWorkbenchCommands.popupCloseTopic(this.popup.id))
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(closeRequest => {
         if (closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) === true) {
@@ -98,7 +98,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     // Navigate to the microfrontend.
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
     this._outletRouter.navigate(this.popupCapability.properties.path, {
-      outlet: this.popupId,
+      outlet: this.popup.id,
       relativeTo: application.baseUrl,
       params: this._popupContext.params,
       pushStateToSessionHistoryStack: false,
@@ -127,13 +127,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Unique identity of this popup.
-   */
-  public get popupId(): string {
-    return this._popupContext.popupId;
-  }
-
-  /**
    * Sets the {@link isWorkbenchDrag} property when a workbench drag operation is detected,
    * such as when dragging a view or moving a sash.
    */
@@ -150,6 +143,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.popupId}).then();
+    this._outletRouter.navigate(null, {outlet: this.popup.id}).then();
   }
 }

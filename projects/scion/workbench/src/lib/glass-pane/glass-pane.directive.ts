@@ -16,6 +16,7 @@ import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {coerceElement} from '@angular/cdk/coercion';
 import {Blocking} from './blocking';
 import {Blockable} from './blockable';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * Prevents user interaction of the host when blocked by placing a glass pane over the host element.
@@ -23,12 +24,14 @@ import {Blockable} from './blockable';
  * Configure this direktive via the following DI tokens. These tokens must be provided at the component level.
  * - {@link GLASS_PANE_BLOCKABLE}: Represents the object to be blocked.
  * - {@link GLASS_PANE_TARGET_ELEMENT}: Controls the HTML element to block. Defaults to the directive's host element if not set.
+ * - {@link GLASS_PANE_OPTIONS}: Configures the glass pane.
  */
 @Directive({selector: '[wbGlassPane]', standalone: true})
 export class GlassPaneDirective implements OnDestroy, AfterViewInit {
 
   private readonly _targetElement: HTMLElement;
   private _glassPane: GlassPane | null = null;
+  private _options = inject(GLASS_PANE_OPTIONS, {optional: true, host: true}) ?? undefined;
 
   constructor(private _injector: Injector) {
     this._targetElement = coerceElement(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
@@ -47,7 +50,7 @@ export class GlassPaneDirective implements OnDestroy, AfterViewInit {
       .pipe(takeUntilDestroyed())
       .subscribe((blockedBy: Blocking | null) => {
         this._glassPane?.dispose();
-        this._glassPane = blockedBy ? new GlassPane(this._targetElement, blockedBy) : null;
+        this._glassPane = blockedBy ? new GlassPane(this._targetElement, blockedBy, this._options) : null;
       });
   }
 
@@ -69,12 +72,13 @@ class GlassPane {
 
   private readonly _destroyRef = new ɵDestroyRef();
 
-  constructor(targetElement: HTMLElement, blockedBy: Blocking) {
+  constructor(targetElement: HTMLElement, blockedBy: Blocking, options?: GlassPaneOptions) {
     const glassPaneElement = createElement('div', {
       parent: targetElement,
-      cssClass: ['glasspane', 'e2e-glasspane'],
+      cssClass: ['glasspane', 'e2e-glasspane', ...Arrays.coerce(options?.cssClass)],
       attributes: {
         'data-owner': blockedBy.id,
+        ...options?.attributes,
       },
       style: {
         position: 'absolute',
@@ -114,6 +118,20 @@ class GlassPane {
 }
 
 /**
+ * Configures the glass pane.
+ */
+export interface GlassPaneOptions {
+  /**
+   * Specifies CSS class(es) to add to the glass pane HTML element.
+   */
+  cssClass?: string | string[];
+  /**
+   * Specifies attributes to add to the glass pane HTML element.
+   */
+  attributes?: {[key: string]: string};
+}
+
+/**
  * DI token to configure the {@link GlassPaneDirective} with the [object]{@link Blockable} to block.
  */
 export const GLASS_PANE_BLOCKABLE = new InjectionToken<Blockable>('GLASS_PANE_BLOCKABLE');
@@ -123,3 +141,8 @@ export const GLASS_PANE_BLOCKABLE = new InjectionToken<Blockable>('GLASS_PANE_BL
  * Defaults to the host element of the {@link GlassPaneDirective} if not specified.
  */
 export const GLASS_PANE_TARGET_ELEMENT = new InjectionToken<HTMLElement | ElementRef<HTMLElement>>('GLASS_PANE_TARGET_ELEMENT');
+
+/**
+ * DI token to configure the {@link GlassPaneDirective}.
+ */
+export const GLASS_PANE_OPTIONS = new InjectionToken<GlassPaneOptions>('GLASS_PANE_OPTIONS');

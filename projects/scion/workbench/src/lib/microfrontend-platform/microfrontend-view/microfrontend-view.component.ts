@@ -31,10 +31,11 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {Objects} from '../../common/objects.util';
+import {WorkbenchView} from '../../view/workbench-view.model';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -322,9 +323,15 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
 /**
  * Blocks the microfrontend outlet when dialog(s) overlay this view.
  */
-function configureMicrofrontendGlassPane(): Provider {
-  return {
-    provide: GLASS_PANE_BLOCKABLE,
-    useExisting: ɵWorkbenchView,
-  };
+function configureMicrofrontendGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useExisting: ɵWorkbenchView,
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-viewid': inject(WorkbenchView).id}}),
+    },
+  ];
 }

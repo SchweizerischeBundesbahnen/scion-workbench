@@ -13,7 +13,7 @@ import {AppPO} from '../../app.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 import {Capability} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
@@ -28,7 +28,8 @@ import {ViewPO} from '../../view.po';
  */
 export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
-export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
+export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'; properties: {path: string | '<null>' | '<undefined>'}};
+export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'; properties: {path: string | '<null>' | '<undefined>'}};
 
 /**
  * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
@@ -52,7 +53,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
    *
    * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability>(capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
     if (capability.type !== undefined) {
       await this.locator.locator('select.e2e-type').selectOption(capability.type);
     }
@@ -90,6 +91,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     }
     else if (capability.type === 'dialog') {
       await this.enterDialogCapabilityProperties(capability as WorkbenchDialogCapability);
+    }
+    else if (capability.type === 'messagebox') {
+      await this.enterMessageBoxCapabilityProperties(capability as WorkbenchMessageBoxCapability);
     }
 
     await this.clickRegister();
@@ -188,8 +192,31 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
-    if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+  }
+
+  private async enterMessageBoxCapabilityProperties(capability: WorkbenchMessageBoxCapability): Promise<void> {
+    const size = capability.properties.size;
+
+    if (size?.width) {
+      await this.locator.locator('input.e2e-width').fill(size.width);
+    }
+    if (size?.height) {
+      await this.locator.locator('input.e2e-height').fill(size.height);
+    }
+    if (size?.minWidth) {
+      await this.locator.locator('input.e2e-min-width').fill(size.minWidth);
+    }
+    if (size?.maxWidth) {
+      await this.locator.locator('input.e2e-max-width').fill(size.maxWidth);
+    }
+    if (size?.minHeight) {
+      await this.locator.locator('input.e2e-min-height').fill(size.minHeight);
+    }
+    if (size?.maxHeight) {
+      await this.locator.locator('input.e2e-max-height').fill(size.maxHeight);
+    }
+    if (capability.properties.showSplash !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
   }
 

@@ -44,6 +44,10 @@ export const routes: Routes = [
     loadComponent: () => import('./message-box-opener-page/message-box-opener-page.component'),
   },
   {
+    path: 'test-message-box',
+    loadComponent: () => import('./message-box-page/message-box-page.component'),
+  },
+  {
     path: 'test-notification-opener',
     loadComponent: () => import('./notification-opener-page/notification-opener-page.component'),
   },

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms from the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {ViewPO} from '../../view.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewId} from '@scion/workbench-client';
+import {ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
@@ -36,55 +36,59 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
     this.closeAction = this.locator.locator('output.e2e-close-action');
   }
 
-  public async enterQualifier(qualifier: Qualifier): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(qualifier);
-  }
+  public async open(message: string, options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(qualifier: Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void>;
+  public async open(content: string | Qualifier, options?: WorkbenchMessageBoxOptions): Promise<void> {
+    if (typeof content === 'string') {
+      await this.locator.locator('input.e2e-message').fill(content);
+    }
+    else {
+      const qualifierKeyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+      await qualifierKeyValueField.clear();
+      await qualifierKeyValueField.addEntries(content);
+    }
 
-  public async enterParams(params: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params);
-  }
+    if (options?.params) {
+      const paramsKeyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+      await paramsKeyValueField.clear();
+      await paramsKeyValueField.addEntries(options.params);
+    }
 
-  public async enterTitle(title: string): Promise<void> {
-    await this.locator.locator('input.e2e-title').fill(title);
-  }
+    if (options?.title) {
+      await this.locator.locator('input.e2e-title').fill(options?.title);
+    }
 
-  public async enterContent(content: string): Promise<void> {
-    await this.locator.locator('input.e2e-content').fill(content);
-  }
+    if (options?.actions) {
+      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
+      await keyValueField.clear();
+      await keyValueField.addEntries(options?.actions);
+    }
 
-  public async enterActions(actions: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(actions);
-  }
+    if (options?.severity) {
+      await this.locator.locator('select.e2e-severity').selectOption(options.severity);
+    }
 
-  public async selectSeverity(severity: 'info' | 'warn' | 'error'): Promise<void> {
-    await this.locator.locator('select.e2e-severity').selectOption(severity);
-  }
+    if (options?.modality) {
+      await this.locator.locator('select.e2e-modality').selectOption(options?.modality);
+    }
 
-  public async selectModality(modality: 'view' | 'application'): Promise<void> {
-    await this.locator.locator('select.e2e-modality').selectOption(modality);
-  }
+    if (options?.context?.viewId) {
+      await this.locator.locator('input.e2e-contextual-view-id').fill(options.context.viewId);
+    }
 
-  public async checkContentSelectable(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(check);
-  }
+    if (options?.contentSelectable) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(options?.contentSelectable);
+    }
 
-  public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
+    if (options?.cssClass) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
+    }
 
-  public async open(): Promise<void> {
     await this.locator.locator('button.e2e-open').click();
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     return Promise.race([
-      waitUntilAttached(this._appPO.messagebox({cssClass}).locator),
+      waitUntilAttached(this._appPO.messagebox({cssClass: options?.cssClass}).locator),
       rejectWhenAttached(this.locator.locator('output.e2e-open-error')),
     ]);
   }

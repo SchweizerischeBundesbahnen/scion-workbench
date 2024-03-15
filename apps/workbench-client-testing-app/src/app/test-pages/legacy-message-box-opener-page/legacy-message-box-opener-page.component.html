@@ -1,0 +1,29 @@
+<form [formGroup]="form">
+  <sci-form-field label="Content">
+    <input [formControl]="form.controls.content" class="e2e-content">
+  </sci-form-field>
+
+  <sci-form-field label="Title">
+    <input [formControl]="form.controls.title" class="e2e-title">
+  </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)">
+    <app-css-class [formControl]="form.controls.cssClass"/>
+  </sci-form-field>
+</form>
+
+<button (click)="onMessageBoxOpen()" class="e2e-open" [disabled]="form.invalid" sci-primary>
+  Open message box
+</button>
+
+@if (closeAction) {
+  <output class="close-action e2e-close-action">
+    {{closeAction}}
+  </output>
+}
+
+@if (openError) {
+  <output class="open-error e2e-open-error">
+    {{openError}}
+  </output>
+}

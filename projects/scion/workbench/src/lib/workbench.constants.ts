@@ -29,6 +29,11 @@ export const POPUP_ID_PREFIX = 'popup.';
 export const DIALOG_ID_PREFIX = 'dialog.';
 
 /**
+ * Represents the id prefix of message boxes.
+ */
+export const MESSAGE_BOX_ID_PREFIX = 'messagebox.';
+
+/**
  * Name of the query parameter that contains the layout of the main area.
  */
 export const MAIN_AREA_LAYOUT_QUERY_PARAM = 'main_area';

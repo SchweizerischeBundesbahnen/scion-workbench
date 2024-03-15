@@ -17,7 +17,7 @@ import {ViewId, WorkbenchView} from './workbench-view.model';
 import {CanClose} from '../workbench.model';
 import {Observable} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {flushMacrotasks, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {By} from '@angular/platform-browser';
@@ -668,7 +668,7 @@ describe('View', () => {
       context: {viewId: 'view.100'},
       cssClass: 'message-box',
     }).then();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Try to close the view (prevented by the message box).
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
@@ -681,7 +681,7 @@ describe('View', () => {
     // Close the message box.
     const messageBox = getDialog('message-box');
     messageBox.close();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Expect view not to be closed.
     expect(view.destroyed).toBeFalse();
@@ -720,7 +720,7 @@ describe('View', () => {
       modality: 'application',
       cssClass: 'message-box',
     }).then();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Try to close the view (prevented by the message box).
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
@@ -733,7 +733,7 @@ describe('View', () => {
     // Close the message box.
     const messageBox = getDialog('message-box');
     messageBox.close();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Expect view not to be closed.
     expect(view.destroyed).toBeFalse();
@@ -773,7 +773,7 @@ describe('View', () => {
       context: {viewId: 'view.100'},
       cssClass: 'dialog',
     }).then();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Try to close the view (prevented by the dialog).
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
@@ -786,7 +786,7 @@ describe('View', () => {
     // Close the dialog.
     const dialog = getDialog('dialog');
     dialog.close();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Expect view not to be closed.
     expect(view.destroyed).toBeFalse();
@@ -825,7 +825,7 @@ describe('View', () => {
       modality: 'application',
       cssClass: 'dialog',
     }).then();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Try to close the view (prevented by the dialog).
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
@@ -838,7 +838,7 @@ describe('View', () => {
     // Close the dialog.
     const dialog = getDialog('dialog');
     dialog.close();
-    await flushMacrotasks();
+    await waitUntilStable();
 
     // Expect view not to be closed.
     expect(view.destroyed).toBeFalse();

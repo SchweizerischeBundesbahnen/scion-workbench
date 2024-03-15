@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Injector, OnInit, Provider, ViewChild} from '@angular/core';
+import {Component, HostBinding, inject, Injector, OnInit, Provider, ViewChild} from '@angular/core';
 import {ɵPopup} from './popup.config';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
 import {noop} from 'rxjs';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -81,6 +81,11 @@ export class PopupComponent implements OnInit {
     return this._popup.cssClasses.join(' ');
   }
 
+  @HostBinding('attr.data-popupid')
+  public get id(): string {
+    return this._popup.id;
+  }
+
   constructor(private _popup: ɵPopup, injector: Injector) {
     this.portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, injector);
   }
@@ -98,9 +103,15 @@ export class PopupComponent implements OnInit {
 /**
  * Blocks this popup when dialog(s) overlay it.
  */
-function configurePopupGlassPane(): Provider {
-  return {
-    provide: GLASS_PANE_BLOCKABLE,
-    useExisting: ɵPopup,
-  };
+function configurePopupGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useExisting: ɵPopup,
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-popupid': inject(ɵPopup).id}}),
+    },
+  ];
 }

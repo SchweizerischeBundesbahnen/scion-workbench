@@ -23,7 +23,7 @@ import {ResizableDirective, WbResizeEvent} from './resizable.directive';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {DialogHeaderComponent} from './dialog-header/dialog-header.component';
 import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
-import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 
 /**
  * Renders the workbench dialog.
@@ -213,10 +213,15 @@ function provideEnterAnimation(): AnimationMetadata[] {
 /**
  * Blocks this dialog when other dialog(s) overlay it.
  */
-function configureDialogGlassPane(): Provider {
-  return {
-    provide: GLASS_PANE_BLOCKABLE,
-    useExisting: forwardRef(() => ɵWorkbenchDialog), // resolve {@link ɵWorkbenchDialog} via forwardRef because not defined yet, i.e., {@link ɵWorkbenchDialog} constructs {@link WorkbenchDialogComponent} in its constructor.
-  };
+function configureDialogGlassPane(): Provider[] {
+  return [
+    {
+      provide: GLASS_PANE_BLOCKABLE,
+      useExisting: forwardRef(() => ɵWorkbenchDialog), // resolve {@link ɵWorkbenchDialog} via forwardRef because not defined yet, i.e., {@link ɵWorkbenchDialog} constructs {@link WorkbenchDialogComponent} in its constructor.
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useFactory: (): GlassPaneOptions => ({attributes: {'data-dialogid': inject(ɵWorkbenchDialog).id}}),
+    },
+  ];
 }
-

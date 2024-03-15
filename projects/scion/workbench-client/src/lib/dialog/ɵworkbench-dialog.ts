@@ -26,12 +26,12 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
 
   private _destroy$ = new Subject<void>();
 
-  public readonly params: Map<string, unknown>;
   public readonly capability: WorkbenchDialogCapability;
+  public readonly params: Map<string, unknown>;
 
   constructor(private _context: ɵDialogContext) {
-    this.params = this._context.params;
     this.capability = this._context.capability;
+    this.params = this._context.params;
   }
 
   /**

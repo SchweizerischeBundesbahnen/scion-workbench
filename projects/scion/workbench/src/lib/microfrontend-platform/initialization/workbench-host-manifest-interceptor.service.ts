@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HostManifestInterceptor, Intention, Manifest} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability} from '@scion/workbench-client';
+import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability} from '@scion/workbench-client';
+import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY, TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from '../microfrontend-host-message-box/text-message/text-message.component';
 
 /**
  * Intercepts the host manifest, registering workbench-specific intentions and capabilities.
@@ -17,8 +18,8 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
     ];
     hostManifest.capabilities = [
       ...hostManifest.capabilities || [],
-      provideBuiltInMessageBoxCapability(),
-      provideBuiltInNotificationCapability(),
+      provideBuiltInTextMessageBoxCapability(),
+      provideBuiltInTextNotificationCapability(),
     ];
   }
 }
@@ -34,29 +35,39 @@ function provideViewIntention(): Intention {
 }
 
 /**
- * Provides the built-in notification capability.
+ * Provides the built-in notification capability to display text.
  *
  * @see MicrofrontendNotificationIntentHandler
  */
-function provideBuiltInNotificationCapability(): WorkbenchNotificationCapability {
+function provideBuiltInTextNotificationCapability(): WorkbenchNotificationCapability {
   return {
     type: WorkbenchCapabilities.Notification,
     qualifier: {},
     private: false,
-    description: 'Allows displaying a simple notification to the user.',
+    description: 'Displays a text notification to the user.',
   };
 }
 
 /**
- * Provides the built-in message box capability.
+ * Provides the built-in {@link WorkbenchMessageBoxCapability} to display text.
  *
  * @see MicrofrontendMessageBoxIntentHandler
  */
-function provideBuiltInMessageBoxCapability(): WorkbenchMessageBoxCapability {
+function provideBuiltInTextMessageBoxCapability(): WorkbenchMessageBoxCapability {
   return {
     type: WorkbenchCapabilities.MessageBox,
     qualifier: {},
+    params: [
+      {
+        name: eMESSAGE_BOX_MESSAGE_PARAM,
+        required: false,
+        description: 'Text to display to the user.',
+      }],
+    properties: {
+      path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
+      [TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY]: TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY,
+    },
     private: false,
-    description: 'Allows displaying a simple message to the user.',
+    description: 'Displays a text message to the user.',
   };
 }

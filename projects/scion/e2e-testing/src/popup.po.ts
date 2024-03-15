@@ -22,6 +22,10 @@ export class PopupPO {
     this._overlay = this.locator.page().locator('.cdk-overlay-pane.wb-popup', {has: this.locator});
   }
 
+  public async getPopupId(): Promise<string> {
+    return (await this.locator.getAttribute('data-popupid'))!;
+  }
+
   /**
    * Retrieves the bounding box of the popup. By default, includes borders ('border-box').
    *

@@ -62,6 +62,15 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'message-box-test-page',
+    children: [
+      {
+        path: ':segment1/segment2',
+        loadComponent: () => import('../message-box-page/message-box-page.component'),
+      },
+    ],
+  },
+  {
     path: 'view-test-page',
     children: [
       {
@@ -89,6 +98,10 @@ const routes: Routes = [
   {
     path: 'workbench-theme-test-page',
     loadComponent: (): any => import('./workbench-theme-test-page/workbench-theme-test-page.component'),
+  },
+  {
+    path: 'legacy-message-box-opener-page',
+    loadComponent: () => import('./legacy-message-box-opener-page/legacy-message-box-opener-page.component'),
   },
 ];
 

@@ -55,7 +55,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   /**
    * Expects the fixture to show a component of the specified type.
    *
-   * The actual value must be a {@link ComponentFixture}.
+   * The actual value must be a {@link ComponentFixture} or {@link DebugElement}.
    *
    * ---
    * Usage:

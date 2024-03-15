@@ -20,6 +20,7 @@ import {DIALOG_ID_PREFIX} from '../../workbench.constants';
 import {Observable} from 'rxjs';
 import {throwError} from '../../common/throw-error.util';
 import {Microfrontends} from '../common/microfrontend.util';
+import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
 
 /**
  * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}.
@@ -50,6 +51,8 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   protected outletName: string;
   protected outletInjector!: Injector;
 
+  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
+
   constructor(private _dialog: ɵWorkbenchDialog,
               private _injector: Injector,
               private _router: Router) {
@@ -61,7 +64,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
     this.createOutletInjector();
     this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
       if (!success) {
-        this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard.'));
+        this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
     });
   }
@@ -74,7 +77,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
-    return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'});
+    return this._singleNavigationExecutor.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 
   private createOutletInjector(): void {

@@ -28,7 +28,7 @@ export class WorkbenchDialogDiffer {
    * Computes differences in the URL since last time {@link WorkbenchDialogDiffer#diff} was invoked.
    */
   public diff(urlTree: UrlTree): WorkbenchDialogDiff {
-    const dialogOutlets = Object.keys(urlTree.root.children).filter(outlet => RouterUtils.isDialogOutlet(outlet));
+    const dialogOutlets = Object.keys(urlTree.root.children).filter(RouterUtils.isDialogOutlet);
 
     return new WorkbenchDialogDiff(this._dialogDiffer.diff(dialogOutlets));
   }

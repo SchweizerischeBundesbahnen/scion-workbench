@@ -19,6 +19,8 @@ import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {TypeofPipe} from '../common/typeof.pipe';
 import {throwError} from '../common/throw-error.util';
+import {Dimension} from '@scion/toolkit/observable';
+import {SciDimensionDirective} from '@scion/components/dimension';
 
 /**
  * Renders the workbench message box.
@@ -32,6 +34,7 @@ import {throwError} from '../common/throw-error.util';
   standalone: true,
   imports: [
     NgComponentOutlet,
+    SciDimensionDirective,
     WorkbenchDialogHeaderDirective,
     WorkbenchDialogFooterDirective,
     MessageBoxHeaderComponent,
@@ -47,6 +50,9 @@ export class WorkbenchMessageBoxComponent {
   // Ensure host element to be focusable in order to close the message box on Escape keystroke.
   @HostBinding('attr.tabindex')
   protected tabindex = -1;
+
+  @HostBinding('class.empty')
+  protected empty = false;
 
   @Input({required: true, transform: nullIfEmptyMessage})
   public message!: string | ComponentType<unknown> | null;
@@ -84,6 +90,10 @@ export class WorkbenchMessageBoxComponent {
 
   protected onFooterPreferredSizeChange(preferredSize: number): void {
     this._dialog.size.minWidth = `${preferredSize}px`;
+  }
+
+  protected onContentDimensionChange(dimension: Dimension): void {
+    this.empty = !dimension.offsetHeight;
   }
 }
 

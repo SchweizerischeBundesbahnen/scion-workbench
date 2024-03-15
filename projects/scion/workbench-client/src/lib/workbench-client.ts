@@ -21,6 +21,8 @@ import {ɵWorkbenchThemeMonitor} from './theme/ɵworkbench-theme-monitor';
 import {WorkbenchDialogInitializer} from './dialog/workbench-dialog-initializer';
 import {WorkbenchDialogService} from './dialog/workbench-dialog-service';
 import {ɵWorkbenchDialogService} from './dialog/ɵworkbench-dialog-service';
+import {WorkbenchMessageBoxInitializer} from './message-box/workbench-message-box-initializer';
+import {ɵWorkbenchMessageBoxService} from './message-box/ɵworkbench-message-box-service';
 
 /**
  * **SCION Workbench Client provides core API for a web app to interact with SCION Workbench and other microfrontends.**
@@ -37,8 +39,9 @@ import {ɵWorkbenchDialogService} from './dialog/ɵworkbench-dialog-service';
  * - {@link WorkbenchDialog} for the microfrontend to interact with the dialog.
  * - {@link WorkbenchPopupService} for displaying a microfrontend in a popup.
  * - {@link WorkbenchPopup} for the microfrontend to interact with the popup.
- * - {@link WorkbenchNotificationService} for displaying a notification.
  * - {@link WorkbenchMessageBoxService} for displaying a message.
+ * - {@link WorkbenchMessageBox} for the microfrontend to interact with the message box.
+ * - {@link WorkbenchNotificationService} for displaying a notification.
  * - `MessageClient` for sending or receiving messages between micro applications.
  * - `IntentClient` for issuing or receiving intents between micro applications.
  * - `ManifestService` for reading and registering capabilities at runtime.
@@ -114,13 +117,14 @@ export class WorkbenchClient {
   public static async connect(symbolicName: string, connectOptions?: ConnectOptions): Promise<void> {
     Beans.register(WorkbenchRouter);
     Beans.register(WorkbenchPopupService);
-    Beans.register(WorkbenchMessageBoxService);
     Beans.register(WorkbenchNotificationService);
     Beans.register(WorkbenchDialogService, {useClass: ɵWorkbenchDialogService});
+    Beans.register(WorkbenchMessageBoxService, {useClass: ɵWorkbenchMessageBoxService});
     Beans.register(WorkbenchThemeMonitor, {useClass: ɵWorkbenchThemeMonitor});
     Beans.registerInitializer({useClass: WorkbenchViewInitializer});
     Beans.registerInitializer({useClass: WorkbenchPopupInitializer});
     Beans.registerInitializer({useClass: WorkbenchDialogInitializer});
+    Beans.registerInitializer({useClass: WorkbenchMessageBoxInitializer});
     await MicrofrontendPlatformClient.connect(symbolicName, connectOptions);
   }
 }

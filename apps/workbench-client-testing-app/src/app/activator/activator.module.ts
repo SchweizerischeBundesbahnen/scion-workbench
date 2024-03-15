@@ -11,7 +11,7 @@
 import {Inject, NgModule} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
 @NgModule({})
 export default class ActivatorModule {
@@ -218,6 +218,25 @@ export default class ActivatorModule {
         title: 'Workbench Message Box',
         heading,
         cssClass: 'e2e-test-message-box-opener',
+      },
+    });
+
+    // Register the message box microfrontend.
+    await this._manifestService.registerCapability<WorkbenchMessageBoxCapability>({
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'message-box',
+        app,
+      },
+      description: '[e2e] Provides access to the workbench message box object',
+      private: false,
+      properties: {
+        path: 'test-message-box',
+        size: {
+          width: '260px',
+          height: '290px',
+        },
+        showSplash: true,
       },
     });
 

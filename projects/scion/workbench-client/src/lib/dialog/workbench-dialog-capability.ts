@@ -118,6 +118,10 @@ export interface WorkbenchDialogCapability extends Capability {
      * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
      */
     cssClass?: string | string[];
+    /**
+     * Arbitrary metadata associated with the capability.
+     */
+    [key: string]: unknown;
   };
 }
 

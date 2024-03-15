@@ -11,10 +11,10 @@
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {Defined, Observables} from '@scion/toolkit/util';
-import {Injectable, Injector, NgZone, OnDestroy, runInInjectionContext} from '@angular/core';
+import {inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
-import {SingleTaskExecutor} from '../executor/single-task-executor';
+import {SINGLE_NAVIGATION_EXECUTOR} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
@@ -30,9 +30,9 @@ import {UUID} from '../common/uuid.util';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
-export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
+export class ɵWorkbenchRouter implements WorkbenchRouter {
 
-  private _singleTaskExecutor = new SingleTaskExecutor();
+  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
 
   /**
    * Holds the current navigational context during a workbench navigation, or `null` if no navigation is in progress.
@@ -67,7 +67,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
     const navigateFn = typeof commandsOrNavigateFn === 'function' ? commandsOrNavigateFn : createNavigationFromCommands(commandsOrNavigateFn, extras ?? {});
 
     // Serialize navigation requests to prevent race conditions when modifying the currently active workbench layout.
-    return this._singleTaskExecutor.submit(async () => {
+    return this._singleNavigationExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, this navigation would override the initial layout as given in the URL.
       if (!this._workbenchLayoutService.layout) {
@@ -130,7 +130,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
       return this._zone.run(() => this.createUrlTree(onNavigate, extras));
     }
 
-    return this._singleTaskExecutor.submit(async () => {
+    return this._singleNavigationExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, would override the initial layout as given in the URL.
       if (!this._workbenchLayoutService.layout) {
@@ -207,10 +207,6 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
    */
   private async waitForInitialLayout(): Promise<void> {
     await firstValueFrom(this._workbenchLayoutService.layout$);
-  }
-
-  public ngOnDestroy(): void {
-    this._singleTaskExecutor.destroy();
   }
 }
 

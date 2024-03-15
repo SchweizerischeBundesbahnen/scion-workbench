@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
@@ -68,14 +68,8 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      this.waitUntilDialogAttached(),
+      waitUntilAttached(this._appPO.dialog({cssClass: options?.cssClass}).locator),
       rejectWhenAttached(this.error),
     ]);
-  }
-
-  private async waitUntilDialogAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
-    const dialog = this._appPO.dialog({cssClass});
-    await dialog.locator.waitFor({state: 'attached'});
   }
 }

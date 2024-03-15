@@ -43,6 +43,10 @@ export class DialogPO {
     };
   }
 
+  public async getDialogId(): Promise<string> {
+    return (await this.locator.getAttribute('data-dialogid'))!;
+  }
+
   public async getDialogBoundingBox(): Promise<DomRect> {
     return fromRect(await this._dialog.boundingBox());
   }
@@ -52,8 +56,7 @@ export class DialogPO {
   }
 
   public async getGlassPaneBoundingBoxes(): Promise<Set<DomRect>> {
-    const dialogId = await this.locator.getAttribute('data-dialogid');
-    const glassPaneLocators = await this.locator.page().locator(`div.e2e-glasspane[data-owner="${dialogId}"]`).all();
+    const glassPaneLocators = await this.locator.page().locator(`div.e2e-glasspane[data-owner="${await this.getDialogId()}"]`).all();
 
     const boundingBoxes = new Set<DomRect>();
     for (const glassPaneLocator of glassPaneLocators) {

@@ -34,6 +34,8 @@ test.describe('Workbench Dialog', () => {
       const dialogPage = new DialogPagePO(dialog);
 
       await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([await dialogOpenerPage.view.getBoundingBox()]));
     });
 
@@ -230,6 +232,8 @@ test.describe('Workbench Dialog', () => {
       const dialogPage = new DialogPagePO(dialog);
 
       await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -247,6 +251,8 @@ test.describe('Workbench Dialog', () => {
       const dialogPage = new DialogPagePO(dialog);
 
       await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -265,6 +271,8 @@ test.describe('Workbench Dialog', () => {
       const dialogPage = new DialogPagePO(dialog);
 
       await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         appPO.viewportBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -323,6 +331,8 @@ test.describe('Workbench Dialog', () => {
       // Re-mount the workbench component by navigating the primary router.
       await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
       await expectDialog(dialogPage).toBeVisible();
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(),
         await dialogOpenerPage.view.getBoundingBox(),
@@ -2016,6 +2026,10 @@ test.describe('Workbench Dialog', () => {
         await dialogOpenerViewPage.view.getBoundingBox(),
         await dialog1.getDialogBoundingBox(),
       ]));
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerViewPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialog1.getDialogId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialog2.getDialogId())).toBe(false);
     });
 
     test('should block interaction with contextual popup', async ({appPO, workbenchNavigator}) => {
@@ -2055,6 +2069,10 @@ test.describe('Workbench Dialog', () => {
         await popupOpenerViewPage.view.getBoundingBox(),
         await popup.getBoundingBox({box: 'content-box'}),
       ]));
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => appPO.isViewBlocked(popupOpenerViewPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isPopupBlocked(popup.getPopupId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialog.getDialogId())).toBe(false);
     });
 
     test('should not block dialogs of other views', async ({appPO, workbenchNavigator}) => {
@@ -2097,6 +2115,12 @@ test.describe('Workbench Dialog', () => {
       const focusDialogTestPage2 = new FocusTestPagePO(dialog2);
       await focusDialogTestPage2.clickField('middle-field');
       await expect(focusDialogTestPage2.middleField).toBeFocused();
+
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(false);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerViewPage1.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerViewPage2.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialog1.getDialogId())).toBe(false);
+      await expect.poll(() => appPO.isDialogBlocked(dialog2.getDialogId())).toBe(false);
     });
 
     test('should block workbench', async ({appPO, workbenchNavigator}) => {
@@ -2110,7 +2134,7 @@ test.describe('Workbench Dialog', () => {
       // Navigate to FocusTestPageComponent
       await routerPage.navigate(['/test-pages/focus-test-page'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'focus-page'
+        cssClass: 'focus-page',
       });
 
       // Open application-modal dialog.
@@ -2128,6 +2152,11 @@ test.describe('Workbench Dialog', () => {
         await dialogOpenerPage.view.getBoundingBox(),
         await focusTestPage.view.getBoundingBox(),
       ]));
+
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(focusTestPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialog.getDialogId())).toBe(false);
     });
 
     test('should block viewport', async ({appPO, workbenchNavigator}) => {
@@ -2141,7 +2170,7 @@ test.describe('Workbench Dialog', () => {
       // Navigate to FocusTestPageComponent
       await routerPage.navigate(['/test-pages/focus-test-page'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'focus-page'
+        cssClass: 'focus-page',
       });
 
       // Open application-modal dialog.
@@ -2159,6 +2188,11 @@ test.describe('Workbench Dialog', () => {
         await dialogOpenerPage.view.getBoundingBox(),
         await focusTestPage.view.getBoundingBox(),
       ]));
+
+      await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isViewBlocked(focusTestPage.view.getViewId())).toBe(true);
+      await expect.poll(() => appPO.isDialogBlocked(dialog.getDialogId())).toBe(false);
     });
   });
 });

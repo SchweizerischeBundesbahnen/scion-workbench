@@ -97,8 +97,7 @@ export default class ViewPageComponent implements CanClose, OnDestroy {
       return true;
     }
 
-    const action = await this._messageBoxService.open({
-      content: 'Do you want to close this view?',
+    const action = await this._messageBoxService.open('Do you want to close this view?', {
       actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
       modality: 'application',

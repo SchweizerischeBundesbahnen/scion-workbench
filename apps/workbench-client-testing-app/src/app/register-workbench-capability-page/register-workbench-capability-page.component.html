@@ -4,6 +4,7 @@
       <select [formControl]="form.controls.type" class="e2e-type">
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
         <option [value]="WorkbenchCapabilities.Dialog">DIALOG</option>
+        <option [value]="WorkbenchCapabilities.MessageBox">MESSAGEBOX</option>
         <option [value]="WorkbenchCapabilities.Popup">POPUP</option>
       </select>
     </sci-form-field>
@@ -152,13 +153,51 @@
         <sci-checkbox [formControl]="form.controls.dialogProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
       </sci-form-field>
 
-      <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControl]="form.controls.dialogProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
-      </sci-form-field>
-
       <sci-form-field label="CSS Class(es)">
         <app-css-class [formControl]="form.controls.dialogProperties.controls.cssClass"/>
       </sci-form-field>
+    }
+
+    @if (form.controls.type.value === WorkbenchCapabilities.MessageBox) {
+      <ng-container [formGroup]="this.form.controls.messageBoxProperties">
+        <sci-form-field label="Path">
+          <input [formControl]="this.form.controls.messageBoxProperties.controls.path" class="e2e-path">
+        </sci-form-field>
+
+        <ng-container [formGroup]="this.form.controls.messageBoxProperties.controls.size">
+          <sci-form-field label="Min Height">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.minHeight" class="e2e-min-height">
+          </sci-form-field>
+
+          <sci-form-field label="Height">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.height" class="e2e-height">
+          </sci-form-field>
+
+          <sci-form-field label="Max Height">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.maxHeight" class="e2e-max-height">
+          </sci-form-field>
+
+          <sci-form-field label="Min Width">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.minWidth" class="e2e-min-width">
+          </sci-form-field>
+
+          <sci-form-field label="Width">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.width" class="e2e-width">
+          </sci-form-field>
+
+          <sci-form-field label="Max Width">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.maxWidth" class="e2e-max-width">
+          </sci-form-field>
+        </ng-container>
+
+        <sci-form-field label="Show Splash">
+          <sci-checkbox [formControl]="this.form.controls.messageBoxProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="CSS Class(es)">
+          <app-css-class [formControl]="form.controls.messageBoxProperties.controls.cssClass"/>
+        </sci-form-field>
+      </ng-container>
     }
   </section>
 

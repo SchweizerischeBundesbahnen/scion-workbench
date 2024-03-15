@@ -11,7 +11,7 @@
 import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {ComponentFixture} from '@angular/core/testing';
-import {Type} from '@angular/core';
+import {DebugElement, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 
 /**
@@ -20,12 +20,8 @@ import {By} from '@angular/platform-browser';
 export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
   toShow: (): CustomMatcher => {
     return {
-      compare(actualFixture: any, expectedComponentType: Type<any>, failOutput: string | undefined): CustomMatcherResult {
-        if (!(actualFixture instanceof ComponentFixture)) {
-          return fail(`Expected actual to be of type 'ComponentFixture' [actual=${actualFixture.constructor.name}]`);
-        }
-
-        const found = !!actualFixture.debugElement.query(By.directive(expectedComponentType));
+      compare(element: any, expectedComponentType: Type<any>, failOutput: string | undefined): CustomMatcherResult {
+        const found = !!coerceDebugElement(element).query(By.directive(expectedComponentType));
         return found ? pass() : fail(`Expected ${expectedComponentType.name} to show`);
 
         function pass(): CustomMatcherResult {
@@ -39,3 +35,13 @@ export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
     };
   },
 };
+
+function coerceDebugElement(element: unknown): DebugElement {
+  if (element instanceof DebugElement) {
+    return element;
+  }
+  if (element instanceof ComponentFixture) {
+    return element.debugElement;
+  }
+  throw Error(`Expected actual to be of type 'ComponentFixture' or 'DebugElement', but was '${element?.constructor.name}'.`);
+}

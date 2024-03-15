@@ -349,6 +349,34 @@ export class AppPO {
   public hasMainArea(): Promise<boolean> {
     return this.workbench.locator('wb-main-area-layout').isVisible();
   }
+
+  /**
+   * Indicates if the workbench is blocked by a dialog.
+   */
+  public async isWorkbenchBlocked(): Promise<boolean> {
+    return (await this.page.locator('.e2e-glasspane.e2e-workbench').count()) > 0;
+  }
+
+  /**
+   * Indicates if the specified view is blocked by a dialog.
+   */
+  public async isViewBlocked(viewId: ViewId | Promise<ViewId>): Promise<boolean> {
+    return (await this.page.locator(`.e2e-glasspane[data-viewid="${await viewId}"]`).count()) > 0;
+  }
+
+  /**
+   * Indicates if the specified dialog is blocked by a dialog.
+   */
+  public async isDialogBlocked(dialogId: string | Promise<string>): Promise<boolean> {
+    return (await this.page.locator(`.e2e-glasspane[data-dialogid="${await dialogId}"]`).count()) > 0;
+  }
+
+  /**
+   * Indicates if the specified popup is blocked by a dialog.
+   */
+  public async isPopupBlocked(popupId: string | Promise<string>): Promise<boolean> {
+    return (await this.page.locator(`.e2e-glasspane[data-popupid="${await popupId}"]`).count()) > 0;
+  }
 }
 
 /**

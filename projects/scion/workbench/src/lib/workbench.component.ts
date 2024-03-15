@@ -20,7 +20,7 @@ import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {combineLatest, lastValueFrom} from 'rxjs';
 import {first, map} from 'rxjs/operators';
-import {GLASS_PANE_BLOCKABLE, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective} from './glass-pane/glass-pane.directive';
+import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {Blockable} from './glass-pane/blockable';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-routes-registrator.service';
@@ -147,6 +147,10 @@ function configureWorkbenchGlassPane(): Provider[] {
           return inject(ElementRef);
         }
       },
+    },
+    {
+      provide: GLASS_PANE_OPTIONS,
+      useValue: {cssClass: 'e2e-workbench'} satisfies GlassPaneOptions,
     },
   ];
 }

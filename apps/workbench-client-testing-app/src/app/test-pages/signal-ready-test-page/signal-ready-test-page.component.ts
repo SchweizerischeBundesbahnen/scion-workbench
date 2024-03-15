@@ -9,13 +9,13 @@
  */
 
 import {Component, Optional} from '@angular/core';
-import {WorkbenchDialog, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
- * Component that signals readiness when a message is published to the topic `signal-ready/${viewId}` (view context) or `signal-ready/${popupCapabilityId}` (popup context)
+ * Component that signals readiness when a message is published to the topic `signal-ready/${viewId}` (view context) or `signal-ready/${capabilityId}` (popup, dialog or message box context)
  */
 @Component({
   selector: 'app-signal-ready-test-page',
@@ -24,8 +24,11 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class SignalReadyTestPageComponent {
 
-  constructor(@Optional() view: WorkbenchView, @Optional() popup: WorkbenchPopup, @Optional() dialog: WorkbenchDialog) {
-    this.installReadySignaler(view ?? popup ?? dialog);
+  constructor(@Optional() view: WorkbenchView,
+              @Optional() popup: WorkbenchPopup,
+              @Optional() dialog: WorkbenchDialog,
+              @Optional() messageBox: WorkbenchMessageBox) {
+    this.installReadySignaler(view ?? popup ?? dialog ?? messageBox);
   }
 
   private installReadySignaler(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | undefined): void {
