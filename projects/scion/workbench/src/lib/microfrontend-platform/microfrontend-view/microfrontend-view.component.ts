@@ -363,13 +363,12 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
  */
 function mapToMicrofrontendRouteSnapshot(): OperatorFunction<ActivatedRouteSnapshot, ActivatedMicrofrontendRouteSnapshot> {
   return switchMap((activatedRoute: ActivatedRouteSnapshot): Observable<ActivatedMicrofrontendRouteSnapshot> => {
-    const {viewCapabilityId, urlParams, transientParams, qualifier} = MicrofrontendViewRoutes.parseParams(activatedRoute);
+    const {viewCapabilityId, urlParams, transientParams} = MicrofrontendViewRoutes.parseParams(activatedRoute);
     return Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: viewCapabilityId}).pipe(map(capabilities => ({
       activatedRoute,
       params: {
         ...urlParams,
         ...transientParams,
-        ...qualifier, // qualifier entries have a higher precedence than parameters
         [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: viewCapabilityId, // capability ID cannot be overwritten.
       },
       viewCapability: capabilities[0],
