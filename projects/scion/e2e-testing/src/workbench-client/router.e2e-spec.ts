@@ -751,6 +751,7 @@ test.describe('Workbench Router', () => {
       properties: {
         path: 'test-pages/view-test-page/view1',
         title: 'Testee 1',
+        cssClass: 'testee-1',
       },
     });
 
@@ -760,17 +761,23 @@ test.describe('Workbench Router', () => {
       properties: {
         path: 'test-pages/view-test-page/view2',
         title: 'Testee 2',
+        cssClass: 'testee-2',
       },
     });
+
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+
+    const componentInstanceIds = new Set<string>();
 
     // navigate to testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.99');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
 
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
-    const componentInstanceIds = new Set<string>();
+    await expectView(testeeViewPage1).toBeActive();
 
     // capture the app instance id
     const appInstanceId = await testeeViewPage.getAppInstanceId();
@@ -779,13 +786,15 @@ test.describe('Workbench Router', () => {
     // navigate to the testee-2 view
     await routerPage.view.tab.click();
     await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.99');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
     await testeeViewPage.view.tab.click();
 
     // expect the correct view to display
-    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(expect.objectContaining({component: 'testee-2 [string]'}));
-    // expect no new view instance to be constructed
+    await expectView(testeeViewPage1).not.toBeAttached();
+    await expectView(testeeViewPage2).toBeActive();
+
+    // expect application not to start anew
     await expect.poll(() => testeeViewPage.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
     expect(componentInstanceIds.add(await testeeViewPage.getComponentInstanceId()).size).toEqual(2);
@@ -793,13 +802,14 @@ test.describe('Workbench Router', () => {
     // navigate to the testee-1 view
     await routerPage.view.tab.click();
     await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.99');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
     await testeeViewPage.view.tab.click();
 
     // expect the correct view to display
-    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(expect.objectContaining({component: 'testee-1 [string]'}));
-    // expect no new view instance to be constructed
+    await expectView(testeeViewPage1).toBeActive();
+    await expectView(testeeViewPage2).not.toBeAttached();
+    // expect application not to start anew
     await expect.poll(() => testeeViewPage.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
     expect(componentInstanceIds.add(await testeeViewPage.getComponentInstanceId()).size).toEqual(3);
@@ -807,13 +817,14 @@ test.describe('Workbench Router', () => {
     // navigate to the testee-2 view
     await routerPage.view.tab.click();
     await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.99');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
     await testeeViewPage.view.tab.click();
 
     // expect the correct view to display
-    await expect.poll(() => testeeViewPage.getViewParams()).toEqual(expect.objectContaining({component: 'testee-2 [string]'}));
-    // expect no new view instance to be constructed
+    await expectView(testeeViewPage1).not.toBeAttached();
+    await expectView(testeeViewPage2).toBeActive();
+    // expect application not to start anew
     await expect.poll(() => testeeViewPage.getAppInstanceId()).toEqual(appInstanceId);
     // expect a different component instance id
     expect(componentInstanceIds.add(await testeeViewPage.getComponentInstanceId()).size).toEqual(4);
@@ -2069,7 +2080,7 @@ test.describe('Workbench Router', () => {
     await expect(testeeView.tab.heading).toHaveText('Heading Param');
   });
 
-  test('should substitute multiple named parameters in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
+  test('should substitute named parameters in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
@@ -2082,8 +2093,8 @@ test.describe('Workbench Router', () => {
       ],
       properties: {
         path: 'test-pages/microfrontend-test-page',
-        title: ':param1/:param2/:param3 [component=:component]',
-        heading: ':param1 :param2 :param3 [component=:component]',
+        title: ':param1/:param2/:param3',
+        heading: ':param1 :param2 :param3',
         cssClass: 'testee',
       },
     });
@@ -2096,7 +2107,7 @@ test.describe('Workbench Router', () => {
     await routerPage.clickNavigate();
 
     const testeeView = appPO.view({cssClass: 'testee'});
-    await expect(testeeView.tab.title).toHaveText('value1/value2/:param3 [component=testee]');
-    await expect(testeeView.tab.heading).toHaveText('value1 value2 :param3 [component=testee]');
+    await expect(testeeView.tab.title).toHaveText('value1/value2/:param3');
+    await expect(testeeView.tab.heading).toHaveText('value1 value2 :param3');
   });
 });

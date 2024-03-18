@@ -42,22 +42,19 @@ export abstract class WorkbenchView {
   public abstract signalReady(): void;
 
   /**
-   * Observable containing the view capability that represents the microfrontend loaded into this workbench view.
+   * Provides the capability of the microfrontend loaded into the view.
    *
-   * Upon subscription, it emits the capability of the current microfrontend, and then emits continuously when navigating
-   * to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing the view
-   * or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before
-   * displaying another microfrontend.
+   * Upon subscription, emits the microfrontend's capability, and then emits continuously when navigating to a different microfrontend
+   * of the same application. It completes when navigating to a microfrontend of another application.
    */
   public abstract readonly capability$: Observable<WorkbenchViewCapability>;
 
   /**
-   * Observable containing the parameters including the qualifier as passed for navigation in {@link WorkbenchNavigationExtras.params}.
+   * Provides the parameters of the microfrontend loaded into the view.
    *
-   * Upon subscription, it emits the current params, and then emits continuously when they change. The Observable does not complete when
-   * navigating to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing the view or
-   * navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
-   * another microfrontend.
+   * Upon subscription, emits the microfrontend's parameters, and then emits continuously when the parameters change.
+   * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
+   * of the same application.
    */
   public abstract readonly params$: Observable<ReadonlyMap<string, any>>;
 

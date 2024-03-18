@@ -57,9 +57,8 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
 
     const intentParams = Dictionaries.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
-    const qualifier = Dictionaries.withoutUndefinedEntries(intent.qualifier!);
     const targets = this.resolveTargets(message, extras);
-    const routerNavigateCommand = extras.close ? [] : MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, qualifier, urlParams);
+    const routerNavigateCommand = extras.close ? [] : MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, urlParams);
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability, transientParams);
     const navigations = await Promise.all(Arrays.coerce(targets).map(target => {
