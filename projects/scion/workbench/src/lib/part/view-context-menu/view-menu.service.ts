@@ -118,7 +118,7 @@ export class ViewMenuService {
                 const modifierKeys = accelerator.slice(0, -1);
 
                 // Compare key.
-                if (event.key.toLowerCase() !== key.toLowerCase()) {
+                if (event.key?.toLowerCase() !== key.toLowerCase()) {
                   return false;
                 }
                 // Compare modifiers.
