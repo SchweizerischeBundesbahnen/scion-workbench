@@ -1,0 +1,24 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+
+  > sci-list {
+    flex: auto;
+  }
+
+  > div.list {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    > span.item {
+      cursor: pointer;
+
+      &.selected {
+        background-color: var(--sci-color-background-accent);
+      }
+    }
+  }
+}

@@ -16,6 +16,8 @@ import {WorkbenchView} from './workbench-view.model';
 import {PopupService} from '../popup/popup.service';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
+import {ɵWorkbenchSelectionService} from '../selection/ɵworkbench-selection.service';
+import {WorkbenchSelectionService} from '../selection/workbench-selection.service';
 
 /**
  * Configures an injector with providers that are aware of the specified view.
@@ -29,5 +31,7 @@ export function provideViewContext(view: ɵWorkbenchView | null | undefined): Pr
     {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
     ɵWorkbenchMessageBoxService,
     {provide: WorkbenchMessageBoxService, useExisting: ɵWorkbenchMessageBoxService},
+    ɵWorkbenchSelectionService,
+    {provide: WorkbenchSelectionService, useExisting: ɵWorkbenchSelectionService},
   ];
 }

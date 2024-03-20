@@ -19,6 +19,7 @@ import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {SettingsService} from './settings.service';
+import {ActiveWorkbenchElementTracker} from '../../../../projects/scion/workbench/src/lib/workbench-active-element-tracker.service';
 
 @Component({
   selector: 'app-root',
@@ -50,6 +51,8 @@ export class AppComponent implements DoCheck {
   protected navigationId: string | undefined;
 
   constructor(settingsService: SettingsService,
+              activeElementTracker: ActiveWorkbenchElementTracker,
+              workbenchService: WorkbenchService,
               private _router: Router,
               private _zone: NgZone,
               private _workbenchService: WorkbenchService,

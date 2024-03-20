@@ -1,0 +1,8 @@
+<header>{{ selectedItems().length }} item(s) selected</header>
+<sci-viewport>
+  @for (selectedItem of selectedItems(); track selectedItem) {
+    <sci-key-value [object]="selectedItem"/>
+  } @empty {
+    <span>properties not available</span>
+  }
+</sci-viewport>

@@ -24,6 +24,7 @@ import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.mode
 import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
 import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
+import {WorkbenchSelectionManagerService} from './selection/workbench-selection-manager.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -41,7 +42,8 @@ export class ɵWorkbenchService implements WorkbenchService {
               private _partActionRegistry: WorkbenchPartActionRegistry,
               private _viewRegistry: WorkbenchViewRegistry,
               private _perspectiveService: WorkbenchPerspectiveService,
-              private _workbenchThemeSwitcher: WorkbenchThemeSwitcher) {
+              private _workbenchThemeSwitcher: WorkbenchThemeSwitcher,
+              private _workbenchSelectionService: WorkbenchSelectionManagerService) {
     this.perspectives$ = this._perspectiveRegistry.perspectives$;
     this.parts$ = this._partRegistry.parts$;
     this.views$ = this._viewRegistry.views$;

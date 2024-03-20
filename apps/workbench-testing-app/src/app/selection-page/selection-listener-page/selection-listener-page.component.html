@@ -1,0 +1,9 @@
+@if (!isSubscribed) {
+  <button (click)="onSubscribe()" class="e2e-subscribe" sci-primary>Subscribe</button>
+} @else {
+  <button (click)="onUnsubscribe()" class="e2e-unsubscribe" sci-primary>Unsubscribe</button>
+}
+
+@if (workbenchSelection !== undefined) {
+  <div class="selection e2e-selection">{{ workbenchSelection | json }}</div>
+}

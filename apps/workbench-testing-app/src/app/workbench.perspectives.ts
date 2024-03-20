@@ -45,6 +45,11 @@ export const Perspectives = {
         data: {[PerspectiveData.label]: 'Debug'},
       },
       {
+        id: 'selection',
+        layout: provideSelectionPerspectiveLayout,
+        data: {[PerspectiveData.label]: 'Selection'},
+      },
+      {
         id: 'empty',
         layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
         data: {[PerspectiveData.label]: 'Empty'},
@@ -81,6 +86,10 @@ export const Perspectives = {
           {path: '', outlet: 'servers', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
           {path: '', outlet: 'progress', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
           {path: '', outlet: 'git-staging', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
+          {path: '', outlet: 'list', loadComponent: () => import('./selection-module/selection-list-page.component'), data: {[WorkbenchRouteData.title]: 'List'}},
+          {path: '', outlet: 'properties', loadComponent: () => import('./selection-module/properties-page.component'), data: {[WorkbenchRouteData.title]: 'Properties'}},
+          {path: '', outlet: 'selection', loadComponent: () => import('./selection-page/selection-page.component'), data: {[WorkbenchRouteData.title]: 'Selection'}},
+          {path: '', outlet: 'inspect-selection', loadComponent: () => import('./selection-page/selection-inspect-page/selection-inspect-page.component'), data: {[WorkbenchRouteData.title]: 'Inspect Selection'}},
         ]  satisfies Routes,
       },
     ]);
@@ -147,4 +156,41 @@ function provideDebugPerspectiveLayout(factory: WorkbenchLayoutFactory): Workben
     .activateView('debug')
     .activateView('console')
     .activateView('variables');
+}
+
+/** @private */
+function provideSelectionPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout { // eslint-disable-line no-inner-declarations
+  return factory
+    .addPart('left-top')
+    .addPart('left-middle', {align: 'bottom', relativeTo: 'left-top', ratio: .5})
+    .addPart('left-bottom', {align: 'bottom', relativeTo: 'left-middle', ratio: .5})
+    .addPart('middle-top', {align: 'right', ratio: .4})
+    .addPart('middle-bottom', {align: 'bottom', relativeTo: 'middle-top', ratio: .5})
+    .addPart('right-top', {align: 'right', ratio: .4})
+    .addPart('right-bottom-1', {align: 'bottom', relativeTo: 'right-top', ratio: .5})
+    .addPart('right-bottom-2', {align: 'right', relativeTo: 'right-bottom-1', ratio: .5})
+    .addView('list-1', {partId: 'left-top'})
+    .addView('list-2', {partId: 'left-middle'})
+    .addView('properties', {partId: 'left-bottom'})
+    .addView('selection-provider-1', {partId: 'middle-top'})
+    .addView('selection-provider-2', {partId: 'middle-bottom'})
+    .addView('inspect-selection', {partId: 'right-top'})
+    .addView('selection-listener-1', {partId: 'right-bottom-1'})
+    .addView('selection-listener-2', {partId: 'right-bottom-2'})
+    .navigateView('list-1', [], {outlet: 'list'})
+    .navigateView('list-2', [], {outlet: 'list'})
+    .navigateView('properties', [], {outlet: 'properties'})
+    .navigateView('selection-provider-1', [], {outlet: 'selection'})
+    .navigateView('selection-provider-2', [], {outlet: 'selection'})
+    .navigateView('inspect-selection', [], {outlet: 'inspect-selection'})
+    .navigateView('selection-listener-1', [], {outlet: 'selection'})
+    .navigateView('selection-listener-2', [], {outlet: 'selection'})
+    .activateView('list-1')
+    .activateView('list-2')
+    .activateView('properties')
+    .activateView('selection-provider-1')
+    .activateView('selection-provider-2')
+    .activateView('inspect-selection')
+    .activateView('selection-listener-1')
+    .activateView('selection-listener-2');
 }

@@ -97,6 +97,11 @@ export const routes: Routes = [
     },
   },
   {
+    path: 'test-selection',
+    loadComponent: () => import('./selection-page/selection-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Workbench Selection', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-selection', pinToStartPage: true},
+  },
+  {
     path: 'test-perspective',
     loadComponent: () => import('./perspective-page/perspective-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Perspective', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-perspective', pinToStartPage: true},

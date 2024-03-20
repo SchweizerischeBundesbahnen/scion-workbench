@@ -22,6 +22,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe} from '@angular/common';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
+import {WorkbenchSelectionService} from '../selection/workbench-selection.service';
 
 /**
  * Is the graphical representation of a workbench view.
@@ -84,6 +85,7 @@ export class ViewComponent implements OnDestroy {
               private _logger: Logger,
               private _host: ElementRef<HTMLElement>,
               private _viewDragService: ViewDragService,
+              private _selectionService: WorkbenchSelectionService,
               viewContextMenuService: ViewMenuService) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
 
@@ -121,6 +123,7 @@ export class ViewComponent implements OnDestroy {
     this._view.classList.remove({scope: 'application'});
     this._view.classList.remove({scope: 'route'});
     this._view.classList.remove({scope: 'navigation'});
+    this._selectionService.deleteSelection();
   }
 
   public ngOnDestroy(): void {

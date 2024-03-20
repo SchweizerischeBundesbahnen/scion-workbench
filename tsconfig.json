@@ -17,7 +17,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "useDefineForClassFields": false,
     "lib": [
       "ES2022",
@@ -48,7 +48,7 @@
     //      ],
     //      "@scion/workbench-client": [
     //        "./projects/scion/workbench-client/src/public-api"
-    //      ],
+    //      ]
     //      //      "@scion/microfrontend-platform": [
     //      //        "../scion-microfrontend-platform/projects/scion/microfrontend-platform/src/public-api"
     //      //      ],
