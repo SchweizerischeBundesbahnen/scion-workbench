@@ -29,13 +29,4 @@ export const WorkbenchRouteData = {
    * Key to associate CSS class(es) with a view in {@link Route.data}, useful in end-to-end tests for locating views and view tabs.
    */
   cssClass: 'ɵworkbenchViewCssClass',
-
-  /**
-   * Key for reading view-specific navigational state from {@link ActivatedRoute.data}.
-   *
-   * The state object contains user-defined state passed to navigation extras.
-   *
-   * @see WorkbenchNavigationalState
-   */
-  state: 'ɵworkbenchViewState',
 } as const;

@@ -16,30 +16,21 @@
   </sci-form-field>
 </section>
 
-<sci-accordion class="e2e-route-params" variant="solid" *ngIf="route.params | async | appNullIfEmpty as params">
+<sci-accordion class="e2e-params" variant="solid" *ngIf="route.params | async | appNullIfEmpty as params">
   <ng-template sciAccordionItem [panel]="panel_route_params">
     <header>Route Params</header>
   </ng-template>
   <ng-template #panel_route_params>
-    <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
+    <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"></sci-key-value>
   </ng-template>
 </sci-accordion>
 
-<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
-  <ng-template sciAccordionItem [panel]="panel_route_query_params">
-    <header>Route Query Params</header>
+<sci-accordion class="e2e-state" variant="solid" *ngIf="view.state | appNullIfEmpty as state">
+  <ng-template sciAccordionItem [panel]="panel_view_state">
+    <header>View State</header>
   </ng-template>
-  <ng-template #panel_route_query_params>
-    <sci-key-value [object]="params" class="e2e-route-query-params"></sci-key-value>
-  </ng-template>
-</sci-accordion>
-
-<sci-accordion class="e2e-navigational-state" variant="solid" *ngIf="route.data | async | appPluck:WorkbenchRouteData.state as state">
-  <ng-template sciAccordionItem [panel]="panel_navigational_state">
-    <header>Navigational State</header>
-  </ng-template>
-  <ng-template #panel_navigational_state>
-    <sci-key-value [object]="$any(state)" class="e2e-navigational-state"></sci-key-value>
+  <ng-template #panel_view_state>
+    <sci-key-value [object]="state | appAppendParamDataType" class="e2e-state"></sci-key-value>
   </ng-template>
 </sci-accordion>
 

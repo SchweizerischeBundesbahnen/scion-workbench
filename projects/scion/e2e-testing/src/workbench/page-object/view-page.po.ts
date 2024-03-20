@@ -17,6 +17,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
+import {ViewState} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.
@@ -37,11 +38,28 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
-  public async getRouteParams(): Promise<Params> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-params'));
+  public async getParams(): Promise<Params> {
+    if (await this.locator.locator('sci-accordion.e2e-params').isHidden()) {
+      return {};
+    }
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-params'));
     await accordion.expand();
     try {
-      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-route-params')).readEntries();
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-params')).readEntries();
+    }
+    finally {
+      await accordion.collapse();
+    }
+  }
+
+  public async getState(): Promise<ViewState> {
+    if (await this.locator.locator('sci-accordion.e2e-state').isHidden()) {
+      return {};
+    }
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-state'));
+    await accordion.expand();
+    try {
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-state')).readEntries();
     }
     finally {
       await accordion.collapse();

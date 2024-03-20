@@ -13,10 +13,10 @@ import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {convertValueFromUI} from '../common/convert-value-from-ui.util';
 import {NgIf} from '@angular/common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {parseTypedObject} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-router-page',
@@ -54,10 +54,7 @@ export default class RouterPageComponent {
     this.navigateError = undefined;
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
-    const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
-
-    // Convert entered params to their actual values.
-    params && Object.entries(params).forEach(([paramName, paramValue]) => params[paramName] = convertValueFromUI(paramValue));
+    const params = parseTypedObject(SciKeyValueFieldComponent.toDictionary(this.form.controls.params));
 
     const extras: WorkbenchNavigationExtras = {
       activate: this.form.controls.activate.value,

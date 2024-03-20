@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {CanActivateFn, CanDeactivateFn, Data, PRIMARY_OUTLET, ResolveData, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
+import {CanActivateFn, CanDeactivateFn, Data, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
@@ -35,7 +35,6 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
           canActivate: [...(config.canActivate || []), ...(primaryRoute.canActivate || [])],
           canDeactivate: [...(config.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
           data: {...primaryRoute.data, ...config.data},
-          resolve: {...primaryRoute.resolve, ...config.resolve},
         }));
       }));
 
@@ -76,10 +75,9 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
  * Controls the creation of auxiliary routes for a named router outlet.
  */
 export interface OutletAuxiliaryRouteConfig {
-  canDeactivate?: CanDeactivateFn<any>[];
   canActivate?: CanActivateFn[];
+  canDeactivate?: CanDeactivateFn<any>[];
   data?: Data;
-  resolve?: ResolveData;
 }
 
 /**

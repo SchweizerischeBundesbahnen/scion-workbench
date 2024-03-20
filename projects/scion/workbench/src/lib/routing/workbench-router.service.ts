@@ -9,7 +9,7 @@
  */
 
 import {ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
-import {Defined, Dictionary} from '@scion/toolkit/util';
+import {Defined, Dictionaries} from '@scion/toolkit/util';
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
@@ -20,6 +20,7 @@ import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from './workbench-navigational-states';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {Commands, ViewState, ViewStates} from './routing.model';
 
 /**
  * Provides workbench view navigation capabilities based on Angular Router.
@@ -141,7 +142,7 @@ export class WorkbenchRouter implements OnDestroy {
           activateView: extras.activate ?? true,
         }),
         viewOutlets: commands.length ? {[viewId]: commands} : {},
-        viewStates: {[viewId]: {[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass}},
+        viewStates: {[viewId]: Dictionaries.withoutUndefinedEntries({[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass})},
       };
     }
 
@@ -154,7 +155,7 @@ export class WorkbenchRouter implements OnDestroy {
       return {
         layout: activateView ? navigation.layout.activateView(viewId) : navigation.layout,
         viewOutlets: {...navigation.viewOutlets, ...(commands.length ? {[viewId]: commands} : {})},
-        viewStates: {...navigation.viewStates, [viewId]: {[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass}},
+        viewStates: {...navigation.viewStates, [viewId]: Dictionaries.withoutUndefinedEntries({[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass})},
       };
     }
 
@@ -463,13 +464,13 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   blankInsertionIndex?: number | 'start' | 'end';
   /**
-   * State that will be passed to the navigation.
+   * Associates state with a view navigation.
    *
-   * See {@link NavigationExtras#state} for detailed instructions on how to access passed state during and after the navigation.
+   * State is written to the browser session history, not to the URL, so will be lost on page reload.
    *
-   * In addition, the workbench router makes state available to the routed component as resolved data under the key {@link WorkbenchRouteData.state}.
+   * State can be read from {@link WorkbenchView.state}, or the browser's session history via `history.state`.
    */
-  state?: Dictionary;
+  state?: ViewState;
   /**
    * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
    * CSS class(es) will not be added to the browser URL, consequently will not survive a page reload.
@@ -499,20 +500,6 @@ export interface WorkbenchNavigationContext {
 }
 
 /**
- * An array of URL fragments with which to construct a view's URL.
- *
- * If the path is static, can be the literal URL string. For a dynamic path, pass an array of path segments,
- * followed by the parameters for each segment.
- *
- * The last segment allows adding matrix parameters in the form of a dictionary to provide additional data along
- * with the URL. Matrix parameters do not affect route resolution. In the routed component, matrix parameters are
- * available in {@link ActivatedRoute#params}.
- *
- * Example command array with 'details' as matrix parameter: `['user', userName, {details: true}]`,
- */
-export type Commands = any[];
-
-/**
  * Information about a workbench navigation operation.
  */
 export interface WorkbenchNavigation {
@@ -527,7 +514,7 @@ export interface WorkbenchNavigation {
    */
   viewOutlets?: {[outlet: string]: Commands | null};
   /**
-   * State to be passed to the routed component as resolved data under the key {@link WorkbenchRouteData.state}.
+   * View states to be associated with the navigation.
    */
-  viewStates?: {[outlet: string]: Dictionary};
+  viewStates?: ViewStates;
 }

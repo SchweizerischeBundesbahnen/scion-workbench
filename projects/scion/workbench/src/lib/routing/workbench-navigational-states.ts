@@ -8,8 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Dictionary} from '@scion/toolkit/util';
-import {Navigation, NavigationExtras} from '@angular/router';
+import {Navigation, NavigationExtras, Router} from '@angular/router';
+import {ViewState, ViewStates} from './routing.model';
+import {inject} from '@angular/core';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 
 /**
  * Provides methods to associate {@link WorkbenchNavigationalState} with a navigation.
@@ -21,6 +23,16 @@ export const WorkbenchNavigationalStates = {
    */
   fromNavigation: (navigation: Navigation): WorkbenchNavigationalState | null => {
     return navigation.extras?.state?.[WORKBENCH_NAVIGATION_STATE_KEY] ?? null;
+  },
+
+  /**
+   * Resolves navigational state associated with a view.
+   *
+   * TODO [WB-LAYOUT] Remove when migrated to the new Router API as state is retained in layout.
+   */
+  resolveViewState: (viewId: string): ViewState | undefined => {
+    const currentNavigation = inject(Router).getCurrentNavigation();
+    return (currentNavigation && WorkbenchNavigationalStates.fromNavigation(currentNavigation)?.viewStates[viewId]) ?? inject(WorkbenchViewRegistry).get(viewId, {orElse: null})?.state;
   },
 
   /**
@@ -49,12 +61,9 @@ export interface WorkbenchNavigationalState {
    */
   maximized: boolean;
   /**
-   * View state to be associated with the navigation.
-   * View state can be read from {@link ActivatedRoute.data} using the key {@link WorkbenchRouteData.state}.
+   * View states to be associated with the navigation.
    */
-  viewStates: {
-    [viewId: string]: Dictionary;
-  };
+  viewStates: ViewStates;
 }
 
 /**

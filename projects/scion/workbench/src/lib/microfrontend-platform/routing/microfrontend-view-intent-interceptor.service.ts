@@ -12,11 +12,10 @@ import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchNavigationExtras, WorkbenchViewCapability} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {MicrofrontendViewRoutes} from './microfrontend-routes';
+import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
-import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 
@@ -59,7 +58,7 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
     const intentParams = Dictionaries.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
     const targets = this.resolveTargets(message, extras);
-    const routerNavigateCommand = extras.close ? [] : MicrofrontendViewRoutes.buildRouterNavigateCommand(viewCapability.metadata!.id, urlParams);
+    const routerNavigateCommand = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability, transientParams);
     const navigations = await Promise.all(Arrays.coerce(targets).map(target => {
@@ -69,9 +68,9 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
         close: extras.close,
         blankInsertionIndex: extras.blankInsertionIndex,
         cssClass: extras.cssClass,
-        state: {
-          [MicrofrontendNavigationalStates.transientParams]: transientParams,
-        },
+        state: Dictionaries.withoutUndefinedEntries({
+          [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
+        }),
       });
     }));
     return navigations.every(Boolean);

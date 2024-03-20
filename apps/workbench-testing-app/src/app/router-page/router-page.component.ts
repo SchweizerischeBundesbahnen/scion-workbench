@@ -19,6 +19,7 @@ import {AsyncPipe, NgFor, NgIf, NgTemplateOutlet} from '@angular/common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {parseTypedObject} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-router-page',
@@ -42,7 +43,7 @@ export default class RouterPageComponent {
   public form = this._formBuilder.group({
     path: this._formBuilder.control(''),
     matrixParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    navigationalState: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    state: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     target: this._formBuilder.control(''),
     blankPartId: this._formBuilder.control(''),
     insertionIndex: this._formBuilder.control(''),
@@ -120,7 +121,7 @@ export default class RouterPageComponent {
       target: this.form.controls.target.value || undefined,
       blankPartId: this.form.controls.blankPartId.value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
-      state: SciKeyValueFieldComponent.toDictionary(this.form.controls.navigationalState) ?? undefined,
+      state: parseTypedObject(SciKeyValueFieldComponent.toDictionary(this.form.controls.state)) ?? undefined,
       cssClass: this.form.controls.cssClass.value?.split(/\s+/).filter(Boolean),
     };
   }

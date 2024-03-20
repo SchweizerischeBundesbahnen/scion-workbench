@@ -5,8 +5,8 @@
        wbGlassPane>
     <sci-router-outlet #router_outlet
                        [name]="view.id"
-                       [attr.data-capabilityid]="viewCapability?.metadata!.id"
-                       [attr.data-app]="viewCapability?.metadata!.appSymbolicName"
+                       [attr.data-capabilityid]="capability?.metadata!.id"
+                       [attr.data-app]="capability?.metadata!.appSymbolicName"
                        [ngClass]="view.cssClasses"
                        (focuswithin)="onFocusWithin($event)"
                        [keystrokes]="keystrokesToBubble$ | async">

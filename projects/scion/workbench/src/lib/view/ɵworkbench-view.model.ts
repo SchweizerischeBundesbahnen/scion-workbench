@@ -37,6 +37,8 @@ import {provideViewContext} from './view-context-provider';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
+import {ViewState} from '../routing/routing.model';
+import {WorkbenchNavigationalStates} from '../routing/workbench-navigational-states';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -64,6 +66,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public dirty = false;
   public scrollTop = 0;
   public scrollLeft = 0;
+  public state: ViewState = {};
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly cssClasses$ = new BehaviorSubject<string[]>([]);
@@ -105,6 +108,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
     const partId = layout.part({by: {viewId: this.id}}).id;
     this._part$.next(this._partRegistry.get(partId));
+    this.state = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!)?.viewStates[this.id] ?? this.state ?? {};
   }
 
   public get first(): boolean {

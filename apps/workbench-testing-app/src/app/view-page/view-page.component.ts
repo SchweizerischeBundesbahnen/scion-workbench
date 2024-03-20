@@ -17,7 +17,6 @@ import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
 import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
-import {PluckPipe} from '../common/pluck.pipe';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JoinPipe} from '../common/join.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -25,6 +24,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 
 @Component({
   selector: 'app-view-page',
@@ -44,10 +44,9 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
     SciAccordionComponent,
     SciAccordionItemDirective,
     SciKeyValueComponent,
-    PluckPipe,
-    PluckPipe,
     NullIfEmptyPipe,
     JoinPipe,
+    AppendParamDataTypePipe,
   ],
 })
 export default class ViewPageComponent {
@@ -73,7 +72,6 @@ export default class ViewPageComponent {
       );
 
     this.installViewActiveStateLogger();
-    this.installNavigationalStateLogger();
   }
 
   private parsePartActions(): WorkbenchPartActionDescriptor[] {
@@ -99,14 +97,6 @@ export default class ViewPageComponent {
         else {
           console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
         }
-      });
-  }
-
-  private installNavigationalStateLogger(): void {
-    this.route.data
-      .pipe(takeUntilDestroyed())
-      .subscribe(data => {
-        console.debug(`[ActivatedRouteDataChange] [viewId=${this.view.id}, state=${JSON.stringify(data[WorkbenchRouteData.state])}]`);
       });
   }
 }

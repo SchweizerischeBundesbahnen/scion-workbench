@@ -11,7 +11,7 @@
 import {Component, inject, Injector, OnDestroy, StaticProvider} from '@angular/core';
 import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
 import {RouterUtils} from '../../routing/router.util';
-import {Commands} from '../../routing/workbench-router.service';
+import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
 import {Popup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';

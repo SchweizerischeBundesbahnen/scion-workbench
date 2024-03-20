@@ -14,7 +14,7 @@ import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-p
 import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
+import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
@@ -25,7 +25,7 @@ import {MicrofrontendPopupIntentInterceptor} from './microfrontend-popup/microfr
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
-import {MicrofrontendViewRoutes} from './routing/microfrontend-routes';
+import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
 import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
 import {Defined} from '@scion/toolkit/util';
@@ -73,7 +73,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     MicrofrontendPopupCapabilityInterceptor,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
-    provideMicrofrontendRoutes(),
+    provideMicrofrontendRoute(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
   ]);
@@ -120,30 +120,17 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
 }
 
 /**
- * Provides routes used for the integration of microfrontends.
+ * Provides the route for integrating microfrontends.
  */
-function provideMicrofrontendRoutes(): EnvironmentProviders {
-  // Define route for embedding the microfrontend of a view capability.
-  const viewMicrofrontendRoute: Route = {
-    /*
-     * Format: '~;{qualifier}/<viewCapabilityId>;{params}'
-     *  - '{qualifier}' as matrix params of the first URL segment (~)
-     *  - '{params}' as matrix params of the second URL segment (viewCapabilityId)
-     */
-    path: `${MicrofrontendViewRoutes.ROUTE_PREFIX}/:${ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID}`,
-    component: MicrofrontendViewComponent,
-    /*
-     * In the microfrontend view integration, parameters can be marked as 'transient'. Transient parameters are not added as matrix
-     * parameters to the URL but passed via navigational state to the component by {@link NavigationStateResolver}. The component can
-     * access transient params as resolved data via `ActivatedRoute.data[WorkbenchRouteData.state][MicrofrontendNavigationalStates.transientParams]`.
-     *
-     * However, by default, the Angular router only runs resolvers when the route's path or matrix parameters change. For this reason, we configure
-     * the microfrontend route to always run resolvers, allowing the update of transient parameters without URL change.
-     */
-    runGuardsAndResolvers: 'always',
-  };
-
+function provideMicrofrontendRoute(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    {provide: ROUTES, multi: true, useValue: viewMicrofrontendRoute},
+    {
+      provide: ROUTES,
+      multi: true,
+      useFactory: (): Route => ({
+        matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
+        component: MicrofrontendViewComponent,
+      }),
+    },
   ]);
 }
