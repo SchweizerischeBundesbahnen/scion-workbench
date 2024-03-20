@@ -18,6 +18,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
 import {MicrofrontendNavigationalStates} from './microfrontend-navigational-states';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 
 /**
  * Handles microfrontend view intents, instructing the Workbench Router to navigate to the microfrontend of given view capabilities.
@@ -105,20 +106,20 @@ export class MicrofrontendViewIntentInterceptor implements IntentInterceptor {
 
     const viewIds = this._viewRegistry.views
       .filter(view => {
-        if (!MicrofrontendViewRoutes.isMicrofrontendRoute(view.urlSegments)) {
+        const microfrontendWorkbenchView = view.adapt(MicrofrontendWorkbenchView);
+        if (!microfrontendWorkbenchView) {
           return false;
         }
 
         // Test whether the capability matches.
-        const viewParams = MicrofrontendViewRoutes.parseParams(view.urlSegments);
-        if (viewParams.viewCapabilityId !== intentMessage.capability.metadata!.id) {
+        if (microfrontendWorkbenchView.capability.metadata!.id !== intentMessage.capability.metadata!.id) {
           return false;
         }
 
         // Test whether all "navigational" params match.
         return requiredParams.every(name => {
-          const intentParam = intentMessage.intent.params!.get(name);
-          return (matchWildcardParams && intentParam === '*') || intentParam === viewParams.urlParams[name];
+          const intentParamValue = intentMessage.intent.params!.get(name);
+          return (matchWildcardParams && intentParamValue === '*') || intentParamValue === microfrontendWorkbenchView.params[name];
         });
       })
       .map(view => view.id);

@@ -9,15 +9,15 @@
  */
 
 import {Injectable, OnDestroy} from '@angular/core';
-import {ManifestService, Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
+import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
 import {Logger} from '../../logging';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {map, switchMap} from 'rxjs/operators';
-import {WorkbenchCapabilities, WorkbenchViewCapability, ɵWorkbenchCommands} from '@scion/workbench-client';
+import {ɵWorkbenchCommands} from '@scion/workbench-client';
 import {merge, Subscription} from 'rxjs';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 
 /**
  * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.
@@ -27,14 +27,11 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendViewCommandHandler implements OnDestroy {
 
-  private _viewCapabilities = new Map<string, WorkbenchViewCapability>();
   private _subscriptions = new Set<Subscription>();
 
   constructor(private _messageClient: MessageClient,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _manifestService: ManifestService,
               private _logger: Logger) {
-    this.installViewCapabilityObserver();
     this.installViewActiveStatePublisher();
 
     this._subscriptions.add(this.installViewTitleCommandHandler());
@@ -119,14 +116,6 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     });
   }
 
-  private installViewCapabilityObserver(): void {
-    this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
-      .pipe(takeUntilDestroyed())
-      .subscribe(viewCapabilities => {
-        this._viewCapabilities = viewCapabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, WorkbenchViewCapability>());
-      });
-  }
-
   /**
    * Runs the given runnable only if the microfrontend displayed in the view is actually provided by the sender,
    * thus preventing other apps from updating other apps' views.
@@ -134,26 +123,12 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   private runIfPrivileged(viewId: string, message: Message, runnable: (view: WorkbenchView) => void): void {
     const view = this._viewRegistry.get(viewId);
     const sender = message.headers.get(MessageHeaders.AppSymbolicName);
-    if (this.isMicrofrontendProvider(sender, view)) {
+    if (view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.appSymbolicName === sender) {
       runnable(view);
     }
     else {
       this._logger.warn('[NotPrivilegedError] Microfrontend not allowed to update views of other apps.');
     }
-  }
-
-  /**
-   * Tests whether the sender provides the microfrontend displayed in the view.
-   */
-  private isMicrofrontendProvider(sender: string, view: WorkbenchView): boolean {
-    const viewCapabilityId = MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId;
-    const viewCapability = this._viewCapabilities.get(viewCapabilityId);
-    if (!viewCapability) {
-      this._logger.error(`Unexpected Error: [NullCapabilityError] No view capability for '${viewCapabilityId}' found.`);
-      return false;
-    }
-
-    return viewCapability.metadata!.appSymbolicName === sender;
   }
 
   public ngOnDestroy(): void {

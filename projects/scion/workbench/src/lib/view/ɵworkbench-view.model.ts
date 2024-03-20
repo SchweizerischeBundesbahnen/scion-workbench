@@ -22,7 +22,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {inject} from '@angular/core';
+import {AbstractType, inject, Type} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -53,6 +53,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _part$ = new BehaviorSubject<ɵWorkbenchPart | undefined>(undefined);
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _scrolledIntoView$ = new BehaviorSubject<boolean>(true);
+  private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
   private readonly _destroyRef = new ɵDestroyRef();
 
   private _activationInstant: number | undefined;
@@ -245,6 +246,30 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         this._menuItemProviders$.next(this._menuItemProviders$.value.filter(it => it !== factoryFn));
       },
     };
+  }
+
+  /**
+   * Registers an adapter for this view, replacing any previously registered adapter of the same type.
+   *
+   * Adapters enable loosely coupled extension of an object, allowing one object to be adapted to another.
+   */
+  public registerAdapter<T>(adapterType: AbstractType<T> | Type<T>, object: T): void {
+    this._adapters.set(adapterType, object);
+  }
+
+  /**
+   * Unregisters the given adapter. Has no effect if not registered.
+   */
+  public unregisterAdapter(adapterType: AbstractType<unknown> | Type<unknown>): void {
+    this._adapters.delete(adapterType);
+  }
+
+  /**
+   * Adapts this object to the specified type. Returns `null` if no such object can be found.
+   */
+  public adapt<T>(adapterType: AbstractType<T> | Type<T>): T | null {
+    const adapter = this._adapters.get(adapterType);
+    return adapter ? adapter as T : null;
   }
 
   public get destroyed(): boolean {

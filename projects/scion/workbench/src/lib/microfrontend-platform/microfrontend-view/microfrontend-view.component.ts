@@ -38,6 +38,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import '../microfrontend-platform.config';
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
+import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -157,6 +158,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     // Check if navigating to a new microfrontend.
     if (!prevViewCapability || prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
       this.viewCapability = viewCapability;
+      this.view.registerAdapter(MicrofrontendWorkbenchView, new MicrofrontendWorkbenchView(viewCapability, params));
       this.setViewProperties(viewCapability, activatedRoute, params);
       this.installParamsUpdater(viewCapability);
     }
@@ -355,6 +357,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true}).then();
     this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true}).then();
     this._outletRouter.navigate(null, {outlet: this.view.id}).then();
+    this.view.unregisterAdapter(MicrofrontendWorkbenchView);
   }
 }
 

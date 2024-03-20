@@ -20,8 +20,8 @@ import {Arrays, Maps} from '@scion/toolkit/util';
 import {PopupService} from '../../popup/popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
+import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 
 /**
  * Handles microfrontend popup intents, instructing the Workbench {@link PopupService} to navigate to the microfrontend of a given popup capability.
@@ -127,13 +127,9 @@ export class MicrofrontendPopupIntentInterceptor implements IntentInterceptor {
     }
 
     const view = this._viewRegistry.get(command.context.viewId);
-    if (!MicrofrontendViewRoutes.isMicrofrontendRoute(view.urlSegments)) {
-      return {viewId: view.id};
-    }
-
     return {
       viewId: view.id,
-      viewCapabilityId: MicrofrontendViewRoutes.parseParams(view.urlSegments).viewCapabilityId,
+      viewCapabilityId: view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.id,
     };
   }
 }
