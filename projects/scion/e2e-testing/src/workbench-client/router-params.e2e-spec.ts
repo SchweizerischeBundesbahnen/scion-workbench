@@ -41,7 +41,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-      id: '123 [string]',
+      id: '123',
     });
   });
 
@@ -78,13 +78,13 @@ test.describe('Workbench Router', () => {
 
     // expect named params to be substituted
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-      segment1: 'SEG1 [string]',
-      segment2: 'SEG2 [string]',
-      mp1: 'MP1 [string]',
-      mp2: 'MP2 [string]',
-      qp1: 'QP1 [string]',
-      qp2: 'QP2 [string]',
-      fragment: 'FRAGMENT [string]',
+      segment1: 'SEG1',
+      segment2: 'SEG2',
+      mp1: 'MP1',
+      mp2: 'MP2',
+      qp1: 'QP1',
+      qp2: 'QP2',
+      fragment: 'FRAGMENT',
     });
     await expect.poll(() => testeeViewPage.getRouteParams()).toEqual({segment1: 'SEG1', segment2: 'SEG2', mp1: 'MP1', mp2: 'MP2'});
     await expect.poll(() => testeeViewPage.getRouteQueryParams()).toEqual({qp1: 'QP1', qp2: 'QP2'});
@@ -131,7 +131,7 @@ test.describe('Workbench Router', () => {
 
     // expect the view's params to be updated
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-      id: '456 [string]',
+      id: '456',
     });
     // expect no new view instance to be constructed
     await expect.poll(() => testeeViewPage.getComponentInstanceId()).toEqual(testeeComponentInstanceId);
@@ -167,7 +167,7 @@ test.describe('Workbench Router', () => {
 
     // expect the optional parameter with value `null` to be contained in view params
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-      id: 'null [string]',
+      id: 'null',
     });
   });
 
@@ -204,7 +204,7 @@ test.describe('Workbench Router', () => {
     const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-      id: '123 [string]',
+      id: '123',
     });
     await expect.poll(() => testeeViewPage.getViewParams()).not.toMatchObject({param1: expect.anything()});
   });
@@ -225,9 +225,9 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (a) [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
       });
       // expect the component to be the same instance
       await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -240,9 +240,9 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param1: expect.stringMatching('PARAM 1')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param2: expect.stringMatching('PARAM 2')});
@@ -266,9 +266,9 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (a) [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
       });
       // expect the component to be the same instance
       await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -281,9 +281,9 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param1: expect.stringMatching('PARAM 1')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param2: expect.stringMatching('PARAM 2')});
@@ -306,9 +306,9 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (a) [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
       });
       // expect the component to be the same instance
       await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -321,11 +321,11 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param3: expect.stringMatching('PARAM 3 (a)')});
       // expect the component to be the same instance
@@ -346,11 +346,11 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
     });
 
@@ -371,7 +371,7 @@ test.describe('Workbench Router', () => {
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param2: expect.stringMatching('PARAM 2')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param3: expect.stringMatching('PARAM 3')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param4: expect.stringMatching('PARAM 4')});
-      await expect.poll(() => viewPage.getViewParams()).toMatchObject({param5: 'PARAM 5 [string]'});
+      await expect.poll(() => viewPage.getViewParams()).toMatchObject({param5: 'PARAM 5'});
     });
 
     test('should remove params having `undefined` as value [paramsHandling=replace]', async ({appPO, microfrontendNavigator}) => {
@@ -386,8 +386,8 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param3: 'PARAM 3 [string]',
+        param1: 'PARAM 1',
+        param3: 'PARAM 3',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param2: expect.anything()});
     });
@@ -403,7 +403,7 @@ test.describe('Workbench Router', () => {
       }, {paramsHandling: 'merge'});
 
       // expect the view's params to be updated
-      await expect.poll(() => viewPage.getViewParams()).toMatchObject({param1: 'PARAM 1 [string]', param3: 'PARAM 3 [string]'});
+      await expect.poll(() => viewPage.getViewParams()).toMatchObject({param1: 'PARAM 1', param3: 'PARAM 3'});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param2: expect.anything()});
     });
 
@@ -419,9 +419,9 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'null [string]',
-        param3: 'PARAM 3 [string]',
+        param1: 'PARAM 1',
+        param2: 'null',
+        param3: 'PARAM 3',
       });
     });
 
@@ -437,16 +437,16 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'null [string]',
-        param3: 'PARAM 3 [string]',
+        param1: 'PARAM 1',
+        param2: 'null',
+        param3: 'PARAM 3',
       });
     });
   });
 
   test.describe('Transient params', () => {
 
-    test('should contain the provided transient params in view params', async ({appPO, microfrontendNavigator}) => {
+    test('should have transient params', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -486,13 +486,90 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-        id: '123 [string]',
-        param1: 'transient param1 [string]',
-        param2: 'transient param2 [string]',
+        id: '123',
+        param1: 'transient param1',
+        param2: 'transient param2',
       });
     });
 
-    test('should not contain transient params in view params after page reload', async ({appPO, microfrontendNavigator}) => {
+    test('should preserve data type of transient params', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'view',
+        qualifier: {component: 'testee'},
+        params: [
+          {
+            name: 'param1',
+            required: false,
+            transient: true,
+          },
+          {
+            name: 'param2',
+            required: false,
+            transient: true,
+          },
+          {
+            name: 'param3',
+            required: false,
+            transient: true,
+          },
+          {
+            name: 'param4',
+            required: false,
+            transient: true,
+          },
+          {
+            name: 'param5',
+            required: false,
+            transient: true,
+          },
+          {
+            name: 'param6',
+            required: false,
+            transient: true,
+          },
+          {
+            name: 'param7',
+            required: false,
+            transient: true,
+          },
+        ],
+        properties: {
+          path: 'test-view',
+          title: 'testee',
+          cssClass: 'testee',
+        },
+      });
+
+      // navigate
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.enterQualifier({component: 'testee'});
+      await routerPage.enterParams({
+        param1: 'value',
+        param2: '<number>0</number>',
+        param3: '<number>2</number>',
+        param4: '<boolean>true</boolean>',
+        param5: '<boolean>false</boolean>',
+        param6: '<null>',
+        param7: '<undefined>',
+      });
+      await routerPage.enterTarget('blank');
+      await routerPage.clickNavigate();
+
+      // expect transient params to have actual data type
+      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
+        param1: 'value',
+        param2: '0 [number]',
+        param3: '2 [number]',
+        param4: 'true [boolean]',
+        param5: 'false [boolean]',
+        param6: 'null [null]',
+      });
+    });
+
+    test('should not have transient params after page reload', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       // We do not register any capability here but use the built-in capability instead.
@@ -509,13 +586,13 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
-        initialTitle: 'TITLE [string]',
-        transientParam: 'TRANSIENT PARAM [string]',
+        initialTitle: 'TITLE',
+        transientParam: 'TRANSIENT PARAM',
       });
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
-      await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({initialTitle: 'TITLE [string]'});
+      await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({initialTitle: 'TITLE'});
       await expect.poll(() => testeeViewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM')});
     });
 
@@ -534,10 +611,10 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (a) [string]',
-        transientParam: 'TRANSIENT PARAM (a) [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
+        transientParam: 'TRANSIENT PARAM (a)',
       });
       // expect the component to be the same instance
       await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -551,12 +628,12 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
-        transientParam: 'TRANSIENT PARAM (b) [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+        transientParam: 'TRANSIENT PARAM (b)',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param3: expect.stringMatching('PARAM 3 (a)')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM (a)')});
@@ -566,11 +643,11 @@ test.describe('Workbench Router', () => {
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')});
     });
@@ -590,10 +667,10 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 (a) [string]',
-        transientParam: 'TRANSIENT PARAM (a) [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3 (a)',
+        transientParam: 'TRANSIENT PARAM (a)',
       });
       // expect the component to be the same instance
       await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
@@ -607,10 +684,10 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
-        transientParam: 'TRANSIENT PARAM (b) [string]',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+        transientParam: 'TRANSIENT PARAM (b)',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param1: expect.stringMatching('PARAM 1')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param2: expect.stringMatching('PARAM 2')});
@@ -622,9 +699,9 @@ test.describe('Workbench Router', () => {
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param3: 'PARAM 3 (b) [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param3: 'PARAM 3 (b)',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM (b)')});
     });
@@ -644,22 +721,22 @@ test.describe('Workbench Router', () => {
 
       // expect the view's params to be updated
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
-        transientParam: 'TRANSIENT PARAM [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
+        transientParam: 'TRANSIENT PARAM',
       });
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
       await expect.poll(() => viewPage.getViewParams()).toMatchObject({
-        param1: 'PARAM 1 [string]',
-        param2: 'PARAM 2 [string]',
-        param3: 'PARAM 3 [string]',
-        param4: 'PARAM 4 [string]',
-        param5: 'PARAM 5 [string]',
+        param1: 'PARAM 1',
+        param2: 'PARAM 2',
+        param3: 'PARAM 3',
+        param4: 'PARAM 4',
+        param5: 'PARAM 5',
       });
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({transientParam: expect.stringMatching('TRANSIENT PARAM')});
     });
@@ -683,7 +760,7 @@ test.describe('Workbench Router', () => {
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param3: expect.stringMatching('PARAM 3')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param4: expect.stringMatching('PARAM 4')});
       await expect.poll(() => viewPage.getViewParams()).not.toMatchObject({param4: expect.stringMatching('PARAM 5')});
-      await expect.poll(() => viewPage.getViewParams()).toMatchObject({transientParam: 'TRANSIENT PARAM [string]'});
+      await expect.poll(() => viewPage.getViewParams()).toMatchObject({transientParam: 'TRANSIENT PARAM'});
 
       // expect transient param to be removed from view params after page reload
       await appPO.reload();
@@ -747,8 +824,8 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage1.getViewParams()).toMatchObject({
-        param: 'param app1 [string]',
-        transientParam: 'transient param app1 [string]',
+        param: 'param app1',
+        transientParam: 'transient param app1',
       });
 
       // self-navigate to view of app2
@@ -763,8 +840,8 @@ test.describe('Workbench Router', () => {
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage2.getViewParams()).toMatchObject({
-        param: 'param app2 [string]',
-        transientParam: 'transient param app2 [string]',
+        param: 'param app2',
+        transientParam: 'transient param app2',
       });
     });
 
@@ -818,7 +895,7 @@ test.describe('Workbench Router', () => {
       // expect transient param to be contained in view params
       const testeeViewId = await testeeViewPage1.view.getViewId();
       await expect.poll(() => testeeViewPage1.getViewParams()).toMatchObject({
-        transientParam: 'transient param app1 [string]',
+        transientParam: 'transient param app1',
       });
 
       // self-navigate to view of app2
@@ -831,7 +908,7 @@ test.describe('Workbench Router', () => {
       const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});
       await testeeViewPage2.view.tab.click();
       await expect.poll(() => testeeViewPage2.getViewParams()).not.toMatchObject({
-        transientParam: 'transient param app1 [string]',
+        transientParam: 'transient param app1',
       });
     });
   });

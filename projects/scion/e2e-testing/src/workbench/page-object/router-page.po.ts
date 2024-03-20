@@ -16,6 +16,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {Params} from '@angular/router';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
+import {ViewState} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RouterPageComponent}.
@@ -46,8 +47,8 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await keyValueField.addEntries(params);
   }
 
-  public async enterNavigationalState(state: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-navigational-state'));
+  public async enterState(state: ViewState): Promise<void> {
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-state'));
     await keyValueField.clear();
     await keyValueField.addEntries(state);
   }

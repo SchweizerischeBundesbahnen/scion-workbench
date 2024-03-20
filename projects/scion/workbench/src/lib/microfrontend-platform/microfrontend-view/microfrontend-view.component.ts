@@ -9,10 +9,10 @@
  */
 
 import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, OnDestroy, OnInit, Provider, ViewChild} from '@angular/core';
-import {ActivatedRoute, ActivatedRouteSnapshot, Params} from '@angular/router';
-import {asapScheduler, combineLatest, EMPTY, firstValueFrom, Observable, of, OperatorFunction, Subject} from 'rxjs';
-import {catchError, debounceTime, first, map, pairwise, startWith, switchMap, takeUntil} from 'rxjs/operators';
-import {Application, ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
+import {ActivatedRoute, Params} from '@angular/router';
+import {combineLatest, EMPTY, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
+import {catchError, first, map, takeUntil} from 'rxjs/operators';
+import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵTHEME_CONTEXT_KEY, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
@@ -24,11 +24,7 @@ import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-routes';
-import {WorkbenchRouteData} from '../../routing/workbench-route-data';
-import {WorkbenchNavigationalViewStates} from '../../routing/workbench-navigational-states';
-import {MicrofrontendNavigationalStates} from '../routing/microfrontend-navigational-states';
-import {Beans} from '@scion/toolkit/bean-manager';
+import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
 import {AsyncPipe, NgClass, NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -36,9 +32,9 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {WorkbenchService} from '../../workbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import '../microfrontend-platform.config';
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
+import {WorkbenchNavigationalViewStates} from '../../routing/workbench-navigational-states';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -67,7 +63,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     'keydown.escape', // allows closing notifications
   ];
 
-  public viewCapability: WorkbenchViewCapability | undefined;
+  protected capability: WorkbenchViewCapability | undefined;
 
   /**
    * Splash to display until the microfrontend signals readiness.
@@ -112,83 +108,63 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     // Construct the view context, allowing embedded content to interact with this view.
     this.routerOutletElement.nativeElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id);
 
-    // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
-    // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
-    // menu of this view do not work, so we install the accelerators on the router outlet as well.
-    this._viewContextMenuService.installMenuItemAccelerators$(this.routerOutletElement.nativeElement, this.view)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe();
-
-    combineLatest([this._route.params, this._route.data])
-      .pipe(
-        debounceTime(0, asapScheduler), // wait until the Angular router completed updating the route, similar to `ngOnChanges` in a component to wait for all input properties to be set
-        map(() => this._route.snapshot),
-        mapToMicrofrontendRouteSnapshot(),
-        startWith(undefined! as ActivatedMicrofrontendRouteSnapshot), // initialize 'pairwise' operator
-        pairwise(),
-        serializeExecution(([prev, curr]) => this.onNavigate(prev, curr)),
-        catchError((error, caught) => {
-          this._logger.error(() => '[MicrofrontendLoadError] An unexpected error occurred.', LoggerNames.MICROFRONTEND_ROUTING, error);
-          return caught; // re-subscribe to the params Observable
-        }),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe();
-
+    this.installNavigator();
+    this.installMenuItemAccelerators$();
     this.installThemePropagator();
   }
 
-  private async onNavigate(prevRouteSnapshot: ActivatedMicrofrontendRouteSnapshot | undefined, currRouteSnapshot: ActivatedMicrofrontendRouteSnapshot): Promise<void> {
-    const prevViewCapability = prevRouteSnapshot?.viewCapability;
-    const {viewCapability, params, activatedRoute} = currRouteSnapshot;
+  private installNavigator(): void {
+    this._route.params
+      .pipe(
+        switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]).pipe(map(capability => ({capability, params})))),
+        serializeExecution(({capability, params}) => this.onNavigate(this.capability, capability, params)),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe();
+  }
 
-    if (!viewCapability) {
-      this._logger.warn(() => `[NullViewError] No application found to provide a view of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
+  private async onNavigate(prevCapability: WorkbenchViewCapability | undefined, capability: WorkbenchViewCapability | undefined, params: Params): Promise<void> {
+    if (!capability) {
+      this._logger.warn(() => `[NullCapabilityError] No application found to provide a view capability of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
       await this.view.close();
       return;
     }
 
-    const application = this.lookupApplication(viewCapability.metadata!.appSymbolicName);
-    if (!application) {
-      this._logger.error(() => `[NullApplicationError] Unexpected. Cannot resolve application '${viewCapability.metadata!.appSymbolicName}'.`, LoggerNames.MICROFRONTEND_ROUTING, viewCapability);
-      await this.view.close();
-      return;
-    }
+    this.capability = capability;
+    this.view.registerAdapter(MicrofrontendWorkbenchView, new MicrofrontendWorkbenchView(capability, params));
 
     // Check if navigating to a new microfrontend.
-    if (!prevViewCapability || prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
-      this.viewCapability = viewCapability;
-      this.view.registerAdapter(MicrofrontendWorkbenchView, new MicrofrontendWorkbenchView(viewCapability, params));
-      this.setViewProperties(viewCapability, activatedRoute, params);
-      this.installParamsUpdater(viewCapability);
+    if (!prevCapability || prevCapability.metadata!.id !== capability.metadata!.id) {
+      this.setViewProperties(capability, params);
+      this.installParamsUpdater(capability);
     }
 
-    // Signal that the currently loaded microfrontend, if any, is about to be replaced by a microfrontend of another application.
-    if (prevViewCapability && prevViewCapability.metadata!.appSymbolicName !== viewCapability.metadata!.appSymbolicName) {
+    // Signal the currently loaded application to unload.
+    if (prevCapability && prevCapability.metadata!.appSymbolicName !== capability.metadata!.appSymbolicName) {
       await this._messageClient.publish(ɵWorkbenchCommands.viewUnloadingTopic(this.view.id));
     }
 
-    // Provide route parameters including matrix parameters and qualifiers to the microfrontend.
+    // Pass parameters to the microfrontend.
     await this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), Maps.coerce(params), {retain: true});
 
-    // When navigating to another view capability of the same app, wait until transported the params to consumers before loading the
-    // new microfrontend into the iframe, allowing the currently loaded microfrontend to cleanup subscriptions. Params include the
-    // capability id.
-    if (prevViewCapability
-      && prevViewCapability.metadata!.appSymbolicName === viewCapability.metadata!.appSymbolicName
-      && prevViewCapability.metadata!.id !== viewCapability.metadata!.id) {
-      await this.waitForCapabilityParam(viewCapability.metadata!.id);
+    // When navigating to another view capability of the same app, wait until transported the params to the microfrontend before loading the
+    // new microfrontend into the iframe, allowing the currently loaded microfrontend to clean up subscriptions.
+    if (prevCapability
+      && prevCapability.metadata!.appSymbolicName === capability.metadata!.appSymbolicName
+      && prevCapability.metadata!.id !== capability.metadata!.id) {
+      await this.waitForCapabilityParam(capability.metadata!.id);
     }
 
     // Navigate to the microfrontend.
-    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this.view.id}, app=${viewCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(viewCapability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, viewCapability);
-    await this._outletRouter.navigate(viewCapability.properties.path, {
+    const application = this._manifestService.applications.find(app => app.symbolicName === capability.metadata!.appSymbolicName)!;
+    this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this.view.id}, app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
+    await this._outletRouter.navigate(capability.properties.path, {
       outlet: this.view.id,
       relativeTo: application.baseUrl,
       params: params,
       pushStateToSessionHistoryStack: false,
-      showSplash: viewCapability.properties.showSplash,
-      ɵcapabilityId: viewCapability.metadata!.id,
+      showSplash: capability.properties.showSplash,
+      ɵcapabilityId: capability.metadata!.id,
     });
 
     // Inactive views are detached from the Angular change detection tree.
@@ -196,6 +172,19 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     if (!this.view.active) {
       this._cd.detectChanges();
     }
+  }
+
+  private fetchCapability$(capabilityId: string): Observable<WorkbenchViewCapability | undefined> {
+    return this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({id: capabilityId}).pipe(map(capabilities => capabilities.at(0)));
+  }
+
+  private installMenuItemAccelerators$(): void {
+    // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
+    // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
+    // menu of this view do not work, so we install the accelerators on the router outlet as well.
+    this._viewContextMenuService.installMenuItemAccelerators$(this.routerOutletElement.nativeElement, this.view)
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe();
   }
 
   /**
@@ -216,18 +205,16 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
               return null;
             }
 
-            const currentMicrofrontendParams = MicrofrontendViewRoutes.parseParams(this._route.snapshot);
-            const currentParams = {...currentMicrofrontendParams.urlParams, ...currentMicrofrontendParams.transientParams};
-
-            const paramsUpdateCommand: ɵViewParamsUpdateCommand = request.body!;
-            const newParams = Dictionaries.coerce(paramsUpdateCommand.params); // coerce params for backward compatibility
-            const mergedParams = Dictionaries.withoutUndefinedEntries(paramsUpdateCommand.paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
+            const paramsHandling = request.body!.paramsHandling;
+            const currentParams = this._route.snapshot.params;
+            const newParams = Dictionaries.coerce(request.body!.params); // coerce params for backward compatibility
+            const mergedParams = Dictionaries.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
             const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
 
             return {
               layout,
               viewOutlets: {[this.view.id]: [urlParams]},
-              viewStates: {[this.view.id]: {[MicrofrontendNavigationalStates.transientParams]: transientParams}},
+              viewStates: {[this.view.id]: {[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams}},
             };
           }, {relativeTo: this._route});
 
@@ -242,21 +229,14 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
   /**
    * Updates the properties of this view, such as the view title, as defined by the capability.
    */
-  private setViewProperties(viewCapability: WorkbenchViewCapability, activatedRoute: ActivatedRouteSnapshot, params: Params): void {
+  private setViewProperties(viewCapability: WorkbenchViewCapability, params: Params): void {
     this.view.title = substituteNamedParameters(viewCapability.properties.title, params) ?? null;
     this.view.heading = substituteNamedParameters(viewCapability.properties.heading, params) ?? null;
     this.view.cssClass = new Array<string>()
       .concat(Arrays.coerce(viewCapability.properties.cssClass))
-      .concat(Arrays.coerce(activatedRoute.data[WorkbenchRouteData.state]?.[WorkbenchNavigationalViewStates.cssClass]));
+      .concat(Arrays.coerce(this.view.state[WorkbenchNavigationalViewStates.cssClass] as undefined | string | string[]));
     this.view.closable = viewCapability.properties.closable ?? true;
     this.view.dirty = false;
-  }
-
-  /**
-   * Looks up the application registered under the given symbolic name. Returns `undefined` if not found.
-   */
-  private lookupApplication(symbolicName: string): Application | undefined {
-    return this._manifestService.applications.find(app => app.symbolicName === symbolicName);
   }
 
   /**
@@ -359,33 +339,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     this._outletRouter.navigate(null, {outlet: this.view.id}).then();
     this.view.unregisterAdapter(MicrofrontendWorkbenchView);
   }
-}
-
-/**
- * Maps the passed {@link ActivatedRouteSnapshot} to a {@link ActivatedMicrofrontendRouteSnapshot} with resolved params and capability.
- */
-function mapToMicrofrontendRouteSnapshot(): OperatorFunction<ActivatedRouteSnapshot, ActivatedMicrofrontendRouteSnapshot> {
-  return switchMap((activatedRoute: ActivatedRouteSnapshot): Observable<ActivatedMicrofrontendRouteSnapshot> => {
-    const {viewCapabilityId, urlParams, transientParams} = MicrofrontendViewRoutes.parseParams(activatedRoute);
-    return Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: viewCapabilityId}).pipe(map(capabilities => ({
-      activatedRoute,
-      params: {
-        ...urlParams,
-        ...transientParams,
-        [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: viewCapabilityId, // capability ID cannot be overwritten.
-      },
-      viewCapability: capabilities[0],
-    })));
-  });
-}
-
-/**
- * Contains the information about a microfrontend route at a particular moment in time.
- */
-interface ActivatedMicrofrontendRouteSnapshot {
-  activatedRoute: ActivatedRouteSnapshot;
-  params: Params;
-  viewCapability?: WorkbenchViewCapability;
 }
 
 /**

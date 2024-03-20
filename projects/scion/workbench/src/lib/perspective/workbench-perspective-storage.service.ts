@@ -10,7 +10,7 @@
 
 import {Injectable} from '@angular/core';
 import {WorkbenchStorage} from '../storage/workbench-storage';
-import {Commands} from '../routing/workbench-router.service';
+import {Commands} from '../routing/routing.model';
 
 /**
  * Provides API to read/write perspective data from/to {@link WorkbenchStorage}.

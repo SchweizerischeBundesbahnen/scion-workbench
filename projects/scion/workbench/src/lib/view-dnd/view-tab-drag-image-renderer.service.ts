@@ -237,6 +237,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly blocked = false;
   public readonly cssClasses = [];
   public readonly urlSegments: UrlSegment[];
+  public readonly state = {};
   public readonly first = true;
   public readonly last = true;
   public readonly position = 0;

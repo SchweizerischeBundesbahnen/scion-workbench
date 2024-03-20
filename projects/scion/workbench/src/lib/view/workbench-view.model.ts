@@ -3,6 +3,7 @@ import {UrlSegment} from '@angular/router';
 import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
+import {ViewState} from '../routing/routing.model';
 
 /**
  * A view is a visual workbench component for displaying content stacked or side-by-side.
@@ -94,11 +95,16 @@ export abstract class WorkbenchView {
   public abstract readonly destroyed: boolean;
 
   /**
-   * Returns the URL segments of this view.
-   *
-   * A {@link UrlSegment} is a part of a URL between the two slashes. It contains a path and the matrix parameters associated with the segment.
+   * URL associated with this view.
    */
   public abstract readonly urlSegments: UrlSegment[];
+
+  /**
+   * State associated with this view.
+   *
+   * Note that state is volatile, meaning it is not encoded in the URL but read from the browser session history; thus, it will be lost when the page is reloaded.
+   */
+  public abstract readonly state: ViewState;
 
   /**
    * Activates this view.

@@ -139,7 +139,7 @@ test.describe('Workbench View', () => {
 
     // Verify matrix params have changed
     await viewPage.view.tab.click();
-    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the title when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
@@ -162,7 +162,7 @@ test.describe('Workbench View', () => {
     await expect(viewPage.view.tab.title).toHaveText('TITLE');
     // Verify matrix params have changed
     await viewPage.view.tab.click();
-    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should not unset the heading when the navigation resolves to the same route, e.g., when updating matrix params or route params', async ({appPO, workbenchNavigator}) => {
@@ -186,7 +186,7 @@ test.describe('Workbench View', () => {
     await expect(viewPage.view.tab.heading).toHaveText('HEADING');
 
     // Verify matrix params have changed
-    await expect.poll(() => viewPage.getRouteParams()).toEqual({matrixParam: 'value'});
+    await expect.poll(() => viewPage.getParams()).toEqual({matrixParam: 'value'});
   });
 
   test('should remove the closing handle from the view tab', async ({appPO, workbenchNavigator}) => {

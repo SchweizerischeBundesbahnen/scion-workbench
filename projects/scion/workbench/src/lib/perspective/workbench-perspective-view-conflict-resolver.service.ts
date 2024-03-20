@@ -12,7 +12,7 @@ import {MPartGrid} from '../layout/workbench-layout.model';
 import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {RouterUtils} from '../routing/router.util';
-import {Commands} from '../routing/workbench-router.service';
+import {Commands} from '../routing/routing.model';
 
 /**
  * Detects and resolves name conflicts of view names, that may occur when switching between perspectives.

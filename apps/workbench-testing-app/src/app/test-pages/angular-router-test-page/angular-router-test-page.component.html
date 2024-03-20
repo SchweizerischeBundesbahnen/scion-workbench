@@ -1,0 +1,21 @@
+<form autocomplete="off" [formGroup]="form">
+  <section>
+    <sci-form-field label="Path">
+      <input [formControl]="form.controls.path" class="e2e-path">
+    </sci-form-field>
+
+    <sci-form-field label="Outlet">
+      <input [formControl]="form.controls.outlet" class="e2e-outlet">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onNavigate()" class="e2e-navigate" [disabled]="form.invalid" sci-primary>
+    Navigate
+  </button>
+
+  @if (navigateError) {
+    <output class="navigate-error e2e-navigate-error">
+      {{navigateError}}
+    </output>
+  }
+</form>

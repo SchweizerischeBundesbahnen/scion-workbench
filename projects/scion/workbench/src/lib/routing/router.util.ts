@@ -9,7 +9,7 @@
  */
 
 import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup} from '@angular/router';
-import {Commands} from './workbench-router.service';
+import {Commands} from './routing.model';
 import {VIEW_ID_PREFIX} from '../workbench.constants';
 
 /**

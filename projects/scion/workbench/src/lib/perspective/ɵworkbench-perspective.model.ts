@@ -12,7 +12,7 @@ import {MPartGrid} from '../layout/workbench-layout.model';
 import {EnvironmentInjector, inject, InjectionToken, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {BehaviorSubject, Observable, Subject} from 'rxjs';
-import {Commands, WorkbenchNavigation, WorkbenchRouter} from '../routing/workbench-router.service';
+import {WorkbenchNavigation, WorkbenchRouter} from '../routing/workbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
@@ -23,6 +23,7 @@ import {RouterUtils} from '../routing/router.util';
 import {Router} from '@angular/router';
 import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
 import {serializeExecution} from '../common/operators';
+import {Commands} from '../routing/routing.model';
 
 /**
  * DI token that holds the identity of the active perspective.

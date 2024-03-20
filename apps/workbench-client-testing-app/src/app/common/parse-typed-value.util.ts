@@ -1,7 +1,17 @@
+/*
+ * Copyright (c) 2018-2024 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
 import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
 
 /**
- * Converts the value entered via the UI to its actual type.
+ * Parses a typed string to its actual type.
  *
  * Examples:
  * - '<undefined>' => undefined
@@ -12,7 +22,7 @@ import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion
  * - '<json>{"key": "value"}</json>' => {"key": "value"}
  * - 'value' => 'value'
  */
-export function convertValueFromUI(value: string): string | number | boolean | object | undefined | null {
+export function parseTypedString(value: string): string | number | boolean | object | undefined | null {
   if ('<undefined>' === value) {
     return undefined;
   }
@@ -37,4 +47,19 @@ export function convertValueFromUI(value: string): string | number | boolean | o
       return value;
     }
   }
+}
+
+/**
+ * Parses the values of given object to their actual types.
+ *
+ * @see parseTypedString
+ */
+export function parseTypedObject(object: Record<string, string> | null | undefined): Record<string, unknown> | null | undefined {
+  if (object === null) {
+    return null;
+  }
+  if (object === undefined) {
+    return undefined;
+  }
+  return Object.fromEntries(Object.entries(object).map(([key, value]) => ([key, parseTypedString(value)])));
 }

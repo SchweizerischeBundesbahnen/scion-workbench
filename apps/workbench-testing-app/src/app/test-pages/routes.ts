@@ -49,6 +49,11 @@ export default [
     loadComponent: () => import('./focus-test-page/focus-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Focus Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-focus-test-page'},
   },
+  {
+    path: 'angular-router-test-page',
+    loadComponent: () => import('./angular-router-test-page/angular-router-test-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Angular Router Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-angular-router-test-page'},
+  },
 ] satisfies Routes;
 
 /**

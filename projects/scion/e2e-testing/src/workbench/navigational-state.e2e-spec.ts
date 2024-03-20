@@ -11,92 +11,219 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
+import {AngularRouterTestPagePO} from './page-object/test-pages/angular-router-test-page.po';
 
 test.describe('Navigational State', () => {
 
-  test.describe('ActivatedRoute.data', () => {
+  test('should have empty state when not passing state', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
 
-    test('should emit `undefined` when not passing state to the view navigation', async ({appPO, workbenchNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
 
-      // navigate to the test view
-      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-view');
-      await routerPage.enterTarget('view.100');
-      await routerPage.clickNavigate();
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expect.poll(() => viewPage.getState()).toEqual({});
+  });
 
-      // expect ActivatedRoute.data emitted undefined as state
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=view.100, state=undefined]`,
-      ]);
+  test('should have state passed', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({some: 'state'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+  });
+
+  test('should preserve data type of state', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({
+      state1: 'value',
+      state2: '<number>0</number>',
+      state3: '<number>2</number>',
+      state4: '<boolean>true</boolean>',
+      state5: '<boolean>false</boolean>',
+      state6: '<null>',
+      state7: '<undefined>',
     });
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
 
-    test('should emit the state as passed to the view navigation', async ({appPO, workbenchNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // navigate to the test view
-      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-view');
-      await routerPage.enterNavigationalState({'some': 'state'});
-      await routerPage.enterTarget('view.100');
-      await routerPage.clickNavigate();
-
-      // expect ActivatedRoute.data emitted the passed state
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=view.100, state={"some":"state"}]`,
-      ]);
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expect.poll(() => viewPage.getState()).toEqual({
+      state1: 'value',
+      state2: '0 [number]',
+      state3: '2 [number]',
+      state4: 'true [boolean]',
+      state5: 'false [boolean]',
+      state6: 'null [null]',
+      state7: 'undefined [undefined]',
     });
+  });
 
-    test('should not restore navigational state after page reload', async ({appPO, workbenchNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+  test('should replace/discard state when navigating view', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
 
-      // navigate to the test view
-      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-view');
-      await routerPage.enterNavigationalState({'some': 'state'});
-      await routerPage.enterTarget('view.100');
-      await routerPage.clickNavigate();
+    // Navigate view
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({state1: 'state 1'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
 
-      // expect ActivatedRoute.data emitted the passed state
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=view.100, state={"some":"state"}]`,
-      ]);
-      consoleLogs.clear();
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expect.poll(() => viewPage.getState()).toEqual({state1: 'state 1'});
 
-      await appPO.reload();
+    // Navigate view again with a different state
+    await routerPage.view.tab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterMatrixParams({matrix: 'param'});
+    await routerPage.enterState({state2: 'state 2'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
 
-      // expect ActivatedRoute.data emitting undefined as state after page reload
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=view.100, state=undefined]`,
-      ]);
-    });
+    await expect.poll(() => viewPage.getState()).toEqual({state2: 'state 2'});
+    await expect.poll(() => viewPage.getParams()).toEqual({matrix: 'param'});
 
-    test('should not emit when updating matrix params of a view ', async ({appPO, workbenchNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+    // Navigate view again without state
+    await routerPage.view.tab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterMatrixParams({});
+    await routerPage.enterState({});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
 
-      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await expect.poll(() => viewPage.getState()).toEqual({});
+    await expect.poll(() => viewPage.getParams()).toEqual({});
 
-      // navigate to the test view
-      await routerPage.enterPath('test-view');
-      await routerPage.enterTarget('blank');
-      await routerPage.enterMatrixParams({'param': 'value 1'});
-      await routerPage.enterTarget('view.100');
-      await routerPage.clickNavigate();
+    // Navigate view again with a different state
+    await routerPage.view.tab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({state3: 'state 3'});
+    await routerPage.clickNavigate();
 
-      // expect ActivatedRoute.data emitted undefined as state
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([
-        `[ActivatedRouteDataChange] [viewId=view.100, state=undefined]`,
-      ]);
-      consoleLogs.clear();
+    await expect.poll(() => viewPage.getState()).toEqual({state3: 'state 3'});
+  });
 
-      // update matrix param
-      await routerPage.view.tab.click();
-      await routerPage.enterMatrixParams({'param': 'value 2'});
-      await routerPage.enterTarget('view.100');
-      await routerPage.clickNavigate();
+  test('should discard state when reloading the page', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
 
-      // expect ActivatedRoute.data not to emit
-      await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ActivatedRouteDataChange/})).toEqual([]);
-    });
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({some: 'state'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+
+    await appPO.reload();
+    await expect.poll(() => viewPage.getState()).toEqual({});
+  });
+
+  test('should maintain state when navigating a different view', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({some: 'state'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+
+    await routerPage.view.tab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({});
+    await routerPage.enterTarget('blank');
+    await routerPage.clickNavigate();
+
+    // Expect view state to be preserved.
+    await viewPage.view.tab.click();
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+  });
+
+  test('should maintain state when navigating back and forth in browser history', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterPath('test-view');
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await viewPage.view.tab.moveTo(await viewPage.view.part.getPartId(), {region: 'east'});
+
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({'state': 'a'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'a'});
+
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({'state': 'b'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
+
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({'state': 'c'});
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'c'});
+
+    await appPO.navigateBack();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
+
+    await appPO.navigateBack();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'a'});
+
+    await appPO.navigateForward();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
+
+    await appPO.navigateForward();
+    await expect.poll(() => viewPage.getState()).toEqual({state: 'c'});
+  });
+
+  test('should maintain state when navigating through the Angular router', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open Workbench Router
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+
+    // Open Angular router
+    await routerPage.enterPath('test-pages/angular-router-test-page');
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+    const angularRouterPage = new AngularRouterTestPagePO(appPO, {viewId: 'view.101'});
+
+    // Open test view
+    await routerPage.view.tab.click();
+    await routerPage.enterPath('test-view');
+    await routerPage.enterState({some: 'state'});
+    await routerPage.enterTarget('view.102');
+    await routerPage.clickNavigate();
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
+    await viewPage.view.tab.moveTo(await viewPage.view.part.getPartId(), {region: 'east'});
+
+    // Expect view state to be passed to the view.
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+
+    // Navigate through the Angular router
+    await angularRouterPage.view.tab.click();
+    await angularRouterPage.navigate('test-view', {outlet: await angularRouterPage.view.getViewId()});
+
+    // Expect view state to be preserved.
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
   });
 });

@@ -937,7 +937,7 @@ test.describe('Workbench Router', () => {
     const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
 
     // expect the param to be set
-    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value1'});
 
     // navigate to the test view 2
     await routerPage.view.tab.click();
@@ -950,7 +950,7 @@ test.describe('Workbench Router', () => {
     const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
 
     // expect the param to be set
-    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value1'});
 
     // update all matching present views
     await routerPage.view.tab.click();
@@ -963,10 +963,10 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(3);
 
     await testee1ViewPage.view.tab.click();
-    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value2'});
 
     await testee2ViewPage.view.tab.click();
-    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value2'});
   });
 
   test('should, by default, open a new view if no matching view is found [target=`undefined`]', async ({appPO, workbenchNavigator}) => {
@@ -1025,7 +1025,7 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(2);
     await expectView(routerPage).toBeInactive();
     await expectView(testeeView).toBeActive();
-    await expect.poll(() => testeeView.getRouteParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testeeView.getParams()).toEqual({param: 'value1'});
   });
 
   test('should, by default, navigate existing view(s) of the same path (path matches multiple views) [target=`undefined`]', async ({appPO, workbenchNavigator}) => {
@@ -1042,7 +1042,7 @@ test.describe('Workbench Router', () => {
     const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
 
     // expect the param to be set
-    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value1'});
 
     // navigate to the test view 2
     await routerPage.view.tab.click();
@@ -1055,7 +1055,7 @@ test.describe('Workbench Router', () => {
     const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
 
     // expect the param to be set
-    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value1'});
+    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value1'});
 
     // update all matching present views
     await routerPage.view.tab.click();
@@ -1068,10 +1068,10 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(3);
 
     await testee1ViewPage.view.tab.click();
-    await expect.poll(() => testee1ViewPage.getRouteParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value2'});
 
     await testee2ViewPage.view.tab.click();
-    await expect.poll(() => testee2ViewPage.getRouteParams()).toEqual({param: 'value2'});
+    await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value2'});
   });
 
   test('should open a new view if the target view is not found [target=viewId]', async ({appPO, workbenchNavigator}) => {

@@ -23,13 +23,11 @@ import {WorkbenchNavigationContext, WorkbenchRouter} from './workbench-router.se
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {WorkbenchPopupDiffer} from './workbench-popup-differ';
 import {Logger, LoggerNames} from '../logging';
-import {WorkbenchRouteData} from './workbench-route-data';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
 import {PartComponent} from '../part/part.component';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {canDeactivateWorkbenchView} from '../view/workbench-view-pre-destroy.guard';
-import {resolveNavigationalViewState} from './navigation-state.resolver';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 
@@ -150,7 +148,6 @@ export class WorkbenchUrlObserver {
 
     const newAuxiliaryRoutes = this._auxRoutesRegistrator.registerOutletAuxiliaryRoutes(addedViewOutlets, {
       canDeactivate: [canDeactivateWorkbenchView],
-      resolve: {[WorkbenchRouteData.state]: resolveNavigationalViewState},
     });
     if (newAuxiliaryRoutes.length) {
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, newAuxiliaryRoutes);
