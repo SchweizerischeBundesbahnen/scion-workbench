@@ -39,12 +39,7 @@ export abstract class WorkbenchView {
   /**
    * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
    */
-  public abstract set cssClass(cssClass: string | string[]);
-
-  /**
-   * CSS classes associated with the view.
-   */
-  public abstract readonly cssClasses: string[];
+  public abstract cssClass: string | string[];
 
   /**
    * Specifies if the content of the current view is dirty.

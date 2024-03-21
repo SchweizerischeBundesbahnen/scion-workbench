@@ -154,7 +154,8 @@ export class ViewTabComponent implements OnChanges {
         viewTabPointerOffsetY: event.offsetY,
         viewTabWidth: this.host.getBoundingClientRect().width,
         viewTabHeight: this.host.getBoundingClientRect().height,
-        workbenchId: this._workbenchId
+        workbenchId: this._workbenchId,
+        classList: this.view.classList.toMap(),
       });
     });
   }
@@ -203,7 +204,7 @@ export class ViewTabComponent implements OnChanges {
 
     this._ngOnChanges$
       .pipe(
-        switchMap(() => this.view.cssClasses$),
+        switchMap(() => this.view.classList.value$),
         map(cssClasses => differ.diff(cssClasses)),
         filter((diff): diff is IterableChanges<string> => diff !== null),
         takeUntilDestroyed(),

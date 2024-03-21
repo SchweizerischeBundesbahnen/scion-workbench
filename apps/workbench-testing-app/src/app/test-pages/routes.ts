@@ -32,7 +32,7 @@ export default [
   {
     path: 'navigation-test-page',
     loadChildren: () => import('./navigation-test-page/routes'),
-    data: {[WorkbenchRouteData.title]: 'Navigation Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage'},
+    data: {[WorkbenchRouteData.title]: 'Navigation Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-navigation-test-page'},
   },
   {
     path: 'blank-test-page',

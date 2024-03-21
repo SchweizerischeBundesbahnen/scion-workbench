@@ -235,7 +235,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly active$ = of(true);
   public readonly active = true;
   public readonly blocked = false;
-  public readonly cssClasses = [];
+  public readonly cssClass = [];
   public readonly urlSegments: UrlSegment[];
   public readonly state = {};
   public readonly first = true;
@@ -261,10 +261,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   }
 
   public move(target: 'new-window' | string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void {
-    throw Error('[UnsupportedOperationError]');
-  }
-
-  public set cssClass(cssClass: string | string[]) {
     throw Error('[UnsupportedOperationError]');
   }
 

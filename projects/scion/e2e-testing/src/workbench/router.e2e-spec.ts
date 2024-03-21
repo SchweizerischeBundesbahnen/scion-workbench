@@ -329,22 +329,19 @@ test.describe('Workbench Router', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
+    await routerPage.enterTarget('view.102');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
+    await routerPage.enterTarget('view.103');
     await routerPage.clickNavigate();
 
     // expect the test views to be opened
@@ -357,9 +354,9 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
 
     // expect the test view to be closed
     await expectView(routerPage).toBeActive();
@@ -376,22 +373,19 @@ test.describe('Workbench Router', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
+    await routerPage.enterTarget('view.102');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
+    await routerPage.enterTarget('view.103');
     await routerPage.clickNavigate();
 
     // expect the test views to be opened
@@ -404,9 +398,9 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -423,22 +417,19 @@ test.describe('Workbench Router', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
+    await routerPage.enterTarget('view.102');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
+    await routerPage.enterTarget('view.103');
     await routerPage.clickNavigate();
 
     // expect the test views to be opened
@@ -451,9 +442,9 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(2);
@@ -470,43 +461,37 @@ test.describe('Workbench Router', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
+    await routerPage.enterTarget('view.102');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
+    await routerPage.enterTarget('view.103');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-4');
+    await routerPage.enterTarget('view.104');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-5');
+    await routerPage.enterTarget('view.105');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-6');
+    await routerPage.enterTarget('view.106');
     await routerPage.clickNavigate();
 
     // expect the test views to be opened
@@ -519,12 +504,12 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
-    const testee4ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-4'});
-    const testee5ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-5'});
-    const testee6ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-6'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
+    const testee4ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.104'});
+    const testee5ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.105'});
+    const testee6ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.106'});
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(6);
@@ -544,43 +529,37 @@ test.describe('Workbench Router', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
+    await routerPage.enterTarget('view.102');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
+    await routerPage.enterTarget('view.103');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-4');
+    await routerPage.enterTarget('view.104');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-5');
+    await routerPage.enterTarget('view.105');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-6');
+    await routerPage.enterTarget('view.106');
     await routerPage.clickNavigate();
 
     // expect the test views to be opened
@@ -593,12 +572,12 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
-    const testee4ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-4'});
-    const testee5ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-5'});
-    const testee6ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-6'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
+    const testee4ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.104'});
+    const testee5ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.105'});
+    const testee6ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.106'});
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(5);
@@ -618,43 +597,37 @@ test.describe('Workbench Router', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
+    await routerPage.enterTarget('view.102');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
+    await routerPage.enterTarget('view.103');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/1/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-4');
+    await routerPage.enterTarget('view.104');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2/1');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-5');
+    await routerPage.enterTarget('view.105');
     await routerPage.clickNavigate();
 
     // open the test view in a new view tab
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-pages/navigation-test-page/2/2');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-6');
+    await routerPage.enterTarget('view.106');
     await routerPage.clickNavigate();
 
     // expect the test views to be opened
@@ -667,12 +640,12 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testee2ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testee3ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
-    const testee4ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-4'});
-    const testee5ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-5'});
-    const testee6ViewPage = new NavigationTestPagePO(appPO, {cssClass: 'testee-6'});
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+    const testee3ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.103'});
+    const testee4ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.104'});
+    const testee5ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.105'});
+    const testee6ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.106'});
 
     // expect the test view to be closed
     await expect(appPO.views()).toHaveCount(3);
@@ -766,11 +739,10 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     // expect the view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -848,34 +820,6 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
   });
 
-  test('should allow setting CSS class(es) via router (active view)', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterTarget('view.99');
-    await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.clickNavigate();
-
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
-    await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee');
-    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
-  });
-
-  test('should allow setting CSS class(es) via router (inactive view)', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterTarget('view.99');
-    await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
-    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
-  });
-
   test('should open a new view if no present view can be found [target=auto]', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
@@ -900,11 +844,10 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -929,12 +872,11 @@ test.describe('Workbench Router', () => {
     // navigate to the test view 1
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterMatrixParams({param: 'value1'});
-    await routerPage.enterCssClass('testee-1');
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
     // expect the param to be set
     await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value1'});
@@ -942,12 +884,11 @@ test.describe('Workbench Router', () => {
     // navigate to the test view 2
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterMatrixParams({param: 'value1'});
-    await routerPage.enterCssClass('testee-2');
     await routerPage.clickNavigate();
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
 
     // expect the param to be set
     await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value1'});
@@ -992,11 +933,10 @@ test.describe('Workbench Router', () => {
     // navigate to the test view
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee');
+    await routerPage.enterTarget('view.100');
     await routerPage.clickNavigate();
 
-    const testeeView = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeView = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     // expect the test view to be opened as new tab
     await expect(appPO.views()).toHaveCount(2);
@@ -1034,12 +974,11 @@ test.describe('Workbench Router', () => {
     // navigate to the test view 1
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee-1');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterMatrixParams({param: 'value1'});
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
     // expect the param to be set
     await expect.poll(() => testee1ViewPage.getParams()).toEqual({param: 'value1'});
@@ -1047,12 +986,11 @@ test.describe('Workbench Router', () => {
     // navigate to the test view 2
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee-2');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterMatrixParams({param: 'value1'});
     await routerPage.clickNavigate();
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
 
     // expect the param to be set
     await expect.poll(() => testee2ViewPage.getParams()).toEqual({param: 'value1'});

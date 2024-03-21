@@ -16,6 +16,7 @@ import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ClassListMap} from '../common/class-list';
 
 /**
  * Events fired during view drag and drop operation.
@@ -273,6 +274,7 @@ export interface ViewDragData {
   viewTabWidth: number;
   viewTabHeight: number;
   workbenchId: string;
+  classList?: ClassListMap;
 }
 
 /**
@@ -291,6 +293,7 @@ export interface ViewMoveEventSource {
   partId: string;
   viewUrlSegments: UrlSegment[];
   workbenchId: string;
+  classList?: ClassListMap;
 }
 
 /**

@@ -94,6 +94,7 @@ export class PartComponent implements OnInit, OnDestroy {
         partId: event.dragData.partId,
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
+        classList: event.dragData.classList,
       },
       target: {
         workbenchId: this._workbenchId,

@@ -54,6 +54,7 @@ export default class ViewPageComponent {
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
   public partActionsFormControl = this._formBuilder.control('');
+  public cssClassFormControl = this._formBuilder.control('');
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
@@ -72,6 +73,7 @@ export default class ViewPageComponent {
       );
 
     this.installViewActiveStateLogger();
+    this.installCssClassUpdater();
   }
 
   private parsePartActions(): WorkbenchPartActionDescriptor[] {
@@ -97,6 +99,14 @@ export default class ViewPageComponent {
         else {
           console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
         }
+      });
+  }
+
+  private installCssClassUpdater(): void {
+    this.cssClassFormControl.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(cssClasses => {
+        this.view.cssClass = cssClasses.split(/\s+/).filter(Boolean);
       });
   }
 }
