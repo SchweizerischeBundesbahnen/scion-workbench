@@ -18,6 +18,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchDialogService, WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
+import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.component';
 
 @Component({
   selector: 'app-workbench',
@@ -53,6 +54,13 @@ export class WorkbenchComponent implements OnDestroy {
       inputs: {view},
       cssClass: 'e2e-move-view',
       context: {viewId: view.id},
+    });
+  }
+
+  protected onShowViewInfo(view: WorkbenchView): void {
+    this._dialogService.open(ViewInfoDialogComponent, {
+      inputs: {view},
+      cssClass: 'e2e-view-info',
     });
   }
 

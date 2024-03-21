@@ -289,11 +289,13 @@ test.describe('Workbench View', () => {
     const contextMenu1 = await viewPage.view.tab.openContextMenu();
     // Expect menu item to be enabled.
     await expect(contextMenu1.menuItems.closeTab.locator).not.toBeDisabled();
+    await contextMenu1.pressEscape();
 
     await viewPage.checkClosable(false);
     const contextMenu2 = await viewPage.view.tab.openContextMenu();
     // Expect menu item to be disabled.
     await expect(contextMenu2.menuItems.closeTab.locator).toBeDisabled();
+    await contextMenu2.pressEscape();
   });
 
   test(`should not close 'non-closable' views via context menu 'Close all tabs'`, async ({appPO, workbenchNavigator}) => {

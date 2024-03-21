@@ -157,6 +157,7 @@ test.describe('Workbench Dialog', () => {
       // Expect context menu item to be disabled.
       const viewTabContextMenu = await dialogOpenerPage.view.tab.openContextMenu();
       await expect(viewTabContextMenu.menuItems.closeTab.locator).toBeDisabled();
+      await viewTabContextMenu.pressEscape();
 
       // Expect closing the view via keystroke not to close the view.
       await page.keyboard.press('Control+K');
