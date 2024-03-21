@@ -14,7 +14,7 @@ import {NotificationOpenerPagePO} from './page-object/notification-opener-page.p
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 

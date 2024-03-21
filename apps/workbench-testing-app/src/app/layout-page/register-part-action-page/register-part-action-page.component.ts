@@ -17,6 +17,7 @@ import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Arrays} from '@scion/toolkit/util';
+import {SettingsService} from '../../settings.service';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -45,7 +46,9 @@ export default class RegisterPartActionPageComponent {
   });
   public registerError: string | false | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder, public workbenchService: WorkbenchService) {
+  constructor(private _formBuilder: NonNullableFormBuilder,
+              private _settingsService: SettingsService,
+              public workbenchService: WorkbenchService) {
   }
 
   public onRegister(): void {
@@ -77,10 +80,16 @@ export default class RegisterPartActionPageComponent {
         cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
       });
       this.registerError = false;
-      this.form.reset();
+      this.resetForm();
     }
     catch (error: unknown) {
       this.registerError = stringifyError(error);
+    }
+  }
+
+  private resetForm(): void {
+    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+      this.form.reset();
     }
   }
 }

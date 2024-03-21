@@ -18,6 +18,7 @@ import {Capability} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -38,7 +39,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
   public readonly outlet: SciRouterOutletPO;
   public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-register-workbench-capability-page');

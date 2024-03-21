@@ -83,7 +83,8 @@ describe('Workbench Perspective', () => {
           layout: factory => factory
             .addPart(MAIN_AREA)
             .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-            .addView('navigator', {partId: 'left', activateView: true}),
+            .addView('view.1', {partId: 'left', activateView: true})
+            .navigateView('view.1', [], {outlet: 'navigator'}),
         }),
         RouterTestingModule.withRoutes([
           {
@@ -104,7 +105,7 @@ describe('Workbench Perspective', () => {
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'navigator'}], activeViewId: 'navigator'}),
+          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .25,
@@ -113,15 +114,17 @@ describe('Workbench Perspective', () => {
     });
   });
 
-  it('should open an unnamed view in the active part of perspective without main area', async () => {
+  it('should open a empty-path view in the active part of perspective without main area', async () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchTestingModule.forTest({
           layout: factory => factory
             .addPart('left')
             .addPart('right', {align: 'right'})
-            .addView('list', {partId: 'left', activateView: true})
-            .addView('overview', {partId: 'right', activateView: true})
+            .addView('view.1', {partId: 'left', activateView: true})
+            .addView('view.2', {partId: 'right', activateView: true})
+            .navigateView('view.1', [], {outlet: 'list'})
+            .navigateView('view.2', [], {outlet: 'overview'})
             .activatePart('right'),
         }),
         RouterTestingModule.withRoutes([
@@ -138,8 +141,8 @@ describe('Workbench Perspective', () => {
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'list'}], activeViewId: 'list'}),
-          child2: new MPart({id: 'right', views: [{id: 'overview'}], activeViewId: 'overview'}),
+          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -150,12 +153,12 @@ describe('Workbench Perspective', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['details/1']);
     await waitUntilStable();
 
-    // unnamed view should be opened in the active part (right) of the workbench grid
+    // empty-path view should be opened in the active part (right) of the workbench grid
     expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'list'}], activeViewId: 'list'}),
-          child2: new MPart({id: 'right', views: [{id: 'overview'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),

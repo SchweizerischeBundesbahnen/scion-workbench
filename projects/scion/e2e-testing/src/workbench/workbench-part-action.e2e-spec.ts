@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 
 test.describe('Workbench Part Action', () => {
 
@@ -28,10 +28,8 @@ test.describe('Workbench Part Action', () => {
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.addPart('left', {align: 'left', ratio: .25});
     await layoutPage.addPart('right', {align: 'right', ratio: .25});
-    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPage.addView('view-2', {partId: 'right', activateView: true});
-    await layoutPage.registerRoute({path: '', outlet: 'view-1', component: 'view-page'}, {title: 'View 1'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-2', component: 'view-page'}, {title: 'View 2'});
+    await layoutPage.addView('view.101', {partId: 'left', activateView: true});
+    await layoutPage.addView('view.102', {partId: 'right', activateView: true});
 
     // Open page in main area
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -59,10 +57,8 @@ test.describe('Workbench Part Action', () => {
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.addPart('left', {align: 'left', ratio: .25});
     await layoutPage.addPart('right', {align: 'right', ratio: .25});
-    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPage.addView('view-2', {partId: 'right', activateView: true});
-    await layoutPage.registerRoute({path: '', outlet: 'view-1', component: 'view-page'}, {title: 'View 1'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-2', component: 'view-page'}, {title: 'View 2'});
+    await layoutPage.addView('view.101', {partId: 'left', activateView: true});
+    await layoutPage.addView('view.102', {partId: 'right', activateView: true});
 
     // Open page in main area
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -90,10 +86,8 @@ test.describe('Workbench Part Action', () => {
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.addPart('left', {align: 'left', ratio: .25});
     await layoutPage.addPart('right', {align: 'right', ratio: .25});
-    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPage.addView('view-2', {partId: 'right', activateView: true});
-    await layoutPage.registerRoute({path: '', outlet: 'view-1', component: 'view-page'}, {title: 'View 1'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-2', component: 'view-page'}, {title: 'View 2'});
+    await layoutPage.addView('view.101', {partId: 'left', activateView: true});
+    await layoutPage.addView('view.102', {partId: 'right', activateView: true});
 
     // Open page in main area
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -155,22 +149,18 @@ test.describe('Workbench Part Action', () => {
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.addPart('left', {align: 'left', ratio: .25});
     await layoutPage.addPart('right', {align: 'right', ratio: .25});
-    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPage.addView('view-2', {partId: 'left'});
-    await layoutPage.addView('view-3', {partId: 'right', activateView: true});
-    await layoutPage.addView('view-4', {partId: 'right'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-1', component: 'view-page'}, {title: 'View 1'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-2', component: 'view-page'}, {title: 'View 2'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-3', component: 'view-page'}, {title: 'View 3'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-4', component: 'view-page'}, {title: 'View 4'});
+    await layoutPage.addView('view.101', {partId: 'left', activateView: true});
+    await layoutPage.addView('view.102', {partId: 'left'});
+    await layoutPage.addView('view.103', {partId: 'right', activateView: true});
+    await layoutPage.addView('view.104', {partId: 'right'});
 
     // Open page in main area
     const mainPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
     const mainPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
     const mainPartId = await mainPage1.view.part.getPartId();
 
-    await test.step('register action in view-1', async () => {
-      await layoutPage.registerPartAction('Action 1', {viewId: 'view-1', cssClass: 'e2e-action-1'});
+    await test.step('register action in view.101', async () => {
+      await layoutPage.registerPartAction('Action 1', {viewId: 'view.101', cssClass: 'e2e-action-1'});
 
       // Expect the action-1 to be displayed only in the left part
       await expect(appPO.part({partId: 'left'}).action({cssClass: 'e2e-action-1'}).locator).toBeVisible();
@@ -178,8 +168,8 @@ test.describe('Workbench Part Action', () => {
       await expect(appPO.part({partId: mainPartId}).action({cssClass: 'e2e-action-1'}).locator).not.toBeAttached();
     });
 
-    await test.step('register action in view-1 and view-3', async () => {
-      await layoutPage.registerPartAction('Action 2', {viewId: ['view-1', 'view-3'], cssClass: 'e2e-action-2'});
+    await test.step('register action in view.101 and view.103', async () => {
+      await layoutPage.registerPartAction('Action 2', {viewId: ['view.101', 'view.103'], cssClass: 'e2e-action-2'});
 
       // Expect the action-1 to be displayed only in the left part
       await expect(appPO.part({partId: 'left'}).action({cssClass: 'e2e-action-1'}).locator).toBeVisible();
@@ -213,8 +203,8 @@ test.describe('Workbench Part Action', () => {
     });
 
     await test.step('change active view tabs', async () => {
-      await appPO.view({viewId: 'view-2'}).tab.click();
-      await appPO.view({viewId: 'view-4'}).tab.click();
+      await appPO.view({viewId: 'view.102'}).tab.click();
+      await appPO.view({viewId: 'view.104'}).tab.click();
       await appPO.view({viewId: await mainPage2.view.getViewId()}).tab.click();
 
       // Expect the action-1 to be displayed only in the left part
@@ -234,8 +224,8 @@ test.describe('Workbench Part Action', () => {
     });
 
     await test.step('change active view tabs back', async () => {
-      await appPO.view({viewId: 'view-1'}).tab.click();
-      await appPO.view({viewId: 'view-3'}).tab.click();
+      await appPO.view({viewId: 'view.101'}).tab.click();
+      await appPO.view({viewId: 'view.103'}).tab.click();
       await appPO.view({viewId: await mainPage1.view.getViewId()}).tab.click();
 
       // Expect the action-1 to be displayed only in the left part
@@ -268,33 +258,31 @@ test.describe('Workbench Part Action', () => {
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
     await layoutPage.addPart('left', {align: 'left', ratio: .25});
     await layoutPage.addPart('right', {align: 'right', ratio: .25});
-    await layoutPage.addView('view-1', {partId: 'left', activateView: true});
-    await layoutPage.addView('view-2', {partId: 'right', activateView: true});
-    await layoutPage.registerRoute({path: '', outlet: 'view-1', component: 'view-page'}, {title: 'View 1'});
-    await layoutPage.registerRoute({path: '', outlet: 'view-2', component: 'view-page'}, {title: 'View 2'});
+    await layoutPage.addView('view.101', {partId: 'left', activateView: true});
+    await layoutPage.addView('view.102', {partId: 'right', activateView: true});
 
     // Open page in main area
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     const mainPartId = await viewPage.view.part.getPartId();
 
     // Register action
-    await layoutPage.registerPartAction('Action', {grid: 'mainArea', viewId: 'view-1', cssClass: 'e2e-action'});
+    await layoutPage.registerPartAction('Action', {grid: 'mainArea', viewId: 'view.101', cssClass: 'e2e-action'});
 
     // Expect the action not to be displayed
     await expect(appPO.part({partId: 'left'}).action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'right'}).action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: mainPartId}).action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
 
-    // Drag view-1 to main area
-    await appPO.view({viewId: 'view-1'}).tab.dragTo({partId: mainPartId, region: 'center'});
+    // Drag view.101 to main area
+    await appPO.view({viewId: 'view.101'}).tab.dragTo({partId: mainPartId, region: 'center'});
 
     // Expect the action not to be displayed
     await expect(appPO.part({partId: 'left'}).action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'right'}).action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: mainPartId}).action({cssClass: 'e2e-action'}).locator).toBeVisible();
 
-    // Drag view-1 to right part
-    await appPO.view({viewId: 'view-1'}).tab.dragTo({partId: 'right', region: 'center'});
+    // Drag view.101 to right part
+    await appPO.view({viewId: 'view.101'}).tab.dragTo({partId: 'right', region: 'center'});
 
     // Expect the action not to be displayed
     await expect(appPO.part({partId: 'left'}).action({cssClass: 'e2e-action'}).locator).not.toBeAttached();

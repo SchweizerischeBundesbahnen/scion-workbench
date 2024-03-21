@@ -2,15 +2,8 @@
   <section>
     <header>Routing Command</header>
 
-    <sci-form-field label="Path">
-      <input [formControl]="form.controls.path" class="e2e-path" list="routes">
-      <datalist id="routes">
-        <option *ngFor="let route of routes" [value]="route.path">{{route.path}}</option>
-      </datalist>
-    </sci-form-field>
-
-    <sci-form-field label="Matrix parameters">
-      <sci-key-value-field [keyValueFormArray]="form.controls.matrixParams" [addable]="true" [removable]="true" class="e2e-matrix-params"></sci-key-value-field>
+    <sci-form-field label="Commands">
+      <app-router-commands [formControl]="form.controls.commands" class="e2e-commands"/>
     </sci-form-field>
 
     <sci-form-field label="State">
@@ -27,6 +20,10 @@
         <option value="auto">auto</option>
         <option value="blank">blank</option>
       </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Outlet">
+      <input [formControl]="form.controls.outlet" class="e2e-outlet">
     </sci-form-field>
 
     <sci-form-field label="Part ID">
@@ -71,8 +68,8 @@
 
   <ng-container *ngTemplateOutlet="router_link; injector: form.controls.viewContext.value ? null : nullViewInjector"></ng-container>
   <ng-template #router_link>
-    <a [wbRouterLink]="routerLinkCommands$ | async"
-       [wbRouterLinkExtras]="(navigationExtras$ | async) ?? undefined"
+    <a [wbRouterLink]="form.controls.commands.value"
+       [wbRouterLinkExtras]="extras"
        class="e2e-router-link-navigate">
       Navigate via Router Link
     </a>

@@ -15,6 +15,7 @@ import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SettingsService} from '../../settings.service';
 
 @Component({
   selector: 'app-add-part-page',
@@ -46,6 +47,7 @@ export default class AddPartPageComponent {
 
   constructor(private _formBuilder: NonNullableFormBuilder,
               private _wbRouter: WorkbenchRouter,
+              private _settingsService: SettingsService,
               public workbenchService: WorkbenchService) {
   }
 
@@ -62,8 +64,15 @@ export default class AddPartPageComponent {
       ))
       .then(() => {
         this.navigateError = false;
-        this.form.reset();
+        this.resetForm();
       })
       .catch(error => this.navigateError = stringifyError(error));
+  }
+
+
+  private resetForm(): void {
+    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+      this.form.reset();
+    }
   }
 }

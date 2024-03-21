@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {fromRect} from '../helper/testing.util';
 import {MAIN_AREA} from '../workbench.model';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';

@@ -12,7 +12,9 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {AngularRouterTestPagePO} from './page-object/test-pages/angular-router-test-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 
 test.describe('Navigational State', () => {
 
@@ -21,23 +23,35 @@ test.describe('Navigational State', () => {
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({});
   });
 
-  test('should have state passed', async ({appPO, workbenchNavigator}) => {
+  test('should have state passed (WorkbenchRouter.navigate)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
     await routerPage.enterState({some: 'state'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+  });
+
+  test('should have state passed (WorkbenchLayout.navigateView)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPage.addPart('right', {align: 'right'});
+    await layoutPage.addView('testee', {partId: 'right', activateView: true, cssClass: 'testee'});
+    await layoutPage.navigateView('testee', ['test-view'], {state: {some: 'state'}});
+
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
   });
 
@@ -55,10 +69,10 @@ test.describe('Navigational State', () => {
       state6: '<null>',
       state7: '<undefined>',
     });
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({
       state1: 'value',
       state2: '0 [number]',
@@ -75,20 +89,19 @@ test.describe('Navigational State', () => {
 
     // Navigate view
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
+    await routerPage.enterCommands(['test-view']);
     await routerPage.enterState({state1: 'state 1'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({state1: 'state 1'});
 
     // Navigate view again with a different state
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({matrix: 'param'});
+    await routerPage.enterCommands(['test-view', {matrix: 'param'}]);
     await routerPage.enterState({state2: 'state 2'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
     await expect.poll(() => viewPage.getState()).toEqual({state2: 'state 2'});
@@ -96,10 +109,8 @@ test.describe('Navigational State', () => {
 
     // Navigate view again without state
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({});
-    await routerPage.enterState({});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCommands(['test-view']);
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
     await expect.poll(() => viewPage.getState()).toEqual({});
@@ -107,8 +118,9 @@ test.describe('Navigational State', () => {
 
     // Navigate view again with a different state
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
+    await routerPage.enterCommands(['test-view']);
     await routerPage.enterState({state3: 'state 3'});
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
     await expect.poll(() => viewPage.getState()).toEqual({state3: 'state 3'});
@@ -120,10 +132,10 @@ test.describe('Navigational State', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
     await routerPage.enterState({some: 'state'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
 
     await appPO.reload();
@@ -136,15 +148,14 @@ test.describe('Navigational State', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.enterPath('test-view');
     await routerPage.enterState({some: 'state'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
 
     await routerPage.view.tab.click();
     await routerPage.enterPath('test-view');
-    await routerPage.enterState({});
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
@@ -156,29 +167,47 @@ test.describe('Navigational State', () => {
   test('should maintain state when navigating back and forth in browser history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
+    await perspectivePage.registerPerspective({
+      id: 'perspective',
+      parts: [
+        {id: 'left'},
+        {id: 'right', align: 'right'},
+      ],
+      views: [
+        {id: 'router', partId: 'left', activateView: true, cssClass: 'router'},
+        {id: 'testee', partId: 'right', activateView: true, cssClass: 'testee'},
+      ],
+      navigateViews: [
+        {id: 'router', commands: ['test-router']},
+        {id: 'testee', commands: ['test-view']},
+      ],
+    });
+    await appPO.switchPerspective('perspective');
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    await viewPage.view.tab.moveTo(await viewPage.view.part.getPartId(), {region: 'east'});
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
+    const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
     await routerPage.enterPath('test-view');
     await routerPage.enterState({'state': 'a'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterTarget('testee');
     await routerPage.clickNavigate();
     await expect.poll(() => viewPage.getState()).toEqual({state: 'a'});
 
+    // Move the view to the left and back again, simulating navigation without explicitly setting the state.
+    // When navigating back, expect the view state to be restored.
+    await viewPage.view.tab.moveTo('left');
+    await viewPage.view.tab.moveTo('right');
+
     await routerPage.enterPath('test-view');
     await routerPage.enterState({'state': 'b'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterTarget('testee');
     await routerPage.clickNavigate();
     await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
 
     await routerPage.enterPath('test-view');
     await routerPage.enterState({'state': 'c'});
-    await routerPage.enterTarget('view.101');
+    await routerPage.enterTarget('testee');
     await routerPage.clickNavigate();
     await expect.poll(() => viewPage.getState()).toEqual({state: 'c'});
 
@@ -198,30 +227,41 @@ test.describe('Navigational State', () => {
   test('should maintain state when navigating through the Angular router', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Open Workbench Router
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-
-    // Open Angular router
-    await routerPage.enterPath('test-pages/angular-router-test-page');
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
-    const angularRouterPage = new AngularRouterTestPagePO(appPO, {viewId: 'view.101'});
+    const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
+    await perspectivePage.registerPerspective({
+      id: 'perspective',
+      parts: [
+        {id: 'left'},
+        {id: 'right', align: 'right'},
+      ],
+      views: [
+        {id: 'workbench-router', partId: 'left', activateView: true, cssClass: 'workbench-router'},
+        {id: 'angular-router', partId: 'left', cssClass: 'angular-router'},
+      ],
+      navigateViews: [
+        {id: 'workbench-router', commands: ['test-router']},
+        {id: 'angular-router', commands: ['test-pages/angular-router-test-page']},
+      ],
+    });
+    await appPO.switchPerspective('perspective');
 
     // Open test view
-    await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
+    const routerPage = new RouterPagePO(appPO, {cssClass: 'workbench-router'});
+    await routerPage.enterCommands(['test-view']);
     await routerPage.enterState({some: 'state'});
-    await routerPage.enterTarget('view.102');
+    await routerPage.enterCssClass('testee');
+    await routerPage.enterTarget('blank');
+    await routerPage.enterBlankPartId('right');
     await routerPage.clickNavigate();
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
-    await viewPage.view.tab.moveTo(await viewPage.view.part.getPartId(), {region: 'east'});
 
     // Expect view state to be passed to the view.
+    const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
 
     // Navigate through the Angular router
+    const angularRouterPage = new AngularRouterTestPagePO(appPO, {cssClass: 'angular-router'});
     await angularRouterPage.view.tab.click();
-    await angularRouterPage.navigate('test-view', {outlet: await angularRouterPage.view.getViewId()});
+    await angularRouterPage.navigate(['test-view'], {outlet: await angularRouterPage.view.getViewId()});
 
     // Expect view state to be preserved.
     await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});

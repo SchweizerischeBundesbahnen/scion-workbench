@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, DomRect, fromRect, waitUntilStable} from './helper/testing.util';
+import {coerceArray, DomRect, fromRect, waitForCondition, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
@@ -19,6 +19,7 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
+import {ViewId} from '@scion/workbench';
 
 export class AppPO {
 
@@ -46,12 +47,28 @@ export class AppPO {
   constructor(public readonly page: Page) {
   }
 
+  // TODO [WB-LAYOUT] Consider removing this as can be done with css classes
+  public async resolveViewId(alternativeViewId: string): Promise<ViewId> {
+    return this.page.evaluate((arg) => {
+      // @ts-expect-error function to resolve view id
+      return window.resolveViewId(arg);
+    }, alternativeViewId);
+  }
+
   /**
    * Navigates to the testing app.
    *
    * By passing a features object, you can control how to start the workbench and which app features to enable.
    */
   public async navigateTo(options?: Options): Promise<void> {
+    if (options?.localStorage) {
+      await this.navigateTo({microfrontendSupport: false});
+      await this.page.evaluate(data => {
+        Object.entries(data).forEach(([key, value]) => window.localStorage.setItem(key, value));
+      }, options.localStorage);
+      await this.page.goto('about:blank');
+    }
+
     this._workbenchStartupQueryParams = new URLSearchParams();
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options?.launcher ?? 'LAZY');
     this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(options?.microfrontendSupport ?? true) === false}`);
@@ -162,7 +179,7 @@ export class AppPO {
    *        @property viewId? - Identifies the view by its id
    *        @property cssClass? - Identifies the view by its CSS class
    */
-  public view(locateBy: {viewId?: string; cssClass?: string}): ViewPO {
+  public view(locateBy: {viewId?: ViewId; cssClass?: string}): ViewPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
@@ -245,7 +262,9 @@ export class AppPO {
    * Switches to the specified perspective.
    */
   public async switchPerspective(perspectiveId: string): Promise<void> {
+    const navigationId = await this.getCurrentNavigationId();
     await this.header.perspectiveToggleButton({perspectiveId}).click();
+    await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
   }
 
   /**
@@ -278,7 +297,7 @@ export class AppPO {
    *
    * @see WORKBENCH_ID
    */
-  public getWorkbenchIdId(): Promise<string | undefined> {
+  public getWorkbenchId(): Promise<string | undefined> {
     return this.page.locator('app-root').getAttribute('data-workbench-id').then(value => value ?? undefined);
   }
 
@@ -346,6 +365,10 @@ export interface Options {
    * Controls the scope of application-modal workbench dialogs. By default, if not specified, workbench scope will be used.
    */
   dialogModalityScope?: 'workbench' | 'viewport';
+  /**
+   * Specifies data to be in local storage.
+   */
+  localStorage?: {[key: string]: string};
 }
 
 /**

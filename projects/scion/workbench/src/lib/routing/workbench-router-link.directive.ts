@@ -16,7 +16,7 @@ import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {filter, takeUntil} from 'rxjs/operators';
 import {Defined} from '@scion/toolkit/util';
-import {RouterUtils} from './router.util';
+import {Commands} from './routing.model';
 
 /**
  * Like 'RouterLink' but with functionality to target a view outlet.
@@ -30,7 +30,7 @@ import {RouterUtils} from './router.util';
 @Directive({selector: '[wbRouterLink]', standalone: true})
 export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
 
-  private _commands: any[] = [];
+  private _commands: Commands = [];
   private _extras: WorkbenchNavigationExtras = {};
   private _ngOnChange$ = new Subject<void>();
   private _ngOnDestroy$ = new Subject<void>();
@@ -39,7 +39,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
   public href: string | null = null;
 
   @Input()
-  public set wbRouterLink(commands: any[] | string | undefined | null) {
+  public set wbRouterLink(commands: Commands | string | undefined | null) {
     this._commands = (commands ? (Array.isArray(commands) ? commands : [commands]) : []);
   }
 
@@ -94,12 +94,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
         if (controlPressed) {
           return 'blank';
         }
-        // Navigate the contextual view only if it is the target of primary routes.
-        const contextualViewId = contextualView?.id;
-        if (contextualViewId && RouterUtils.isPrimaryRouteTarget(contextualViewId)) {
-          return contextualViewId;
-        }
-        return undefined;
+        return contextualView?.id;
       }),
       activate: this._extras.activate ?? !controlPressed, // by default, the view is not activated if CTRL or META modifier key is pressed (same behavior as for browser links)
       blankPartId: this._extras.blankPartId ?? (contextualPart?.isInMainArea ? contextualPart.id : undefined),

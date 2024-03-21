@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {UrlSegment} from '@angular/router';
+import {ViewId} from '../view/workbench-view.model';
+
 /**
  * Represents an ordered list of path segments instructing the router which route to navigate to.
  *
@@ -24,9 +27,14 @@
 export type Commands = any[];
 
 /**
+ * URL segments of views contained in the workbench layout.
+ */
+export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
+
+/**
  * Navigational view states associated with a workbench navigation.
  */
-export type ViewStates = {[viewId: string]: ViewState};
+export type ViewStates = {[viewId: ViewId]: ViewState};
 
 /**
  * State associated with a view navigation.

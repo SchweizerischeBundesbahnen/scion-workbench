@@ -15,13 +15,14 @@ import {RouterPagePO} from '../router-page.po';
 import {WorkbenchNavigator} from '../../workbench-navigator';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
+import {ViewId} from '@scion/workbench';
 
 export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-bulk-navigation-test-page');
   }

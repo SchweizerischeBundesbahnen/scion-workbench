@@ -16,7 +16,6 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
-import {LayoutPagePO} from './page-object/layout-page.po';
 
 test.describe('View Tabbar', () => {
 
@@ -104,10 +103,6 @@ test.describe('View Tabbar', () => {
   test('should open new view to the right of the active view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Register Angular routes.
-    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPage.registerRoute({path: '', component: 'router-page', outlet: 'router'});
-
     const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
     await perspectivePage.registerPerspective({
       id: 'perspective',
@@ -118,30 +113,33 @@ test.describe('View Tabbar', () => {
       views: [
         // Add views to the left part.
         {id: 'view.1', partId: 'left'},
-        {id: 'router', partId: 'left', activateView: true}, // TODO [WB-LAYOUT] Change to view.2 and navigate to router page
+        {id: 'view.2', partId: 'left', activateView: true},
         {id: 'view.3', partId: 'left'},
         {id: 'view.4', partId: 'left'},
         // Add views to the right part.
         {id: 'view.5', partId: 'right', activateView: true},
         {id: 'view.6', partId: 'right'},
       ],
+      navigateViews: [
+        {id: 'view.2', commands: ['test-router']},
+      ],
     });
     await appPO.switchPerspective('perspective');
 
     // Open view in the active part (left part).
-    const routerPage = new RouterPagePO(appPO, {viewId: 'router'});
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.2'});
     await routerPage.enterPath('test-view');
     await routerPage.enterTarget('blank');
     await routerPage.clickNavigate();
 
-    // Expect view.2 to be opened to the right of the active view.
+    // Expect view.7 (new view) to be opened to the right of the active view.
     await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'left',
-            views: [{id: 'view.1'}, {id: 'router'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}],
-            activeViewId: 'view.2',
+            views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.7'}, {id: 'view.3'}, {id: 'view.4'}],
+            activeViewId: 'view.7',
           }),
           child2: new MPart({
             id: 'right',
@@ -162,19 +160,19 @@ test.describe('View Tabbar', () => {
     await routerPage.enterBlankPartId('right');
     await routerPage.clickNavigate();
 
-    // Expect view.7 to be opened to the right of the active view.
+    // Expect view.8 (new view) to be opened to the right of the active view.
     await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'left',
-            views: [{id: 'view.1'}, {id: 'router'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}],
-            activeViewId: 'router',
+            views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.7'}, {id: 'view.3'}, {id: 'view.4'}],
+            activeViewId: 'view.2',
           }),
           child2: new MPart({
             id: 'right',
-            views: [{id: 'view.5'}, {id: 'view.7'}, {id: 'view.6'}],
-            activeViewId: 'view.7',
+            views: [{id: 'view.5'}, {id: 'view.8'}, {id: 'view.6'}],
+            activeViewId: 'view.8',
           }),
           direction: 'row',
           ratio: .5,

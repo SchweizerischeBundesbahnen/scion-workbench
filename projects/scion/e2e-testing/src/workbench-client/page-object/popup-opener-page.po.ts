@@ -12,7 +12,7 @@ import {coerceArray, DomRect, rejectWhenAttached, waitUntilBoundingBoxStable} fr
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Qualifier} from '@scion/microfrontend-platform';
-import {BottomLeftPoint, BottomRightPoint, PopupOrigin, TopLeftPoint, TopRightPoint} from '@scion/workbench';
+import {BottomLeftPoint, BottomRightPoint, PopupOrigin, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -31,7 +31,7 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
   public readonly returnValue: Locator;
   public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-popup-opener-page');

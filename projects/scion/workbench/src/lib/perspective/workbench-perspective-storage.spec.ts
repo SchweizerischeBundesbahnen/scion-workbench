@@ -20,9 +20,9 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {WorkbenchService} from '../workbench.service';
-
-import {PerspectiveData} from './workbench-perspective-storage.service';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
+import {WorkbenchLayoutSerializer} from '../layout/workench-layout-serializer.service';
+import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 
 describe('WorkbenchPerspectiveStorage', () => {
 
@@ -61,7 +61,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
-    expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective'))).toEqualWorkbenchLayout({
+    expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
@@ -78,7 +78,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
-    expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective'))).toEqualWorkbenchLayout({
+    expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
@@ -191,7 +191,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           startup: {launcher: 'APP_INITIALIZER'},
         }),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent},
+          {path: 'path/to/view', component: TestComponent},
         ]),
       ],
     });
@@ -199,11 +199,11 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in perspective-1
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {blankPartId: 'left', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout of perspective-1 to be stored.
-    expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-1'))).toEqualWorkbenchLayout({
+    expect(await loadPerspectiveLayoutFromStorage('perspective-1')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -212,7 +212,7 @@ describe('WorkbenchPerspectiveStorage', () => {
       },
     });
     // THEN: Expect the layout of perspective-2 not to be stored.
-    expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-2'))).toBeNull();
+    expect(await loadPerspectiveLayoutFromStorage('perspective-2')).toBeNull();
 
     // Switch to perspective-2.
     await TestBed.inject(WorkbenchService).switchPerspective('perspective-2');
@@ -222,11 +222,11 @@ describe('WorkbenchPerspectiveStorage', () => {
     localStorage.clear();
 
     // WHEN: Opening view.1 in perspective-2
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {blankPartId: 'left', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout of perspective-2 to be stored.
-    expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-2'))).toEqualWorkbenchLayout({
+    expect(await loadPerspectiveLayoutFromStorage('perspective-2')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -235,17 +235,18 @@ describe('WorkbenchPerspectiveStorage', () => {
       },
     });
     // THEN: Expect the layout of perspective-1 not to be stored.
-    expect(deserializePerspectiveData(localStorage.getItem('scion.workbench.perspectives.perspective-1'))).toBeNull();
+    expect(await loadPerspectiveLayoutFromStorage('perspective-1')).toBeNull();
   });
 });
 
-/**
- * Deserializes given perspective data.
- */
-function deserializePerspectiveData(serializedPerspectiveData: string | null): WorkbenchLayout | null {
-  if (!serializedPerspectiveData) {
+async function loadPerspectiveLayoutFromStorage(perspectiveId: string): Promise<WorkbenchLayout | null> {
+  const perspectiveLayouts = await TestBed.inject(WorkbenchPerspectiveStorageService).loadPerspectiveLayouts(perspectiveId);
+  if (!perspectiveLayouts) {
     return null;
   }
-  const perspectiveData: PerspectiveData = JSON.parse(window.atob(serializedPerspectiveData));
-  return TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: perspectiveData.workbenchGrid});
+
+  return TestBed.inject(ɵWorkbenchLayoutFactory).create({
+    workbenchGrid: TestBed.inject(WorkbenchLayoutSerializer).deserialize(perspectiveLayouts.userLayout.workbenchGrid),
+    viewOutlets: TestBed.inject(WorkbenchLayoutSerializer).deserializeViewOutlets(perspectiveLayouts.userLayout.viewOutlets),
+  });
 }

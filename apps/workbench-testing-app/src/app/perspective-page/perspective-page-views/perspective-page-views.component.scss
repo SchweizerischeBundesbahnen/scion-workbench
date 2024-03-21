@@ -6,7 +6,7 @@
 
     div.views {
       display: grid;
-      grid-template-columns: repeat(3, 1fr) min-content min-content auto;
+      grid-template-columns: 5em repeat(3, 1fr) min-content min-content min-content;
       gap: .5em .75em;
       align-items: center;
 

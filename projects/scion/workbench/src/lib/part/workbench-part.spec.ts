@@ -27,8 +27,10 @@ describe('WorkbenchPart', () => {
           layout: factory => factory
             .addPart('left-top')
             .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'})
-            .addView('view-1', {partId: 'left-top', activateView: true})
-            .addView('view-2', {partId: 'left-bottom', activateView: true})
+            .addView('view.1', {partId: 'left-top', activateView: true})
+            .addView('view.2', {partId: 'left-bottom', activateView: true})
+            .navigateView('view.1', [], {outlet: 'view-1'})
+            .navigateView('view.2', [], {outlet: 'view-2'})
             .activatePart('left-top'),
         }),
         RouterTestingModule.withRoutes([
@@ -45,7 +47,7 @@ describe('WorkbenchPart', () => {
     expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active).toBeFalse();
 
     // WHEN activating already active view
-    await TestBed.inject(WorkbenchViewRegistry).get('view-2').activate();
+    await TestBed.inject(WorkbenchViewRegistry).get('view.2').activate();
 
     // THEN expect part to be activated.
     expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active).toBeFalse();

@@ -1,0 +1,34 @@
+<form [formGroup]="form">
+  <sci-form-field label="Navigate Views">
+    <div class="navigate-views">
+      <span>View ID</span>
+      <span>Commands</span>
+      <span>Outlet</span>
+      <span>CSS Class(es)</span>
+
+      <div class="actions">
+        <!-- add button -->
+        <button (click)="onAddNavigateView()" class="e2e-add" title="Add Navigation" sciMaterialIcon>add</button>
+        <!-- remove button -->
+        <button (click)="onClearNavigateViews()" class="e2e-clear" title="Remove all navigations" sciMaterialIcon>clear</button>
+      </div>
+
+      <ng-container *ngFor="let formGroup of form.controls.navigateViews.controls; index as i;">
+        <!-- id -->
+        <input [formControl]="formGroup.controls.id" class="e2e-view-id" list="view">
+        <!-- commands -->
+        <app-router-commands [formControl]="formGroup.controls.commands" class="e2e-commands"/>
+        <!-- outlet -->
+        <input [formControl]="formGroup.controls.options.controls.outlet" class="e2e-outlet">
+        <!-- CSS class -->
+        <input [formControl]="formGroup.controls.options.controls.cssClass" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+        <!-- 'remove' button -->
+        <button class="e2e-remove" (click)="onRemoveNavigateView(i)" title="Remove navigate view" sciMaterialIcon>remove</button>
+      </ng-container>
+    </div>
+  </sci-form-field>
+</form>
+
+<datalist id="view">
+  <option *ngFor="let view of viewEntries" [value]="view.id">{{view.id}}</option>
+</datalist>

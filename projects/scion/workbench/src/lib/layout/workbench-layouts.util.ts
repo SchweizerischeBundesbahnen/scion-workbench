@@ -7,7 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MTreeNode} from './workbench-layout.model';
+import {MPart, MPartGrid, MTreeNode, MView} from './workbench-layout.model';
+import {MAIN_AREA} from './workbench-layout';
+import {ViewId} from '../view/workbench-view.model';
+import {VIEW_ID_PREFIX} from '../workbench.constants';
 
 /**
  * Provides helper functions for operating on a workbench layout.
@@ -27,5 +30,57 @@ export const WorkbenchLayouts = {
       parts.push(...WorkbenchLayouts.collectParts(element.child2));
     }
     return parts;
+  },
+
+  collectViews: (node: MPart | MTreeNode): MView[] => {
+    const views = new Array<MView>();
+    if (node instanceof MPart) {
+      views.push(...node.views);
+    }
+    else {
+      views.push(...WorkbenchLayouts.collectViews(node.child1));
+      views.push(...WorkbenchLayouts.collectViews(node.child2));
+    }
+    return views;
+  },
+
+  hasMainArea: (workbenchGrid: MPartGrid): boolean => {
+    return hasMainArea_(workbenchGrid.root);
+
+    function hasMainArea_(node: MPart | MTreeNode): boolean {
+      if (node instanceof MPart) {
+        return node.id === MAIN_AREA;
+      }
+      return hasMainArea_(node.child1) || hasMainArea_(node.child2);
+    }
+  },
+
+  /**
+   * Tests if the given {@link MTreeNode} or {@link MPart} is visible.
+   *
+   * - A part is considered visible if it is the main area part or has at least one view.
+   * - A node is considered visible if it has at least one visible part in its child hierarchy.
+   */
+  isGridElementVisible: (element: MTreeNode | MPart): boolean => {
+    if (element instanceof MPart) {
+      return element.id === MAIN_AREA || element.views.length > 0;
+    }
+    return WorkbenchLayouts.isGridElementVisible(element.child1) || WorkbenchLayouts.isGridElementVisible(element.child2);
+  },
+
+  /**
+   * Computes the next available view id.
+   */
+  computeNextViewId: (viewIds: Iterable<ViewId>): ViewId => {
+    const ids = Array.from(viewIds)
+      .map(viewId => Number(viewId.substring(VIEW_ID_PREFIX.length)))
+      .reduce((set, id) => set.add(id), new Set<number>());
+
+    for (let i = 1; i <= ids.size; i++) {
+      if (!ids.has(i)) {
+        return VIEW_ID_PREFIX.concat(`${i}`) as ViewId;
+      }
+    }
+    return VIEW_ID_PREFIX.concat(`${ids.size + 1}`) as ViewId;
   },
 } as const;

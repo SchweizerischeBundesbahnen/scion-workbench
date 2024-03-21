@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Routes} from '@angular/router';
+import {PRIMARY_OUTLET, Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {WorkbenchRouteData} from '@scion/workbench';
 import {topLevelTestPageRoutes} from './test-pages/routes';
@@ -36,12 +36,65 @@ export const routes: Routes = [
   {
     path: 'test-router',
     loadComponent: () => import('./router-page/router-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Workbench Router', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-router', pinToStartPage: true},
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Router',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-router',
+      pinToStartPage: true,
+      path: 'test-router',
+      outlet: PRIMARY_OUTLET,
+    },
+  },
+  {
+    path: '',
+    outlet: 'test-router',
+    loadComponent: () => import('./router-page/router-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Router',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-router',
+      pinToStartPage: true,
+      path: '',
+      outlet: 'test-router',
+    },
   },
   {
     path: 'test-view',
     loadComponent: () => import('./view-page/view-page.component'),
-    data: {[WorkbenchRouteData.title]: 'Workbench View', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-view', pinToStartPage: true},
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench View',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-view',
+      pinToStartPage: true,
+      path: 'test-view',
+      outlet: PRIMARY_OUTLET,
+    },
+  },
+  {
+    path: '',
+    outlet: 'test-view',
+    loadComponent: () => import('./view-page/view-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench View',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-view',
+      pinToStartPage: true,
+      path: '',
+      outlet: 'test-view',
+    },
+  },
+  {
+    path: 'test-view',
+    outlet: 'test-view',
+    loadComponent: () => import('./view-page/view-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench View',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-view',
+      pinToStartPage: true,
+      path: 'test-view',
+      outlet: 'test-view',
+    },
   },
   {
     path: 'test-perspective',

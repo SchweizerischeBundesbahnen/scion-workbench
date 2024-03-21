@@ -10,7 +10,7 @@
 
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {StandaloneViewTestPagePO} from './page-object/test-pages/standalone-view-test-page.po';
 import {NonStandaloneViewTestPagePO} from './page-object/test-pages/non-standalone-view-test-page.po';
 import {MAIN_AREA} from '../workbench.model';

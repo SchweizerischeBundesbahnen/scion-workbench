@@ -1,0 +1,38 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <sci-form-field label="View ID">
+      <input [formControl]="form.controls.viewId" class="e2e-view-id">
+    </sci-form-field>
+  </section>
+
+  <section>
+    <sci-form-field label="Commands">
+      <app-router-commands [formControl]="form.controls.commands" class="e2e-commands"/>
+    </sci-form-field>
+
+    <sci-form-field label="State">
+      <sci-key-value-field [keyValueFormArray]="form.controls.state" [addable]="true" [removable]="true" class="e2e-state"></sci-key-value-field>
+    </sci-form-field>
+  </section>
+
+  <section [formGroup]="form.controls.options">
+    <sci-form-field label="Outlet">
+      <input [formControl]="form.controls.options.controls.outlet" class="e2e-outlet">
+    </sci-form-field>
+    <sci-form-field label="CSS Class(es)">
+      <input [formControl]="form.controls.options.controls.cssClass" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onNavigate()" [disabled]="form.invalid" class="e2e-navigate" sci-primary>
+    Navigate
+  </button>
+</form>
+
+<output class="navigate-success e2e-navigate-success" *ngIf="navigateError === false">
+  Success
+</output>
+
+<output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
+  {{navigateError}}
+</output>

@@ -16,6 +16,7 @@ import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ViewId} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 
 /**
@@ -264,9 +265,11 @@ export interface ViewDragData {
    * Y-coordinate of the mouse pointer, relative to the view tab drag image.
    */
   viewTabPointerOffsetY: number;
-  viewId: string;
+  viewId: ViewId;
+  alternativeViewId?: string;
   viewTitle: string;
   viewUrlSegments: UrlSegment[];
+  outlet?: string;
   viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
@@ -289,8 +292,10 @@ export interface ViewMoveEvent {
  * Describes a view to be moved to another location.
  */
 export interface ViewMoveEventSource {
-  viewId: string;
+  viewId: ViewId;
   partId: string;
+  outlet?: string;
+  alternativeViewId?: string;
   viewUrlSegments: UrlSegment[];
   workbenchId: string;
   classList?: ClassListMap;

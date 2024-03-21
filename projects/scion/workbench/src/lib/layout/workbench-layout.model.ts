@@ -10,6 +10,7 @@
 
 import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -83,7 +84,7 @@ export class MPart {
   public readonly id!: string;
   public parent?: MTreeNode;
   public views: MView[] = [];
-  public activeViewId?: string;
+  public activeViewId?: ViewId;
   public structural!: boolean;
 
   constructor(part: Partial<Omit<MPart, 'type'>>) {
@@ -106,5 +107,11 @@ export class MPart {
  * The M-prefix indicates that {@link MView} is a layout model object that will be serialized into the URL.
  */
 export interface MView {
-  readonly id: string;
+  id: ViewId;
+  alternativeId?: string;
+  cssClass?: string[];
+  navigation?: {
+    outlet: string;
+    cssClass?: string[];
+  };
 }

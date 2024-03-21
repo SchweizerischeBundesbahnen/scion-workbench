@@ -14,6 +14,7 @@ import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
 import {AppPO} from './app.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Handle for interacting with a workbench view tab.
@@ -44,8 +45,8 @@ export class ViewTabPO {
     this.part = part;
   }
 
-  public async getViewId(): Promise<string> {
-    return (await this.locator.getAttribute('data-viewid'))!;
+  public async getViewId(): Promise<ViewId> {
+    return (await this.locator.getAttribute('data-viewid'))! as ViewId;
   }
 
   public async click(): Promise<void> {

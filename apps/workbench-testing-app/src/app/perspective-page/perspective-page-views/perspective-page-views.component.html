@@ -4,6 +4,7 @@
       <span>View ID</span>
       <span>Part ID</span>
       <span>Position</span>
+      <span>CSS Class(es)</span>
       <span class="checkbox">Activate View</span>
       <span class="checkbox">Activate Part</span>
 
@@ -14,17 +15,19 @@
         <button (click)="onClearViews()" class="e2e-clear" title="Remove all views" sciMaterialIcon>clear</button>
       </div>
 
-      <ng-container *ngFor="let partsGroup of form.controls.views.controls; index as i;">
+      <ng-container *ngFor="let formGroup of form.controls.views.controls; index as i;">
         <!-- id -->
-        <input [formControl]="partsGroup.controls.id" [class]="'e2e-view-id'">
+        <input [formControl]="formGroup.controls.id" [class]="'e2e-view-id'">
         <!-- partId -->
-        <input [formControl]="partsGroup.controls.partId" [class]="'e2e-view-part-id'" list="parts">
+        <input [formControl]="formGroup.controls.options.controls.partId" [class]="'e2e-part-id'" list="parts">
         <!-- position -->
-        <input [formControl]="partsGroup.controls.position" type="number" [class]="'e2e-view-position'">
+        <input [formControl]="formGroup.controls.options.controls.position" type="number" [class]="'e2e-position'">
+        <!-- CSS class -->
+        <input [formControl]="formGroup.controls.options.controls.cssClass" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
         <!-- activateView -->
-        <sci-checkbox [formControl]="partsGroup.controls.activateView" [class]="'e2e-view-activate-view'"></sci-checkbox>
+        <sci-checkbox [formControl]="formGroup.controls.options.controls.activateView" [class]="'e2e-activate-view'"></sci-checkbox>
         <!-- activatePart -->
-        <sci-checkbox [formControl]="partsGroup.controls.activatePart" [class]="'e2e-view-activate-part'"></sci-checkbox>
+        <sci-checkbox [formControl]="formGroup.controls.options.controls.activatePart" [class]="'e2e-activate-part'"></sci-checkbox>
         <!-- 'remove' button -->
         <button class="e2e-remove" (click)="onRemoveView(i)" title="Remove view" sciMaterialIcon>remove</button>
       </ng-container>

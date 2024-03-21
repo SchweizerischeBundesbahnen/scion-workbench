@@ -34,7 +34,14 @@ export abstract class WorkbenchModuleConfig {
    *   constructor(view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {}
    * }
    */
-  public abstract viewTabComponent?: ComponentType<any>;
+  public abstract viewTabComponent?: ComponentType<unknown>;
+
+  /**
+   * Specifies the component to display when the URL for a view does not match any defined routes, e.g.,
+   * when navigating to a route that does not exist, or when loading the application and the routes have
+   * changed since last use.
+   */
+  public abstract viewNotFoundComponent?: ComponentType<unknown>;
 
   /**
    * Controls which built-in menu items to display in the view context menu.
@@ -164,12 +171,14 @@ export abstract class WorkbenchModuleConfig {
    * ```
    */
   public abstract layout?: WorkbenchLayoutFn | WorkbenchPerspectives;
+
   /**
    * Provides persistent storage to the SCION Workbench.
    *
    * If not set, the workbench uses the browser's local storage as persistent storage.
    */
   public abstract storage?: Type<WorkbenchStorage>;
+
   /**
    * Configures the behavior of workbench dialogs.
    */

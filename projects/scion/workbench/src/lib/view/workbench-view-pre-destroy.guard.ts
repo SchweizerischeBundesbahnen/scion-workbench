@@ -12,11 +12,17 @@ import {CanDeactivateFn} from '@angular/router';
 import {WorkbenchViewPreDestroy} from '../workbench.model';
 import {inject} from '@angular/core';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {RouterUtils} from '../routing/router.util';
+import {ViewId} from './workbench-view.model';
 
 /**
  * Invokes {@link WorkbenchViewPreDestroy#onWorkbenchViewPreDestroy} lifecycle hook if implemented by the component.
  */
 export const canDeactivateWorkbenchView: CanDeactivateFn<unknown> = (component, currentRoute) => {
+  if (!RouterUtils.isPrimaryViewId(currentRoute.outlet)) {
+    throw Error(`[ViewError] Expected outlet to have format "view.\${number}", but was "${currentRoute.outlet}".`);
+  }
+
   // Depending on the route configuration, this guard can be called even if the component is not to be destroyed.
   // Therefore, we need to check if the view is actually being closed before invoking the `onWorkbenchViewPreDestroy`
   // lifecycle hook. For an example, see {@link provideMicrofrontendRoutes}.
@@ -30,7 +36,7 @@ export const canDeactivateWorkbenchView: CanDeactivateFn<unknown> = (component, 
 /**
  * Tests if given view is to be removed.
  */
-function isViewToBeRemoved(currentViewId: string): boolean {
+function isViewToBeRemoved(currentViewId: ViewId): boolean {
   return inject(WorkbenchRouter).getCurrentNavigationContext()?.layoutDiff.removedViews.includes(currentViewId) ?? false;
 }
 

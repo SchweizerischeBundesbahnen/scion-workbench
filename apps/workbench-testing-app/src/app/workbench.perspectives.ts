@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ROUTES} from '@angular/router';
+import {Routes, ROUTES} from '@angular/router';
 import {MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
@@ -81,7 +81,7 @@ export const Perspectives = {
           {path: '', outlet: 'servers', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
           {path: '', outlet: 'progress', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
           {path: '', outlet: 'git-staging', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
-        ],
+        ]  satisfies Routes,
       },
     ]);
   },
@@ -106,6 +106,15 @@ function provideDeveloperPerspectiveLayout(factory: WorkbenchLayoutFactory): Wor
     .addView('search', {partId: 'bottom'})
     .addView('progress', {partId: 'bottom'})
     .addView('outline', {partId: 'right'})
+    .navigateView('package-explorer', [], {outlet: 'package-explorer'})
+    .navigateView('navigator', [], {outlet: 'navigator'})
+    .navigateView('git-repositories', [], {outlet: 'git-repositories'})
+    .navigateView('problems', [], {outlet: 'problems'})
+    .navigateView('git-staging', [], {outlet: 'git-staging'})
+    .navigateView('console', [], {outlet: 'console'})
+    .navigateView('search', [], {outlet: 'search'})
+    .navigateView('progress', [], {outlet: 'progress'})
+    .navigateView('outline', [], {outlet: 'outline'})
     .activateView('package-explorer')
     .activateView('git-repositories')
     .activateView('console')
@@ -127,7 +136,14 @@ function provideDebugPerspectiveLayout(factory: WorkbenchLayoutFactory): Workben
     .addView('variables', {partId: 'right'})
     .addView('expressions', {partId: 'right'})
     .addView('breakpoints', {partId: 'right'})
-    .addPart('findArea', {align: 'right', ratio: .25})
+    .navigateView('debug', [], {outlet: 'debug'})
+    .navigateView('package-explorer', [], {outlet: 'package-explorer'})
+    .navigateView('servers', [], {outlet: 'servers'})
+    .navigateView('console', [], {outlet: 'console'})
+    .navigateView('problems', [], {outlet: 'problems'})
+    .navigateView('variables', [], {outlet: 'variables'})
+    .navigateView('expressions', [], {outlet: 'expressions'})
+    .navigateView('breakpoints', [], {outlet: 'breakpoints'})
     .activateView('debug')
     .activateView('console')
     .activateView('variables');

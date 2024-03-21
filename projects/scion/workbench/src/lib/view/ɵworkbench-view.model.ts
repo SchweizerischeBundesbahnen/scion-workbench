@@ -9,15 +9,15 @@
  */
 
 import {BehaviorSubject, combineLatest, EMPTY, Observable, switchMap} from 'rxjs';
-import {ChildrenOutletContexts, Router, UrlSegment} from '@angular/router';
-import {ViewDragService} from '../view-dnd/view-drag.service';
+import {ChildrenOutletContexts, UrlSegment} from '@angular/router';
+import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
-import {WorkbenchView} from './workbench-view.model';
+import {ViewId, WorkbenchView} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
@@ -37,9 +37,9 @@ import {provideViewContext} from './view-context-provider';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
-import {ViewState} from '../routing/routing.model';
-import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
+import {MView} from '../layout/workbench-layout.model';
 import {ClassList} from '../common/class-list';
+import {ViewState} from '../routing/routing.model';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -49,7 +49,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _router = inject(Router);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
 
@@ -61,13 +60,15 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   private _activationInstant: number | undefined;
   private _closable = true;
+  private _mView!: MView;
 
+  public urlSegments: UrlSegment[] = [];
+  public state: ViewState = {};
   public title: string | null = null;
   public heading: string | null = null;
   public dirty = false;
   public scrollTop = 0;
   public scrollLeft = 0;
-  public state: ViewState = {};
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
@@ -75,7 +76,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
-  constructor(public readonly id: string, options: {component: ComponentType<ViewComponent>}) {
+  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>}) {
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
@@ -107,44 +108,66 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Method invoked to update this workbench model object when the workbench layout changes.
    */
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
-    const partId = layout.part({by: {viewId: this.id}}).id;
-    this._part$.next(this._partRegistry.get(partId));
-    this.state = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!)?.viewStates[this.id] ?? this.state ?? {};
-    this.classList.set(this.state[WorkbenchNavigationalViewStates.cssClass] as undefined | string | string[], {scope: 'navigation'});
+    const part = layout.part({by: {viewId: this.id}});
+    this._mView = layout.view({by: {viewId: this.id}});
+    this.urlSegments = layout.urlSegments({by: {viewId: this.id}});
+    this.state = layout.viewState({by: {viewId: this.id}});
+    this.classList.set(this._mView.cssClass, {scope: 'layout'});
+    this.classList.set(this._mView.navigation?.cssClass, {scope: 'navigation'});
+    this._part$.next(this._partRegistry.get(part.id));
   }
 
+  /** @inheritDoc */
   public get first(): boolean {
     return this.position === 0;
   }
 
+  /** @inheritDoc */
   public get last(): boolean {
     return this.position === this.part.viewIds.length - 1;
   }
 
+  /** @inheritDoc */
   public get position(): number {
     return this.part.viewIds.indexOf(this.id);
   }
 
+  /** @inheritDoc */
   public set cssClass(cssClass: string | string[]) {
     this.classList.set(cssClass, {scope: 'application'});
   }
 
+  /** @inheritDoc */
   public get cssClass(): string[] {
     return this.classList.get({scope: 'application'});
   }
 
+  /** @inheritDoc */
   public get active(): boolean {
     return this.active$.value;
   }
 
+  /** @inheritDoc */
   public set closable(closable: boolean) {
     this._closable = closable;
   }
 
+  /** @inheritDoc */
   public get closable(): boolean {
     return this._closable && !this.blockedBy$.value;
   }
 
+  /** @inheritDoc */
+  public get alternativeId(): string | undefined {
+    return this._mView.alternativeId;
+  }
+
+  /** @inheritDoc */
+  public get outlet(): string | undefined {
+    return this._mView.navigation?.outlet;
+  }
+
+  /** @inheritDoc */
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
     if (this.active && this.part.active) {
       return true;
@@ -157,18 +180,14 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     );
   }
 
-  /**
-   * Sets whether the tab of this view is scrolled into view in the tabbar.
-   */
+  /** @inheritDoc */
   public set scrolledIntoView(scrolledIntoView: boolean) {
     if (scrolledIntoView !== this._scrolledIntoView$.value) {
       this._scrolledIntoView$.next(scrolledIntoView);
     }
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public get scrolledIntoView(): boolean {
     return this._scrolledIntoView$.value;
   }
@@ -185,10 +204,12 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     return this._activationInstant;
   }
 
+  /** @inheritDoc */
   public get part(): WorkbenchPart {
     return Defined.orElseThrow(this._part$.value, () => Error(`[NullPartError] Part reference missing for view '${this.id}'.`));
   }
 
+  /** @inheritDoc */
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
     switch (target || 'self') {
       case 'self': {
@@ -214,14 +235,17 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     }
   }
 
+  /** @inheritDoc */
   public move(target: 'new-window'): void;
   public move(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void;
   public move(target: 'new-window' | string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void {
-    const source = {
+    const source: ViewMoveEventSource = {
       workbenchId: this._workbenchId,
       partId: this.part.id,
       viewId: this.id,
+      alternativeViewId: this.alternativeId,
       viewUrlSegments: this.urlSegments,
+      outlet: this.outlet,
       classList: this.classList.toMap(),
     };
 
@@ -240,11 +264,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     }
   }
 
-  public get urlSegments(): UrlSegment[] {
-    const urlTree = this._router.parseUrl(this._router.url);
-    return urlTree.root.children[this.id]?.segments ?? [];
-  }
-
+  /** @inheritDoc */
   public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
     const factoryFn = (): WorkbenchMenuItem => menuItem;
     this._menuItemProviders$.next(this._menuItemProviders$.value.concat(factoryFn));

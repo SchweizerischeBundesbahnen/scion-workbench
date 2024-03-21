@@ -13,6 +13,7 @@ import {MPart, MPartGrid} from './workbench-layout.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {EnvironmentInjector, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA} from './workbench-layout';
+import {ViewOutlets, ViewStates} from '../routing/routing.model';
 
 /**
  * @inheritDoc
@@ -39,11 +40,13 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
    * - If not specifying the main area grid, but the workbench grid has a main area part, creates a main area grid with an initial part.
    *   To control the identity of the initial part, pass an injector and set the DI token {@link MAIN_AREA_INITIAL_PART_ID}.
    */
-  public create(options?: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; injector?: Injector; maximized?: boolean}): ɵWorkbenchLayout {
+  public create(options?: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: ViewOutlets; viewStates?: ViewStates; injector?: Injector; maximized?: boolean}): ɵWorkbenchLayout {
     return runInInjectionContext(options?.injector ?? this._environmentInjector, () => new ɵWorkbenchLayout({
       workbenchGrid: options?.workbenchGrid,
       mainAreaGrid: options?.mainAreaGrid,
       maximized: options?.maximized,
+      viewOutlets: options?.viewOutlets,
+      viewStates: options?.viewStates,
     }));
   }
 }

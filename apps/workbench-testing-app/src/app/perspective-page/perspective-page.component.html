@@ -19,6 +19,10 @@
     <app-perspective-page-views [formControl]="form.controls.views" [partEntries]="form.controls.parts.value"/>
   </section>
 
+  <section>
+    <app-perspective-page-navigate-views [formControl]="form.controls.navigateViews" [viewEntries]="form.controls.views.value"/>
+  </section>
+
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>
     Register
   </button>

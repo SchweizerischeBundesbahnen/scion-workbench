@@ -12,6 +12,7 @@ import {Locator} from '@playwright/test';
 import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -357,7 +358,7 @@ export class MPart {
   public readonly type = 'MPart';
   public readonly id?: string;
   public views?: MView[];
-  public activeViewId?: string;
+  public activeViewId?: ViewId;
 
   constructor(part: Omit<MPart, 'type'>) {
     Object.assign(this, part);
@@ -368,5 +369,5 @@ export class MPart {
  * Modified version of {@link MView} to expect the workbench layout.
  */
 export interface MView {
-  readonly id: string;
+  readonly id: ViewId;
 }

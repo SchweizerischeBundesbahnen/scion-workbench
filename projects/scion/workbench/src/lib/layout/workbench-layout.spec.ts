@@ -16,6 +16,8 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
+import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
+import {segments} from '../testing/testing.util';
 
 describe('WorkbenchLayout', () => {
 
@@ -1152,8 +1154,8 @@ describe('WorkbenchLayout', () => {
       .addView('view.1', {partId: 'main'})
       .addView('view.5', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
-      .addView('view.4', {partId: 'main'})
-      .addView('view.3', {partId: 'main'});
+      .addView('view.3', {partId: 'main'})
+      .addView('view.4', {partId: 'main'});
 
     // prepare the activation history
     viewActivationInstantProviderSpyObj.getActivationInstant
@@ -1450,9 +1452,6 @@ describe('WorkbenchLayout', () => {
     workbenchLayout = workbenchLayout.addView('view.2', {partId: 'main'});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
 
-    workbenchLayout = workbenchLayout.addView('view.6', {partId: 'main'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
     workbenchLayout = workbenchLayout.addView('view.3', {partId: 'main'});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.4');
 
@@ -1460,6 +1459,9 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.computeNextViewId()).toEqual('view.5');
 
     workbenchLayout = workbenchLayout.addView('view.5', {partId: 'main'});
+    expect(workbenchLayout.computeNextViewId()).toEqual('view.6');
+
+    workbenchLayout = workbenchLayout.addView('view.6', {partId: 'main'});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
 
     workbenchLayout = workbenchLayout.removeView('view.3');
@@ -1622,6 +1624,78 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.views({grid: 'mainArea'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
   });
 
+  it('should find views by URL segments', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.1', {partId: MAIN_AREA})
+      .addView('view.2', {partId: MAIN_AREA})
+      .addView('view.3', {partId: MAIN_AREA})
+      .navigateView('view.1', ['path', 'to', 'view', '1'])
+      .navigateView('view.2', ['path', 'to', 'view', '2'])
+      .navigateView('view.3', ['path', 'to', 'view', '2']);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path']), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view']), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '1']), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(['view.1']);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '2']), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.2', 'view.3']));
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '*']), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '*']), {matchWildcardPathSegment: true, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+  });
+
+  it('should find views by URL segments (matrix params matching)', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.1', {partId: MAIN_AREA})
+      .addView('view.2', {partId: MAIN_AREA})
+      .addView('view.3', {partId: MAIN_AREA})
+      .navigateView('view.1', ['path', 'to', 'view'])
+      .navigateView('view.2', ['path', 'to', 'view', {matrixParam: 'A'}])
+      .navigateView('view.3', ['path', 'to', 'view', {matrixParam: 'B'}]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view']), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view']), {matchWildcardPathSegment: false, matchMatrixParams: true})})
+      .map(view => view.id),
+    ).toEqual(['view.1']);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', {matrixParam: 'A'}]), {matchWildcardPathSegment: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', {matrixParam: 'A'}]), {matchWildcardPathSegment: false, matchMatrixParams: true})})
+      .map(view => view.id),
+    ).toEqual(['view.2']);
+  });
+
   it('should activate adjacent view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
 
@@ -1727,7 +1801,7 @@ describe('WorkbenchLayout', () => {
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.30', 'view.4']));
 
     // Rename 'view.99' (does not exist)
-    expect(() => workbenchLayout.renameView('view.99', 'view.999')).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.renameView('view.99', 'view.999')).toThrowError(/NullViewError/);
 
     // Rename 'view.1' to 'view.2'
     expect(() => workbenchLayout.renameView('view.1', 'view.2')).toThrowError(/\[IllegalArgumentError] View id must be unique/);

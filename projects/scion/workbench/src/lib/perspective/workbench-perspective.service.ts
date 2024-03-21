@@ -90,13 +90,16 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
   /**
    * Switches to the specified perspective. The main area will not change, if any.
+   * TODO [WB-LAYOUT] Convince Marcarrian -> better naming
+   *                  -> required for layout migration tests where we store a layout in local storage before executing the test
+   *                  -> otherwise, the initial perspective is ignored even if set via local storage -> because current perspective is stored as window name, which has precedence when selecting the initial perspective
    */
-  public async switchPerspective(id: string): Promise<boolean> {
+  public async switchPerspective(id: string, options?: {storeActivation?: boolean}): Promise<boolean> {
     if (this.activePerspective?.id === id) {
       return true;
     }
     const activated = await this._perspectiveRegistry.get(id).activate();
-    if (activated) {
+    if (activated && (options?.storeActivation ?? true)) {
       await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);
       window.name = generatePerspectiveWindowName(id);
     }
@@ -144,7 +147,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
     // Select initial perspective.
     if (initialPerspectiveId) {
-      await this.switchPerspective(initialPerspectiveId);
+      await this.switchPerspective(initialPerspectiveId, {storeActivation: false});
     }
   }
 

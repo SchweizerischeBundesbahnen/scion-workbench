@@ -190,6 +190,11 @@ export class HeaderComponent {
   private contributeSettingsMenuItems(): MenuItem[] {
     return [
       new MenuItem({
+        text: 'Reset forms on submit',
+        checked: this._settingsService.isEnabled('resetFormsOnSubmit'),
+        onAction: () => this._settingsService.toggle('resetFormsOnSubmit'),
+      }),
+      new MenuItem({
         text: 'Log Angular change detection cycles',
         cssClass: 'e2e-log-angular-change-detection-cycles',
         checked: this._settingsService.isEnabled('logAngularChangeDetectionCycles'),

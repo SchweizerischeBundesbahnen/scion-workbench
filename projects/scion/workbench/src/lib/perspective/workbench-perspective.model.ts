@@ -10,6 +10,8 @@
 import {Observable} from 'rxjs';
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
+import {MPartGrid} from '../layout/workbench-layout.model';
+import {ViewOutlets} from '../routing/routing.model';
 
 /**
  * A perspective is a named workbench layout.
@@ -121,3 +123,62 @@ export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<Wor
  * The function is passed a list of registered perspectives. The function can call `inject` to get any required dependencies.
  */
 export type WorkbenchPerspectiveSelectionFn = (perspectives: WorkbenchPerspective[]) => Promise<WorkbenchPerspective | null> | WorkbenchPerspective | null;
+
+/**
+ * Represents a perspective
+ *
+ * Contains the aspets o
+ *
+ * Represents the layout configuration for a perspective, defining the arrangement of views
+ * in the workbench grid and containing the commands of referenced non-static views.
+ */
+export interface MPerspectiveLayout {
+  /**
+   * Arrangement of views in the workbench grid.
+   */
+  workbenchGrid: MPartGrid;
+  /**
+   * URL segments of views referenced in the workbench grid.
+   */
+  viewOutlets: ViewOutlets;
+}
+
+/**
+ * Contains the layouts of a perspective stored in persistent storage.
+ */
+export interface MPerspectiveLayouts {
+  /**
+   * Defines the default layout before any user personalization (factory default).
+   */
+  referenceLayout: {
+    /**
+     * @see MPerspectiveLayout.workbenchGrid
+     * @see WorkbenchLayoutSerializer.serialize
+     * @see WorkbenchLayoutSerializer.deserialize
+     */
+    workbenchGrid: string;
+    /**
+     * @see MPerspectiveLayout.viewOutlets
+     * @see WorkbenchLayoutSerializer.serializeViewOutlets
+     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     */
+    viewOutlets: string;
+  };
+  /**
+   * Represents the personalized layout customized by the user.
+   */
+  userLayout: {
+    /**
+     * @see MPerspectiveLayout.workbenchGrid
+     * @see WorkbenchLayoutSerializer.serialize
+     * @see WorkbenchLayoutSerializer.deserialize
+     */
+    workbenchGrid: string;
+    /**
+     * @see MPerspectiveLayout.viewOutlets
+     * @see WorkbenchLayoutSerializer.serializeViewOutlets
+     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     */
+    viewOutlets: string;
+  };
+}

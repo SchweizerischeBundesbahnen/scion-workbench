@@ -1,0 +1,14 @@
+<header>NG04002: Cannot match any routes.</header>
+
+<section class="details">
+  <span>View ID:</span><span>{{view.id}}</span>
+  <span>URL Segments:</span><span>{{view.urlSegments}}</span>
+  <span>Route Outlet:</span><span>{{view.outlet ?? 'PRIMARY'}}</span>
+</section>
+
+Consider the following:
+<ul>
+  <li>should display component or close the view silently when activing a perspective; component should be configurable via workbench module config</li>
+  <li>should throw error (in a guard) when navigating via router to propagate error to the navigator</li>
+</ul>
+

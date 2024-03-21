@@ -8,14 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
-import {VIEW_ID_PREFIX} from '../workbench.constants';
 import {assertType} from '../common/asserts.util';
 import {UUID} from '@scion/toolkit/uuid';
 import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
-import {inject, Injectable, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
+import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
+import {RouterUtils} from '../routing/router.util';
+import {Commands, ViewOutlets, ViewState, ViewStates} from '../routing/routing.model';
+import {ActivatedRoute, PRIMARY_OUTLET, UrlSegment} from '@angular/router';
+import {ViewId} from '../view/workbench-view.model';
+import {Arrays} from '@scion/toolkit/util';
+import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
+import {Objects} from '../common/objects.util';
+import {WorkbenchLayouts} from './workbench-layouts.util';
 
 /**
  * @inheritDoc
@@ -33,6 +40,8 @@ import {inject, Injectable, InjectionToken, Injector, runInInjectionContext} fro
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
+  private readonly _viewOutlets: Map<ViewId, UrlSegment[]>;
+  private readonly _viewStates: Map<ViewId, ViewState>;
   private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
@@ -42,16 +51,25 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private _maximized: boolean;
 
   /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; maximized?: boolean}) {
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: ViewOutlets; viewStates?: ViewStates; maximized?: boolean}) {
     this._grids = {
       workbench: coerceMPartGrid(config.workbenchGrid ?? createDefaultWorkbenchGrid()),
     };
     if (this.hasPart(MAIN_AREA, {grid: 'workbench'})) {
       this._grids.mainArea = coerceMPartGrid(config.mainAreaGrid ?? createInitialMainAreaGrid());
     }
-    this._gridNames = Object.keys(this._grids) as Array<keyof Grids>;
+    this._gridNames = Objects.keys(this._grids);
     this._maximized = config.maximized ?? false;
+    this._viewOutlets = new Map<ViewId, UrlSegment[]>(Objects.entries(config.viewOutlets ?? {}));
+    this._viewStates = new Map<ViewId, ViewState>(Objects.entries(config.viewStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
+
+    // Remove view state of views not contained in this layout.
+    this._viewOutlets.forEach((_, viewId) => {
+      if (!this.hasView(viewId)) {
+        this._viewOutlets.delete(viewId);
+      }
+    });
   }
 
   /**
@@ -73,8 +91,45 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Tests if given part is contained in specified grid.
    */
-  public hasPart(partId: string, options?: {grid?: keyof Grids}): boolean {
-    return this.part({by: {partId}, grid: options?.grid}, {orElse: null}) !== null;
+  public hasPart(id: string, options?: {grid?: keyof Grids}): boolean {
+    return this.part({by: {partId: id}, grid: options?.grid}, {orElse: null}) !== null;
+  }
+
+  /**
+   * Tests if given view is contained in specified grid.
+   */
+  public hasView(id: string, options?: {grid?: keyof Grids}): boolean {
+    return this.views({grid: options?.grid, id: id}).length > 0;
+  }
+
+  /**
+   * Returns the URL segments of non-static views that match the given search criteria.
+   *
+   * @param find - Search constraints
+   *       @property grid - Limits the search scope. If not specified, all grids are searched.
+   * @return view outlets matching the filter criteria.
+   */
+  public viewOutlets(find?: {grid?: keyof Grids}): ViewOutlets {
+    const viewOutletEntries = this.views({grid: find?.grid}).map(view => [view.id, this._viewOutlets.get(view.id) ?? []]);
+    return Object.fromEntries(viewOutletEntries);
+  }
+
+  /**
+   * View state to be passed to the navigation when activating this layout.
+   *
+   * State can be read from {@link WorkbenchView.state}, or the browser's session history via `history.state`. During navigation, state is available via navigation extras.
+   */
+  public viewStates(find?: {grid?: keyof Grids}): ViewStates {
+    const viewStateEntries = this.views({grid: find?.grid}).map(view => [view.id, this._viewStates.get(view.id) ?? {}]);
+    return Object.fromEntries(viewStateEntries);
+  }
+
+  public viewState(find: {by: {viewId: ViewId}}): ViewState {
+    return this._viewStates.get(find.by.viewId) ?? {};
+  }
+
+  public urlSegments(find: {by: {viewId: ViewId}}): UrlSegment[] {
+    return this._viewOutlets.get(find.by.viewId) ?? [];
   }
 
   /**
@@ -83,7 +138,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return a copy of this layout with the maximization changed.
    */
   public toggleMaximized(): ɵWorkbenchLayout {
-    return this.workingCopy().__toggleMaximized();
+    const workingCopy = this.workingCopy();
+    workingCopy.__toggleMaximized();
+    return workingCopy;
   }
 
   /**
@@ -129,7 +186,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       if (find.by.partId && element.id !== find.by.partId) {
         return false;
       }
-      if (find.by.viewId && !element.views.some(view => view.id === find.by.viewId)) {
+      if (find.by.viewId && !element.views.some(matchViewById(find.by.viewId!))) {
         return false;
       }
       return true;
@@ -151,14 +208,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *                               from the layout when removing its last view. If not set, defaults to `true`.
    */
   public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
-    return this.workingCopy().__addPart(id, relativeTo, options);
+    const workingCopy = this.workingCopy();
+    workingCopy.__addPart(id, relativeTo, options);
+    return workingCopy;
   }
 
   /**
    * @inheritDoc
    */
   public removePart(id: string): ɵWorkbenchLayout {
-    return this.workingCopy().__removePart(id);
+    const workingCopy = this.workingCopy();
+    workingCopy.__removePart(id);
+    return workingCopy;
   }
 
   /**
@@ -178,7 +239,24 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @inheritDoc
    */
   public activatePart(id: string): ɵWorkbenchLayout {
-    return this.workingCopy().__activatePart(id);
+    const workingCopy = this.workingCopy();
+    workingCopy.__activatePart(id);
+    return workingCopy;
+  }
+
+  public view(find: {by: {viewId: ViewId}}): MView;
+  public view(find: {by: {viewId: ViewId}}, options: {orElse: null}): MView | null;
+  public view(find: {by: {viewId: ViewId}}, options?: {orElse: null}): MView | null {
+    const viewId = find.by.viewId;
+    if (!RouterUtils.isPrimaryViewId(viewId)) {
+      throw Error(`[ViewError] Expected view id to be primary view id, but was "${viewId}".`);
+    }
+
+    const view = this.views({id: viewId}).at(0);
+    if (!view && !options) {
+      throw Error(`[NullViewError] No view found with id "${viewId}".`);
+    }
+    return view ?? null;
   }
 
   /**
@@ -188,22 +266,53 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *       @property grid - Limits the search scope. If not specified, all grids are searched.
    * @return views maching the filter criteria.
    */
-  public views(find?: {grid?: keyof Grids}): readonly MView[] {
-    return this.parts(find).reduce((views, part) => views.concat(part.views), new Array<MView>());
+  public views(find?: {id?: string; segments?: UrlSegmentMatcher; outlet?: string; grid?: keyof Grids}): readonly MView[] {
+    return this.parts({grid: find?.grid})
+      .flatMap(part => part.views)
+      .filter(view => {
+        if (find?.id && !matchViewById(find.id)(view)) {
+          return false;
+        }
+        if (find?.segments && !find.segments.matches(this._viewOutlets.get(view.id) ?? [])) {
+          return false;
+        }
+        if (find?.outlet && find.outlet !== view.navigation?.outlet) {
+          return false;
+        }
+        return true;
+      });
   }
 
   /**
    * @inheritDoc
    */
-  public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
-    return this.workingCopy().__addView(id, options);
+  public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    if (RouterUtils.isPrimaryViewId(id)) {
+      workingCopy.__addView({id}, options);
+    }
+    else {
+      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id}, options);
+    }
+    return workingCopy;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public navigateView(id: string, commands: Commands, extras?: {outlet?: string; relativeTo?: ActivatedRoute | null; state?: ViewState; cssClass?: string | string[]}): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.views({id}).forEach(view => workingCopy.__navigateView(view, commands, extras));
+    return workingCopy;
   }
 
   /**
    * @inheritDoc
    */
   public removeView(id: string, options?: {grid?: keyof Grids}): ɵWorkbenchLayout {
-    return this.workingCopy().__removeView(id, options);
+    const workingCopy = this.workingCopy();
+    workingCopy.views({id}).forEach(view => workingCopy.__removeView(view, options));
+    return workingCopy;
   }
 
   /**
@@ -219,14 +328,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return a copy of this layout with the view moved.
    */
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
-    return this.workingCopy().__moveView(id, targetPartId, options);
+    const workingCopy = this.workingCopy();
+    workingCopy.views({id}).forEach(view => workingCopy.__moveView(view, targetPartId, options));
+    return workingCopy;
   }
 
   /**
    * @inheritDoc
    */
   public activateView(id: string, options?: {activatePart?: boolean}): ɵWorkbenchLayout {
-    return this.workingCopy().__activateView(id, options);
+    const workingCopy = this.workingCopy();
+    workingCopy.views({id}).forEach(view => workingCopy.__activateView(view, options));
+    return workingCopy;
   }
 
   /**
@@ -238,7 +351,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return a copy of this layout with the adjacent view activated.
    */
   public activateAdjacentView(id: string, options?: {activatePart?: boolean}): ɵWorkbenchLayout {
-    return this.workingCopy().__activateAdjacentView(id, options);
+    const workingCopy = this.workingCopy();
+    workingCopy.views({id}).forEach(view => workingCopy.__activateAdjacentView(view, options));
+    return workingCopy;
   }
 
   /**
@@ -250,8 +365,24 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *       @property grid - Grid to constrain where to find the view for rename.
    * @return a copy of this layout with the view renamed.
    */
-  public renameView(id: string, newViewId: string, options?: {grid?: keyof Grids}): ɵWorkbenchLayout {
-    return this.workingCopy().__renameView(id, newViewId, options);
+  public renameView(id: ViewId, newViewId: ViewId, options?: {grid?: keyof Grids}): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__renameView(workingCopy.view({by: {viewId: id}}), newViewId, {grid: options?.grid});
+    return workingCopy;
+  }
+
+  /**
+   * Sets the split ratio for the two children of a {@link MTreeNode}.
+   *
+   * @param  nodeId - The id of the node to set the split ratio for.
+   * @param  ratio - The proportional size between the two children, expressed as closed interval [0,1].
+   *                 Example: To give 1/3 of the space to the first child, set the ratio to `0.3`.
+   * @return a copy of this layout with the split ratio set.
+   */
+  public setSplitRatio(nodeId: string, ratio: number): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__setSplitRatio(nodeId, ratio);
+    return workingCopy;
   }
 
   /**
@@ -266,40 +397,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Computes the next available view id to be the target of a primary route.
-   *
-   * @see VIEW_ID_PREFIX
+   * Computes the next available view id.
    */
-  public computeNextViewId(): string {
-    const ids = this.views()
-      .filter(view => view.id.startsWith(VIEW_ID_PREFIX))
-      .map(view => Number(view.id.substring(VIEW_ID_PREFIX.length)))
-      .reduce((set, viewId) => set.add(viewId), new Set<number>());
-
-    for (let i = 1; i <= ids.size; i++) {
-      if (!ids.has(i)) {
-        return VIEW_ID_PREFIX.concat(`${i}`);
-      }
-    }
-    return VIEW_ID_PREFIX.concat(`${ids.size + 1}`);
-  }
-
-  /**
-   * Sets the split ratio for the two children of a {@link MTreeNode}.
-   *
-   * @param  nodeId - The id of the node to set the split ratio for.
-   * @param  ratio - The proportional size between the two children, expressed as closed interval [0,1].
-   *                 Example: To give 1/3 of the space to the first child, set the ratio to `0.3`.
-   * @return a copy of this layout with the split ratio set.
-   */
-  public setSplitRatio(nodeId: string, ratio: number): ɵWorkbenchLayout {
-    return this.workingCopy().__setSplitRatio(nodeId, ratio);
+  public computeNextViewId(): ViewId {
+    return WorkbenchLayouts.computeNextViewId(this.views().map(view => view.id));
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): this {
+  private __addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): void {
     if (this.hasPart(id)) {
       throw Error(`[IllegalArgumentError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
@@ -338,14 +445,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (options?.activate) {
       this.__activatePart(newPart.id);
     }
-
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removePart(id: string): this {
+  private __removePart(id: string): void {
     const part = this.part({by: {partId: id}});
     const grid = this.grid({by: {element: part}});
     const gridName = this._gridNames.find(gridName => this._grids[gridName] === grid);
@@ -353,7 +458,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     // The last part is never removed.
     const parts = this.parts({grid: gridName});
     if (parts.length === 1) {
-      return this;
+      return;
     }
 
     // Remove the part.
@@ -369,6 +474,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       part.parent!.parent.child2 = siblingElement;
     }
 
+    // Remove outlets and states of views contained in the part.
+    part.views.forEach(view => {
+      this._viewOutlets.delete(view.id);
+      this._viewStates.delete(view.id);
+    });
+
     // If the removed part was the active part, make the last used part the active part.
     if (grid.activePartId === id) {
       const activePart = parts
@@ -380,49 +491,82 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         })[0];
       grid.activePartId = activePart!.id;
     }
-
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): this {
-    if (this.views().find(view => view.id === id)) {
-      throw Error(`[IllegalArgumentError] View id must be unique. The layout already contains a view with the id '${id}'.`);
+  private __addView(view: MView, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): void {
+    if (this.hasView(view.id)) {
+      throw Error(`[IllegalArgumentError] View id must be unique. The layout already contains a view with the id '${view.id}'.`);
     }
 
     const part = this.part({by: {partId: options.partId}});
     const position = coercePosition(options.position ?? 'end', part);
-    part.views.splice(position, 0, {id});
+    part.views.splice(position, 0, view);
 
-    // Activate view and part.
     if (options.activateView) {
-      this.__activateView(id);
+      this.__activateView(view);
     }
     if (options.activatePart) {
       this.__activatePart(options.partId);
     }
-    return this;
+    if (options.cssClass) {
+      view.cssClass = Arrays.coerce(options.cssClass);
+    }
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): this {
-    const sourcePart = this.part({by: {viewId: id}});
+  private __navigateView(view: MView, commands: Commands, extras?: {outlet?: string; relativeTo?: ActivatedRoute | null; state?: ViewState; cssClass?: string | string[]}): void {
+    // TODO [WB-LAYOUT] Consider throwing an error if outlet is not set for empty commands
+    // TODO [WB-LAYOUT] Consider throwing an error if outlet is set for non-empty commands
+    // TODO [WB-LAYOUT] Navigating for the second time (with empty path) is outlet cleared?
+    const urlSegments = runInInjectionContext(this._injector, () => RouterUtils.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
+    if (urlSegments.length) {
+      this._viewOutlets.set(view.id, urlSegments);
+    }
+    else {
+      this._viewOutlets.delete(view.id);
+    }
+
+    if (extras?.state) {
+      this._viewStates.set(view.id, extras.state);
+    }
+    else {
+      this._viewStates.delete(view.id);
+    }
+
+    view.navigation = {
+      outlet: extras?.outlet ?? PRIMARY_OUTLET,
+      cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+    };
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __moveView(view: MView, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): void {
+    const sourcePart = this.part({by: {viewId: view.id}});
     const targetPart = this.part({by: {partId: targetPartId}});
 
     // Move the view.
     if (sourcePart !== targetPart) {
-      this.__removeView(id);
-      this.__addView(id, {partId: targetPartId, position: options?.position});
+      // TODO [WB-LAYOUT] Consider passing object to removeView to not remove outlet. Consequently, perform navigation after adding the view
+      const urlSegments = this._viewOutlets.get(view.id);
+      const state = this._viewStates.get(view.id);
+      this.__removeView(view);
+      this.__addView(view, {partId: targetPartId, position: options?.position});
+      urlSegments && this._viewOutlets.set(view.id, urlSegments);
+      state && this._viewStates.set(view.id, state);
     }
     else if (options?.position !== undefined) {
       const position = coercePosition(options.position, targetPart);
       const referenceView: MView | undefined = sourcePart.views.at(position);
-      sourcePart.views.splice(sourcePart.views.findIndex(view => view.id === id), 1);
-      sourcePart.views.splice(referenceView ? sourcePart.views.indexOf(referenceView) : sourcePart.views.length, 0, {id});
+      sourcePart.views.splice(sourcePart.views.indexOf(view), 1);
+      sourcePart.views.splice(referenceView ? sourcePart.views.indexOf(referenceView) : sourcePart.views.length, 0, view);
+
     }
 
     // Activate view and part.
@@ -430,121 +574,115 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this.__activatePart(targetPartId);
     }
     if (options?.activateView) {
-      this.__activateView(id);
+      this.__activateView(view);
     }
-
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removeView(id: string, options?: {grid?: keyof Grids}): this {
-    const part = this.part({by: {viewId: id}, grid: options?.grid});
+  private __removeView(view: MView, options?: {grid?: keyof Grids}): void {
+    const part = this.part({by: {viewId: view.id}, grid: options?.grid});
 
     // Remove the view.
-    const viewIndex = part.views.findIndex(view => view.id === id);
-    if (viewIndex === -1) {
-      throw Error(`[IllegalArgumentError] View not found in the part [part=${part.id}, view=${id}]`);
-    }
-
-    part.views.splice(viewIndex, 1);
+    part.views.splice(part.views.indexOf(view), 1);
+    this._viewOutlets.delete(view.id);
+    this._viewStates.delete(view.id);
 
     // Activate the last used view if this view was active.
-    if (part.activeViewId === id) {
+    if (part.activeViewId === view.id) {
       part.activeViewId = part.views
         .map(view => view.id)
         .sort((viewId1, viewId2) => {
           const activationInstantView1 = this._viewActivationInstantProvider.getActivationInstant(viewId1);
           const activationInstantView2 = this._viewActivationInstantProvider.getActivationInstant(viewId2);
           return activationInstantView2 - activationInstantView1;
-        })[0];
+        }).at(0);
     }
 
     // Remove the part if this is the last view of the part and not a structural part.
     if (part.views.length === 0 && !part.structural) {
       this.__removePart(part.id);
     }
-
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __activateView(id: string, options?: {activatePart?: boolean}): this {
+  private __activateView(view: MView, options?: {activatePart?: boolean}): void {
     // Activate the view.
-    const part = this.part({by: {viewId: id}});
-    part.activeViewId = id;
+    const part = this.part({by: {viewId: view.id}});
+    part.activeViewId = view.id;
 
     // Activate the part.
     if (options?.activatePart) {
       this.__activatePart(part.id);
     }
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __activateAdjacentView(id: string, options?: {activatePart?: boolean}): this {
-    const part = this.part({by: {viewId: id}});
-    const viewIndex = part.views.findIndex(view => view.id === id);
+  private __activateAdjacentView(view: MView, options?: {activatePart?: boolean}): void {
+    const part = this.part({by: {viewId: view.id}});
+    const viewIndex = part.views.indexOf(view);
     part.activeViewId = (part.views[viewIndex - 1] || part.views[viewIndex + 1])?.id; // is `undefined` if it is the last view of the part
 
     // Activate the part.
     if (options?.activatePart) {
       this.__activatePart(part.id);
     }
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __setSplitRatio(nodeId: string, ratio: number): this {
+  private __setSplitRatio(nodeId: string, ratio: number): void {
     if (ratio < 0 || ratio > 1) {
       throw Error(`[IllegalArgumentError] Ratio for node '${nodeId}' must be in the closed interval [0,1], but was '${ratio}'.`);
     }
     this.node({by: {nodeId}}).ratio = ratio;
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __activatePart(id: string): this {
+  private __activatePart(id: string): void {
     const part = this.part({by: {partId: id}});
     this.grid({by: {element: part}}).activePartId = id;
-
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __toggleMaximized(): this {
+  private __toggleMaximized(): void {
     this._maximized = !this._maximized;
-    return this;
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __renameView(id: string, newViewId: string, options?: {grid?: keyof Grids}): this {
-    if (this.views().find(view => view.id === newViewId)) {
+  private __renameView(view: MView, newViewId: ViewId, options?: {grid?: keyof Grids}): void {
+    if (this.hasView(newViewId)) {
       throw Error(`[IllegalArgumentError] View id must be unique. The layout already contains a view with the id '${newViewId}'.`);
     }
 
-    const part = this.part({by: {viewId: id}, grid: options?.grid});
-    const viewIndex = part.views.findIndex(view => view.id === id);
-    part.views[viewIndex] = {...part.views[viewIndex], id: newViewId};
+    const part = this.part({by: {viewId: view.id}, grid: options?.grid});
 
-    if (part.activeViewId === id) {
+    if (this._viewOutlets.has(view.id)) {
+      this._viewOutlets.set(newViewId, this._viewOutlets.get(view.id)!);
+      this._viewOutlets.delete(view.id);
+    }
+    if (this._viewStates.has(view.id)) {
+      this._viewStates.set(newViewId, this._viewStates.get(view.id)!);
+      this._viewStates.delete(view.id);
+    }
+
+    if (part.activeViewId === view.id) {
       part.activeViewId = newViewId;
     }
 
-    return this;
+    view.id = newViewId;
   }
 
   /**
@@ -652,6 +790,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
       workbenchGrid: this._serializer.serialize(this.workbenchGrid, {includeNodeId: true}),
       mainAreaGrid: this._serializer.serialize(this._grids.mainArea, {includeNodeId: true}),
+      viewOutlets: Object.fromEntries(this._viewOutlets),
+      viewStates: Object.fromEntries(this._viewStates),
       maximized: this._maximized,
     }));
   }
@@ -703,19 +843,6 @@ interface Grids {
    * The main area grid is a sub-grid embedded in the main area part, if any. It defines the arrangement of parts in the main area.
    */
   mainArea?: ɵMPartGrid;
-}
-
-/**
- * Tests if the given {@link MTreeNode} or {@link MPart} is visible.
- *
- * - A part is considered visible if it is the main area part or has at least one view.
- * - A node is considered visible if it has at least one visible part in its child hierarchy.
- */
-export function isGridElementVisible(element: MTreeNode | MPart): boolean {
-  if (element instanceof MPart) {
-    return element.id === MAIN_AREA || element.views.length > 0;
-  }
-  return isGridElementVisible(element.child1) || isGridElementVisible(element.child2);
 }
 
 /**
@@ -811,5 +938,17 @@ export class ViewActivationInstantProvider {
    */
   public getActivationInstant(viewId: string): number {
     return this._viewRegistry.get(viewId, {orElse: null})?.activationInstant ?? 0;
+  }
+}
+
+/**
+ * Creates a predicate to match a view by its primary or alternative id, depending on the type of the passed id.
+ */
+function matchViewById(id: string): Predicate<MView> {
+  if (RouterUtils.isPrimaryViewId(id)) {
+    return view => view.id === id;
+  }
+  else {
+    return view => view.alternativeId === id;
   }
 }

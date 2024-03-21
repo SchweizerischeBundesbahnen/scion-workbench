@@ -18,18 +18,18 @@
         <!-- id -->
         <input [formControl]="partsGroup.controls.id" [class]="'e2e-part-id'" list="ids">
         <!-- relativeTo -->
-        <input [formControl]="partsGroup.controls.relativeTo" [class]="'e2e-part-relative-to'" list="parts">
+        <input [formControl]="partsGroup.controls.relativeTo" [class]="'e2e-relative-to'" list="parts">
         <!-- align -->
-        <select [formControl]="partsGroup.controls.align" [class]="'e2e-part-align'">
+        <select [formControl]="partsGroup.controls.align" [class]="'e2e-align'">
           <option value="left">left</option>
           <option value="right">right</option>
           <option value="top">top</option>
           <option value="bottom">bottom</option>
         </select>
         <!-- ratio -->
-        <input [formControl]="partsGroup.controls.ratio" type="number" [class]="'e2e-part-ratio'">
+        <input [formControl]="partsGroup.controls.ratio" type="number" [class]="'e2e-ratio'">
         <!-- activate -->
-        <sci-checkbox [formControl]="partsGroup.controls.activate" [class]="'e2e-part-activate'"></sci-checkbox>
+        <sci-checkbox [formControl]="partsGroup.controls.activate" [class]="'e2e-activate-part'"></sci-checkbox>
         <!-- 'remove' button -->
         <button class="e2e-remove" (click)="onRemovePart(i)" title="Remove part" sciMaterialIcon>remove</button>
       </ng-container>

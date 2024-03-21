@@ -55,6 +55,10 @@ export class SettingsService {
  * Settings of the workbench testing application.
  */
 const SETTINGS = {
+  resetFormsOnSubmit: {
+    default: true,
+    storageKey: 'scion.workbench.testing-app.settings.reset-forms-on-submit',
+  },
   logAngularChangeDetectionCycles: {
     default: environment.logAngularChangeDetectionCycles,
     storageKey: 'scion.workbench.testing-app.settings.log-angular-change-detection-cycles',

@@ -48,7 +48,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
   /**
    * Returns the {@link WorkbenchView} of the given identity. If not found, by default, throws an error unless setting the `orElseNull` option.
    */
-  public get(viewId: string): ɵWorkbenchView;
+  public get(viewId: string): ɵWorkbenchView; // TODO [WB-LAYOUT] Change to ViewType
   public get(viewId: string, options: {orElse: null}): ɵWorkbenchView | null;
   public get(viewId: string, options?: {orElse: null}): ɵWorkbenchView | null {
     return this._registry.get(viewId, options);

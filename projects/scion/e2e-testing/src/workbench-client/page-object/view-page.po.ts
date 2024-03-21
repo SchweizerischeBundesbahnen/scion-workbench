@@ -20,6 +20,7 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link ViewPageComponent} of workbench-client testing app.
@@ -32,7 +33,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.outlet = new SciRouterOutletPO(appPO, {name: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-view-page');

@@ -3,16 +3,24 @@
     <span class="e2e-view-id">{{view.id}}</span>
   </sci-form-field>
 
+  <sci-form-field label="Alternative View ID" *ngIf="view.alternativeId">
+    <span>{{view.alternativeId}}</span>
+  </sci-form-field>
+
   <sci-form-field label="Part ID">
     <span class="e2e-part-id">{{view.part.id}}</span>
   </sci-form-field>
 
-  <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
-    <span class="e2e-component-instance-id">{{uuid}}</span>
-  </sci-form-field>
-
   <sci-form-field label="Path">
     <span>{{view.urlSegments | appJoin:'/'}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Outlet" *ngIf="view.outlet">
+    <span>{{view.outlet}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Instantiation ID" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
 </section>
 

@@ -10,7 +10,7 @@
 
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {UrlTree} from '@angular/router';
-import {POPUP_ID_PREFIX} from '../workbench.constants';
+import {RouterUtils} from './router.util';
 
 /**
  * Stateful differ for finding added/removed popups.
@@ -28,7 +28,7 @@ export class WorkbenchPopupDiffer {
    * Computes differences in the URL since last time {@link WorkbenchPopupDiffer#diff} was invoked.
    */
   public diff(urlTree: UrlTree): WorkbenchPopupDiff {
-    const popupOutlets = Object.keys(urlTree.root.children).filter(outlet => outlet.startsWith(POPUP_ID_PREFIX));
+    const popupOutlets = Object.keys(urlTree.root.children).filter(RouterUtils.isPopupOutlet);
 
     return new WorkbenchPopupDiff(this._popupsDiffer.diff(popupOutlets));
   }
@@ -39,18 +39,18 @@ export class WorkbenchPopupDiffer {
  */
 export class WorkbenchPopupDiff {
 
-  public readonly addedPopupOutlets = new Array<string>();
-  public readonly removedPopupOutlets = new Array<string>();
+  public readonly addedPopups = new Array<string>();
+  public readonly removedPopups = new Array<string>();
 
   constructor(changes: IterableChanges<string> | null) {
-    changes?.forEachAddedItem(({item}) => this.addedPopupOutlets.push(item));
-    changes?.forEachRemovedItem(({item}) => this.removedPopupOutlets.push(item));
+    changes?.forEachAddedItem(({item}) => this.addedPopups.push(item));
+    changes?.forEachRemovedItem(({item}) => this.removedPopups.push(item));
   }
 
   public toString(): string {
     return `${new Array<string>()
-      .concat(this.addedPopupOutlets.length ? `addedPopupOutlets=[${this.addedPopupOutlets}]` : [])
-      .concat(this.removedPopupOutlets.length ? `removedPopupOutlets=[${this.removedPopupOutlets}]` : [])
+      .concat(this.addedPopups.length ? `addedPopups=[${this.addedPopups}]` : [])
+      .concat(this.removedPopups.length ? `removedPopups=[${this.removedPopups}]` : [])
       .join(', ')}`;
   }
 }

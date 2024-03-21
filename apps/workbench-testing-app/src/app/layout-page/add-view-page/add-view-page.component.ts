@@ -15,6 +15,7 @@ import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {SettingsService} from '../../settings.service';
 
 @Component({
   selector: 'app-add-view-page',
@@ -37,6 +38,7 @@ export default class AddViewPageComponent {
     options: this._formBuilder.group({
       partId: this._formBuilder.control('', Validators.required),
       position: this._formBuilder.control<number | undefined>(undefined),
+      cssClass: this._formBuilder.control<string | undefined>(undefined),
       activateView: this._formBuilder.control<boolean | undefined>(undefined),
       activatePart: this._formBuilder.control<boolean | undefined>(undefined),
     }),
@@ -45,6 +47,7 @@ export default class AddViewPageComponent {
 
   constructor(private _formBuilder: NonNullableFormBuilder,
               private _wbRouter: WorkbenchRouter,
+              private _settingsService: SettingsService,
               public workbenchService: WorkbenchService) {
   }
 
@@ -55,13 +58,20 @@ export default class AddViewPageComponent {
       .ɵnavigate(layout => layout.addView(this.form.controls.viewId.value, {
         partId: this.form.controls.options.controls.partId.value,
         position: this.form.controls.options.controls.position.value ?? undefined,
+        cssClass: this.form.controls.options.controls.cssClass.value?.split(/\s+/).filter(Boolean),
         activateView: this.form.controls.options.controls.activateView.value,
         activatePart: this.form.controls.options.controls.activatePart.value,
       }))
       .then(() => {
         this.navigateError = false;
-        this.form.reset();
+        this.resetForm();
       })
       .catch(error => this.navigateError = stringifyError(error));
+  }
+
+  private resetForm(): void {
+    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+      this.form.reset();
+    }
   }
 }

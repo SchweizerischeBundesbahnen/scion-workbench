@@ -17,7 +17,9 @@ export abstract class WorkbenchView {
   /**
    * Unique identity of this view.
    */
-  public abstract readonly id: string;
+  public abstract readonly id: ViewId;
+  public abstract readonly alternativeId: string | undefined;
+  public abstract outlet: string | undefined;
 
   /**
    * Reference to the part which contains this view.
@@ -145,3 +147,8 @@ export abstract class WorkbenchView {
    */
   public abstract registerMenuItem(menuItem: WorkbenchMenuItem): Disposable;
 }
+
+/**
+ * Represents the type of the primary view id.
+ */
+export type ViewId = `view.${number}`;

@@ -8,10 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
-import {WorkbenchLayoutMigrator} from './migration/workbench-layout-migrator.service';
 import {UUID} from '@scion/toolkit/uuid';
+import {ViewOutlets} from '../routing/routing.model';
+import {UrlSegment} from '@angular/router';
+import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration-v2.service';
+import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
+import {WorkbenchMigrator} from '../migration/workbench-migrator';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -19,8 +24,9 @@ import {UUID} from '@scion/toolkit/uuid';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutSerializer {
 
-  constructor(private _workbenchLayoutMigrator: WorkbenchLayoutMigrator) {
-  }
+  private _workbenchLayoutMigrator = new WorkbenchMigrator()
+    .registerMigration(1, inject(WorkbenchLayoutMigrationV2))
+    .registerMigration(2, inject(WorkbenchLayoutMigrationV3));
 
   /**
    * Serializes the given grid into a URL-safe base64 string.
@@ -50,11 +56,10 @@ export class WorkbenchLayoutSerializer {
   /**
    * Deserializes the given base64-serialized grid.
    */
-  public deserialize(serializedGrid: string): ɵMPartGrid {
-    const [jsonGrid, jsonGridVersion] = window.atob(serializedGrid).split(VERSION_SEPARATOR, 2);
+  public deserialize(serialized: string): ɵMPartGrid {
+    const [jsonGrid, jsonGridVersion] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
     const gridVersion = Number.isNaN(Number(jsonGridVersion)) ? 1 : Number(jsonGridVersion);
-    const isGridOutdated = gridVersion < WORKBENCH_LAYOUT_VERSION;
-    const migratedJsonGrid = isGridOutdated ? this._workbenchLayoutMigrator.migrate(gridVersion, jsonGrid) : jsonGrid;
+    const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
 
     // Parse the JSON.
     const grid: MPartGrid = JSON.parse(migratedJsonGrid, (key, value) => {
@@ -77,7 +82,23 @@ export class WorkbenchLayoutSerializer {
       }
     })(grid.root, undefined);
 
-    return {...grid, migrated: isGridOutdated};
+    return {...grid, migrated: gridVersion < WORKBENCH_LAYOUT_VERSION};
+  }
+
+  public serializeViewOutlets(viewOutlets: ViewOutlets): string {
+    return JSON.stringify(Object.fromEntries(Object.entries(viewOutlets)
+      .map(([viewId, segments]: [string, UrlSegment[]]): [string, UrlSegmentData[]] => {
+        return [viewId, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
+      })));
+  }
+
+  public deserializeViewOutlets(serialized: string): ViewOutlets {
+    const viewOutlets: {[viewId: ViewId]: UrlSegmentData[]} = JSON.parse(serialized);
+
+    return Object.fromEntries(Object.entries(viewOutlets)
+      .map(([viewId, segments]: [string, UrlSegmentData[]]): [string, UrlSegment[]] => {
+        return [viewId, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
+      }));
   }
 }
 
@@ -86,9 +107,10 @@ export class WorkbenchLayoutSerializer {
  *
  * Increment this version and write a migrator when introducting a breaking layout model change.
  *
- * @see WorkbenchLayoutMigrator
+ * @see WorkbenchMigrator
  */
-const WORKBENCH_LAYOUT_VERSION = 2;
+export const WORKBENCH_LAYOUT_VERSION = 3;
+
 /**
  * Fields not serialized into JSON representation.
  */
@@ -99,3 +121,8 @@ const TRANSIENT_FIELDS = new Set<string>().add('parent').add('migrated');
  * Format: <json>//<version>
  */
 const VERSION_SEPARATOR = '//';
+
+interface UrlSegmentData {
+  path: string;
+  parameters: {[name: string]: string};
+}

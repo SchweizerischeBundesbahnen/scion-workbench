@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {Commands, ViewState} from '../routing/routing.model';
+import {ActivatedRoute} from '@angular/router';
+
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is
  * displayed in views.
@@ -47,7 +50,18 @@ export interface WorkbenchLayout {
    *        @property activatePart - Controls whether to activate the part that contains the view. If not set, defaults to `false`.
    * @return a copy of this layout with the view added.
    */
-  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout;
+  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
+
+  /**
+   * TODO [WB-LAYOUT] documentation
+   * @param id
+   * @param commands
+   * @param extras
+   *
+   * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
+   * State can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+   */
+  navigateView(id: string, commands: Commands, extras?: {outlet?: string; relativeTo?: ActivatedRoute; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Removes given view from the layout.

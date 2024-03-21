@@ -18,6 +18,8 @@ import {NgIf} from '@angular/common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {PerspectivePagePartEntry, PerspectivePagePartsComponent} from './perspective-page-parts/perspective-page-parts.component';
 import {PerspectivePageViewEntry, PerspectivePageViewsComponent} from './perspective-page-views/perspective-page-views.component';
+import {PerspectivePageNavigateViewEntry, PerspectivePageNavigateViewsComponent} from './perspective-page-navigate-views/perspective-page-navigate-views.component';
+import {SettingsService} from '../settings.service';
 
 @Component({
   selector: 'app-perspective-page',
@@ -32,6 +34,7 @@ import {PerspectivePageViewEntry, PerspectivePageViewsComponent} from './perspec
     SciKeyValueFieldComponent,
     PerspectivePagePartsComponent,
     PerspectivePageViewsComponent,
+    PerspectivePageNavigateViewsComponent,
   ],
 })
 export default class PerspectivePageComponent {
@@ -42,10 +45,13 @@ export default class PerspectivePageComponent {
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.control<PerspectivePagePartEntry[]>([], Validators.required),
     views: this._formBuilder.control<PerspectivePageViewEntry[]>([]),
+    navigateViews: this._formBuilder.control<PerspectivePageNavigateViewEntry[]>([]),
   });
   public registerError: string | false | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _workbenchService: WorkbenchService) {
+  constructor(private _formBuilder: NonNullableFormBuilder,
+              private _settingsService: SettingsService,
+              private _workbenchService: WorkbenchService) {
   }
 
   public async onRegister(): Promise<void> {
@@ -57,8 +63,7 @@ export default class PerspectivePageComponent {
         layout: this.createLayout(),
       });
       this.registerError = false;
-      this.form.reset();
-      this.form.setControl('data', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+      this.resetForm();
     }
     catch (error) {
       this.registerError = stringifyError(error);
@@ -69,6 +74,7 @@ export default class PerspectivePageComponent {
     // Capture form values, since the `layout` function is evaluated independently of the form life-cycle
     const [initialPart, ...parts] = this.form.controls.parts.value;
     const views = this.form.controls.views.value;
+    const navigateViews = this.form.controls.navigateViews.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
       let layout = factory.addPart(initialPart.id, {activate: initialPart.activate});
@@ -77,9 +83,29 @@ export default class PerspectivePageComponent {
       }
 
       for (const view of views) {
-        layout = layout.addView(view.id, {partId: view.partId, position: view.position, activateView: view.activateView, activatePart: view.activatePart});
+        layout = layout.addView(view.id, {
+          partId: view.options.partId,
+          position: view.options.position,
+          activateView: view.options.activateView,
+          activatePart: view.options.activatePart,
+          cssClass: view.options.cssClass,
+        });
+      }
+
+      for (const navigateView of navigateViews) {
+        layout = layout.navigateView(navigateView.id, navigateView.commands, {
+          outlet: navigateView.options?.outlet,
+          cssClass: navigateView.options?.cssClass,
+        });
       }
       return layout;
     };
+  }
+
+  private resetForm(): void {
+    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+      this.form.reset();
+      this.form.setControl('data', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+    }
   }
 }

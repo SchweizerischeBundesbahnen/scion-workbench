@@ -17,6 +17,7 @@ import {Locator} from '@playwright/test';
 import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RouterPageComponent} of workbench-client testing app.
@@ -27,7 +28,7 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
   public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-router-page');

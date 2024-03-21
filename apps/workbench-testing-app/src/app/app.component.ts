@@ -14,7 +14,7 @@ import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} 
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe, DOCUMENT, NgIf} from '@angular/common';
-import {WORKBENCH_ID, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
+import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeInside} from '@scion/toolkit/operators';
@@ -52,9 +52,11 @@ export class AppComponent implements DoCheck {
   constructor(settingsService: SettingsService,
               private _router: Router,
               private _zone: NgZone,
+              private _workbenchService: WorkbenchService,
               protected workbenchStartup: WorkbenchStartup) {
     this.installRouterEventListeners();
     this.installPropagatedKeyboardEventLogger();
+    this.installAlternativeViewIdResolver();
 
     settingsService.observe$('logAngularChangeDetectionCycles')
       .pipe(takeUntilDestroyed())
@@ -94,5 +96,19 @@ export class AppComponent implements DoCheck {
           console.debug(`[AppComponent][synth-event][event=${event.type}][key=${event.key}][key.control=${event.ctrlKey}][key.shift=${event.shiftKey}][key.alt=${event.altKey}][key.meta=${event.metaKey}]`);
         }
       });
+  }
+
+  private installAlternativeViewIdResolver(): void {
+    // @ts-expect-error function to resolve view id used in end-to-end tests
+    window.resolveViewId = (alternativeViewId: string): ViewId => {
+      const views = this._workbenchService.views.filter(view => view.alternativeId === alternativeViewId);
+      if (views.length > 1) {
+        throw Error('alternativeViewId resolved to multiple views');
+      }
+      if (views.length === 0) {
+        throw Error(`[NullViewError] No view found with alternative id "${alternativeViewId}".`);
+      }
+      return views[0].id;
+    };
   }
 }

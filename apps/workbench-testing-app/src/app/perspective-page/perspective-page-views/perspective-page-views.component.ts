@@ -46,10 +46,13 @@ export class PerspectivePageViewsComponent implements ControlValueAccessor, Vali
   public form = this._formBuilder.group({
     views: this._formBuilder.array<FormGroup<{
       id: FormControl<string>;
-      partId: FormControl<string>;
-      position: FormControl<number | undefined>;
-      activateView: FormControl<boolean | undefined>;
-      activatePart: FormControl<boolean | undefined>;
+      options: FormGroup<{
+        partId: FormControl<string>;
+        position: FormControl<number | 'start' | 'end' | 'before-active-view' | 'after-active-view' | undefined>;
+        cssClass: FormControl<string | undefined>;
+        activateView: FormControl<boolean | undefined>;
+        activatePart: FormControl<boolean | undefined>;
+      }>;
     }>>([]),
   });
 
@@ -59,10 +62,13 @@ export class PerspectivePageViewsComponent implements ControlValueAccessor, Vali
       .subscribe(() => {
         const views: PerspectivePageViewEntry[] = this.form.controls.views.controls.map(viewFormGroup => ({
           id: viewFormGroup.controls.id.value,
-          partId: viewFormGroup.controls.partId.value,
-          position: viewFormGroup.controls.position.value,
-          activateView: viewFormGroup.controls.activateView.value,
-          activatePart: viewFormGroup.controls.activatePart.value,
+          options: {
+            partId: viewFormGroup.controls.options.controls.partId.value,
+            position: viewFormGroup.controls.options.controls.position.value,
+            cssClass: viewFormGroup.controls.options.controls.cssClass.value?.split(/\s+/).filter(Boolean),
+            activateView: viewFormGroup.controls.options.controls.activateView.value,
+            activatePart: viewFormGroup.controls.options.controls.activatePart.value,
+          },
         }));
         this._cvaChangeFn(views);
         this._cvaTouchedFn();
@@ -72,7 +78,9 @@ export class PerspectivePageViewsComponent implements ControlValueAccessor, Vali
   protected onAddView(): void {
     this.addViewEntry({
       id: '',
-      partId: '',
+      options: {
+        partId: '',
+      },
     });
   }
 
@@ -88,10 +96,13 @@ export class PerspectivePageViewsComponent implements ControlValueAccessor, Vali
     this.form.controls.views.push(
       this._formBuilder.group({
         id: this._formBuilder.control<string>(view.id, Validators.required),
-        partId: this._formBuilder.control<string>(view.partId, Validators.required),
-        position: this._formBuilder.control<number | undefined>(view.position),
-        activateView: this._formBuilder.control<boolean | undefined>(view.activateView),
-        activatePart: this._formBuilder.control<boolean | undefined>(view.activatePart),
+        options: this._formBuilder.group({
+          partId: this._formBuilder.control<string>(view.options.partId, Validators.required),
+          position: this._formBuilder.control<number | 'start' | 'end' | 'before-active-view' | 'after-active-view' | undefined>(view.options.position),
+          cssClass: this._formBuilder.control<string | undefined>(view.options.cssClass?.join(' ')),
+          activateView: this._formBuilder.control<boolean | undefined>(view.options.activateView),
+          activatePart: this._formBuilder.control<boolean | undefined>(view.options.activatePart),
+        }),
       }), {emitEvent: options?.emitEvent ?? true});
   }
 
@@ -129,10 +140,13 @@ export class PerspectivePageViewsComponent implements ControlValueAccessor, Vali
   }
 }
 
-export type PerspectivePageViewEntry = {
+export interface PerspectivePageViewEntry {
   id: string;
-  partId: string;
-  position?: number;
-  activateView?: boolean;
-  activatePart?: boolean;
-};
+  options: {
+    partId: string;
+    position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
+    activateView?: boolean;
+    activatePart?: boolean;
+    cssClass?: string[];
+  };
+}

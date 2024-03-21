@@ -23,7 +23,8 @@ export const appConfig: ApplicationConfig = {
       layout: (factory: WorkbenchLayoutFactory) => factory
         .addPart(MAIN_AREA)
         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-        .addView('todos', {partId: 'left', activateView: true}),
+        .addView('todos', {partId: 'left', activateView: true})
+        .navigateView('todos', [], {outlet: 'todos'}),
     }),
     provideRouter([
       {path: '', loadComponent: () => import('./welcome/welcome.component')},

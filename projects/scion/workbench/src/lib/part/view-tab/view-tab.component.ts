@@ -149,6 +149,8 @@ export class ViewTabComponent implements OnChanges {
         viewClosable: this.view.closable,
         viewDirty: this.view.dirty,
         viewUrlSegments: this.view.urlSegments,
+        alternativeViewId: this.view.alternativeId,
+        outlet: this.view.outlet,
         partId: this.view.part.id,
         viewTabPointerOffsetX: event.offsetX,
         viewTabPointerOffsetY: event.offsetY,

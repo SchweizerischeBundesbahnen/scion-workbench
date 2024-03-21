@@ -9,26 +9,27 @@
  */
 
 import {Injectable} from '@angular/core';
-import {MPart, MPartGrid, MTreeNode} from '../workbench-layout.model';
+import {MPartsLayoutV1, MPartV1, MTreeNodeV1} from './model/workbench-layout-migration-v1.model';
+import {MPartGridV2, MPartV2, MTreeNodeV2} from './model/workbench-layout-migration-v2.model';
+import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
- * Migrates a workbench layout in version 1 to the latest version.
+ * Migrates a workbench layout in version 1 to version 2.
  *
- * TODO [Angular 18] Remove migrator.
+ * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchLayoutV1Migrator {
-
+export class WorkbenchLayoutMigrationV2 implements WorkbenchMigration {
   public migrate(json: string): string {
     const partsLayoutV1: MPartsLayoutV1 = JSON.parse(json);
-    const partsGrid: MPartGrid = {
+    const partsGridV2: MPartGridV2 = {
       root: this.migrateGridElement(partsLayoutV1.root),
       activePartId: partsLayoutV1.activePartId,
     };
-    return JSON.stringify(partsGrid);
+    return JSON.stringify(partsGridV2);
   }
 
-  private migrateGridElement(elementV1: MTreeNodeV1 | MPartV1): MTreeNode | MPart {
+  private migrateGridElement(elementV1: MTreeNodeV1 | MPartV1): MTreeNodeV2 | MPartV2 {
     if (elementV1.hasOwnProperty('partId')) { // eslint-disable-line no-prototype-builtins
       const partV1 = elementV1 as MPartV1;
       return {
@@ -51,27 +52,7 @@ export class WorkbenchLayoutV1Migrator {
       };
     }
     else {
-      throw Error(`[WorkbenchLayoutError] Unable to migrate to the latest version. Expected element to be of type 'MPart' or 'MTreeNode'. [version=1, element=${elementV1}]`);
+      throw Error(`[WorkbenchLayoutError] Unable to migrate to the latest version. Expected element to be of type 'MPart' or 'MTreeNode'. [version=1, element=${JSON.stringify(elementV1)}]`);
     }
   }
-}
-
-interface MPartsLayoutV1 {
-  root: MTreeNodeV1 | MPartV1;
-  activePartId: string;
-}
-
-interface MTreeNodeV1 {
-  nodeId: string;
-  child1: MTreeNodeV1 | MPartV1;
-  child2: MTreeNodeV1 | MPartV1;
-  ratio: number;
-  direction: 'column' | 'row';
-}
-
-interface MPartV1 {
-  partId: string;
-  parent?: MTreeNodeV1;
-  viewIds: string[];
-  activeViewId?: string;
 }

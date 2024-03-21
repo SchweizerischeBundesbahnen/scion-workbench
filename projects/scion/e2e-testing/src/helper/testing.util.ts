@@ -10,6 +10,7 @@
 
 import {Locator, Page} from '@playwright/test';
 import {exhaustMap, filter, firstValueFrom, map, pairwise, timer} from 'rxjs';
+import {Commands} from '@scion/workbench';
 
 /**
  * Returns if given CSS class is present on given element.
@@ -53,6 +54,19 @@ export async function waitUntilStable<A>(value: () => Promise<A> | A, options?: 
       map(([previous]) => previous),
     );
   return firstValueFrom(value$);
+}
+
+/**
+ * Waits for a value to become stable.
+ * This function returns the value if it hasn't changed during `probeInterval` (defaults to 100ms).
+ */
+export async function waitForCondition(predicate: () => Promise<boolean>): Promise<void> {
+  const value$ = timer(0, 100)
+    .pipe(
+      exhaustMap(async () => await predicate()),
+      filter(Boolean),
+    );
+  await firstValueFrom(value$);
 }
 
 /**
@@ -162,4 +176,18 @@ export interface DomRect {
   right: number;
   hcenter: number;
   vcenter: number;
+}
+
+export function commandsToPath(commands: Commands): string {
+  return commands
+    .reduce((path, command) => {
+      if (typeof command === 'string') {
+        return path.concat(command);
+      }
+      else {
+        const matrixParams = Object.entries(command).map(([key, value]) => `${key}=${value}`).join(';');
+        return path.concat(`${path.pop()!};${matrixParams}`);
+      }
+    }, [])
+    .join('/');
 }

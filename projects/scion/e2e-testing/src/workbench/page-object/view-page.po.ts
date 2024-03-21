@@ -17,7 +17,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {ViewState} from '@scion/workbench';
+import {ViewId, ViewState} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.
@@ -28,7 +28,7 @@ export class ViewPagePO implements WorkbenchViewPagePO {
   public readonly view: ViewPO;
   public readonly viewId: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.view.locator.locator('app-view-page');
     this.viewId = this.locator.locator('span.e2e-view-id');

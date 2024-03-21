@@ -12,26 +12,29 @@ import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {rejectWhenAttached, waitUntilStable} from '../../../helper/testing.util';
+import {Commands, ViewId} from '@scion/workbench';
+import {commandsToPath, rejectWhenAttached, waitForCondition} from '../../../helper/testing.util';
 
 export class AngularRouterTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.view.locator.locator('app-angular-router-test-page');
   }
 
-  public async navigate(path: string, extras: {outlet: string}): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(path);
+  public async navigate(commands: Commands, extras: {outlet: string}): Promise<void> {
+    await this.locator.locator('input.e2e-commands').fill(commandsToPath(commands));
     await this.locator.locator('input.e2e-outlet').fill(extras.outlet);
+
+    const navigationId = await this._appPO.getCurrentNavigationId();
     await this.locator.locator('button.e2e-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
+      waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }

@@ -10,10 +10,11 @@
 
 import {Params, PRIMARY_OUTLET, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} from '@angular/router';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
-import {inject, Injector, runInInjectionContext} from '@angular/core';
+import {inject, Injector} from '@angular/core';
 import {RouterUtils} from '../../routing/router.util';
-import {WorkbenchNavigationalStates} from '../../routing/workbench-navigational-states';
 import {Commands} from '../../routing/routing.model';
+import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {ViewId} from '../../view/workbench-view.model';
 
 /**
  * Provides functions and constants specific to microfrontend routes.
@@ -47,14 +48,16 @@ export const MicrofrontendViewRoutes = {
     const injector = inject(Injector);
 
     return (segments: UrlSegment[], group: UrlSegmentGroup, route: Route): UrlMatchResult | null => {
-      if (!RouterUtils.isPrimaryRouteTarget(route.outlet ?? PRIMARY_OUTLET)) {
+      if (!RouterUtils.isPrimaryViewId(route.outlet ?? PRIMARY_OUTLET)) {
         return null;
       }
       if (!MicrofrontendViewRoutes.isMicrofrontendRoute(segments)) {
         return null;
       }
-      const viewState = runInInjectionContext(injector, () => WorkbenchNavigationalStates.resolveViewState(route.outlet!));
-      const transientParams = viewState?.[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
+
+      const {layout} = injector.get(WorkbenchRouter).getCurrentNavigationContext();
+      const viewState = layout.viewState({by: {viewId: route.outlet as ViewId}});
+      const transientParams = viewState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
       const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);
 
       return {

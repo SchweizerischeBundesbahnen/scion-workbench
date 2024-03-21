@@ -8,14 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup} from '@angular/router';
-import {Commands} from './routing.model';
-import {VIEW_ID_PREFIX} from '../workbench.constants';
+import {ActivatedRoute, ActivatedRouteSnapshot, PRIMARY_OUTLET, Route, Router, UrlSegment, UrlTree} from '@angular/router';
+import {Commands} from '../routing/routing.model';
+import {POPUP_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
+import {inject} from '@angular/core';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Provides utility functions for router operations.
  */
-export const RouterUtils = {
+export const RouterUtils = { // TODO [WB-LAYOUT] rename to Routers
 
   /**
    * Replaces named parameters in the given path with values contained in the given {@link Map}.
@@ -37,41 +39,57 @@ export const RouterUtils = {
   },
 
   /**
-   * Converts URL segments into an array of routable commands to be passed to the Angular router for navigation.
+   * Converts given URL segments into an array of routable commands that can be passed to the Angular router for navigation.
    */
-  segmentsToCommands: (segments: UrlSegment[]): Commands[] => {
-    return segments.reduce((acc: Commands, segment: UrlSegment) => {
-      return acc.concat(
-        segment.path || [],
-        segment.parameters && Object.keys(segment.parameters).length ? segment.parameters : [],
-      );
-    }, []);
-  },
+  segmentsToCommands: (segments: UrlSegment[]): Commands => {
+    const commands = new Array<any>();
 
-  /**
-   * Reads specified outlets from the current URL, optionally applying a `replacer` function to replace the commands of an outlet.
-   */
-  outletsFromCurrentUrl: (router: Router, outletNames: string[], replacer?: (outlet: string, commands: Commands) => Commands | null): {[viewId: string]: Commands} => {
-    const urlTree = router.parseUrl(router.url);
-    return outletNames.reduce((acc, outletName) => {
-      if (urlTree.root.children[outletName]) {
-        const commands = RouterUtils.segmentsToCommands(urlTree.root.children[outletName].segments);
-        return {...acc, [outletName]: replacer ? replacer(outletName, commands) : commands};
+    segments.forEach(segment => {
+      if (segment.path) {
+        commands.push(segment.path);
       }
-      return acc;
-    }, {});
+      if (segment.parameters && Object.keys(segment.parameters).length) {
+        commands.push(segment.parameters);
+      }
+    });
+
+    return commands;
   },
 
   /**
-   * Parses the given path including any matrix parameters into URL segments.
+   * Constructs URL segments from given commands, resolving any relative navigational symbols.
+   *
+   * This function must be called inside an injection context.
    */
-  parsePath: (router: Router, path: string): UrlSegment[] => {
-    const urlTree = router.parseUrl(path);
-    const segmentGroup: UrlSegmentGroup = urlTree.root.children[PRIMARY_OUTLET];
-    if (!segmentGroup) {
-      throw Error(`[RouteMatchError] Cannot match any route for '${path}'.`);
+  commandsToSegments: (commands: Commands, options?: {relativeTo?: ActivatedRoute | null}): UrlSegment[] => {
+    if (!commands.filter(Boolean).length) {
+      return [];
     }
-    return segmentGroup.segments;
+
+    // Angular throws the error 'NG04003: Root segment cannot have matrix parameters' when passing an empty path command
+    // followed by a matrix params object, but not when passing matrix params as the first command. For consistency, when
+    // passing matrix params as the first command, we prepend an empty path for Angular to throw the same error.
+    if (!options?.relativeTo && typeof commands[0] === 'object') {
+      commands = ['', ...commands];
+    }
+
+    // TOOD [WB-LAYOUT] Consider adding a comment what is happening here.
+    const urlTree = inject(Router).createUrlTree(commands, {relativeTo: options?.relativeTo});
+    return urlTree.root.children[options?.relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET].segments;
+  },
+
+  /**
+   * Parses the given path and matrix parameters into an array of routable commands that can be passed to the Angular router for navigation.
+   *
+   * This function must be called inside an injection context.
+   */
+  pathToCommands: (path: string): Commands => {
+    const urlTree = inject(Router).parseUrl(path);
+    const segments = urlTree.root.children[PRIMARY_OUTLET]?.segments;
+    if (!segments) {
+      throw Error(`[RouterError] Cannot match any routes for path '${path}'.`);
+    }
+    return RouterUtils.segmentsToCommands(segments);
   },
 
   /**
@@ -92,11 +110,30 @@ export const RouterUtils = {
     return activatedRoute.pathFromRoot.reduceRight((resolvedData, route) => resolvedData ?? route.data[dataKey], undefined);
   },
 
-  /**
-   * Tests if the given view can be the target of a primary route.
-   * Such views have an id that begins with the view prefix.
-   */
-  isPrimaryRouteTarget: (viewId: string): boolean => {
+  isPrimaryViewId: (viewId: string): viewId is ViewId => {
     return viewId.startsWith(VIEW_ID_PREFIX);
+  },
+
+  isViewOutlet: (outlet: string | undefined | null): outlet is ViewId => {
+    return outlet?.startsWith(VIEW_ID_PREFIX) ?? false;
+  },
+
+  isPopupOutlet: (outlet: string | undefined | null): outlet is `popup.${string}` => {
+    return outlet?.startsWith(POPUP_ID_PREFIX) ?? false;
+  },
+
+  isRootRoute: (route: Route): boolean => {
+    const outlet = route.outlet ?? PRIMARY_OUTLET;
+    return route.path === '' && outlet === PRIMARY_OUTLET;
+  },
+
+  parseViewOutlets: (url: UrlTree): Map<ViewId, UrlSegment[]> => {
+    const viewOutlets = new Map<ViewId, UrlSegment[]>();
+    Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
+      if (RouterUtils.isViewOutlet(outlet)) {
+        viewOutlets.set(outlet, segmentGroup.segments);
+      }
+    });
+    return viewOutlets;
   },
 } as const;

@@ -11,7 +11,7 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectView} from '../matcher/view-matcher';
 import {PerspectivePagePO} from './page-object/perspective-page.po';

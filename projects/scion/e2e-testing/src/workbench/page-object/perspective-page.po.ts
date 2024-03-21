@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
+import {coerceArray, commandsToPath, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -16,6 +16,7 @@ import {Locator} from '@playwright/test';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {MAIN_AREA} from '../../workbench.model';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
+import {Commands, ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link PerspectivePageComponent}.
@@ -25,7 +26,7 @@ export class PerspectivePagePO implements WorkbenchViewPagePO {
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.view.locator.locator('app-perspective-page');
   }
@@ -41,6 +42,9 @@ export class PerspectivePagePO implements WorkbenchViewPagePO {
 
     // Enter views.
     await this.enterViews(definition.views);
+
+    // Enter navigate views.
+    await this.enterNavigateViews(definition.navigateViews);
 
     // Register perspective.
     await this.locator.locator('button.e2e-register').click();
@@ -59,28 +63,40 @@ export class PerspectivePagePO implements WorkbenchViewPagePO {
   }
 
   private async enterParts(parts: PerspectivePartDescriptor[]): Promise<void> {
-    const partsLocator = await this.locator.locator('app-perspective-page-parts');
+    const partsLocator = this.locator.locator('app-perspective-page-parts');
     for (const [i, part] of parts.entries()) {
       await partsLocator.locator('button.e2e-add').click();
       await partsLocator.locator('input.e2e-part-id').nth(i).fill(part.id);
-      await new SciCheckboxPO(partsLocator.locator('sci-checkbox.e2e-part-activate').nth(i)).toggle(part.activate === true);
+      await new SciCheckboxPO(partsLocator.locator('sci-checkbox.e2e-activate-part').nth(i)).toggle(part.activate === true);
       if (i > 0) {
-        await partsLocator.locator('select.e2e-part-align').nth(i).selectOption(part.align!);
-        await partsLocator.locator('input.e2e-part-relative-to').nth(i).fill(part.relativeTo ?? '');
-        await partsLocator.locator('input.e2e-part-ratio').nth(i).fill(part.ratio?.toString() ?? '');
+        await partsLocator.locator('select.e2e-align').nth(i).selectOption(part.align!);
+        await partsLocator.locator('input.e2e-relative-to').nth(i).fill(part.relativeTo ?? '');
+        await partsLocator.locator('input.e2e-ratio').nth(i).fill(part.ratio?.toString() ?? '');
       }
     }
   }
 
   private async enterViews(views: PerspectiveViewDescriptor[] = []): Promise<void> {
-    const viewsLocator = await this.locator.locator('app-perspective-page-views');
+    const viewsLocator = this.locator.locator('app-perspective-page-views');
     for (const [i, view] of views.entries()) {
       await viewsLocator.locator('button.e2e-add').click();
       await viewsLocator.locator('input.e2e-view-id').nth(i).fill(view.id);
-      await viewsLocator.locator('input.e2e-view-part-id').nth(i).fill(view.partId);
-      await viewsLocator.locator('input.e2e-view-position').nth(i).fill(view.position?.toString() ?? '');
-      await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-view-activate-view').nth(i)).toggle(view.activateView === true);
-      await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-view-activate-part').nth(i)).toggle(view.activatePart === true);
+      await viewsLocator.locator('input.e2e-part-id').nth(i).fill(view.partId);
+      await viewsLocator.locator('input.e2e-position').nth(i).fill(view.position?.toString() ?? '');
+      await viewsLocator.locator('input.e2e-css-class').nth(i).fill(coerceArray(view.cssClass).join(' '));
+      await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-activate-view').nth(i)).toggle(view.activateView === true);
+      await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-activate-part').nth(i)).toggle(view.activatePart === true);
+    }
+  }
+
+  private async enterNavigateViews(navigateViews: PerspectiveNavigateViewDescriptor[] = []): Promise<void> {
+    const navigateViewsLocator = this.locator.locator('app-perspective-page-navigate-views');
+    for (const [i, navigateView] of navigateViews.entries()) {
+      await navigateViewsLocator.locator('button.e2e-add').click();
+      await navigateViewsLocator.locator('input.e2e-view-id').nth(i).fill(navigateView.id);
+      await navigateViewsLocator.locator('input.e2e-commands').nth(i).fill(commandsToPath(navigateView.commands));
+      await navigateViewsLocator.locator('input.e2e-outlet').nth(i).fill(navigateView.outlet ?? '');
+      await navigateViewsLocator.locator('input.e2e-css-class').nth(i).fill(coerceArray(navigateView.cssClass).join(' '));
     }
   }
 }
@@ -90,6 +106,7 @@ export interface PerspectiveDefinition {
   transient?: true;
   parts: PerspectivePartDescriptor[];
   views?: PerspectiveViewDescriptor[];
+  navigateViews?: PerspectiveNavigateViewDescriptor[];
   data?: {[key: string]: any};
 }
 
@@ -104,7 +121,15 @@ export interface PerspectivePartDescriptor {
 export interface PerspectiveViewDescriptor {
   id: string;
   partId: string;
-  position?: number;
+  position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   activateView?: boolean;
   activatePart?: boolean;
+  cssClass?: string | string[];
+}
+
+export interface PerspectiveNavigateViewDescriptor {
+  id: string;
+  commands: Commands;
+  outlet?: string;
+  cssClass?: string | string[];
 }

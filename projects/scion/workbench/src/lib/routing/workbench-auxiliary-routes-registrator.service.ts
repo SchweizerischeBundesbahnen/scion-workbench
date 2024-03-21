@@ -1,6 +1,10 @@
-import {Injectable} from '@angular/core';
-import {CanActivateFn, CanDeactivateFn, Data, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
-import {Arrays} from '@scion/toolkit/util';
+import {inject, Injectable} from '@angular/core';
+import {CanActivateFn, CanDeactivateFn, CanMatchFn, Data, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
+import {RouterUtils} from './router.util';
+import {WorkbenchRouter} from './workbench-router.service';
+import {ViewId} from '../view/workbench-view.model';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import ViewNotFoundComponent from './view-not-found/view-not-found.component';
 
 /**
  * Registers auxiliary routes for views.
@@ -8,54 +12,69 @@ import {Arrays} from '@scion/toolkit/util';
 @Injectable({providedIn: 'root'})
 export class WorkbenchAuxiliaryRoutesRegistrator {
 
-  constructor(private _router: Router) {
+  constructor(private _workbenchModuleConfig: WorkbenchModuleConfig, private _router: Router) {
   }
 
   /**
    * Registers an auxiliary route for every primary route found in the router config, allowing
    * primary routes to be used in named router outlets.
    *
-   * @param outletName - outlet names for which to create named auxiliary routes
+   * @param outlets - outlet names for which to create named auxiliary routes
    * @param config of the auxiliary route
    */
-  public registerOutletAuxiliaryRoutes(outletName: string | string[], config: OutletAuxiliaryRouteConfig = {}): Routes {
-    const outletNames = new Set<string>(Arrays.coerce(outletName));
-    if (!outletNames.size) {
+  public registerOutletAuxiliaryRoutes(outlets: string[], config: OutletAuxiliaryRouteConfig = {}): Routes {
+    if (!outlets.length) {
       return [];
     }
 
-    const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
-    const outletAuxRoutes: Routes = [];
-    primaryRoutes
-      .filter(primaryRoute => primaryRoute.path !== '') // skip root route(s)
-      .forEach(primaryRoute => outletNames.forEach(outlet => {
-        outletAuxRoutes.push(standardizeConfig({
-          ...primaryRoute,
-          outlet: outlet,
-          canActivate: [...(config.canActivate || []), ...(primaryRoute.canActivate || [])],
-          canDeactivate: [...(config.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
-          data: {...primaryRoute.data, ...config.data},
-        }));
+    const registeredRoutes: Routes = [];
+    outlets.forEach(outlet => {
+      this._router.config
+        .filter(route => !RouterUtils.isRootRoute(route) && !RouterUtils.isViewOutlet(route.outlet) && !RouterUtils.isPopupOutlet(route.outlet))
+        .forEach(route => {
+          registeredRoutes.push(standardizeConfig({
+            ...route,
+            outlet: outlet,
+            canActivate: [...(config.canActivate || []), ...(route.canActivate || [])],
+            canDeactivate: [...(config.canDeactivate || []), ...(route.canDeactivate || [])],
+            canMatch: [...(config.canMatch?.(route) ?? []), ...(route.canMatch ?? [])],
+            data: {...route.data, ...config.data},
+          }));
+        });
+
+      // register not found route (must be at the end)
+      registeredRoutes.push(standardizeConfig({
+        path: '**',
+        outlet: outlet,
+        component: this._workbenchModuleConfig.viewNotFoundComponent ?? ViewNotFoundComponent, // TODO [WB-LAYOUT] Consider passing as argument to have no view-specifics in this class
+        canMatch: [(): boolean => {
+          // TODO [WB-LAYOUT] describe why
+          const layout = inject(WorkbenchRouter).getCurrentNavigationContext().layout;
+          const view = layout.view({by: {viewId: outlet as ViewId}}, {orElse: null});
+          return !view || !!view.navigation;
+        }],
       }));
+    });
 
     this.replaceRouterConfig([
-      ...this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)), // all registered routes, except auxiliary routes for any of the given outlets
-      ...outletAuxRoutes,
+      ...this._router.config,
+      ...registeredRoutes,
     ]);
 
-    return outletAuxRoutes;
+    return registeredRoutes;
   }
 
   /**
    * Unregisters all auxiliary routes for the given outlet.
    */
-  public unregisterOutletAuxiliaryRoutes(outletName: string | string[]): void {
-    const outletNames = new Set<string>(Arrays.coerce(outletName));
-    if (!outletNames.size) {
-      return;
+  public unregisterOutletAuxiliaryRoutes(outlets: string[]): void {
+    const outletsToRemove = new Set<string>(outlets);
+
+    function shouldRemoveRoute(route: Route): boolean {
+      return !!route.outlet && outletsToRemove.has(route.outlet);
     }
 
-    this.replaceRouterConfig(this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)));
+    this.replaceRouterConfig(this._router.config.filter(route => !shouldRemoveRoute(route)));
   }
 
   /**
@@ -77,6 +96,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
 export interface OutletAuxiliaryRouteConfig {
   canActivate?: CanActivateFn[];
   canDeactivate?: CanDeactivateFn<any>[];
+  canMatch?: (relatedRoute: Route) => CanMatchFn[];
   data?: Data;
 }
 

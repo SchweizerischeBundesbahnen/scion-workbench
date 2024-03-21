@@ -28,7 +28,7 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciCheckboxComponent,
-    SciMaterialIconDirective
+    SciMaterialIconDirective,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PerspectivePagePartsComponent)},
@@ -128,10 +128,10 @@ export class PerspectivePagePartsComponent implements ControlValueAccessor, Vali
   }
 }
 
-export type PerspectivePagePartEntry = {
+export interface PerspectivePagePartEntry {
   id: string | MAIN_AREA;
   relativeTo?: string;
   align?: 'left' | 'right' | 'top' | 'bottom';
   ratio?: number;
   activate?: boolean;
-};
+}
