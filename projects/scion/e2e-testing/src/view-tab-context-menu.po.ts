@@ -20,9 +20,14 @@ export class ViewTabContextMenuPO {
     closeAll: new ContextMenuItem(this.locator.locator('button.e2e-close-all-tabs')),
     moveToNewWindow: new ContextMenuItem(this.locator.locator('button.e2e-move-to-new-window')),
     moveView: new ContextMenuItem(this.locator.locator('button.e2e-move-view')),
+    showViewInfo: new ContextMenuItem(this.locator.locator('button.e2e-show-view-info')),
   };
 
   constructor(public locator: Locator) {
+  }
+
+  public async pressEscape(): Promise<void> {
+    await this.locator.page().keyboard.press('Escape');
   }
 }
 

@@ -1,0 +1,47 @@
+<section>
+  <sci-form-field label="View ID">
+    <span class="e2e-view-id">{{view.id}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Part ID">
+    <span class="e2e-part-id">{{view.part.id}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="View Title">
+    <span class="e2e-title">{{view.title}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="View Heading">
+    <span class="e2e-heading">{{view.heading}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="URL Segments">
+    <span class="e2e-url-segments">{{view.urlSegments | appJoin:'/'}}</span>
+  </sci-form-field>
+</section>
+
+@if (route?.snapshot?.params | appNullIfEmpty; as params) {
+  <section>
+    <header>Route Params</header>
+    <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
+  </section>
+}
+
+@if (route?.snapshot?.data | appNullIfEmpty; as data) {
+  <section>
+    <header>Route Data</header>
+    <sci-key-value [object]="data" class="e2e-route-data"></sci-key-value>
+  </section>
+}
+
+@if (view.state | appNullIfEmpty; as state) {
+  <section>
+    <header>View State</header>
+    <sci-key-value [object]="state" class="e2e-state"></sci-key-value>
+  </section>
+}
+
+<!-- Close button -->
+<ng-template wbDialogAction>
+  <button (click)="onClose()">Close</button>
+</ng-template>

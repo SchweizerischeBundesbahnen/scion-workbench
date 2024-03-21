@@ -8,4 +8,8 @@
   <ng-template wbViewMenuItem group="move" cssClass="e2e-move-view" (action)="onMoveView($event)">
     Move view...
   </ng-template>
+
+  <ng-template wbViewMenuItem group="x-debug" cssClass="e2e-show-view-info" [accelerator]="['F1']" (action)="onShowViewInfo($event)">
+    Show view info
+  </ng-template>
 </wb-workbench>

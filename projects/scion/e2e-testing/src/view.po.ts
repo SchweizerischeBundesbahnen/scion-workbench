@@ -12,6 +12,8 @@ import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
+import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
+import {AppPO} from './app.po';
 
 /**
  * Handle for interacting with a workbench view.
@@ -29,6 +31,21 @@ export class ViewPO {
 
   public async getViewId(): Promise<string> {
     return this.tab.getViewId();
+  }
+
+  public async getInfo(): Promise<ViewInfo> {
+    const contextMenu = await this.tab.openContextMenu();
+    await contextMenu.menuItems.showViewInfo.click();
+
+    const dialog = new AppPO(this.locator.page()).dialog({cssClass: 'e2e-view-info'});
+    const dialogPage = new ViewInfoDialogPO(dialog);
+
+    try {
+      return await dialogPage.getInfo();
+    }
+    finally {
+      await dialog.close();
+    }
   }
 
   /**
