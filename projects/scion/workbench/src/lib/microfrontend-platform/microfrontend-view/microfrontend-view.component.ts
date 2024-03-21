@@ -14,7 +14,7 @@ import {combineLatest, EMPTY, firstValueFrom, Observable, of, Subject, switchMap
 import {catchError, first, map, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵTHEME_CONTEXT_KEY, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
+import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchTheme, WorkbenchViewPreDestroy} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
@@ -34,7 +34,6 @@ import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
-import {WorkbenchNavigationalViewStates} from '../../routing/workbench-navigational-states';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -232,9 +231,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
   private setViewProperties(viewCapability: WorkbenchViewCapability, params: Params): void {
     this.view.title = substituteNamedParameters(viewCapability.properties.title, params) ?? null;
     this.view.heading = substituteNamedParameters(viewCapability.properties.heading, params) ?? null;
-    this.view.cssClass = new Array<string>()
-      .concat(Arrays.coerce(viewCapability.properties.cssClass))
-      .concat(Arrays.coerce(this.view.state[WorkbenchNavigationalViewStates.cssClass] as undefined | string | string[]));
+    this.view.classList.set(viewCapability.properties.cssClass, {scope: 'application'});
     this.view.closable = viewCapability.properties.closable ?? true;
     this.view.dirty = false;
   }

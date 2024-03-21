@@ -334,28 +334,26 @@ test.describe('Workbench Router', () => {
 
     // navigate to the testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-1');
     await routerPage.enterParams({param: 'value1'});
     await routerPage.clickNavigate();
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({param: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
 
     // navigate to the testee-2 view
     await routerPage.view.tab.click();
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-2');
     await routerPage.enterParams({param: 'value2'});
     await routerPage.clickNavigate();
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({param: 'value2'});
     await expectView(testee2ViewPage).toBeActive();
@@ -399,42 +397,39 @@ test.describe('Workbench Router', () => {
 
     // navigate to the testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-1');
     await routerPage.enterParams({optionalParam: 'value1', requiredParam: 'value1'});
     await routerPage.clickNavigate();
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({optionalParam: 'value1', requiredParam: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
 
     // navigate to the testee-2 view
     await routerPage.view.tab.click();
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-2');
     await routerPage.enterParams({optionalParam: 'value2', requiredParam: 'value1'});
     await routerPage.clickNavigate();
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({optionalParam: 'value2', requiredParam: 'value1'});
     await expectView(testee2ViewPage).toBeActive();
 
     // navigate to the testee-3 view
     await routerPage.view.tab.click();
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.103');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-3');
     await routerPage.enterParams({optionalParam: 'value3', requiredParam: 'value2'});
     await routerPage.clickNavigate();
 
     // expect testee-3 view to be opened in a new tab
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
     await expect(appPO.views()).toHaveCount(4);
     await expect.poll(() => testee3ViewPage.getViewParams()).toMatchObject({optionalParam: 'value3', requiredParam: 'value2'});
     await expectView(testee3ViewPage).toBeActive();
@@ -566,28 +561,26 @@ test.describe('Workbench Router', () => {
 
     // navigate to the testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-1');
     await routerPage.enterParams({param: 'value1'});
     await routerPage.clickNavigate();
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({param: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
 
     // navigate to the testee-2 view
     await routerPage.view.tab.click();
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-2');
     await routerPage.enterParams({param: 'value2'});
     await routerPage.clickNavigate();
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({param: 'value2'});
     await expectView(testee2ViewPage).toBeActive();
@@ -631,42 +624,39 @@ test.describe('Workbench Router', () => {
 
     // navigate to the testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.101');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-1');
     await routerPage.enterParams({optionalParam: 'value1', requiredParam: 'value1'});
     await routerPage.clickNavigate();
 
     // expect testee-1 view to be opened in a new tab
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => testee1ViewPage.getViewParams()).toMatchObject({optionalParam: 'value1', requiredParam: 'value1'});
     await expectView(testee1ViewPage).toBeActive();
 
     // navigate to the testee-2 view
     await routerPage.view.tab.click();
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.102');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-2');
     await routerPage.enterParams({optionalParam: 'value2', requiredParam: 'value1'});
     await routerPage.clickNavigate();
 
     // expect testee-2 view to be opened in a new tab
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
     await expect(appPO.views()).toHaveCount(3);
     await expect.poll(() => testee2ViewPage.getViewParams()).toMatchObject({optionalParam: 'value2', requiredParam: 'value1'});
     await expectView(testee2ViewPage).toBeActive();
 
     // navigate to the testee-3 view
     await routerPage.view.tab.click();
-    await routerPage.enterTarget('blank');
+    await routerPage.enterTarget('view.103');
     await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee-3');
     await routerPage.enterParams({optionalParam: 'value3', requiredParam: 'value2'});
     await routerPage.clickNavigate();
 
     // expect testee-3 view to be opened in a new tab
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
     await expect(appPO.views()).toHaveCount(4);
     await expect.poll(() => testee3ViewPage.getViewParams()).toMatchObject({optionalParam: 'value3', requiredParam: 'value2'});
     await expectView(testee3ViewPage).toBeActive();
@@ -910,18 +900,18 @@ test.describe('Workbench Router', () => {
     await routerPage.enterQualifier({component: 'view', app: 'app1'});
     await routerPage.enterParams({initialTitle: 'INITIAL TITLE 1'});
     await routerPage.checkActivate(false);
-    await routerPage.enterTarget('view.10');
+    await routerPage.enterTarget('view.101');
     await routerPage.clickNavigate();
 
     // navigate to the view
     await routerPage.enterQualifier({component: 'view', app: 'app1'});
     await routerPage.enterParams({initialTitle: 'INITIAL TITLE 2'});
-    await routerPage.enterTarget('view.20');
+    await routerPage.enterTarget('view.102');
     await routerPage.checkActivate(true);
     await routerPage.clickNavigate();
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.10'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.20'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
 
     // wait for views to be opened before reloading the application
     await expect(appPO.views()).toHaveCount(3);
@@ -2018,35 +2008,6 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(1);
     await expectView(routerPage).toBeActive();
     await expectView(testeeViewPage).not.toBeAttached();
-  });
-
-  test('should allow setting CSS class(es) via router (active view)', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'view', app: 'app1'});
-    await routerPage.enterTarget('view.99');
-    await routerPage.enterCssClass('testee');
-    await routerPage.clickNavigate();
-
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
-    await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee');
-    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
-  });
-
-  test('should allow setting CSS class(es) via router (inactive view)', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'view', app: 'app1'});
-    await routerPage.enterTarget('view.99');
-    await routerPage.enterCssClass('testee');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.99'});
-    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
-    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
   });
 
   test('should substitute named parameter in title/heading property of view capability', async ({appPO, microfrontendNavigator}) => {

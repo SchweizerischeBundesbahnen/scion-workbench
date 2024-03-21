@@ -86,6 +86,7 @@ export class WorkbenchLayoutComponent {
         partId: event.dragData.partId,
         viewId: event.dragData.viewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
+        classList: event.dragData.classList,
       },
       target: GridDropTargets.resolve({
         grid: this.grid!,

@@ -52,6 +52,10 @@
   <sci-form-field label="Closable">
     <sci-checkbox [(ngModel)]="view.closable" class="e2e-closable"></sci-checkbox>
   </sci-form-field>
+
+  <sci-form-field label="CSS Class(es)">
+    <input [formControl]="cssClassFormControl" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+  </sci-form-field>
 </section>
 
 <sci-accordion class="e2e-view-actions" variant="solid">

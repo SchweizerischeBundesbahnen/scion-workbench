@@ -8,16 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding, Injector, OnDestroy, Provider, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostBinding, OnDestroy, Provider, ViewChild} from '@angular/core';
 import {AsyncSubject, combineLatest} from 'rxjs';
 import {ActivatedRoute, RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
-import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
-import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
 import {RouterUtils} from '../routing/router.util';
 import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -74,7 +72,7 @@ export class ViewComponent implements OnDestroy {
 
   @HostBinding('attr.class')
   public get cssClasses(): string {
-    return this._view.cssClasses.join(' ');
+    return this._view.classList.value.join(' ');
   }
 
   @HostBinding('class.view-drag')
@@ -86,7 +84,6 @@ export class ViewComponent implements OnDestroy {
               private _logger: Logger,
               private _host: ElementRef<HTMLElement>,
               private _viewDragService: ViewDragService,
-              private _injector: Injector,
               viewContextMenuService: ViewMenuService) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
 
@@ -114,19 +111,16 @@ export class ViewComponent implements OnDestroy {
     const actualRouteSnapshot = RouterUtils.resolveActualRouteSnapshot(route.snapshot);
     this._view.title ??= RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.title) ?? null;
     this._view.heading ??= RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.heading) ?? null;
-
-    const viewState = runInInjectionContext(this._injector, () => WorkbenchNavigationalStates.resolveViewState(this.viewId));
-    this._view.cssClass = new Array<string>()
-      .concat(Arrays.coerce(RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.cssClass)))
-      .concat(Arrays.coerce(viewState?.[WorkbenchNavigationalViewStates.cssClass] as undefined | string | string[]))
-      .concat(this._view.cssClasses);
+    this._view.classList.set(RouterUtils.lookupRouteData(actualRouteSnapshot, WorkbenchRouteData.cssClass), {scope: 'route'});
   }
 
   public onDeactivateRoute(): void {
     this._view.heading = null;
     this._view.title = null;
-    this._view.cssClass = [];
     this._view.dirty = false;
+    this._view.classList.remove({scope: 'application'});
+    this._view.classList.remove({scope: 'route'});
+    this._view.classList.remove({scope: 'navigation'});
   }
 
   public ngOnDestroy(): void {

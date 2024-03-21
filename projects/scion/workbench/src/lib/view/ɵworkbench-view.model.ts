@@ -13,7 +13,7 @@ import {ChildrenOutletContexts, Router, UrlSegment} from '@angular/router';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {Arrays, Defined} from '@scion/toolkit/util';
+import {Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
@@ -38,7 +38,8 @@ import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
 import {ViewState} from '../routing/routing.model';
-import {WorkbenchNavigationalStates} from '../routing/workbench-navigational-states';
+import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from '../routing/workbench-navigational-states';
+import {ClassList} from '../common/class-list';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -69,10 +70,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public state: ViewState = {};
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
-  public readonly cssClasses$ = new BehaviorSubject<string[]>([]);
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly portal: WbComponentPortal;
+  public readonly classList = new ClassList();
 
   constructor(public readonly id: string, options: {component: ComponentType<ViewComponent>}) {
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
@@ -109,6 +110,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     const partId = layout.part({by: {viewId: this.id}}).id;
     this._part$.next(this._partRegistry.get(partId));
     this.state = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!)?.viewStates[this.id] ?? this.state ?? {};
+    this.classList.set(this.state[WorkbenchNavigationalViewStates.cssClass] as undefined | string | string[], {scope: 'navigation'});
   }
 
   public get first(): boolean {
@@ -124,11 +126,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   public set cssClass(cssClass: string | string[]) {
-    this.cssClasses$.next(Arrays.coerce(cssClass));
+    this.classList.set(cssClass, {scope: 'application'});
   }
 
-  public get cssClasses(): string[] {
-    return this.cssClasses$.value;
+  public get cssClass(): string[] {
+    return this.classList.get({scope: 'application'});
   }
 
   public get active(): boolean {
@@ -220,6 +222,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       partId: this.part.id,
       viewId: this.id,
       viewUrlSegments: this.urlSegments,
+      classList: this.classList.toMap(),
     };
 
     if (target === 'new-window') {

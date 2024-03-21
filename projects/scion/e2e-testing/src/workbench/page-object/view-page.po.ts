@@ -78,6 +78,10 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-dirty')).toggle(check);
   }
 
+  public async enterCssClass(cssClass: string | string[]): Promise<void> {
+    await this.locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
+  }
+
   public async checkClosable(check: boolean): Promise<void> {
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(check);
   }
