@@ -182,6 +182,9 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.properties.resizable !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-resizable')).toggle(capability.properties.resizable);
     }
+    if (capability.properties.padding !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-padding')).toggle(capability.properties.padding);
+    }
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }

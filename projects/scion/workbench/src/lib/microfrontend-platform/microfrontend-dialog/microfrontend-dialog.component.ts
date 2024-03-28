@@ -114,7 +114,7 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
     this.dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
     this.dialog.closable = this.capability.properties.closable ?? true;
     this.dialog.resizable = this.capability.properties.resizable ?? true;
-    this.dialog.padding = false;
+    this.dialog.padding = this.capability.properties.padding ?? false;
   }
 
   private propagateWorkbenchTheme(): void {

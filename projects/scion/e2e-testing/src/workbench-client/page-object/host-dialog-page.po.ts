@@ -15,6 +15,7 @@ import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchDialogPagePO} from '../../workbench/page-object/workbench-dialog-page.po';
 import {DialogPO} from '../../dialog.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {DomRect, fromRect} from '../../helper/testing.util';
 
 /**
  * Page object to interact with {@link HostDialogPageComponent}.
@@ -54,6 +55,10 @@ export class HostDialogPagePO implements WorkbenchDialogPagePO {
     finally {
       await accordion.collapse();
     }
+  }
+
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
   }
 
   public async close(options?: {returnValue?: string; closeWithError?: boolean}): Promise<void> {

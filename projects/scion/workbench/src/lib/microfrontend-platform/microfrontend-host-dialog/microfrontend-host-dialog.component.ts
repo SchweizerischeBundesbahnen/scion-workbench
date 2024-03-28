@@ -98,7 +98,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
     this._dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
     this._dialog.closable = this.capability.properties.closable ?? true;
     this._dialog.resizable = this.capability.properties.resizable ?? true;
-    this._dialog.padding = false;
+    this._dialog.padding = this.capability.properties.padding ?? true;
   }
 
   public ngOnDestroy(): void {

@@ -33,6 +33,35 @@ test.describe('Workbench Host Dialog', () => {
     await expectDialog(dialogPage).toBeVisible();
   });
 
+  test('should apply dialog defaults', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // TODO [#271]: Register dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+    await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog'}});
+
+    // Open the dialog.
+    const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+    await dialogOpenerPage.open({component: 'host-dialog'}, {cssClass: 'testee'});
+
+    const dialog = appPO.dialog({cssClass: 'testee'});
+    const dialogPage = new HostDialogPagePO(dialog);
+
+    // Expect dialog page to be displayed.
+    await expectDialog(dialogPage).toBeVisible();
+
+    // Expect the close button to be visible.
+    await expect(dialog.closeButton).toBeVisible();
+    // Expect the dialog to be resizable.
+    await expect(dialog.resizeHandles).toHaveCount(8);
+    // Expect padding.
+    await expect(async () => {
+      const dialogBorder = 2 * await dialog.getDialogBorderWidth();
+      const pageSize = await dialogPage.getBoundingBox();
+      const dialogSize = await dialog.getDialogBoundingBox();
+      expect(pageSize.width).toBeLessThan(dialogSize.width - dialogBorder);
+    }).toPass();
+  });
+
   test('should apply capability properties', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -44,6 +73,7 @@ test.describe('Workbench Host Dialog', () => {
     await dialogOpenerPage.open({component: 'host-dialog-custom-properties'}, {cssClass: 'testee', params: {id: '123'}});
 
     const dialog = appPO.dialog({cssClass: 'testee'});
+    const dialogPage = new HostDialogPagePO(dialog);
 
     // Assert non-default property values of capability defined in workbench.manifest.ts
     // Expect title to be set.
@@ -61,6 +91,13 @@ test.describe('Workbench Host Dialog', () => {
       minWidth: '495px',
       maxWidth: '505px',
     } satisfies Partial<CSSStyleDeclaration>);
+    // Expect no padding.
+    await expect(async () => {
+      const dialogBorder = 2 * await dialog.getDialogBorderWidth();
+      const pageSize = await dialogPage.getBoundingBox();
+      const dialogSize = await dialog.getDialogBoundingBox();
+      expect(pageSize.width).toEqual(dialogSize.width - dialogBorder);
+    }).toPass();
   });
 
   test('should pass params to the dialog component', async ({appPO, microfrontendNavigator}) => {

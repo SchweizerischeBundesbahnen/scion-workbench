@@ -1,4 +1,4 @@
-import {WorkbenchCapabilities} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Manifest} from '@scion/microfrontend-platform';
 
 /**
@@ -16,7 +16,7 @@ export const workbenchManifest: Manifest = {
         {name: 'param2', required: false},
       ],
       description: 'Allows interacting with a message box.',
-    },
+    } satisfies WorkbenchMessageBoxCapability,
     {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'notification-page'},
@@ -26,7 +26,7 @@ export const workbenchManifest: Manifest = {
         {name: 'param2', required: false},
       ],
       description: 'Allows interacting with a notification.',
-    },
+    } satisfies WorkbenchNotificationCapability,
     // TODO [#271]: Remove this popup capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Popup,
@@ -41,7 +41,7 @@ export const workbenchManifest: Manifest = {
       properties: {
         path: 'test-host-popup;matrixParam=:param',
       },
-    },
+    } satisfies WorkbenchPopupCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Dialog,
@@ -56,7 +56,7 @@ export const workbenchManifest: Manifest = {
       properties: {
         path: 'test-host-dialog;matrixParam=:param',
       },
-    },
+    } satisfies WorkbenchDialogCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Dialog,
@@ -73,6 +73,7 @@ export const workbenchManifest: Manifest = {
         title: 'Workbench Host Dialog :id',
         closable: false,
         resizable: false,
+        padding: false,
         size: {
           height: '500px',
           minHeight: '495px',
@@ -82,7 +83,7 @@ export const workbenchManifest: Manifest = {
           maxWidth: '505px',
         },
       },
-    },
+    } satisfies WorkbenchDialogCapability,
   ],
   intentions: [
     // allow opening test views

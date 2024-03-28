@@ -101,6 +101,12 @@ export interface WorkbenchDialogCapability extends Capability {
      */
     resizable?: boolean;
     /**
+     * Controls if to apply a padding to the content of the dialog.
+     *
+     * By default, dialogs provided by the workbench host application have a padding, others do not.
+     */
+    padding?: boolean;
+    /**
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the dialog microfrontend signals readiness.
      *
      * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.

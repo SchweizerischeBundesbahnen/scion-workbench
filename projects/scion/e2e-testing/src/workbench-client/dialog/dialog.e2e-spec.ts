@@ -462,7 +462,7 @@ test.describe('Workbench Dialog', () => {
     });
   });
 
-  test.describe('Workbench Dialog Size', () => {
+  test.describe('Size', () => {
 
     test('should size the dialog as configured in the dialog capability', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
@@ -574,6 +574,64 @@ test.describe('Workbench Dialog', () => {
 
       // Expect the dialog not to be resizable.
       await expect(dialog.resizeHandles).toHaveCount(0);
+    });
+  });
+
+  test.describe('Padding', () => {
+
+    test('should not have padding by default', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+        },
+      });
+
+      // Open the dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expect(async () => {
+        const dialogBorder = 2 * await dialog.getDialogBorderWidth();
+        const pageSize = await dialogPage.getBoundingBox();
+        const dialogSize = await dialog.getDialogBoundingBox();
+        expect(pageSize.width).toEqual(dialogSize.width - dialogBorder);
+      }).toPass();
+    });
+
+    test('should have padding if set', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'dialog',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-dialog',
+          size: {height: '475px', width: '300px'},
+          padding: true,
+        },
+      });
+
+      // Open the dialog.
+      const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+      await dialogOpenerPage.open({component: 'testee'}, {cssClass: 'testee'});
+
+      const dialog = appPO.dialog({cssClass: 'testee'});
+      const dialogPage = new DialogPagePO(dialog);
+
+      await expect(async () => {
+        const dialogBorder = 2 * await dialog.getDialogBorderWidth();
+        const pageSize = await dialogPage.getBoundingBox();
+        const dialogSize = await dialog.getDialogBoundingBox();
+        expect(pageSize.width).toBeLessThan(dialogSize.width - dialogBorder);
+      }).toPass();
     });
   });
 });
