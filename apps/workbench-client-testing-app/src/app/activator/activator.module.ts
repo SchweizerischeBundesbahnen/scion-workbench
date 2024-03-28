@@ -11,7 +11,7 @@
 import {Inject, NgModule} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
-import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 
 @NgModule({})
 export default class ActivatorModule {
@@ -160,6 +160,44 @@ export default class ActivatorModule {
       private: false,
       properties: {
         path: 'test-popup',
+        showSplash: true,
+      },
+    });
+
+    // Register view to open a workbench dialog.
+    await this._manifestService.registerCapability<TestingAppViewCapability>({
+      type: WorkbenchCapabilities.View,
+      qualifier: {
+        component: 'dialog',
+        app,
+      },
+      description: '[e2e] Allows opening a microfrontend in a workbench dialog',
+      private: false,
+      properties: {
+        path: 'test-dialog-opener',
+        showSplash: true,
+        pinToStartPage: true,
+        title: 'Workbench Dialog',
+        heading,
+        cssClass: 'e2e-test-dialog-opener',
+      },
+    });
+
+    // Register the dialog microfrontend.
+    await this._manifestService.registerCapability<WorkbenchDialogCapability>({
+      type: WorkbenchCapabilities.Dialog,
+      qualifier: {
+        component: 'dialog',
+        app,
+      },
+      description: '[e2e] Provides access to the workbench dialog object',
+      private: false,
+      properties: {
+        path: 'test-dialog',
+        size: {
+          width: '300px',
+          height: '475px',
+        },
         showSplash: true,
       },
     });

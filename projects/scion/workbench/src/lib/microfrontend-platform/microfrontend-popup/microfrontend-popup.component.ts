@@ -8,22 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, Injector, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
 import {Application, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵTHEME_CONTEXT_KEY, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {Popup} from '../../popup/popup.config';
 import {NgClass, NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {WorkbenchService} from '../../workbench.service';
-import {WorkbenchTheme} from '../../workbench.model';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import '../microfrontend-platform.config';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
- * Displays the microfrontend of a popup capability inside a workbench popup.
+ * Displays the microfrontend of a given {@link WorkbenchPopupCapability}.
+ *
+ * This component is designed to be displayed in a workbench popup.
  */
 @Component({
   selector: 'wb-microfrontend-popup',
@@ -60,7 +60,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
               private _messageClient: MessageClient,
               private _destroyRef: DestroyRef,
               private _workbenchLayoutService: WorkbenchLayoutService,
-              private _workbenchService: WorkbenchService,
+              private _injector: Injector,
               private _logger: Logger) {
     this._popupContext = this.popup.input!;
     this.popupCapability = this._popupContext.capability;
@@ -92,6 +92,9 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
 
+    // Propagate workbench and color theme to the microfrontend.
+    this.propagateWorkbenchTheme();
+
     // Navigate to the microfrontend.
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
     this._outletRouter.navigate(this.popupCapability.properties.path, {
@@ -101,8 +104,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
     }).then();
-
-    this.installThemePropagator();
   }
 
   public onFocusWithin(event: Event): void {
@@ -144,22 +145,8 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Propagates the current theme and color scheme to embedded content.
-   */
-  private installThemePropagator(): void {
-    this._workbenchService.theme$
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(theme => {
-        if (theme) {
-          this.routerOutletElement.nativeElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
-          this.routerOutletElement.nativeElement.setContextValue('color-scheme', theme.colorScheme);
-        }
-        else {
-          this.routerOutletElement.nativeElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
-          this.routerOutletElement.nativeElement.removeContextValue('color-scheme');
-        }
-      });
+  private propagateWorkbenchTheme(): void {
+    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
   }
 
   public ngOnDestroy(): void {

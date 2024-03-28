@@ -75,17 +75,11 @@ export abstract class WorkbenchView {
 
   /**
    * Sets the title to be displayed in the view tab.
-   *
-   * You can provide the title either as a string literal or as Observable. If you pass an Observable, it will be unsubscribed when navigating
-   * to another microfrontend, whether from the same app or a different one.
    */
   public abstract setTitle(title: string | Observable<string>): void;
 
   /**
    * Sets the subtitle to be displayed in the view tab.
-   *
-   * You can provide the heading either as a string literal or as Observable. If you pass an Observable, it will be unsubscribed when navigating
-   * to another microfrontend, whether from the same app or a different one.
    */
   public abstract setHeading(heading: string | Observable<string>): void;
 

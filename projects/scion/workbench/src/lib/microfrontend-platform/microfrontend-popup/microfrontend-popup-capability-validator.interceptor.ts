@@ -16,7 +16,7 @@ import {WorkbenchCapabilities, WorkbenchPopupCapability} from '@scion/workbench-
  * Asserts popup capabilities to have required properties.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendPopupCapabilityInterceptor implements CapabilityInterceptor {
+export class MicrofrontendPopupCapabilityValidator implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {
     if (capability.type !== WorkbenchCapabilities.Popup) {

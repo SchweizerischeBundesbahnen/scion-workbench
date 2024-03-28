@@ -48,9 +48,9 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private _blink$ = new Subject<void>();
 
   /**
-   * Contains the result to be passed to the dialog opener.
+   * Result (or error) to be passed to the dialog opener.
    */
-  private _result: R | ɵDialogErrorResult | undefined;
+  private _result: R | Error | undefined;
   private _componentRef: ComponentRef<WorkbenchDialogComponent> | undefined;
   private _cssClass: string;
 
@@ -108,25 +108,14 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     // Wait for the dialog to close, resolving to its result or rejecting if closed with an error.
     return new Promise<R | undefined>((resolve, reject) => {
       this._destroyRef.onDestroy(() => {
-        if (this._result instanceof ɵDialogErrorResult) {
-          reject(this._result.error);
-        }
-        else {
-          resolve(this._result);
-        }
+        this._result instanceof Error ? reject(this._result) : resolve(this._result);
       });
     });
   }
 
   /** @inheritDoc */
-  public close(result?: R): void {
+  public close(result?: R | Error): void {
     this._result = result;
-    this.destroy();
-  }
-
-  /** @inheritDoc */
-  public closeWithError(error: Error | string): void {
-    this._result = new ɵDialogErrorResult(error);
     this.destroy();
   }
 
@@ -356,14 +345,5 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
       this._destroyRef.destroy();
       this._overlayRef.dispose();
     }
-  }
-}
-
-/**
- * Wrapper to identify an erroneous result.
- */
-class ɵDialogErrorResult {
-
-  constructor(public error: string | Error) {
   }
 }

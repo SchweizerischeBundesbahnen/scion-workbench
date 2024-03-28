@@ -417,7 +417,7 @@ test.describe('Workbench Host Popup', () => {
         qualifier: {component: 'host-popup'},
         type: 'popup',
         properties: expect.objectContaining({
-          path: 'test-host-popup;matrixParam1=:param1;matrixParam2=:component',
+          path: 'test-host-popup;matrixParam=:param',
         }),
       }));
     });
@@ -434,7 +434,7 @@ test.describe('Workbench Host Popup', () => {
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterParams({param1: 'PARAM1'});
+      await popupOpenerPage.enterParams({param: 'PARAM'});
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.open();
 
@@ -442,7 +442,7 @@ test.describe('Workbench Host Popup', () => {
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new HostPopupPagePO(popup);
 
-      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({param1: 'PARAM1'}));
+      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({param: 'PARAM'}));
     });
 
     test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
@@ -479,7 +479,7 @@ test.describe('Workbench Host Popup', () => {
       // open the popup
       const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
       await popupOpenerPage.enterQualifier({component: 'host-popup'});
-      await popupOpenerPage.enterParams({param1: 'PARAM1'});
+      await popupOpenerPage.enterParams({param: 'PARAM'});
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.open();
 
@@ -487,8 +487,8 @@ test.describe('Workbench Host Popup', () => {
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new HostPopupPagePO(popup);
 
-      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup', param1: 'PARAM1'}));
-      await expect.poll(() => popupPage.getRouteParams()).toEqual({matrixParam1: 'PARAM1', matrixParam2: 'host-popup'});
+      await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'host-popup', param: 'PARAM'}));
+      await expect.poll(() => popupPage.getRouteParams()).toEqual({matrixParam: 'PARAM'});
     });
   });
 });

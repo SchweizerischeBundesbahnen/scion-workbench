@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {InputFieldTestPagePO as WorkbenchInputFieldTestPagePO} from '../workbench/page-object/test-pages/input-field-test-page.po';
+import {ViewPagePO} from './page-object/view-page.po';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
 
@@ -295,39 +296,7 @@ test.describe('Workbench Popup', () => {
 
   test.describe('view context', () => {
 
-    test('should hide the popup when its contextual view (if any) is deactivated, and then display the popup again when activating it', async ({appPO, microfrontendNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: true});
-
-      await microfrontendNavigator.registerCapability('app1', {
-        type: 'popup',
-        qualifier: {component: 'testee'},
-        properties: {
-          path: 'test-popup',
-        },
-      });
-
-      // open the popup
-      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-      await popupOpenerPage.enterQualifier({component: 'testee'});
-      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
-
-      const popup = appPO.popup({cssClass: 'testee'});
-      const popupPage = new PopupPagePO(popup);
-
-      await expectPopup(popupPage).toBeVisible();
-
-      // activate another view
-      await appPO.openNewViewTab();
-      await expectPopup(popupPage).toBeHidden();
-
-      // re-activate the view
-      await popupOpenerPage.view.tab.click();
-      await expectPopup(popupPage).toBeVisible();
-    });
-
-    test('should not destroy the popup when its contextual view (if any) is deactivated', async ({appPO, microfrontendNavigator}) => {
+    test('should detach popup if contextual view is not active', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -397,6 +366,46 @@ test.describe('Workbench Popup', () => {
       // close the view
       await popupOpenerPage.view.tab.close();
       await expectPopup(popupPage).not.toBeAttached();
+    });
+
+    test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-popup',
+        },
+      });
+
+      // Open view in main area.
+      const viewInMainArea = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+
+      // Open popup opener view.
+      const popupOpenerView = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+
+      // Drag popup opener view into peripheral area.
+      await popupOpenerView.view.tab.dragTo({grid: 'workbench', region: 'east'});
+
+      // Open popup.
+      await popupOpenerView.enterCssClass('testee');
+      await popupOpenerView.enterQualifier({component: 'testee'});
+      await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
+      await popupOpenerView.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await expectPopup(popupPage).toBeVisible();
+
+      // Maximize the main area.
+      await viewInMainArea.view.tab.dblclick();
+      await expectPopup(popupPage).toBeHidden();
+
+      // Restore the layout.
+      await viewInMainArea.view.tab.dblclick();
+      await expectPopup(popupPage).toBeVisible();
     });
   });
 

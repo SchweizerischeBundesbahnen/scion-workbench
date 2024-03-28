@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -85,4 +85,14 @@ export const ɵWorkbenchCommands = {
    * Computes the topic via which a popup can be closed.
    */
   popupCloseTopic: (popupId: string) => `ɵworkbench/popups/${popupId}/close`,
+
+  /**
+   * Computes the topic via which the title of a dialog can be set.
+   */
+  dialogTitleTopic: (dialogId: string) => `ɵworkbench/dialogs/${dialogId}/title`,
+
+  /**
+   * Computes the topic via which a dialog can be closed.
+   */
+  dialogCloseTopic: (dialogId: string) => `ɵworkbench/dialogs/${dialogId}/close`,
 } as const;
