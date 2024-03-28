@@ -1,4 +1,4 @@
-<sci-viewport class="content" [formGroup]="form" cdkTrapFocus cdkTrapFocusAutoCapture>
+<form [formGroup]="form" autocomplete="off">
   <sci-form-field label="Title" direction="column">
     <input [formControl]="form.controls.title" class="e2e-title">
   </sci-form-field>
@@ -63,13 +63,15 @@
       <input [formControl]="form.controls.result" class="e2e-return-value" placeholder="Optional data to return to the dialog opener">
     </ng-template>
   </sci-accordion>
-</sci-viewport>
+</form>
 
-<footer>
-  <label class="close-with-error">
+<ng-template wbDialogAction align="start">
+  <label>
     <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"></sci-checkbox>
     Close with error
   </label>
+</ng-template>
 
+<ng-template wbDialogAction align="end">
   <button (click)="onClose()" class="e2e-close" sci-primary>Close</button>
-</footer>
+</ng-template>

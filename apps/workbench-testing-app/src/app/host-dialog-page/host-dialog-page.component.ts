@@ -22,6 +22,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WorkbenchDialogActionDirective} from '@scion/workbench';
 
 /**
  * Dialog test component provided by the workbench host application.
@@ -44,6 +45,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     SciKeyValueComponent,
     SciCheckboxComponent,
     A11yModule,
+    WorkbenchDialogActionDirective,
   ],
 })
 export default class HostDialogPageComponent {

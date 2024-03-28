@@ -62,10 +62,10 @@ export class HostDialogPagePO implements WorkbenchDialogPagePO {
     }
 
     if (options?.closeWithError) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-with-error')).toggle(true);
+      await new SciCheckboxPO(this.dialog.footer.locator('sci-checkbox.e2e-close-with-error')).toggle(true);
     }
 
-    await this.locator.locator('button.e2e-close').click();
+    await this.dialog.footer.locator('button.e2e-close').click();
   }
 
   private async enterReturnValue(returnValue: string): Promise<void> {
