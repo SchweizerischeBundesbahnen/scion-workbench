@@ -56,7 +56,7 @@ const routes: Routes = [
     path: 'dialog-test-page',
     children: [
       {
-        path: ':segment1/segment2',
+        path: ':segment',
         loadComponent: () => import('../dialog-page/dialog-page.component'),
       },
     ],

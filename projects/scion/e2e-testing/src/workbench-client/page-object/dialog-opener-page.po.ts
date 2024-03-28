@@ -17,6 +17,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {WorkbenchDialogOptions} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
@@ -37,16 +38,14 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
     this.error = this.locator.locator('output.e2e-dialog-error');
   }
 
-  public async open(qualifier: Qualifier, options?: DialogOpenerPageOptions): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(qualifier);
+  public async open(qualifier: Qualifier, options?: WorkbenchDialogOptions): Promise<void> {
+    const qualifierField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+    await qualifierField.addEntries(qualifier);
 
-    if (options?.params) {
-      const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-      await keyValueField.clear();
-      await keyValueField.addEntries(options.params);
-    }
+    const paramsField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+    await paramsField.clear();
+    await paramsField.addEntries(options?.params ?? {});
 
     if (options?.modality) {
       await this.locator.locator('select.e2e-modality').selectOption(options.modality);
@@ -79,14 +78,4 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
     const dialog = this._appPO.dialog({cssClass});
     await dialog.locator.waitFor({state: 'attached'});
   }
-}
-
-export interface DialogOpenerPageOptions {
-  params?: Record<string, string>;
-  modality?: 'application' | 'view';
-  context?: {
-    viewId?: string;
-  };
-  animate?: boolean;
-  cssClass?: string | string[];
 }

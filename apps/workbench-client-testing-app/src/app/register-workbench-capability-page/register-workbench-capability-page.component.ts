@@ -20,6 +20,7 @@ import {JsonPipe} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {parseTypedString} from '../common/parse-typed-value.util';
 
 /**
  * Allows registering workbench capabilities.
@@ -139,7 +140,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: parseNullOrUndefined(this.form.controls.viewProperties.controls.path.value)!,
+        path: parseTypedString(this.form.controls.viewProperties.controls.path.value), // allow `undefined` to test capability validation
         title: this.form.controls.viewProperties.controls.title.value || undefined,
         heading: this.form.controls.viewProperties.controls.heading.value || undefined,
         cssClass: this.form.controls.viewProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
@@ -162,7 +163,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: parseNullOrUndefined(this.form.controls.popupProperties.controls.path.value)!,
+        path: parseTypedString(this.form.controls.popupProperties.controls.path.value), // allow `undefined` to test capability validation
         size: undefinedIfEmpty<PopupSize>({
           width: this.form.controls.popupProperties.controls.size.controls.width.value || undefined,
           height: this.form.controls.popupProperties.controls.size.controls.height.value || undefined,
@@ -190,15 +191,15 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: parseNullOrUndefined(this.form.controls.dialogProperties.controls.path.value)!,
+        path: parseTypedString(this.form.controls.dialogProperties.controls.path.value), // allow `undefined` to test capability validation
         size: undefinedIfEmpty<WorkbenchDialogSize>({
-          width: parseNullOrUndefined(this.form.controls.dialogProperties.controls.size.controls.width.value)!, // allow undefined for testing the capability interceptor.
-          height: parseNullOrUndefined(this.form.controls.dialogProperties.controls.size.controls.height.value)!, // allow undefined for testing the capability interceptor.
+          width: parseTypedString(this.form.controls.dialogProperties.controls.size.controls.width.value)!, // allow `undefined` to test capability validation
+          height: parseTypedString(this.form.controls.dialogProperties.controls.size.controls.height.value)!, // allow `undefined` to test capability validation
           minWidth: this.form.controls.dialogProperties.controls.size.controls.minWidth.value || undefined,
           maxWidth: this.form.controls.dialogProperties.controls.size.controls.maxWidth.value || undefined,
           minHeight: this.form.controls.dialogProperties.controls.size.controls.minHeight.value || undefined,
           maxHeight: this.form.controls.dialogProperties.controls.size.controls.maxHeight.value || undefined,
-        })!, // allow undefined for testing the capability interceptor.
+        })!, // allow `undefined` to test capability validation
         title: this.form.controls.dialogProperties.controls.title.value || undefined,
         closable: this.form.controls.dialogProperties.controls.closable.value,
         resizable: this.form.controls.dialogProperties.controls.resizable.value,
@@ -207,16 +208,5 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         cssClass: this.form.controls.dialogProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
       },
     };
-  }
-}
-
-function parseNullOrUndefined(value: string): string | null | undefined {
-  switch (value) {
-    case '<null>':
-      return null;
-    case '<undefined>':
-      return undefined;
-    default:
-      return value;
   }
 }

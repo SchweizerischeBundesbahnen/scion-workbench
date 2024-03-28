@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, Injector, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
 import {Application, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
@@ -18,11 +18,12 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import '../microfrontend-platform.config';
-import {MicrofrontendThemePropagator} from '../theme/microfrontend-theme-propagtor.service';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
- * Displays the microfrontend of a popup capability inside a workbench popup.
+ * Displays the microfrontend of a given {@link WorkbenchPopupCapability}.
+ *
+ * This component is designed to be displayed in a workbench popup.
  */
 @Component({
   selector: 'wb-microfrontend-popup',
@@ -30,9 +31,6 @@ import {MicrofrontendThemePropagator} from '../theme/microfrontend-theme-propagt
   templateUrl: './microfrontend-popup.component.html',
   standalone: true,
   imports: [NgClass, NgComponentOutlet],
-  providers: [
-    {provide: MicrofrontendThemePropagator},
-  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
 export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
@@ -62,7 +60,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
               private _messageClient: MessageClient,
               private _destroyRef: DestroyRef,
               private _workbenchLayoutService: WorkbenchLayoutService,
-              private _microfrontendThemePropagator: MicrofrontendThemePropagator,
+              private _injector: Injector,
               private _logger: Logger) {
     this._popupContext = this.popup.input!;
     this.popupCapability = this._popupContext.capability;
@@ -94,6 +92,9 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
 
+    // Propagate workbench and color theme to the microfrontend.
+    this.propagateWorkbenchTheme();
+
     // Navigate to the microfrontend.
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
     this._outletRouter.navigate(this.popupCapability.properties.path, {
@@ -103,8 +104,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
     }).then();
-
-    this._microfrontendThemePropagator.install(this.routerOutletElement.nativeElement);
   }
 
   public onFocusWithin(event: Event): void {
@@ -144,6 +143,10 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       .subscribe(event => {
         this.isWorkbenchDrag = (event === 'start');
       });
+  }
+
+  private propagateWorkbenchTheme(): void {
+    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
   }
 
   public ngOnDestroy(): void {

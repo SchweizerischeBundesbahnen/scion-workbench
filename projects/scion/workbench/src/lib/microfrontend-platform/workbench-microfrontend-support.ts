@@ -20,17 +20,19 @@ import {WorkbenchModuleConfig} from '../workbench-module-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler.service';
-import {MicrofrontendViewIntentInterceptor} from './routing/microfrontend-view-intent-interceptor.service';
-import {MicrofrontendPopupIntentInterceptor} from './microfrontend-popup/microfrontend-popup-intent-interceptor.service';
+import {MicrofrontendViewIntentHandler} from './routing/microfrontend-view-intent-handler.interceptor';
+import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
-import {MicrofrontendViewCapabilityInterceptor} from './routing/microfrontend-view-capability-interceptor.service';
-import {MicrofrontendPopupCapabilityInterceptor} from './microfrontend-popup/microfrontend-popup-capability-interceptor.service';
+import {MicrofrontendViewCapabilityValidator} from './routing/microfrontend-view-capability-validator.interceptor';
+import {MicrofrontendViewCapabilityIdAssigner} from './routing/microfrontend-view-capability-id-assigner.interceptor';
+import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
+import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
+import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
-import {MicrofrontendDialogIntentInterceptor} from './microfrontend-dialog/microfrontend-dialog-intent-interceptor.service';
-import {MicrofrontendDialogCapabilityInterceptor} from './microfrontend-dialog/microfrontend-dialog-capability-interceptor.service';
+import '../microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -69,12 +71,13 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
       provide: MicrofrontendPlatformConfig,
       useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
     },
-    MicrofrontendViewIntentInterceptor,
-    MicrofrontendPopupIntentInterceptor,
-    MicrofrontendDialogIntentInterceptor,
-    MicrofrontendViewCapabilityInterceptor,
-    MicrofrontendPopupCapabilityInterceptor,
-    MicrofrontendDialogCapabilityInterceptor,
+    MicrofrontendViewIntentHandler,
+    MicrofrontendPopupIntentHandler,
+    MicrofrontendDialogIntentHandler,
+    MicrofrontendViewCapabilityValidator,
+    MicrofrontendViewCapabilityIdAssigner,
+    MicrofrontendPopupCapabilityValidator,
+    MicrofrontendDialogCapabilityValidator,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideMicrofrontendRoute(),

@@ -27,6 +27,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
 import {Dictionaries} from '@scion/toolkit/util';
+import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -56,7 +57,7 @@ export default class PopupOpenerPageComponent {
       width: this._formBuilder.control<number | undefined>(undefined),
       height: this._formBuilder.control<number | undefined>(undefined),
     }),
-    contextualViewId: this._formBuilder.control('<default>', Validators.required),
+    contextualViewId: this._formBuilder.control(''),
     align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
     cssClass: this._formBuilder.control(''),
     input: this._formBuilder.control(''),
@@ -107,7 +108,7 @@ export default class PopupOpenerPageComponent {
         maxHeight: this.form.controls.size.controls.maxHeight.value || undefined,
       } satisfies PopupSize)),
       context: {
-        viewId: this.parseContextualViewIdInput(),
+        viewId: parseTypedString(this.form.controls.contextualViewId.value || undefined),
       },
     })
       .then(result => this.returnValue = result)
@@ -130,18 +131,6 @@ export default class PopupOpenerPageComponent {
         return PopupOpenerPageComponent;
       default:
         throw Error(`[IllegalPopupComponent] Popup component not supported: ${this.form.controls.popupComponent.value}`);
-    }
-  }
-
-  private parseContextualViewIdInput(): string | null | undefined {
-    const viewId = this.form.controls.contextualViewId.value;
-    switch (viewId) {
-      case '<default>':
-        return undefined;
-      case '<null>':
-        return null;
-      default:
-        return viewId;
     }
   }
 

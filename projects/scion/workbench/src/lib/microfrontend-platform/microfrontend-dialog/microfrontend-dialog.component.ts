@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, HostBinding, inject, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, HostBinding, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
@@ -18,11 +18,12 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
-import {MicrofrontendThemePropagator} from '../theme/microfrontend-theme-propagtor.service';
-import {NamedParameters} from '../common/named-parameters.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
- * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link OutletRouter}. The content is displayed inside a workbench dialog.
+ * Displays the microfrontend of a given {@link WorkbenchDialogCapability}.
+ *
+ * This component is designed to be displayed in a workbench dialog.
  */
 @Component({
   selector: 'wb-microfrontend-dialog',
@@ -32,9 +33,6 @@ import {NamedParameters} from '../common/named-parameters.util';
   imports: [
     NgClass,
     NgComponentOutlet,
-  ],
-  providers: [
-    {provide: MicrofrontendThemePropagator},
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
@@ -60,12 +58,12 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
    */
   protected splash: ComponentType<unknown>;
 
-  constructor(public dialog: ɵWorkbenchDialog,
+  constructor(protected dialog: ɵWorkbenchDialog,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
               private _messageClient: MessageClient,
               private _workbenchLayoutService: WorkbenchLayoutService,
-              private _microfrontendThemePropagator: MicrofrontendThemePropagator,
+              private _injector: Injector,
               private _logger: Logger) {
     this._logger.debug(() => 'Constructing MicrofrontendDialogComponent.', LoggerNames.MICROFRONTEND);
     this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
@@ -77,8 +75,8 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.setDialogProperties();
     this.propagateDialogContext();
+    this.propagateWorkbenchTheme();
     this.navigate();
-    this.installThemePropagator();
   }
 
   private navigate(): void {
@@ -113,14 +111,14 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
     this.dialog.size.minHeight = this.capability.properties.size.minHeight;
     this.dialog.size.maxHeight = this.capability.properties.size.maxHeight;
 
-    this.dialog.title = NamedParameters.substitute(this.capability.properties.title, this.params);
+    this.dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
     this.dialog.closable = this.capability.properties.closable ?? true;
     this.dialog.resizable = this.capability.properties.resizable ?? true;
     this.dialog.padding = false;
   }
 
-  private installThemePropagator(): void {
-    this._microfrontendThemePropagator.install(this.routerOutletElement.nativeElement);
+  private propagateWorkbenchTheme(): void {
+    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
   }
 
   private installDialogCloseListener(): void {

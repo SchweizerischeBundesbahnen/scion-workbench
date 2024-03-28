@@ -17,7 +17,7 @@ import {Popup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';
 import {Defined} from '@scion/toolkit/util';
 import {POPUP_ID_PREFIX} from '../../workbench.constants';
-import {NamedParameters} from '../common/named-parameters.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -65,7 +65,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
    * Performs navigation in the specified outlet, substituting path params if any. To clear navigation, pass `null` as the path.
    */
   private navigate(path: string | null, extras: {outletName: string; params?: Map<string, any>}): Promise<boolean> {
-    path = NamedParameters.substitute(path, extras.params);
+    path = Microfrontends.substituteNamedParameters(path, extras.params);
 
     const outletCommands: Commands | null = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];

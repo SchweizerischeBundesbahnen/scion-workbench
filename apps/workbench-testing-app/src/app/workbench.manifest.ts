@@ -36,10 +36,10 @@ export const workbenchManifest: Manifest = {
       private: false,
       description: 'Represents a popup provided by the host app.',
       params: [
-        {name: 'param1', required: false},
+        {name: 'param', required: false},
       ],
       properties: {
-        path: 'test-host-popup;matrixParam1=:param1;matrixParam2=:component',
+        path: 'test-host-popup;matrixParam=:param',
       },
     },
     // TODO [#271]: Remove this dialog capability when implemented the issue #271
@@ -51,10 +51,10 @@ export const workbenchManifest: Manifest = {
       private: false,
       description: 'Represents a dialog provided by the host app.',
       params: [
-        {name: 'param1', required: false},
+        {name: 'param', required: false},
       ],
       properties: {
-        path: 'test-host-dialog;matrixParam1=:param1',
+        path: 'test-host-dialog;matrixParam=:param',
         size: {
           width: '300px',
           height: '600px',

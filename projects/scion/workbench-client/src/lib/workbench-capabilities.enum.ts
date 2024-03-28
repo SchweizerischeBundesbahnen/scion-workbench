@@ -13,34 +13,34 @@
  */
 export enum WorkbenchCapabilities {
   /**
-   * Allows contributing a microfrontend for display in workbench view.
+   * Contributes a microfrontend for display in workbench view.
    *
    * A view is a visual workbench component for displaying content stacked or side-by-side.
    */
   View = 'view',
   /**
-   * Allows contributing a microfrontend for display in workbench popup.
+   * Contributes a microfrontend for display in workbench popup.
    *
    * A popup is a visual workbench component for displaying content above other content.
    */
   Popup = 'popup',
   /**
-   * Allows contributing a microfrontend for display in workbench dialog.
+   * Contributes a microfrontend for display in workbench dialog.
    *
    * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
    */
   Dialog = 'dialog',
   /**
-   * Allows contributing a message box provider in the host app.
+   * Contributes a message box in the host app.
    *
-   * A message box is a modal dialog box that an application can use to display a message to the user. It typically contains a text
-   * message and one or more buttons.
+   * A message box is a standardized dialog for presenting a message to the user, such as an info, warning or alert,
+   * or for prompting the user for confirmation.
    */
   MessageBox = 'messagebox',
   /**
-   * Allows contributing a notification provider in the host app.
+   * Contributes a notification in the host app.
    *
-   * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
+   * A notification appears in the upper-right corner and disappears automatically after a few seconds.
    * It informs the user of a system event, e.g., that a task has been completed or an error has occurred.
    */
   Notification = 'notification',

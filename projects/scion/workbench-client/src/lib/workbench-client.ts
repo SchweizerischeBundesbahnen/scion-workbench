@@ -31,8 +31,13 @@ import {WorkbenchDialogService} from './dialog/workbench-dialog-service';
  * #### Core services include:
  *
  * - {@link WorkbenchRouter} for navigating to a microfrontend in a workbench view.
- * - {@link WorkbenchView} for interacting with the workbench view, such as setting view tab properties or closing the view.
- * - {@link WorkbenchDialog} for interacting with the workbench dialog, such as setting the title or closing the dialog.
+ * - {@link WorkbenchView} for the microfrontend to interact with the view.
+ * - {@link WorkbenchDialogService} for displaying a microfrontend in a dialog.
+ * - {@link WorkbenchDialog} for the microfrontend to interact with the dialog.
+ * - {@link WorkbenchPopupService} for displaying a microfrontend in a popup.
+ * - {@link WorkbenchPopup} for the microfrontend to interact with the popup.
+ * - {@link WorkbenchNotificationService} for displaying a notification.
+ * - {@link WorkbenchMessageBoxService} for displaying a message.
  * - `MessageClient` for sending or receiving messages between micro applications.
  * - `IntentClient` for issuing or receiving intents between micro applications.
  * - `ManifestService` for reading and registering capabilities at runtime.
@@ -87,6 +92,9 @@ import {WorkbenchDialogService} from './dialog/workbench-dialog-service';
  * [SCION Microfrontend Platform](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform).
  */
 export class WorkbenchClient {
+
+  private constructor() {
+  }
 
   /**
    * Connects the micro application to the SCION Workbench and SCION Microfrontend Platform.

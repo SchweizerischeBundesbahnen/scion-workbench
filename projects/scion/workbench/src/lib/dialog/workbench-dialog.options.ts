@@ -70,7 +70,7 @@ export interface WorkbenchDialogOptions {
    */
   context?: {
     /**
-     * Allows controlling which view to block when opening a view-modal dialog.
+     * Controls which view to block when opening a dialog view-modal.
      *
      * By default, if opening the dialog in the context of a view, that view is used as the contextual view.
      */

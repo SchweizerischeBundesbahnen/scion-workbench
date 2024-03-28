@@ -1,5 +1,5 @@
 <ng-container *ngIf="workbenchContextActive | async; else workbench_context_note">
-  <sci-viewport class="e2e-viewport" cdkTrapFocus>
+  <sci-viewport cdkTrapFocus>
     <router-outlet></router-outlet>
   </sci-viewport>
   <section class="metadata">

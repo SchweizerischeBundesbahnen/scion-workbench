@@ -13,10 +13,10 @@ import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchDialogCapability} from '@scion/workbench-client';
 
 /**
- * Validates that dialog capabilities have the required properties before registering them in the workbench.
+ * Asserts dialog capabilities to have required properties.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendDialogCapabilityInterceptor implements CapabilityInterceptor {
+export class MicrofrontendDialogCapabilityValidator implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {
     if (capability.type !== WorkbenchCapabilities.Dialog) {
@@ -24,18 +24,18 @@ export class MicrofrontendDialogCapabilityInterceptor implements CapabilityInter
     }
 
     const dialogCapability = capability as WorkbenchDialogCapability;
-    // Validate that the dialog capability has a qualifier set.
+    // Assert the dialog capability to have a qualifier.
     if (!dialogCapability.qualifier || !Object.keys(dialogCapability.qualifier).length) {
       throw Error(`[NullQualifierError] Dialog capability requires a qualifier [capability=${JSON.stringify(dialogCapability)}]`);
     }
 
-    // Validate that the dialog capability has a path set.
+    // Assert the dialog capability to have a path.
     const path = dialogCapability.properties?.path;
     if (path === undefined || path === null) {
       throw Error(`[NullPathError] Dialog capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(dialogCapability)}]`);
     }
 
-    // Validate that the dialog capability has height and width set.
+    // Assert the dialog capability to have a height and width.
     const size = dialogCapability.properties?.size;
     if (!size?.width || !size?.height) {
       throw Error(`[NullSizeError] Dialog capability requires width and height in its size properties [capability=${JSON.stringify(dialogCapability)}]`);

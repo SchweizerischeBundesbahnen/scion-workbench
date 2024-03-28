@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding, OnInit, ViewChild} from '@angular/core';
+import {Component, HostBinding} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -20,6 +20,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
@@ -42,26 +43,24 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     SciAccordionItemDirective,
     SciKeyValueComponent,
     SciCheckboxComponent,
+    A11yModule,
   ],
 })
-export default class HostDialogPageComponent implements OnInit {
+export default class HostDialogPageComponent {
+
+  protected uuid = UUID.randomUUID();
 
   @HostBinding('style.width')
-  public get width(): string {
+  protected get width(): string {
     return this.form.controls.width.value;
   }
 
   @HostBinding('style.height')
-  public get height(): string {
+  protected get height(): string {
     return this.form.controls.height.value;
   }
 
-  @ViewChild('title_input', {static: true})
-  private titleInput!: ElementRef<HTMLElement>;
-
-  public uuid = UUID.randomUUID();
-
-  public form = this._formBuilder.group({
+  protected form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     height: this._formBuilder.control(''),
     width: this._formBuilder.control(''),
@@ -70,18 +69,14 @@ export default class HostDialogPageComponent implements OnInit {
   });
 
   constructor(private _formBuilder: NonNullableFormBuilder,
-              public route: ActivatedRoute,
-              public dialog: WorkbenchDialog<string>) {
+              protected route: ActivatedRoute,
+              protected dialog: WorkbenchDialog<string>) {
     this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(title => this.dialog.setTitle(title));
   }
 
-  public ngOnInit(): void {
-    this.titleInput.nativeElement.focus();
-  }
-
-  public onClose(): void {
+  protected onClose(): void {
     const result = this.form.controls.closeWithError.value ? new Error(this.form.controls.result.value) : this.form.controls.result.value;
     this.dialog.close(result);
   }

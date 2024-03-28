@@ -53,14 +53,14 @@ test.describe('Workbench Host Dialog', () => {
     // Expect the dialog not to be resizable.
     await expect(dialog.resizeHandles).toHaveCount(0);
     // Expect size to be set.
-    await expect.poll(() => dialog.getComputedStyle()).toEqual(expect.objectContaining({
+    await expect.poll(() => dialog.getComputedStyle()).toMatchObject({
       height: '500px',
       minHeight: '495px',
       maxHeight: '505px',
       width: '500px',
       minWidth: '495px',
       maxWidth: '505px',
-    } satisfies Partial<CSSStyleDeclaration>));
+    } satisfies Partial<CSSStyleDeclaration>);
   });
 
   test('should pass params to the dialog component', async ({appPO, microfrontendNavigator}) => {
@@ -71,15 +71,15 @@ test.describe('Workbench Host Dialog', () => {
 
     // Open the dialog.
     const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-    await dialogOpenerPage.open({component: 'host-dialog'}, {params: {param1: '123'}, cssClass: 'testee'});
+    await dialogOpenerPage.open({component: 'host-dialog'}, {params: {param: '123'}, cssClass: 'testee'});
 
     const dialog = appPO.dialog({cssClass: 'testee'});
     const dialogPage = new HostDialogPagePO(dialog);
 
-    // Expect dialog page to be displayed and value of param1 is passed.
-    await expect.poll(() => dialogPage.getDialogParams()).toEqual({param1: '123'});
+    // Expect dialog page to be displayed and value of param is passed.
+    await expect.poll(() => dialogPage.getDialogParams()).toEqual({param: '123'});
     // Expect matrix parameter to be substituted.
-    await expect.poll(() => dialogPage.getRouteParams()).toEqual({matrixParam1: '123'});
+    await expect.poll(() => dialogPage.getRouteParams()).toEqual({matrixParam: '123'});
   });
 
   test('should update title', async ({appPO, microfrontendNavigator}) => {

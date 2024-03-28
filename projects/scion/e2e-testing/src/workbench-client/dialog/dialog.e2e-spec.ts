@@ -44,7 +44,7 @@ test.describe('Workbench Dialog', () => {
       // Expect glass pane for the current view.
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await dialogOpenerPage.view.getBoundingBox(), // workbench view
-        await dialogOpenerPage.outlet.locator.boundingBox(), // projected router outlet
+        await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
     });
 
@@ -146,7 +146,7 @@ test.describe('Workbench Dialog', () => {
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
         await appPO.workbenchBoundingBox(), // workbench
         await dialogOpenerPage.view.getBoundingBox(), // workbench view
-        await dialogOpenerPage.outlet.locator.boundingBox(), // projected router outlet
+        await dialogOpenerPage.outlet.locator.boundingBox(), // router outlet
       ]));
     });
 
@@ -178,9 +178,6 @@ test.describe('Workbench Dialog', () => {
       const dialogPage = new DialogPagePO(dialog);
 
       await expectDialog(dialogPage).toBeVisible();
-
-      // Open and activate another view.
-      await appPO.openNewViewTab();
 
       // Maximize the main area.
       await viewInMainArea.view.tab.dblclick();
@@ -276,7 +273,7 @@ test.describe('Workbench Dialog', () => {
 
   test.describe('Params', () => {
 
-    test('should pass params as values to the dialog component', async ({appPO, microfrontendNavigator}) => {
+    test('should pass params to the dialog component', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -308,34 +305,31 @@ test.describe('Workbench Dialog', () => {
         type: 'dialog',
         qualifier: {component: 'testee'},
         params: [
-          {name: 'seg1', required: true},
-          {name: 'mp1', required: true},
-          {name: 'qp1', required: true},
+          {name: 'segmentParam', required: true},
+          {name: 'matrixParam', required: true},
+          {name: 'queryParam', required: true},
           {name: 'fragment', required: true},
         ],
         properties: {
-          path: 'test-pages/dialog-test-page/:seg1/segment2;mp1=:mp1?qp1=:qp1#:fragment',
+          path: 'test-pages/dialog-test-page/:segmentParam;matrixParam=:matrixParam?queryParam=:queryParam#:fragment',
           size: {height: '475px', width: '300px'},
         },
       });
 
       // Open the dialog.
       const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-      await dialogOpenerPage.open(
-        {component: 'testee'},
-        {
-          params: {seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1', fragment: 'FRAGMENT'},
-          cssClass: 'testee',
-        },
-      );
+      await dialogOpenerPage.open({component: 'testee'}, {
+        params: {segmentParam: 'SEGMENT', matrixParam: 'MATRIX_PARAM', queryParam: 'QUERY_PARAM', fragment: 'FRAGMENT'},
+        cssClass: 'testee',
+      });
 
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
 
       // Expect named params to be substituted.
-      await expect.poll(() => dialogPage.getDialogParams()).toEqual({seg1: 'SEG1', mp1: 'MP1', qp1: 'QP1', fragment: 'FRAGMENT'});
-      await expect.poll(() => dialogPage.getRouteParams()).toEqual({segment1: 'SEG1', mp1: 'MP1'});
-      await expect.poll(() => dialogPage.getRouteQueryParams()).toEqual({qp1: 'QP1'});
+      await expect.poll(() => dialogPage.getDialogParams()).toEqual({segmentParam: 'SEGMENT', matrixParam: 'MATRIX_PARAM', queryParam: 'QUERY_PARAM', fragment: 'FRAGMENT'});
+      await expect.poll(() => dialogPage.getRouteParams()).toEqual({segment: 'SEGMENT', matrixParam: 'MATRIX_PARAM'});
+      await expect.poll(() => dialogPage.getRouteQueryParams()).toEqual({queryParam: 'QUERY_PARAM'});
       await expect.poll(() => dialogPage.getRouteFragment()).toEqual('FRAGMENT');
     });
   });
@@ -495,23 +489,23 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
 
-      await expect.poll(() => dialog.getComputedStyle()).toEqual(expect.objectContaining({
+      await expect.poll(() => dialog.getComputedStyle()).toMatchObject({
         height: '500px',
         minHeight: '495px',
         maxHeight: '505px',
         width: '500px',
         minWidth: '495px',
         maxWidth: '505px',
-      } satisfies Partial<CSSStyleDeclaration>));
+      } satisfies Partial<CSSStyleDeclaration>);
 
-      // Expect the dialog to display with the defined size.
-      await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(expect.objectContaining({
+      // Expect the dialog to display in the defined size.
+      await expect.poll(() => dialog.getDialogBoundingBox()).toMatchObject({
         height: 500,
         width: 500,
-      }));
+      });
     });
 
-    test('should not adjust dialog size and display scrollbars if embedded content overflows', async ({appPO, microfrontendNavigator}) => {
+    test('should not change dialog size when embedded content overflows', async ({appPO, microfrontendNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -532,18 +526,9 @@ test.describe('Workbench Dialog', () => {
 
       const dialogBoundingBox = await dialog.getDialogBoundingBox();
 
-      // Expect the dialog content not to overflow.
-      await expect(dialogPage.contentScrollbars.vertical).not.toBeVisible();
-      await expect(dialogPage.contentScrollbars.horizontal).not.toBeVisible();
-
-      await dialogPage.enterComponentSize({height: '800px', width: '600px'});
-
       // Expect dialog size not to change.
+      await dialogPage.enterComponentSize({height: '800px', width: '600px'});
       await expect.poll(() => dialog.getDialogBoundingBox()).toEqual(dialogBoundingBox);
-
-      // Expect embedded content to overflow and scrollbars from the app-root viewport of the client testing app to be displayed.
-      await expect(dialogPage.contentScrollbars.vertical).toBeVisible();
-      await expect(dialogPage.contentScrollbars.horizontal).toBeVisible();
     });
 
     test('should be resizable by default', async ({appPO, microfrontendNavigator}) => {

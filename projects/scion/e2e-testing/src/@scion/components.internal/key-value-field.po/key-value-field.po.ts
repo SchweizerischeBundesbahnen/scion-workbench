@@ -9,6 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
+import {coerceMap} from '../../../helper/testing.util';
 
 /**
  * Page object for {@link SciKeyValueFieldComponent}.
@@ -18,15 +19,15 @@ export class SciKeyValueFieldPO {
   constructor(private _sciKeyValueFieldLocator: Locator) {
   }
 
-  public async addEntries(entries: Record<string, any>): Promise<void> {
+  public async addEntries(entries: Record<string, any> | Map<string, any>): Promise<void> {
     const addButton = this._sciKeyValueFieldLocator.locator('button.e2e-add');
     const lastKeyInput = this._sciKeyValueFieldLocator.locator('input.e2e-key').last();
     const lastValueInput = this._sciKeyValueFieldLocator.locator('input.e2e-value').last();
 
-    for (const key of Object.keys(entries)) {
+    for (const [key, value] of coerceMap(entries).entries()) {
       await addButton.click();
       await lastKeyInput.fill(key);
-      await lastValueInput.fill(`${entries[key]}`);
+      await lastValueInput.fill(`${value}`);
     }
   }
 

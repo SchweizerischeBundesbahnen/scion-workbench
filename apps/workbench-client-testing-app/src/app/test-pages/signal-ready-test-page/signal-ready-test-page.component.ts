@@ -25,9 +25,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 export default class SignalReadyTestPageComponent {
 
   constructor(@Optional() view: WorkbenchView, @Optional() popup: WorkbenchPopup, @Optional() dialog: WorkbenchDialog) {
-    this.installReadySignaler(view);
-    this.installReadySignaler(popup);
-    this.installReadySignaler(dialog);
+    this.installReadySignaler(view ?? popup ?? dialog);
   }
 
   private installReadySignaler(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | undefined): void {
@@ -41,5 +39,5 @@ export default class SignalReadyTestPageComponent {
 }
 
 function isView(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog): handle is WorkbenchView {
-  return (<WorkbenchView>handle).id !== undefined;
+  return (handle as WorkbenchView).id !== undefined;
 }

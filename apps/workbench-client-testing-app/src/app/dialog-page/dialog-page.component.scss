@@ -29,10 +29,6 @@
         }
       }
 
-      &.dialog-params sci-viewport {
-        max-height: 200px;
-      }
-
       &.return-value input {
         @include sci-design.style-input-field();
       }
@@ -45,26 +41,13 @@
     padding: .5em 1em;
     display: flex;
     gap: 2em;
+    align-items: center;
+    justify-content: space-between;
 
-    > div.actions {
-      flex: auto;
+    > label.close-with-error {
       display: flex;
       align-items: center;
       gap: .5em;
-
-      &.start {
-        place-content: flex-start;
-      }
-
-      &.end {
-        place-content: flex-end;
-      }
-
-      > label.close-with-error {
-        display: flex;
-        align-items: center;
-        gap: .5em;
-      }
     }
   }
 }

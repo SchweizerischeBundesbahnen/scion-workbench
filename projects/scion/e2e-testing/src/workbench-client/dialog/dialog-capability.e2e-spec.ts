@@ -35,31 +35,17 @@ test.describe('Workbench Dialog Capability', () => {
     const dialogPage = new DialogPagePO(dialog);
 
     // Expect capability to resolve to the microfrontend dialog and to be set in the handle.
-    await expect.poll(() => dialogPage.getDialogCapability()).toEqual(expect.objectContaining({
+    await expect.poll(() => dialogPage.getDialogCapability()).toMatchObject({
       type: 'dialog',
       qualifier: {component: 'testee'},
-      properties: expect.objectContaining({
-        path: 'test-dialog',
-        size: {height: '475px', width: '300px'},
-      }),
-    }));
-  });
-
-  test('should error if qualifier is missing', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    const registeredCapability = microfrontendNavigator.registerCapability('app1', {
-      type: 'dialog',
-      qualifier: undefined!,
       properties: {
-        path: 'test-pages/microfrontend-test-page',
+        path: 'test-dialog',
         size: {height: '475px', width: '300px'},
       },
     });
-    await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);
   });
 
-  test('should error if qualifier is empty', async ({appPO, microfrontendNavigator}) => {
+  test('should error if not having a qualifier', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const registeredCapability = microfrontendNavigator.registerCapability('app1', {

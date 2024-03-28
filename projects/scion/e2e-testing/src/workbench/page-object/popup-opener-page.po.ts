@@ -176,7 +176,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     }
   }
 
-  public async enterContextualViewId(viewId: string | '<null>' | '<default>'): Promise<void> {
+  public async enterContextualViewId(viewId: string | '<null>' | ''): Promise<void> {
     await this.locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 

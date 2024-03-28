@@ -22,7 +22,7 @@ export function expectPopup(popupPage: WorkbenchPopupPagePO | MicrofrontendPopup
 }
 
 /**
- * Returns a {@PopupMatcher} to expect the workbench popup.
+ * Returns a {@link PopupMatcher} to expect the workbench popup.
  */
 function expectWorkbenchPopup(popupPage: WorkbenchPopupPagePO): PopupMatcher {
   return {
@@ -47,7 +47,7 @@ function expectWorkbenchPopup(popupPage: WorkbenchPopupPagePO): PopupMatcher {
 }
 
 /**
- * Returns a {@PopupMatcher} to expect the microfrontend popup.
+ * Returns a {@link PopupMatcher} to expect the microfrontend popup.
  */
 function expectMicrofrontendPopup(popupPage: MicrofrontendPopupPagePO): PopupMatcher {
   return {

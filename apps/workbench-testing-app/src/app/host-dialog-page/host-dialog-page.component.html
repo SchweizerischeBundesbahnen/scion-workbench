@@ -1,6 +1,6 @@
-<sci-viewport class="content" [formGroup]="form">
+<sci-viewport class="content" [formGroup]="form" cdkTrapFocus cdkTrapFocusAutoCapture>
   <sci-form-field label="Title" direction="column">
-    <input [formControl]="form.controls.title" class="e2e-title" #title_input>
+    <input [formControl]="form.controls.title" class="e2e-title">
   </sci-form-field>
 
   <sci-form-field label="Instance ID" title="Unique identifier of this component instance">
@@ -39,9 +39,7 @@
         <header>Dialog Params</header>
       </ng-template>
       <ng-template #panel_dialog_params>
-        <sci-viewport>
-          <sci-key-value [object]="params" class="e2e-dialog-params"></sci-key-value>
-        </sci-viewport>
+        <sci-key-value [object]="params" class="e2e-dialog-params"></sci-key-value>
       </ng-template>
     </sci-accordion>
   }
@@ -68,14 +66,10 @@
 </sci-viewport>
 
 <footer>
-  <div class="actions start">
-    <label class="close-with-error">
-      <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"></sci-checkbox>
-      Close with error
-    </label>
-  </div>
+  <label class="close-with-error">
+    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"></sci-checkbox>
+    Close with error
+  </label>
 
-  <div class="actions end">
-    <button (click)="onClose()" class="e2e-close" sci-primary>Close</button>
-  </div>
+  <button (click)="onClose()" class="e2e-close" sci-primary>Close</button>
 </footer>

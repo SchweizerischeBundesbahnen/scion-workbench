@@ -14,24 +14,27 @@ import {Observable} from 'rxjs';
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
  *
- * The dialog component can inject this handle to interact with the dialog, such as setting the title or closing the dialog.
+ * The dialog microfrontend can inject this handle to interact with the dialog, such as setting the title,
+ * reading parameters, or closing it.
  *
  * @category Dialog
+ * @see WorkbenchDialogCapability
+ * @see WorkbenchDialogService
  */
 export abstract class WorkbenchDialog<R = unknown> {
 
   /**
-   * Capability that represents the microfrontend loaded into this workbench dialog.
+   * Capability of the microfrontend loaded into this dialog.
    */
   public abstract readonly capability: WorkbenchDialogCapability;
 
   /**
-   * Parameters as passed for navigation by the dialog opener.
+   * Parameters as passed by the dialog opener.
    */
   public abstract readonly params: Map<string, unknown>;
 
   /**
-   * Sets the title of the dialog. You can provide the title either as a string literal or as Observable.
+   * Sets the title of the dialog.
    */
   public abstract setTitle(title: string | Observable<string>): void;
 

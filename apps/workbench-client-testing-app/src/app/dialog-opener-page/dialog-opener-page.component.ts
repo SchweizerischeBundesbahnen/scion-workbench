@@ -32,7 +32,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class DialogOpenerPageComponent {
 
-  public form = this._formBuilder.group({
+  protected form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
       this._formBuilder.group({
         key: this._formBuilder.control('component'),
@@ -52,8 +52,8 @@ export default class DialogOpenerPageComponent {
     }),
   });
 
-  public dialogError: string | undefined;
-  public returnValue: string | undefined;
+  protected dialogError: string | undefined;
+  protected returnValue: string | undefined;
 
   constructor(view: WorkbenchView,
               private _dialogService: WorkbenchDialogService,
@@ -62,7 +62,7 @@ export default class DialogOpenerPageComponent {
     this.installContextualViewIdEnabler();
   }
 
-  public async onDialogOpen(): Promise<void> {
+  protected async onDialogOpen(): Promise<void> {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
     const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.params);
 

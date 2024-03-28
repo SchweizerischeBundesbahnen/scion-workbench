@@ -20,16 +20,17 @@ import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
 import {MicrofrontendHostDialogComponent} from '../microfrontend-host-dialog/microfrontend-host-dialog.component';
 
 /**
- * Handles microfrontend dialog intents, instructing the Workbench {@link WorkbenchDialogService} to display the dialog capability in either {@link MicrofrontendDialogComponent}
- * or {@link MicrofrontendHostDialogComponent} if the capability is provided by the workbench host application.
+ * Handles dialog intents, instructing the workbench to open a dialog with the microfrontend declared on the resolved capability.
  *
- * Dialog intents are handled in this interceptor in order to support microfrontends not using the SCION Workbench. They are not transported to the providing application.
+ * Microfrontends of the host are displayed in {@link MicrofrontendHostDialogComponent}, microfrontends of other applications in {@link MicrofrontendDialogComponent}.
+ *
+ * Dialog intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
+ * that are not connected to the SCION Workbench.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendDialogIntentInterceptor implements IntentInterceptor {
+export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
 
-  constructor(private _dialogService: WorkbenchDialogService,
-              private _logger: Logger) {
+  constructor(private _dialogService: WorkbenchDialogService, private _logger: Logger) {
   }
 
   /**
@@ -61,7 +62,7 @@ export class MicrofrontendDialogIntentInterceptor implements IntentInterceptor {
   }
 
   /**
-   * Opens a workbench dialog to display the microfrontend from the dialog capability provider.
+   * Opens the microfrontend declared by the resolved capability in a dialog.
    */
   private async openDialog(message: IntentMessage<WorkbenchDialogOptions>): Promise<unknown> {
     const options = message.body!;
@@ -69,18 +70,15 @@ export class MicrofrontendDialogIntentInterceptor implements IntentInterceptor {
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
     this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
 
-    return this._dialogService.open(
-      isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent,
-      {
-        inputs: {
-          capability,
-          params: message.intent.params ?? new Map(),
-        },
-        modality: options.modality,
-        context: options.context,
-        animate: options.animate,
-        cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(options.cssClass)),
+    return this._dialogService.open(isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
+      inputs: {
+        capability,
+        params: message.intent.params ?? new Map(),
       },
-    );
+      modality: options.modality,
+      context: options.context,
+      animate: options.animate,
+      cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(options.cssClass)),
+    });
   }
 }

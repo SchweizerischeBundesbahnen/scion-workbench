@@ -28,10 +28,7 @@ test.describe('Workbench Dialog Blocking', () => {
     await dialogOpenerPage.view.tab.close();
 
     const dialog = appPO.dialog({cssClass: 'testee'});
-    const dialogRect = await dialog.getDialogBoundingBox();
-
-    // Move the dialog to the bottom right corner.
-    await dialog.moveDialog({x: appPO.viewportBoundingBox().right - dialogRect.right, y: appPO.viewportBoundingBox().bottom - dialogRect.bottom});
+    await dialog.moveDialog('bottom-right-corner');
 
     // Expect interaction with contextual view to be blocked.
     await expect(inputFieldTestPage.clickInputField({timeout: 1000})).rejects.toThrowError();
@@ -40,7 +37,7 @@ test.describe('Workbench Dialog Blocking', () => {
     // Expect glass panes
     await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
       await inputFieldTestPage.view.getBoundingBox(), // workbench view
-      await inputFieldTestPage.outlet.locator.boundingBox(), // projected router outlet
+      await inputFieldTestPage.outlet.locator.boundingBox(), // router outlet
     ]));
   });
 });

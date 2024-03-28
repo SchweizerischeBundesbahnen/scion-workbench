@@ -12,7 +12,7 @@ import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
 
 /**
- * Information about the popup embedding a microfrontend.
+ * Context when displaying a microfrontend in a popup.
  *
  * This object can be obtained from the {@link ContextService} using the name {@link ɵPOPUP_CONTEXT}.
  *

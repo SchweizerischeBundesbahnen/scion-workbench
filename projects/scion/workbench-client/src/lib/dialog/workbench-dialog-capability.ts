@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability, Qualifier} from '@scion/microfrontend-platform';
+import {Capability, ParamDefinition, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
 /**
@@ -17,31 +17,53 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
  * The user can move or resize a dialog.
  *
- * Displayed on top of other content, a dialog blocks interaction with other parts of the application.
+ * Displayed on top of other content, a dialog blocks interaction with other parts of the application. Multiple dialogs are stacked,
+ * and only the topmost dialog in each modality stack can be interacted with.
+ *
+ * The microfrontend can inject the {@link WorkbenchDialog} handle to interact with the dialog, such as setting the title, reading
+ * parameters, or closing it.
+ *
+ * If provided by the host application, the dialog has a footer and resizes to fit its content. See the documentation of
+ * `WorkbenchDialogService` in `@scion/workbench` for more information on adding actions to the footer.
+ *
+ * Dialogs from other applications must specify their size using {@link WorkbenchDialogCapability.properties.size} and do not have
+ * a built-in footer.
  *
  * @category Dialog
+ * @see WorkbenchDialog
+ * @see WorkbenchDialogService
  */
 export interface WorkbenchDialogCapability extends Capability {
-
+  /**
+   * @inheritDoc
+   */
   type: WorkbenchCapabilities.Dialog;
-
   /**
    * Qualifies this dialog. The qualifier is required for dialogs.
+   *
+   * @inheritDoc
    */
   qualifier: Qualifier;
-
+  /**
+   * Specifies parameters required by the dialog.
+   *
+   * Parameters are available in the path or title for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchDialog} handle.
+   *
+   * @inheritDoc
+   */
+  params?: ParamDefinition[];
+  /**
+   * @inheritDoc
+   */
   properties: {
     /**
-     * Specifies the path of the microfrontend to be opened when navigating to this dialog capability.
+     * Specifies the path to the microfrontend.
      *
-     * The path is relative to the base URL, as specified in the application manifest. If the
+     * The path is relative to the base URL specified in the application manifest. If the
      * application does not declare a base URL, it is relative to the origin of the manifest file.
      *
-     * In the path, you can reference parameter values in the form of named parameters.
-     * Named parameters begin with a colon (`:`) followed by the parameter and are allowed in path segments, query parameters, matrix parameters
-     * and the fragment part. The workbench router will substitute named parameters in the URL accordingly.
-     *
-     * In addition to using parameter values as named parameters in the URL, params are available in the microfrontend via {@link WorkbenchDialog.params} object.
+     * The path supports placeholders that will be replaced with parameter values. A placeholder
+     * starts with a colon (`:`) followed by the parameter name.
      *
      * #### Usage of named parameters in the path:
      * ```json
@@ -57,26 +79,17 @@ export interface WorkbenchDialogCapability extends Capability {
      *   }
      * }
      * ```
-     *
-     * #### Path parameter example:
-     * segment/:param1/segment/:param2
-     *
-     * #### Matrix parameter example:
-     * segment/segment;matrixParam1=:param1;matrixParam2=:param2
-     *
-     * #### Query parameter example:
-     * segment/segment?queryParam1=:param1&queryParam2=:param2
      */
     path: string;
     /**
-     * Specifies the dialog size.
+     * Specifies the size of this dialog.
      */
     size: WorkbenchDialogSize;
     /**
-     * Specifies the title of the dialog.
+     * Specifies the title of this dialog.
      *
-     * You can refer to parameters in the form of named parameters to be replaced during navigation.
-     * Named parameters begin with a colon (`:`) followed by the parameter name.
+     * The title supports placeholders that will be replaced with parameter values. A placeholder starts with a colon (`:`) followed by the parameter name.
+     * The title can also be set in the microfrontend via {@link WorkbenchDialog} handle.
      */
     title?: string;
     /**
@@ -90,15 +103,7 @@ export interface WorkbenchDialogCapability extends Capability {
     /**
      * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the dialog microfrontend signals readiness.
      *
-     * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench as follows:
-     *
-     * ```ts
-     * WorkbenchModule.forRoot({
-     *   microfrontendPlatform: {
-     *     splash: SplashComponent
-     *   }
-     * });
-     * ```
+     * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
      *
      * @see WorkbenchDialog.signalReady
      */
@@ -111,7 +116,7 @@ export interface WorkbenchDialogCapability extends Capability {
 }
 
 /**
- * Represents the dialog size.
+ * Specifies the dialog size.
  */
 export interface WorkbenchDialogSize {
   /**

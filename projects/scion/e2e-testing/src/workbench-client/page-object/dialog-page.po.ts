@@ -29,24 +29,10 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
   public readonly outlet: SciRouterOutletPO;
   private readonly _hasFocusLocator: Locator;
 
-  /**
-   * Use to locate the <sci-scrollbar> elements of the viewport in the app-root component.
-   */
-  public readonly contentScrollbars: {
-    vertical: Locator;
-    horizontal: Locator;
-  };
-
   constructor(public dialog: DialogPO) {
     this.outlet = new SciRouterOutletPO(new AppPO(dialog.locator.page()), {locator: dialog.locator.locator('sci-router-outlet')});
     this.locator = this.outlet.frameLocator.locator('app-dialog-page');
-    const appRootLocator = this.outlet.frameLocator.locator('app-root');
-    this.contentScrollbars = {
-      vertical: appRootLocator.locator('sci-viewport.e2e-viewport > sci-scrollbar.e2e-vertical'),
-      horizontal: appRootLocator.locator('sci-viewport.e2e-viewport > sci-scrollbar.e2e-horizontal'),
-    };
-
-    this._hasFocusLocator = appRootLocator.locator('.e2e-has-focus');
+    this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
   }
 
   public async enterTitle(title: string): Promise<void> {

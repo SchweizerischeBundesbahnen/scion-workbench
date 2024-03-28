@@ -124,6 +124,13 @@ export function coerceArray<T>(value: T | T[] | undefined | null): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
+export function coerceMap<V>(value: Record<string, V> | Map<string, V>): Map<string, V> {
+  if (value instanceof Map) {
+    return value;
+  }
+  return new Map(Object.entries(value ?? {}));
+}
+
 /**
  * Returns a new {@link Record} with `undefined` and `<undefined>` values removed.
  */

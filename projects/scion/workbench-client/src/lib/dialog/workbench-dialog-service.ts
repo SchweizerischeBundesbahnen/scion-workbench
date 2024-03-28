@@ -11,7 +11,7 @@
 import {Intent, IntentClient, mapToBody, Qualifier, RequestError} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {firstValueFrom} from 'rxjs';
+import {catchError, firstValueFrom, throwError} from 'rxjs';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {Maps} from '@scion/toolkit/util';
 import {WorkbenchView} from '../view/workbench-view';
@@ -22,29 +22,15 @@ import {WorkbenchView} from '../view/workbench-view';
  * A dialog is a visual element for focused interaction with the user, such as prompting the user for input or confirming actions.
  * The user can move or resize a dialog.
  *
- * Displayed on top of other content, a dialog blocks interaction with other parts of the application.
+ * Displayed on top of other content, a dialog blocks interaction with other parts of the application. Multiple dialogs are stacked,
+ * and only the topmost dialog in each modality stack can be interacted with.
  *
- * ## Modality
- * A dialog can be view-modal or application-modal.
+ * A dialog can be view-modal or application-modal. A view-modal dialog blocks only a specific view, allowing the user to interact
+ * with other views. An application-modal dialog blocks the workbench, or the browser's viewport if configured in the workbench
+ * host application.
  *
- * A view-modal dialog blocks only a specific view, allowing the user to interact with other views. An application-modal dialog blocks
- * the workbench, or the browser's viewport if configured in the workbench host application.
- *
- * ## Dialog Stack
- * Multiple dialogs are stacked, and only the topmost dialog in each modality stack can be interacted with.
- *
- * ## Dialog Header
- * The dialog displays the title and a close button in the header.
- *
- * ## Dialog Content
- * The microfrontend providing the dialog content can inject the {@link WorkbenchDialog} handle to interact with the dialog, such as setting the title or closing the dialog.
- *
- * The content of the dialog typically consists of a body and a footer. The width and height of the dialog must be specified in the capability.
- *
- * The body should be wrapped in a viewport to display scrollbars if the content overflows.
- *
- * The footer typically contains action buttons for interacting with the dialog and should not grow or shrink dynamically.
- * If using a flex-container the footer should be set to `flex: none`.
+ * @category Dialog
+ * @see WorkbenchDialogCapability
  */
 export class WorkbenchDialogService {
 
@@ -55,24 +41,26 @@ export class WorkbenchDialogService {
    * To open the dialog with a different modality, specify the modality in {@link WorkbenchDialogOptions.modality}.
    *
    * @param qualifier - Identifies the dialog capability that provides the microfrontend to be displayed in a dialog.
-   * @param options - Controls how to open a dialog.
+   * @param options - Controls how to open the dialog.
    * @returns Promise that resolves to the dialog result, if any, or that rejects if the dialog couldn't be opened or was closed with an error.
+   *
+   * @category Dialog
+   *
+   * @see WorkbenchDialogCapability
+   * @see WorkbenchDialog
    */
-  public async open<T>(qualifier: Qualifier, options?: WorkbenchDialogOptions): Promise<T | undefined> {
-    try {
-      const intent: Intent = {type: WorkbenchCapabilities.Dialog, qualifier, params: Maps.coerce(options?.params)};
-      const body: WorkbenchDialogOptions = {
-        ...options,
-        context: {viewId: options?.context?.viewId ?? Beans.opt(WorkbenchView)?.id},
-        params: undefined, // passed via intent
-      };
-      const closeResult$ = Beans.get(IntentClient).request$<T>(intent, body).pipe(mapToBody());
-      return await firstValueFrom(closeResult$, {defaultValue: undefined});
-    }
-    catch (error) {
-      throw (error instanceof RequestError ? error.message : error);
-    }
+  public open<R>(qualifier: Qualifier, options?: WorkbenchDialogOptions): Promise<R | undefined> {
+    const intent: Intent = {type: WorkbenchCapabilities.Dialog, qualifier, params: Maps.coerce(options?.params)};
+    const body: WorkbenchDialogOptions = {
+      ...options,
+      context: {viewId: options?.context?.viewId ?? Beans.opt(WorkbenchView)?.id},
+      params: undefined, // passed via intent
+    };
+    const closeResult$ = Beans.get(IntentClient).request$<R>(intent, body)
+      .pipe(
+        mapToBody(),
+        catchError(error => throwError(() => error instanceof RequestError ? error.message : error)),
+      );
+    return firstValueFrom(closeResult$, {defaultValue: undefined});
   }
 }
-
-

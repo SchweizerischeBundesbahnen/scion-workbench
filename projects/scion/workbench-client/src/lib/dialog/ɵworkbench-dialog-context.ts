@@ -11,7 +11,7 @@
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 
 /**
- * Information about the dialog embedding a microfrontend.
+ * Context when displaying a microfrontend in a dialog.
  *
  * This object can be obtained from the {@link ContextService} using the name {@link ɵDIALOG_CONTEXT}.
  *

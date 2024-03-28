@@ -19,13 +19,15 @@ import {NgTemplateOutlet} from '@angular/common';
 import {DIALOG_ID_PREFIX} from '../../workbench.constants';
 import {Observable} from 'rxjs';
 import {throwError} from '../../common/throw-error.util';
-import {NamedParameters} from '../common/named-parameters.util';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
- * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}. The content is displayed inside a workbench dialog.
+ * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}.
  *
  * Unlike {@link MicrofrontendDialogComponent}, this component uses a `<router-outlet>` instead of a `<sci-router-outlet>`
  * to allow direct integration of the content provided by the workbench host application via the Angular router.
+ *
+ * This component is designed to be displayed in a workbench dialog.
  */
 @Component({
   selector: 'wb-microfrontend-host-dialog',
@@ -68,7 +70,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
    * Performs navigation in the named outlet, substituting path params if any. To clear navigation, pass `null` as the path.
    */
   private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
-    path = NamedParameters.substitute(path, extras?.params);
+    path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
     const outletCommands: Commands | null = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
     const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
@@ -79,7 +81,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
     this.outletInjector = Injector.create({
       parent: this._injector,
       providers: [provideWorkbenchClientDialogHandle(this.capability, this.params),
-        // Allow interaction only with the client dialog handle in the host capability provider.
+        // Prevent injecting the dialog handle in host dialog component.
         {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)},
       ],
     });
@@ -93,7 +95,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
     this._dialog.size.minHeight = this.capability.properties.size.minHeight;
     this._dialog.size.maxHeight = this.capability.properties.size.maxHeight;
 
-    this._dialog.title = NamedParameters.substitute(this.capability.properties.title, this.params);
+    this._dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
     this._dialog.closable = this.capability.properties.closable ?? true;
     this._dialog.resizable = this.capability.properties.resizable ?? true;
     this._dialog.padding = false;

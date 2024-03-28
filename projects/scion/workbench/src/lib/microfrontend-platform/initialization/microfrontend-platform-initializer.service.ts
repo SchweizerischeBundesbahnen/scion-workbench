@@ -15,14 +15,15 @@ import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
-import {MicrofrontendViewIntentInterceptor} from '../routing/microfrontend-view-intent-interceptor.service';
+import {MicrofrontendViewIntentHandler} from '../routing/microfrontend-view-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
-import {MicrofrontendPopupIntentInterceptor} from '../microfrontend-popup/microfrontend-popup-intent-interceptor.service';
-import {MicrofrontendViewCapabilityInterceptor} from '../routing/microfrontend-view-capability-interceptor.service';
-import {MicrofrontendPopupCapabilityInterceptor} from '../microfrontend-popup/microfrontend-popup-capability-interceptor.service';
+import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
+import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
-import {MicrofrontendDialogIntentInterceptor} from '../microfrontend-dialog/microfrontend-dialog-intent-interceptor.service';
-import {MicrofrontendDialogCapabilityInterceptor} from '../microfrontend-dialog/microfrontend-dialog-capability-interceptor.service';
+import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
+import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
+import {MicrofrontendViewCapabilityValidator} from '../routing/microfrontend-view-capability-validator.interceptor';
+import {MicrofrontendViewCapabilityIdAssigner} from '../routing/microfrontend-view-capability-id-assigner.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -35,12 +36,13 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
               private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
               private _ngZoneObservableDecorator: NgZoneObservableDecorator,
-              private _microfrontendViewIntentInterceptor: MicrofrontendViewIntentInterceptor,
-              private _microfrontendPopupIntentInterceptor: MicrofrontendPopupIntentInterceptor,
-              private _microfrontendDialogIntentInterceptor: MicrofrontendDialogIntentInterceptor,
-              private _microfrontendViewCapabilityInterceptor: MicrofrontendViewCapabilityInterceptor,
-              private _microfrontendPopupCapabilityInterceptor: MicrofrontendPopupCapabilityInterceptor,
-              private _microfrontendDialogCapabilityInterceptor: MicrofrontendDialogCapabilityInterceptor,
+              private _viewIntentHandler: MicrofrontendViewIntentHandler,
+              private _popupIntentHandler: MicrofrontendPopupIntentHandler,
+              private _dialogIntentHandler: MicrofrontendDialogIntentHandler,
+              private _viewCapabilityValidator: MicrofrontendViewCapabilityValidator,
+              private _viewCapabilityIdAssigner: MicrofrontendViewCapabilityIdAssigner,
+              private _popupCapabilityValidator: MicrofrontendPopupCapabilityValidator,
+              private _dialogCapabilityValidator: MicrofrontendDialogCapabilityValidator,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -76,23 +78,26 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Synchronize emissions of Observables exposed by the SCION Microfrontend Platform with the Angular zone.
     Beans.register(ObservableDecorator, {useValue: this._ngZoneObservableDecorator});
 
-    // Register view intent interceptor to translate view intents into workbench router commands.
-    Beans.register(IntentInterceptor, {useValue: this._microfrontendViewIntentInterceptor, multi: true});
+    // Register view intent interceptor to open the corresponding view.
+    Beans.register(IntentInterceptor, {useValue: this._viewIntentHandler, multi: true});
 
-    // Register popup intent interceptor to translate popup intents into workbench popup commands.
-    Beans.register(IntentInterceptor, {useValue: this._microfrontendPopupIntentInterceptor, multi: true});
+    // Register popup intent interceptor to open the corresponding popup.
+    Beans.register(IntentInterceptor, {useValue: this._popupIntentHandler, multi: true});
 
-    // Register dialog intent interceptor to translate dialog intents into workbench dialog commands.
-    Beans.register(IntentInterceptor, {useValue: this._microfrontendDialogIntentInterceptor, multi: true});
+    // Register dialog intent interceptor to open the corresponding dialog.
+    Beans.register(IntentInterceptor, {useValue: this._dialogIntentHandler, multi: true});
+
+    // Register view capability interceptor to assert required view capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityValidator, multi: true});
 
     // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
-    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendViewCapabilityInterceptor, multi: true});
+    Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityIdAssigner, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
-    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendPopupCapabilityInterceptor, multi: true});
+    Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});
 
     // Register dialog capability interceptor to assert required dialog capability properties.
-    Beans.register(CapabilityInterceptor, {useValue: this._microfrontendDialogCapabilityInterceptor, multi: true});
+    Beans.register(CapabilityInterceptor, {useValue: this._dialogCapabilityValidator, multi: true});
 
     // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.
