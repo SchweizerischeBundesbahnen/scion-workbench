@@ -23,9 +23,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {A11yModule} from '@angular/cdk/a11y';
 
-/**
- * Dialog test component with fixed size.
- */
 @Component({
   selector: 'app-dialog-page',
   templateUrl: './dialog-page.component.html',

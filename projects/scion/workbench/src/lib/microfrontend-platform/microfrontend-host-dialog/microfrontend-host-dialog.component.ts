@@ -47,8 +47,8 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   @Input({required: true})
   public params!: Map<string, unknown>;
 
-  public outletName: string;
-  public outletInjector!: Injector;
+  protected outletName: string;
+  protected outletInjector!: Injector;
 
   constructor(private _dialog: ɵWorkbenchDialog,
               private _injector: Injector,
@@ -88,12 +88,12 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   }
 
   private setDialogProperties(): void {
-    this._dialog.size.width = this.capability.properties.size.width;
-    this._dialog.size.height = this.capability.properties.size.height;
-    this._dialog.size.minWidth = this.capability.properties.size.minWidth;
-    this._dialog.size.maxWidth = this.capability.properties.size.maxWidth;
-    this._dialog.size.minHeight = this.capability.properties.size.minHeight;
-    this._dialog.size.maxHeight = this.capability.properties.size.maxHeight;
+    this._dialog.size.width = this.capability.properties.size?.width;
+    this._dialog.size.height = this.capability.properties.size?.height;
+    this._dialog.size.minWidth = this.capability.properties.size?.minWidth;
+    this._dialog.size.maxWidth = this.capability.properties.size?.maxWidth;
+    this._dialog.size.minHeight = this.capability.properties.size?.minHeight;
+    this._dialog.size.maxHeight = this.capability.properties.size?.maxHeight;
 
     this._dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
     this._dialog.closable = this.capability.properties.closable ?? true;

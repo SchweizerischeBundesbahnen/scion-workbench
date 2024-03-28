@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchDialogCapability} from '@scion/workbench-client';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
  * Asserts dialog capabilities to have required properties.
@@ -35,12 +36,21 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
       throw Error(`[NullPathError] Dialog capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(dialogCapability)}]`);
     }
 
-    // Assert the dialog capability to have a height and width.
-    const size = dialogCapability.properties?.size;
-    if (!size?.width || !size?.height) {
-      throw Error(`[NullSizeError] Dialog capability requires width and height in its size properties [capability=${JSON.stringify(dialogCapability)}]`);
-    }
+    // Assert the dialog capability to have a height and width, unless provided by the host application.
+    this.assertSize(dialogCapability);
 
     return dialogCapability;
+  }
+
+  private assertSize(capability: WorkbenchDialogCapability): void {
+    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+    if (isHostProvider) {
+      return;
+    }
+
+    const size = capability.properties?.size;
+    if (!size?.width || !size?.height) {
+      throw Error(`[NullSizeError] Dialog capability requires width and height in its size properties [capability=${JSON.stringify(capability)}]`);
+    }
   }
 }

@@ -23,11 +23,11 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  * The microfrontend can inject the {@link WorkbenchDialog} handle to interact with the dialog, such as setting the title, reading
  * parameters, or closing it.
  *
- * If provided by the host application, the dialog has a footer and resizes to fit its content. See the documentation of
+ * If provided by the workbench host application, the dialog has a footer and resizes to fit its content. See the documentation of
  * `WorkbenchDialogService` in `@scion/workbench` for more information on adding actions to the footer.
  *
- * Dialogs from other applications must specify their size using {@link WorkbenchDialogCapability.properties.size} and do not have
- * a built-in footer.
+ * Dialogs from other applications must specify their size using {@link WorkbenchDialogCapability.properties.size} and add
+ * the footer in the microfrontend.
  *
  * @category Dialog
  * @see WorkbenchDialog
@@ -82,9 +82,9 @@ export interface WorkbenchDialogCapability extends Capability {
      */
     path: string;
     /**
-     * Specifies the size of this dialog.
+     * Specifies the size of this dialog, required if this dialog is provided by an application other than the workbench host application.
      */
-    size: WorkbenchDialogSize;
+    size?: WorkbenchDialogSize;
     /**
      * Specifies the title of this dialog.
      *
@@ -120,13 +120,13 @@ export interface WorkbenchDialogCapability extends Capability {
  */
 export interface WorkbenchDialogSize {
   /**
-   * Specifies the height of the dialog.
+   * Specifies the height of the dialog, required if this dialog is provided by an application other than the workbench host application.
    */
-  height: string;
+  height?: string;
   /**
-   * Specifies the width of the dialog.
+   * Specifies the width of the dialog, required if this dialog is provided by an application other than the workbench host application.
    */
-  width: string;
+  width?: string;
   /**
    * Specifies the minimum height of the dialog.
    */

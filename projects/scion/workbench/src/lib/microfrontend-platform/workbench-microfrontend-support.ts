@@ -32,7 +32,7 @@ import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/micro
 import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
-import '../microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
+import './microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.

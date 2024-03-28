@@ -55,10 +55,6 @@ export const workbenchManifest: Manifest = {
       ],
       properties: {
         path: 'test-host-dialog;matrixParam=:param',
-        size: {
-          width: '300px',
-          height: '600px',
-        },
       },
     },
     // TODO [#271]: Remove this dialog capability when implemented the issue #271

@@ -104,12 +104,12 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
   }
 
   private setDialogProperties(): void {
-    this.dialog.size.width = this.capability.properties.size.width;
-    this.dialog.size.height = this.capability.properties.size.height;
-    this.dialog.size.minWidth = this.capability.properties.size.minWidth;
-    this.dialog.size.maxWidth = this.capability.properties.size.maxWidth;
-    this.dialog.size.minHeight = this.capability.properties.size.minHeight;
-    this.dialog.size.maxHeight = this.capability.properties.size.maxHeight;
+    this.dialog.size.width = this.capability.properties.size!.width;
+    this.dialog.size.height = this.capability.properties.size!.height;
+    this.dialog.size.minWidth = this.capability.properties.size!.minWidth;
+    this.dialog.size.maxWidth = this.capability.properties.size!.maxWidth;
+    this.dialog.size.minHeight = this.capability.properties.size!.minHeight;
+    this.dialog.size.maxHeight = this.capability.properties.size!.maxHeight;
 
     this.dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
     this.dialog.closable = this.capability.properties.closable ?? true;

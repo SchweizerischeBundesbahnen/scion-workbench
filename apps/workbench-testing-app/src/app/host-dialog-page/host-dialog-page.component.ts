@@ -24,7 +24,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
- * Dialog test component with fixed size provided by the workbench host application.
+ * Dialog test component provided by the workbench host application.
  */
 @Component({
   selector: 'app-host-dialog-page',
