@@ -1,10 +1,21 @@
-# [1.0.0-beta.20](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.19...workbench-client-1.0.0-beta.20) (2023-10-31)
+# [1.0.0-beta.21](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.20...workbench-client-1.0.0-beta.21) (2024-03-29)
+
+
+### Bug Fixes
+
+* **workbench-client/view:** remove qualifier from microfrontend URL and params ([57cfd9e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/57cfd9e4d4090158393086b928a11aa69c38db2f))
 
 
 ### Features
 
-* **workbench-client:** enable microfrontend to display a splash until loaded ([7a79065](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7a79065543da636b545672fd01cfeceb2fbab323))
-* **workbench-client:** provide workbench color scheme ([ed63b22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ed63b225976c23b39446d4095fded734937e030a))
+* **workbench-client/dialog:** enable microfrontend display in a dialog ([11d762b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/11d762bb40539fdbdc263da8faf2177423a68d43))
+
+
+### BREAKING CHANGES
+
+* **workbench-client/view:** Removing qualifier from params has introduced a breaking change.
+
+  The view qualifier has been removed from the view parameters as it is static.
 
 
 
