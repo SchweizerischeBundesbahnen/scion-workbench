@@ -28,18 +28,18 @@ test.describe('Workbench', () => {
 
     // Open view 1 in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('view-1');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'blank',
+      activate: false,
+      cssClass: 'view-1'
+    });
 
     // Open view 2 in main area.
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('view-2');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'blank',
+      activate: false,
+      cssClass: 'view-2'
+    });
     await routerPage.view.tab.close();
 
     // Move view 2 to the right of view 1.

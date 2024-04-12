@@ -26,10 +26,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-a`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-a`], {
+        target: 'blank',
+        cssClass: 'testee'
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Features Title');
@@ -42,10 +42,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-b`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-b`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Feature B Title');
@@ -59,10 +59,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-c`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-c`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Features Title');
@@ -75,10 +75,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-d`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-d`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Feature D Title');
@@ -97,10 +97,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-a`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-a`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Features Lazy Title');
@@ -113,10 +113,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-b`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-b`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Feature B Title');
@@ -130,10 +130,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-c`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-c`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Features Lazy Title');
@@ -146,10 +146,10 @@ test.describe('View Route Data', () => {
       await appPO.setDesignToken('--sci-workbench-tab-height', '3.5rem');
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath(`${basePath}/feature-d`);
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate([`${basePath}/feature-d`], {
+        target: 'blank',
+        cssClass: 'testee',
+      });
 
       const view = appPO.view({cssClass: 'testee'});
       await expect(view.tab.title).toHaveText('Feature D Title');

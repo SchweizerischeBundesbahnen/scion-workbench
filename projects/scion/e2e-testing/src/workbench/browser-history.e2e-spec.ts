@@ -26,20 +26,22 @@ test.describe('Browser History', () => {
 
     // Add view-1 to the left part
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.101');
-    await routerPage.enterBlankPartId('left');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.101',
+      blankPartId: 'left',
+      cssClass: 'testee'
+    });
 
     // Expect view-1 to be active
     const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     await expectView(testee1ViewPage).toBeActive();
 
     // Add view-2 to the left part
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.102');
-    await routerPage.enterBlankPartId('left');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.102',
+      blankPartId: 'left',
+      cssClass: 'testee'
+    });
 
     // Expect view-2 to be active
     const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
@@ -110,18 +112,20 @@ test.describe('Browser History', () => {
 
     // Add view-1
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.101');
-    await routerPage.checkActivate(false);
-    await routerPage.enterInsertionIndex('end');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.101',
+      activate: false,
+      blankInsertionIndex: 'end',
+      cssClass: 'testee'
+    });
 
     // Add view-2
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.102');
-    await routerPage.checkActivate(false);
-    await routerPage.enterInsertionIndex('end');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.102',
+      activate: false,
+      blankInsertionIndex: 'end',
+      cssClass: 'testee'
+    });
 
     const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
@@ -189,10 +193,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/component');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/component'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -211,10 +215,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/load-component');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/load-component'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -233,10 +237,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/module');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/load-children/module'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -255,10 +259,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/routes');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/load-children/routes'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -277,10 +281,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/children');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/children'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -302,10 +306,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/non-standalone-view-test-page/component');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/non-standalone-view-test-page/component'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -324,10 +328,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/non-standalone-view-test-page/load-children/module');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/non-standalone-view-test-page/load-children/module'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee',
+      });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();
@@ -346,10 +350,10 @@ test.describe('Browser History', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/non-standalone-view-test-page/children');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/non-standalone-view-test-page/children'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'testee'
+      });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
       await expectView(routerPage).not.toBeAttached();

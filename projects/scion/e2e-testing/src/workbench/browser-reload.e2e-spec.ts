@@ -22,9 +22,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/component');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/component'], {
+        target: 'view.101',
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(standaloneViewTestPage).toBeActive();
@@ -37,9 +37,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/load-component');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/load-component'], {
+        target: 'view.101',
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(standaloneViewTestPage).toBeActive();
@@ -52,9 +52,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/module');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/load-children/module'], {
+        target: 'view.101',
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(standaloneViewTestPage).toBeActive();
@@ -67,9 +67,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/load-children/routes');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/load-children/routes'], {
+        target: 'view.101',
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(standaloneViewTestPage).toBeActive();
@@ -82,9 +82,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/standalone-view-test-page/children');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/standalone-view-test-page/children'], {
+        target: 'view.101',
+      });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(standaloneViewTestPage).toBeActive();
@@ -100,9 +100,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/non-standalone-view-test-page/component');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/non-standalone-view-test-page/component'], {
+        target: 'view.101',
+      });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(nonStandaloneViewTestPage).toBeActive();
@@ -115,9 +115,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/non-standalone-view-test-page/load-children/module');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/non-standalone-view-test-page/load-children/module'], {
+        target: 'view.101',
+      });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(nonStandaloneViewTestPage).toBeActive();
@@ -130,9 +130,9 @@ test.describe('Browser Reload', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-pages/non-standalone-view-test-page/children');
-      await routerPage.enterTarget('view.101');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['test-pages/non-standalone-view-test-page/children'], {
+        target: 'view.101',
+      });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {viewId: 'view.101'});
       await expectView(nonStandaloneViewTestPage).toBeActive();

@@ -21,14 +21,14 @@ test.describe('Workbench View', () => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 
-    await routerPage.enterPath('/test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.enterTarget('view.99');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['/test-view'], {
+      target: 'view.100',
+      cssClass: 'testee',
+    });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
-    await expect(viewPage.viewId).toHaveText('view.99');
+    await expect(viewPage.viewId).toHaveText('view.100');
   });
 
   test('should allow updating the view tab title', async ({appPO, workbenchNavigator}) => {
@@ -47,15 +47,15 @@ test.describe('Workbench View', () => {
 
     // open test view 1
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterCommands(['test-pages/navigation-test-page', {title: 'view-1-title'}]);
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/navigation-test-page', {title: 'view-1-title'}], {
+      target: 'view.101',
+    });
 
     // open test view 2
     await routerPage.view.tab.click();
-    await routerPage.enterCommands(['test-pages/navigation-test-page', {title: 'view-2-title'}]);
-    await routerPage.enterTarget('view.102');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/navigation-test-page', {title: 'view-2-title'}], {
+      target: 'view.102',
+    });
 
     const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
     const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
@@ -138,9 +138,9 @@ test.describe('Workbench View', () => {
 
     // Navigate to a different route in the same view
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-router');
-    await routerPage.enterTarget(viewId);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-router'], {
+      target: viewId,
+    });
 
     // Expect the view to be pristine
     const testeeView = appPO.view({viewId});
@@ -158,9 +158,9 @@ test.describe('Workbench View', () => {
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
-    await routerPage.enterCommands(['test-view', {matrixParam: 'value'}]);
-    await routerPage.enterTarget(await viewPage.view.getViewId());
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view', {matrixParam: 'value'}], {
+      target: await viewPage.view.getViewId(),
+    });
 
     // Expect the view to still be dirty
     await expect.poll(() => viewPage.view.tab.isDirty()).toBe(true);
@@ -181,9 +181,9 @@ test.describe('Workbench View', () => {
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
-    await routerPage.enterCommands(['test-view', {matrixParam: 'value'}]);
-    await routerPage.enterTarget(await viewPage.view.getViewId());
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view', {matrixParam: 'value'}], {
+      target: await viewPage.view.getViewId(),
+    });
 
     // Expect the title has not changed
     await expect(viewPage.view.tab.title).toHaveText('TITLE');
@@ -205,8 +205,7 @@ test.describe('Workbench View', () => {
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
-    await routerPage.enterCommands(['test-view', {matrixParam: 'value'}]);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view', {matrixParam: 'value'}]);
 
     // Expect the heading has not changed
     await expect(viewPage.view.tab.heading).toHaveText('HEADING');
