@@ -35,9 +35,9 @@ export class WorkbenchThemeTestPagePO implements WorkbenchViewPagePO {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     const viewId = await routerPage.view.getViewId();
 
-    await routerPage.enterPath('test-pages/workbench-theme-test-page');
-    await routerPage.enterTarget(viewId);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/workbench-theme-test-page'], {
+      target: viewId,
+    });
 
     const view = appPO.view({cssClass: 'e2e-test-workbench-theme', viewId});
     await view.waitUntilAttached();

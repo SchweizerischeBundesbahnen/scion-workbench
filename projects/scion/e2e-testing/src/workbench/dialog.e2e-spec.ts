@@ -2108,10 +2108,10 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.view.tab.dragTo({partId: await dialogOpenerPage.view.part.getPartId(), region: 'east'});
 
       // Navigate to FocusTestPageComponent
-      await routerPage.enterPath('/test-pages/focus-test-page');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('focus-page');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['/test-pages/focus-test-page'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'focus-page'
+      });
 
       // Open application-modal dialog.
       await dialogOpenerPage.open('dialog-page', {modality: 'application', cssClass: 'testee'});
@@ -2139,10 +2139,10 @@ test.describe('Workbench Dialog', () => {
       await dialogOpenerPage.view.tab.dragTo({partId: await dialogOpenerPage.view.part.getPartId(), region: 'east'});
 
       // Navigate to FocusTestPageComponent
-      await routerPage.enterPath('/test-pages/focus-test-page');
-      await routerPage.enterTarget(await routerPage.view.getViewId());
-      await routerPage.enterCssClass('focus-page');
-      await routerPage.clickNavigate();
+      await routerPage.navigate(['/test-pages/focus-test-page'], {
+        target: await routerPage.view.getViewId(),
+        cssClass: 'focus-page'
+      });
 
       // Open application-modal dialog.
       await dialogOpenerPage.open('dialog-page', {modality: 'application', cssClass: 'testee'});

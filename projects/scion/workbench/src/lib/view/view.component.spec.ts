@@ -304,7 +304,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.1').component.destroyed).withContext('(H)').toBeFalse();
 
     // Switch to View 1
-    TestBed.inject(WorkbenchRouter).navigate(['view-1'], {activate: true}).then();
+    TestBed.inject(WorkbenchRouter).navigate(['view-1']).then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -320,7 +320,7 @@ describe('ViewComponent', () => {
     expect(getViewDebugElement<SpecView1Component>('view.2').component.destroyed).withContext('(N)').toBeFalse();
 
     // Switch to View 2
-    TestBed.inject(WorkbenchRouter).navigate(['view-2'], {activate: true}).then();
+    TestBed.inject(WorkbenchRouter).navigate(['view-2']).then();
     advance(fixture);
 
     view1DebugElement.component.checked = false;
@@ -356,7 +356,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).withContext('(F)').toBeTrue();
 
     // Switch to View 1
-    TestBed.inject(WorkbenchRouter).navigate(['view-1'], {activate: true}).then();
+    TestBed.inject(WorkbenchRouter).navigate(['view-1']).then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).withContext('(G)').toBeTrue();
@@ -365,7 +365,7 @@ describe('ViewComponent', () => {
     expect(view2DebugElement.component.activated).withContext('(J)').toBeFalse();
 
     // Switch to View 2
-    TestBed.inject(WorkbenchRouter).navigate(['view-2'], {activate: true}).then();
+    TestBed.inject(WorkbenchRouter).navigate(['view-2']).then();
     advance(fixture);
 
     expect(view1DebugElement.view.active).withContext('(K)').toBeFalse();

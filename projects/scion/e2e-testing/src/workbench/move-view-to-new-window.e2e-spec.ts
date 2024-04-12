@@ -123,9 +123,9 @@ test.describe('Workbench View', () => {
 
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.100',
+    });
 
     // Move test view to new window.
     const newAppPO = await appPO.view({viewId: 'view.100'}).tab.moveToNewWindow();
@@ -172,9 +172,9 @@ test.describe('Workbench View', () => {
 
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      cssClass: 'testee'
+    });
 
     const testViewPage = appPO.view({cssClass: 'testee'});
 
@@ -314,9 +314,9 @@ test.describe('Workbench View', () => {
 
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('test-view');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      cssClass: 'test-view',
+    });
 
     const testViewPage = appPO.view({cssClass: 'test-view'});
 
@@ -330,10 +330,10 @@ test.describe('Workbench View', () => {
 
     // Open peripheral view in the new browser window.
     const newAppRouterPage = await newWindow.workbenchNavigator.openInNewTab(RouterPagePO);
-    await newAppRouterPage.enterPath('test-view');
-    await newAppRouterPage.enterCssClass('peripheral-view');
-    await newAppRouterPage.enterTarget('blank');
-    await newAppRouterPage.clickNavigate();
+    await newAppRouterPage.navigate(['test-view'], {
+      target: 'blank',
+      cssClass: 'peripheral-view'
+    });
     await newAppRouterPage.view.tab.close();
 
     // Move peripheral view to workbench grid.
@@ -411,9 +411,9 @@ test.describe('Workbench View', () => {
 
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('test-view');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      cssClass: 'test-view'
+    });
 
     const testViewPage = appPO.view({cssClass: 'test-view'});
 
@@ -426,10 +426,10 @@ test.describe('Workbench View', () => {
 
     // Open peripheral view.
     const newAppRouterPage = await newWindow.workbenchNavigator.openInNewTab(RouterPagePO);
-    await newAppRouterPage.enterPath('test-view');
-    await newAppRouterPage.enterCssClass('peripheral-view');
-    await newAppRouterPage.enterTarget('blank');
-    await newAppRouterPage.clickNavigate();
+    await newAppRouterPage.navigate(['test-view'], {
+      target: 'blank',
+      cssClass: 'peripheral-view'
+    });
     await newAppRouterPage.view.tab.close();
 
     // Move peripheral view to workbench grid.

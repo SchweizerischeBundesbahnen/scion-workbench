@@ -19,10 +19,10 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation',
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
@@ -78,10 +78,11 @@ test.describe('Workbench View CSS Class', () => {
 
     // Navigate to 'test-pages/navigation-test-page/1' passing CSS class 'testee-navigation-1'.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterCommands(['test-pages/navigation-test-page/1']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation-1');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/navigation-test-page/1'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation-1',
+    });
+
     // Expect CSS classes of the navigation to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-navigation-1');
@@ -93,10 +94,11 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('e2e-navigation-test-page');
 
     // Navigate to 'test-pages/navigation-test-page/2' passing CSS class 'testee-navigation-2'.
-    await routerPage.enterCommands(['test-pages/navigation-test-page/2']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation-2');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/navigation-test-page/2'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation-2',
+    });
+
     // Expect CSS classes of the navigation to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation-2');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-navigation-2');
@@ -111,10 +113,11 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('e2e-navigation-test-page');
 
     // Navigate to 'test-pages/navigation-test-page/2' passing CSS class 'testee-navigation-3'.
-    await routerPage.enterCommands(['test-pages/navigation-test-page/2']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation-3');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/navigation-test-page/2'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation-3',
+    });
+
     // Expect CSS classes of the navigation to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation-3');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-navigation-3');
@@ -131,9 +134,10 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('e2e-navigation-test-page');
 
     // Navigate to 'test-pages/navigation-test-page/1' without passing CSS class.
-    await routerPage.enterCommands(['test-pages/navigation-test-page/1']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-pages/navigation-test-page/1'], {
+      target: 'view.100',
+    });
+
     // Expect CSS classes of the previous navigations not to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).not.toContain('testee-navigation-1');
     await expect.poll(() => viewPage.view.getCssClasses()).not.toContain('testee-navigation-2');
@@ -224,10 +228,10 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterCommands(['test-view']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation',
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await viewPage.view.tab.dragTo({partId: await viewPage.view.part.getPartId(), region: 'east'});
@@ -241,10 +245,10 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterCommands(['test-view']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation',
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
@@ -262,18 +266,18 @@ test.describe('Workbench View CSS Class', () => {
 
     // Open view 1
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterCommands(['test-view']);
-    await routerPage.enterTarget('view.101');
-    await routerPage.enterCssClass('testee-navigation-1');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.101',
+      activate: false,
+      cssClass: 'testee-navigation-1',
+    });
 
     // Open view 2
-    await routerPage.enterCommands(['test-view']);
-    await routerPage.enterTarget('view.102');
-    await routerPage.enterCssClass('testee-navigation-2');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.102',
+      activate: false,
+      cssClass: 'testee-navigation-2',
+    });
 
     const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
     const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
@@ -295,10 +299,10 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterCommands(['test-view']);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation');
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.100',
+      cssClass: 'testee-navigation',
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
@@ -318,17 +322,17 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.101');
-    await routerPage.enterCssClass('testee-1');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.101',
+      activate: false,
+      cssClass: 'testee-1',
+    });
 
-    await routerPage.enterPath('test-view');
-    await routerPage.enterTarget('view.102');
-    await routerPage.enterCssClass('testee-2');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.102',
+      activate: false,
+      cssClass: 'testee-2',
+    });
 
     const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
     const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
@@ -348,11 +352,11 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterPath('test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate(['test-view'], {
+      target: 'view.100',
+      activate: false,
+      cssClass: 'testee',
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');

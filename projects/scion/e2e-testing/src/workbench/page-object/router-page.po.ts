@@ -8,15 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, commandsToPath, rejectWhenAttached, waitForCondition, waitUntilStable} from '../../helper/testing.util';
+import {coerceArray, commandsToPath, rejectWhenAttached, waitForCondition} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {Params} from '@angular/router';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {Commands, ViewId, ViewState} from '@scion/workbench';
+import {Commands, ViewId, ViewState, WorkbenchNavigationExtras} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RouterPageComponent}.
@@ -32,64 +31,12 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   }
 
   /**
-   * @deprecated use {@link enterCommands} instead.
+   * Navigates via {@link WorkbenchRouter}.
    */
-  public async enterPath(path: string): Promise<void> {
-    await this.locator.locator('input.e2e-commands').fill(path);
-  }
+  public async navigate(commands: Commands, extras?: WorkbenchNavigationExtras & RouterPageOptions): Promise<void> {
+    await this.enterCommands(commands);
+    await this.enterExtras(extras);
 
-  public async enterCommands(commands: Commands): Promise<void> {
-    await this.locator.locator('input.e2e-commands').fill(commandsToPath(commands));
-  }
-
-  public async enterQueryParams(params: Params): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-query-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params);
-  }
-
-  public async enterState(state: ViewState): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-state'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(state);
-  }
-
-  public async checkActivate(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-activate')).toggle(check);
-  }
-
-  public async checkClose(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close')).toggle(check);
-  }
-
-  public async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
-    await this.locator.locator('input.e2e-target').fill(target ?? '');
-  }
-
-  public async enterHint(hint?: string): Promise<void> {
-    await this.locator.locator('input.e2e-hint').fill(hint ?? '');
-  }
-
-  public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
-    await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
-  }
-
-  public async enterBlankPartId(blankPartId: string): Promise<void> {
-    await this.locator.locator('input.e2e-blank-part-id').fill(blankPartId);
-  }
-
-  public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
-
-  public async checkViewContext(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
-  }
-
-  /**
-   * Clicks on a button to navigate via {@link WorkbenchRouter}.
-   */
-  public async clickNavigate(): Promise<void> {
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this.locator.locator('button.e2e-router-navigate').click();
 
@@ -101,11 +48,84 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   }
 
   /**
-   * Clicks on the router link, optionally pressing the specified modifier key.
+   * Navigates via workbench router link.
    */
-  public async clickNavigateViaRouterLink(modifiers?: Array<'Alt' | 'Control' | 'Meta' | 'Shift'>): Promise<void> {
-    await this.locator.locator('a.e2e-router-link-navigate').click({modifiers});
+  public async navigateViaRouterLink(commands: Commands, extras?: Omit<WorkbenchNavigationExtras, 'close'> & RouterPageOptions & RouterLinkPageOptions): Promise<void> {
+    await this.enterCommands(commands);
+    await this.enterExtras(extras);
+
+    const navigationId = await this._appPO.getCurrentNavigationId();
+    await this.locator.locator('a.e2e-router-link-navigate').click({modifiers: extras?.modifiers});
+
     // Wait until navigation completed.
-    await waitUntilStable(() => this._appPO.getCurrentNavigationId());
+    await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
   }
+
+  private async enterCommands(commands: Commands): Promise<void> {
+    await this.locator.locator('input.e2e-commands').fill(commandsToPath(commands));
+  }
+
+  private async enterExtras(extras: WorkbenchNavigationExtras & RouterPageOptions | undefined): Promise<void> {
+    await this.enterTarget(extras?.target);
+    await this.enterHint(extras?.hint);
+    await this.enterState(extras?.state);
+    await this.checkActivate(extras?.activate);
+    await this.checkClose(extras?.close);
+    await this.enterInsertionIndex(extras?.blankInsertionIndex);
+    await this.enterBlankPartId(extras?.blankPartId);
+    await this.checkViewContext(extras?.viewContextActive);
+    await this.enterCssClass(extras?.cssClass);
+  }
+
+  private async enterState(state?: ViewState): Promise<void> {
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-state'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(state ?? {});
+  }
+
+  private async checkActivate(check?: boolean): Promise<void> {
+    if (check !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-activate')).toggle(check);
+    }
+  }
+
+  private async checkClose(check?: boolean): Promise<void> {
+    if (check !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close')).toggle(check);
+    }
+  }
+
+  private async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
+    await this.locator.locator('input.e2e-target').fill(target ?? '');
+  }
+
+  private async enterHint(hint?: string): Promise<void> {
+    await this.locator.locator('input.e2e-hint').fill(hint ?? '');
+  }
+
+  private async enterInsertionIndex(insertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'): Promise<void> {
+    await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex ?? ''}`);
+  }
+
+  private async enterBlankPartId(blankPartId?: string): Promise<void> {
+    await this.locator.locator('input.e2e-blank-part-id').fill(blankPartId ?? '');
+  }
+
+  private async enterCssClass(cssClass?: string | string[]): Promise<void> {
+    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
+  }
+
+  private async checkViewContext(check?: boolean): Promise<void> {
+    if (check !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-view-context')).toggle(check);
+    }
+  }
+}
+
+export interface RouterPageOptions {
+  viewContextActive?: boolean;
+}
+
+export interface RouterLinkPageOptions {
+  modifiers?: Array<'Alt' | 'Control' | 'Meta' | 'Shift'>;
 }
