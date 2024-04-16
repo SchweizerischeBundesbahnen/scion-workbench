@@ -269,6 +269,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *
    * @param findBy - Defines the search scope.
    * @param findBy.id - Searches for views with the specified id.
+   * @param findBy.partId - Searches for views contained in the specified part.
    * @param findBy.segments - Searches for views navigated to the specified URL.
    * @param findBy.navigationHint - Searches for views navigated with given hint. Passing `null` searches for views navigated without a hint.
    * @param findBy.grid - Searches for views contained in the specified grid.
@@ -276,8 +277,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.orElse - Controls to error if no view is found.
    * @return views matching the filter criteria.
    */
-  public views(findBy?: {id?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; grid?: keyof Grids}, options?: {orElse: 'throwError'}): readonly MView[] {
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; grid?: keyof Grids}, options?: {orElse: 'throwError'}): readonly MView[] {
     const views = this.parts({grid: findBy?.grid})
+      .filter(part => {
+        if (findBy?.partId !== undefined && part.id !== findBy.partId) {
+          return false;
+        }
+        return true;
+      })
       .flatMap(part => part.views)
       .filter(view => {
         if (findBy?.id !== undefined && !matchViewById(findBy.id)(view)) {

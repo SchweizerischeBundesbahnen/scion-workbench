@@ -663,6 +663,174 @@ test.describe('Workbench Router', () => {
     await expectView(testee2ViewPage).toBeActive();
   });
 
+  test('should open view in the specified part', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Add part on the right.
+    await workbenchNavigator.modifyLayout(layout => layout.addPart('right', {align: 'right'}));
+
+    // Open view in the right part.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {
+      target: 'blank',
+      partId: 'right',
+      cssClass: 'testee',
+    });
+
+    // Expect view to be opened in the right part.
+    const view = appPO.view({cssClass: 'testee'});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        urlSegments: 'test-view',
+        partId: 'right',
+      } satisfies Partial<ViewInfo>,
+    );
+    await expect(appPO.views()).toHaveCount(2);
+  });
+
+  test('should navigate existing view(s) in the specified part, or open a new view in the specified part otherwise', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Add left and right part.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('left', {align: 'left'})
+      .addPart('right', {align: 'right'})
+      .addView('view.100', {partId: 'left'})
+      .navigateView('view.100', ['test-view']),
+    );
+
+    // Navigate view in the left part.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {
+      partId: 'left',
+      state: {navigated: '1'},
+      cssClass: 'testee-1',
+    });
+
+    // Expect existing view in the left part to be navigated.
+    const view1 = appPO.view({cssClass: 'testee-1'});
+    await expect.poll(() => view1.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        state: {navigated: '1'},
+        partId: 'left',
+      } satisfies Partial<ViewInfo>,
+    );
+    await expect(appPO.views()).toHaveCount(2);
+
+    // Navigate view in the right part.
+    await routerPage.navigate(['test-view'], {
+      partId: 'right',
+      state: {navigated: '2'},
+      cssClass: 'testee-2',
+    });
+
+    // Expect view in the left part not to be navigated.
+    await expect.poll(() => view1.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        state: {navigated: '1'},
+        partId: 'left',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect new view to be opened in the right part.
+    const view2 = appPO.view({cssClass: 'testee-2'});
+    await expect.poll(() => view2.getInfo()).toMatchObject(
+      {
+        urlSegments: 'test-view',
+        state: {navigated: '2'},
+        partId: 'right',
+      } satisfies Partial<ViewInfo>,
+    );
+    await expect(appPO.views()).toHaveCount(3);
+  });
+
+  test('should open view in the active part of the main area if specified part is not in the layout', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Add left part.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('left', {align: 'left'})
+      .addView('view.100', {partId: 'left', activatePart: true, activateView: true})
+      .navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}),
+    );
+
+    // Open view in a part not contained in the layout.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {
+      partId: 'does-not-exist',
+      state: {navigated: 'true'},
+      cssClass: 'testee',
+    });
+
+    // Expect view to be opened in the main area.
+    await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
+      {
+        urlSegments: 'test-view',
+        partId: await appPO.activePart({inMainArea: true}).getPartId(),
+        state: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view in the left part not to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.100'}).getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        partId: 'left',
+        state: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+    await expect(appPO.views()).toHaveCount(3);
+  });
+
+  test('should open view in the active part of the workbench grid if specified part is not in the layout', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a left and right part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('left')
+      .addPart('right', {align: 'right'})
+      .addView('router', {partId: 'left', cssClass: 'router'})
+      .addView('view.100', {partId: 'right', activateView: true})
+      .navigateView('router', ['test-router']),
+    );
+
+    // Add state via separate navigation as not supported when adding views to the perspective.
+    await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}));
+
+    // Open view in a part not contained in the layout.
+    const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
+    await routerPage.navigate(['test-view'], {
+      partId: 'does-not-exist',
+      state: {navigated: 'true'},
+      cssClass: 'testee',
+    });
+
+    // Expect view to be opened in the active part.
+    await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
+      {
+        urlSegments: 'test-view',
+        partId: await appPO.activePart({inMainArea: false}).getPartId(),
+        state: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view in the right part not to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.100'}).getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        partId: 'right',
+        state: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+    await expect(appPO.views()).toHaveCount(3);
+  });
+
   test('should activate a present view if setting `activate` to `true`', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
@@ -1186,6 +1354,37 @@ test.describe('Workbench Router', () => {
 
     // Expect view.101 not to be closed.
     await expectView(testView1).toBeActive();
+  });
+
+  test('should close views in the specified part', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Add left and right part.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('left', {align: 'left'})
+      .addPart('right', {align: 'right'})
+      .addView('view.101', {partId: 'left'})
+      .addView('view.102', {partId: 'left'})
+      .addView('view.103', {partId: 'left'})
+      .addView('view.104', {partId: 'right'})
+      .navigateView('view.101', ['test-view/1'])
+      .navigateView('view.102', ['test-view/1'])
+      .navigateView('view.103', ['test-view/2'])
+      .navigateView('view.104', ['test-view/1']),
+    );
+
+    // Close views in the left part
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view/1'], {
+      partId: 'left',
+      close: true,
+    });
+
+    // Expect views in the left part to be closed.
+    await expect.poll(() => appPO.part({partId: 'left'}).getViewIds()).toEqual(['view.103']);
+
+    // Expect view in the right part not to be closed.
+    await expect.poll(() => appPO.part({partId: 'right'}).getViewIds()).toEqual(['view.104']);
   });
 
   test('should support app URL to contain view outlets of views in the workbench grid', async ({appPO, workbenchNavigator}) => {

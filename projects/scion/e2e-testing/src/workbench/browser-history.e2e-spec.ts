@@ -28,7 +28,7 @@ test.describe('Browser History', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
       target: 'view.101',
-      blankPartId: 'left',
+      partId: 'left',
       cssClass: 'testee'
     });
 
@@ -39,7 +39,7 @@ test.describe('Browser History', () => {
     // Add view-2 to the left part
     await routerPage.navigate(['test-view'], {
       target: 'view.102',
-      blankPartId: 'left',
+      partId: 'left',
       cssClass: 'testee'
     });
 

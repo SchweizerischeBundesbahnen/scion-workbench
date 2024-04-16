@@ -96,6 +96,7 @@ export class WorkbenchRouter implements OnDestroy {
         const urlSegments = RouterUtils.commandsToSegments(commands, {relativeTo: extras.relativeTo});
         return layout
           .views({
+            partId: extras.partId,
             segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: true}),
             navigationHint: extras.hint ?? null,
           })
@@ -111,6 +112,7 @@ export class WorkbenchRouter implements OnDestroy {
         case 'auto': {
           const urlSegments = RouterUtils.commandsToSegments(commands, {relativeTo: extras.relativeTo});
           const views = layout.views({
+            partId: extras.partId,
             segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: false}),
             navigationHint: extras.hint ?? null,
           });
@@ -137,9 +139,17 @@ export class WorkbenchRouter implements OnDestroy {
      * Creates the navigation for adding the specified view to the workbench layout.
      */
     function addView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+      // Default to the active part (with the active part of the main area taking precedence) if not specified or not in the layout.
+      const partId = ((): string => {
+        if (extras.partId && layout.hasPart(extras.partId)) {
+          return extras.partId;
+        }
+        return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
+      })();
+
       return layout
         .addView(viewId, {
-          partId: computeTargetPartId(extras, layout),
+          partId: partId,
           position: extras.blankInsertionIndex ?? 'after-active-view',
           activateView: extras.activate ?? true,
         })
@@ -165,17 +175,6 @@ export class WorkbenchRouter implements OnDestroy {
         cssClass: extras.cssClass,
         state: extras.state,
       });
-    }
-
-    /**
-     * Computes the target part based on the provided navigation extras.
-     * Default is the active part, with the active part of the main area taking precedence.
-     */
-    function computeTargetPartId(extras: WorkbenchNavigationExtras, layout: ɵWorkbenchLayout): string {
-      if (extras.blankPartId && layout.hasPart(extras.blankPartId)) {
-        return extras.blankPartId;
-      }
-      return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
     }
   }
 
@@ -333,9 +332,14 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   hint?: string;
   /**
-   * Specifies in which part to open the view. Default is the active part, with the active part of the main area taking precedence.
+   * Controls which part to navigate views in.
+   *
+   * If target is `blank`, opens the view in the specified part.
+   * If target is `auto`, navigates matching views in the specified part, or opens a new view in that part otherwise.
+   *
+   * If the specified part is not in the layout, opens the view in the active part, with the active part of the main area taking precedence.
    */
-  blankPartId?: string;
+  partId?: string;
   /**
    * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
    */

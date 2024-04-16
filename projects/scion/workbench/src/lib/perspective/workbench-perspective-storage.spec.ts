@@ -56,7 +56,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in part 'left-top'
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left-top', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left-top', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
@@ -73,7 +73,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     });
 
     // WHEN: Opening view.2 in part 'left-bottom'
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left-bottom', target: 'view.2'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left-bottom', target: 'view.2'});
     await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
@@ -119,7 +119,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1.
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left', target: 'view.1'});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -135,7 +135,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     const layout = localStorage.getItem('scion.workbench.perspectives.perspective-1')!;
 
     // Open view.2 in perspective-1.
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {blankPartId: 'left', target: 'view.2'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left', target: 'view.2'});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -198,7 +198,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in perspective-1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {blankPartId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'left', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout of perspective-1 to be stored.
@@ -221,7 +221,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     localStorage.clear();
 
     // WHEN: Opening view.1 in perspective-2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {blankPartId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'left', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout of perspective-2 to be stored.

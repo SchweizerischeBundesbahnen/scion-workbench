@@ -27,7 +27,7 @@
     </sci-form-field>
 
     <sci-form-field label="Part ID">
-      <input [formControl]="form.controls.blankPartId" class="e2e-blank-part-id" list="parts">
+      <input [formControl]="form.controls.partId" class="e2e-part-id" list="parts">
       <datalist id="parts">
         <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
       </datalist>

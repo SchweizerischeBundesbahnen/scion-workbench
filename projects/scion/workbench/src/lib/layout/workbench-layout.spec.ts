@@ -1841,6 +1841,33 @@ describe('WorkbenchLayout', () => {
     ).toEqual(['view.3']);
   });
 
+  it('should find views by part', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('left')
+      .addPart('right', {align: 'right'})
+      .addView('view.1', {partId: 'left'})
+      .addView('view.2', {partId: 'left'})
+      .addView('view.3', {partId: 'right'})
+      .navigateView('view.1', ['path', 'to', 'view'])
+      .navigateView('view.2', ['path', 'to', 'view'])
+      .navigateView('view.3', ['path', 'to', 'view']);
+
+    expect(layout
+      .views({partId: undefined})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({partId: 'left'})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
+
+    expect(layout
+      .views({partId: 'right'})
+      .map(view => view.id),
+    ).toEqual(['view.3']);
+  });
+
   it('should activate adjacent view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
 
