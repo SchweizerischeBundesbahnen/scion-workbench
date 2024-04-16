@@ -1723,7 +1723,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {blankPartId: 'main'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'main'});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1779,7 +1779,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {blankPartId: 'main', target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'main', target: 'blank'});
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 

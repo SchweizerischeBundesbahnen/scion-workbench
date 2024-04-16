@@ -72,7 +72,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.checkActivate(extras?.activate);
     await this.checkClose(extras?.close);
     await this.enterInsertionIndex(extras?.blankInsertionIndex);
-    await this.enterBlankPartId(extras?.blankPartId);
+    await this.enterPartId(extras?.partId);
     await this.checkViewContext(extras?.viewContextActive);
     await this.enterCssClass(extras?.cssClass);
   }
@@ -107,8 +107,8 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex ?? ''}`);
   }
 
-  private async enterBlankPartId(blankPartId?: string): Promise<void> {
-    await this.locator.locator('input.e2e-blank-part-id').fill(blankPartId ?? '');
+  private async enterPartId(partId?: string): Promise<void> {
+    await this.locator.locator('input.e2e-part-id').fill(partId ?? '');
   }
 
   private async enterCssClass(cssClass?: string | string[]): Promise<void> {

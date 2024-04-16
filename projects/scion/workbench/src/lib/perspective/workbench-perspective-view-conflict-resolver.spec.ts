@@ -51,7 +51,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1'], {blankPartId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view-1'], {partId: 'left', target: 'view.1'});
     await waitUntilStable();
 
     // Switch to perspective-2

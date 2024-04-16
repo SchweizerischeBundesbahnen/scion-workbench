@@ -230,7 +230,7 @@ test.describe('Navigational State', () => {
     const routerPage = new RouterPagePO(appPO, {cssClass: 'workbench-router'});
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankPartId: 'right',
+      partId: 'right',
       state: {some: 'state'},
       cssClass: 'testee'
     });

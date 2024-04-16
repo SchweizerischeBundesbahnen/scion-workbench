@@ -145,7 +145,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankPartId: 'right',
+      partId: 'right',
     });
 
     // Expect view.8 (new view) to be opened to the right of the active view.
