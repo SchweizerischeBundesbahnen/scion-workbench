@@ -19,19 +19,33 @@ import {Defined} from '@scion/toolkit/util';
 import {RouterUtils} from './router.util';
 
 /**
- * Like 'RouterLink' but with functionality to target a view outlet.
+ * Like the Angular 'RouterLink' directive but with functionality to navigate a view.
  *
- * If in the context of a view in the main area and CTRL (Mac: ⌘, Windows: ⊞) key is not pressed, by default, navigation
- * replaces the content of the current view. Override this default behavior by setting a view target strategy in navigation extras.
+ * Use this directive to navigate the current view. If the user presses the CTRL key (Mac: ⌘, Windows: ⊞), this directive will open a new view.
+ *
+ * ```html
+ * <a [wbRouterLink]="['../path/to/view']">Link</a>
+ * ```
+ *
+ * You can override the default behavior by setting an explicit navigation target in navigation extras.
+ *
+ * ```html
+ * <a [wbRouterLink]="['../path/to/view']" [wbRouterLinkExtras]="{target: 'blank'}">Link</a>
+ * ```
  *
  * By default, navigation is relative to the currently activated route, if any.
+ *
  * Prepend the path with a forward slash '/' to navigate absolutely, or set `relativeTo` property in navigational extras to `null`.
+ *
+ * ```html
+ * <a [wbRouterLink]="['/path/to/view']">Link</a>
+ * ```
  */
 @Directive({selector: '[wbRouterLink]', standalone: true})
 export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
 
   private _commands: any[] = [];
-  private _extras: WorkbenchNavigationExtras = {};
+  private _extras: Omit<WorkbenchNavigationExtras, 'close'> = {};
   private _ngOnChange$ = new Subject<void>();
   private _ngOnDestroy$ = new Subject<void>();
 
@@ -44,7 +58,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
   }
 
   @Input('wbRouterLinkExtras') // eslint-disable-line @angular-eslint/no-input-rename
-  public set extras(extras: WorkbenchNavigationExtras | undefined) {
+  public set extras(extras: Omit<WorkbenchNavigationExtras, 'close'> | undefined) {
     this._extras = extras || {};
   }
 
@@ -74,7 +88,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
   /**
    * Computes navigation extras based on the given extras and this directive's injection context.
    */
-  protected computeNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): WorkbenchNavigationExtras {
+  protected computeNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): Omit<WorkbenchNavigationExtras, 'close'> {
     const contextualView = this._view ?? undefined;
     const contextualPart = this._view?.part;
     const controlPressed = ctrlKey || metaKey;
@@ -86,10 +100,6 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
         return isAbsolute ? null : this._route;
       }),
       target: Defined.orElse(this._extras.target, () => {
-        // When closing a view, derive the target only if no path is set.
-        if (this._extras.close && this._commands.length) {
-          return undefined;
-        }
         // Navigate in new tab if CTRL or META modifier key is pressed.
         if (controlPressed) {
           return 'blank';

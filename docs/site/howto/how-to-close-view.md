@@ -7,9 +7,9 @@
 
 ### How to close a view
 
-A view can be closed via navigation, the view's handle `WorkbenchView`, or the `WorkbenchService`.
+A view can be closed via the view's handle `WorkbenchView`, the `WorkbenchService`, or the `WorkbenchRouter`.
 
-#### Closing the view using its handle
+#### Closing a view using its handle
 Inject `WorkbenchView` handle and invoke the `close` method.
 
 ```ts
@@ -17,16 +17,18 @@ inject(WorkbenchView).close();
 ```
 
 #### Closing view(s) using the `WorkbenchService`
-Inject `WorkbenchService` and invoke `close`, passing the identifies of the views to close.
+Inject `WorkbenchService` and invoke `closeViews`, passing the ids of the views to close.
 
 
 ```ts
 inject(WorkbenchService).closeViews('view.1', 'view.2');
 ```
 
-#### Closing view(s) via navigation
+#### Closing view(s) via `WorkbenchRouter`
 
-Views can be closed by performing a navigation with the `close` flag set in the navigation extras. Views matching the path will be closed. The path supports the asterisk wildcard segment (`*`) to match view(s) with any value in that segment. To close a specific view, set a view `target` instead of a path.
+The router supports for closing views matching the routing commands by setting `close` in navigation extras.
+
+Matrix parameters do not affect view resolution. The path supports the asterisk wildcard segment (`*`) to match views with any value in a segment. To close a specific view, set a view target instead of a path.
 
 ```ts
 inject(WorkbenchRouter).navigate(['path/*/view'], {close: true});

@@ -50,18 +50,24 @@ The default behavior can be overridden by specifying a `target` via navigation e
 ### How to navigate in a template
 The workbench provides the `wbRouterLink` directive for navigation in a template. The `wbRouterLink` directive is the workbench equivalent of the Angular `routerLink`.
 
+Use this directive to navigate the current view. If the user presses the CTRL key (Mac: ⌘, Windows: ⊞), this directive will open a new view.
+
 ```html
 <a [wbRouterLink]="['../path/to/view']">Link</a>
 ```
-
-If in the context of a view in the main area and CTRL (Mac: ⌘, Windows: ⊞) key is not pressed, by default, navigation replaces the content of the current view. Override this default behavior by setting a view target strategy in navigation extras.
+You can override the default behavior by setting an explicit navigation target in navigation extras.
 
 ```html
 <a [wbRouterLink]="['../path/to/view']" [wbRouterLinkExtras]="{target: 'blank'}">Link</a>
 ```
 
-By default, navigation is relative to the currently activated route, if any. Prepend the path with a forward slash `/` to navigate absolutely, or set `relativeTo` property in navigational extras to `null`. 
+By default, navigation is relative to the currently activated route, if any.
 
+Prepend the path with a forward slash `/` to navigate absolutely, or set `relativeTo` property in navigational extras to `null`.
+
+```html
+<a [wbRouterLink]="['/path/to/view']">Link</a>
+```
 ***
 #### Related Links:
 - [Learn how to provide a view.][link-how-to-provide-view]

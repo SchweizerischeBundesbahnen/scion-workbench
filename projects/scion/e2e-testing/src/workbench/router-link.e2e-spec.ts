@@ -17,7 +17,6 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../workbench.model';
 import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
-import {NavigationTestPagePO} from './page-object/test-pages/navigation-test-page.po';
 
 test.describe('Workbench RouterLink', () => {
 
@@ -130,126 +129,6 @@ test.describe('Workbench RouterLink', () => {
     await expect(appPO.views()).toHaveCount(2);
     await expectView(routerPage).toBeInactive();
     await expectView(testeeViewPage).toBeActive();
-  });
-
-  test('should close view by path', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-
-    // GIVEN
-    // Open test view 1 (but do not activate it)
-    await routerPage.enterPath('/test-view');
-    await routerPage.enterCssClass('testee');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expectView(routerPage).toBeActive();
-    await expectView(testeeViewPage).toBeInactive();
-
-    // WHEN
-    await routerPage.enterPath('/test-view');
-    await routerPage.checkClose(true);
-    await routerPage.clickNavigateViaRouterLink();
-
-    // THEN
-    await expectView(routerPage).toBeActive();
-    await expectView(testeeViewPage).not.toBeAttached();
-    await expect(appPO.views()).toHaveCount(1);
-  });
-
-  test('should close view by id', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-
-    // GIVEN
-    // Open test view 1 (but do not activate it)
-    await routerPage.enterPath('/test-view');
-    await routerPage.enterTarget('view.101');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
-    await expectView(routerPage).toBeActive();
-    await expectView(testeeViewPage).toBeInactive();
-
-    // WHEN
-    await routerPage.enterPath('');
-    await routerPage.enterTarget('view.101');
-    await routerPage.checkClose(true);
-    await routerPage.clickNavigateViaRouterLink();
-
-    // THEN
-    await expectView(routerPage).toBeActive();
-    await expectView(testeeViewPage).not.toBeAttached();
-    await expect(appPO.views()).toHaveCount(1);
-  });
-
-  test('should close the current view without explicit target', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    // GIVEN
-    const routerPage1 = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const routerPage2 = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const routerPage3 = await workbenchNavigator.openInNewTab(RouterPagePO);
-
-    // WHEN
-    await routerPage2.view.tab.click();
-    await routerPage2.enterPath('');
-    await routerPage2.checkClose(true);
-    await routerPage2.clickNavigateViaRouterLink();
-
-    // THEN
-    await expectView(routerPage1).toBeInactive();
-    await expectView(routerPage2).not.toBeAttached();
-    await expectView(routerPage3).toBeActive();
-    await expect(appPO.views()).toHaveCount(2);
-  });
-
-  test('should close matching views', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
-
-    // GIVEN
-    // Open test view 1 (but do not activate it)
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.enterPath('/test-pages/navigation-test-page/1');
-    await routerPage.enterCssClass('testee-1');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    // Open test view 2 (but do not activate it)
-    await routerPage.enterPath('/test-pages/navigation-test-page/2');
-    await routerPage.enterCssClass('testee-2');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    // Open test view 3 (but do not activate it)
-    await routerPage.enterPath('/test-pages/navigation-test-page/3');
-    await routerPage.enterCssClass('testee-3');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
-
-    const testViewPage1 = new NavigationTestPagePO(appPO, {cssClass: 'testee-1'});
-    const testViewPage2 = new NavigationTestPagePO(appPO, {cssClass: 'testee-2'});
-    const testViewPage3 = new NavigationTestPagePO(appPO, {cssClass: 'testee-3'});
-
-    await expectView(routerPage).toBeActive();
-    await expectView(testViewPage1).toBeInactive();
-    await expectView(testViewPage2).toBeInactive();
-    await expectView(testViewPage3).toBeInactive();
-
-    // WHEN
-    await routerPage.enterPath('/test-pages/navigation-test-page/*');
-    await routerPage.checkClose(true);
-    await routerPage.clickNavigateViaRouterLink();
-
-    // THEN
-    await expectView(routerPage).toBeActive();
-    await expectView(testViewPage1).not.toBeAttached();
-    await expectView(testViewPage2).not.toBeAttached();
-    await expectView(testViewPage3).not.toBeAttached();
   });
 
   test('should navigate present view(s) if navigating outside a view and not setting a target', async ({appPO, workbenchNavigator}) => {
