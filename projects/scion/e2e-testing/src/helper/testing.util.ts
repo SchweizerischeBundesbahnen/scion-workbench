@@ -10,6 +10,7 @@
 
 import {Locator, Page} from '@playwright/test';
 import {exhaustMap, filter, firstValueFrom, map, pairwise, timer} from 'rxjs';
+import {Commands} from '@scion/workbench';
 
 /**
  * Returns if given CSS class is present on given element.
@@ -53,6 +54,18 @@ export async function waitUntilStable<A>(value: () => Promise<A> | A, options?: 
       map(([previous]) => previous),
     );
   return firstValueFrom(value$);
+}
+
+/**
+ * Waits for a condition to be fulfilled.
+ */
+export async function waitForCondition(predicate: () => Promise<boolean>): Promise<void> {
+  const value$ = timer(0, 100)
+    .pipe(
+      exhaustMap(async () => await predicate()),
+      filter(Boolean),
+    );
+  await firstValueFrom(value$);
 }
 
 /**
@@ -132,6 +145,13 @@ export function coerceMap<V>(value: Record<string, V> | Map<string, V>): Map<str
 }
 
 /**
+ * Stringifies given object to matrix notation: a=b;c=d;e=f
+ */
+export function toMatrixNotation(object: Record<string, unknown> | null | undefined): string {
+  return Object.entries(object ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
+}
+
+/**
  * Returns a new {@link Record} with `undefined` and `<undefined>` values removed.
  */
 export function withoutUndefinedEntries<T>(object: Record<string, T>): Record<string, T> {
@@ -169,4 +189,23 @@ export interface DomRect {
   right: number;
   hcenter: number;
   vcenter: number;
+}
+
+/**
+ * Converts given segments to a path.
+ */
+export function commandsToPath(commands: Commands): string {
+  return commands
+    .reduce((path, command) => {
+      if (typeof command === 'string') {
+        return path.concat(command);
+      }
+      else if (!path.length) {
+        return path.concat(`.;${toMatrixNotation(command)}`); // Note that matrix parameters in the first segment are only supported in combination with a `relativeTo`.
+      }
+      else {
+        return path.concat(`${path.pop()};${toMatrixNotation(command)}`);
+      }
+    }, [])
+    .join('/');
 }

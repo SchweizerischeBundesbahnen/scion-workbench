@@ -44,7 +44,7 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
  * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
  * area for user interaction.
  *
- * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+ * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
  * Perspectives share the same main area, if any.
  */
 @NgModule({

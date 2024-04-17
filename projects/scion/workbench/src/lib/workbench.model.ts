@@ -53,7 +53,7 @@ export interface WorkbenchPartAction {
    */
   canMatch?: CanMatchPartFn;
   /**
-   * Specifies CSS class(es) to be associated with the action, useful in end-to-end tests for locating it.
+   * Specifies CSS class(es) to add to the action, e.g., to locate the action in tests.
    */
   cssClass?: string | string[];
 }
@@ -99,7 +99,7 @@ export interface WorkbenchMenuItem {
    */
   isDisabled?: () => boolean;
   /**
-   * Specifies CSS class(es) to be added to the menu item, useful in end-to-end tests for locating the menu item.
+   * Specifies CSS class(es) to add to the menu item, e.g., to locate the menu item in tests.
    */
   cssClass?: string | string[];
 }

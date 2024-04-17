@@ -11,12 +11,9 @@
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectView} from '../matcher/view-matcher';
-import {PerspectivePagePO} from './page-object/perspective-page.po';
 import {MAIN_AREA} from '../workbench.model';
-import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('View Drag', () => {
 
@@ -330,72 +327,75 @@ test.describe('View Drag', () => {
   test.describe('drag to another part', () => {
 
     /**
-     * +----------+------------------+    +------------------+----------+
-     * |  INITIAL |       XYZ        | => |  INITIAL         |   XYZ    |
-     * | [view.1] | [view.2, view.3] |    | [view.1, view.2] | [view.3] |
-     * +----------+------------------+    +------------------+----------+
+     * +-----------+----------------------+    +--------------------+------------+
+     * |  INITIAL  |       RIGHT          | => |      INITIAL       |   RIGHT    |
+     * | [view.1]  | [view.101, view.102] |    | [view.1, view.101] | [view.102] |
+     * +-----------+----------------------+    +--------------------+------------+
      */
     test('should allow dragging a view to the center of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view in the initial part.
-      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2 = appPO.view({viewId: 'view.2'});
-      const view3 = appPO.view({viewId: 'view.3'});
+      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const initialPartId = await initialPartView.view.part.getPartId();
 
       // Open two views in another part.
-      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
-      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
-      await layoutPage.addView('view.3', {partId: 'xyz'});
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'right', activateView: true})
+        .addView('view.102', {partId: 'right'}),
+      );
 
-      // Move view 2 to the center of the initial part.
-      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'center'});
+      // Move view to the center of the initial part.
+      const testView = appPO.view({viewId: 'view.101'});
+      await testView.tab.dragTo({partId: initialPartId, region: 'center'});
 
-      // Expect view 2 to be moved to the initial part.
+      // Expect view to be moved to the initial part.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
             child1: new MPart({
-              id: await layoutPage.view.part.getPartId(),
-              views: [{id: 'view.1'}, {id: 'view.2'}],
-              activeViewId: 'view.2',
+              id: initialPartId,
+              views: [{id: 'view.1'}, {id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
             child2: new MPart({
-              id: await view3.part.getPartId(),
-              views: [{id: 'view.3'}],
-              activeViewId: 'view.3',
+              id: 'right',
+              views: [{id: 'view.102'}],
+              activeViewId: 'view.102',
             }),
           }),
-          activePartId: await layoutPage.view.part.getPartId(),
+          activePartId: initialPartId,
         },
       });
     });
 
     /**
-     * +----------+------------------+    +----------+----------+----------+
-     * |  INITIAL |       XYZ        | => |  WEST    |  INITIAL |   XYZ    |
-     * | [view.1] | [view.2, view.3] |    | [view.2] | [view.1] | [view.3] |
-     * +----------+------------------+    +----------+----------+----------+
+     * +-----------+----------------------+    +------------+------------+------------+
+     * |  INITIAL  |       RIGHT          | => |    WEST    |   INITIAL  |   RIGHT    |
+     * | [view.1]  | [view.101, view.102] |    | [view.101] | [view.1]   | [view.102] |
+     * +-----------+----------------------+    +------------+------------+------------+
      */
     test('should allow dragging a view to the west of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view in the initial part.
-      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2 = appPO.view({viewId: 'view.2'});
-      const view3 = appPO.view({viewId: 'view.3'});
+      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const initialPartId = await initialPartView.view.part.getPartId();
 
       // Open two views in another part.
-      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
-      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
-      await layoutPage.addView('view.3', {partId: 'xyz'});
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'right', activateView: true})
+        .addView('view.102', {partId: 'right'}),
+      );
 
-      // Move view 2 to a new part in the west of the initial part.
-      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'west'});
+      // Move view to a new part in the west of the initial part.
+      const testView = appPO.view({viewId: 'view.101'});
+      await testView.tab.dragTo({partId: initialPartId, region: 'west'});
+      const testViewInfo = await testView.getInfo();
 
-      // Expect view 2 to be moved to a new part in the west of the initial part.
+      // Expect view to be moved to a new part in the west of the initial part.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
@@ -405,50 +405,52 @@ test.describe('View Drag', () => {
               direction: 'row',
               ratio: .5,
               child1: new MPart({
-                id: await view2.part.getPartId(),
-                views: [{id: 'view.2'}],
-                activeViewId: 'view.2',
+                id: testViewInfo.partId,
+                views: [{id: 'view.101'}],
+                activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: await layoutPage.view.part.getPartId(),
+                id: initialPartId,
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
             }),
             child2: new MPart({
-              id: await view3.part.getPartId(),
-              views: [{id: 'view.3'}],
-              activeViewId: 'view.3',
+              id: 'right',
+              views: [{id: 'view.102'}],
+              activeViewId: 'view.102',
             }),
           }),
-          activePartId: await view2.part.getPartId(),
+          activePartId: testViewInfo.partId,
         },
       });
     });
 
     /**
-     * +----------+------------------+    +----------+----------+----------+
-     * |  INITIAL |       XYZ        | => |  INITIAL |  EAST    |   XYZ    |
-     * | [view.1] | [view.2, view.3] |    | [view.1] | [view.2] | [view.3] |
-     * +----------+------------------+    +----------+----------+----------+
+     * +----------+----------------------+    +----------+------------+------------+
+     * |  INITIAL |       RIGHT          | => |  INITIAL |  EAST      |   RIGHT    |
+     * | [view.1] | [view.101, view.102] |    | [view.1] | [view.101] | [view.102] |
+     * +----------+----------------------+    +----------+------------+------------+
      */
     test('should allow dragging a view to the east of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view in the initial part.
-      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2 = appPO.view({viewId: 'view.2'});
-      const view3 = appPO.view({viewId: 'view.3'});
+      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const initialPartId = await initialPartView.view.part.getPartId();
 
       // Open two views in another part.
-      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
-      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
-      await layoutPage.addView('view.3', {partId: 'xyz'});
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'right', activateView: true})
+        .addView('view.102', {partId: 'right'}),
+      );
 
-      // Move view 2 to a new part in the east of the initial part.
-      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'east'});
+      // Move view to a new part in the east of the initial part.
+      const testView = appPO.view({viewId: 'view.101'});
+      await testView.tab.dragTo({partId: initialPartId, region: 'east'});
+      const testViewInfo = await testView.getInfo();
 
-      // Expect view 2 to be moved to a new part in the east of the initial part.
+      // Expect view to be moved to a new part in the east of the initial part.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
@@ -458,53 +460,55 @@ test.describe('View Drag', () => {
               direction: 'row',
               ratio: .5,
               child1: new MPart({
-                id: await layoutPage.view.part.getPartId(),
+                id: initialPartId,
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
               child2: new MPart({
-                id: await view2.part.getPartId(),
-                views: [{id: 'view.2'}],
-                activeViewId: 'view.2',
+                id: testViewInfo.partId,
+                views: [{id: 'view.101'}],
+                activeViewId: 'view.101',
               }),
             }),
             child2: new MPart({
-              id: await view3.part.getPartId(),
-              views: [{id: 'view.3'}],
-              activeViewId: 'view.3',
+              id: 'right',
+              views: [{id: 'view.102'}],
+              activeViewId: 'view.102',
             }),
           }),
-          activePartId: await view2.part.getPartId(),
+          activePartId: testViewInfo.partId,
         },
       });
     });
 
     /**
-     * +----------+------------------+    +----------+----------+
-     * |          |                  |    |  NORTH   |          |
-     * |  INITIAL |       XYZ        |    | [view.2] |   XYZ    |
-     * | [view.1] | [view.2, view.3] | => +----------+ [view.3] |
-     * |          |                  |    |  INITIAL |          |
-     * |          |                  |    | [view.1] |          |
-     * +----------+------------------+    +----------+----------+
+     * +----------+----------------------+    +------------+------------+
+     * |          |                      |    |  NORTH     |            |
+     * | INITIAL  |       RIGHT          |    | [view.101] |   RIGHT    |
+     * | [view.1] | [view.101, view.102] | => +------------+ [view.102] |
+     * |          |                      |    | INITIAL    |            |
+     * |          |                      |    | [view.1]   |            |
+     * +----------+----------------------+    +------------+------------+
      */
     test('should allow dragging a view to the north of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view in the initial part.
-      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2 = appPO.view({viewId: 'view.2'});
-      const view3 = appPO.view({viewId: 'view.3'});
+      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const initialPartId = await initialPartView.view.part.getPartId();
 
       // Open two views in another part.
-      await layoutPage.addPart('xyz', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
-      await layoutPage.addView('view.2', {partId: 'xyz', activateView: true});
-      await layoutPage.addView('view.3', {partId: 'xyz'});
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'right', activateView: true})
+        .addView('view.102', {partId: 'right'}),
+      );
 
-      // Move view 2 to a new part in the north of the initial part.
-      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'north'});
+      // Move view to a new part in the north of the initial part.
+      const testView = appPO.view({viewId: 'view.101'});
+      await testView.tab.dragTo({partId: initialPartId, region: 'north'});
+      const testViewInfo = await testView.getInfo();
 
-      // Expect view 2 to be moved to a new part in the north of the initial part.
+      // Expect view to be moved to a new part in the north of the initial part.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
@@ -514,53 +518,55 @@ test.describe('View Drag', () => {
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: await view2.part.getPartId(),
-                views: [{id: 'view.2'}],
-                activeViewId: 'view.2',
+                id: testViewInfo.partId,
+                views: [{id: 'view.101'}],
+                activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: await layoutPage.view.part.getPartId(),
+                id: initialPartId,
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
             }),
             child2: new MPart({
-              id: await view3.part.getPartId(),
-              views: [{id: 'view.3'}],
-              activeViewId: 'view.3',
+              id: 'right',
+              views: [{id: 'view.102'}],
+              activeViewId: 'view.102',
             }),
           }),
-          activePartId: await view2.part.getPartId(),
+          activePartId: testViewInfo.partId,
         },
       });
     });
 
     /**
-     * +----------+------------------+    +----------+----------+
-     * |          |                  |    |  INITIAL |          |
-     * |  INITIAL |       XYZ        |    | [view.1] |   XYZ    |
-     * | [view.1] | [view.2, view.3] | => +----------+ [view.3] |
-     * |          |                  |    |  SOUTH   |          |
-     * |          |                  |    | [view.2] |          |
-     * +----------+------------------+    +----------+----------+
+     * +----------+----------------------+    +------------+------------+
+     * |          |                      |    |  INITIAL   |            |
+     * | INITIAL  |       RIGHT          |    | [view.1]   |   RIGHT    |
+     * | [view.1] | [view.101, view.102] | => +------------+ [view.102] |
+     * |          |                      |    |  SOUTH     |            |
+     * |          |                      |    | [view.101] |            |
+     * +----------+----------------------+    +------------+------------+
      */
     test('should allow dragging a view to the south of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Open view in the initial part.
-      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const view2 = appPO.view({viewId: 'view.2'});
-      const view3 = appPO.view({viewId: 'view.3'});
+      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
+      const initialPartId = await initialPartView.view.part.getPartId();
 
       // Open two views in another part.
-      await layoutPage.addPart('another', {relativeTo: await layoutPage.view.part.getPartId(), align: 'right', ratio: .5});
-      await layoutPage.addView('view.2', {partId: 'another', activateView: true});
-      await layoutPage.addView('view.3', {partId: 'another'});
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'right', activateView: true})
+        .addView('view.102', {partId: 'right'}),
+      );
 
-      // Move view 2 to a new part in the south of the initial part.
-      await view2.tab.dragTo({partId: await layoutPage.view.part.getPartId(), region: 'south'});
+      // Move view to a new part in the south of the initial part.
+      const testView = appPO.view({viewId: 'view.101'});
+      await testView.tab.dragTo({partId: initialPartId, region: 'south'});
+      const testViewInfo = await testView.getInfo();
 
-      // Expect view 2 to be moved to a new part in the south of the initial part.
+      // Expect view to be moved to a new part in the south of the initial part.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
@@ -570,23 +576,23 @@ test.describe('View Drag', () => {
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: await layoutPage.view.part.getPartId(),
+                id: initialPartId,
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
               child2: new MPart({
-                id: await view2.part.getPartId(),
-                views: [{id: 'view.2'}],
-                activeViewId: 'view.2',
+                id: testViewInfo.partId,
+                views: [{id: 'view.101'}],
+                activeViewId: 'view.101',
               }),
             }),
             child2: new MPart({
-              id: await view3.part.getPartId(),
-              views: [{id: 'view.3'}],
-              activeViewId: 'view.3',
+              id: 'right',
+              views: [{id: 'view.102'}],
+              activeViewId: 'view.102',
             }),
           }),
-          activePartId: await view2.part.getPartId(),
+          activePartId: testViewInfo.partId,
         },
       });
     });
@@ -597,26 +603,12 @@ test.describe('View Drag', () => {
     test('should drop view on start page of the main area (grid root is MPart)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Create perspective with a left and right part.
-      const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
-      await perspectivePage.registerPerspective({
-        id: 'perspective',
-        parts: [
-          {id: MAIN_AREA},
-          {id: 'left', align: 'left'},
-        ],
-      });
-      await perspectivePage.view.tab.close();
-      await appPO.switchPerspective('perspective');
-
-      // TODO [WB-LAYOUT] Open test view via perspective definition.
-      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-view');
-      await routerPage.enterCssClass('testee');
-      await routerPage.enterTarget('blank');
-      await routerPage.enterBlankPartId('left');
-      await routerPage.clickNavigate();
-      await routerPage.view.tab.close();
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('left', {align: 'left'})
+        .addView('testee', {partId: 'left', cssClass: 'testee'})
+        .navigateView('testee', ['test-view']),
+      );
 
       // Drop view on the start page of the main area.
       const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
@@ -630,33 +622,18 @@ test.describe('View Drag', () => {
     test('should drop view on start page of the main area (grid root is MTreeNode)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
-      // Create perspective with a part left to the main area.
-      const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
-      await perspectivePage.registerPerspective({
-        id: 'perspective',
-        parts: [
-          {id: MAIN_AREA},
-          {id: 'left', align: 'left'},
-        ],
-      });
-      await perspectivePage.view.tab.close();
-      await appPO.switchPerspective('perspective');
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('left', {align: 'left'})
+        .addView('testee', {partId: 'left', cssClass: 'testee'})
+        .navigateView('testee', ['test-view']),
+      );
 
       // Change the grid root of the main area to a `MTreeNode`.
-      const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-      const mainAreaActivePartId = await layoutPage.view.part.getPartId();
-      await layoutPage.addPart('main-left', {relativeTo: mainAreaActivePartId, align: 'left'});
-      await layoutPage.addPart('main-right', {relativeTo: mainAreaActivePartId, align: 'right'});
-      await layoutPage.view.tab.close();
-
-      // TODO [WB-LAYOUT] Open test view via perspective definition.
-      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-      await routerPage.enterPath('test-view');
-      await routerPage.enterCssClass('testee');
-      await routerPage.enterTarget('blank');
-      await routerPage.enterBlankPartId('left');
-      await routerPage.clickNavigate();
-      await routerPage.view.tab.close();
+      await workbenchNavigator.modifyLayout((layout, activePartId) => layout
+        .addPart('main-left', {relativeTo: activePartId, align: 'left'})
+        .addPart('main-right', {relativeTo: activePartId, align: 'right'}),
+      );
 
       // Drop view on the start page of the main area.
       const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});

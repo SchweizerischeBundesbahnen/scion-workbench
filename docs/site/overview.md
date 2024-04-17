@@ -11,19 +11,21 @@ The workbench layout is a grid of parts. Parts are aligned relative to each othe
 
 The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views. The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable area for user interaction.
 
-Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time. Perspectives share the same main area, if any.
+Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time. Perspectives share the same main area, if any.
 
  [<img src="/docs/site/images/workbench-layout.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-parts.svg)
 
 #### Developer Experience
-The SCION Workbench integrates seamlessly with Angular, leveraging familiar Angular APIs and concepts. It is designed to have minimal impact on development. Developing with the SCION Workbench is as straightforward as developing a regular Angular application. Workbench views are registered as primary routes that can be navigated using the router. Data is passed to views through navigation, either as path or matrix parameters. A view can read passed data from `ActivatedRoute`.
+The SCION Workbench is built on top of Angular and is designed to have minimal impact on application development. The Workbench API is based on familiar Angular concepts, making development straightforward.
 
-Because the workbench navigation is fully based on the Angular Router, the application can continue to leverage the rich and powerful features of the Angular Router, such as lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more. Dependency on SCION is minimal.
+Any component can be opened as a view. A view is a regular Angular component associated with a route. Views are navigated using the Workbench Router. Like the Angular Router, it has a `navigate` method to open views or change the workbench layout. Data is passed to views through navigation. A view can read data from its `ActivatedRoute`.
+
+Because SCION Workbench uses Angular's routing mechanism to navigate and lay out views, the application can harness Angular's extensive routing capabilities, such as lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more.
 
 #### Integration into Angular
 SCION Workbench integrates with the Angular Router to perform layout changes and populate views, enabling persistent and backward/forward navigation.
 
-A view is a named router outlet that is filled based on the current Angular router state. For all top-level primary routes, SCION Workbench registers view-specific secondary routes, allowing routing on a per-view basis.
+A view is a named router outlet that is filled based on the current Angular router state. The SCION Workbench registers view-specific auxiliary routes for all routes, enabling routing on a per-view basis.
 
 The browser URL contains the path and arrangement of views in the main area. The arrangement of views outside the main area is passed as state to the navigation and stored in local storage.
 The figure below shows the browser URL when there are 3 views opened in the main area. For each view, Angular adds an auxiliary route to the URL. An auxiliary route consists of the view identifier and the path. Multiple views are separated by two slashes.

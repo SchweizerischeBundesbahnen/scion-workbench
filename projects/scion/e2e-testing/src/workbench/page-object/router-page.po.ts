@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
+import {coerceArray, commandsToPath, rejectWhenAttached, waitForCondition, waitUntilStable} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
@@ -16,7 +16,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {Params} from '@angular/router';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {ViewState} from '@scion/workbench';
+import {Commands, ViewId, ViewState} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RouterPageComponent}.
@@ -26,19 +26,20 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.view.locator.locator('app-router-page');
   }
 
+  /**
+   * @deprecated use {@link enterCommands} instead.
+   */
   public async enterPath(path: string): Promise<void> {
-    await this.locator.locator('input.e2e-path').fill(path);
+    await this.locator.locator('input.e2e-commands').fill(path);
   }
 
-  public async enterMatrixParams(params: Params): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-matrix-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params);
+  public async enterCommands(commands: Commands): Promise<void> {
+    await this.locator.locator('input.e2e-commands').fill(commandsToPath(commands));
   }
 
   public async enterQueryParams(params: Params): Promise<void> {
@@ -65,6 +66,10 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-target').fill(target ?? '');
   }
 
+  public async enterHint(hint?: string): Promise<void> {
+    await this.locator.locator('input.e2e-hint').fill(hint ?? '');
+  }
+
   public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
     await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
   }
@@ -74,7 +79,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-css-class').fill(coerceArray(cssClass).join(' '));
+    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 
   public async checkViewContext(check: boolean): Promise<void> {
@@ -85,11 +90,12 @@ export class RouterPagePO implements WorkbenchViewPagePO {
    * Clicks on a button to navigate via {@link WorkbenchRouter}.
    */
   public async clickNavigate(): Promise<void> {
+    const navigationId = await this._appPO.getCurrentNavigationId();
     await this.locator.locator('button.e2e-router-navigate').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
+      waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }

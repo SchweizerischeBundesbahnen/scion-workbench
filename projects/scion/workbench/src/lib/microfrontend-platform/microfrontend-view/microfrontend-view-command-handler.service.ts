@@ -11,7 +11,7 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
 import {Logger} from '../../logging';
-import {WorkbenchView} from '../../view/workbench-view.model';
+import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {map, switchMap} from 'rxjs/operators';
 import {ɵWorkbenchCommands} from '@scion/workbench-client';
@@ -61,7 +61,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewTitleCommandHandler(): Subscription {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
-      const viewId = message.params!.get('viewId')!;
+      const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
         view.title = message.body;
       });
@@ -73,7 +73,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewHeadingCommandHandler(): Subscription {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
-      const viewId = message.params!.get('viewId')!;
+      const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
         view.heading = message.body;
       });
@@ -85,7 +85,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewDirtyCommandHandler(): Subscription {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
-      const viewId = message.params!.get('viewId')!;
+      const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
         view.dirty = message.body;
       });
@@ -97,7 +97,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewClosableCommandHandler(): Subscription {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
-      const viewId = message.params!.get('viewId')!;
+      const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
         view.closable = message.body;
       });
@@ -109,7 +109,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private installViewCloseCommandHandler(): Subscription {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
-      const viewId = message.params!.get('viewId')!;
+      const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
         view.close().then();
       });
@@ -120,7 +120,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Runs the given runnable only if the microfrontend displayed in the view is actually provided by the sender,
    * thus preventing other apps from updating other apps' views.
    */
-  private runIfPrivileged(viewId: string, message: Message, runnable: (view: WorkbenchView) => void): void {
+  private runIfPrivileged(viewId: ViewId, message: Message, runnable: (view: WorkbenchView) => void): void {
     const view = this._viewRegistry.get(viewId);
     const sender = message.headers.get(MessageHeaders.AppSymbolicName);
     if (view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.appSymbolicName === sender) {

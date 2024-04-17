@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, Input, OnDestroy, OnInit, StaticProvider} from '@angular/core';
+import {Component, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {RouterUtils} from '../../routing/router.util';
 import {Commands} from '../../routing/routing.model';
@@ -72,7 +72,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
-    const outletCommands: Commands | null = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
+    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
     return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'});
   }

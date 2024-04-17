@@ -16,6 +16,7 @@ import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ViewId} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 
 /**
@@ -129,8 +130,8 @@ export class ViewDragService implements OnDestroy {
    *
    * @param target - Specifies the element on which to subscribe for drag events.
    * @param options - Controls how to subscribe for drag events.
-   *        @property eventType - Filters for specified drag events; defaults to any event.
-   *        @property capture - Controls whether to subscribe for drag events in the capturing phase; defaults to `false`, i.e., `bubbling` phase.
+   * @param options.eventType - Filters for specified drag events; defaults to any event.
+   * @param options.capture - Controls whether to subscribe for drag events in the capturing phase; defaults to `false`, i.e., `bubbling` phase.
    */
   public viewDrag$(target: Element | Window, options?: ViewDragEventListenerOptions): Observable<DragEvent> {
     const filteredEventTypes = new Set<string>(Arrays.coerce(options?.eventType));
@@ -264,9 +265,11 @@ export interface ViewDragData {
    * Y-coordinate of the mouse pointer, relative to the view tab drag image.
    */
   viewTabPointerOffsetY: number;
-  viewId: string;
+  viewId: ViewId;
+  alternativeViewId?: string;
   viewTitle: string;
   viewUrlSegments: UrlSegment[];
+  navigationHint?: string;
   viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
@@ -289,8 +292,10 @@ export interface ViewMoveEvent {
  * Describes a view to be moved to another location.
  */
 export interface ViewMoveEventSource {
-  viewId: string;
+  viewId: ViewId;
   partId: string;
+  navigationHint?: string;
+  alternativeViewId?: string;
   viewUrlSegments: UrlSegment[];
   workbenchId: string;
   classList?: ClassListMap;

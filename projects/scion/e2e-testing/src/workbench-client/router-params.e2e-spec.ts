@@ -580,9 +580,10 @@ test.describe('Workbench Router', () => {
       await routerPage.enterQualifier({component: 'view', app: 'app1'});
       await routerPage.enterParams({initialTitle: 'TITLE', transientParam: 'TRANSIENT PARAM'});
       await routerPage.enterTarget('blank');
+      await routerPage.enterCssClass('testee');
       await routerPage.clickNavigate();
 
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'e2e-test-view'});
+      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({

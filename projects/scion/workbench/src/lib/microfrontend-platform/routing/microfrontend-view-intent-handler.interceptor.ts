@@ -18,6 +18,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Handles microfrontend view intents, instructing the workbench to navigate to the microfrontend of the resolved capability.
@@ -56,20 +57,20 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const intent = message.intent;
     const extras: WorkbenchNavigationExtras = message.body ?? {};
 
-    const intentParams = Dictionaries.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
+    const intentParams = Objects.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
     const targets = this.resolveTargets(message, extras);
-    const routerNavigateCommand = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
+    const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
 
-    this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, routerNavigateCommand, viewCapability, transientParams);
+    this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, viewCapability, transientParams);
     const navigations = await Promise.all(Arrays.coerce(targets).map(target => {
-      return this._workbenchRouter.navigate(routerNavigateCommand, {
+      return this._workbenchRouter.navigate(commands, {
         target,
         activate: extras.activate,
         close: extras.close,
         blankInsertionIndex: extras.blankInsertionIndex,
         cssClass: extras.cssClass,
-        state: Dictionaries.withoutUndefinedEntries({
+        state: Objects.withoutUndefinedEntries({
           [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
         }),
       });
@@ -83,7 +84,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
   private resolveTargets(intentMessage: IntentMessage, extras: WorkbenchNavigationExtras): string | string[] {
     // Closing a microfrontend view by viewId is not allowed, as this would violate the concept of intent-based view navigation.
     if (extras.close && extras.target) {
-      throw Error(`[WorkbenchRouterError][IllegalArgumentError] The target must be empty if closing a view [target=${(extras.target)}]`);
+      throw Error(`[NavigateError] The target must be empty if closing a view [target=${(extras.target)}]`);
     }
     if (extras.close) {
       return this.resolvePresentViewIds(intentMessage, {matchWildcardParams: true}) ?? [];

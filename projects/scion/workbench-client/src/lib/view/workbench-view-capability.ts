@@ -14,35 +14,48 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 /**
  * Represents a microfrontend for display in a workbench view.
  *
- * A view is a visual workbench component for displaying content stacked or side-by-side.
+ * A view is a visual workbench element for displaying content stacked or side-by-side.
+ *
+ * The microfrontend can inject the {@link WorkbenchView} handle to interact with the view, such as setting the title, reading
+ * parameters, or closing it.
  *
  * @category View
+ * @see WorkbenchView
+ * @see WorkbenchRouter
  */
 export interface WorkbenchViewCapability extends Capability {
-
+  /**
+   * @inheritDoc
+   */
   type: WorkbenchCapabilities.View;
-
   /**
    * Qualifies this view. The qualifier is required for views.
+   *
+   * @inheritDoc
    */
   qualifier: Qualifier;
-
+  /**
+   * Specifies parameters required by the view.
+   *
+   * Parameters are available in the path and title for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchView} handle.
+   *
+   * @inheritDoc
+   */
   params?: ViewParamDefinition[];
-
+  /**
+   * @inheritDoc
+   */
   properties: {
     /**
-     * Specifies the path of the microfrontend to be opened when navigating to this view capability.
+     * Specifies the path to the microfrontend.
      *
-     * The path is relative to the base URL, as specified in the application manifest. If the
+     * The path is relative to the base URL specified in the application manifest. If the
      * application does not declare a base URL, it is relative to the origin of the manifest file.
      *
-     * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
-     * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key, and are allowed in path segments,
-     * query parameters, matrix parameters and the fragment part. Empty query and matrix params are removed, but not empty path params.
+     * The path supports placeholders that will be replaced with parameter values. A placeholder
+     * starts with a colon (`:`) followed by the parameter name.
      *
-     * In addition to using qualifier and parameter values as named parameters in the URL, params are available in the microfrontend via {@link WorkbenchView.params$} Observable.
-     *
-     * #### Usage of named parameters in the path:
+     * Usage:
      * ```json
      * {
      *   "type": "view",
@@ -56,33 +69,24 @@ export interface WorkbenchViewCapability extends Capability {
      *   }
      * }
      * ```
-     *
-     * #### Path parameter example:
-     * segment/:param1/segment/:param2
-     *
-     * #### Matrix parameter example:
-     * segment/segment;matrixParam1=:param1;matrixParam2=:param2
-     *
-     * #### Query parameter example:
-     * segment/segment?queryParam1=:param1&queryParam2=:param2
      */
     path: string;
     /**
-     * Specifies the title to be displayed in the view tab.
+     * Specifies the title of this view.
      *
-     * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
-     * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key.
+     * The title supports placeholders that will be replaced with parameter values. A placeholder starts with a colon (`:`) followed by the parameter name.
+     * The title can also be set in the microfrontend via {@link WorkbenchView} handle.
      */
     title?: string;
     /**
-     * Specifies the subtitle to be displayed in the view tab.
+     * Specifies the subtitle of this view.
      *
-     * You can refer to qualifiers or parameters in the form of named parameters to be replaced during navigation.
-     * Named parameters begin with a colon (`:`) followed by the parameter name or qualifier key.
+     * The heading supports placeholders that will be replaced with parameter values. A placeholder starts with a colon (`:`) followed by the parameter name.
+     * The heading can also be set in the microfrontend via {@link WorkbenchView} handle.
      */
     heading?: string;
     /**
-     * Specifies if a close button should be displayed in the view tab.
+     * Specifies if to display a close button in the view tab. Default is `true`.
      */
     closable?: boolean;
     /**
@@ -94,7 +98,7 @@ export interface WorkbenchViewCapability extends Capability {
      */
     showSplash?: boolean;
     /**
-     * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
+     * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
      */
     cssClass?: string | string[];
   };
@@ -102,18 +106,23 @@ export interface WorkbenchViewCapability extends Capability {
 
 /**
  * Describes a parameter to be passed along with a view intent.
+ *
+ * @category View
+ * @inheritDoc
  */
 export interface ViewParamDefinition extends ParamDefinition {
   /**
-   * Controls how the workbench router should pass the parameter to the workbench view that embeds the microfrontend.
+   * Controls how the workbench router should pass this parameter to the workbench view.
    *
-   * By default, the workbench router passes the parameter via the workbench URL as matrix parameter to the workbench view
-   * that embeds the microfrontend. By marking the parameter as "transient", you can instruct the workbench router to pass it
-   * via navigational state instead of the workbench URL, for example to pass large objects. Since a transient parameter is not
-   * included in the workbench URL, it does not survive a page reload, i.e., is only available during the initial navigation of
-   * the microfrontend. Consequently, the microfrontend must be able to restore its state without this parameter present.
+   * By default, parameters are passed via the workbench URL as matrix parameters.
+   * Marking a parameter as "transient" instructs the router to pass it via navigational state, useful for large objects.
+   *
+   * Transient parameters are stored in the browser's session history, supporting back/forward navigation, but are lost on page reload.
+   * Therefore, microfrontends must be able to restore their state without relying on transient parameters.
    */
   transient?: boolean;
-
+  /**
+   * @inheritDoc
+   */
   [property: string]: any;
 }

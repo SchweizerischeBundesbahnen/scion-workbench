@@ -16,7 +16,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
-import {ViewClosingEvent, ViewClosingListener, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {ViewClosingEvent, ViewClosingListener, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
@@ -43,7 +43,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     params: new Map<string, any>(),
   };
 
-  constructor(public id: string) {
+  constructor(public id: ViewId) {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.id))
       .pipe(map(() => undefined));
 

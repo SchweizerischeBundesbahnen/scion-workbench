@@ -25,6 +25,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-view-page',
@@ -47,14 +48,18 @@ import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
     NullIfEmptyPipe,
     JoinPipe,
     AppendParamDataTypePipe,
+    CssClassComponent,
   ],
 })
 export default class ViewPageComponent {
 
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
-  public partActionsFormControl = this._formBuilder.control('');
-  public cssClassFormControl = this._formBuilder.control('');
+
+  public formControls = {
+    partActions: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control(''),
+  };
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
@@ -66,7 +71,7 @@ export default class ViewPageComponent {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
-    this.partActions$ = this.partActionsFormControl.valueChanges
+    this.partActions$ = this.formControls.partActions.valueChanges
       .pipe(
         map(() => this.parsePartActions()),
         startWith(this.parsePartActions()),
@@ -77,12 +82,12 @@ export default class ViewPageComponent {
   }
 
   private parsePartActions(): WorkbenchPartActionDescriptor[] {
-    if (!this.partActionsFormControl.value) {
+    if (!this.formControls.partActions.value) {
       return [];
     }
 
     try {
-      return Arrays.coerce(JSON.parse(this.partActionsFormControl.value));
+      return Arrays.coerce(JSON.parse(this.formControls.partActions.value));
     }
     catch {
       return [];
@@ -103,10 +108,10 @@ export default class ViewPageComponent {
   }
 
   private installCssClassUpdater(): void {
-    this.cssClassFormControl.valueChanges
+    this.formControls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(cssClasses => {
-        this.view.cssClass = cssClasses.split(/\s+/).filter(Boolean);
+        this.view.cssClass = cssClasses;
       });
   }
 }

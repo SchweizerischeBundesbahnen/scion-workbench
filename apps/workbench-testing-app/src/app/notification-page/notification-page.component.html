@@ -30,6 +30,6 @@
   </sci-form-field>
 
   <sci-form-field label="CSS Class(es)" direction="column">
-    <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+    <app-css-class [formControl]="form.controls.cssClass"/>
   </sci-form-field>
 </ng-container>

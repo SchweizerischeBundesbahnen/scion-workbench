@@ -12,13 +12,14 @@ import {AppPO} from '../../../app.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../../view.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
+import {ViewId} from '@scion/workbench';
 
 export class StandaloneViewTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-standalone-view-test-page');
   }

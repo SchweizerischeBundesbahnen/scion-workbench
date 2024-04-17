@@ -84,7 +84,7 @@ export interface WorkbenchPopupCapability extends Capability {
      */
     showSplash?: boolean;
     /**
-     * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
+     * Specifies CSS class(es) to add to the popup, e.g., to locate the popup in tests.
      */
     cssClass?: string | string[];
   };

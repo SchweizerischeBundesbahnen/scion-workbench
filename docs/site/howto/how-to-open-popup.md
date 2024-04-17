@@ -12,6 +12,9 @@ which can be either a coordinate or an HTML element. The popup moves when the an
 To open a popup, inject `PopupService` and invoke the `open` method, passing a `PopupConfig` options object to control the appearance of the popup.
 
 ```ts
+import {inject} from '@angular/core';
+import {PopupService} from '@scion/workbench';
+
 const popupService = inject(PopupService);
 
 const result = await popupService.open({
@@ -25,6 +28,9 @@ To interact with the popup in the popup component, inject the popup handle `Popu
 
 
 ```typescript
+import {inject} from '@angular/core';
+import {Popup} from '@scion/workbench';
+
 inject(Popup).close();
 ```
 

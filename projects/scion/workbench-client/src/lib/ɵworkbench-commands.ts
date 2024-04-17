@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {ViewId} from './view/workbench-view';
+
 /**
  * Defines command endpoints for the communication between SCION Workbench and SCION Workbench Client.
  *
@@ -18,34 +20,34 @@ export const ɵWorkbenchCommands = {
   /**
    * Computes the topic via which the title of a workbench view tab can be set.
    */
-  viewTitleTopic: (viewId: string) => `ɵworkbench/views/${viewId}/title`,
+  viewTitleTopic: (viewId: ViewId | ':viewId') => `ɵworkbench/views/${viewId}/title`,
 
   /**
    * Computes the topic via which the heading of a workbench view tab can be set.
    */
-  viewHeadingTopic: (viewId: string) => `ɵworkbench/views/${viewId}/heading`,
+  viewHeadingTopic: (viewId: ViewId | ':viewId') => `ɵworkbench/views/${viewId}/heading`,
 
   /**
    * Computes the topic via which a view tab can be marked dirty or pristine.
    */
-  viewDirtyTopic: (viewId: string) => `ɵworkbench/views/${viewId}/dirty`,
+  viewDirtyTopic: (viewId: ViewId | ':viewId') => `ɵworkbench/views/${viewId}/dirty`,
 
   /**
    * Computes the topic via which a view tab can be made closable.
    */
-  viewClosableTopic: (viewId: string) => `ɵworkbench/views/${viewId}/closable`,
+  viewClosableTopic: (viewId: ViewId | ':viewId') => `ɵworkbench/views/${viewId}/closable`,
 
   /**
    * Computes the topic via which a view can be closed.
    */
-  viewCloseTopic: (viewId: string) => `ɵworkbench/views/${viewId}/close`,
+  viewCloseTopic: (viewId: ViewId | ':viewId') => `ɵworkbench/views/${viewId}/close`,
 
   /**
    * Computes the topic for notifying about view active state changes.
    *
    * The active state is published as a retained message.
    */
-  viewActiveTopic: (viewId: string) => `ɵworkbench/views/${viewId}/active`,
+  viewActiveTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/active`,
 
   /**
    * Computes the topic for signaling that a view is about to be closed.
@@ -54,17 +56,17 @@ export const ɵWorkbenchCommands = {
    * a closing confirmation via this topic. By sending a `true` reply, the workbench continues with closing the view,
    * by sending a `false` reply, closing is prevented.
    */
-  viewClosingTopic: (viewId: string) => `ɵworkbench/views/${viewId}/closing`,
+  viewClosingTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/closing`,
 
   /**
    * Computes the topic for signaling that a microfrontend is about to be replaced by a microfrontend of another app.
    */
-  viewUnloadingTopic: (viewId: string) => `ɵworkbench/views/${viewId}/unloading`,
+  viewUnloadingTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/unloading`,
 
   /**
    * Computes the topic for updating params of a microfrontend view.
    */
-  viewParamsUpdateTopic: (viewId: string, viewCapabilityId: string) => `ɵworkbench/views/${viewId}/capabilities/${viewCapabilityId}/params/update`,
+  viewParamsUpdateTopic: (viewId: ViewId, viewCapabilityId: string) => `ɵworkbench/views/${viewId}/capabilities/${viewCapabilityId}/params/update`,
 
   /**
    * Computes the topic for providing params to a view microfrontend.
@@ -74,7 +76,7 @@ export const ɵWorkbenchCommands = {
    *
    * Params are published as a retained message.
    */
-  viewParamsTopic: (viewId: string) => `ɵworkbench/views/${viewId}/params`,
+  viewParamsTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/params`,
 
   /**
    * Computes the topic for observing the popup origin.

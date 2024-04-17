@@ -852,7 +852,6 @@ test.describe('Workbench Router', () => {
       properties: {
         path: 'test-view',
         title: 'testee',
-        cssClass: 'testee',
       },
     });
 
@@ -860,6 +859,7 @@ test.describe('Workbench Router', () => {
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.enterQualifier({component: 'testee'});
     await routerPage.enterTarget('blank');
+    await routerPage.enterCssClass('testee');
     await routerPage.clickNavigate();
 
     // expect the view to be present
@@ -1279,7 +1279,7 @@ test.describe('Workbench Router', () => {
     await routerPage.checkClose(true);
 
     // expect closing to be rejected
-    await expect(routerPage.clickNavigate()).rejects.toThrow(/\[WorkbenchRouterError]\[IllegalArgumentError]/);
+    await expect(routerPage.clickNavigate()).rejects.toThrow(/\[NavigateError]/);
     await expect(appPO.views()).toHaveCount(2);
   });
 

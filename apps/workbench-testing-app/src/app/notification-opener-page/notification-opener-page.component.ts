@@ -16,6 +16,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
 import {NotificationPageComponent} from '../notification-page/notification-page.component';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -27,6 +28,7 @@ import {NotificationPageComponent} from '../notification-page/notification-page.
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciCheckboxComponent,
+    CssClassComponent,
   ],
 })
 export default class NotificationOpenerPageComponent {
@@ -42,7 +44,7 @@ export default class NotificationOpenerPageComponent {
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | '' | number>(''),
     group: this._formBuilder.control(''),
     useGroupInputReducer: this._formBuilder.control(false),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
   constructor(private _formBuilder: NonNullableFormBuilder, private _notificationService: NotificationService) {
@@ -59,7 +61,7 @@ export default class NotificationOpenerPageComponent {
         duration: this.parseDurationFromUI(),
         group: this.form.controls.group.value || undefined,
         groupInputReduceFn: this.isUseGroupInputReducer() ? concatInput : undefined,
-        cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+        cssClass: this.form.controls.cssClass.value,
       });
     }
     catch (error) {

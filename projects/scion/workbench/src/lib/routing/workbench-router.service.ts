@@ -8,23 +8,30 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRoute, NavigationExtras, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
-import {Defined, Dictionaries} from '@scion/toolkit/util';
-import {Injectable, NgZone, OnDestroy} from '@angular/core';
+import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
+import {Defined} from '@scion/toolkit/util';
+import {Injectable, Injector, NgZone, OnDestroy, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {WorkbenchPopupDiff} from './workbench-popup-differ';
 import {SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
-import {WorkbenchNavigationalStates, WorkbenchNavigationalViewStates} from './workbench-navigational-states';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {Commands, ViewState, ViewStates} from './routing.model';
+import {RouterUtils} from './router.util';
+import {Commands, ViewOutlets, ViewState} from './routing.model';
+import {ViewId} from '../view/workbench-view.model';
+import {UrlSegmentMatcher} from './url-segment-matcher';
+import {Objects} from '../common/objects.util';
 import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 
 /**
- * Provides workbench view navigation capabilities based on Angular Router.
+ * Enables navigation of workbench views and modification of the workbench layout.
+ *
+ * A view is a visual workbench element for displaying content side-by-side or stacked. A view can be navigated to any route.
+ *
+ * A view can inject `ActivatedRoute` to obtain parameters passed to the navigation and/or read data associated with the route.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchRouter implements OnDestroy {
@@ -37,8 +44,8 @@ export class WorkbenchRouter implements OnDestroy {
   private _currentNavigationContext: WorkbenchNavigationContext | null = null;
 
   constructor(private _router: Router,
-              private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchLayoutService: WorkbenchLayoutService,
+              private _injector: Injector,
               private _zone: NgZone) {
     // Instruct the Angular router to process navigations that do not change the current URL, i.e., when only updating navigation state.
     // For example, the workbench grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
@@ -50,28 +57,24 @@ export class WorkbenchRouter implements OnDestroy {
   }
 
   /**
-   * Navigates based on the provided array of commands, and is like 'Router.navigate(...)' but with a workbench view as the router outlet target.
-   * Navigation is absolute unless providing a `relativeTo` route in navigational extras.
+   * Navigates based on the provided array of commands and extras. This method is similar to Angular's `Router.navigate(...)`, but with a view as the navigation target.
    *
-   * By passing navigation extras, you can control navigation. By default, the router opens a new view tab if no view is found that matches the
-   * specified path. Matrix parameters do not affect view resolution. If one (or more) view(s) match the specified path, they are navigated
-   * instead of opening the view in a new view tab, e.g., to update matrix parameters.
+   * A command can be a string or an object literal. A string represents a path segment, an object literal associates data with the preceding path segment.
+   * Multiple segments can be combined into a single command, separated by a forward slash.
    *
-   * The router supports for closing views matching the routing commands by setting `close` in navigational extras.
+   * By default, the router opens a new view if no view is found that matches the specified path. Matrix parameters do not affect view resolution.
+   * If one or more views match the path, they will be navigated instead of opening the view in a new view tab, e.g., to update matrix parameters.
+   * This behavior can be changed by setting an explicit navigation target in navigation extras.
    *
-   * ### Commands
-   * - Multiple static segments can be merged into one, e.g. `['/team/11/user', userName, {details: true}]`
-   * - The first segment name can be prepended with `/`, `./`, or `../`
-   * - Matrix parameters can be used to associate optional data with the URL, e.g. `['user', userName, {details: true}]`
-   *   Matrix parameters are like regular URL parameters, but do not affect route and view resolution. Unlike query parameters, matrix parameters
-   *   are not global but part of the routing path, which makes them suitable for auxiliary routes.
+   * By default, navigation is absolute. Set `relativeTo` in extras for relative navigation.
+   *
+   * The router supports for closing views matching the routing commands by setting `close` in navigation extras.
    *
    * ### Usage
-   *
    * ```
-   * router.navigate(['team', 33, 'user', 11]);
-   * router.navigate(['team/11/user', userName, {details: true}]); // multiple static segments can be merged into one
-   * router.navigate(['teams', {selection: 33'}]); // matrix parameter 'selection' with the value '33'.
+   * inject(WorkbenchRouter).navigate(['team', 33, 'user', 11]);
+   * inject(WorkbenchRouter).navigate(['team/11/user', userName, {details: true}]); // multiple static segments can be merged into one
+   * inject(WorkbenchRouter).navigate(['teams', {selection: 33'}]); // matrix parameter `selection` with the value `33`.
    * ```
    *
    * @see WorkbenchRouterLinkDirective
@@ -83,31 +86,36 @@ export class WorkbenchRouter implements OnDestroy {
     }
 
     if (extras.close) {
-      return this.ɵnavigate((layout: ɵWorkbenchLayout): WorkbenchNavigation | ɵWorkbenchLayout | null => {
+      return this.ɵnavigate((layout: ɵWorkbenchLayout): ɵWorkbenchLayout | null => {
         if (extras.target) {
-          const viewId = extras.target;
-          if (commands.length) {
-            throw Error(`[WorkbenchRouterError][IllegalArgumentError] The commands must be empty if closing a view by viewId [commands=${commands}]`);
+          if (commands.length || extras.hint || extras.relativeTo) {
+            throw Error('[NavigateError] Commands, hint, or relativeTo must not be set when closing a view by id.');
           }
-          if (!layout.views().some(view => view.id === viewId)) {
-            return null;
-          }
-          return removeView(viewId, layout);
+          return layout.removeView(extras.target);
         }
-        const viewIds = this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo, matchWildcardSegments: true});
-        return viewIds.reduce((navigation, viewId) => removeView(viewId, navigation), {layout});
+        const urlSegments = RouterUtils.commandsToSegments(commands, {relativeTo: extras.relativeTo});
+        return layout
+          .views({
+            segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: true}),
+            navigationHint: extras.hint ?? null,
+          })
+          .reduce((layout, view) => layout.removeView(view.id), layout);
       });
     }
 
-    return this.ɵnavigate((layout: ɵWorkbenchLayout): WorkbenchNavigation | ɵWorkbenchLayout | null => {
+    return this.ɵnavigate((layout: ɵWorkbenchLayout): ɵWorkbenchLayout | null => {
       switch (extras.target ?? 'auto') {
         case 'blank': {
           return addView(layout.computeNextViewId(), layout);
         }
         case 'auto': {
-          const viewIds = this.resolvePresentViewIds(commands, {relativeTo: extras.relativeTo});
-          if (viewIds.length) {
-            return viewIds.reduce((navigation, viewId) => updateView(viewId, navigation), {layout});
+          const urlSegments = RouterUtils.commandsToSegments(commands, {relativeTo: extras.relativeTo});
+          const views = layout.views({
+            segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: false}),
+            navigationHint: extras.hint ?? null,
+          });
+          if (views.length) {
+            return views.reduce((layout, view) => updateView(view.id, layout), layout);
           }
           else {
             return addView(layout.computeNextViewId(), layout);
@@ -115,7 +123,7 @@ export class WorkbenchRouter implements OnDestroy {
         }
         default: {
           const viewId = extras.target!;
-          if (layout.views().some(view => view.id === viewId)) {
+          if (layout.hasView(viewId)) {
             return updateView(viewId, layout);
           }
           else {
@@ -128,48 +136,46 @@ export class WorkbenchRouter implements OnDestroy {
     /**
      * Creates the navigation for adding the specified view to the workbench layout.
      */
-    function addView(viewId: string, layout: ɵWorkbenchLayout): WorkbenchNavigation {
-      const partId = ((): string => {
-        if (extras.blankPartId && layout.hasPart(extras.blankPartId)) {
-          return extras.blankPartId;
-        }
-        return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
-      })();
-
-      return {
-        layout: layout.addView(viewId, {
-          partId,
+    function addView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+      return layout
+        .addView(viewId, {
+          partId: computeTargetPartId(extras, layout),
           position: extras.blankInsertionIndex ?? 'after-active-view',
           activateView: extras.activate ?? true,
-        }),
-        viewOutlets: commands.length ? {[viewId]: commands} : {},
-        viewStates: {[viewId]: Dictionaries.withoutUndefinedEntries({[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass})},
-      };
+        })
+        .navigateView(viewId, commands, {
+          relativeTo: extras.relativeTo,
+          hint: extras.hint,
+          cssClass: extras.cssClass,
+          state: extras.state,
+        });
     }
 
     /**
-     * Creates the navigation for updating the path of the specified view.
+     * Creates the navigation for updating the specified view.
      */
-    function updateView(viewId: string, layout: WorkbenchNavigation | ɵWorkbenchLayout): WorkbenchNavigation {
-      const navigation = coerceNavigation(layout)!;
-      const activateView = extras.activate ?? true;
-      return {
-        layout: activateView ? navigation.layout.activateView(viewId) : navigation.layout,
-        viewOutlets: {...navigation.viewOutlets, ...(commands.length ? {[viewId]: commands} : {})},
-        viewStates: {...navigation.viewStates, [viewId]: Dictionaries.withoutUndefinedEntries({[WorkbenchNavigationalViewStates.cssClass]: extras.cssClass})},
-      };
+    function updateView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+      if (extras.activate ?? true) {
+        layout = layout.activateView(viewId);
+      }
+
+      return layout.navigateView(viewId, commands, {
+        relativeTo: extras.relativeTo,
+        hint: extras.hint,
+        cssClass: extras.cssClass,
+        state: extras.state,
+      });
     }
 
     /**
-     * Creates the navigation for removing the specified view from the workbench layout.
+     * Computes the target part based on the provided navigation extras.
+     * Default is the active part, with the active part of the main area taking precedence.
      */
-    function removeView(viewId: string, layout: WorkbenchNavigation | ɵWorkbenchLayout): WorkbenchNavigation {
-      const navigation = coerceNavigation(layout)!;
-      return {
-        layout: navigation.layout.removeView(viewId),
-        viewOutlets: {...navigation.viewOutlets, [viewId]: null},
-        viewStates: navigation.viewStates,
-      };
+    function computeTargetPartId(extras: WorkbenchNavigationExtras, layout: ɵWorkbenchLayout): string {
+      if (extras.blankPartId && layout.hasPart(extras.blankPartId)) {
+        return extras.blankPartId;
+      }
+      return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
     }
   }
 
@@ -177,10 +183,11 @@ export class WorkbenchRouter implements OnDestroy {
    * Experimental API for modifying the workbench layout.
    *
    * @param onNavigate - Callback to modify the current layout.
-   *        The callback is passed the current layout which can be modified and returned for navigation. Returning `null` does not perform the navigation.
+   *        Receives the current layout and can return a modified layout for navigation. Returning `null` cancels navigation.
+   *        The callback can call `inject` to get any required dependencies.
    * @param extras - Controls how to perform the navigation.
    */
-  public ɵnavigate(onNavigate: (layout: ɵWorkbenchLayout) => Promise<ɵWorkbenchLayout | WorkbenchNavigation | null> | ɵWorkbenchLayout | WorkbenchNavigation | null, extras?: NavigationExtras): Promise<boolean> {
+  public ɵnavigate(onNavigate: (layout: ɵWorkbenchLayout) => Promise<ɵWorkbenchLayout | null> | ɵWorkbenchLayout | null, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean> {
     // Ensure to run in Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.ɵnavigate(onNavigate, extras));
@@ -194,35 +201,19 @@ export class WorkbenchRouter implements OnDestroy {
         await this.waitForInitialLayout();
       }
 
-      // Pass control to the navigator to compute the new workbench layout.
-      const navigation: WorkbenchNavigation | null = coerceNavigation(await onNavigate(this._workbenchLayoutService.layout!));
-      if (!navigation) {
+      // Let the navigator compute the new workbench layout.
+      const currentLayout = this._workbenchLayoutService.layout!;
+      const newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => onNavigate(currentLayout));
+      if (!newLayout) {
         return true;
       }
 
-      // Add user-defined state from navigation extras to the view state.
-      // NOTE: We must ensure that a view state object is associated for each outlet to be navigated.
-      // Otherwise, if the state object were `null` or `undefined`, {@link NavigationStateResolver} would restore the state of the previously activated route.
-      const viewStates = Object.keys(navigation.viewOutlets || {}).reduce((viewStates, viewId) => {
-        viewStates[viewId] = {...viewStates[viewId], ...extras?.state};
-        return viewStates;
-      }, navigation.viewStates || {});
+      // Create extras with workbench navigation instructions.
+      extras = createNavigationExtras(newLayout, extras);
 
-      // Instruct the router to process the navigation even if the URL does not change, e.g., when changing the workbench grid which is not contained in the URL.
-      extras = {...extras, onSameUrlNavigation: 'reload'};
-
-      // Serialize the layout.
-      const serializedLayout = navigation.layout.serialize();
-
-      // Associate workbench-specific state with the navigation.
-      WorkbenchNavigationalStates.addToNavigationExtras(extras, {
-        workbenchGrid: serializedLayout.workbenchGrid,
-        maximized: navigation.layout.maximized,
-        viewStates,
-      });
-
-      // Compute the new URL tree.
-      const urlTree = this.__createUrlTree(navigation.viewOutlets, serializedLayout.mainAreaGrid, extras);
+      // Create the new URL tree.
+      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const urlTree = this._router.createUrlTree(commands, extras);
 
       // Perform the navigation.
       if (!(await this._router.navigateByUrl(urlTree, extras))) {
@@ -239,13 +230,13 @@ export class WorkbenchRouter implements OnDestroy {
    * Experimental API to replace {@link WorkbenchRouter#navigate} for navigating views and modifying the layout.
    *
    * @param onNavigate - Computes the new workbench layout.
-   *        The callback is passed the current workbench layout which the caller can modify and return.
-   *        In the callback, it is safe to access currently activated routes or the current router url.
+   *        Receives the current layout and can return a modified layout for navigation. Returning `null` cancels navigation.
+   *        The callback can call `inject` to get any required dependencies.
    * @param extras - Options to control navigation.
    *
    * @internal
    */
-  public async createUrlTree(onNavigate: (layout: ɵWorkbenchLayout) => Promise<ɵWorkbenchLayout | WorkbenchNavigation> | ɵWorkbenchLayout | WorkbenchNavigation, extras?: NavigationExtras): Promise<UrlTree> {
+  public async createUrlTree(onNavigate: (layout: ɵWorkbenchLayout) => Promise<ɵWorkbenchLayout | null> | ɵWorkbenchLayout | null, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<UrlTree | null> {
     // Ensure to run in Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.createUrlTree(onNavigate, extras));
@@ -258,113 +249,20 @@ export class WorkbenchRouter implements OnDestroy {
         await this.waitForInitialLayout();
       }
 
-      // Pass control to the navigator to compute the new workbench layout.
-      const navigation: WorkbenchNavigation = coerceNavigation(await onNavigate(this._workbenchLayoutService.layout!))!;
+      // Let the navigator compute the new workbench layout.
+      const currentLayout = this._workbenchLayoutService.layout!;
+      const newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => onNavigate(currentLayout));
+      if (!newLayout) {
+        return null;
+      }
 
-      // create the URL tree.
-      return this.__createUrlTree(navigation.viewOutlets, navigation.layout.serialize().mainAreaGrid, extras);
+      // Create extras with workbench navigation instructions.
+      extras = createNavigationExtras(newLayout, extras);
+
+      // Create the new URL tree.
+      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      return this._router.createUrlTree(commands, extras);
     });
-  }
-
-  /**
-   * This method name begins with underscores to indicate that it must only be invoked from within {@link SingleTaskExecutor}.
-   */
-  private __createUrlTree(viewOutlets: {[outlet: string]: Commands | null} | undefined, serializedMainAreaGrid: string | null, extras?: NavigationExtras): UrlTree {
-    // Normalize commands of the outlets to their absolute form and resolve relative navigational symbols.
-    const normalizedViewOutlets = this.normalizeOutletCommands(viewOutlets, extras?.relativeTo);
-
-    // Add view outlets as 'outlets' fragment to be interpreted by Angular.
-    const commands: Commands = normalizedViewOutlets ? [{outlets: normalizedViewOutlets}] : [];
-
-    // Let Angular Router construct the URL tree.
-    return this._router.createUrlTree(commands, {
-      ...extras,
-      queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: serializedMainAreaGrid},
-      // Merge with existing query params unless specified an explicit strategy, e.g., for migrating an outdated layout URL.
-      // Note that `null` is a valid strategy for clearing existing query params, so do not use the nullish coalescing operator (??).
-      queryParamsHandling: Defined.orElse(extras?.queryParamsHandling, 'merge'),
-      relativeTo: null, // commands are normalized to their absolute form
-    });
-  }
-
-  /**
-   * @see normalizeCommands
-   */
-  private normalizeOutletCommands(outlets?: {[outlet: string]: Commands | null}, relativeTo?: ActivatedRoute | null): {[outlet: string]: Commands | null} | null {
-    if (!outlets || !Object.keys(outlets).length) {
-      return null;
-    }
-
-    return Object.entries(outlets).reduce((acc, [outletName, commands]) => {
-      return {
-        ...acc,
-        [outletName]: commands ? this.normalizeCommands(commands, relativeTo) : null, // `null` to remove an outlet
-      };
-    }, {});
-  }
-
-  /**
-   * Normalizes commands to their absolute form.
-   *
-   * ---
-   * As of Angular 6.x, commands which target a named outlet (auxiliary route) are not normalized, meaning that
-   * relative navigational symbols like `/`, `./`, or `../` are not resolved (see `create_url_tree.ts` method: `computeNavigation`).
-   *
-   * Example: router.navigate([{outlets: {[outlet]: commands}}])
-   *
-   * To bypass that restriction, we first create a URL tree without specifying the target outlet. As expected, this translates into a
-   * URL with all navigational symbols resolved. Then, we extract the URL segments of the resolved route and convert it back into commands.
-   * The resulting commands are in their absolute form and may be used for the effective navigation to target a named router outlet.
-   */
-  private normalizeCommands(commands: Commands, relativeTo?: ActivatedRoute | null): Commands {
-    if (!commands.length) {
-      return [];
-    }
-
-    // Ensure to run in Angular zone.
-    if (!NgZone.isInAngularZone()) {
-      return this._zone.run(() => this.normalizeCommands(commands, relativeTo));
-    }
-
-    const normalizeFn = (outlet: string, extras?: NavigationExtras): Commands => {
-      return this._router.createUrlTree(commands, extras)
-        .root.children[outlet].segments
-        .reduce<Commands>((acc, p) => [...acc, p.path, ...(Object.keys(p.parameters).length ? [p.parameters] : [])], []);
-    };
-
-    if (!relativeTo) {
-      return normalizeFn(PRIMARY_OUTLET);
-    }
-
-    const targetOutlet = relativeTo.pathFromRoot[1]?.outlet;
-    if (!targetOutlet) {
-      return normalizeFn(PRIMARY_OUTLET);
-    }
-
-    return normalizeFn(targetOutlet, {relativeTo});
-  }
-
-  /**
-   * Resolves present views which match the given commands.
-   *
-   * Allows matching wildcard segments by setting the option `matchWildcardSegments` to `true`.
-   *
-   * @internal
-   */
-  public resolvePresentViewIds(commandList: Commands, options?: {relativeTo?: ActivatedRoute | null; matchWildcardSegments?: boolean}): string[] {
-    const commands = this.normalizeCommands(commandList, options?.relativeTo);
-    const commandPath = this.serializeCommands(commands, {skipMatrixParams: true});
-    const matchWildcardSegments = options?.matchWildcardSegments ?? false;
-
-    return this._viewRegistry.views
-      .filter(view => {
-        const viewPath = view.urlSegments.map(segment => segment.path);
-        if (commandPath.length !== viewPath.length) {
-          return false;
-        }
-        return commandPath.every((commandSegment, index) => (matchWildcardSegments && commandSegment === '*') || commandSegment === viewPath[index]);
-      })
-      .map(view => view.id);
   }
 
   /**
@@ -374,7 +272,7 @@ export class WorkbenchRouter implements OnDestroy {
    */
   public getCurrentNavigationContext(): WorkbenchNavigationContext {
     if (!this._currentNavigationContext) {
-      throw Error('[WorkbenchRouterError] Navigation context not available as no navigation is in progress.');
+      throw Error('[NavigateError] Navigation context not available because no navigation is in progress.');
     }
     return this._currentNavigationContext;
   }
@@ -395,92 +293,70 @@ export class WorkbenchRouter implements OnDestroy {
     await firstValueFrom(this._workbenchLayoutService.layout$);
   }
 
-  /**
-   * Serializes given commands into valid URL segments.
-   */
-  private serializeCommands(commands: Commands, options?: {skipMatrixParams?: boolean}): string[] {
-    const serializedCommands: string[] = [];
-    const skipMatrixParams = options?.skipMatrixParams ?? false;
-    commands.forEach(cmd => {
-      // if matrix param, append it to the last segment
-      const isMatrixParam = typeof cmd === 'object';
-
-      if (!isMatrixParam) {
-        serializedCommands.push(encodeURIComponent(cmd));
-      }
-      else if (!skipMatrixParams) {
-        serializedCommands.push(new UrlSegment(serializedCommands.pop()!, cmd).toString());
-      }
-    });
-
-    return serializedCommands;
-  }
-
   public ngOnDestroy(): void {
     this._singleTaskExecutor.destroy();
   }
 }
 
-function coerceNavigation(navigation: ɵWorkbenchLayout | WorkbenchNavigation | null): WorkbenchNavigation | null {
-  return navigation instanceof ɵWorkbenchLayout ? ({layout: navigation}) : navigation;
-}
-
 /**
- * Represents the extra options used during navigation.
+ * Options to control the navigation.
  */
 export interface WorkbenchNavigationExtras extends NavigationExtras {
   /**
-   * Instructs the router to activate the view. Defaults to `true` if not specified.
+   * Instructs the router to activate the view. Default is `true`.
    */
   activate?: boolean;
   /**
-   * Closes the view(s) that match the specified path. Matrix parameters do not affect view resolution.
-   * The path supports the asterisk wildcard segment (`*`) to match view(s) with any value in that segment.
+   * Closes views that match the specified path. Matrix parameters do not affect view resolution.
+   * The path supports the asterisk wildcard segment (`*`) to match views with any value in a segment.
    * To close a specific view, set a view target instead of a path.
    */
   close?: boolean;
   /**
-   * Controls where to open the view.
+   * Controls where to open the view. Default is `auto`.
    *
    * One of:
-   * - 'auto':    Opens the view in a new view tab if no view is found that matches the specified path. Matrix parameters do not affect
-   *              view resolution. If one (or more) view(s) match the specified path, they are navigated instead of opening the view
-   *              in a new view tab, e.g., to update matrix parameters. This is the default behavior if not set.
-   * - 'blank':   Opens the view in a new view tab.
-   * - <view.id>: Navigates the specified view. If already opened, replaces it, or opens the view in a new view tab otherwise.
-   *              Note that the passed view identifier must start with `view.`, e.g., `view.5`.
-   *
-   * If not specified, defaults to `auto`.
+   * - 'auto':   Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
+   * - 'blank':  Navigates in a new view.
+   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
    */
-  target?: string | 'blank' | 'auto';
+  target?: ViewId | string | 'blank' | 'auto';
   /**
-   * Specifies in which part to open the view. By default, if not specified, opens the view in the active part of the main area,
-   * if the layout has one, otherwise in the active part of the layout.
+   * Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
+   *
+   * For example, views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
+   * requiring a navigation hint to differentiate between the routes. See {@link canMatchWorkbenchView} for an example.
+   *
+   * Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
+   *
+   * @see canMatchWorkbenchView
+   */
+  hint?: string;
+  /**
+   * Specifies in which part to open the view. Default is the active part, with the active part of the main area taking precedence.
    */
   blankPartId?: string;
   /**
-   * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
-   * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting
-   * the view at the beginning or at the end.
+   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
    */
-  blankInsertionIndex?: number | 'start' | 'end';
+  blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
-   * Associates state with a view navigation.
+   * Associates arbitrary state with a view navigation.
    *
-   * State is written to the browser session history, not to the URL, so will be lost on page reload.
+   * Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
+   * Therefore, a view must be able to restore its state without relying on navigational state.
    *
-   * State can be read from {@link WorkbenchView.state}, or the browser's session history via `history.state`.
+   * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
    */
   state?: ViewState;
   /**
-   * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
-   * CSS class(es) will not be added to the browser URL, consequently will not survive a page reload.
+   * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    */
   cssClass?: string | string[];
 }
 
 /**
- * Contextual data of a workbench navigation available on the router during navigation.
+ * Contextual data of a workbench navigation available in the router during navigation.
  *
  * @internal
  * @see WorkbenchUrlObserver
@@ -505,21 +381,56 @@ export interface WorkbenchNavigationContext {
 }
 
 /**
- * Information about a workbench navigation operation.
+ * Creates navigation extras with workbench navigation instructions.
  */
-export interface WorkbenchNavigation {
-  /**
-   * The target layout to apply.
-   */
-  layout: ɵWorkbenchLayout;
-  /**
-   * View outlet delta to apply to the current URL. For each outlet to add, remove, or change,
-   * add a property to this dictionary and set the commands to construct the outlet URL.
-   * To remove an outlet from the URL, set its commands to `null`.
-   */
-  viewOutlets?: {[outlet: string]: Commands | null};
-  /**
-   * View states to be associated with the navigation.
-   */
-  viewStates?: ViewStates;
+function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
+  const {workbenchGrid, mainAreaGrid} = layout.serialize();
+
+  return {
+    ...extras,
+    // Instruct the Angular router to process the navigation even if the URL does not change, e.g., when changing the workbench grid which is not contained in the URL.
+    onSameUrlNavigation: 'reload',
+    // Unset `relativeTo` because commands are already normalized to their absolute form.
+    relativeTo: null,
+    // Associate workbench-specific state with the navigation.
+    state: WorkbenchNavigationalStates.create({
+      workbenchGrid: workbenchGrid,
+      maximized: layout.maximized,
+      viewStates: layout.viewStates(),
+    }),
+    // Add the main area as query parameter.
+    queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},
+    // Merge with existing query params unless specified an explicit strategy, e.g., for migrating an outdated layout URL.
+    // Note that `null` is a valid strategy for clearing existing query params, so do not use the nullish coalescing operator (??).
+    queryParamsHandling: Defined.orElse(extras?.queryParamsHandling, 'merge'),
+  };
+}
+
+/**
+ * Creates commands to be passed to the Angular router to navigate view outlets of the new layout and to remove view outlets of removed views.
+ */
+function computeNavigationCommands(previousViewOutlets: ViewOutlets, nextViewOutlets: ViewOutlets): [{outlets: {[outlet: ViewId]: Commands | null}}] | [] {
+  const previousViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(previousViewOutlets));
+  const nextViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(nextViewOutlets));
+
+  const commands = new Map<ViewId, Commands | null>();
+  const viewIds = new Set<ViewId>([...previousViewOutletMap.keys(), ...nextViewOutletMap.keys()]);
+
+  viewIds.forEach(viewId => {
+    // Test if the view was added to the layout.
+    if (!previousViewOutletMap.has(viewId)) {
+      commands.set(viewId, RouterUtils.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+    }
+    // Test if the view was removed from the layout.
+    else if (!nextViewOutletMap.has(viewId)) {
+      commands.set(viewId, null);
+    }
+    // Test if the view was updated.
+    else if (!new UrlSegmentMatcher(previousViewOutletMap.get(viewId)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(nextViewOutletMap.get(viewId)!)) {
+      commands.set(viewId, RouterUtils.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+    }
+  });
+
+  // Add view commands to the 'outlets' property to be interpreted by the Angular router.
+  return commands.size ? [{outlets: Object.fromEntries(commands)}] : [];
 }

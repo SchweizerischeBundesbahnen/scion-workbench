@@ -24,7 +24,7 @@ export class AppHeaderPO {
    * Handle to the specified perspective toggle button.
    *
    * @param locateBy - Specifies how to locate the perspective toggle button.
-   *        @property perspectiveId - Identifies the toggle button by the perspective id
+   * @param locateBy.perspectiveId - Identifies the toggle button by the perspective id
    */
   public perspectiveToggleButton(locateBy: {perspectiveId: string}): PerspectiveTogglePO {
     return new PerspectiveTogglePO(this._locator.locator('div.e2e-perspective-toggles').locator(`button.e2e-perspective[data-perspectiveid="${locateBy.perspectiveId}"]`));

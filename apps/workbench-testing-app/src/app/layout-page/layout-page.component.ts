@@ -9,12 +9,10 @@
  */
 
 import {Component} from '@angular/core';
-import AddPartPageComponent from './add-part-page/add-part-page.component';
-import AddViewPageComponent from './add-view-page/add-view-page.component';
-import ActivateViewPageComponent from './activate-view-page/activate-view-page.component';
 import RegisterPartActionPageComponent from './register-part-action-page/register-part-action-page.component';
-import RegisterRoutePageComponent from './register-route-page/register-route-page.component';
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
+import ModifyLayoutPageComponent from './modify-layout-page/modify-layout-page.component';
+import CreatePerspectivePageComponent from './create-perspective-page/create-perspective-page.component';
 
 @Component({
   selector: 'app-layout-page',
@@ -24,11 +22,9 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
   imports: [
     SciTabbarComponent,
     SciTabDirective,
-    AddPartPageComponent,
-    AddViewPageComponent,
-    ActivateViewPageComponent,
+    ModifyLayoutPageComponent,
+    CreatePerspectivePageComponent,
     RegisterPartActionPageComponent,
-    RegisterRoutePageComponent,
   ],
 })
 export default class LayoutPageComponent {

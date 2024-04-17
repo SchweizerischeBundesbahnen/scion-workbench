@@ -17,6 +17,7 @@ import {NgIf} from '@angular/common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {parseTypedObject} from '../common/parse-typed-value.util';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-router-page',
@@ -29,6 +30,7 @@ import {parseTypedObject} from '../common/parse-typed-value.util';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
+    CssClassComponent,
   ],
 })
 export default class RouterPageComponent {
@@ -40,7 +42,7 @@ export default class RouterPageComponent {
     insertionIndex: this._formBuilder.control(''),
     activate: this._formBuilder.control<boolean | undefined>(undefined),
     close: this._formBuilder.control<boolean | undefined>(undefined),
-    cssClass: this._formBuilder.control<string | undefined>(undefined),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
   public navigateError: string | undefined;
 
@@ -62,7 +64,7 @@ export default class RouterPageComponent {
       target: this.form.controls.target.value || undefined,
       blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
       params: params || undefined,
-      cssClass: this.form.controls.cssClass.value?.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.cssClass.value,
     };
     await this._router.navigate(qualifier, extras)
       .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))

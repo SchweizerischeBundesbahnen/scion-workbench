@@ -45,7 +45,7 @@ export default class AngularZoneTestPageComponent {
   }
 
   private async testWorkbenchViewCapability(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('VIEW_ID'));
+    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
 
     // Register two view capabilities
     const viewCapabilityId1 = await Beans.get(ManifestService).registerCapability({
@@ -79,7 +79,7 @@ export default class AngularZoneTestPageComponent {
   }
 
   private async testWorkbenchViewParams(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('VIEW_ID'));
+    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
 
     // Subscribe to params
     workbenchViewTestee.params$
@@ -97,7 +97,7 @@ export default class AngularZoneTestPageComponent {
   }
 
   private async testWorkbenchViewActive(model: TestCaseModel): Promise<void> {
-    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('VIEW_ID'));
+    const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));
 
     // Subscribe to active state
     workbenchViewTestee.active$

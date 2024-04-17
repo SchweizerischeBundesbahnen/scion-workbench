@@ -22,7 +22,7 @@ import {MenuItemConfig, WorkbenchModuleConfig} from '../../workbench-module-conf
 import {WorkbenchService} from '../../workbench.service';
 import {filterArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {WorkbenchView} from '../../view/workbench-view.model';
+import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {provideViewContext} from '../../view/view-context-provider';
 import {Arrays} from '@scion/toolkit/util';
 
@@ -61,7 +61,7 @@ export class ViewMenuService {
    *
    * @see {@link WorkbenchView.registerViewMenuItem}
    */
-  public async showMenu(location: Point, viewId: string): Promise<boolean> {
+  public async showMenu(location: Point, viewId: ViewId): Promise<boolean> {
     const view = this._viewRegistry.get(viewId);
     const menuItems = await firstValueFrom(view.menuItems$);
 

@@ -3,14 +3,7 @@
     <header>Routing Command</header>
 
     <sci-form-field label="Path">
-      <input [formControl]="form.controls.path" class="e2e-path" list="routes">
-      <datalist id="routes">
-        <option *ngFor="let route of routes" [value]="route.path">{{route.path}}</option>
-      </datalist>
-    </sci-form-field>
-
-    <sci-form-field label="Matrix parameters">
-      <sci-key-value-field [keyValueFormArray]="form.controls.matrixParams" [addable]="true" [removable]="true" class="e2e-matrix-params"></sci-key-value-field>
+      <app-router-commands [formControl]="form.controls.commands"/>
     </sci-form-field>
 
     <sci-form-field label="State">
@@ -27,6 +20,10 @@
         <option value="auto">auto</option>
         <option value="blank">blank</option>
       </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Hint">
+      <input [formControl]="form.controls.hint" class="e2e-hint">
     </sci-form-field>
 
     <sci-form-field label="Part ID">
@@ -61,7 +58,7 @@
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <input [formControl]="form.controls.cssClass" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+      <app-css-class [formControl]="form.controls.cssClass"/>
     </sci-form-field>
   </section>
 
@@ -71,11 +68,15 @@
 
   <ng-container *ngTemplateOutlet="router_link; injector: form.controls.viewContext.value ? null : nullViewInjector"></ng-container>
   <ng-template #router_link>
-    <a [wbRouterLink]="routerLinkCommands$ | async"
-       [wbRouterLinkExtras]="(navigationExtras$ | async) ?? undefined"
+    <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+    <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+    <a [wbRouterLink]="form.controls.commands.value"
+       [wbRouterLinkExtras]="extras"
+       (click)="onRouterLinkNavigate()"
        class="e2e-router-link-navigate">
       Navigate via Router Link
     </a>
+    <!-- eslint-enable -->
   </ng-template>
 
   <output class="navigate-error e2e-navigate-error" *ngIf="navigateError">

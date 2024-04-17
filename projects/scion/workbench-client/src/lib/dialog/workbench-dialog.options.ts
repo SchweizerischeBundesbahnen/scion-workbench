@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {ViewId} from '../view/workbench-view';
+
 /**
  * Configures the dialog to display a microfrontend in a workbench dialog using {@link WorkbenchDialogService}.
  *
@@ -15,8 +17,9 @@
  */
 export interface WorkbenchDialogOptions {
   /**
-   * Passes data to the dialog microfrontend. The dialog provider can declare mandatory and optional parameters.
-   * No additional parameters may be included. Refer to the documentation of the dialog capability provider for more information.
+   * Passes data to the dialog.
+   *
+   * The dialog can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
   params?: Map<string, unknown> | {[param: string]: unknown};
   /**
@@ -39,14 +42,14 @@ export interface WorkbenchDialogOptions {
      *
      * By default, if opening the dialog in the context of a view, that view is used as the contextual view.
      */
-    viewId?: string;
+    viewId?: ViewId;
   };
   /**
    * Controls whether to animate the opening of the dialog. Defaults is `false`.
    */
   animate?: boolean;
   /**
-   * Specifies CSS class(es) to be added to the dialog, useful in end-to-end tests for locating the dialog.
+   * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
    */
   cssClass?: string | string[];
 }

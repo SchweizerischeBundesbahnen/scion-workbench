@@ -17,16 +17,13 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {lastValueFrom} from 'rxjs';
 
 /**
- * Allows navigating to a microfrontend in a workbench view.
+ * Enables navigation of workbench views.
  *
- * A view is a visual workbench component for displaying content stacked or side-by-side.
+ * A view is a visual workbench element for displaying content side-by-side or stacked.
  *
- * In SCION Workbench Client, routing means instructing a workbench view to display the microfrontend of a registered view capability.
- * A qualifier is used to differentiate view capabilities. A micro application can provide multiple view capabilities and make them
- * publicly available to other micro applications.
- *
- * As a prerequisite for routing, the navigating micro application must declare a fulfilling view intention in its manifest unless navigating
- * to views that the app provides itself. Navigation to microfrontends of other apps is only allowed for public view capabilities.
+ * A microfrontend provided as a view capability can be opened in a view. The qualifier differentiates between different
+ * view capabilities. An application can open the public view capabilities of other applications if it manifests a respective
+ * intention.
  *
  * @category Router
  * @category View
@@ -34,22 +31,17 @@ import {lastValueFrom} from 'rxjs';
 export class WorkbenchRouter {
 
   /**
-   * Navigates to a view microfrontend based on the given qualifier.
+   * Navigates to a microfrontend of a view capability based on the given qualifier and extras.
    *
-   * The qualifier identifies the view microfrontend(s) which to open. If multiple view microfrontends match the qualifier, they are all opened.
+   * By default, the router opens a new view if no view is found that matches the specified qualifier and required params. Optional parameters do not affect view resolution.
+   * If one or more views match the qualifier and required params, they will be navigated instead of opening the microfrontend in a new view tab.
+   * This behavior can be changed by setting an explicit navigation target in navigation extras.
    *
-   * By passing navigation extras, you can control where the microfrontend should open. By default, the router opens the microfrontend in a new view
-   * tab if no view is found that matches the specified qualifier and required params. Optional parameters do not affect view resolution. If one
-   * (or more) view(s) match the qualifier and required params, they are navigated instead of opening the microfrontend in a new view tab.
-   *
-   * @param  qualifier - Identifies the view capability that provides the microfrontend.
-   *                     By passing an empty qualifier (`{}`), the currently loaded microfrontend can update its parameters in the workbench URL,
-   *                     e.g., to support persistent navigation. This type of navigation is referred to as self-navigation and is supported only
-   *                     if in the context of a view. Setting {@link WorkbenchNavigationExtras#paramsHandling} allows instructing the workbench
-   *                     router how to handle params. By default, new params replace params contained in the URL.
+   * @param  qualifier - Identifies the view capability that provides the microfrontend to display in a view.
+   *                     Passing an empty qualifier (`{}`) allows the microfrontend to update its parameters, restoring updated parameters when the page reloads.
+   *                     Parameter handling can be controlled using the {@link WorkbenchNavigationExtras#paramsHandling} option.
    * @param  extras - Options to control navigation.
-   * @return Promise that resolves to `true` when navigation succeeds, to `false` when navigation fails, or is rejected on error,
-   *         e.g., if not qualified or because no application provides the requested view.
+   * @return Promise that resolves to `true` on successful navigation, or `false` otherwise.
    */
   public async navigate(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<boolean> {
     if (this.isSelfNavigation(qualifier)) {
@@ -97,7 +89,7 @@ export class WorkbenchRouter {
   private isSelfNavigation(qualifier: Qualifier | {}): boolean {
     if (!qualifier || Object.keys(qualifier).length === 0) {
       if (!Beans.opt(WorkbenchView)) {
-        throw Error('[WorkbenchRouterError] Self-navigation is supported only if in the context of a view.');
+        throw Error('[NavigateError] Self-navigation is supported only if in the context of a view.');
       }
       return true;
     }
@@ -113,57 +105,51 @@ export class WorkbenchRouter {
  */
 export interface WorkbenchNavigationExtras {
   /**
-   * Allows passing additional data to the microfrontend. In contrast to the qualifier, params have no effect on the intent routing.
-   * If the fulfilling capability(-ies) declare(s) mandatory parameters, be sure to include them, otherwise navigation will be rejected.
+   * Passes data to the view.
+   *
+   * The view can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
   params?: Map<string, any> | Dictionary;
   /**
    * Instructs the workbench router how to handle params in self-navigation.
    *
-   * Self-navigation allows a view to update its parameters in the workbench URL to support persistent navigation. Setting a `paramsHandling`
-   * strategy has no effect on navigations other than self-navigation. A self-navigation is initiated by passing an empty qualifier.
+   * Self-navigation allows the microfrontend to update its parameters, restoring updated parameters when the page reloads.
+   * Setting a `paramsHandling` strategy has no effect on navigations other than self-navigation. A self-navigation is
+   * initiated by passing an empty qualifier.
    *
    * One of:
-   * * `replace`: Discards parameters in the URL and uses the new parameters instead (which is by default if not set).
-   * * `merge`:   Merges new parameters with the parameters currently contained in the URL. In case of a key collision, new parameters overwrite
-   *              the parameters contained in the URL. A parameter can be removed by passing `undefined` as its value.
+   * * `replace`: Replaces current parameters (default).
+   * * `merge`:   Merges new parameters with current parameters, with new parameters of equal name overwriting existing parameters.
+   *              A parameter can be removed by passing `undefined` as its value.
    */
   paramsHandling?: 'merge' | 'replace';
   /**
-   * Instructs the router to activate the view. Defaults to `true` if not specified.
+   * Instructs the router to activate the view. Default is `true`.
    */
   activate?: boolean;
   /**
-   * Closes the view(s) that match the specified qualifier and required parameter(s). Optional parameters do not affect view resolution.
+   * Closes views that match the specified qualifier and required parameters. Optional parameters do not affect view resolution.
    *
-   * To match views with any value for a specific required parameter, use the asterisk wildcard character (`*`) as the parameter value.
+   * The parameters support the asterisk wildcard value (`*`) to match views with any value for a parameter.
    *
-   * Note that you can only close view(s) for which you have an intention and which are visible to your app.
+   * Only views for which the application has an intention can be closed.
    */
   close?: boolean;
   /**
-   * Controls where to open the view.
+   * Controls where to open the view. Default is `auto`.
    *
    * One of:
-   * - 'auto':    Opens the microfrontend in a new view tab if no view is found that matches the specified qualifier and required params. Optional parameters
-   *              do not affect view resolution. If one (or more) view(s) match the qualifier and required params, they are navigated instead of
-   *              opening the microfrontend in a new view tab, e.g., to update optional parameters. This is the default behavior if not set.
-   * - 'blank':   Opens the microfrontend in a new view tab.
-   * - <view.id>: Navigates the specified view. If already opened, replaces it, or opens the view in a new view tab otherwise.
-   *              Note that the passed view identifier must start with `view.`, e.g., `view.5`.
-   *
-   * If not specified, defaults to `auto`.
+   * - 'auto':   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
+   * - 'blank':  Navigates in a new view.
+   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
    */
   target?: string | 'blank' | 'auto';
   /**
-   * Specifies the position where to insert the view into the tab bar when using 'blank' view target strategy.
-   * If not specified, the view is inserted after the active view. Set the index to 'start' or 'end' for inserting
-   * the view at the beginning or at the end.
+   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
    */
-  blankInsertionIndex?: number | 'start' | 'end';
+  blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
-   * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
-   * CSS class(es) will not be added to the browser URL, consequently will not survive a page reload.
+   * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    */
   cssClass?: string | string[];
 }

@@ -12,6 +12,7 @@ import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchViewRegistry} from '../../../view/workbench-view.registry';
+import {ViewId} from '../../../view/workbench-view.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toHaveTransientState}.
@@ -19,7 +20,7 @@ import {WorkbenchViewRegistry} from '../../../view/workbench-view.registry';
 export const toHaveTransientStateCustomMatcher: jasmine.CustomMatcherFactories = {
   toHaveTransientState: (): CustomMatcher => {
     return {
-      compare(viewId: string, expected: string, failOutput: string | undefined): CustomMatcherResult {
+      compare(viewId: ViewId, expected: string, failOutput: string | undefined): CustomMatcherResult {
         const componentRef = TestBed.inject(WorkbenchViewRegistry).get(viewId).portal.componentRef;
         const actual = componentRef.location.nativeElement.querySelector('input.transient-state').value;
         if (actual !== expected) {

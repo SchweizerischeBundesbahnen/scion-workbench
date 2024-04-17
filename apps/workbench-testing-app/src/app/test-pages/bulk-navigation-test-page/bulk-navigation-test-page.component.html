@@ -3,8 +3,8 @@
     <input [formControl]="form.controls.viewCount" type="number" class="e2e-view-count">
   </sci-form-field>
 
-  <sci-form-field label="CSS Class">
-    <input [formControl]="form.controls.cssClass" class="e2e-css-class">
+  <sci-form-field label="CSS Class(es)">
+    <app-css-class [formControl]="form.controls.cssClass"/>
   </sci-form-field>
 </form>
 

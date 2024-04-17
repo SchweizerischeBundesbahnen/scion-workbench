@@ -1,0 +1,24 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+
+  > form {
+    display: grid;
+    grid-template-columns: 7.5em 1fr 5em 10em min-content min-content auto;
+    gap: .5em .75em;
+    align-items: center;
+
+    > span.checkbox {
+      text-align: center;
+    }
+
+    > sci-checkbox {
+      justify-self: center;
+    }
+
+    > input {
+      @include sci-design.style-input-field();
+    }
+  }
+}

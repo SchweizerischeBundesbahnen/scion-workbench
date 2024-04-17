@@ -12,6 +12,7 @@ import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
 import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
+import {ViewId} from '@scion/workbench';
 import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
 import {AppPO} from './app.po';
 
@@ -29,7 +30,7 @@ export class ViewPO {
     this.tab = tab;
   }
 
-  public async getViewId(): Promise<string> {
+  public async getViewId(): Promise<ViewId> {
     return this.tab.getViewId();
   }
 

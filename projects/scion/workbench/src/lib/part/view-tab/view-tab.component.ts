@@ -20,7 +20,7 @@ import {WorkbenchModuleConfig} from '../../workbench-module-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {WorkbenchView} from '../../view/workbench-view.model';
+import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -52,7 +52,7 @@ export class ViewTabComponent implements OnChanges {
 
   @Input({required: true})
   @HostBinding('attr.data-viewid')
-  public viewId!: string;
+  public viewId!: ViewId;
 
   @HostBinding('attr.draggable')
   public draggable = true;
@@ -149,6 +149,8 @@ export class ViewTabComponent implements OnChanges {
         viewClosable: this.view.closable,
         viewDirty: this.view.dirty,
         viewUrlSegments: this.view.urlSegments,
+        alternativeViewId: this.view.alternativeId,
+        navigationHint: this.view.navigationHint,
         partId: this.view.part.id,
         viewTabPointerOffsetX: event.offsetX,
         viewTabPointerOffsetY: event.offsetY,

@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Injector} from '@angular/core';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Controls the appearance and behavior of a message box.
@@ -92,7 +93,7 @@ export interface WorkbenchMessageBoxOptions {
   injector?: Injector;
 
   /**
-   * Specifies CSS class(es) to be added to the message box, useful in end-to-end tests for locating the message box.
+   * Specifies CSS class(es) to add to the message box, e.g., to locate the message box in tests.
    */
   cssClass?: string | string[];
 
@@ -105,6 +106,6 @@ export interface WorkbenchMessageBoxOptions {
      *
      * By default, if opening the message box in the context of a view, that view is used as the contextual view.
      */
-    viewId?: string;
+    viewId?: ViewId;
   };
 }

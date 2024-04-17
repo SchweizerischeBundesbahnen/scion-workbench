@@ -36,7 +36,7 @@ export class ViewDropZoneDirective implements OnInit {
   public regions?: DropZoneRegion;
 
   /**
-   * Specifies CSS class(es) to be associated with the drop zone.
+   * Specifies CSS class(es) to add to the drop zone.
    */
   @Input('wbViewDropZoneCssClass') // eslint-disable-line @angular-eslint/no-input-rename
   public cssClass?: string | string[] | undefined;

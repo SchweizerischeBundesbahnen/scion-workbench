@@ -9,6 +9,7 @@
  */
 
 import {Dictionary} from '@scion/toolkit/util';
+import {ViewId} from '../view/workbench-view';
 
 /**
  * Configures the content and appearance of a message presented to the user in the form of a message box.
@@ -46,8 +47,9 @@ export interface WorkbenchMessageBoxConfig {
   content?: any;
 
   /**
-   * Allows passing data to the message box. The message box provider can declare mandatory and optional parameters.
-   * No additional parameters may be included. Refer to the documentation of the message box capability provider for more information.
+   * Passes data to the message box.
+   *
+   * The message box can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
   params?: Map<string, any> | Dictionary;
 
@@ -90,7 +92,7 @@ export interface WorkbenchMessageBoxConfig {
   contentSelectable?: boolean;
 
   /**
-   * Specifies CSS class(es) to be added to the message box, useful in end-to-end tests for locating the message box.
+   * Specifies CSS class(es) to add to the message box, e.g., to locate the message box in tests.
    */
   cssClass?: string | string[];
 
@@ -103,6 +105,6 @@ export interface WorkbenchMessageBoxConfig {
      *
      * By default, if opening the message box in the context of a view, that view is used as the contextual view.
      */
-    viewId?: string;
+    viewId?: ViewId;
   };
 }

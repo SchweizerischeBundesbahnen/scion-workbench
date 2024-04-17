@@ -20,9 +20,9 @@ import {WbComponentPortal} from './wb-component-portal';
  * Usage:
  *
  * ```html
- * <ng-container *wbPortalOutlet="greeting"></ng-container>
+ * <ng-container *wbPortalOutlet="greeting"/>
  * <!-- or -->
- * <ng-template [wbPortalOutlet]="greeting"></ng-template>
+ * <ng-template [wbPortalOutlet]="greeting"/>
  * ````
  *
  * @see WbComponentPortal

@@ -17,11 +17,9 @@ import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-
 export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORROOT_GUARD');
 
 /**
- * Prefix for views that are target of a primary route.
+ * Represents the id prefix of views.
  *
- * Views with an id that begins with the view prefix can be the target of any primary route. A primary route does not declare an outlet.
- * On the other hand, views with an id that does not begin with the view prefix can only be the target of secondary routes having the view
- * id as their target outlet.
+ * @see ViewId
  */
 export const VIEW_ID_PREFIX = 'view.';
 

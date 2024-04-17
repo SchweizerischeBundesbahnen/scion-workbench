@@ -57,7 +57,7 @@ Open `app.module.ts` and import the `WorkbenchModule`. The lines to be added are
 Open `app.component.html` and replace it with the following content:
 
 ```html 
-<wb-workbench></wb-workbench>
+<wb-workbench/>
 ```
 
 The workbench itself does not position nor lay out the `<wb-workbench>` component. Depending on your requirements, you may want the workbench to fill the entire page viewport or only parts of it, for example, if you have a header, footer, or navigation panel.
@@ -89,9 +89,9 @@ Also, download the workbench icon font from <a href="https://github.com/Schweize
 
 After completing the above steps, start your application by running `ng serve`. Open a browser at http://localhost:4200. You should see a blank page.
 
-Continue with guide [How to define an initial layout][link-how-to-define-initial-layout] to define an initial layout for the workbench.
+Continue with guide [How to define the initial workbench layout][link-how-to-define-initial-workbench-layout] to define an initial layout for the workbench.
 
-[link-how-to-define-initial-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
 [link-how-to-configure-icons-if-deploying-app-in-subdirectory]: /docs/site/howto/how-to-icons.md#deploying-the-app-in-a-subdirectory
 
 [menu-how-to]: /docs/site/howto/how-to.md

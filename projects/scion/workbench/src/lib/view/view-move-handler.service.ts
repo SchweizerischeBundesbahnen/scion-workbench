@@ -1,4 +1,4 @@
-import {Inject, Injectable, Injector} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
 import {UUID} from '@scion/toolkit/uuid';
 import {Router} from '@angular/router';
@@ -10,7 +10,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Defined} from '@scion/toolkit/util';
 import {generatePerspectiveWindowName} from '../perspective/workbench-perspective.service';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
-import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {WORKBENCH_ID} from '../workbench-id';
 
 /**
@@ -24,8 +23,7 @@ export class ViewMoveHandler {
               private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
               private _viewDragService: ViewDragService,
               private _router: Router,
-              private _locationStrategy: LocationStrategy,
-              private _injector: Injector) {
+              private _locationStrategy: LocationStrategy) {
     this.installViewMoveListener();
   }
 
@@ -67,70 +65,50 @@ export class ViewMoveHandler {
     const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
 
     await this._workbenchRouter.ɵnavigate(layout => {
-      const newViewId = RouterUtils.isPrimaryRouteTarget(event.source.viewId) ? layout.computeNextViewId() : event.source.viewId;
+      const newViewId = event.source.alternativeViewId ?? layout.computeNextViewId();
       if (addToNewPart) {
         const newPartId = event.target.newPart?.id ?? UUID.randomUUID();
-        return {
-          layout: layout
-            .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
-            .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true}),
-          viewOutlets: {[newViewId]: commands},
-        };
+        return layout
+          .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
+          .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
+          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
       }
       else {
-        return {
-          layout: layout.addView(newViewId, {
-            partId: Defined.orElseThrow(event.target.elementId, () => Error(`[IllegalArgumentError] Target part mandatory for region 'center'.`)),
+        return layout
+          .addView(newViewId, {
+            partId: Defined.orElseThrow(event.target.elementId, () => Error(`[ViewMoveError] Target part required for region 'center'.`)),
             position: event.target.position ?? 'after-active-view',
+            cssClass: event.source.classList?.get('layout'),
             activateView: true,
             activatePart: true,
-          }),
-          viewOutlets: {[newViewId]: commands},
-        };
+          })
+          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
       }
     });
   }
 
   private async moveViewToNewWindow(event: ViewMoveEvent): Promise<void> {
     // Open the view "standalone" in a blank window in an anonymous perspective.
-    const urlTree = await this._workbenchRouter.createUrlTree(layout => {
-      const mainAreaPartId = UUID.randomUUID();
-
-      return {
-        layout: this._workbenchLayoutFactory
-          .create({
-            injector: Injector.create({
-              parent: this._injector,
-              // Instruct factory not to use UUID as identity for the initial part of the main area
-              providers: [{provide: MAIN_AREA_INITIAL_PART_ID, useValue: mainAreaPartId}],
-            }),
-          })
-          .addView(event.source.viewId, {
-              partId: mainAreaPartId,
-              activateView: true,
-              activatePart: true,
-            },
-          ),
-        viewOutlets: layout.views() // Remove other views
-          .map(view => view.id)
-          .filter(viewId => viewId !== event.source.viewId)
-          .reduce((acc, viewId) => ({...acc, [viewId]: null}), {}),
-      };
+    const urlTree = await this._workbenchRouter.createUrlTree(() => {
+      const newLayout = this._workbenchLayoutFactory.create();
+      const newViewId = event.source.alternativeViewId ?? newLayout.computeNextViewId();
+      const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
+      return newLayout
+        .addView(newViewId, {
+          partId: newLayout.activePart({grid: 'mainArea'})!.id,
+          activateView: true,
+          cssClass: event.source.classList?.get('layout'),
+        })
+        .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
     });
     const target = generatePerspectiveWindowName(`${ANONYMOUS_PERSPECTIVE_ID_PREFIX}${UUID.randomUUID()}`);
-    if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree)), target)) {
+    if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree!)), target)) {
       await this.removeView(event);
     }
   }
 
   private async removeView(event: ViewMoveEvent): Promise<void> {
-    const viewId = event.source.viewId;
-    await this._workbenchRouter.ɵnavigate(layout => {
-      return {
-        layout: layout.removeView(viewId),
-        viewOutlets: {[viewId]: null},
-      };
-    });
+    await this._workbenchRouter.ɵnavigate(layout => layout.removeView(event.source.viewId));
   }
 
   private async moveView(event: ViewMoveEvent): Promise<void> {
@@ -143,7 +121,7 @@ export class ViewMoveHandler {
       );
     }
     else {
-      const targetPartId = Defined.orElseThrow(event.target.elementId, () => Error(`[IllegalArgumentError] Target part mandatory for region 'center'.`));
+      const targetPartId = Defined.orElseThrow(event.target.elementId, () => Error(`[ViewMoveError] Target part required for region 'center'.`));
       await this._workbenchRouter.ɵnavigate(layout => layout.moveView(event.source.viewId, targetPartId, {
         position: event.target.position ?? (event.source.partId === targetPartId ? undefined : 'after-active-view'),
         activateView: true,

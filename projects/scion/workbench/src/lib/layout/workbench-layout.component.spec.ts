@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {Router, RouterOutlet, UrlSegment} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {toBeRegisteredCustomMatcher} from '../testing/jasmine/matcher/to-be-registered.matcher';
@@ -22,7 +22,7 @@ import {By} from '@angular/platform-browser';
 import {MAIN_AREA} from './workbench-layout';
 import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
 import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {MPart, MTreeNode} from './workbench-layout.model';
@@ -46,8 +46,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest(),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent},
-          {path: 'outlet', component: TestComponent, outlet: 'outlet', providers: [withComponentContent('routed content')]},
+          {path: 'path/to/view', component: TestComponent},
+          {path: 'path/to/outlet', component: TestComponent, outlet: 'outlet', providers: [withComponentContent('routed content')]},
         ]),
       ],
     });
@@ -55,22 +55,13 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
-          .addPart('right', {relativeTo: 'main', align: 'right', ratio: .5})
-          .addView('view.1', {partId: 'left', activateView: true})
-          .addView('view.2', {partId: 'main', activateView: true})
-          .addView('view.3', {partId: 'right', activateView: true})
-        ,
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-          'view.3': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
+      .addPart('right', {relativeTo: 'main', align: 'right', ratio: .5})
+      .addView('view.1', {partId: 'left', activateView: true})
+      .addView('view.2', {partId: 'main', activateView: true})
+      .addView('view.3', {partId: 'right', activateView: true}),
+    );
     await waitUntilStable();
 
     // Assert initial workbench layout
@@ -94,7 +85,7 @@ describe('WorkbenchLayout', () => {
     });
 
     // Navigate using the Angular router.
-    await TestBed.inject(Router).navigate([{outlets: {outlet: ['outlet']}}]);
+    await TestBed.inject(Router).navigate([{outlets: {outlet: ['path', 'to', 'outlet']}}]);
     await waitUntilStable();
 
     // Expect the layout not to be discarded.
@@ -118,7 +109,7 @@ describe('WorkbenchLayout', () => {
     });
 
     // Navigate using the Workbench router.
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
     await waitUntilStable();
 
     // Expect the layout to be changed.
@@ -147,7 +138,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent},
+          {path: 'path/to/view', component: TestComponent},
         ]),
       ],
     });
@@ -155,10 +146,10 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // GIVEN four views (view.1, view.2, view.3, view.4).
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
 
     // WHEN moving view.3 to position 0
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -166,7 +157,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -186,7 +177,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -206,7 +197,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -226,7 +217,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -246,7 +237,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -266,8 +257,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -275,7 +266,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -288,7 +279,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -308,7 +299,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -340,8 +331,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -349,7 +340,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -362,7 +353,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -382,7 +373,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -414,8 +405,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -423,7 +414,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -436,7 +427,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -456,7 +447,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -488,8 +479,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -497,7 +488,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -510,7 +501,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -530,7 +521,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -562,8 +553,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -571,7 +562,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -584,7 +575,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -604,7 +595,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -629,9 +620,9 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-3', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -639,7 +630,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -652,7 +643,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -667,7 +658,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 3
-    await TestBed.inject(WorkbenchRouter).navigate(['view-3']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -689,7 +680,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view-3', {})],
+        viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -724,7 +715,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -756,7 +747,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.1',
-        viewUrlSegments: [new UrlSegment('view-1', {})],
+        viewUrlSegments: segments(['path/to/view/1']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -784,8 +775,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -793,7 +784,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -806,7 +797,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -826,7 +817,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -859,7 +850,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -891,8 +882,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -900,7 +891,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -913,7 +904,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -933,7 +924,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -966,7 +957,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -998,8 +989,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1007,7 +998,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1020,7 +1011,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1040,7 +1031,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1072,7 +1063,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1104,8 +1095,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1113,7 +1104,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1126,7 +1117,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1146,7 +1137,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1178,7 +1169,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1210,9 +1201,9 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-3', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1220,7 +1211,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1233,7 +1224,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1248,7 +1239,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 3
-    await TestBed.inject(WorkbenchRouter).navigate(['view-3']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -1270,7 +1261,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view-3', {})],
+        viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1305,7 +1296,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1344,7 +1335,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'SOUTH-EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1378,13 +1369,13 @@ describe('WorkbenchLayout', () => {
     expect('view.3').toHaveTransientState('C');
   });
 
-  it('allows to move a view to a new part in the south and back to the main part ', async () => {
+  it('allows to move a view to a new part in the south and back to the initial part ', async () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1392,7 +1383,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1405,7 +1396,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1425,7 +1416,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1451,13 +1442,13 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
     expect('view.2').toHaveTransientState('B');
 
-    // Move view 2 back to the main part
+    // Move view 2 back to the initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'SOUTH',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1477,13 +1468,13 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
   });
 
-  it('allows to move a view to a new part in the east and then to the south of the main part ', async () => {
+  it('allows to move a view to a new part in the east and then to the south of the initial part ', async () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1491,7 +1482,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1504,7 +1495,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1524,7 +1515,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1556,7 +1547,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1583,13 +1574,13 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
   });
 
-  it('allows to move a view to a new part in the west and then to the south of the main part ', async () => {
+  it('allows to move a view to a new part in the west and then to the south of the initial part ', async () => {
     TestBed.configureTestingModule({
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1597,7 +1588,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1610,7 +1601,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1630,7 +1621,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1662,7 +1653,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'WEST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1694,8 +1685,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1703,7 +1694,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1717,7 +1708,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1732,7 +1723,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2'], {blankPartId: 'main'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {blankPartId: 'main'});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -1751,8 +1742,8 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1760,7 +1751,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1773,7 +1764,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1788,7 +1779,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2'], {blankPartId: 'main', target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {blankPartId: 'main', target: 'blank'});
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -1810,10 +1801,10 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view-1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-2', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-3', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'view-4', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/4', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -1821,7 +1812,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
@@ -1834,7 +1825,7 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
@@ -1854,7 +1845,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1881,7 +1872,7 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
 
     // Add view 3 to part EAST-1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-3']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -1908,7 +1899,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view-3', {})],
+        viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -1942,7 +1933,7 @@ describe('WorkbenchLayout', () => {
     expect('view.3').toHaveTransientState('C');
 
     // Add view 4 to part EAST-2
-    await TestBed.inject(WorkbenchRouter).navigate(['view-4']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4']);
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.4', 'D');
 
@@ -1976,7 +1967,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-2',
         viewId: 'view.4',
-        viewUrlSegments: [new UrlSegment('view-4', {})],
+        viewUrlSegments: segments(['path/to/view/4']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2022,7 +2013,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-2',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view-3', {})],
+        viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2068,7 +2059,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view-2', {})],
+        viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2110,7 +2101,7 @@ describe('WorkbenchLayout', () => {
     expect('view.4').toHaveTransientState('D');
 
     // Close view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['view-1'], {close: true});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {close: true});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -2137,7 +2128,7 @@ describe('WorkbenchLayout', () => {
     expect('view.4').toHaveTransientState('D');
 
     // Close view 3
-    await TestBed.inject(WorkbenchRouter).navigate(['view-3'], {close: true});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3'], {close: true});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -2158,7 +2149,7 @@ describe('WorkbenchLayout', () => {
     expect('view.4').toHaveTransientState('D');
 
     // Close view 4
-    await TestBed.inject(WorkbenchRouter).navigate(['view-4'], {close: true});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4'], {close: true});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -2178,7 +2169,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -2186,20 +2177,15 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addView('view.1', {partId: 'main'})
-          .addView('view.2', {partId: 'main'})
-          .addView('view.3', {partId: 'main'})
-          .activateView('view.3'),
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-          'view.3': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addView('view.1', {partId: 'main'})
+      .addView('view.2', {partId: 'main'})
+      .addView('view.3', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.2', ['path/to/view'])
+      .navigateView('view.3', ['path/to/view'])
+      .activateView('view.3'),
+    );
     await waitUntilStable();
 
     // Enter transient states.
@@ -2221,7 +2207,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2252,7 +2238,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2288,7 +2274,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -2296,20 +2282,15 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addView('view.1', {partId: 'main'})
-          .addView('view.2', {partId: 'main'})
-          .addView('view.3', {partId: 'main'})
-          .activateView('view.3'),
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-          'view.3': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addView('view.1', {partId: 'main'})
+      .addView('view.2', {partId: 'main'})
+      .addView('view.3', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.2', ['path/to/view'])
+      .navigateView('view.3', ['path/to/view'])
+      .activateView('view.3'),
+    );
     await waitUntilStable();
 
     // Enter transient states.
@@ -2331,7 +2312,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2356,13 +2337,13 @@ describe('WorkbenchLayout', () => {
     expect('view.2').toHaveTransientState('B');
     expect('view.3').toHaveTransientState('C');
 
-    // Move view 2 to a new part in the west of the main part
+    // Move view 2 to a new part in the west of the initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2393,7 +2374,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -2401,22 +2382,17 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addView('view.1', {partId: 'main'})
-          .addView('view.2', {partId: 'main'})
-          .addView('view.3', {partId: 'main'})
-          .addView('view.4', {partId: 'main'})
-          .activateView('view.4'),
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-          'view.3': ['view'],
-          'view.4': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addView('view.1', {partId: 'main'})
+      .addView('view.2', {partId: 'main'})
+      .addView('view.3', {partId: 'main'})
+      .addView('view.4', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.2', ['path/to/view'])
+      .navigateView('view.3', ['path/to/view'])
+      .navigateView('view.4', ['path/to/view'])
+      .activateView('view.4'),
+    );
     await waitUntilStable();
 
     // Enter transient states.
@@ -2442,7 +2418,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2474,7 +2450,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2511,7 +2487,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.4',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2553,7 +2529,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-2',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2595,7 +2571,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST-1',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2688,7 +2664,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -2696,20 +2672,15 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addView('view.1', {partId: 'main'})
-          .addView('view.2', {partId: 'main'})
-          .addView('view.3', {partId: 'main'})
-          .activateView('view.3'),
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-          'view.3': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addView('view.1', {partId: 'main'})
+      .addView('view.2', {partId: 'main'})
+      .addView('view.3', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.2', ['path/to/view'])
+      .navigateView('view.3', ['path/to/view'])
+      .activateView('view.3'),
+    );
     await waitUntilStable();
 
     // Enter transient states.
@@ -2731,7 +2702,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2762,7 +2733,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2798,7 +2769,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2834,7 +2805,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -2842,20 +2813,15 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addView('view.1', {partId: 'main'})
-          .addView('view.2', {partId: 'main'})
-          .addView('view.3', {partId: 'main'})
-          .activateView('view.3'),
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-          'view.3': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addView('view.1', {partId: 'main'})
+      .addView('view.2', {partId: 'main'})
+      .addView('view.3', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.2', ['path/to/view'])
+      .navigateView('view.3', ['path/to/view'])
+      .activateView('view.3'),
+    );
     await waitUntilStable();
 
     // Enter transient states.
@@ -2877,7 +2843,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2908,7 +2874,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2944,7 +2910,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.3',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2980,7 +2946,7 @@ describe('WorkbenchLayout', () => {
       imports: [
         WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
         RouterTestingModule.withRoutes([
-          {path: 'view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
     });
@@ -2988,18 +2954,13 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
-      return {
-        layout: layout
-          .addView('view.1', {partId: 'main'})
-          .addView('view.2', {partId: 'main'})
-          .activateView('view.2'),
-        viewOutlets: {
-          'view.1': ['view'],
-          'view.2': ['view'],
-        },
-      };
-    });
+    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+      .addView('view.1', {partId: 'main'})
+      .addView('view.2', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.2', ['path/to/view'])
+      .activateView('view.2'),
+    );
     await waitUntilStable();
 
     // Enter transient states.
@@ -3017,7 +2978,7 @@ describe('WorkbenchLayout', () => {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'main',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -3041,13 +3002,13 @@ describe('WorkbenchLayout', () => {
     expect('view.1').toHaveTransientState('A');
     expect('view.2').toHaveTransientState('B');
 
-    // Move view 2 to a new part in the west of main part
+    // Move view 2 to a new part in the west of initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
         partId: 'EAST',
         viewId: 'view.2',
-        viewUrlSegments: [new UrlSegment('view', {})],
+        viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),

@@ -1,7 +1,7 @@
 <form autocomplete="off" [formGroup]="form">
   <section>
     <sci-form-field label="Path">
-      <input [formControl]="form.controls.path" class="e2e-path">
+      <app-router-commands [formControl]="form.controls.commands"/>
     </sci-form-field>
 
     <sci-form-field label="Outlet">

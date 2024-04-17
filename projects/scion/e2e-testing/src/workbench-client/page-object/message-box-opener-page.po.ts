@@ -17,6 +17,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {ViewPO} from '../../view.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
+import {ViewId} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link MessageBoxOpenerPageComponent}.
@@ -28,7 +29,7 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
   public readonly outlet: SciRouterOutletPO;
   public readonly closeAction: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-message-box-opener-page');

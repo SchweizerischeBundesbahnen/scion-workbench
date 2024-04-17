@@ -9,10 +9,10 @@
  */
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Optional, ViewChild} from '@angular/core';
-import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
+import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
-import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {filter} from 'rxjs/operators';
@@ -59,7 +59,8 @@ export default class StartPageComponent {
   public WorkbenchRouteData = WorkbenchRouteData;
 
   constructor(@Optional() private _view: WorkbenchView, // not available on entry point page
-              @Optional() private _workbenchClientRouter: WorkbenchRouter, // not available when starting the workbench standalone
+              @Optional() private _workbenchClientRouter: WorkbenchClientRouter, // not available when starting the workbench standalone
+              @Optional() private _workbenchRouter: WorkbenchRouter, // not available when starting the workbench standalone
               @Optional() private _workbenchPopupService: WorkbenchPopupService, // not available when starting the workbench standalone
               @Optional() private _intentClient: IntentClient, // not available when starting the workbench standalone
               @Optional() private _manifestService: ManifestService, // not available when starting the workbench standalone
@@ -70,8 +71,8 @@ export default class StartPageComponent {
     // Read workbench views to be pinned to the start page.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(filterArray(route => {
-        if ((!route.outlet || route.outlet === PRIMARY_OUTLET) && route.data) {
-          return route.data['pinToStartPage'] === true;
+        if ((!route.outlet || route.outlet === PRIMARY_OUTLET)) {
+          return route.data?.['pinToStartPage'] === true;
         }
         return false;
       }));
@@ -97,10 +98,18 @@ export default class StartPageComponent {
     this.installFilterFieldDisplayTextSynchronizer();
   }
 
+  public onViewOpen(path: string, event: MouseEvent): void {
+    event.preventDefault(); // Prevent href navigation imposed by accessibility rules
+    this._workbenchRouter.navigate([path], {
+      target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
+      activate: !event.ctrlKey,
+    }).then();
+  }
+
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     this._workbenchClientRouter.navigate(viewCapability.qualifier, {
-      target: event.ctrlKey ? 'blank' : this._view?.id,
+      target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
     }).then();
   }

@@ -13,11 +13,11 @@
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <input [formControl]="form.controls.cssClass" class="e2e-class" placeholder="Separate multiple CSS classes by space">
+      <app-css-class [formControl]="form.controls.cssClass"/>
     </sci-form-field>
   </section>
 
-  <section [formGroup]="form.controls.canMatch" class="e2e-can-match">
+  <section [formGroup]="form.controls.canMatch">
     <header>CanMatch</header>
 
     <sci-form-field label="View(s)">

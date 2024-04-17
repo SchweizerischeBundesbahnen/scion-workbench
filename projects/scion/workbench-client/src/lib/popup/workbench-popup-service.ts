@@ -53,8 +53,8 @@ export class WorkbenchPopupService {
    *
    * By setting the alignment of the popup, you can control the region where to open the popup relative to its anchor.
    *
-   * You can pass data to the popup microfrontend using parameters. The popup provider can declare mandatory and optional parameters.
-   * No additional parameters may be included. Refer to the documentation of the popup capability provider for more information.
+   * You can pass data to the popup using parameters. The popup can declare mandatory and optional parameters.
+   * No additional parameters are allowed. Refer to the documentation of the capability for more information.
    *
    * By default, the popup will close on focus loss, or when the user hits the escape key.
    *

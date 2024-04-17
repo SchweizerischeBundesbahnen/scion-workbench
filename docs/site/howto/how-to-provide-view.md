@@ -9,6 +9,8 @@
 Any component can be displayed as a view. A view is a regular Angular component associated with a route. Below are some examples of common route configurations.
 
 ```ts
+import {RouterModule} from '@angular/router';
+
 // Routes
 RouterModule.forRoot([
   {path: 'path/to/view1', component: ViewComponent},
@@ -18,6 +20,8 @@ RouterModule.forRoot([
 ```
 
 ```ts
+import {Routes} from '@angular/router';
+
 // file: routes.ts
 export default [
   {path: 'view3', component: ViewComponent},
@@ -28,6 +32,9 @@ export default [
 Having defined the routes, views can be opened using the `WorkbenchRouter`.
 
 ```ts
+import {WorkbenchRouter} from '@scion/workbench';
+import {inject} from '@angular/core';
+
 // Open view 1
 inject(WorkbenchRouter).navigate(['/path/to/view1']);
 
@@ -41,30 +48,36 @@ inject(WorkbenchRouter).navigate(['/path/to/views/view3']);
 inject(WorkbenchRouter).navigate(['/path/to/views/view4']);
 ```
 
-The workbench supports associating view-specific data with a route, such as a tile, a heading, or a CSS class. Alternatively, this data can be set in the view by injecting the view handle `WorkbenchView`.
+The workbench supports associating view-specific data with a route, such as a tile, a heading, or a CSS class.
 
 ```ts
-RouterModule.forRoot([
+import {provideRouter} from '@angular/router';
+import {WorkbenchRouteData} from '@scion/workbench';
+
+provideRouter([
   {
     path: 'path/to/view',
     loadComponent: () => import('./view/view.component'),
     data: {
       [WorkbenchRouteData.title]: 'View Title',
       [WorkbenchRouteData.heading]: 'View Heading',
-      [WorkbenchRouteData.cssClass]: 'e2e-view',
+      [WorkbenchRouteData.cssClass]: ['class 1', 'class 2'],
     },
   },
-])
+]);
 ```
+
+Alternatively, the above data can be set in the view by injecting the view handle `WorkbenchView`. See [How to interact with a view][how-to-interact-with-view].
 
 ***
 #### Related Links:
 - [Learn how to open a view.][link-how-to-open-view] 
-- [Learn how to define an initial layout.][link-how-to-define-initial-layout] 
+- [Learn how to define the initial workbench layout.][link-how-to-define-initial-workbench-layout] 
 ***
 
 [link-how-to-open-view]: /docs/site/howto/how-to-open-view.md
-[link-how-to-define-initial-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[how-to-interact-with-view]: /docs/site/howto/how-to-interact-with-view.md
 
 [menu-how-to]: /docs/site/howto/how-to.md
 [menu-home]: /README.md

@@ -10,9 +10,12 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {WorkenchStartupQueryParams} from '../app.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../workbench.model';
+import {expectView} from '../matcher/view-matcher';
+import {ViewPagePO} from './page-object/view-page.po';
+import {RouterPagePO} from './page-object/router-page.po';
+import {ViewInfo} from './page-object/view-info-dialog.po';
 
 test.describe('Workbench Layout Migration', () => {
 
@@ -23,9 +26,11 @@ test.describe('Workbench Layout Migration', () => {
    * | Active View: view.1                        | Active View: view.3                        |
    * +--------------------------------------------+--------------------------------------------+
    */
-  test('should migrate workbench layout v1 to the latest version', async ({page, appPO}) => {
-    await page.goto(`/?${WorkenchStartupQueryParams.STANDALONE}=true/#/(view.3:test-view//view.2:test-view//view.1:test-view)?parts=eyJyb290Ijp7Im5vZGVJZCI6IjhkMWQ4MzA1LTgxYzItNDllOC05NWE3LWFlYjNlODM1ODFhMSIsImNoaWxkMSI6eyJ2aWV3SWRzIjpbInZpZXcuMSJdLCJwYXJ0SWQiOiIzOGY5MTU0MS03ZmRjLTRjNzEtYmVjMi0xZDVhZDc1MjNiZWUiLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjEifSwiY2hpbGQyIjp7InZpZXdJZHMiOlsidmlldy4yIiwidmlldy4zIl0sInBhcnRJZCI6ImZlZDM4MDExLTY2YjctNDZjZC1iYjQyLTMwY2U2ZjBmODA3MSIsImFjdGl2ZVZpZXdJZCI6InZpZXcuMyJ9LCJkaXJlY3Rpb24iOiJyb3ciLCJyYXRpbyI6MC41fSwiYWN0aXZlUGFydElkIjoiMzhmOTE1NDEtN2ZkYy00YzcxLWJlYzItMWQ1YWQ3NTIzYmVlIiwidXVpZCI6IjFlMjIzN2U1LWE3MzAtNDk1NC1iYWJmLWNkMzRjMjM3OWI1ZSJ9`);
-    await appPO.waitUntilWorkbenchStarted();
+  test('should migrate workbench layout v1 to the latest version', async ({appPO}) => {
+    await appPO.navigateTo({
+      url: '#/(view.3:test-view//view.2:test-view//view.1:test-view)?parts=eyJyb290Ijp7Im5vZGVJZCI6IjhkMWQ4MzA1LTgxYzItNDllOC05NWE3LWFlYjNlODM1ODFhMSIsImNoaWxkMSI6eyJ2aWV3SWRzIjpbInZpZXcuMSJdLCJwYXJ0SWQiOiIzOGY5MTU0MS03ZmRjLTRjNzEtYmVjMi0xZDVhZDc1MjNiZWUiLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjEifSwiY2hpbGQyIjp7InZpZXdJZHMiOlsidmlldy4yIiwidmlldy4zIl0sInBhcnRJZCI6ImZlZDM4MDExLTY2YjctNDZjZC1iYjQyLTMwY2U2ZjBmODA3MSIsImFjdGl2ZVZpZXdJZCI6InZpZXcuMyJ9LCJkaXJlY3Rpb24iOiJyb3ciLCJyYXRpbyI6MC41fSwiYWN0aXZlUGFydElkIjoiMzhmOTE1NDEtN2ZkYy00YzcxLWJlYzItMWQ1YWQ3NTIzYmVlIiwidXVpZCI6IjFlMjIzN2U1LWE3MzAtNDk1NC1iYWJmLWNkMzRjMjM3OWI1ZSJ9',
+      microfrontendSupport: false,
+    });
 
     await expect(appPO.workbench).toEqualWorkbenchLayout({
       workbenchGrid: {
@@ -54,5 +59,174 @@ test.describe('Workbench Layout Migration', () => {
         activePartId: '38f91541-7fdc-4c71-bec2-1d5ad7523bee',
       },
     });
+
+    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
+    await expectView(viewPage1).toBeActive();
+
+    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
+    await expectView(viewPage2).toBeInactive();
+
+    const viewPage3 = new ViewPagePO(appPO, {viewId: 'view.3'});
+    await expectView(viewPage3).toBeActive();
+
+    await expect.poll(() => viewPage1.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: 'test-view', navigationHint: ''},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    await expect.poll(() => viewPage2.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: 'test-view', navigationHint: ''},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    await expect.poll(() => viewPage3.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: 'test-view', navigationHint: ''},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  /**
+   * ## Given layout in version 2:
+   *
+   *           PERIPHERAL AREA                                       MAIN AREA                                PERIPHERAL AREA
+   * +--------------------------------------------+ +--------------------------------------------+ +--------------------------------------------+
+   * | Part: 33b22f60-bf34-4704-885d-7de0d707430f | | Part: a25eb4cf-9da7-43e7-8db2-302fd38e59a1 | | Part: 9bc4c09f-67a7-4c69-a28b-532781a1c98f |
+   * | Views: [view.3]                            | | Views: [view.1, test-view]                 | | Views: [test-router]                       |
+   * | Active View: view.3                        | | Active View: test-view                     | | Active View: test-router                   |
+   * |                                            | +--------------------------------------------+ |                                            |
+   * |                                            | | Part: 2b534d97-ed7d-43b3-bb2c-0e59d9766e86 | |                                            |
+   * |                                            | | Views: [view.2]                            | |                                            |
+   * |                                            | | Active View: view.2                        | |                                            |
+   * +--------------------------------------------+ +--------------------------------------------+ +--------------------------------------------+
+   * view.1:      [path='test-view']
+   * view.2:      [path='test-view']
+   * test-view:   [path='', outlet='test-view']
+   * test-router: [path='', outlet='test-router']
+   * view.3:      [path='test-view']
+   *
+   * ## Migrated layout:
+   *
+   *          PERIPHERAL AREA                                       MAIN AREA                                PERIPHERAL AREA
+   * +--------------------------------------------+ +--------------------------------------------+ +--------------------------------------------+
+   * | Part: 33b22f60-bf34-4704-885d-7de0d707430f | | Part: a25eb4cf-9da7-43e7-8db2-302fd38e59a1 | | Part: 9bc4c09f-67a7-4c69-a28b-532781a1c98f |
+   * | Views: [view.3]                            | | Views: [view.1, view.4]                    | | Views: [view.5]                            |
+   * | Active View: view.3                        | | Active View: view.4                        | | Active View: view.5                        |
+   * |                                            | +--------------------------------------------+ |                                            |
+   * |                                            | | Part: 2b534d97-ed7d-43b3-bb2c-0e59d9766e86 | |                                            |
+   * |                                            | | Views: [view.2]                            | |                                            |
+   * |                                            | | Active View: view.2                        | |                                            |
+   * +--------------------------------------------+ +--------------------------------------------+ +--------------------------------------------+
+   * view.1: [path='test-view']
+   * view.2: [path='test-view']
+   * view.3: [path='test-view']
+   * view.4: [path='', navigationHint='test-view']
+   * view.5: [path='', navigationHint='test-router']
+   */
+  test('should migrate workbench layout v2 to the latest version', async ({appPO}) => {
+    await appPO.navigateTo({
+      url: '#/(view.1:test-view//view.2:test-view//view.3:test-view)?main_area=eyJyb290Ijp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0Iiwidmlld3MiOlt7ImlkIjoidmlldy4xIn0seyJpZCI6InRlc3QtdmlldyJ9XSwiaWQiOiJhMjVlYjRjZi05ZGE3LTQzZTctOGRiMi0zMDJmZDM4ZTU5YTEiLCJzdHJ1Y3R1cmFsIjpmYWxzZSwiYWN0aXZlVmlld0lkIjoidGVzdC12aWV3In0sImNoaWxkMiI6eyJ0eXBlIjoiTVBhcnQiLCJ2aWV3cyI6W3siaWQiOiJ2aWV3LjIifV0sImlkIjoiMmI1MzRkOTctZWQ3ZC00M2IzLWJiMmMtMGU1OWQ5NzY2ZTg2Iiwic3RydWN0dXJhbCI6ZmFsc2UsImFjdGl2ZVZpZXdJZCI6InZpZXcuMiJ9LCJkaXJlY3Rpb24iOiJjb2x1bW4iLCJyYXRpbyI6MC41fSwiYWN0aXZlUGFydElkIjoiYTI1ZWI0Y2YtOWRhNy00M2U3LThkYjItMzAyZmQzOGU1OWExIn0vLzI%3D',
+      microfrontendSupport: false,
+      localStorage: {
+        'scion.workbench.perspective': 'empty',
+        'scion.workbench.perspectives.empty': 'eyJpbml0aWFsV29ya2JlbmNoR3JpZCI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW5acFpYZHpJanBiWFN3aWFXUWlPaUp0WVdsdUxXRnlaV0VpTENKemRISjFZM1IxY21Gc0lqcDBjblZsZlN3aVlXTjBhWFpsVUdGeWRFbGtJam9pYldGcGJpMWhjbVZoSW4wdkx6ST0iLCJ3b3JrYmVuY2hHcmlkIjoiZXlKeWIyOTBJanA3SW5SNWNHVWlPaUpOVkhKbFpVNXZaR1VpTENKamFHbHNaREVpT25zaWRIbHdaU0k2SWsxVWNtVmxUbTlrWlNJc0ltTm9hV3hrTVNJNmV5SjBlWEJsSWpvaVRWQmhjblFpTENKMmFXVjNjeUk2VzNzaWFXUWlPaUoyYVdWM0xqTWlmVjBzSW1sa0lqb2lNek5pTWpKbU5qQXRZbVl6TkMwME56QTBMVGc0TldRdE4yUmxNR1EzTURjME16Qm1JaXdpYzNSeWRXTjBkWEpoYkNJNlptRnNjMlVzSW1GamRHbDJaVlpwWlhkSlpDSTZJblpwWlhjdU15SjlMQ0pqYUdsc1pESWlPbnNpZEhsd1pTSTZJazFRWVhKMElpd2lkbWxsZDNNaU9sdGRMQ0pwWkNJNkltMWhhVzR0WVhKbFlTSXNJbk4wY25WamRIVnlZV3dpT25SeWRXVjlMQ0prYVhKbFkzUnBiMjRpT2lKeWIzY2lMQ0p5WVhScGJ5STZNQzR5ZlN3aVkyaHBiR1F5SWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW5acFpYZHpJanBiZXlKcFpDSTZJblJsYzNRdGNtOTFkR1Z5SW4xZExDSnBaQ0k2SWpsaVl6UmpNRGxtTFRZM1lUY3ROR00yT1MxaE1qaGlMVFV6TWpjNE1XRXhZems0WmlJc0luTjBjblZqZEhWeVlXd2lPbVpoYkhObExDSmhZM1JwZG1WV2FXVjNTV1FpT2lKMFpYTjBMWEp2ZFhSbGNpSjlMQ0prYVhKbFkzUnBiMjRpT2lKeWIzY2lMQ0p5WVhScGJ5STZNQzQ0ZlN3aVlXTjBhWFpsVUdGeWRFbGtJam9pTXpOaU1qSm1OakF0WW1Zek5DMDBOekEwTFRnNE5XUXROMlJsTUdRM01EYzBNekJtSW4wdkx6ST0iLCJ2aWV3T3V0bGV0cyI6eyJ2aWV3LjMiOlsidGVzdC12aWV3Il19fQ==',
+      },
+    });
+
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .8,
+          child1: new MTreeNode({
+            direction: 'row',
+            ratio: .2,
+            child1: new MPart({
+              id: '33b22f60-bf34-4704-885d-7de0d707430f',
+              views: [{id: 'view.3'}],
+              activeViewId: 'view.3',
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
+          }),
+          child2: new MPart({
+            id: '9bc4c09f-67a7-4c69-a28b-532781a1c98f',
+            views: [{id: 'view.5'}],
+            activeViewId: 'view.5',
+          }),
+        }),
+        activePartId: '33b22f60-bf34-4704-885d-7de0d707430f',
+      },
+      mainAreaGrid: {
+        root: new MTreeNode({
+          direction: 'column',
+          ratio: .5,
+          child1: new MPart({
+            id: 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1',
+            views: [{id: 'view.1'}, {id: 'view.4'}],
+            activeViewId: 'view.4',
+          }),
+          child2: new MPart({
+            id: '2b534d97-ed7d-43b3-bb2c-0e59d9766e86',
+            views: [{id: 'view.2'}],
+            activeViewId: 'view.2',
+          }),
+        }),
+        activePartId: 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1',
+      },
+    });
+
+    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
+    await viewPage1.view.tab.click();
+    await expectView(viewPage1).toBeActive();
+    await expect.poll(() => viewPage1.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: 'test-view', navigationHint: ''},
+        urlSegments: 'test-view',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
+    await viewPage2.view.tab.click();
+    await expectView(viewPage2).toBeActive();
+    await expect.poll(() => viewPage2.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: 'test-view', navigationHint: ''},
+        urlSegments: 'test-view',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    const viewPage3 = new ViewPagePO(appPO, {viewId: 'view.3'});
+    await viewPage3.view.tab.click();
+    await expectView(viewPage3).toBeActive();
+    await expect.poll(() => viewPage3.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: 'test-view', navigationHint: ''},
+        urlSegments: 'test-view',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    const viewPage4 = new ViewPagePO(appPO, {viewId: 'view.4'});
+    await viewPage4.view.tab.click();
+    await expectView(viewPage4).toBeActive();
+    await expect.poll(() => viewPage4.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: '', navigationHint: 'test-view'},
+        urlSegments: '',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    const viewPage5 = new RouterPagePO(appPO, {viewId: 'view.5'});
+    await viewPage5.view.tab.click();
+    await expectView(viewPage5).toBeActive();
+    await expect.poll(() => viewPage5.view.getInfo()).toMatchObject(
+      {
+        routeData: {path: '', navigationHint: 'test-router'},
+        urlSegments: '',
+      } satisfies Partial<ViewInfo>,
+    );
   });
 });

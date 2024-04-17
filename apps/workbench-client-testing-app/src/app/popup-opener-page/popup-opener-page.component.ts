@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CloseStrategy, PopupOrigin, WorkbenchPopupService, WorkbenchView} from '@scion/workbench-client';
+import {CloseStrategy, PopupOrigin, ViewId, WorkbenchPopupService, WorkbenchView} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
@@ -22,6 +22,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {parseTypedString} from '../common/parse-typed-value.util';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -37,6 +38,7 @@ import {parseTypedString} from '../common/parse-typed-value.util';
     SciAccordionItemDirective,
     SciCheckboxComponent,
     PopupPositionLabelPipe,
+    CssClassComponent,
   ],
 })
 export default class PopupOpenerPageComponent {
@@ -62,9 +64,9 @@ export default class PopupOpenerPageComponent {
       width: this._formBuilder.control<number | undefined>(undefined),
       height: this._formBuilder.control<number | undefined>(undefined),
     }),
-    contextualViewId: this._formBuilder.control(''),
+    contextualViewId: this._formBuilder.control<ViewId | ''>(''),
     align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     closeStrategy: this._formBuilder.group({
       onFocusLost: this._formBuilder.control(true),
       onEscape: this._formBuilder.control(true),
@@ -99,7 +101,7 @@ export default class PopupOpenerPageComponent {
         onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value ?? undefined,
         onEscape: this.form.controls.closeStrategy.controls.onEscape.value ?? undefined,
       }),
-      cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.cssClass.value,
       context: {
         viewId: parseTypedString(this.form.controls.contextualViewId.value || undefined),
       },

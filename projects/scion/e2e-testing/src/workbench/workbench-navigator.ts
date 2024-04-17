@@ -14,9 +14,9 @@ import {NotificationOpenerPagePO} from './page-object/notification-opener-page.p
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
-import {PerspectivePagePO} from './page-object/perspective-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
+import {WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 
 export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
   new(...args: any[]): T;
@@ -55,10 +55,6 @@ export class WorkbenchNavigator {
    */
   public openInNewTab(page: Type<LayoutPagePO>): Promise<LayoutPagePO>;
   /**
-   * Opens the page to register a perspective in a new workbench tab.
-   */
-  public openInNewTab(page: Type<PerspectivePagePO>): Promise<PerspectivePagePO>;
-  /**
    * Opens the page to inspect view properties in a new workbench tab.
    */
   public openInNewTab(page: Type<ViewPagePO>): Promise<ViewPagePO>;
@@ -92,10 +88,6 @@ export class WorkbenchNavigator {
         await startPage.openWorkbenchView('e2e-test-layout');
         return new LayoutPagePO(this._appPO, {viewId, cssClass: 'e2e-test-layout'});
       }
-      case PerspectivePagePO: {
-        await startPage.openWorkbenchView('e2e-test-perspective');
-        return new PerspectivePagePO(this._appPO, {viewId, cssClass: 'e2e-test-perspective'});
-      }
       case ViewPagePO: {
         await startPage.openWorkbenchView('e2e-test-view');
         return new ViewPagePO(this._appPO, {viewId, cssClass: 'e2e-test-view'});
@@ -104,5 +96,31 @@ export class WorkbenchNavigator {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);
       }
     }
+  }
+
+  /**
+   * Creates a perspective and activates it.
+   *
+   * @see WorkbenchService.registerPerspective
+   * @see WorkbenchService.switchPerspective
+   */
+  public async createPerspective(defineLayoutFn: (factory: WorkbenchLayoutFactory) => WorkbenchLayout): Promise<string> {
+    const id = crypto.randomUUID();
+    const layoutPage = await this.openInNewTab(LayoutPagePO);
+    await layoutPage.createPerspective(id, {layout: defineLayoutFn});
+    await layoutPage.view.tab.close();
+    await this._appPO.switchPerspective(id);
+    return id;
+  }
+
+  /**
+   * Modifies the current workbench layout.
+   *
+   * @see WorkbenchRouter.ɵnavigate
+   */
+  public async modifyLayout(modifyLayoutFn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
+    const layoutPage = await this.openInNewTab(LayoutPagePO);
+    await layoutPage.modifyLayout(modifyLayoutFn);
+    await layoutPage.view.tab.close();
   }
 }

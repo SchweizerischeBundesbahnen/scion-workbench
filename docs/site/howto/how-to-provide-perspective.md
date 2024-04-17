@@ -7,15 +7,15 @@
 
 A perspective is a named workbench layout. Multiple perspectives are supported. Perspectives can be switched. Only one perspective is active at a time. Perspectives share the same main area, if any.
 
+The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+
 ### How to provide a perspective
 
-Providing a perspective requires two steps.
+Perspectives are registered similarly to [Defining the initial workbench layout][link-how-to-define-initial-workbench-layout] via the configuration passed to `WorkbenchModule.forRoot()`. However, an array of perspective definitions is passed instead of a single workbench layout. A perspective must have a unique identity and define a workbench layout. Optionally, data can be associated with the perspective via data dictionary, e.g., to associate an icon, label or tooltip with the perspective.
 
-<details>
-    <summary>1. Register the perspective via workbench config</summary>
-    <br>
+Define the perspective's layout by registering a layout function in the perspective definition. The workbench will invoke this function with a factory to create the layout. The layout is immutable, so each modification creates a new instance. Use the instance for further modifications and finally return it.
 
-Perspectives are registered similarly to [Defining an initial layout][link-how-to-define-initial-layout] via the configuration passed to `WorkbenchModule.forRoot()`. However, an array of perspective definitions is passed instead of a single layout. A perspective must have a unique identity and define a layout. Optionally, data can be associated with the perspective via data dictionary, e.g., to associate an icon, label or tooltip with the perspective.
+Start by adding the first part. From there, you can gradually add more parts and align them relative to each other. Next, add views to the layout, specifying to which part to add the views. The final step is to navigate the views. A view can be navigated to any route.
 
 ```ts
 import {MAIN_AREA, WorkbenchLayoutFactory, WorkbenchModule} from '@scion/workbench';
@@ -26,16 +26,32 @@ WorkbenchModule.forRoot({
       {
         id: 'admin',
         layout: (factory: WorkbenchLayoutFactory) => factory
-            .addPart(MAIN_AREA)
-            .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-            .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-            .addPart('bottom', {align: 'bottom', ratio: .3})
-            .addView('navigator', {partId: 'topLeft', activateView: true})
-            .addView('explorer', {partId: 'topLeft'})
-            .addView('outline', {partId: 'bottomLeft', activateView: true})
-            .addView('console', {partId: 'bottom', activateView: true})
-            .addView('problems', {partId: 'bottom'})
-            .addView('search', {partId: 'bottom'}),
+          // Add parts to the layout.
+          .addPart(MAIN_AREA)
+          .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+          .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+          .addPart('bottom', {align: 'bottom', ratio: .3})
+
+          // Add views to the layout.
+          .addView('navigator', {partId: 'topLeft'})
+          .addView('explorer', {partId: 'topLeft'})
+          .addView('outline', {partId: 'bottomLeft'})
+          .addView('console', {partId: 'bottom'})
+          .addView('problems', {partId: 'bottom'})
+          .addView('search', {partId: 'bottom'})
+
+          // Navigate views.
+          .navigateView('navigator', ['path/to/navigator'])
+          .navigateView('explorer', ['path/to/explorer'])
+          .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
+          .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
+          .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
+          .navigateView('search', ['path/to/search'])
+
+          // Decide which views to activate.
+          .activateView('navigator')
+          .activateView('outline')
+          .activateView('console'),
         data: {
           label: 'Administrator',
         },
@@ -43,12 +59,24 @@ WorkbenchModule.forRoot({
       {
         id: 'manager',
         layout: (factory: WorkbenchLayoutFactory) => factory
-            .addPart(MAIN_AREA)
-            .addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .3})
-            .addView('explorer', {partId: 'bottom', activateView: true})
-            .addView('navigator', {partId: 'bottom'})
-            .addView('outline', {partId: 'bottom'})
-            .addView('search', {partId: 'bottom'}),
+          // Add parts to the layout.
+          .addPart(MAIN_AREA)
+          .addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .3})
+
+          // Add views to the layout.  
+          .addView('navigator', {partId: 'bottom'})
+          .addView('explorer', {partId: 'bottom'})
+          .addView('outline', {partId: 'bottom'})
+          .addView('search', {partId: 'bottom'})
+
+          // Navigate views.
+          .navigateView('navigator', ['path/to/navigator'])
+          .navigateView('explorer', ['path/to/explorer'])
+          .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
+          .navigateView('search', ['path/to/search'])
+
+          // Decide which views to activate.
+          .activateView('explorer'),
         data: {
           label: 'Manager',
         },
@@ -59,13 +87,19 @@ WorkbenchModule.forRoot({
 });
 ```
 
-The perspective 'admin' defines the following layout.
+> The layout function can call `inject` to get any required dependencies.
+
+> A `canActivate` function can be configured to determine if the perspective can be activated, for example based on the user's permissions.
+
+> The initial perspective can be set via `initialPerspective` property which accepts a string literal or a function for more advanced use cases.
+
+The perspective `admin` defines the following layout.
 
 ```plain
 +--------+----------------+
-|  top   |   main area    |
+|  top   |                |
 |  left  |                |
-|--------+                |
+|--------+   main area    |
 | bottom |                |
 | left   |                |
 +--------+----------------+
@@ -73,48 +107,52 @@ The perspective 'admin' defines the following layout.
 +-------------------------+
 ```
 
-The perspective 'manager' defines the following layout.
+The perspective `manager` defines the following layout.
 
 ```plain
 +-------------------------+
-|        main area        |
 |                         |
+|        main area        |
 |                         |
 +-------------------------+
 |          bottom         |
 +-------------------------+
 ```
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
-
-A layout is defined through a layout function in the workbench config. The function is passed a factory to create the layout. The layout has methods to modify it. Each modification creates a new layout instance that can be used for further modifications.
-
-> The function can call `inject` to get required dependencies, if any.
-
-Optionally, a `canActivate` function can be configured with a perspective descriptor to determine whether the perspective can be activated, for example based on the user's permissions. The initial activated perspective can be set via `initialPerspective` property which accepts a string literal or a function for more advanced use cases.
-</details>
-
-<details>
-    <summary>2. Register the routes for views added to the perspectives</summary>
-    <br>
+The above perspectives require the following routes.
  
-Routes for views added to the perspective layouts must be registered via the router module, as follows:
-
 ```ts
-RouterModule.forRoot([
-  {path: '', outlet: 'navigator', loadComponent: () => import('./navigator/navigator.component')},
-  {path: '', outlet: 'explorer', loadComponent: () => import('./explorer/explorer.component')},
-  {path: '', outlet: 'outline', loadComponent: () => import('./outline/outline.component')},
-  {path: '', outlet: 'console', loadComponent: () => import('./console/console.component')},
-  {path: '', outlet: 'problems', loadComponent: () => import('./problems/problems.component')},
-  {path: '', outlet: 'search', loadComponent: () => import('./search/search.component')},
-]);
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideRouter} from '@angular/router';
+import {canMatchWorkbenchView} from '@scion/workbench';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      // Navigator View
+      {path: 'path/to/navigator', loadComponent: () => import('./navigator/navigator.component')},
+      // Explorer View
+      {path: 'path/to/explorer', loadComponent: () => import('./explorer/explorer.component')},
+      // Outline View
+      {path: '', canMatch: [canMatchWorkbenchView('outline')], loadComponent: () => import('./outline/outline.component')},
+      // Console View
+      {path: '', canMatch: [canMatchWorkbenchView('console')], loadComponent: () => import('./console/console.component')},
+      // Problems View
+      {path: '', canMatch: [canMatchWorkbenchView('problems')], loadComponent: () => import('./problems/problems.component')},
+      // Search View
+      {path: 'path/to/search', loadComponent: () => import('./search/search.component')},
+    ]),
+  ],
+});
 ```
 
-A route for a view in the perspective layout must be a secondary route with an empty path. The outlet refers to the view in the layout. Because the path is empty, no outlet needs to be added to the URL.
-</details>
+> To avoid cluttering the initial URL, we recommend navigating the views of a perspective to empty path routes and using a navigation hint to differentiate.
 
-[link-how-to-define-initial-layout]: /docs/site/howto/how-to-define-initial-layout.md
+> Use the `canMatchWorkbenchView` guard to match a route only when navigating a view with a particular hint.
+
+> Use the `canMatchWorkbenchView` guard and pass `false` to never match a route for a workbench view, e.g., to exclude the application root path, if any, necessary when navigating views to the empty path route.
+
+[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

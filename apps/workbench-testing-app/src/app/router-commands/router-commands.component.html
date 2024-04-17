@@ -1,0 +1,7 @@
+<input [formControl]="formControl" class="e2e-commands" [attr.list]="routeList" placeholder="path/to/view;a=b;c=d" title="Separate path segments with slash and enter matrix parameters in matrix notation.">
+
+<datalist [id]="routeList">
+  @for (route of routes; track route) {
+    <option [value]="route.path">{{route.path}}</option>
+  }
+</datalist>

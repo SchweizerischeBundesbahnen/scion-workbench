@@ -10,11 +10,12 @@
 
 import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Represents the arrangement of parts as grid.
  *
- * The M-prefix indicates that {@link MPartGrid} is a layout model object that will be serialized into the URL.
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
  */
 export interface MPartGrid {
   root: MTreeNode | MPart;
@@ -28,7 +29,7 @@ export interface ɵMPartGrid extends MPartGrid {
   /**
    * Indicates if this grid was migrated from an older version.
    */
-  migrated: boolean;
+  migrated?: true;
 }
 
 /**
@@ -37,7 +38,7 @@ export interface ɵMPartGrid extends MPartGrid {
  * A node contains two children, which are either a {@link MPart} or a {@link MTreeNode}, respectively.
  * The ratio together with the direction describes how to arrange the two children.
  *
- * The M-prefix indicates that {@link MTreeNode} is a layout model object that will be serialized into the URL.
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
  */
 export class MTreeNode {
 
@@ -63,7 +64,7 @@ export class MTreeNode {
    * Tests if the given object is a {@link MTreeNode}.
    */
   public static isMTreeNode(object: any): object is MTreeNode {
-    return (object as MTreeNode).type === 'MTreeNode';
+    return object && (object as MTreeNode).type === 'MTreeNode';
   }
 }
 
@@ -72,7 +73,7 @@ export class MTreeNode {
  *
  * A part is a container for views.
  *
- * The M-prefix indicates that {@link MPart} is a layout model object that will be serialized into the URL.
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
  */
 export class MPart {
 
@@ -83,7 +84,7 @@ export class MPart {
   public readonly id!: string;
   public parent?: MTreeNode;
   public views: MView[] = [];
-  public activeViewId?: string;
+  public activeViewId?: ViewId;
   public structural!: boolean;
 
   constructor(part: Partial<Omit<MPart, 'type'>>) {
@@ -96,15 +97,21 @@ export class MPart {
    * Tests if the given object is a {@link MPart}.
    */
   public static isMPart(object: any): object is MPart {
-    return (object as MPart).type === 'MPart';
+    return object && (object as MPart).type === 'MPart';
   }
 }
 
 /**
  * Represents a view contained in a {@link MPart}.
  *
- * The M-prefix indicates that {@link MView} is a layout model object that will be serialized into the URL.
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
  */
 export interface MView {
-  readonly id: string;
+  id: ViewId;
+  alternativeId?: string;
+  cssClass?: string[];
+  navigation?: {
+    hint?: string;
+    cssClass?: string[];
+  };
 }

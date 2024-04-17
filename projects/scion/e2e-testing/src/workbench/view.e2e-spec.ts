@@ -13,6 +13,7 @@ import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
+import {NavigationTestPagePO} from './page-object/test-pages/navigation-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -39,6 +40,34 @@ test.describe('Workbench View', () => {
 
     await viewPage.enterTitle('title');
     await expect(viewPage.view.tab.title).toHaveText('title');
+  });
+
+  test('should show title of inactive views when reloading the application', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // open test view 1
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.enterCommands(['test-pages/navigation-test-page', {title: 'view-1-title'}]);
+    await routerPage.enterTarget('view.101');
+    await routerPage.clickNavigate();
+
+    // open test view 2
+    await routerPage.view.tab.click();
+    await routerPage.enterCommands(['test-pages/navigation-test-page', {title: 'view-2-title'}]);
+    await routerPage.enterTarget('view.102');
+    await routerPage.clickNavigate();
+
+    const testee1ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.101'});
+    const testee2ViewPage = new NavigationTestPagePO(appPO, {viewId: 'view.102'});
+
+    // reload the application
+    await appPO.reload();
+
+    await expectView(testee1ViewPage).toBeInactive();
+    await expect(testee1ViewPage.view.tab.title).toHaveText('view-1-title');
+
+    await expectView(testee2ViewPage).toBeActive();
+    await expect(testee2ViewPage.view.tab.title).toHaveText('view-2-title');
   });
 
   test('should allow updating the view tab heading', async ({appPO, workbenchNavigator}) => {
@@ -129,9 +158,8 @@ test.describe('Workbench View', () => {
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
+    await routerPage.enterCommands(['test-view', {matrixParam: 'value'}]);
     await routerPage.enterTarget(await viewPage.view.getViewId());
-    await routerPage.enterMatrixParams({matrixParam: 'value'});
     await routerPage.clickNavigate();
 
     // Expect the view to still be dirty
@@ -153,9 +181,8 @@ test.describe('Workbench View', () => {
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
+    await routerPage.enterCommands(['test-view', {matrixParam: 'value'}]);
     await routerPage.enterTarget(await viewPage.view.getViewId());
-    await routerPage.enterMatrixParams({matrixParam: 'value'});
     await routerPage.clickNavigate();
 
     // Expect the title has not changed
@@ -178,8 +205,7 @@ test.describe('Workbench View', () => {
 
     // Update matrix params (does not affect routing)
     await routerPage.view.tab.click();
-    await routerPage.enterPath('test-view');
-    await routerPage.enterMatrixParams({matrixParam: 'value'});
+    await routerPage.enterCommands(['test-view', {matrixParam: 'value'}]);
     await routerPage.clickNavigate();
 
     // Expect the heading has not changed
@@ -367,5 +393,27 @@ test.describe('Workbench View', () => {
 
     // Expect view 2 not to be instantiated anew
     await expect.poll(() => viewPage2.getComponentInstanceId()).toEqual(view2ComponentId);
+  });
+
+  test('should not destroy the component of the view when it is inactivated', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    const componentInstanceId = await viewPage.getComponentInstanceId();
+
+    // activate the router test view
+    await routerPage.view.tab.click();
+    await expectView(routerPage).toBeActive();
+    await expectView(viewPage).toBeInactive();
+
+    // activate the test view
+    await viewPage.view.tab.click();
+    await expectView(viewPage).toBeActive();
+    await expectView(routerPage).toBeInactive();
+
+    // expect the component not to be constructed anew
+    await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
   });
 });

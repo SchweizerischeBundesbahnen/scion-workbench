@@ -12,25 +12,21 @@ import {Observable} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 
 /**
- * A view is a visual workbench component for displaying content stacked or side-by-side.
+ * Handle to interact with a view opened via {@link WorkbenchRouter}.
  *
- * If a microfrontend lives in the context of a workbench view, regardless of its embedding level, it can inject an instance
- * of this class to interact with the workbench view, such as setting view tab properties or closing the view. It further
- * provides you access to the microfrontend capability and passed parameters.
- *
- * This object's lifecycle is bound to the workbench view and not to the navigation. In other words: If using hash-based routing
- * in your app, no new instance will be constructed when navigating to a different microfrontend of the same application, or when
- * re-routing to the same view capability, e.g., for updating the browser URL to persist navigation. Consequently, do not forget
- * to unsubscribe from Observables of this class before displaying another microfrontend.
+ * The view microfrontend can inject this handle to interact with the view, such as setting the title,
+ * reading parameters, or closing it.
  *
  * @category View
+ * @see WorkbenchViewCapability
+ * @see WorkbenchRouter
  */
 export abstract class WorkbenchView {
 
   /**
    * Represents the identity of this workbench view.
    */
-  public abstract readonly id: string;
+  public abstract readonly id: ViewId;
 
   /**
    * Signals readiness, notifying the workbench that this view has completed initialization.
@@ -179,3 +175,12 @@ export class ViewClosingEvent {
 export interface ViewSnapshot {
   params: ReadonlyMap<string, any>;
 }
+
+/**
+ * Format of a view identifier.
+ *
+ * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
+ *
+ * @category View
+ */
+export type ViewId = `view.${number}`;

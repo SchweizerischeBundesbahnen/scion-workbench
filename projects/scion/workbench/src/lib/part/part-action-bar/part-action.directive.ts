@@ -60,7 +60,7 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
   public canMatch?: CanMatchPartFn;
 
   /**
-   * Specifies CSS class(es) to be associated with the action, useful in end-to-end tests for locating it.
+   * Specifies CSS class(es) to add to the action, e.g., to locate the action in tests.
    */
   @Input()
   public cssClass?: string | string[] | undefined;

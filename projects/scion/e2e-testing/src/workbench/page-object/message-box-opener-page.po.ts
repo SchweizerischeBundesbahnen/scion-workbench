@@ -14,7 +14,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {Locator} from '@playwright/test';
 import {ViewPO} from '../../view.po';
-import {WorkbenchMessageBoxOptions} from '@scion/workbench';
+import {ViewId, WorkbenchMessageBoxOptions} from '@scion/workbench';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 
 /**
@@ -28,7 +28,7 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
   public readonly view: ViewPO;
   private readonly _openButton: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.view.locator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');

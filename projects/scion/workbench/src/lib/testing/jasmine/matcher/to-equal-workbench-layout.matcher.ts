@@ -15,7 +15,8 @@ import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
 import {MPart, MPartGrid, MTreeNode} from '../../../layout/workbench-layout.model';
-import {isGridElementVisible, ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
+import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
+import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
@@ -123,8 +124,8 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualElement:
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = isGridElementVisible(expectedTreeNode.child1!);
-  const child2Visible = isGridElementVisible(expectedTreeNode.child2!);
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1!);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2!);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {

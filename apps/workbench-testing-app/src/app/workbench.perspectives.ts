@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ROUTES} from '@angular/router';
-import {MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
+import {Routes, ROUTES} from '@angular/router';
+import {canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 
@@ -67,21 +67,21 @@ export const Perspectives = {
         provide: ROUTES,
         multi: true,
         useValue: [
-          {path: '', outlet: 'navigator', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Navigator'}},
-          {path: '', outlet: 'package-explorer', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Package Explorer'}},
-          {path: '', outlet: 'git-repositories', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Repositories'}},
-          {path: '', outlet: 'console', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Console'}},
-          {path: '', outlet: 'problems', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Problems'}},
-          {path: '', outlet: 'search', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Search'}},
-          {path: '', outlet: 'outline', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Outline'}},
-          {path: '', outlet: 'debug', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Debug'}},
-          {path: '', outlet: 'expressions', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Expressions'}},
-          {path: '', outlet: 'breakpoints', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Breakpoints'}},
-          {path: '', outlet: 'variables', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Variables'}},
-          {path: '', outlet: 'servers', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
-          {path: '', outlet: 'progress', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
-          {path: '', outlet: 'git-staging', loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
-        ],
+          {path: '', canMatch: [canMatchWorkbenchView('navigator')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Navigator'}},
+          {path: '', canMatch: [canMatchWorkbenchView('package-explorer')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Package Explorer'}},
+          {path: '', canMatch: [canMatchWorkbenchView('git-repositories')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Repositories'}},
+          {path: '', canMatch: [canMatchWorkbenchView('console')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Console'}},
+          {path: '', canMatch: [canMatchWorkbenchView('problems')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Problems'}},
+          {path: '', canMatch: [canMatchWorkbenchView('search')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Search'}},
+          {path: '', canMatch: [canMatchWorkbenchView('outline')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Outline'}},
+          {path: '', canMatch: [canMatchWorkbenchView('debug')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Debug'}},
+          {path: '', canMatch: [canMatchWorkbenchView('expressions')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Expressions'}},
+          {path: '', canMatch: [canMatchWorkbenchView('breakpoints')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Breakpoints'}},
+          {path: '', canMatch: [canMatchWorkbenchView('variables')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Variables'}},
+          {path: '', canMatch: [canMatchWorkbenchView('servers')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
+          {path: '', canMatch: [canMatchWorkbenchView('progress')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
+          {path: '', canMatch: [canMatchWorkbenchView('git-staging')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
+        ]  satisfies Routes,
       },
     ]);
   },
@@ -106,6 +106,15 @@ function provideDeveloperPerspectiveLayout(factory: WorkbenchLayoutFactory): Wor
     .addView('search', {partId: 'bottom'})
     .addView('progress', {partId: 'bottom'})
     .addView('outline', {partId: 'right'})
+    .navigateView('package-explorer', [], {hint: 'package-explorer'})
+    .navigateView('navigator', [], {hint: 'navigator'})
+    .navigateView('git-repositories', [], {hint: 'git-repositories'})
+    .navigateView('problems', [], {hint: 'problems'})
+    .navigateView('git-staging', [], {hint: 'git-staging'})
+    .navigateView('console', [], {hint: 'console'})
+    .navigateView('search', [], {hint: 'search'})
+    .navigateView('progress', [], {hint: 'progress'})
+    .navigateView('outline', [], {hint: 'outline'})
     .activateView('package-explorer')
     .activateView('git-repositories')
     .activateView('console')
@@ -127,7 +136,14 @@ function provideDebugPerspectiveLayout(factory: WorkbenchLayoutFactory): Workben
     .addView('variables', {partId: 'right'})
     .addView('expressions', {partId: 'right'})
     .addView('breakpoints', {partId: 'right'})
-    .addPart('findArea', {align: 'right', ratio: .25})
+    .navigateView('debug', [], {hint: 'debug'})
+    .navigateView('package-explorer', [], {hint: 'package-explorer'})
+    .navigateView('servers', [], {hint: 'servers'})
+    .navigateView('console', [], {hint: 'console'})
+    .navigateView('problems', [], {hint: 'problems'})
+    .navigateView('variables', [], {hint: 'variables'})
+    .navigateView('expressions', [], {hint: 'expressions'})
+    .navigateView('breakpoints', [], {hint: 'breakpoints'})
     .activateView('debug')
     .activateView('console')
     .activateView('variables');

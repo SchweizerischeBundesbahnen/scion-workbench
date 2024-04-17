@@ -10,46 +10,114 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {LayoutPagePO} from './page-object/layout-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
+import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 
 test.describe('Workbench Perspective Storage', () => {
 
-  test('should restore workbench grid from storage', async ({page, appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
-
-    // Switch to perspective-1
-    await appPO.switchPerspective('perspective-1');
+  test('should restore workbench grid from storage', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
 
     // Add part and view to the workbench grid
-    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPage.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
-    await layoutPage.addView('outline', {partId: 'left', activateView: true});
-    await layoutPage.addView('console', {partId: 'left', activateView: true});
+    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
+      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addView('view.101', {partId: 'left'})
+      .addView('view.102', {partId: 'left', activateView: true, activatePart: true})
+      .addView('view.103', {partId: activePartId, activateView: true})
+      .navigateView('view.101', ['test-view'])
+      .navigateView('view.102', ['test-view'])
+      .navigateView('view.103', ['test-view']),
+    );
 
-    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'outline'});
-    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'console'});
+    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    const viewPage3 = new ViewPagePO(appPO, {viewId: 'view.103'});
 
     // Reopen the page
-    await page.goto('about:blank');
-    await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
+    await appPO.reload();
 
-    // Expect perspective-1 to be restored from the storage
-    await expect.poll(() => appPO.header.perspectiveToggleButton({perspectiveId: 'perspective-1'}).isActive()).toBe(true);
-    await expectView(testee1ViewPage).toBeInactive();
-    await expectView(testee2ViewPage).toBeActive();
+    // Expect perspective to be restored from the storage
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .25,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.101'}, {id: 'view.102'}],
+            activeViewId: 'view.102',
+          }),
+          child2: new MPart({
+            id: MAIN_AREA,
+          }),
+        }),
+        activePartId: 'left',
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: 'view.103'}],
+          activeViewId: 'view.103',
+        }),
+      },
+    });
+
+    await expectView(viewPage1).toBeInactive();
+    await expectView(viewPage2).toBeActive();
+    await expectView(viewPage3).toBeActive();
 
     // Close view
-    await testee2ViewPage.view.tab.close();
+    await viewPage2.view.tab.close();
 
     // Reopen the page
-    await page.goto('about:blank');
-    await appPO.navigateTo({microfrontendSupport: false, perspectives: ['perspective-1']});
+    await appPO.reload();
 
-    // Expect perspective-1 to be restored from the storage
-    await expectView(testee1ViewPage).toBeActive();
-    await expectView(testee2ViewPage).not.toBeAttached();
+    // Expect perspective to be restored from the storage
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .25,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.101'}],
+            activeViewId: 'view.101',
+          }),
+          child2: new MPart({
+            id: MAIN_AREA,
+          }),
+        }),
+        activePartId: 'left',
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: 'view.103'}],
+          activeViewId: 'view.103',
+        }),
+      },
+    });
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).not.toBeAttached();
+    await expectView(viewPage3).toBeActive();
+  });
+
+  test('should not set the initial perspective as the active perspective in storage and window', async ({appPO}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await expect.poll(() => appPO.getWindowName()).toEqual('');
+    await expect.poll(() => appPO.getLocalStorageItem('scion.workbench.perspective')).toBeNull();
+  });
+
+  test('should select the initial perspective from storage', async ({appPO}) => {
+    await appPO.navigateTo({
+      microfrontendSupport: false,
+      perspectives: ['testee-1', 'testee-2', 'testee-3'],
+      localStorage: {
+        'scion.workbench.perspective': 'testee-2',
+      },
+    });
+
+    await expect.poll(() => appPO.header.perspectiveToggleButton({perspectiveId: 'testee-2'}).isActive()).toBe(true);
   });
 });

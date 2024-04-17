@@ -13,6 +13,9 @@ A view can be closed via the view's handle `WorkbenchView`, the `WorkbenchServic
 Inject `WorkbenchView` handle and invoke the `close` method.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchView} from '@scion/workbench';
+
 inject(WorkbenchView).close();
 ```
 
@@ -21,6 +24,9 @@ Inject `WorkbenchService` and invoke `closeViews`, passing the ids of the views 
 
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchService} from '@scion/workbench';
+
 inject(WorkbenchService).closeViews('view.1', 'view.2');
 ```
 
@@ -31,6 +37,9 @@ The router supports for closing views matching the routing commands by setting `
 Matrix parameters do not affect view resolution. The path supports the asterisk wildcard segment (`*`) to match views with any value in a segment. To close a specific view, set a view target instead of a path.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchRouter} from '@scion/workbench';
+
 inject(WorkbenchRouter).navigate(['path/*/view'], {close: true});
 ```
 

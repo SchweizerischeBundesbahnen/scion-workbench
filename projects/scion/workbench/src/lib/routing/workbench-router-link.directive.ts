@@ -15,8 +15,8 @@ import {LocationStrategy} from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {filter, takeUntil} from 'rxjs/operators';
+import {Commands} from './routing.model';
 import {Defined} from '@scion/toolkit/util';
-import {RouterUtils} from './router.util';
 
 /**
  * Like the Angular 'RouterLink' directive but with functionality to navigate a view.
@@ -44,7 +44,7 @@ import {RouterUtils} from './router.util';
 @Directive({selector: '[wbRouterLink]', standalone: true})
 export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
 
-  private _commands: any[] = [];
+  private _commands: Commands = [];
   private _extras: Omit<WorkbenchNavigationExtras, 'close'> = {};
   private _ngOnChange$ = new Subject<void>();
   private _ngOnDestroy$ = new Subject<void>();
@@ -53,7 +53,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
   public href: string | null = null;
 
   @Input()
-  public set wbRouterLink(commands: any[] | string | undefined | null) {
+  public set wbRouterLink(commands: Commands | string | undefined | null) {
     this._commands = (commands ? (Array.isArray(commands) ? commands : [commands]) : []);
   }
 
@@ -89,30 +89,13 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
    * Computes navigation extras based on the given extras and this directive's injection context.
    */
   protected computeNavigationExtras(ctrlKey: boolean = false, metaKey: boolean = false): Omit<WorkbenchNavigationExtras, 'close'> {
-    const contextualView = this._view ?? undefined;
-    const contextualPart = this._view?.part;
     const controlPressed = ctrlKey || metaKey;
 
     return {
       ...this._extras,
-      relativeTo: Defined.orElse(this._extras.relativeTo, () => {
-        const isAbsolute = (typeof this._commands[0] === 'string') && this._commands[0].startsWith('/');
-        return isAbsolute ? null : this._route;
-      }),
-      target: Defined.orElse(this._extras.target, () => {
-        // Navigate in new tab if CTRL or META modifier key is pressed.
-        if (controlPressed) {
-          return 'blank';
-        }
-        // Navigate the contextual view only if it is the target of primary routes.
-        const contextualViewId = contextualView?.id;
-        if (contextualViewId && RouterUtils.isPrimaryRouteTarget(contextualViewId)) {
-          return contextualViewId;
-        }
-        return undefined;
-      }),
+      relativeTo: Defined.orElse(this._extras.relativeTo, this._route), // `null` is a valid `relativeTo` for absolute navigation
+      target: controlPressed ? 'blank' : this._extras.target ?? this._view?.id,
       activate: this._extras.activate ?? !controlPressed, // by default, the view is not activated if CTRL or META modifier key is pressed (same behavior as for browser links)
-      blankPartId: this._extras.blankPartId ?? (contextualPart?.isInMainArea ? contextualPart.id : undefined),
     };
   }
 

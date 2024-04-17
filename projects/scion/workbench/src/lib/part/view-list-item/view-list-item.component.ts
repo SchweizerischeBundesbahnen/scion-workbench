@@ -15,7 +15,7 @@ import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {NgIf} from '@angular/common';
 import {WorkbenchModuleConfig} from '../../workbench-module-config';
-import {WorkbenchView} from '../../view/workbench-view.model';
+import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 
 @Component({
@@ -35,7 +35,7 @@ export class ViewListItemComponent {
   public viewTabContentPortal!: ComponentPortal<unknown>;
 
   @Input({required: true})
-  public set viewId(viewId: string) {
+  public set viewId(viewId: ViewId) {
     this.view = this._viewRegistry.get(viewId);
     this.viewTabContentPortal = this.createViewTabContentPortal();
   }

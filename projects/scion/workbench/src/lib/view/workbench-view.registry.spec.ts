@@ -78,7 +78,7 @@ describe('WorkbenchViewRegistry', () => {
       imports: [
         WorkbenchTestingModule.forTest(),
         RouterTestingModule.withRoutes([
-          {path: '', outlet: 'view', component: TestComponent},
+          {path: 'test-view', component: TestComponent},
         ]),
       ],
       providers: [
@@ -93,7 +93,8 @@ describe('WorkbenchViewRegistry', () => {
     // Open view in the right part.
     await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
       .addPart('right', {relativeTo: 'main', align: 'right'})
-      .addView('view', {partId: 'right'}),
+      .addView('view', {partId: 'right'})
+      .navigateView('view', ['test-view']),
     );
 
     // Expect the part to be resolved when `WorkbenchViewRegistry.views$` emits.

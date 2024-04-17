@@ -14,7 +14,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ViewComponent} from './view.component';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {WorkbenchView} from './workbench-view.model';
+import {ViewId, WorkbenchView} from './workbench-view.model';
 import {WorkbenchViewPreDestroy} from '../workbench.model';
 import {Observable} from 'rxjs';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
@@ -503,7 +503,7 @@ describe('ViewComponent', () => {
     discardPeriodicTasks();
   }));
 
-  function getViewDebugElement<T>(viewId: string): ViewDebugElement<T> {
+  function getViewDebugElement<T>(viewId: ViewId): ViewDebugElement<T> {
     const view = TestBed.inject(WorkbenchViewRegistry).get(viewId);
     const viewComponent = view.portal.componentRef.instance as ViewComponent;
     const component = viewComponent.routerOutlet.component as T;

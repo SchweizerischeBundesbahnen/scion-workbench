@@ -16,6 +16,7 @@ import {rejectWhenAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
+import {ViewId} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link RegisterWorkbenchIntentionPageComponent}.
@@ -26,7 +27,7 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
   public readonly outlet: SciRouterOutletPO;
   public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-register-workbench-intention-page');

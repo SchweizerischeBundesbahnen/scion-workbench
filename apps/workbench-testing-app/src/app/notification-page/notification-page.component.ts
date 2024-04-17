@@ -17,6 +17,7 @@ import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-notification-page',
@@ -29,6 +30,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
     StringifyPipe,
     SciFormFieldComponent,
     SciViewportComponent,
+    CssClassComponent,
   ],
 })
 export class NotificationPageComponent {
@@ -37,7 +39,7 @@ export class NotificationPageComponent {
     title: this._formBuilder.control(''),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | number | undefined>(undefined),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
   constructor(public notification: Notification<Map<string, any>>, private _formBuilder: NonNullableFormBuilder) {
@@ -68,7 +70,7 @@ export class NotificationPageComponent {
     this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(cssClass => {
-        this.notification.setCssClass(cssClass.split(/\s+/).filter(Boolean));
+        this.notification.setCssClass(cssClass ?? []);
       });
   }
 

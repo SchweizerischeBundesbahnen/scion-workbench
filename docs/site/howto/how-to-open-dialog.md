@@ -13,6 +13,9 @@ Displayed on top of other content, a dialog blocks interaction with other parts 
 To open a dialog, inject `WorkbenchDialogService` and invoke the `open` method, passing the component to display.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialogService} from '@scion/workbench';
+
 const dialogService = inject(WorkbenchDialogService);
 
 dialogService.open(MyDialogComponent);
@@ -24,6 +27,9 @@ A dialog can be view-modal or application-modal. A view-modal dialog blocks only
 By default, the calling context determines the modality of the dialog. If the dialog is opened from a view, only this view is blocked. To open the dialog with a different modality, specify the modality in the dialog options.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialogService} from '@scion/workbench';
+
 const dialogService = inject(WorkbenchDialogService);
 
 dialogService.open(MyDialogComponent, {
@@ -31,7 +37,7 @@ dialogService.open(MyDialogComponent, {
 });
 ```
 
-An application-modal dialog blocks the workbench element, still allowing interaction with elements outside the workbench element. To block the entire browser viewport, change the global modality scope setting in the workbench module configuration.
+An application-modal dialog blocks the workbench element, still allowing interaction with elements outside the workbench element. To block the entire browser viewport, change the global modality scope setting in the workbench configuration.
 
 ```ts
 import {WorkbenchModule} from '@scion/workbench';
@@ -49,6 +55,9 @@ Data can be passed to the dialog component as inputs in the dialog options.
 
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialogService} from '@scion/workbench';
+
 const dialogService = inject(WorkbenchDialogService);
 
 dialogService.open(MyDialogComponent, {
@@ -62,6 +71,8 @@ dialogService.open(MyDialogComponent, {
 Dialog inputs are available as input properties in the dialog component.
 
 ```ts
+import {Component, Input} from '@angular/core';
+
 @Component({...})
 export class MyDialogComponent {
 
@@ -115,6 +126,9 @@ Alternatively, the dialog supports the use of a custom footer. To provide a cust
 The dialog component can inject the `WorkbenchDialog` handle and close the dialog, optionally passing a result to the dialog opener.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialog} from '@scion/workbench';
+
 // Closes the dialog.
 inject(WorkbenchDialog).close();
 
@@ -125,6 +139,9 @@ inject(WorkbenchDialog).close('some result');
 Opening the dialog returns a Promise, that resolves to the result when the dialog is closed.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialog} from '@scion/workbench';
+
 const dialogService = inject(WorkbenchDialogService);
 
 const result = await dialogService.open(MyDialogComponent);
@@ -134,6 +151,9 @@ const result = await dialogService.open(MyDialogComponent);
 The dialog handle can be used to specify a preferred size, displaying scrollbar(s) if the component overflows. If no size is specified, the dialog has the size of the component.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialog} from '@scion/workbench';
+
 // Sets a fixed size.
 inject(WorkbenchDialog).size.height = '500px';
 inject(WorkbenchDialog).size.width = '600px';
@@ -159,6 +179,9 @@ By default, the dialog displays the title and a close button in the header. Alte
 The dialog component can inject the dialog handle `WorkbenchDialog` to interact with the dialog and change its default settings, such as making it non-closable, non-resizable, removing padding, and more.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchDialog} from '@scion/workbench';
+
 const dialog = inject(WorkbenchDialog);
 dialog.closable = false;
 dialog.resizable = false;

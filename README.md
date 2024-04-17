@@ -16,12 +16,12 @@ SCION Workbench enables the creation of Angular web applications that require a 
 - [**Getting Started**][link-getting-started]\
   Follow these steps to install the SCION Workbench in your project and start with a basic introduction to the SCION Workbench.
 
-#### Workbench Demo Applications
+#### Workbench Sample Applications
 
-- [**SCION Workbench Testing App**][link-testing-app]\
-  Visit our technical testing application to explore the workbench and experiment with its features.
+- [**Playground Application**][link-playground-app]\
+  Visit our playground application to explore the workbench and experiment with its features.
 
-- [**SCION Workbench Getting Started App**][link-getting-started-app]\
+- [**Getting Started Application**][link-getting-started-app]\
   Open the application developed in the [Getting Started][link-getting-started] guide.
 
 #### Documentation
@@ -72,7 +72,7 @@ SCION Workbench enables the creation of Angular web applications that require a 
 [link-getting-started]: /docs/site/getting-started.md
 [link-howto]: /docs/site/howto/how-to.md
 [link-demo-app]: https://schweizerischebundesbahnen.github.io/scion-workbench-demo/#/(view.24:person/64//view.22:person/32//view.5:person/79//view.3:person/15//view.2:person/38//view.1:person/66//activity:person-list)?viewgrid=eyJpZCI6MSwic2FzaDEiOlsidmlld3BhcnQuMSIsInZpZXcuMSIsInZpZXcuMiIsInZpZXcuMSJdLCJzYXNoMiI6eyJpZCI6Miwic2FzaDEiOlsidmlld3BhcnQuMiIsInZpZXcuMyIsInZpZXcuMyJdLCJzYXNoMiI6eyJpZCI6Mywic2FzaDEiOlsidmlld3BhcnQuNCIsInZpZXcuMjQiLCJ2aWV3LjI0Il0sInNhc2gyIjpbInZpZXdwYXJ0LjMiLCJ2aWV3LjIyIiwidmlldy41Iiwidmlldy4yMiJdLCJzcGxpdHRlciI6MC41MTk0Mzg0NDQ5MjQ0MDY2LCJoc3BsaXQiOmZhbHNlfSwic3BsaXR0ZXIiOjAuNTU5NDI0MzI2ODMzNzk3NSwiaHNwbGl0Ijp0cnVlfSwic3BsaXR0ZXIiOjAuMzIyNjI3NzM3MjI2Mjc3MywiaHNwbGl0IjpmYWxzZX0%3D
-[link-testing-app]: https://scion-workbench-testing-app.vercel.app
+[link-playground-app]: https://scion-workbench-testing-app.vercel.app
 [link-getting-started-app]: https://scion-workbench-getting-started.vercel.app
 [link-features]: /docs/site/features.md
 [link-announcements]: /docs/site/announcements.md

@@ -24,6 +24,7 @@ import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.mode
 import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
 import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
+import {ViewId} from './view/workbench-view.model';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -74,7 +75,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public getView(viewId: string): ɵWorkbenchView | null {
+  public getView(viewId: ViewId): ɵWorkbenchView | null {
     return this._viewRegistry.get(viewId, {orElse: null});
   }
 
@@ -94,14 +95,12 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public async closeViews(...viewIds: string[]): Promise<boolean> {
+  public async closeViews(...viewIds: ViewId[]): Promise<boolean> {
     // TODO [#27]: Use single navigation to close multiple views.
     // For example:
     // return this._workbenchRouter.ɵnavigate(layout => {
-    //   return {
-    //     layout: viewIds.reduce((layout, viewId) => layout.removeView(viewId), layout),
-    //     viewOutlets: viewIds.reduce((outlets, viewId) => ({...outlets, [viewId]: null}), {}),
-    //   };
+    //   viewIds.forEach(viewId => layout = layout.removeView(viewId));
+    //   return layout
     // });
 
     // To avoid canceling the entire navigation if some view(s) prevent(s) closing, close each view through a separate navigation.

@@ -1,0 +1,22 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <header>Parts</header>
+    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals$ | async"/>
+  </section>
+
+  <section>
+    <header>Views</header>
+    <app-add-views [formControl]="form.controls.views" [partProposals]="partProposals$ | async"/>
+  </section>
+
+  <section>
+    <header>View Navigations</header>
+    <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals$ | async"/>
+  </section>
+
+  <button (click)="onModify()" [disabled]="form.invalid" class="e2e-modify" sci-primary>Modify</button>
+</form>
+
+@if (modifyError) {
+  <output class="modify-error e2e-modify-error">{{modifyError}}</output>
+}

@@ -23,11 +23,12 @@ export const appConfig: ApplicationConfig = {
       layout: (factory: WorkbenchLayoutFactory) => factory
         .addPart(MAIN_AREA)
         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-        .addView('todos', {partId: 'left', activateView: true}),
+        .addView('todos', {partId: 'left', activateView: true})
+        .navigateView('todos', ['todos']),
     }),
     provideRouter([
       {path: '', loadComponent: () => import('./welcome/welcome.component')},
-      {path: '', outlet: 'todos', loadComponent: () => import('./todos/todos.component')},
+      {path: 'todos', loadComponent: () => import('./todos/todos.component')},
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
     ], withHashLocation()),
     provideAnimations(),

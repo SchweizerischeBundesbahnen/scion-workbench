@@ -21,6 +21,7 @@ import {filterArray} from '@scion/toolkit/operators';
 import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {ViewId} from '../view/workbench-view.model';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -35,8 +36,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _destroy$ = new Subject<void>();
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
-  public readonly viewIds$ = new BehaviorSubject<string[]>([]);
-  public readonly activeViewId$ = new BehaviorSubject<string | null>(null);
+  public readonly viewIds$ = new BehaviorSubject<ViewId[]>([]);
+  public readonly activeViewId$ = new BehaviorSubject<ViewId | null>(null);
   public readonly actions$: Observable<readonly WorkbenchPartAction[]>;
 
   private _isInMainArea: boolean | undefined;
@@ -66,7 +67,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    */
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
-    const part = layout.part({by: {partId: this.id}});
+    const part = layout.part({partId: this.id});
     const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
     const prevViewIds = this.viewIds$.value;
     const currViewIds = part.views.map(view => view.id);
@@ -87,11 +88,11 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     }
   }
 
-  public get viewIds(): string[] {
+  public get viewIds(): ViewId[] {
     return this.viewIds$.value;
   }
 
-  public get activeViewId(): string | null {
+  public get activeViewId(): ViewId | null {
     return this.activeViewId$.value;
   }
 

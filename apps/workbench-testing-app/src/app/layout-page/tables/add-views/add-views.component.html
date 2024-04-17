@@ -1,0 +1,32 @@
+<form [formGroup]="form">
+  <span>View ID</span>
+  <span>Part ID</span>
+  <span>Position</span>
+  <span>CSS Class(es)</span>
+  <span class="checkbox">Activate View</span>
+  <span class="checkbox">Activate Part</span>
+  <button (click)="onAddView()" class="e2e-add" title="Add view" sciMaterialIcon>add</button>
+
+  @for (viewFormGroup of form.controls.views.controls; track $index) {
+    <!-- ID -->
+    <input [formControl]="viewFormGroup.controls.id" [class]="'e2e-view-id'">
+    <!-- Part ID -->
+    <input [formControl]="viewFormGroup.controls.options.controls.partId" [class]="'e2e-part-id'" [attr.list]="partList">
+    <!-- Position -->
+    <input [formControl]="viewFormGroup.controls.options.controls.position" type="number" [class]="'e2e-position'">
+    <!-- CSS class -->
+    <app-css-class [formControl]="viewFormGroup.controls.options.controls.cssClass"/>
+    <!-- Activate View -->
+    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activateView" [class]="'e2e-activate-view'"></sci-checkbox>
+    <!-- Activate Part -->
+    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activatePart" [class]="'e2e-activate-part'"></sci-checkbox>
+    <!-- Remove button -->
+    <button class="e2e-remove" (click)="onRemoveView($index)" title="Remove view" sciMaterialIcon>remove</button>
+  }
+</form>
+
+<datalist [id]="partList">
+  @for (part of partProposals; track part) {
+    <option [value]="part">{{part}}</option>
+  }
+</datalist>

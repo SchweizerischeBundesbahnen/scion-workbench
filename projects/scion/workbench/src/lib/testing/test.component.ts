@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, EnvironmentProviders, Inject, InjectionToken, makeEnvironmentProviders, Optional} from '@angular/core';
+import {Component, EnvironmentProviders, inject, InjectionToken, makeEnvironmentProviders} from '@angular/core';
 import {ComponentFixture} from '@angular/core/testing';
-import {WorkbenchView} from '../view/workbench-view.model';
-import {NgIf} from '@angular/common';
+import {ViewId, WorkbenchView} from '../view/workbench-view.model';
 
 /**
  * Component that can be used in unit tests.
@@ -19,16 +18,22 @@ import {NgIf} from '@angular/common';
 @Component({
   selector: 'spec-test-component',
   template: `
-    <main *ngIf="content">{{content}}</main>
-    <input *ngIf="withTransientStateInputElement" class="transient-state"/>`,
+    @if (content) {
+      <main>{{content}}</main>
+    }
+    @if (withTransientStateInputElement) {
+      <input class="transient-state"/>
+    }
+  `,
   standalone: true,
-  imports: [NgIf],
 })
 export default class _TestComponent {
 
-  constructor(@Optional() @Inject(COMPONENT_CONTENT) public content: string | null,
-              @Optional() @Inject(TRANSIENT_STATE_INPUT_ELEMENT) public withTransientStateInputElement: boolean | null,
-              @Optional() public view: WorkbenchView | null) {
+  protected content = inject(COMPONENT_CONTENT, {optional: true});
+  protected withTransientStateInputElement = inject(TRANSIENT_STATE_INPUT_ELEMENT, {optional: true});
+
+  constructor() {
+    const view = inject(WorkbenchView, {optional: true});
     if (view) {
       view.title = view.id;
     }
@@ -69,6 +74,6 @@ export function withTransientStateInputElement(): EnvironmentProviders {
  *
  * Use that state to check whether the component has been re-created.
  */
-export function enterTransientViewState(fixture: ComponentFixture<any>, viewId: string, textualState: string): void {
+export function enterTransientViewState(fixture: ComponentFixture<any>, viewId: ViewId, textualState: string): void {
   fixture.nativeElement.querySelector(`wb-view[data-viewid="${viewId}"] input.transient-state`).value = textualState;
 }

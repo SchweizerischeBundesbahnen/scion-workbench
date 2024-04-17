@@ -34,6 +34,7 @@ import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfronten
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../../glass-pane/glass-pane.directive';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Microfrontends} from '../common/microfrontend.util';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -205,15 +206,16 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
             const paramsHandling = request.body!.paramsHandling;
             const currentParams = this._route.snapshot.params;
             const newParams = Dictionaries.coerce(request.body!.params); // coerce params for backward compatibility
-            const mergedParams = Dictionaries.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
+            const mergedParams = Objects.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
             const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
 
-            return {
-              layout,
-              viewOutlets: {[this.view.id]: [urlParams]},
-              viewStates: {[this.view.id]: {[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams}},
-            };
-          }, {relativeTo: this._route});
+            return layout.navigateView(this.view.id, [urlParams], {
+              relativeTo: this._route,
+              state: Objects.withoutUndefinedEntries({
+                [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
+              }),
+            });
+          });
 
           await this._messageClient.publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
         }

@@ -11,7 +11,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {isGridElementVisible} from '../layout/ɵworkbench-layout';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Determines whether the given element requires a drop zone in the specified region.
@@ -32,8 +32,8 @@ function requiresDropZone(element: MTreeNode | MPart, region: 'north' | 'south' 
     return element.id === MAIN_AREA;
   }
 
-  const child1Visible = isGridElementVisible(element.child1);
-  const child2Visible = isGridElementVisible(element.child2);
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(element.child2);
 
   if (child1Visible && child2Visible) {
     switch (region) {

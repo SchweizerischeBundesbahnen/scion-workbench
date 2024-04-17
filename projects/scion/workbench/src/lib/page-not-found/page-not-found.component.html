@@ -1,0 +1,15 @@
+<header>Page Not Found</header>
+
+<section class="message">
+  The requested page <span class="url">{{view.urlSegments | appFormatUrl}}</span> was not found.
+  <br>
+  The URL may have changed. Try to open the view again.
+</section>
+
+<button (click)="view.close()">Close</button>
+
+@if (isDevMode) {
+  <section class="developer-hint">
+    You can create a custom "Page Not Found" component and register it in the workbench configuration to personalize this page.
+  </section>
+}

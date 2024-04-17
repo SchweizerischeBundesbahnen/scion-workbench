@@ -1,5 +1,6 @@
 import {Observable} from 'rxjs';
 import {WorkbenchPartAction} from '../workbench.model';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Represents a part of the workbench layout.
@@ -35,24 +36,24 @@ export abstract class WorkbenchPart {
   /**
    * Emits the currently active view in this part.
    */
-  public abstract readonly activeViewId$: Observable<string | null>;
+  public abstract readonly activeViewId$: Observable<ViewId | null>;
 
   /**
    * The currently active view, if any.
    */
-  public abstract readonly activeViewId: string | null;
+  public abstract readonly activeViewId: ViewId | null;
 
   /**
    * Emits the views opened in this part.
    *
    * Upon subscription, emits the current views, and then each time the views change. The observable never completes.
    */
-  public abstract readonly viewIds$: Observable<string[]>;
+  public abstract readonly viewIds$: Observable<ViewId[]>;
 
   /**
    * The currently opened views in this part.
    */
-  public abstract readonly viewIds: string[];
+  public abstract readonly viewIds: ViewId[];
 
   /**
    * Emits actions associated with this part.

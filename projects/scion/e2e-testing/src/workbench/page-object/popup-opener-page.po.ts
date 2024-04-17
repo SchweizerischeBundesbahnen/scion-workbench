@@ -10,7 +10,7 @@
 
 import {coerceArray, DomRect, fromRect, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint} from '@scion/workbench';
+import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -176,7 +176,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     }
   }
 
-  public async enterContextualViewId(viewId: string | '<null>' | ''): Promise<void> {
+  public async enterContextualViewId(viewId: ViewId | '<null>' | ''): Promise<void> {
     await this.locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 

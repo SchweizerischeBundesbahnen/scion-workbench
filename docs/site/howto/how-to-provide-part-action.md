@@ -32,9 +32,11 @@ Add a `<ng-template>` to an HTML template and decorate it with the `wbPartAction
 As an alternative to modeling an action in HTML templates, actions can be contributed programmatically using the `WorkbenchService.registerPartAction` method. The content is specified in the form of a CDK portal, i.e., a component portal or a template portal.
 
 ```ts
-const workbenchService = inject(WorkbenchService);
+import {inject} from '@angular/core';
+import {WorkbenchService} from '@scion/workbench';
+import {ComponentPortal} from '@angular/cdk/portal';
 
-workbenchService.registerPartAction({
+inject(WorkbenchService).registerPartAction({
   portal: new ComponentPortal(YourComponent),
   align: 'end',
 });
@@ -56,6 +58,9 @@ The action can be configured with a `canMatch` function to match a specific part
 The following function contributes the action only to parts in the perspective 'MyPerspective' located in the main area.
 
 ```ts
+import {inject} from '@angular/core';
+import {CanMatchPartFn, WorkbenchPart, WorkbenchService} from '@scion/workbench';
+
 public canMatch: CanMatchPartFn = (part: WorkbenchPart): boolean => {
   if (!inject(WorkbenchService).getPerspective('MyPerspective')?.active) {
     return false;

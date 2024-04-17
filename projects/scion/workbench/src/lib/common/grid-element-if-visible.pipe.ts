@@ -10,7 +10,7 @@
 
 import {Pipe, PipeTransform} from '@angular/core';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
-import {isGridElementVisible} from '../layout/ɵworkbench-layout';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Returns given grid element, but only if visible.
@@ -21,7 +21,7 @@ import {isGridElementVisible} from '../layout/ɵworkbench-layout';
 export class GridElementIfVisiblePipe implements PipeTransform {
 
   public transform(gridElement: MTreeNode | MPart | null | undefined): MTreeNode | MPart | null {
-    if (gridElement && isGridElementVisible(gridElement)) {
+    if (gridElement && WorkbenchLayouts.isGridElementVisible(gridElement)) {
       return gridElement;
     }
     return null;

@@ -21,6 +21,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {parseTypedString} from '../common/parse-typed-value.util';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 /**
  * Allows registering workbench capabilities.
@@ -37,6 +38,7 @@ import {parseTypedString} from '../common/parse-typed-value.util';
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
     SciViewportComponent,
+    CssClassComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
@@ -54,7 +56,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       heading: this._formBuilder.control(''),
       closable: this._formBuilder.control<boolean | null>(null),
       showSplash: this._formBuilder.control<boolean | null>(null),
-      cssClass: this._formBuilder.control(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
       pinToStartPage: this._formBuilder.control(false),
     }),
     popupProperties: this._formBuilder.group({
@@ -69,7 +71,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       }),
       showSplash: this._formBuilder.control<boolean | null>(null),
       pinToStartPage: this._formBuilder.control(false),
-      cssClass: this._formBuilder.control(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
     dialogProperties: this._formBuilder.group({
       path: this._formBuilder.control(''),
@@ -87,7 +89,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       padding: this._formBuilder.control<boolean | null>(null),
       showSplash: this._formBuilder.control<boolean | null>(null),
       pinToStartPage: this._formBuilder.control(false),
-      cssClass: this._formBuilder.control(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
   });
 
@@ -111,7 +113,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         case WorkbenchCapabilities.Dialog:
           return this.readDialogCapabilityFromUI();
         default:
-          throw Error('[IllegalArgumentError] Capability expected to be a workbench capability, but was not.');
+          throw Error('Capability expected to be a workbench capability, but was not.');
       }
     })();
 
@@ -144,7 +146,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         path: parseTypedString(this.form.controls.viewProperties.controls.path.value), // allow `undefined` to test capability validation
         title: this.form.controls.viewProperties.controls.title.value || undefined,
         heading: this.form.controls.viewProperties.controls.heading.value || undefined,
-        cssClass: this.form.controls.viewProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
+        cssClass: this.form.controls.viewProperties.controls.cssClass.value,
         closable: this.form.controls.viewProperties.controls.closable.value ?? undefined,
         showSplash: this.form.controls.viewProperties.controls.showSplash.value ?? undefined,
         pinToStartPage: this.form.controls.viewProperties.controls.pinToStartPage.value,
@@ -175,7 +177,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         }),
         showSplash: this.form.controls.popupProperties.controls.showSplash.value ?? undefined,
         pinToStartPage: this.form.controls.popupProperties.controls.pinToStartPage.value,
-        cssClass: this.form.controls.popupProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
+        cssClass: this.form.controls.popupProperties.controls.cssClass.value,
       },
     };
   }
@@ -207,7 +209,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         padding: this.form.controls.dialogProperties.controls.padding.value ?? undefined,
         showSplash: this.form.controls.dialogProperties.controls.showSplash.value ?? undefined,
         pinToStartPage: this.form.controls.dialogProperties.controls.pinToStartPage.value,
-        cssClass: this.form.controls.dialogProperties.controls.cssClass.value.split(/\s+/).filter(Boolean),
+        cssClass: this.form.controls.dialogProperties.controls.cssClass.value,
       },
     };
   }

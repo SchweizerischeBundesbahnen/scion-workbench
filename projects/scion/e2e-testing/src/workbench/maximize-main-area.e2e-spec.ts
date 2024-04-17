@@ -9,8 +9,6 @@
  */
 
 import {test} from '../fixtures';
-import {PerspectivePagePO} from './page-object/perspective-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {RouterPagePO} from './page-object/router-page.po';
 import {expect} from '@playwright/test';
@@ -21,27 +19,12 @@ test.describe('Workbench', () => {
   test('should allow maximizing the main area', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Register Angular routes.
-    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPage.registerRoute({outlet: 'view', path: '', component: 'view-page'});
-    await layoutPage.view.tab.close();
-
-    // Register perspective.
-    const perspectivePage = await workbenchNavigator.openInNewTab(PerspectivePagePO);
-    await perspectivePage.registerPerspective({
-      id: 'perspective',
-      parts: [
-        {id: MAIN_AREA},
-        {id: 'left', relativeTo: MAIN_AREA, align: 'left', ratio: .2},
-      ],
-      views: [
-        {id: 'view', partId: 'left', activateView: true},
-      ],
-    });
-    await perspectivePage.view.tab.close();
-
-    // Activate the perspective.
-    await appPO.switchPerspective('perspective');
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
+      .addView('view.100', {partId: 'left', activateView: true})
+      .navigateView('view.100', ['test-view']),
+    );
 
     // Open view 1 in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -75,8 +58,8 @@ test.describe('Workbench', () => {
           ratio: .2,
           child1: new MPart({
             id: 'left',
-            views: [{id: 'view'}],
-            activeViewId: 'view',
+            views: [{id: 'view.100'}],
+            activeViewId: 'view.100',
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
@@ -125,8 +108,8 @@ test.describe('Workbench', () => {
           ratio: .2,
           child1: new MPart({
             id: 'left',
-            views: [{id: 'view'}],
-            activeViewId: 'view',
+            views: [{id: 'view.100'}],
+            activeViewId: 'view.100',
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),

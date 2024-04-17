@@ -14,6 +14,9 @@ Displayed on top of other content, a message box blocks interaction with other p
 To display a text message, inject `MessageBoxService` and invoke the `open` method, passing the text to display. 
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService} from '@scion/workbench';
+
 inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.');
 ```
 
@@ -23,6 +26,9 @@ To display structured content, pass a component instead of a string literal.
 Data can be passed to the component as inputs via the options object in the form of an object literal. Inputs are available as input properties in the component.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService} from '@scion/workbench';
+
 const action = await inject(WorkbenchMessageBoxService).open(SomeComponent, {
   inputs: {
     a: '...',
@@ -32,6 +38,8 @@ const action = await inject(WorkbenchMessageBoxService).open(SomeComponent, {
 ```
 
 ```ts
+import {Component, Input} from '@angular/core';
+
 @Component({...})
 export class SomeComponent {
 
@@ -50,6 +58,9 @@ Clicking a button closes the message box and resolves the Promise to the propert
 
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService} from '@scion/workbench';
+
 const action = await inject(WorkbenchMessageBoxService).open('Do you want to save changes?', {
   actions: {
     yes: 'Yes',
@@ -69,6 +80,9 @@ A message box can be view-modal or application-modal. A view-modal message box b
 By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked. To open the message box with a different modality, specify the modality in the message box options.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService} from '@scion/workbench';
+
 inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.', {
   modality: 'application',
 });
@@ -78,6 +92,9 @@ inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.', {
 A message can be displayed as info, warning or alert. The severity can be set via the options object.
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService} from '@scion/workbench';
+
 inject(WorkbenchMessageBoxService).open('Data could not be saved.', {
   severity: 'error',
 });
@@ -87,6 +104,9 @@ inject(WorkbenchMessageBoxService).open('Data could not be saved.', {
 A message box can have a title. The title is specified via the options object. 
 
 ```ts
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService} from '@scion/workbench';
+
 inject(WorkbenchMessageBoxService).open('The view contains stale data.', {
   title: 'Stale Data',
 });

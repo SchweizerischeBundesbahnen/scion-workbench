@@ -38,7 +38,7 @@ export class ViewMoveDialogTestPageComponent {
 
   constructor(private _formBuilder: NonNullableFormBuilder, private _dialog: WorkbenchDialog) {
     this._dialog.title = 'Move view';
-    this.requirePartIfMovingToPart();
+    this.requirePartIfMovingToExistingWindow();
   }
 
   public onOk(): void {
@@ -61,7 +61,7 @@ export class ViewMoveDialogTestPageComponent {
   /**
    * Makes the part a required field if not moving the view to a new window.
    */
-  private requirePartIfMovingToPart(): void {
+  private requirePartIfMovingToExistingWindow(): void {
     this.form.controls.workbenchId.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(target => {

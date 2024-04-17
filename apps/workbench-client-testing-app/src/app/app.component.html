@@ -1,6 +1,6 @@
 <ng-container *ngIf="workbenchContextActive | async; else workbench_context_note">
   <sci-viewport cdkTrapFocus>
-    <router-outlet></router-outlet>
+    <router-outlet/>
   </sci-viewport>
   <section class="metadata">
     <span class="chip has-focus e2e-has-focus" *ngIf="focusMonitor!.focus$ | async">has-focus</span>
