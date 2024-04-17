@@ -14,6 +14,7 @@ import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 import {take} from 'rxjs/operators';
 import {bufferLatestUntilLayoutChange} from '../common/operators';
+import {ViewId} from './workbench-view.model';
 
 /**
  * Registry for {@link WorkbenchView} model objects.
@@ -41,16 +42,16 @@ export class WorkbenchViewRegistry implements OnDestroy {
   /**
    * Unregisters specified view and destroys it.
    */
-  public unregister(viewId: string): void {
+  public unregister(viewId: ViewId): void {
     this._registry.unregister(viewId)?.destroy();
   }
 
   /**
    * Returns the {@link WorkbenchView} of the given identity. If not found, by default, throws an error unless setting the `orElseNull` option.
    */
-  public get(viewId: string): ɵWorkbenchView;
-  public get(viewId: string, options: {orElse: null}): ɵWorkbenchView | null;
-  public get(viewId: string, options?: {orElse: null}): ɵWorkbenchView | null {
+  public get(viewId: ViewId): ɵWorkbenchView;
+  public get(viewId: ViewId, options: {orElse: null}): ɵWorkbenchView | null;
+  public get(viewId: ViewId, options?: {orElse: null}): ɵWorkbenchView | null {
     return this._registry.get(viewId, options);
   }
 

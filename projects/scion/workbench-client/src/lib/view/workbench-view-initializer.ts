@@ -10,7 +10,7 @@
 
 import {Beans, Initializer} from '@scion/toolkit/bean-manager';
 import {ContextService} from '@scion/microfrontend-platform';
-import {WorkbenchView} from './workbench-view';
+import {ViewId, WorkbenchView} from './workbench-view';
 import {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view';
 
 /**
@@ -21,7 +21,7 @@ import {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './ɵworkbench-view';
 export class WorkbenchViewInitializer implements Initializer {
 
   public async init(): Promise<void> {
-    const viewId = await Beans.get(ContextService).lookup<string>(ɵVIEW_ID_CONTEXT_KEY);
+    const viewId = await Beans.get(ContextService).lookup<ViewId>(ɵVIEW_ID_CONTEXT_KEY);
     if (viewId !== null) {
       const workbenchView = new ɵWorkbenchView(viewId);
       Beans.register(WorkbenchView, {useValue: workbenchView});

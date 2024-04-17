@@ -7,7 +7,7 @@ The workbench layout is a grid of parts. Parts are aligned relative to each othe
 
 The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views. The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable area for user interaction.
 
-Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time. Perspectives share the same main area, if any.
+Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time. Perspectives share the same main area, if any.
 
 The sources for this package are in [SCION Workbench](https://github.com/SchweizerischeBundesbahnen/scion-workbench) repo. Please file issues and pull requests against that repo.
 

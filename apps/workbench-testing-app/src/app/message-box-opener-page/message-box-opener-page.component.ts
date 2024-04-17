@@ -17,6 +17,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -29,6 +30,7 @@ import {MessageBoxPageComponent} from '../message-box-page/message-box-page.comp
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
+    CssClassComponent,
   ],
 })
 export default class MessageBoxOpenerPageComponent {
@@ -43,7 +45,7 @@ export default class MessageBoxOpenerPageComponent {
       modality: this._formBuilder.control<'application' | 'view' | ''>(''),
       contentSelectable: this._formBuilder.control(false),
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-      cssClass: this._formBuilder.control(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
   });
 
@@ -71,7 +73,7 @@ export default class MessageBoxOpenerPageComponent {
       modality: this.form.controls.options.controls.modality.value || undefined,
       contentSelectable: this.form.controls.options.controls.contentSelectable.value || undefined,
       inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
-      cssClass: this.form.controls.options.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.options.controls.cssClass.value,
     };
 
     if (this.isUseComponent()) {

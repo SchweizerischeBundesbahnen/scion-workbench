@@ -23,7 +23,7 @@ export abstract class WorkbenchLayoutFactory {
    *
    * @param id - The id of the part. Use {@link MAIN_AREA} to add the main area.
    * @param options - Controls how to add the part to the layout.
-   *        @property activate - Controls whether to activate the part. If not set, defaults to `false`.
+   * @param options.activate - Controls whether to activate the part. If not set, defaults to `false`.
    * @return layout with the part added.
    */
   public abstract addPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout;

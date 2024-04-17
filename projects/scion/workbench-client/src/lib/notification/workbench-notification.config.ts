@@ -37,8 +37,9 @@ export interface WorkbenchNotificationConfig {
   content?: any;
 
   /**
-   * Allows passing data to the notification. The notification provider can declare mandatory and optional parameters.
-   * No additional parameters may be included. Refer to the documentation of the notification capability provider for more information.
+   * Passes data to the notification.
+   *
+   * The notification can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
   params?: Map<string, any> | Dictionary;
 
@@ -60,7 +61,7 @@ export interface WorkbenchNotificationConfig {
   group?: string;
 
   /**
-   * Specifies CSS class(es) to be added to the notification, useful in end-to-end tests for locating the notification.
+   * Specifies CSS class(es) to add to the notification, e.g., to locate the notification in tests.
    */
   cssClass?: string | string[];
 }

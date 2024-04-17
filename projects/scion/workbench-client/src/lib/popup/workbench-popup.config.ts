@@ -11,6 +11,7 @@
 import {Observable} from 'rxjs';
 import {Dictionary} from '@scion/toolkit/util';
 import {PopupOrigin} from './popup.origin';
+import {ViewId} from '../view/workbench-view';
 
 /**
  * Configures the popup to display a microfrontend in a workbench popup using {@link WorkbenchPopupService}.
@@ -41,8 +42,9 @@ export interface WorkbenchPopupConfig {
    */
   anchor: Element | PopupOrigin | Observable<PopupOrigin>;
   /**
-   * Allows passing data to the popup microfrontend. The popup provider can declare mandatory and optional parameters.
-   * No additional parameters may be included. Refer to the documentation of the popup capability provider for more information.
+   * Passes data to the popup.
+   *
+   * The popup can declare mandatory and optional parameters. No additional parameters are allowed. Refer to the documentation of the capability for more information.
    */
   params?: Map<string, any> | Dictionary;
   /**
@@ -55,7 +57,7 @@ export interface WorkbenchPopupConfig {
    */
   closeStrategy?: CloseStrategy;
   /**
-   * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
+   * Specifies CSS class(es) to add to the popup, e.g., to locate the popup in tests.
    */
   cssClass?: string | string[];
   /**
@@ -70,7 +72,7 @@ export interface WorkbenchPopupConfig {
      * By default, if opening the popup in the context of a view, that view is used as the popup's contextual view.
      * If you set the view id to `null`, the popup will open without referring to the contextual view.
      */
-    viewId?: string | null;
+    viewId?: ViewId | null;
   };
 }
 

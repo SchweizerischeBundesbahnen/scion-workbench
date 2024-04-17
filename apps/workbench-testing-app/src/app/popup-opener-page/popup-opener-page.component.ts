@@ -10,7 +10,7 @@
 
 import {Component, ElementRef, Type, ViewChild} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {PopupService, PopupSize} from '@scion/workbench';
+import {PopupService, PopupSize, ViewId} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import {map, startWith} from 'rxjs/operators';
@@ -28,6 +28,7 @@ import InputFieldTestPageComponent from '../test-pages/input-field-test-page/inp
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
 import {Dictionaries} from '@scion/toolkit/util';
 import {parseTypedString} from '../common/parse-typed-value.util';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -42,6 +43,7 @@ import {parseTypedString} from '../common/parse-typed-value.util';
     SciAccordionItemDirective,
     SciCheckboxComponent,
     PopupPositionLabelPipe,
+    CssClassComponent,
   ],
 })
 export default class PopupOpenerPageComponent {
@@ -57,9 +59,9 @@ export default class PopupOpenerPageComponent {
       width: this._formBuilder.control<number | undefined>(undefined),
       height: this._formBuilder.control<number | undefined>(undefined),
     }),
-    contextualViewId: this._formBuilder.control(''),
+    contextualViewId: this._formBuilder.control<ViewId | ''>(''),
     align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     input: this._formBuilder.control(''),
     closeStrategy: this._formBuilder.group({
       onFocusLost: this._formBuilder.control(true),
@@ -94,7 +96,7 @@ export default class PopupOpenerPageComponent {
       input: this.form.controls.input.value || undefined,
       anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton : this._popupOrigin$,
       align: this.form.controls.align.value || undefined,
-      cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.cssClass.value,
       closeStrategy: {
         onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,
         onEscape: this.form.controls.closeStrategy.controls.onEscape.value,

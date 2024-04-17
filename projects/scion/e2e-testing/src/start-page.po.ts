@@ -14,6 +14,7 @@ import {Locator} from '@playwright/test';
 import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outlet.po';
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -26,7 +27,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
 
-  constructor(private _appPO: AppPO, locateBy?: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy?: {viewId?: ViewId; cssClass?: string}) {
     if (locateBy?.viewId || locateBy?.cssClass) {
       this._view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
       this.locator = this._view.locator.locator('app-start-page');

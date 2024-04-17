@@ -9,6 +9,7 @@
  */
 
 import {CloseStrategy} from './workbench-popup.config';
+import {ViewId} from '../view/workbench-view';
 
 /**
  * Command object for instructing the Workbench to open the microfrontend of given popup capability in a popup.
@@ -22,6 +23,6 @@ export interface ɵWorkbenchPopupCommand {
   closeStrategy?: CloseStrategy;
   cssClass?: string | string[];
   context?: {
-    viewId?: string | null;
+    viewId?: ViewId | null;
   };
 }

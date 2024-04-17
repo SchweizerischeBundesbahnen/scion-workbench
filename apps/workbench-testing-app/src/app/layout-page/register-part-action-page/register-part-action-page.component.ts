@@ -17,6 +17,8 @@ import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Arrays} from '@scion/toolkit/util';
+import {SettingsService} from '../../settings.service';
+import {CssClassComponent} from '../../css-class/css-class.component';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -29,6 +31,7 @@ import {Arrays} from '@scion/toolkit/util';
     AsyncPipe,
     ReactiveFormsModule,
     SciFormFieldComponent,
+    CssClassComponent,
   ],
 })
 export default class RegisterPartActionPageComponent {
@@ -36,7 +39,7 @@ export default class RegisterPartActionPageComponent {
   public form = this._formBuilder.group({
     content: this._formBuilder.control('', {validators: Validators.required}),
     align: this._formBuilder.control<'start' | 'end' | ''>(''),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     canMatch: this._formBuilder.group({
       view: this._formBuilder.control(''),
       part: this._formBuilder.control(''),
@@ -45,7 +48,9 @@ export default class RegisterPartActionPageComponent {
   });
   public registerError: string | false | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder, public workbenchService: WorkbenchService) {
+  constructor(private _formBuilder: NonNullableFormBuilder,
+              private _settingsService: SettingsService,
+              public workbenchService: WorkbenchService) {
   }
 
   public onRegister(): void {
@@ -74,13 +79,19 @@ export default class RegisterPartActionPageComponent {
           }
           return true;
         }),
-        cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+        cssClass: this.form.controls.cssClass.value,
       });
       this.registerError = false;
-      this.form.reset();
+      this.resetForm();
     }
     catch (error: unknown) {
       this.registerError = stringifyError(error);
+    }
+  }
+
+  private resetForm(): void {
+    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+      this.form.reset();
     }
   }
 }

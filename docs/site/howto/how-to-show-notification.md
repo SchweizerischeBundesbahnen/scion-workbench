@@ -11,6 +11,9 @@ A notification is a closable message that appears in the upper-right corner and 
 To show a notification, inject `NotificationService` and invoke the `notify` method, passing a `Notification` options object to control the appearance of the notification, like its severity, its content and show duration.
 
 ```ts
+import {inject} from '@angular/core';
+import {NotificationService} from '@scion/workbench';
+
 const notificationService = inject(NotificationService);
 notificationService.notify({
   content: 'Person successfully created',

@@ -15,7 +15,7 @@ export enum WorkbenchCapabilities {
   /**
    * Contributes a microfrontend for display in workbench view.
    *
-   * A view is a visual workbench component for displaying content stacked or side-by-side.
+   * A view is a visual workbench element for displaying content stacked or side-by-side.
    */
   View = 'view',
   /**

@@ -8,9 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlSegmentGroup} from '@angular/router';
-import {Commands} from './routing.model';
-import {VIEW_ID_PREFIX} from '../workbench.constants';
+import {ActivatedRoute, ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
+import {Commands} from '../routing/routing.model';
+import {DIALOG_ID_PREFIX, POPUP_ID_PREFIX} from '../workbench.constants';
+import {inject} from '@angular/core';
+import {ViewId} from '../view/workbench-view.model';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Provides utility functions for router operations.
@@ -18,41 +21,56 @@ import {VIEW_ID_PREFIX} from '../workbench.constants';
 export const RouterUtils = {
 
   /**
-   * Converts URL segments into an array of routable commands to be passed to the Angular router for navigation.
+   * Converts given URL segments into an array of commands that can be passed to the Angular router for navigation.
    */
-  segmentsToCommands: (segments: UrlSegment[]): Commands[] => {
-    return segments.reduce((acc: Commands, segment: UrlSegment) => {
-      return acc.concat(
-        segment.path || [],
-        segment.parameters && Object.keys(segment.parameters).length ? segment.parameters : [],
-      );
-    }, []);
-  },
+  segmentsToCommands: (segments: UrlSegment[]): Commands => {
+    const commands = new Array<any>();
 
-  /**
-   * Reads specified outlets from the current URL, optionally applying a `replacer` function to replace the commands of an outlet.
-   */
-  outletsFromCurrentUrl: (router: Router, outletNames: string[], replacer?: (outlet: string, commands: Commands) => Commands | null): {[viewId: string]: Commands} => {
-    const urlTree = router.parseUrl(router.url);
-    return outletNames.reduce((acc, outletName) => {
-      if (urlTree.root.children[outletName]) {
-        const commands = RouterUtils.segmentsToCommands(urlTree.root.children[outletName].segments);
-        return {...acc, [outletName]: replacer ? replacer(outletName, commands) : commands};
+    segments.forEach(segment => {
+      if (segment.path) {
+        commands.push(segment.path);
       }
-      return acc;
-    }, {});
+      if (segment.parameters && Object.keys(segment.parameters).length) {
+        commands.push(segment.parameters);
+      }
+    });
+
+    return commands;
   },
 
   /**
-   * Parses the given path including any matrix parameters into URL segments.
+   * Constructs URL segments from given commands, resolving any relative navigational symbols.
+   *
+   * This function must be called inside an injection context.
    */
-  parsePath: (router: Router, path: string): UrlSegment[] => {
-    const urlTree = router.parseUrl(path);
-    const segmentGroup: UrlSegmentGroup = urlTree.root.children[PRIMARY_OUTLET];
-    if (!segmentGroup) {
-      throw Error(`[RouteMatchError] Cannot match any route for '${path}'.`);
+  commandsToSegments: (commands: Commands, options?: {relativeTo?: ActivatedRoute | null}): UrlSegment[] => {
+    // Ignore `relativeTo` for absolute commands.
+    const isAbsolutePath = typeof commands[0] === 'string' && commands[0].startsWith('/');
+    const relativeTo = isAbsolutePath ? null : (options?.relativeTo || null);
+
+    // Angular throws the error 'NG04003: Root segment cannot have matrix parameters' when passing an empty path command
+    // followed by a matrix params object, but not when passing matrix params as the first command. For consistency, when
+    // passing matrix params as the first command, we prepend an empty path for Angular to throw the same error.
+    if (typeof commands[0] === 'object' && (!relativeTo || RouterUtils.hasEmptyPathFromRoot(relativeTo))) {
+      commands = ['', ...commands];
     }
-    return segmentGroup.segments;
+
+    const urlTree = inject(Router).createUrlTree(commands, {relativeTo});
+    return urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET]?.segments ?? [];
+  },
+
+  /**
+   * Parses the given path and matrix parameters into an array of commands that can be passed to the Angular router for navigation.
+   *
+   * This function must be called inside an injection context.
+   */
+  pathToCommands: (path: string): Commands => {
+    const urlTree = inject(Router).parseUrl(path);
+    const segments = urlTree.root.children[PRIMARY_OUTLET]?.segments;
+    if (!segments) {
+      throw Error(`[RouterError] Cannot match any routes for path '${path}'.`);
+    }
+    return RouterUtils.segmentsToCommands(segments);
   },
 
   /**
@@ -67,17 +85,45 @@ export const RouterUtils = {
   },
 
   /**
-   * Looks for requested data on given route, or its parent route(s) if not declared.
+   * Looks for requested data on given route, or its parent route(s) if not found.
    */
   lookupRouteData: <T>(activatedRoute: ActivatedRouteSnapshot, dataKey: string): T | undefined => {
     return activatedRoute.pathFromRoot.reduceRight((resolvedData, route) => resolvedData ?? route.data[dataKey], undefined);
   },
 
   /**
-   * Tests if the given view can be the target of a primary route.
-   * Such views have an id that begins with the view prefix.
+   * Tests if the given outlet matches the format of a popup outlet.
    */
-  isPrimaryRouteTarget: (viewId: string): boolean => {
-    return viewId.startsWith(VIEW_ID_PREFIX);
+  isPopupOutlet: (outlet: string | undefined | null): outlet is `popup.${string}` => {
+    return outlet?.startsWith(POPUP_ID_PREFIX) ?? false;
+  },
+
+  /**
+   * Tests if the given outlet matches the format of a dialog outlet.
+   */
+  isDialogOutlet: (outlet: string | undefined | null): outlet is `dialog.${string}` => {
+    return outlet?.startsWith(DIALOG_ID_PREFIX) ?? false;
+  },
+
+  /**
+   * Reads view outlets from given URL.
+   *
+   * A view outlet contains the URL segments of a view contained in the workbench layout.
+   */
+  parseViewOutlets: (url: UrlTree): Map<ViewId, UrlSegment[]> => {
+    const viewOutlets = new Map<ViewId, UrlSegment[]>();
+    Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
+      if (WorkbenchLayouts.isViewId(outlet)) {
+        viewOutlets.set(outlet, segmentGroup.segments);
+      }
+    });
+    return viewOutlets;
+  },
+
+  /**
+   * Tests if given route has an empty path from root.
+   */
+  hasEmptyPathFromRoot(route: ActivatedRoute): boolean {
+    return route.snapshot.pathFromRoot.flatMap(route => route.url).filter(segment => segment.path.length).length === 0;
   },
 } as const;

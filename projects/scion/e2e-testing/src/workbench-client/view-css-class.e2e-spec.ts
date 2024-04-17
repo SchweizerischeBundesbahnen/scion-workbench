@@ -12,7 +12,6 @@ import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expect} from '@playwright/test';
 import {RouterPagePO} from './page-object/router-page.po';
-import {LayoutPagePO} from '../workbench/page-object/layout-page.po';
 
 test.describe('Workbench View CSS Class', () => {
 
@@ -43,9 +42,10 @@ test.describe('Workbench View CSS Class', () => {
     });
     await microfrontendNavigator.registerIntention('app1', {type: 'view', qualifier: {component: 'testee-2'}});
 
-    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPage.addPart('right', {align: 'right'});
-    await layoutPage.addView('view.100', {partId: 'right', activateView: true});
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('right', {align: 'right'})
+      .addView('view.100', {partId: 'right', activateView: true, cssClass: 'testee-layout'}),
+    );
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
@@ -59,6 +59,10 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-navigation-1');
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee-navigation-1');
+    // Expect CSS classes of the view to be set.
+    await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-layout');
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-layout');
+    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee-layout');
     // Expect CSS classes of the capability to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-capability-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-capability-1');
@@ -81,6 +85,10 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.view.getCssClasses()).not.toContain('testee-capability-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).not.toContain('testee-capability-1');
     await expect.poll(() => viewPage.outlet.getCssClasses()).not.toContain('testee-capability-1');
+    // Expect CSS classes of the view to be set.
+    await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-layout');
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-layout');
+    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee-layout');
     // Expect CSS classes of the capability to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-capability-2');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-capability-2');
@@ -101,6 +109,10 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.view.getCssClasses()).not.toContain('testee-capability-2');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).not.toContain('testee-capability-2');
     await expect.poll(() => viewPage.outlet.getCssClasses()).not.toContain('testee-capability-2');
+    // Expect CSS classes of the view to be set.
+    await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-layout');
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-layout');
+    await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee-layout');
     // Expect CSS classes of the capability to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-capability-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-capability-1');

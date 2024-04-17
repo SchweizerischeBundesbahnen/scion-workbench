@@ -13,6 +13,7 @@ import {WorkbenchRouter} from '@scion/workbench-client';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {APP_IDENTITY} from '@scion/microfrontend-platform';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {CssClassComponent} from '../../css-class/css-class.component';
 
 @Component({
   selector: 'app-bulk-navigation-test-page',
@@ -22,13 +23,14 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,
+    CssClassComponent,
   ],
 })
 export default class BulkNavigationTestPageComponent {
 
   public form = this._formBuilder.group({
     viewCount: this._formBuilder.control(1, Validators.required),
-    cssClass: this._formBuilder.control('', Validators.required),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined, Validators.required),
   });
 
   constructor(private _formBuilder: NonNullableFormBuilder,

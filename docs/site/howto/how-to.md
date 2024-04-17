@@ -15,19 +15,19 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to install the SCION Workbench](how-to-install-workbench.md)
 
 #### Layout
-- [How to define an initial layout](how-to-define-initial-layout.md)
+- [How to define the initial workbench layout](how-to-define-initial-layout.md)
 - [How to provide a perspective](how-to-provide-perspective.md)
+- [How to work with perspectives](how-to-perspective.md)
 - [How to configure a start page](how-to-configure-start-page.md)
-- [How to query, switch and reset perspectives](how-to-perspective.md)
 
 #### View
 - [How to provide a view](how-to-provide-view.md)
 - [How to open a view](how-to-open-view.md)
-- [How to open an initial view in the main area](how-to-open-initial-view.md)
-- [How to set a view title](how-to-set-view-title.md)
+- [How to interact with a view](how-to-interact-with-view.md)
 - [How to close a view](how-to-close-view.md)
 - [How to prevent a view from being closed](how-to-prevent-view-closing.md)
 - [How to provide a part action](how-to-provide-part-action.md)
+- [How to provide a "Not Found Page"](how-to-provide-not-found-page.md)
 
 #### Dialog, Popup, Messagebox, Notification
 - [How to open a dialog](how-to-open-dialog.md)

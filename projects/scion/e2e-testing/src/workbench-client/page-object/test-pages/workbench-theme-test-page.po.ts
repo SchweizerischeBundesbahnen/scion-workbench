@@ -14,6 +14,7 @@ import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
+import {ViewId} from '@scion/workbench-client';
 
 export class WorkbenchThemeTestPagePO implements MicrofrontendViewPagePO {
 
@@ -24,7 +25,7 @@ export class WorkbenchThemeTestPagePO implements MicrofrontendViewPagePO {
   public readonly theme: Locator;
   public readonly colorScheme: Locator;
 
-  constructor(appPO: AppPO, viewId: string) {
+  constructor(appPO: AppPO, viewId: ViewId) {
     this.view = appPO.view({viewId});
     this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
     this.locator = this.outlet.frameLocator.locator('app-workbench-theme-test-page');

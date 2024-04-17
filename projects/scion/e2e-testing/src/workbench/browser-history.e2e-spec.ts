@@ -10,7 +10,6 @@
 
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
-import {LayoutPagePO} from './page-object/layout-page.po';
 import {StandaloneViewTestPagePO} from './page-object/test-pages/standalone-view-test-page.po';
 import {NonStandaloneViewTestPagePO} from './page-object/test-pages/non-standalone-view-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
@@ -23,8 +22,7 @@ test.describe('Browser History', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add part to the workbench grid
-    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
-    await layoutPage.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25});
+    await workbenchNavigator.modifyLayout(layout => layout.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25}));
 
     // Add view-1 to the left part
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);

@@ -11,6 +11,8 @@ A start page can be used to display content when all views are closed.
 To display a start page, register an empty path route, as follows:
 
 ```ts
+import {RouterModule} from '@angular/router';
+
 RouterModule.forRoot([
   {path: '', loadComponent: () => import('./start-page/start-page.component')},
 ]);
@@ -21,6 +23,10 @@ RouterModule.forRoot([
 If working with perspectives, configure a different start page per perspective by testing for the active perspective in the `canMatch` route handler.
 
 ```ts
+import {RouterModule} from '@angular/router';
+import {inject} from '@angular/core';
+import {WorkbenchService} from '@scion/workbench';
+
 RouterModule.forRoot([
   // Match this route only if 'perspective A' is active.
   {

@@ -10,7 +10,7 @@
 
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {UrlTree} from '@angular/router';
-import {DIALOG_ID_PREFIX} from '../workbench.constants';
+import {RouterUtils} from './router.util';
 
 /**
  * Stateful differ for finding added/removed dialogs.
@@ -28,7 +28,7 @@ export class WorkbenchDialogDiffer {
    * Computes differences in the URL since last time {@link WorkbenchDialogDiffer#diff} was invoked.
    */
   public diff(urlTree: UrlTree): WorkbenchDialogDiff {
-    const dialogOutlets = Object.keys(urlTree.root.children).filter(outlet => outlet.startsWith(DIALOG_ID_PREFIX));
+    const dialogOutlets = Object.keys(urlTree.root.children).filter(outlet => RouterUtils.isDialogOutlet(outlet));
 
     return new WorkbenchDialogDiff(this._dialogDiffer.diff(dialogOutlets));
   }

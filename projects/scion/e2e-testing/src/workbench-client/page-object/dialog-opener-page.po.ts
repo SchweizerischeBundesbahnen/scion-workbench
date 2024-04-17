@@ -17,7 +17,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {WorkbenchDialogOptions} from '@scion/workbench-client';
+import {ViewId, WorkbenchDialogOptions} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link DialogOpenerPageComponent}.
@@ -30,7 +30,7 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
   public readonly returnValue: Locator;
   public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-dialog-opener-page');

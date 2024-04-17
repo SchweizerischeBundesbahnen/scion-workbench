@@ -10,13 +10,14 @@
 
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {WorkbenchDialogService, WorkbenchView} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchView, ViewId} from '@scion/workbench-client';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -28,6 +29,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
+    CssClassComponent,
   ],
 })
 export default class DialogOpenerPageComponent {
@@ -46,9 +48,9 @@ export default class DialogOpenerPageComponent {
     options: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       modality: this._formBuilder.control<'application' | 'view' | ''>(''),
-      contextualViewId: this._formBuilder.control(''),
+      contextualViewId: this._formBuilder.control<ViewId | ''>(''),
       animate: this._formBuilder.control(undefined),
-      cssClass: this._formBuilder.control(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
   });
 
@@ -76,7 +78,7 @@ export default class DialogOpenerPageComponent {
       context: {
         viewId: this.form.controls.options.controls.contextualViewId.value || undefined,
       },
-      cssClass: this.form.controls.options.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.options.controls.cssClass.value,
     })
       .then(result => this.returnValue = result)
       .catch(error => this.dialogError = stringifyError(error) || 'Dialog was closed with an error');

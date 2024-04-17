@@ -27,6 +27,7 @@ import {ViewListButtonComponent} from '../view-list-button/view-list-button.comp
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {fromDimension$} from '@scion/toolkit/observable';
 import {WORKBENCH_ID} from '../../workbench-id';
+import {ViewId} from '../../view/workbench-view.model';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -165,7 +166,7 @@ export class PartBarComponent implements OnInit {
     event.stopPropagation();
   }
 
-  public get viewIds$(): Observable<string[]> {
+  public get viewIds$(): Observable<ViewId[]> {
     return this._part.viewIds$;
   }
 
@@ -303,7 +304,9 @@ export class PartBarComponent implements OnInit {
         workbenchId: this._dragData!.workbenchId,
         partId: this._dragData!.partId,
         viewId: this._dragData!.viewId,
+        alternativeViewId: this._dragData!.alternativeViewId,
         viewUrlSegments: this._dragData!.viewUrlSegments,
+        navigationHint: this._dragData!.navigationHint,
         classList: this._dragData!.classList,
       },
       target: {

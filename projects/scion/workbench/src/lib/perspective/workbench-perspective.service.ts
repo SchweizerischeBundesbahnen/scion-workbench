@@ -90,13 +90,18 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
   /**
    * Switches to the specified perspective. The main area will not change, if any.
+   *
+   * @param id - Specifies the id of the perspective to activate.
+   * @param options - Controls activation of the perspective.
+   * @param options.storePerspectiveAsActive - Controls if to store the perspective as the active perspective. Default is `true`.
+   * @return `true` if activated the perspective, otherwise `false`.
    */
-  public async switchPerspective(id: string): Promise<boolean> {
+  public async switchPerspective(id: string, options?: {storePerspectiveAsActive?: boolean}): Promise<boolean> {
     if (this.activePerspective?.id === id) {
       return true;
     }
     const activated = await this._perspectiveRegistry.get(id).activate();
-    if (activated) {
+    if (activated && (options?.storePerspectiveAsActive ?? true)) {
       await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);
       window.name = generatePerspectiveWindowName(id);
     }
@@ -144,7 +149,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
     // Select initial perspective.
     if (initialPerspectiveId) {
-      await this.switchPerspective(initialPerspectiveId);
+      await this.switchPerspective(initialPerspectiveId, {storePerspectiveAsActive: false});
     }
   }
 

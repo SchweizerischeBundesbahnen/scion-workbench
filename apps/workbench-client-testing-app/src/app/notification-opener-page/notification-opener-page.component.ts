@@ -15,6 +15,7 @@ import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -26,6 +27,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
+    CssClassComponent,
   ],
 })
 export default class NotificationOpenerPageComponent {
@@ -38,7 +40,7 @@ export default class NotificationOpenerPageComponent {
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | number | ''>(''),
     group: this._formBuilder.control(''),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
   public notificationOpenError: string | undefined;
@@ -61,7 +63,7 @@ export default class NotificationOpenerPageComponent {
       severity: this.form.controls.severity.value || undefined,
       duration: this.parseDurationFromUI(),
       group: this.form.controls.group.value || undefined,
-      cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+      cssClass: this.form.controls.cssClass.value,
     }, qualifier ?? undefined)
       .catch(error => this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened');
   }

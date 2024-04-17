@@ -14,6 +14,7 @@ import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
 import {AppPO} from './app.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Handle for interacting with a workbench view tab.
@@ -44,8 +45,8 @@ export class ViewTabPO {
     this.part = part;
   }
 
-  public async getViewId(): Promise<string> {
-    return (await this.locator.getAttribute('data-viewid'))!;
+  public async getViewId(): Promise<ViewId> {
+    return (await this.locator.getAttribute('data-viewid'))! as ViewId;
   }
 
   public async click(): Promise<void> {
@@ -158,12 +159,12 @@ export class ViewTabPO {
    * Drags this view tab to the specified region of specified part or grid.
    *
    * @param target - Specifies the part or grid where to drop this view tab.
-   *        @property partId - Specifies the part where to drag this tab.
-   *        @property grid - Specifies the grid where to drag this tab.
-   *        @property region - Specifies the region where to drop this tab in the specified target.
+   * @param target.partId - Specifies the part where to drag this tab.
+   * @param target.grid - Specifies the grid where to drag this tab.
+   * @param target.region - Specifies the region where to drop this tab in the specified target.
    * @param options - Controls the drag operation.
-   *        @property steps - Sets the number of intermediate events to be emitted while dragging; defaults to `2`.
-   *        @property performDrop - Controls whether to perform the drop; defaults to `true`.
+   * @param options.steps - Sets the number of intermediate events to be emitted while dragging; defaults to `2`.
+   * @param options.performDrop - Controls whether to perform the drop; defaults to `true`.
    */
   public async dragTo(target: {partId: string; region: 'north' | 'east' | 'south' | 'west' | 'center'}, options?: {steps?: number; performDrop?: boolean}): Promise<void>;
   public async dragTo(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}, options?: {steps?: number; performDrop?: boolean}): Promise<void>;

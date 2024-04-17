@@ -10,7 +10,7 @@
 
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {UrlTree} from '@angular/router';
-import {POPUP_ID_PREFIX} from '../workbench.constants';
+import {RouterUtils} from './router.util';
 
 /**
  * Stateful differ for finding added/removed popups.
@@ -28,7 +28,7 @@ export class WorkbenchPopupDiffer {
    * Computes differences in the URL since last time {@link WorkbenchPopupDiffer#diff} was invoked.
    */
   public diff(urlTree: UrlTree): WorkbenchPopupDiff {
-    const popupOutlets = Object.keys(urlTree.root.children).filter(outlet => outlet.startsWith(POPUP_ID_PREFIX));
+    const popupOutlets = Object.keys(urlTree.root.children).filter(RouterUtils.isPopupOutlet);
 
     return new WorkbenchPopupDiff(this._popupsDiffer.diff(popupOutlets));
   }

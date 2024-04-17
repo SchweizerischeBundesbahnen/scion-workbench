@@ -9,6 +9,7 @@
  */
 
 import {Injector} from '@angular/core';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Controls how to open a dialog.
@@ -56,7 +57,7 @@ export interface WorkbenchDialogOptions {
   injector?: Injector;
 
   /**
-   * Specifies CSS class(es) to be added to the dialog, useful in end-to-end tests for locating the dialog.
+   * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
    */
   cssClass?: string | string[];
 
@@ -74,6 +75,6 @@ export interface WorkbenchDialogOptions {
      *
      * By default, if opening the dialog in the context of a view, that view is used as the contextual view.
      */
-    viewId?: string;
+    viewId?: ViewId;
   };
 }

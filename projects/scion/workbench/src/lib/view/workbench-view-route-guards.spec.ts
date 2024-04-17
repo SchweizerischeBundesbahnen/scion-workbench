@@ -1,0 +1,328 @@
+/*
+ * Copyright (c) 2018-2023 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {TestBed} from '@angular/core/testing';
+import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {RouterOutlet} from '@angular/router';
+import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {Component} from '@angular/core';
+import PageNotFoundComponent from '../page-not-found/page-not-found.component';
+import {WorkbenchComponent} from '../workbench.component';
+import {canMatchWorkbenchView} from './workbench-view-route-guards';
+import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
+import {RouterTestingModule} from '@angular/router/testing';
+
+describe('CanMatchWorkbenchView Guard', () => {
+
+  beforeEach(() => {
+    jasmine.addMatchers(toShowCustomMatcher);
+  });
+
+  it('should match empty path route if not installed `canMatchWorkbenchView` guard', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: '', component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to empty path route.
+    await workbenchRouter.navigate([], {hint: 'ignored'});
+    await waitUntilStable();
+
+    expect(fixture).toShow(View1Component);
+  });
+
+  it('should match empty path route based on hint passed to the navigation', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
+          {path: '', canMatch: [canMatchWorkbenchView('view-2')], component: View2Component},
+          {path: '', canMatch: [canMatchWorkbenchView('view-3')], component: View3Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to view 1
+    await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(View1Component);
+
+    // Navigate to view 2
+    await workbenchRouter.navigate([], {hint: 'view-2', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(View2Component);
+
+    // Navigate to view 3
+    await workbenchRouter.navigate([], {hint: 'view-3', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(View3Component);
+  });
+
+  it('should match nested empty path route based on hint passed to the navigation', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {
+            path: '',
+            children: [
+              {
+                path: '',
+                children: [
+                  {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
+                  {path: '', canMatch: [canMatchWorkbenchView('view-2')], component: View2Component},
+                  {path: '', canMatch: [canMatchWorkbenchView('view-3')], component: View3Component},
+                ],
+              },
+            ],
+          },
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to view 1
+    await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(View1Component);
+
+    // Navigate to view 2
+    await workbenchRouter.navigate([], {hint: 'view-2', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(View2Component);
+
+    // Navigate to view 3
+    await workbenchRouter.navigate([], {hint: 'view-3', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(View3Component);
+  });
+
+  it('should not match route if target of a workbench view', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: 'path/to/view', canMatch: [canMatchWorkbenchView(false)], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to 'path/to/view'.
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await workbenchRouter.navigate(['path/to/view']);
+    await waitUntilStable();
+    expect(fixture).toShow(PageNotFoundComponent);
+  });
+
+  it('should match route if target of a workbench view', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: 'path/to/view', canMatch: [canMatchWorkbenchView(true)], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to 'path/to/view'.
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await workbenchRouter.navigate(['path/to/view']);
+    await waitUntilStable();
+    expect(fixture).toShow(View1Component);
+  });
+
+  it('should match route if matching the hint passed to the navigation', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: 'path/to/view', canMatch: [canMatchWorkbenchView('hint')], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to 'path/to/view' passing matching hint.
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await workbenchRouter.navigate(['path/to/view'], {hint: 'hint'});
+    await waitUntilStable();
+    expect(fixture).toShow(View1Component);
+  });
+
+  it('should not match route if navigating without hint', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: 'path/to/view', canMatch: [canMatchWorkbenchView('hint')], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to 'path/to/view' without passing a hint.
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await workbenchRouter.navigate(['path/to/view']);
+    await waitUntilStable();
+    expect(fixture).toShow(PageNotFoundComponent);
+  });
+
+  it('should not match route if navigating with different hint', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: 'path/to/view', canMatch: [canMatchWorkbenchView('hint')], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to 'path/to/view' passing non-matching hint.
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await workbenchRouter.navigate(['path/to/view'], {hint: 'other-hint'});
+    await waitUntilStable();
+    expect(fixture).toShow(PageNotFoundComponent);
+  });
+
+  it('should error when loading the application root route into a view', async () => {
+    await jasmine.spyOnGlobalErrorsAsync(async errors => {
+      TestBed.configureTestingModule({
+        imports: [
+          WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+          RouterTestingModule.withRoutes([
+            {path: '', component: WorkbenchComponent}, // do not guard the application root route
+            {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
+          ]),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Navigate to the empty path route.
+      const workbenchRouter = TestBed.inject(WorkbenchRouter);
+      await workbenchRouter.navigate([], {hint: 'view-1'});
+      await waitUntilStable();
+
+      expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Workbench must not be loaded into a view\. Did you navigate to the empty path route\? Make sure that the application's root route is guarded with 'canMatchWorkbenchView\(false\)'\./));
+      expect(fixture).not.toShow(View1Component);
+    });
+  });
+
+  it('should not load the application root route into a view', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: '', canMatch: [canMatchWorkbenchView(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
+          {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to the empty path route.
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await workbenchRouter.navigate([], {hint: 'view-1'});
+    await waitUntilStable();
+
+    expect(fixture).toShow(View1Component);
+  });
+});
+
+describe('CanMatchNotFoundPage', () => {
+
+  beforeEach(() => {
+    jasmine.addMatchers(toShowCustomMatcher);
+  });
+
+  it('should display "Page Not Found" if not matching a route', async () => {
+    TestBed.configureTestingModule({
+      imports: [
+        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        RouterTestingModule.withRoutes([
+          {path: '', canMatch: [() => false], component: View1Component},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to empty path route.
+    await workbenchRouter.navigate([], {hint: 'hint', target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(PageNotFoundComponent);
+
+    // Navigate to 'path/to/view'.
+    await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+    expect(fixture).toShow(PageNotFoundComponent);
+  });
+});
+
+@Component({
+  selector: 'spec-view-1',
+  template: 'View 1',
+  standalone: true,
+})
+class View1Component {
+}
+
+@Component({
+  selector: 'spec-view-2',
+  template: 'View 2',
+  standalone: true,
+})
+class View2Component {
+}
+
+@Component({
+  selector: 'spec-view-3',
+  template: 'View 3',
+  standalone: true,
+})
+class View3Component {
+}
+
+@Component({
+  selector: 'spec-router-outlet',
+  template: '<router-outlet/>',
+  styles: [':host { display: grid; }'],
+  standalone: true,
+  imports: [
+    RouterOutlet,
+  ],
+})
+class RouterOutletComponent {
+}

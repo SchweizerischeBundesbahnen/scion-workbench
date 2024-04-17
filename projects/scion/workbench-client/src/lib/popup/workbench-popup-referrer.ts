@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {ViewId} from '../view/workbench-view';
+
 /**
  * Information about the context in which a popup was opened.
  *
@@ -17,7 +19,7 @@ export interface WorkbenchPopupReferrer {
   /**
    * Identity of the view if opened in the context of a view.
    */
-  viewId?: string;
+  viewId?: ViewId;
   /**
    * Identity of the view capability if opened in the context of a view microfrontend.
    */

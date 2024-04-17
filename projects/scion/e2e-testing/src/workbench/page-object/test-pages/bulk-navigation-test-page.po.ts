@@ -15,13 +15,14 @@ import {RouterPagePO} from '../router-page.po';
 import {WorkbenchNavigator} from '../../workbench-navigator';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
+import {ViewId} from '@scion/workbench';
 
 export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
 
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-bulk-navigation-test-page');
   }
@@ -31,7 +32,7 @@ export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
   }
 
   public async enterCssClass(cssClass: string): Promise<void> {
-    await this.locator.locator('input.e2e-css-class').fill(cssClass);
+    await this.locator.locator('input.e2e-class').fill(cssClass);
   }
 
   public async clickNavigateNoAwait(): Promise<void> {

@@ -8,10 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Navigation, NavigationExtras, Router} from '@angular/router';
-import {ViewState, ViewStates} from './routing.model';
-import {inject} from '@angular/core';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {Navigation} from '@angular/router';
+import {ViewStates} from './routing.model';
 
 /**
  * Provides methods to associate {@link WorkbenchNavigationalState} with a navigation.
@@ -26,21 +24,10 @@ export const WorkbenchNavigationalStates = {
   },
 
   /**
-   * Resolves navigational state associated with a view.
-   *
-   * TODO [WB-LAYOUT] Remove when migrated to the new Router API as state is retained in layout.
+   * Creates a state object with workbench-specific data that can be passed to a workbench navigation.
    */
-  resolveViewState: (viewId: string): ViewState | undefined => {
-    const currentNavigation = inject(Router).getCurrentNavigation();
-    return (currentNavigation && WorkbenchNavigationalStates.fromNavigation(currentNavigation)?.viewStates[viewId]) ?? inject(WorkbenchViewRegistry).get(viewId, {orElse: null})?.state;
-  },
-
-  /**
-   * Associates workbench-specific state with given navigation extras.
-   */
-  addToNavigationExtras: (extras: NavigationExtras, state: WorkbenchNavigationalState): void => {
-    extras.state = {
-      ...extras.state,
+  create: (state: WorkbenchNavigationalState): {[key: string]: unknown} => {
+    return {
       [WORKBENCH_NAVIGATION_STATE_KEY]: state,
     };
   },
@@ -67,18 +54,6 @@ export interface WorkbenchNavigationalState {
 }
 
 /**
- * Keys for associating state with a view navigation.
- */
-export const WorkbenchNavigationalViewStates = {
-  /**
-   * Key for associating CSS class(es) with a view state.
-   */
-  cssClass: 'ɵcssClass',
-} as const;
-
-/**
  * Key for associating workbench-specific state with a navigation.
- *
- * @private
  */
 const WORKBENCH_NAVIGATION_STATE_KEY = 'ɵworkbench';

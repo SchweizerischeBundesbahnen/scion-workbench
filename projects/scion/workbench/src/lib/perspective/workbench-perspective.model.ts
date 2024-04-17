@@ -72,6 +72,8 @@ export interface WorkbenchPerspectiveDefinition {
   id: string;
   /**
    * Function to create the initial layout for the perspective. The function can call `inject` to get any required dependencies.
+   *
+   * See {@link WorkbenchLayoutFn} for more information and an example.
    */
   layout: WorkbenchLayoutFn;
   /**
@@ -91,26 +93,94 @@ export interface WorkbenchPerspectiveDefinition {
 /**
  * Signature of a function to provide a workbench layout.
  *
- * The function is passed a factory to create the layout. The layout has methods to modify it.
- * Each modification creates a new layout instance that can be used for further modifications.
- *
- * The layout is an immutable object, i.e., modifications have no side effects.
+ * The workbench will invoke this function with a factory to create the layout. The layout is immutable, so each modification creates a new instance.
+ * Use the instance for further modifications and finally return it.
  *
  * The function can call `inject` to get any required dependencies.
  *
+ * ## Workbench Layout
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+ *
+ * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
+ * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
+ * area for user interaction.
+ *
+ * ## Steps to create the layout
+ * Start by adding the first part. From there, you can gradually add more parts and align them relative to each other.
+ * Next, add views to the layout, specifying to which part to add the views.
+ * The final step is to navigate the views. A view can be navigated to any route.
+ *
+ * To avoid cluttering the initial URL, we recommend navigating the views of the initial layout to empty path routes and using a navigation hint to differentiate.
+ *
+ * ## Example
+ * The following example defines a layout with a main area and three parts in the peripheral area:
+ *
+ * ```plain
+ * +--------+----------------+
+ * |  top   |   main area    |
+ * |  left  |                |
+ * |--------+                |
+ * | bottom |                |
+ * |  left  |                |
+ * +--------+----------------+
+ * |          bottom         |
+ * +-------------------------+
+ * ```
+ *
  * ```ts
  * function defineLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
- *   return factory.addPart(MAIN_AREA)
- *                 .addPart('topLeft', {align: 'left', ratio: .25})
- *                 .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
- *                 .addPart('bottom', {align: 'bottom', ratio: .3})
- *                 .addView('navigator', {partId: 'topLeft', activateView: true})
- *                 .addView('explorer', {partId: 'topLeft'})
- *                 .addView('repositories', {partId: 'bottomLeft', activateView: true})
- *                 .addView('console', {partId: 'bottom', activateView: true})
- *                 .addView('problems', {partId: 'bottom'})
- *                 .addView('search', {partId: 'bottom'});
+ *   return factory
+ *     // Add parts to the layout.
+ *     .addPart(MAIN_AREA)
+ *     .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+ *     .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+ *     .addPart('bottom', {align: 'bottom', ratio: .3})
+ *
+ *     // Add views to the layout.
+ *     .addView('navigator', {partId: 'topLeft'})
+ *     .addView('explorer', {partId: 'bottomLeft'})
+ *     .addView('console', {partId: 'bottom'})
+ *     .addView('problems', {partId: 'bottom'})
+ *     .addView('search', {partId: 'bottom'})
+ *
+ *     // Navigate views.
+ *     .navigateView('navigator', ['path/to/navigator'])
+ *     .navigateView('explorer', ['path/to/explorer'])
+ *     .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
+ *     .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
+ *     .navigateView('search', ['path/to/search'])
+ *
+ *     // Decide which views to activate.
+ *     .activateView('navigator')
+ *     .activateView('explorer')
+ *     .activateView('console');
  * }
+ * ```
+ *
+ * The layout requires the following routes.
+ *
+ * ```ts
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {provideRouter} from '@angular/router';
+ * import {canMatchWorkbenchView} from '@scion/workbench';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideRouter([
+ *       // Navigator View
+ *       {path: 'path/to/navigator', loadComponent: () => import('./navigator/navigator.component')},
+ *       // Explorer View
+ *       {path: 'path/to/explorer', loadComponent: () => import('./explorer/explorer.component')},
+ *       // Search view
+ *       {path: 'path/to/search', loadComponent: () => import('./search/search.component')},
+ *       // Console view
+ *       {path: '', canMatch: [canMatchWorkbenchView('console')], loadComponent: () => import('./console/console.component')},
+ *       // Problems view
+ *       {path: '', canMatch: [canMatchWorkbenchView('problems')], loadComponent: () => import('./problems/problems.component')},
+ *     ]),
+ *   ],
+ * });
  * ```
  */
 export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<WorkbenchLayout> | WorkbenchLayout;
@@ -121,3 +191,43 @@ export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<Wor
  * The function is passed a list of registered perspectives. The function can call `inject` to get any required dependencies.
  */
 export type WorkbenchPerspectiveSelectionFn = (perspectives: WorkbenchPerspective[]) => Promise<WorkbenchPerspective | null> | WorkbenchPerspective | null;
+
+/**
+ * Contains different versions of a perspective layout.
+ *
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
+ *
+ * @see WORKBENCH_PERSPECTIVE_MODEL_VERSION
+ */
+export interface MPerspectiveLayout {
+  /**
+   * Layout before any user personalization (initial layout).
+   */
+  referenceLayout: {
+    /**
+     * @see WorkbenchLayoutSerializer.serializeGrid
+     * @see WorkbenchLayoutSerializer.deserializeGrid
+     */
+    workbenchGrid: string;
+    /**
+     * @see WorkbenchLayoutSerializer.serializeViewOutlets
+     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     */
+    viewOutlets: string;
+  };
+  /**
+   * Layout personalized by the user.
+   */
+  userLayout: {
+    /**
+     * @see WorkbenchLayoutSerializer.serializeGrid
+     * @see WorkbenchLayoutSerializer.deserializeGrid
+     */
+    workbenchGrid: string;
+    /**
+     * @see WorkbenchLayoutSerializer.serializeViewOutlets
+     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     */
+    viewOutlets: string;
+  };
+}

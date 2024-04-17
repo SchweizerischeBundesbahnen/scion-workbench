@@ -13,6 +13,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
+import {ViewId} from '@scion/workbench-client';
 
 export class ViewPropertiesTestPagePO implements MicrofrontendViewPagePO {
 
@@ -20,7 +21,7 @@ export class ViewPropertiesTestPagePO implements MicrofrontendViewPagePO {
   public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(appPO: AppPO, viewId: string) {
+  constructor(appPO: AppPO, viewId: ViewId) {
     this.view = appPO.view({viewId});
     this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
     this.locator = this.outlet.frameLocator.locator('app-view-properties-test-page');

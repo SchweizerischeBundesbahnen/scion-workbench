@@ -41,9 +41,7 @@ export abstract class Notification<T = any> {
   public abstract setDuration(duration: 'short' | 'medium' | 'long' | 'infinite' | number): void;
 
   /**
-   * Specifies CSS class(es) to be added to the notification, useful in end-to-end tests for locating the notification.
-   *
-   * This operation is additive, that is, it does not override CSS classes set by the notification opener.
+   * Specifies CSS class(es) to add to the notification, e.g., to locate the notification in tests.
    */
   public abstract setCssClass(cssClass: string | string[]): void;
 }

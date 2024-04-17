@@ -14,6 +14,7 @@ import {WorkbenchNavigator} from '../../workbench-navigator';
 import {RouterPagePO} from '../router-page.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
+import {ViewId} from '@scion/workbench';
 
 export class WorkbenchThemeTestPagePO implements WorkbenchViewPagePO {
 
@@ -22,7 +23,7 @@ export class WorkbenchThemeTestPagePO implements WorkbenchViewPagePO {
   public readonly theme: Locator;
   public readonly colorScheme: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-workbench-theme-test-page');
 

@@ -47,7 +47,7 @@ export interface WorkbenchDialogCapability extends Capability {
   /**
    * Specifies parameters required by the dialog.
    *
-   * Parameters are available in the path or title for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchDialog} handle.
+   * Parameters are available in the path and title for placeholder substitution, or can be read in the microfrontend by injecting the {@link WorkbenchDialog} handle.
    *
    * @inheritDoc
    */
@@ -65,7 +65,7 @@ export interface WorkbenchDialogCapability extends Capability {
      * The path supports placeholders that will be replaced with parameter values. A placeholder
      * starts with a colon (`:`) followed by the parameter name.
      *
-     * #### Usage of named parameters in the path:
+     * Usage:
      * ```json
      * {
      *   "type": "dialog",
@@ -115,7 +115,7 @@ export interface WorkbenchDialogCapability extends Capability {
      */
     showSplash?: boolean;
     /**
-     * Specifies CSS class(es) to be added to the dialog, useful in end-to-end tests for locating the dialog.
+     * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
      */
     cssClass?: string | string[];
   };

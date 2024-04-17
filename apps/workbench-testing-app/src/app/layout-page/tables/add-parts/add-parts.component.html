@@ -1,0 +1,38 @@
+<form [formGroup]="form">
+  <span>Part ID</span>
+  <span>RelativeTo</span>
+  <span>Align</span>
+  <span>Ratio</span>
+  <span class="checkbox">Activate</span>
+  <button (click)="onAddPart()" class="e2e-add" title="Add part" sciMaterialIcon>add</button>
+
+  @for (partFormGroup of form.controls.parts.controls; track $index) {
+    <!-- ID -->
+    <input [formControl]="partFormGroup.controls.id" [class]="'e2e-part-id'" [attr.list]="idList">
+    <!-- RelativeTo -->
+    <input [formControl]="partFormGroup.controls.relativeTo.controls.relativeTo" [class]="'e2e-relative-to'" [attr.list]="relativeToList">
+    <!-- Align -->
+    <select [formControl]="partFormGroup.controls.relativeTo.controls.align" [class]="'e2e-align'">
+      <option value="left">left</option>
+      <option value="right">right</option>
+      <option value="top">top</option>
+      <option value="bottom">bottom</option>
+    </select>
+    <!-- Ratio -->
+    <input [formControl]="partFormGroup.controls.relativeTo.controls.ratio" type="number" [class]="'e2e-ratio'">
+    <!-- Activate -->
+    <sci-checkbox [formControl]="partFormGroup.controls.options.controls.activate" [class]="'e2e-activate-part'"></sci-checkbox>
+    <!-- Remove button -->
+    <button class="e2e-remove" (click)="onRemovePart($index)" title="Remove part" sciMaterialIcon>remove</button>
+  }
+</form>
+
+<datalist [id]="idList">
+  <option [value]="MAIN_AREA">{{MAIN_AREA}}</option>
+</datalist>
+
+<datalist [id]="relativeToList">
+  @for (part of partProposals; track part) {
+    <option [value]="part">{{part}}</option>
+  }
+</datalist>

@@ -1,61 +1,82 @@
-import {Injectable} from '@angular/core';
-import {CanActivateFn, CanDeactivateFn, Data, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
-import {Arrays} from '@scion/toolkit/util';
+/*
+* Copyright (c) 2018-2024 Swiss Federal Railways
+*
+* This program and the accompanying materials are made
+* available under the terms of the Eclipse Public License 2.0
+* which is available at https://www.eclipse.org/legal/epl-2.0/
+*
+* SPDX-License-Identifier: EPL-2.0
+*/
+
+import {Injectable, InjectionToken} from '@angular/core';
+import {CanDeactivateFn, CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
+import {WorkbenchModuleConfig} from '../workbench-module-config';
+import PageNotFoundComponent from '../page-not-found/page-not-found.component';
+import {WorkbenchRouteData} from './workbench-route-data';
 
 /**
- * Registers auxiliary routes for views.
+ * Facilitates the registration of auxiliary routes of top-level routes.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchAuxiliaryRoutesRegistrator {
 
-  constructor(private _router: Router) {
+  constructor(private _workbenchModuleConfig: WorkbenchModuleConfig, private _router: Router) {
   }
 
   /**
-   * Registers an auxiliary route for every primary route found in the router config, allowing
-   * primary routes to be used in named router outlets.
+   * Registers an auxiliary route for each top-level route, enabling navigation in the specified router outlet(s).
    *
-   * @param outletName - outlet names for which to create named auxiliary routes
-   * @param config of the auxiliary route
+   * @param outlets - Specifies outlets for which to create auxiliary routes.
+   * @param config - Specifies the config of the auxiliary routes.
    */
-  public registerOutletAuxiliaryRoutes(outletName: string | string[], config: OutletAuxiliaryRouteConfig = {}): Routes {
-    const outletNames = new Set<string>(Arrays.coerce(outletName));
-    if (!outletNames.size) {
+  public registerAuxiliaryRoutes(outlets: string[], config: AuxiliaryRouteConfig = {}): Routes {
+    if (!outlets.length) {
       return [];
     }
 
-    const primaryRoutes = this._router.config.filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET);
-    const outletAuxRoutes: Routes = [];
-    primaryRoutes
-      .filter(primaryRoute => primaryRoute.path !== '') // skip root route(s)
-      .forEach(primaryRoute => outletNames.forEach(outlet => {
-        outletAuxRoutes.push(standardizeConfig({
-          ...primaryRoute,
-          outlet: outlet,
-          canActivate: [...(config.canActivate || []), ...(primaryRoute.canActivate || [])],
-          canDeactivate: [...(config.canDeactivate || []), ...(primaryRoute.canDeactivate || [])],
-          data: {...primaryRoute.data, ...config.data},
-        }));
+    const registeredRoutes: Routes = [];
+    outlets.forEach(outlet => {
+      this._router.config
+        .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
+        .forEach(route => {
+          registeredRoutes.push(standardizeConfig({
+            ...route,
+            outlet,
+            providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}, ...(route.providers ?? [])],
+            canDeactivate: [...(config.canDeactivate || []), ...(route.canDeactivate || [])],
+          }));
+        });
+
+      // Register "Page Not Found" route; must be registered as the last auxiliary route for the outlet.
+      registeredRoutes.push(standardizeConfig({
+        path: '**',
+        outlet,
+        providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}],
+        loadComponent: () => this._workbenchModuleConfig.pageNotFoundComponent ?? PageNotFoundComponent,
+        data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
+        canMatch: config.canMatchNotFoundPage || [],
       }));
+    });
 
     this.replaceRouterConfig([
-      ...this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)), // all registered routes, except auxiliary routes for any of the given outlets
-      ...outletAuxRoutes,
+      ...this._router.config,
+      ...registeredRoutes,
     ]);
 
-    return outletAuxRoutes;
+    return registeredRoutes;
   }
 
   /**
-   * Unregisters all auxiliary routes for the given outlet.
+   * Unregisters auxiliary routes for the given outlet.
    */
-  public unregisterOutletAuxiliaryRoutes(outletName: string | string[]): void {
-    const outletNames = new Set<string>(Arrays.coerce(outletName));
-    if (!outletNames.size) {
-      return;
+  public unregisterAuxiliaryRoutes(outlets: string[]): void {
+    const outletsToRemove = new Set<string>(outlets);
+
+    function shouldRemoveRoute(route: Route): boolean {
+      return !!route.outlet && outletsToRemove.has(route.outlet);
     }
 
-    this.replaceRouterConfig(this._router.config.filter(route => !route.outlet || !outletNames.has(route.outlet)));
+    this.replaceRouterConfig(this._router.config.filter(route => !shouldRemoveRoute(route)));
   }
 
   /**
@@ -72,12 +93,18 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
 }
 
 /**
- * Controls the creation of auxiliary routes for a named router outlet.
+ * Configures auxiliary routes.
  */
-export interface OutletAuxiliaryRouteConfig {
-  canActivate?: CanActivateFn[];
-  canDeactivate?: CanDeactivateFn<any>[];
-  data?: Data;
+export interface AuxiliaryRouteConfig {
+  /**
+   * Specifies "CanDeactivate" guard(s) to install on the auxiliary routes.
+   */
+  canDeactivate?: Array<CanDeactivateFn<unknown>>;
+  /**
+   * Specifies "CanMatch" guard(s) to install on the wildcard route (`**`),
+   * selected by the router if no route matches the requested URL.
+   */
+  canMatchNotFoundPage?: Array<CanMatchFn>;
 }
 
 /**
@@ -93,3 +120,10 @@ function standardizeConfig(route: Route): Route {
   route.children?.forEach(standardizeConfig);
   return route;
 }
+
+/**
+ * DI token to inject the outlet of a workbench auxiliary route.
+ *
+ * Can be injected in a `CanMatch` guard to obtain a reference to the workbench element.
+ */
+export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('WORKBENCH_AUXILIARY_ROUTE_OUTLET');

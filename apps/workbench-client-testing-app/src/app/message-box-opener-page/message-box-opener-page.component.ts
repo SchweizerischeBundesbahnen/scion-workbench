@@ -17,6 +17,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -29,6 +30,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
+    CssClassComponent,
   ],
 })
 export default class MessageBoxOpenerPageComponent {
@@ -42,7 +44,7 @@ export default class MessageBoxOpenerPageComponent {
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | ''>(''),
     modality: this._formBuilder.control<'application' | 'view' | ''>(''),
     contentSelectable: this._formBuilder.control(true),
-    cssClass: this._formBuilder.control(''),
+    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     viewContext: this._formBuilder.control(true),
   });
 
@@ -76,7 +78,7 @@ export default class MessageBoxOpenerPageComponent {
         severity: this.form.controls.severity.value || undefined,
         modality: this.form.controls.modality.value || undefined,
         contentSelectable: this.form.controls.contentSelectable.value || undefined,
-        cssClass: this.form.controls.cssClass.value.split(/\s+/).filter(Boolean),
+        cssClass: this.form.controls.cssClass.value,
       }, qualifier ?? undefined)
         .then(closeAction => this.closeAction = closeAction)
         .catch(error => this.openError = stringifyError(error));

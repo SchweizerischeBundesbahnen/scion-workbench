@@ -29,8 +29,8 @@ export class WorkbenchObjectRegistry<KEY, T> {
    * Creates an instance of the registry.
    *
    * @param config - Controls the creation of the registry.
-   *        @property keyFn - Function to extract the key of an object.
-   *        @property nullObjectErrorFn - Function to provide an error when looking up an object not contained in the registry.
+   * @param config.keyFn - Function to extract the key of an object.
+   * @param config.nullObjectErrorFn - Function to provide an error when looking up an object not contained in the registry.
    */
   constructor(config: {keyFn: (object: T) => KEY; nullObjectErrorFn: (key: KEY) => Error}) {
     this._keyFn = config.keyFn;

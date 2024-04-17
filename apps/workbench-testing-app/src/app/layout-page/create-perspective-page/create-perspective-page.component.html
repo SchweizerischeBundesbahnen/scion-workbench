@@ -1,0 +1,38 @@
+<form [formGroup]="form" autocomplete="off">
+  <section>
+    <sci-form-field label="ID">
+      <input [formControl]="form.controls.id" class="e2e-id">
+    </sci-form-field>
+    <sci-form-field label="Transient">
+      <sci-checkbox [formControl]="form.controls.transient" class="e2e-transient"></sci-checkbox>
+    </sci-form-field>
+    <sci-form-field label="Data">
+      <sci-key-value-field [keyValueFormArray]="form.controls.data" [addable]="true" [removable]="true" class="e2e-data"></sci-key-value-field>
+    </sci-form-field>
+  </section>
+
+  <section>
+    <header>Parts</header>
+    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals$ | async" [requiresInitialPart]="true"/>
+  </section>
+
+  <section>
+    <header>Views</header>
+    <app-add-views [formControl]="form.controls.views" [partProposals]="partProposals$ | async"/>
+  </section>
+
+  <section>
+    <header>View Navigations</header>
+    <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals$ | async"/>
+  </section>
+
+  <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>Register</button>
+</form>
+
+@if (registerError === false) {
+  <output class="register-success e2e-register-success">Success</output>
+}
+
+@if (registerError) {
+  <output class="register-error e2e-register-error">{{registerError}}</output>
+}

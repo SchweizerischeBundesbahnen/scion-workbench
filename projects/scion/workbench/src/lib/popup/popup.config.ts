@@ -18,6 +18,7 @@ import {map} from 'rxjs/operators';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -105,7 +106,7 @@ export abstract class PopupConfig {
    */
   public readonly size?: PopupSize;
   /**
-   * Specifies CSS class(es) to be added to the popup, useful in end-to-end tests for locating the popup.
+   * Specifies CSS class(es) to add to the popup, e.g., to locate the popup in tests.
    */
   public readonly cssClass?: string | string[];
   /**
@@ -120,7 +121,7 @@ export abstract class PopupConfig {
      * By default, if opening the popup in the context of a view, that view is used as the popup's contextual view.
      * If you set the view id to `null`, the popup will open without referring to the contextual view.
      */
-    viewId?: string | null;
+    viewId?: ViewId | null;
   };
 }
 
@@ -296,5 +297,5 @@ export interface PopupReferrer {
   /**
    * Identity of the view if opened in the context of a view.
    */
-  viewId?: string;
+  viewId?: ViewId;
 }

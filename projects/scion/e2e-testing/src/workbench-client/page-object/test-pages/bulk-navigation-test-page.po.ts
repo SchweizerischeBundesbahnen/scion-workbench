@@ -15,6 +15,7 @@ import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
+import {ViewId} from '@scion/workbench-client';
 
 export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
 
@@ -22,7 +23,7 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(private _appPO: AppPO, viewId: string) {
+  constructor(private _appPO: AppPO, viewId: ViewId) {
     this.view = this._appPO.view({viewId});
     this.outlet = new SciRouterOutletPO(this._appPO, {name: viewId});
     this.locator = this.outlet.frameLocator.locator('app-bulk-navigation-test-page');
@@ -33,7 +34,7 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   }
 
   public async enterCssClass(cssClass: string): Promise<void> {
-    await this.locator.locator('input.e2e-css-class').fill(cssClass);
+    await this.locator.locator('input.e2e-class').fill(cssClass);
   }
 
   /**

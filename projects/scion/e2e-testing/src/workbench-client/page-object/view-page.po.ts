@@ -12,7 +12,7 @@ import {DomRect, fromRect} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Params} from '@angular/router';
-import {WorkbenchViewCapability} from '@scion/workbench-client';
+import {ViewId, WorkbenchViewCapability} from '@scion/workbench-client';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
@@ -32,7 +32,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.outlet = new SciRouterOutletPO(appPO, {name: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-view-page');

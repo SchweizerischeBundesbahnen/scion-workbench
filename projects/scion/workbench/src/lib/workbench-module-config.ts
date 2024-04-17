@@ -34,7 +34,14 @@ export abstract class WorkbenchModuleConfig {
    *   constructor(view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {}
    * }
    */
-  public abstract viewTabComponent?: ComponentType<any>;
+  public abstract viewTabComponent?: ComponentType<unknown>;
+
+  /**
+   * Specifies the component to display if no route matches the requested URL.
+   *
+   * This happens when navigating to a route that does not exist or when loading the application, and the routes have changed since the last use.
+   */
+  public abstract pageNotFoundComponent?: ComponentType<unknown>;
 
   /**
    * Controls which built-in menu items to display in the view context menu.
@@ -117,59 +124,23 @@ export abstract class WorkbenchModuleConfig {
   public abstract microfrontendPlatform?: MicrofrontendPlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
 
   /**
-   *
    * Defines the workbench layout. Multiple layouts can be defined in the form of perspectives.
    * If not set, defaults to a layout with only a main area.
    *
-   * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is
-   * displayed in views.
-   *
-   * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
-   * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
-   * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
-   * area for user interaction.
-   *
-   * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+   * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
    * Perspectives share the same main area, if any.
    *
-   *
-   * ## Example of a layout that has a main area and three parts in the peripheral area:
-   *
-   * ```plain
-   * +--------+----------------+
-   * |  top   |                |
-   * |  left  |                |
-   * |--------+   main area    |
-   * | bottom |                |
-   * |  left  |                |
-   * +--------+----------------+
-   * |          bottom         |
-   * +-------------------------+
-   * ```
-   *
-   * ```ts
-   * WorkbenchModule.forRoot({
-   *   layout: (factory: WorkbenchLayoutFactory) => factory
-   *     .addPart(MAIN_AREA)
-   *     .addPart('topLeft', {align: 'left', ratio: .25})
-   *     .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-   *     .addPart('bottom', {align: 'bottom', ratio: .3})
-   *     .addView('navigator', {partId: 'topLeft', activateView: true})
-   *     .addView('explorer', {partId: 'topLeft'})
-   *     .addView('repositories', {partId: 'bottomLeft', activateView: true})
-   *     .addView('console', {partId: 'bottom', activateView: true})
-   *     .addView('problems', {partId: 'bottom'})
-   *     .addView('search', {partId: 'bottom'})
-   * });
-   * ```
+   * See {@link WorkbenchLayoutFn} for more information and an example.
    */
   public abstract layout?: WorkbenchLayoutFn | WorkbenchPerspectives;
+
   /**
    * Provides persistent storage to the SCION Workbench.
    *
    * If not set, the workbench uses the browser's local storage as persistent storage.
    */
   public abstract storage?: Type<WorkbenchStorage>;
+
   /**
    * Configures the behavior of workbench dialogs.
    */

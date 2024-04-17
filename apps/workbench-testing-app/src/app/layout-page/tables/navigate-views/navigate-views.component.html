@@ -1,0 +1,29 @@
+<form [formGroup]="form">
+  <span>View ID</span>
+  <span>Path</span>
+  <span>Hint</span>
+  <span>State</span>
+  <span>CSS Class(es)</span>
+  <button (click)="onAddNavigation()" class="e2e-add" title="Add navigation" sciMaterialIcon>add</button>
+
+  @for (navigationFormGroup of form.controls.navigations.controls; track $index) {
+    <!-- ID -->
+    <input [formControl]="navigationFormGroup.controls.id" class="e2e-view-id" [attr.list]="viewList">
+    <!-- Commands -->
+    <app-router-commands [formControl]="navigationFormGroup.controls.commands"/>
+    <!-- Hint -->
+    <input [formControl]="navigationFormGroup.controls.extras.controls.hint" class="e2e-hint">
+    <!-- State -->
+    <app-navigation-state [formControl]="navigationFormGroup.controls.extras.controls.state"/>
+    <!-- CSS class -->
+    <app-css-class [formControl]="navigationFormGroup.controls.extras.controls.cssClass"/>
+    <!-- Remove button -->
+    <button class="e2e-remove" (click)="onRemoveNavigation($index)" title="Remove navigation" sciMaterialIcon>remove</button>
+  }
+</form>
+
+<datalist [id]="viewList">
+  @for (view of viewProposals; track view) {
+    <option [value]="view">{{view}}</option>
+  }
+</datalist>

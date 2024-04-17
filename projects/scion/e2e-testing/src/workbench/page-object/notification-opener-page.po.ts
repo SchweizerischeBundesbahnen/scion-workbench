@@ -14,6 +14,7 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
 import {ViewPO} from '../../view.po';
+import {ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link NotificationPageComponent}.
@@ -24,7 +25,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO {
   public readonly view: ViewPO;
   public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.view.locator.locator('app-notification-opener-page');
     this.error = this.locator.locator('output.e2e-notification-open-error');

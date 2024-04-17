@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, OnDestroy, StaticProvider} from '@angular/core';
+import {Component, inject, Injector, OnDestroy, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
 import {RouterUtils} from '../../routing/router.util';
 import {Commands} from '../../routing/routing.model';
@@ -41,7 +41,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   public readonly outletInjector: Injector;
 
   constructor(popup: Popup<ɵPopupContext>,
-              injector: Injector,
+              private _injector: Injector,
               private _router: Router) {
     const popupContext = popup.input!;
     const capability = popupContext.capability;
@@ -49,7 +49,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     const params = popupContext.params;
     this.outletName = POPUP_ID_PREFIX.concat(popupContext.popupId);
     this.outletInjector = Injector.create({
-      parent: injector,
+      parent: this._injector,
       providers: [provideWorkbenchPopupHandle(popupContext)],
     });
 
@@ -67,7 +67,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   private navigate(path: string | null, extras: {outletName: string; params?: Map<string, any>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras.params);
 
-    const outletCommands: Commands | null = (path !== null ? RouterUtils.segmentsToCommands(RouterUtils.parsePath(this._router, path)) : null);
+    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'});
   }

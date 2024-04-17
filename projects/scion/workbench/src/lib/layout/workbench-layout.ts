@@ -8,6 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import {Commands, ViewState} from '../routing/routing.model';
+import {ActivatedRoute} from '@angular/router';
+
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is
  * displayed in views.
@@ -17,7 +20,7 @@
  * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
  * area for user interaction.
  *
- * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+ * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
  * Perspectives share the same main area, if any.
  *
  * The layout is an immutable object that provides methods to modify the layout. Modifications have no
@@ -31,7 +34,7 @@ export interface WorkbenchLayout {
    * @param id - Unique id of the part. Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
    * @param options - Controls how to add the part to the layout.
-   *        @property activate - Controls whether to activate the part. If not set, defaults to `false`.
+   * @param options.activate - Controls whether to activate the part. Default is `false`.
    * @return a copy of this layout with the part added.
    */
   addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
@@ -41,13 +44,44 @@ export interface WorkbenchLayout {
    *
    * @param id - The id of the view to add.
    * @param options - Controls how to add the view to the layout.
-   *        @property partId - References the part to which to add the view.
-   *        @property position - Specifies the position where to insert the view. The position is zero-based. If not set, adds the view at the end.
-   *        @property activateView - Controls whether to activate the view. If not set, defaults to `false`.
-   *        @property activatePart - Controls whether to activate the part that contains the view. If not set, defaults to `false`.
+   * @param options.partId - References the part to which to add the view.
+   * @param options.position - Specifies the position where to insert the view. The position is zero-based. Default is `end`.
+   * @param options.activateView - Controls whether to activate the view. Default is `false`.
+   * @param options.activatePart - Controls whether to activate the part that contains the view. Default is `false`.
    * @return a copy of this layout with the view added.
    */
-  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout;
+  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
+
+  /**
+   * Navigates the specified view based on the provided array of commands and extras.
+   *
+   * A command can be a string or an object literal. A string represents a path segment, an object literal associates data with the preceding path segment.
+   * Multiple segments can be combined into a single command, separated by a forward slash.
+   *
+   * By default, navigation is absolute. Set `relativeTo` in extras for relative navigation.
+   *
+   * Usage:
+   * ```
+   * layout.navigateView(viewId, ['path', 'to', 'view', {param1: 'value1', param2: 'value2'}]);
+   * layout.navigateView(viewId, ['path/to/view', {param1: 'value1', param2: 'value2'}]);
+   * ```
+   *
+   * @param id - Identifies the view for navigation.
+   * @param commands - Instructs the router which route to navigate to.
+   * @param extras - Controls navigation.
+   * @param extras.hint - Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
+   *                      For example, views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
+   *                      requiring a navigation hint to differentiate between the routes. See {@link canMatchWorkbenchView} for an example.
+   *                      Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
+   * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
+   * @param extras.state - Associates arbitrary state with a view navigation.
+   *                       Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
+   *                       Therefore, a view must be able to restore its state without relying on navigational state.
+   *                       Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+   * @param extras.cssClass - Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
+   * @return a copy of this layout with the view navigated.
+   */
+  navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Removes given view from the layout.
@@ -75,7 +109,7 @@ export interface WorkbenchLayout {
    *
    * @param id - The id of the view which to activate.
    * @param options - Controls view activation.
-   *        @property activatePart - Controls whether to activate the part that contains the view. If not set, defaults to `false`.
+   * @param options.activatePart - Controls whether to activate the part that contains the view. Default is `false`.
    * @return a copy of this layout with the view activated.
    */
   activateView(id: string, options?: {activatePart?: boolean}): WorkbenchLayout;

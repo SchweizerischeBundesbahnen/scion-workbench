@@ -12,6 +12,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, map} from 'rxjs/operators';
+import {ViewId} from '../view/workbench-view.model';
 
 /**
  * Registry for {@link ɵWorkbenchDialog} objects.
@@ -40,7 +41,7 @@ export class WorkbenchDialogRegistry implements OnDestroy {
   /**
    * Returns currently opened dialogs, sorted by the time they were opened, based on the specified filter.
    */
-  public dialogs(filter?: {viewId?: string} | ((dialog: ɵWorkbenchDialog) => boolean)): ɵWorkbenchDialog[] {
+  public dialogs(filter?: {viewId?: ViewId} | ((dialog: ɵWorkbenchDialog) => boolean)): ɵWorkbenchDialog[] {
     const filterFn = typeof filter === 'function' ? filter : (dialog: ɵWorkbenchDialog) => !filter?.viewId || dialog.context.view?.id === filter.viewId;
     return this._dialogs$.value.filter(filterFn);
   }
@@ -52,7 +53,7 @@ export class WorkbenchDialogRegistry implements OnDestroy {
    * This can be either a view-modal or an application-modal dialog. Otherwise, returns
    * the topmost application-modal dialog.
    */
-  public top$(context?: {viewId?: string}): Observable<ɵWorkbenchDialog | null> {
+  public top$(context?: {viewId?: ViewId}): Observable<ɵWorkbenchDialog | null> {
     return this._dialogs$
       .pipe(
         map(() => this.top(context)),
@@ -67,7 +68,7 @@ export class WorkbenchDialogRegistry implements OnDestroy {
    * This can be either a view-modal or an application-modal dialog. Otherwise, returns
    * the topmost application-modal dialog.
    */
-  public top(context?: {viewId?: string}): ɵWorkbenchDialog | null {
+  public top(context?: {viewId?: ViewId}): ɵWorkbenchDialog | null {
     return this.dialogs(dialog => !dialog.context.view || dialog.context.view.id === context?.viewId).at(-1) ?? null;
   }
 

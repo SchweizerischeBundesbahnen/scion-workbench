@@ -44,7 +44,7 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
 
       // Expect to error when opening the dialog.
-      await expect(dialogOpenerPage.open('dialog-page', {modality: 'view', context: {viewId: 'non-existent'}})).rejects.toThrow('[NullViewError] View \'non-existent\' not found.');
+      await expect(dialogOpenerPage.open('dialog-page', {modality: 'view', context: {viewId: 'view.100'}})).rejects.toThrow('[NullViewError] View \'view.100\' not found.');
 
       // Expect no error to be logged to the console.
       await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);

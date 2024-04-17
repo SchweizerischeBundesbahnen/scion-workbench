@@ -16,6 +16,7 @@ import {Locator} from '@playwright/test';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../view.po';
+import {ViewId} from '@scion/workbench-client';
 
 /**
  * Page object to interact with {@link NotificationOpenerPageComponent}.
@@ -27,7 +28,7 @@ export class NotificationOpenerPagePO implements MicrofrontendViewPagePO {
   public readonly view: ViewPO;
   public readonly error: Locator;
 
-  constructor(private _appPO: AppPO, locateBy: {viewId?: string; cssClass?: string}) {
+  constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.outlet = new SciRouterOutletPO(this._appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-notification-opener-page');

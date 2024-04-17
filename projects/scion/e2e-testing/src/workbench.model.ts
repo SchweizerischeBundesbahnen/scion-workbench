@@ -9,7 +9,7 @@
  */
 
 /**
- * This files contains model classes of @scion/workbench.
+ * This file contains model classes of @scion/workbench.
  *
  * In Playwright tests, we cannot reference types from other modules, only interfaces, because they are erased when transpiled to JavaScript.
  */

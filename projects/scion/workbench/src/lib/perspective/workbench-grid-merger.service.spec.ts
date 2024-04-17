@@ -12,20 +12,14 @@ import {TestBed} from '@angular/core/testing';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {RouterTestingModule} from '@angular/router/testing';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
+import {segments} from '../testing/testing.util';
 
 describe('WorkbenchGridMerger', () => {
-
-  let workbenchGridMerger: WorkbenchGridMerger;
-
-  let local: ɵWorkbenchLayout;
-  let base: ɵWorkbenchLayout;
-  let remote: ɵWorkbenchLayout;
 
   beforeEach(() => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
@@ -35,32 +29,32 @@ describe('WorkbenchGridMerger', () => {
         RouterTestingModule.withRoutes([]),
       ],
     });
+  });
 
-    workbenchGridMerger = TestBed.inject(WorkbenchGridMerger);
-
-    local = TestBed.inject(ɵWorkbenchLayoutFactory)
+  it('should preserve local changes when no diff between base and remote', () => {
+    const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
       .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
       .addView('view.1', {partId: 'topLeft'})
       .addView('view.2', {partId: 'topLeft'})
-      .addView('view.3', {partId: 'topLeft'})
-      .addView('view.4', {partId: 'bottomLeft'})
-      .addView('view.5', {partId: 'bottomLeft'})
-      .addView('view.6', {partId: 'bottomLeft'});
-    base = local;
-    remote = local;
-  });
+      .addView('view.3', {partId: 'bottomLeft'})
+      .navigateView('view.1', ['path/to/view/1'])
+      .navigateView('view.2', ['path/to/view/2'])
+      .navigateView('view.3', [], {hint: 'hint-3'});
 
-  it('should do nothing if no diff between remote and base', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.workbenchGrid,
-      }),
+    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+      local: base
+        .removeView('view.2')
+        .addView('view.100', {partId: 'topLeft'})
+        .navigateView('view.100', ['path/to/view/100'])
+        .navigateView('view.1', ['PATH/TO/VIEW/1']),
+      base,
+      remote: base,
     });
-    expect(mergedGrid).toEqualWorkbenchLayout({
+
+    // Expect local changes not to be discarded.
+    expect(mergedLayout).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -68,24 +62,67 @@ describe('WorkbenchGridMerger', () => {
           child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({
+              id: 'topLeft',
+              views: [
+                {id: 'view.1', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.100', navigation: {}}, // additional assertion below to assert the hint not to be present
+              ],
+            }),
+            child2: new MPart({
+              id: 'bottomLeft',
+              views: [
+                {id: 'view.3', navigation: {hint: 'hint-3'}},
+              ],
+            }),
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
+
+    // Expect hint not to be present.
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({hint: 'hint-3'});
+    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({});
+
+    expect(mergedLayout.viewOutlets()).toEqual({
+      'view.1': segments(['PATH/TO/VIEW/1']),
+      'view.3': [],
+      'view.100': segments(['path/to/view/100']),
+    });
   });
 
-  it('should add views that are added to the remote', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.addView('view.7', {partId: 'topLeft'}).workbenchGrid,
-      }),
+  /**
+   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   */
+  it('should discard local changes when diff between base and remote grids', () => {
+    const base = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'topLeft'})
+      .addView('view.2', {partId: 'topLeft'})
+      .addView('view.3', {partId: 'bottomLeft'})
+      .navigateView('view.1', ['path/to/view/1'])
+      .navigateView('view.2', ['path/to/view/2'])
+      .navigateView('view.3', [], {hint: 'hint-3'});
+
+    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+      local: base
+        .removeView('view.2')
+        .addView('view.100', {partId: 'topLeft'})
+        .navigateView('view.100', ['path/to/view/100'])
+        .navigateView('view.3', ['path/to/view/3']),
+      base,
+      remote: base
+        .removeView('view.1')
+        .addView('view.100', {partId: 'bottomLeft'})
+        .navigateView('view.100', ['PATH/TO/VIEW/100']),
     });
-    expect(mergedGrid).toEqualWorkbenchLayout({
+
+    // Expect local changes to be discarded.
+    expect(mergedLayout).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -93,24 +130,58 @@ describe('WorkbenchGridMerger', () => {
           child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({
+              id: 'topLeft',
+              views: [
+                {id: 'view.2', navigation: {}}, // additional assertion below to assert the hint not to be present
+              ],
+            }),
+            child2: new MPart({
+              id: 'bottomLeft',
+              views: [
+                {id: 'view.3', navigation: {hint: 'hint-3'}},
+                {id: 'view.100', navigation: {}}, // additional assertion below to assert the hint not to be present
+              ],
+            }),
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
+
+    // Expect hint not to be present.
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({hint: 'hint-3'});
+    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({});
+
+    expect(mergedLayout.viewOutlets()).toEqual({
+      'view.2': segments(['path/to/view/2']),
+      'view.3': [],
+      'view.100': segments(['PATH/TO/VIEW/100']),
+    });
   });
 
-  it('should remove views that are removed from the remote', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.removeView('view.4').workbenchGrid,
-      }),
+  /**
+   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   */
+  it('should discard local changes when diff between base and remote paths', () => {
+    const base = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'topLeft'})
+      .addView('view.2', {partId: 'bottomLeft'})
+      .navigateView('view.1', ['path/to/view/1'])
+      .navigateView('view.2', ['path/to/view/2']);
+
+    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+      local: base.navigateView('view.2', ['path/to/view/2a']),
+      base,
+      remote: base.navigateView('view.2', ['path/to/view/2b']),
     });
-    expect(mergedGrid).toEqualWorkbenchLayout({
+
+    // Expect local changes to be discarded.
+    expect(mergedLayout).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -118,24 +189,55 @@ describe('WorkbenchGridMerger', () => {
           child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({
+              id: 'topLeft',
+              views: [
+                {id: 'view.1', navigation: {}}, // additional assertion below to assert the hint not to be present
+              ],
+            }),
+            child2: new MPart({
+              id: 'bottomLeft',
+              views: [
+                {id: 'view.2', navigation: {}}, // additional assertion below to assert the hint not to be present
+              ],
+            }),
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
+
+    // Expect hint not to be present.
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({});
+
+    expect(mergedLayout.viewOutlets()).toEqual({
+      'view.1': segments(['path/to/view/1']),
+      'view.2': segments(['path/to/view/2b']),
+    });
   });
 
-  it('should not remove views that are added to the local', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.addView('view.7', {partId: 'topLeft'}).workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.workbenchGrid,
-      }),
+  /**
+   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   */
+  it('should discard local changes when diff between base and remote hints', () => {
+    const base = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'topLeft'})
+      .addView('view.2', {partId: 'bottomLeft'})
+      .navigateView('view.1', ['path/to/view/1'])
+      .navigateView('view.2', [], {hint: 'hint-2'});
+
+    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+      local: base.navigateView('view.2', [], {hint: 'hint-2a'}),
+      base,
+      remote: base.navigateView('view.2', [], {hint: 'hint-2b'}),
     });
-    expect(mergedGrid).toEqualWorkbenchLayout({
+
+    // Expect local changes to be discarded.
+    expect(mergedLayout).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -143,126 +245,31 @@ describe('WorkbenchGridMerger', () => {
           child1: new MTreeNode({
             direction: 'column',
             ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
+            child1: new MPart({
+              id: 'topLeft',
+              views: [
+                {id: 'view.1', navigation: {}}, // additional assertion below to assert the hint not to be present
+              ],
+            }),
+            child2: new MPart({
+              id: 'bottomLeft',
+              views: [
+                {id: 'view.2', navigation: {hint: 'hint-2b'}},
+              ],
+            }),
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
     });
-  });
 
-  it('should not re-add views that are removed from the local (1)', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.removeView('view.1').workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.workbenchGrid,
-      }),
-    });
-    expect(mergedGrid).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.2'}, {id: 'view.3'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
-          }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
-      },
-    });
-  });
+    // Expect hint not to be present.
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({hint: 'hint-2b'});
 
-  it('should not re-add views that are removed from the local (2)', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: {root: new MPart({id: MAIN_AREA}), activePartId: MAIN_AREA},
-        base: remote.workbenchGrid,
-        remote: remote.workbenchGrid,
-      }),
-    });
-    expect(mergedGrid).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MPart({id: MAIN_AREA}),
-      },
-    });
-  });
-
-  it('should not re-add views that are moved in the local', () => {
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.moveView('view.1', 'bottomLeft').workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.workbenchGrid,
-      }),
-    });
-    expect(mergedGrid).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.2'}, {id: 'view.3'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}, {id: 'view.1'}]}),
-          }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
-      },
-    });
-  });
-
-  it('should add views of new remote parts to "any" local part (1)', () => {
-    // This test is not very useful and should be removed when implemented issue #452.
-    // TODO [#452]: Support for merging newly added or moved parts into the user's layout)
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: local.workbenchGrid,
-        base: base.workbenchGrid,
-        remote: remote.addPart('right', {relativeTo: MAIN_AREA, align: 'right', ratio: .25}).addView('view.7', {partId: 'right'}).workbenchGrid,
-      }),
-    });
-    expect(mergedGrid).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.7'}]}),
-            child2: new MPart({id: 'bottomLeft', views: [{id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
-          }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
-      },
-    });
-  });
-
-  it('should add views of new remote parts to "any" local part (2)', () => {
-    // This test is not very useful and should be removed when implemented issue #452.
-    // TODO [#452]: Support for merging newly added or moved parts into the user's layout)
-    const mergedGrid = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: workbenchGridMerger.merge({
-        local: {root: new MPart({id: MAIN_AREA}), activePartId: MAIN_AREA},
-        base: {root: new MPart({id: MAIN_AREA}), activePartId: MAIN_AREA},
-        remote: remote.workbenchGrid,
-      }),
-    });
-    expect(mergedGrid).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({id: 'topLeft', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}, {id: 'view.5'}, {id: 'view.6'}]}),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
-      },
+    expect(mergedLayout.viewOutlets()).toEqual({
+      'view.1': segments(['path/to/view/1']),
+      'view.2': [],
     });
   });
 });

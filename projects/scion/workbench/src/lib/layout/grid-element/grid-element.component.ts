@@ -17,7 +17,7 @@ import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {NgFor, NgIf} from '@angular/common';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
-import {isGridElementVisible} from '../ɵworkbench-layout';
+import {WorkbenchLayouts} from '../workbench-layouts.util';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -86,8 +86,8 @@ export class GridElementComponent implements OnChanges {
   }
 
   private computeChildren(treeNode: MTreeNode): ChildElement[] {
-    const child1Visible = isGridElementVisible(treeNode.child1);
-    const child2Visible = isGridElementVisible(treeNode.child2);
+    const child1Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child1);
+    const child2Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child2);
 
     if (child1Visible && child2Visible) {
       const [size1, size2] = calculateSashSizes(treeNode.ratio);

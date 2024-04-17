@@ -6,18 +6,44 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ViewState} from '../routing/routing.model';
 
 /**
- * A view is a visual workbench component for displaying content stacked or side-by-side.
+ * Handle to interact with a view opened via {@link WorkbenchRouter}.
  *
- * Any component registered as a primary Angular route can be opened as a view using the {@link WorkbenchRouter}.
+ * The view component can inject this handle to interact with the view, such as setting the title or closing the view.
  *
- * @see WorkbenchPart
+ * The view component can inject `ActivatedRoute` to obtain parameters passed to the navigation and/or read data associated with the route.
+ *
+ * @see WorkbenchRouter
  */
 export abstract class WorkbenchView {
 
   /**
    * Unique identity of this view.
+   *
+   * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
+   *
+   * @see alternativeId
    */
-  public abstract readonly id: string;
+  public abstract readonly id: ViewId;
+
+  /**
+   * Alternative identity of this view.
+   *
+   * A view can have an alternative id, a meaningful but not necessarily unique name. A view can
+   * be identified either by its unique or alternative id.
+   *
+   * @see id
+   */
+  public abstract readonly alternativeId: string | undefined;
+
+  /**
+   * Hint passed to the navigation.
+   *
+   * A hint can be passed to the navigation to differentiate between routes with identical paths.
+   *
+   * For example, the views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
+   * requiring a navigation hint to differentiate between the routes.
+   */
+  public abstract readonly navigationHint: string | undefined;
 
   /**
    * Reference to the part which contains this view.
@@ -37,7 +63,7 @@ export abstract class WorkbenchView {
   public abstract heading: string | null;
 
   /**
-   * Specifies CSS class(es) to be added to the view, useful in end-to-end tests for locating view and view tab.
+   * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    */
   public abstract cssClass: string | string[];
 
@@ -145,3 +171,12 @@ export abstract class WorkbenchView {
    */
   public abstract registerMenuItem(menuItem: WorkbenchMenuItem): Disposable;
 }
+
+/**
+ * Format of a view identifier.
+ *
+ * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
+ * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
+ * be identified either by its unique or alternative id.
+ */
+export type ViewId = `view.${number}`;

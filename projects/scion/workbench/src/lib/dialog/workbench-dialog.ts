@@ -49,7 +49,7 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract resizable: boolean;
 
   /**
-   * Specifies CSS class(es) to be added to the dialog, useful in end-to-end tests for locating the dialog.
+   * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
    */
   public abstract cssClass: string | string[];
 

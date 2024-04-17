@@ -3,16 +3,24 @@
     <span class="e2e-view-id">{{view.id}}</span>
   </sci-form-field>
 
+  <sci-form-field label="Alternative View ID" *ngIf="view.alternativeId">
+    <span>{{view.alternativeId}}</span>
+  </sci-form-field>
+
   <sci-form-field label="Part ID">
     <span class="e2e-part-id">{{view.part.id}}</span>
   </sci-form-field>
 
-  <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
-    <span class="e2e-component-instance-id">{{uuid}}</span>
-  </sci-form-field>
-
   <sci-form-field label="Path">
     <span>{{view.urlSegments | appJoin:'/'}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Navigation Hint" *ngIf="view.navigationHint">
+    <span>{{view.navigationHint}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Instantiation ID" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
 </section>
 
@@ -54,7 +62,7 @@
   </sci-form-field>
 
   <sci-form-field label="CSS Class(es)">
-    <input [formControl]="cssClassFormControl" class="e2e-css-class" placeholder="Separate multiple CSS classes by space">
+    <app-css-class [formControl]="formControls.cssClass"/>
   </sci-form-field>
 </section>
 
@@ -73,7 +81,7 @@
   </ng-template>
   <ng-template #panel_part_actions>
     <input class="e2e-part-actions"
-           [formControl]="partActionsFormControl"
+           [formControl]="formControls.partActions"
            placeholder='Enter action(s) as JSON array: [{"content":"...","align":"end","cssClass":"e2e-open-in-new"}]'>
   </ng-template>
 </sci-accordion>

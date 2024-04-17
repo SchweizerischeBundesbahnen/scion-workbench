@@ -24,13 +24,7 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GlassPaneDirective} from '../glass-pane/glass-pane.directive';
 
 /**
- * Is the graphical representation of a workbench view.
- *
- * The view has its dedicated router outlet to display view content. Use route path parameters
- * to decide what specific content to present. Use matrix parameters to associate optional data
- * with the view outlet URL.
- *
- * Title and heading of this view are either set via `WorkbenchView`, or given as route data or matrix parameter.
+ * Renders the workbench view, using a router-outlet to display view content.
  */
 @Component({
   selector: 'wb-view',

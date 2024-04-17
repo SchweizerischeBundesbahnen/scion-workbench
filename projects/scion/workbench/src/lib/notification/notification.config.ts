@@ -101,7 +101,7 @@ export interface NotificationConfig {
   groupInputReduceFn?: (prevInput: any, currInput: any) => any;
 
   /**
-   * Specifies CSS class(es) to be added to the notification, useful in end-to-end tests for locating the notification.
+   * Specifies CSS class(es) to add to the notification, e.g., to locate the notification in tests.
    */
   cssClass?: string | string[];
 }

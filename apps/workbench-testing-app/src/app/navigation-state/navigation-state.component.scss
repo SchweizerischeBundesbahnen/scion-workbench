@@ -1,0 +1,10 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: inline-grid;
+
+  > input {
+    @include sci-design.style-input-field();
+    min-width: 0;
+  }
+}

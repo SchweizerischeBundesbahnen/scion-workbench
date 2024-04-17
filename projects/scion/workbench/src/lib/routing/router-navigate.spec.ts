@@ -301,16 +301,16 @@ describe('Router', () => {
       <li><a wbRouterLink="view-1">view-1</a></li>
       <li><a wbRouterLink="./view-2">./view-2</a></li>
 
-      <li><a wbRouterLink="/feature-a/view-1">view-1</a></li>
-      <li><a wbRouterLink="/feature-a/view-2">view-2</a></li>
+      <li><a wbRouterLink="/feature-a/view-1">/feature-a/view-1</a></li>
+      <li><a wbRouterLink="/feature-a/view-2">/feature-a/view-2</a></li>
 
       <li><a wbRouterLink="feature-b">feature-b</a></li>
       <li><a wbRouterLink="feature-b/view-1">feature-b/view-1</a></li>
-      <li><a wbRouterLink="./feature-b/view-2">feature-b/view-1</a></li>
+      <li><a wbRouterLink="./feature-b/view-2">./feature-b/view-2</a></li>
 
-      <li><a wbRouterLink="/feature-a/feature-b">feature-b</a></li>
-      <li><a wbRouterLink="/feature-a/feature-b/view-1">feature-b/view-1</a></li>
-      <li><a wbRouterLink="/feature-a/feature-b/view-2">feature-b/view-2</a></li>
+      <li><a wbRouterLink="/feature-a/feature-b">/feature-a/feature-b</a></li>
+      <li><a wbRouterLink="/feature-a/feature-b/view-1">/feature-a/feature-b/view-1</a></li>
+      <li><a wbRouterLink="/feature-a/feature-b/view-2">/feature-a/feature-b/view-2</a></li>
     </ul>
   `,
   standalone: true,
@@ -323,12 +323,12 @@ class FeatureA_EntryComponent {
   template: `
     <h1>Feature Module A - View 1</h1>
     <ul>
-      <li><a wbRouterLink="..">go back 1 level</a></li>
-      <li><a wbRouterLink="../view-2">view-2</a></li>
+      <li><a wbRouterLink="..">..</a></li>
+      <li><a wbRouterLink="../view-2">../view-2</a></li>
 
-      <li><a wbRouterLink="../feature-b">feature-b</a></li>
-      <li><a wbRouterLink="../feature-b/view-1">feature-b/view-1</a></li>
-      <li><a wbRouterLink="../feature-b/view-2">feature-b/view-2</a></li>
+      <li><a wbRouterLink="../feature-b">../feature-b</a></li>
+      <li><a wbRouterLink="../feature-b/view-1">../feature-b/view-1</a></li>
+      <li><a wbRouterLink="../feature-b/view-2">../feature-b/view-2</a></li>
 
       <li><a wbRouterLink="/feature-a/feature-b">/feature-a/feature-b</a></li>
     </ul>
@@ -343,8 +343,8 @@ class FeatureA_View1Component {
   template: `
     <h1>Feature Module A - View 2</h1>
     <ul>
-      <li><a wbRouterLink="..">go back 1 level</a></li>
-      <li><a wbRouterLink="../view-1">view-1</a></li>
+      <li><a wbRouterLink="..">..</a></li>
+      <li><a wbRouterLink="../view-1">../view-1</a></li>
     </ul>
   `,
   standalone: true,
@@ -376,8 +376,8 @@ export class FeatureAModule {
   template: `
     <h1>Feature Module B - Entry</h1>
     <ul>
-      <li><a wbRouterLink="..">go back 1 level</a></li>
-      <li><a wbRouterLink="../..">go back 2 levels</a></li>
+      <li><a wbRouterLink="..">..</a></li>
+      <li><a wbRouterLink="../..">../..</a></li>
       <li><a wbRouterLink="../view-1">../view-1</a></li>
 
       <li><a wbRouterLink="view-1">view-1</a></li>
@@ -399,8 +399,8 @@ class FeatureB_EntryComponent {
   template: `
     <h1>Feature Module B - View 1</h1>
     <ul>
-      <li><a wbRouterLink="..">go back 1 level</a></li>
-      <li><a wbRouterLink="../..">go back 2 levels</a></li>
+      <li><a wbRouterLink="..">..</a></li>
+      <li><a wbRouterLink="../..">..</a></li>
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,
@@ -414,8 +414,8 @@ class FeatureB_View1Component {
   template: `
     <h1>Feature Module B - View 2</h1>
     <ul>
-      <li><a wbRouterLink="..">go back 1 level</a></li>
-      <li><a wbRouterLink="../..">go back 2 levels</a></li>
+      <li><a wbRouterLink="..">..</a></li>
+      <li><a wbRouterLink="../..">../..</a></li>
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,

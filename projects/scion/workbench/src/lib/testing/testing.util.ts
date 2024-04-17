@@ -15,6 +15,9 @@ import {firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {filter} from 'rxjs/operators';
+import {Commands} from '../routing/routing.model';
+import {UrlSegment} from '@angular/router';
+import {RouterUtils} from '../routing/router.util';
 
 /**
  * Simulates the asynchronous passage of time for the timers and detects the fixture for changes.
@@ -70,4 +73,11 @@ export function clickElement(appFixture: ComponentFixture<any>, viewType: Type<a
 
   linkDebugElement.nativeElement.click();
   advance(appFixture);
+}
+
+/**
+ * Creates URL segments from given commands.
+ */
+export function segments(commands: Commands): UrlSegment[] {
+  return TestBed.runInInjectionContext(() => RouterUtils.commandsToSegments(commands));
 }

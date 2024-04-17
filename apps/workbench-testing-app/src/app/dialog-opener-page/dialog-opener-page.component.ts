@@ -10,7 +10,7 @@
 
 import {ApplicationRef, Component, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {WorkbenchDialogService} from '@scion/workbench';
+import {ViewId, WorkbenchDialogService} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
 import {NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -23,6 +23,7 @@ import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-pag
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
+import {CssClassComponent} from '../css-class/css-class.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -35,6 +36,7 @@ import InputFieldTestPageComponent from '../test-pages/input-field-test-page/inp
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
+    CssClassComponent,
   ],
 })
 export default class DialogOpenerPageComponent {
@@ -44,8 +46,8 @@ export default class DialogOpenerPageComponent {
     options: this._formBuilder.group({
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       modality: this._formBuilder.control<'application' | 'view' | ''>(''),
-      contextualViewId: this._formBuilder.control(''),
-      cssClass: this._formBuilder.control(''),
+      contextualViewId: this._formBuilder.control<ViewId | ''>(''),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
       animate: this._formBuilder.control(undefined),
     }),
     count: this._formBuilder.control(''),
@@ -79,7 +81,7 @@ export default class DialogOpenerPageComponent {
     return dialogService.open<string | undefined>(component, {
       inputs: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.inputs) ?? undefined,
       modality: this.form.controls.options.controls.modality.value || undefined,
-      cssClass: [`index-${index}`].concat(this.form.controls.options.controls.cssClass.value.split(/\s+/).filter(Boolean) || []),
+      cssClass: [`index-${index}`].concat(this.form.controls.options.controls.cssClass.value ?? []),
       animate: this.form.controls.options.controls.animate.value,
       context: {
         viewId: this.form.controls.options.controls.contextualViewId.value || undefined,

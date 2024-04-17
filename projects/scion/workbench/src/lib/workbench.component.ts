@@ -23,6 +23,7 @@ import {first, map} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {Blockable} from './glass-pane/blockable';
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-routes-registrator.service';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -83,6 +84,9 @@ export class WorkbenchComponent implements OnDestroy {
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
+    if (inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true})) {
+      throw Error(`[WorkbenchError] Workbench must not be loaded into a view. Did you navigate to the empty path route? Make sure that the application's root route is guarded with 'canMatchWorkbenchView(false)'. Example: "{path: '', canMatch: [canMatchWorkbenchView(false), ...]}"`);
+    }
     this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
     this.splash = workbenchModuleConfig?.startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();

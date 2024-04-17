@@ -12,10 +12,13 @@ The closing of a view can be intercepted by implementing the `WorkbenchViewPreDe
 The following snippet asks the user whether to save changes.
 
 ```ts 
+import {Component} from '@angular/core';
+import {WorkbenchMessageBoxService, WorkbenchView, WorkbenchViewPreDestroy} from '@scion/workbench';
+
 @Component({})
 export class ViewComponent implements WorkbenchViewPreDestroy {
 
-  constructor(private view: WorkbenchView, private messageBoxService: MessageBoxService) {
+  constructor(private view: WorkbenchView, private messageBoxService: WorkbenchMessageBoxService) {
   }
 
   public async onWorkbenchViewPreDestroy(): Promise<boolean> {
@@ -23,9 +26,7 @@ export class ViewComponent implements WorkbenchViewPreDestroy {
       return true;
     }
 
-    const messageBoxService = inject(MessageBoxService);
-    const action = await messageBoxService.open({
-      content: 'Do you want to save changes?',
+    const action = await this.messageBoxService.open('Do you want to save changes?', {
       severity: 'info',
       actions: {
         yes: 'Yes',

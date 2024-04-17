@@ -11,7 +11,7 @@
 import {Observable} from 'rxjs';
 import {Disposable} from './common/disposable';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
-import {WorkbenchView} from './view/workbench-view.model';
+import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPart} from './part/workbench-part.model';
 import {Injectable} from '@angular/core';
@@ -31,7 +31,7 @@ import {ɵWorkbenchService} from './ɵworkbench.service';
  * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
  * area for user interaction.
  *
- * Multiple layouts, called perspectives, are supported. Perspectives can be switched with one perspective active at a time.
+ * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
  * Perspectives share the same main area, if any.
  */
 @Injectable({providedIn: 'root', useExisting: ɵWorkbenchService})
@@ -107,14 +107,14 @@ export abstract class WorkbenchService {
   /**
    * Returns a reference to the specified {@link WorkbenchView}, or `null` if not found.
    */
-  public abstract getView(viewId: string): WorkbenchView | null;
+  public abstract getView(viewId: ViewId): WorkbenchView | null;
 
   /**
    * Closes the specified workbench views.
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public abstract closeViews(...viewIds: string[]): Promise<boolean>;
+  public abstract closeViews(...viewIds: ViewId[]): Promise<boolean>;
 
   /**
    * Contributes an action to a part's action bar.

@@ -12,7 +12,7 @@ import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
-import {ViewState} from '@scion/workbench';
+import {ViewId, ViewState} from '@scion/workbench';
 import {Data, Params} from '@angular/router';
 
 /**
@@ -32,11 +32,13 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
     const state = this.locator.locator('sci-key-value.e2e-state');
 
     return {
-      viewId: await this.locator.locator('span.e2e-view-id').innerText(),
+      viewId: await this.locator.locator('span.e2e-view-id').innerText() as ViewId,
+      alternativeId: await this.locator.locator('span.e2e-alternative-view-id').innerText(),
       partId: await this.locator.locator('span.e2e-part-id').innerText(),
       title: await this.locator.locator('span.e2e-title').innerText(),
       heading: await this.locator.locator('span.e2e-heading').innerText(),
       urlSegments: await this.locator.locator('span.e2e-url-segments').innerText(),
+      navigationHint: await this.locator.locator('span.e2e-navigation-hint').innerText(),
       routeParams: await routeParams.isVisible() ? await new SciKeyValuePO(routeParams).readEntries() : {},
       routeData: await routeData.isVisible() ? await new SciKeyValuePO(routeData).readEntries() : {},
       state: await state.isVisible() ? await new SciKeyValuePO(state).readEntries() : {},
@@ -45,11 +47,13 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
 }
 
 export interface ViewInfo {
-  viewId: string;
+  viewId: ViewId;
+  alternativeId: string;
   partId: string;
   title: string;
   heading: string;
   urlSegments: string;
+  navigationHint: string;
   routeParams: Params;
   routeData: Data;
   state: ViewState;

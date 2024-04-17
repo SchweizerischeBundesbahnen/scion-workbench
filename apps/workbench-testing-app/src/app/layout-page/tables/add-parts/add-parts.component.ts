@@ -1,0 +1,160 @@
+/*
+ * Copyright (c) 2018-2024 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {Component, forwardRef, Input} from '@angular/core';
+import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
+import {SciFormFieldComponent} from '@scion/components.internal/form-field';
+import {noop} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {MAIN_AREA} from '@scion/workbench';
+import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
+import {UUID} from '@scion/toolkit/uuid';
+
+@Component({
+  selector: 'app-add-parts',
+  templateUrl: './add-parts.component.html',
+  styleUrls: ['./add-parts.component.scss'],
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    SciFormFieldComponent,
+    SciCheckboxComponent,
+    SciMaterialIconDirective,
+  ],
+  providers: [
+    {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => AddPartsComponent)},
+    {provide: NG_VALIDATORS, multi: true, useExisting: forwardRef(() => AddPartsComponent)},
+  ],
+})
+export class AddPartsComponent implements ControlValueAccessor, Validator {
+
+  private _cvaChangeFn: (value: PartDescriptor[]) => void = noop;
+  private _cvaTouchedFn: () => void = noop;
+
+  @Input()
+  public requiresInitialPart = false;
+
+  @Input({transform: arrayAttribute})
+  public partProposals: string[] = [];
+
+  protected form = this._formBuilder.group({
+    parts: this._formBuilder.array<FormGroup<{
+      id: FormControl<string | MAIN_AREA>;
+      relativeTo: FormGroup<{
+        relativeTo: FormControl<string | undefined>;
+        align: FormControl<'left' | 'right' | 'top' | 'bottom' | undefined>;
+        ratio: FormControl<number | undefined>;
+      }>;
+      options: FormGroup<{
+        activate: FormControl<boolean | undefined>;
+      }>;
+    }>>([]),
+  });
+
+  protected MAIN_AREA = MAIN_AREA;
+  protected relativeToList = `relative-to-list-${UUID.randomUUID()}`;
+  protected idList = `id-list-${UUID.randomUUID()}`;
+
+  constructor(private _formBuilder: NonNullableFormBuilder) {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this._cvaChangeFn(this.form.controls.parts.controls.map(partFormGroup => ({
+          id: partFormGroup.controls.id.value,
+          relativeTo: {
+            relativeTo: partFormGroup.controls.relativeTo.controls.relativeTo.value,
+            align: partFormGroup.controls.relativeTo.controls.align.value,
+            ratio: partFormGroup.controls.relativeTo.controls.ratio.value,
+          },
+          options: {
+            activate: partFormGroup.controls.options.controls.activate.value,
+          },
+        })));
+        this._cvaTouchedFn();
+      });
+  }
+
+  protected onAddPart(): void {
+    this.addPart({
+      id: '',
+      relativeTo: {},
+    });
+  }
+
+  protected onRemovePart(index: number): void {
+    this.form.controls.parts.removeAt(index);
+  }
+
+  private addPart(part: PartDescriptor, options?: {emitEvent?: boolean}): void {
+    const isInitialPart = this.requiresInitialPart && this.form.controls.parts.length === 0;
+    this.form.controls.parts.push(
+      this._formBuilder.group({
+        id: this._formBuilder.control<string>(part.id, Validators.required),
+        relativeTo: this._formBuilder.group({
+          relativeTo: this._formBuilder.control<string | undefined>({value: isInitialPart ? undefined : part.relativeTo.relativeTo, disabled: isInitialPart}),
+          align: this._formBuilder.control<'left' | 'right' | 'top' | 'bottom' | undefined>({value: isInitialPart ? undefined : part.relativeTo.align, disabled: isInitialPart}, isInitialPart ? Validators.nullValidator : Validators.required),
+          ratio: this._formBuilder.control<number | undefined>({value: isInitialPart ? undefined : part.relativeTo.ratio, disabled: isInitialPart}),
+        }),
+        options: this._formBuilder.group({
+          activate: part.options?.activate,
+        }),
+      }), {emitEvent: options?.emitEvent ?? true});
+  }
+
+  /**
+   * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
+   * @docs-private
+   */
+  public writeValue(parts: PartDescriptor[] | undefined | null): void {
+    this.form.controls.parts.clear({emitEvent: false});
+    parts?.forEach(part => this.addPart(part, {emitEvent: false}));
+  }
+
+  /**
+   * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
+   * @docs-private
+   */
+  public registerOnChange(fn: any): void {
+    this._cvaChangeFn = fn;
+  }
+
+  /**
+   * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
+   * @docs-private
+   */
+  public registerOnTouched(fn: any): void {
+    this._cvaTouchedFn = fn;
+  }
+
+  /**
+   * Method implemented as part of `Validator` to work with Angular forms API
+   * @docs-private
+   */
+  public validate(control: AbstractControl): ValidationErrors | null {
+    return this.form.controls.parts.valid ? null : {valid: false};
+  }
+}
+
+export interface PartDescriptor {
+  id: string | MAIN_AREA;
+  relativeTo: {
+    relativeTo?: string;
+    align?: 'left' | 'right' | 'top' | 'bottom';
+    ratio?: number;
+  };
+  options?: {
+    activate?: boolean;
+  };
+}
+
+function arrayAttribute(proposals: string[] | null | undefined): string[] {
+  return proposals ?? [];
+}

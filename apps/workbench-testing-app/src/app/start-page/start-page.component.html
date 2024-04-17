@@ -1,8 +1,8 @@
 <img src="assets/scion-workbench-banner.svg" alt="SCION Workbench" class="banner">
 
 <span class="about" *ngIf="isWelcomePage()" ngPreserveWhitespaces>
-Welcome to the internal test app of SCION Workbench and SCION Workbench Client.
-We use this app to run our e2e tests and experiment with features.
+Welcome to the SCION Workbench Playground.
+We use this application to experiment with features and run our end-to-end tests.
 </span>
 
 <sci-tabbar>
@@ -10,8 +10,9 @@ We use this app to run our e2e tests and experiment with features.
     <section class="tiles e2e-workbench-view-tiles">
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
       <a *ngFor="let route of workbenchViewRoutes | appFilter$:filterControl:selectViewRouteText | async"
-         [wbRouterLink]="route.path" [wbRouterLinkExtras]="{relativeTo: null}"
-         [ngClass]="route.data![WorkbenchRouteData.cssClass]">
+         (click)="onViewOpen(route.path!, $event)"
+         [ngClass]="route.data![WorkbenchRouteData.cssClass]"
+         href="">
         {{route.data![WorkbenchRouteData.title]}}
         <span class="description" *ngIf="route.data![WorkbenchRouteData.heading]">
           {{route.data![WorkbenchRouteData.heading]}}

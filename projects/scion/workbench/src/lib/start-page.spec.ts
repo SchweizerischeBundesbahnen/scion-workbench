@@ -98,7 +98,8 @@ describe('Start Page', () => {
           WorkbenchTestingModule.forTest({
             layout: (factory: WorkbenchLayoutFactory) => factory
               .addPart('part')
-              .addView('test-view', {partId: 'part', activateView: true}),
+              .addView('test-view', {partId: 'part', activateView: true})
+              .navigateView('test-view', ['path/to/view']),
           }),
           RouterTestingModule.withRoutes([
             {
@@ -107,8 +108,7 @@ describe('Start Page', () => {
               providers: [withComponentContent('Start Page')],
             },
             {
-              path: '',
-              outlet: 'test-view',
+              path: 'path/to/view',
               loadComponent: () => import('./testing/test.component'),
               providers: [withComponentContent('View')],
             },

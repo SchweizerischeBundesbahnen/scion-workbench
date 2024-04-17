@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MPart, MTreeNode} from './workbench-layout.model';
+import {MPart, MTreeNode, MView} from './workbench-layout.model';
 import {MAIN_AREA_INITIAL_PART_ID, PartActivationInstantProvider, ViewActivationInstantProvider, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MAIN_AREA, WorkbenchLayout} from './workbench-layout';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
@@ -16,6 +16,8 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
+import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
+import {segments} from '../testing/testing.util';
 
 describe('WorkbenchLayout', () => {
 
@@ -31,35 +33,35 @@ describe('WorkbenchLayout', () => {
     // add view without specifying position
     expect(layout
       .addView('view.4', {partId: 'A'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
 
     // add view at the start
     expect(layout
       .addView('view.4', {partId: 'A', position: 'start'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.4', 'view.1', 'view.2', 'view.3']);
 
     // add view at the end
     expect(layout
       .addView('view.4', {partId: 'A', position: 'end'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
 
     // add view before the active view
     expect(layout
       .addView('view.4', {partId: 'A', position: 'before-active-view'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.4', 'view.2', 'view.3']);
 
     // add view after the active view
     expect(layout
       .addView('view.4', {partId: 'A', position: 'after-active-view'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
   });
@@ -250,7 +252,7 @@ describe('WorkbenchLayout', () => {
         root: new MPart({id: 'B'}),
       },
     });
-    expect(workbenchLayout.part({by: {partId: 'B'}}).parent).toBeUndefined();
+    expect(workbenchLayout.part({partId: 'B'}).parent).toBeUndefined();
   });
 
   /**
@@ -704,11 +706,11 @@ describe('WorkbenchLayout', () => {
     expect(bottomLeftPart.parent).toBe(bcNode);
     expect(bottomLeftPart.id).toEqual('C');
 
-    // verify the main part
-    const mainPart = rootNode.child2 as MPart;
-    expect(mainPart.constructor).toEqual(MPart);
-    expect(mainPart.parent).toBe(rootNode);
-    expect(mainPart.id).toEqual('A');
+    // verify the initial part
+    const initialPart = rootNode.child2 as MPart;
+    expect(initialPart.constructor).toEqual(MPart);
+    expect(initialPart.parent).toBe(rootNode);
+    expect(initialPart.id).toEqual('A');
   });
 
   /**
@@ -761,9 +763,9 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A'})
       .addView('view.4', {partId: 'C'});
 
-    expect(workbenchLayout.part({by: {partId: 'B'}}).views).toEqual([{id: 'view.1'}, {id: 'view.2'}]);
-    expect(workbenchLayout.part({by: {partId: 'A'}}).views).toEqual([{id: 'view.3'}]);
-    expect(workbenchLayout.part({by: {partId: 'C'}}).views).toEqual([{id: 'view.4'}]);
+    expect(workbenchLayout.part({partId: 'B'}).views).toEqual([{id: 'view.1'}, {id: 'view.2'}]);
+    expect(workbenchLayout.part({partId: 'A'}).views).toEqual([{id: 'view.3'}]);
+    expect(workbenchLayout.part({partId: 'C'}).views).toEqual([{id: 'view.4'}]);
   });
 
   it('should remove non-structural part when removing its last view', () => {
@@ -777,7 +779,7 @@ describe('WorkbenchLayout', () => {
       .removeView('view.1')
       .removeView('view.2');
 
-    expect(() => workbenchLayout.part({by: {partId: 'left'}})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({partId: 'left'})).toThrowError(/NullPartError/);
     expect(workbenchLayout.hasPart('left')).toBeFalse();
   });
 
@@ -792,7 +794,7 @@ describe('WorkbenchLayout', () => {
       .removeView('view.1')
       .removeView('view.2');
 
-    expect(workbenchLayout.part({by: {partId: 'left'}})).toEqual(jasmine.objectContaining({id: 'left'}));
+    expect(workbenchLayout.part({partId: 'left'})).toEqual(jasmine.objectContaining({id: 'left'}));
   });
 
   /**
@@ -817,7 +819,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A'})
       .addView('view.4', {partId: 'A'})
       .moveView('view.1', 'A', {position: 2})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.2', 'view.1', 'view.3', 'view.4']);
 
@@ -831,7 +833,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A'})
       .addView('view.4', {partId: 'A'})
       .moveView('view.4', 'A', {position: 2})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
 
@@ -845,7 +847,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A'})
       .addView('view.4', {partId: 'A'})
       .moveView('view.2', 'A', {position: 'end'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.3', 'view.4', 'view.2']);
 
@@ -859,7 +861,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A'})
       .addView('view.4', {partId: 'A'})
       .moveView('view.3', 'A', {position: 'start'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
@@ -873,7 +875,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A', activateView: true})
       .addView('view.4', {partId: 'A'})
       .moveView('view.1', 'A', {position: 'before-active-view'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.2', 'view.1', 'view.3', 'view.4']);
 
@@ -889,7 +891,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.5', {partId: 'C', activateView: true})
       .addView('view.6', {partId: 'C'})
       .moveView('view.2', 'C', {position: 'before-active-view'})
-      .part({by: {partId: 'C'}})
+      .part({partId: 'C'})
       .views.map(view => view.id),
     ).toEqual(['view.4', 'view.2', 'view.5', 'view.6']);
 
@@ -903,7 +905,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A', activateView: true})
       .addView('view.4', {partId: 'A'})
       .moveView('view.1', 'A', {position: 'after-active-view'})
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.2', 'view.3', 'view.1', 'view.4']);
 
@@ -919,7 +921,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.5', {partId: 'C', activateView: true})
       .addView('view.6', {partId: 'C'})
       .moveView('view.2', 'C', {position: 'after-active-view'})
-      .part({by: {partId: 'C'}})
+      .part({partId: 'C'})
       .views.map(view => view.id),
     ).toEqual(['view.4', 'view.5', 'view.2', 'view.6']);
 
@@ -933,7 +935,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'A'})
       .addView('view.4', {partId: 'A'})
       .moveView('view.2', 'A')
-      .part({by: {partId: 'A'}})
+      .part({partId: 'A'})
       .views.map(view => view.id),
     ).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
 
@@ -949,7 +951,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.5', {partId: 'C', activateView: true})
       .addView('view.6', {partId: 'C'})
       .moveView('view.2', 'C')
-      .part({by: {partId: 'C'}})
+      .part({partId: 'C'})
       .views.map(view => view.id),
     ).toEqual(['view.4', 'view.5', 'view.6', 'view.2']);
   });
@@ -978,9 +980,113 @@ describe('WorkbenchLayout', () => {
       .moveView('view.2', 'C')
       .moveView('view.3', 'C');
 
-    expect(workbenchLayout.part({by: {partId: 'B'}}).views).toEqual([{id: 'view.1'}]);
-    expect(workbenchLayout.part({by: {partId: 'C'}}).views).toEqual([{id: 'view.2'}, {id: 'view.3'}]);
-    expect(workbenchLayout.part({by: {partId: 'A'}}).views).toEqual([{id: 'view.4'}]);
+    expect(workbenchLayout.part({partId: 'B'}).views).toEqual([{id: 'view.1'}]);
+    expect(workbenchLayout.part({partId: 'C'}).views).toEqual([{id: 'view.2'}, {id: 'view.3'}]);
+    expect(workbenchLayout.part({partId: 'A'}).views).toEqual([{id: 'view.4'}]);
+  });
+
+  it('should retain navigation when moving view to another part', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('left')
+      .addPart('right', {relativeTo: 'left', align: 'right'})
+      .addView('view.1', {partId: 'left', cssClass: 'class-view'})
+      .addView('view.2', {partId: 'left'})
+      .navigateView('view.1', ['path/to/view'], {cssClass: 'class-navigation'})
+      .navigateView('view.2', [], {hint: 'some-hint'})
+      .moveView('view.1', 'right')
+      .moveView('view.2', 'right');
+
+    expect(workbenchLayout.part({partId: 'right'}).views).toEqual(jasmine.arrayWithExactContents([
+      {id: 'view.1', navigation: {cssClass: ['class-navigation']}, cssClass: ['class-view']} satisfies MView,
+      {id: 'view.2', navigation: {hint: 'some-hint'}} satisfies MView,
+    ]));
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
+    expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual([]);
+  });
+
+  it('should retain state when moving view to another part', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('left')
+      .addPart('right', {relativeTo: 'left', align: 'right'})
+      .addView('view.1', {partId: 'left'})
+      .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+      .moveView('view.1', 'right');
+
+    expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {}} satisfies MView]);
+    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({some: 'state'});
+  });
+
+  it('should clear hint of previous navigation when navigating without hint', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part')
+      .addView('view.1', {partId: 'part'})
+      .navigateView('view.1', [], {hint: 'some-hint'})
+      .navigateView('view.1', ['path/to/view']);
+
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {}} satisfies MView);
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
+  });
+
+  it('should clear URL of previous navigation when navigating without URL', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part')
+      .addView('view.1', {partId: 'part'})
+      .navigateView('view.1', ['path/to/view'])
+      .navigateView('view.1', [], {hint: 'some-hint'});
+
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {hint: 'some-hint'}} satisfies MView);
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+  });
+
+  it('should clear state of previous navigation when navigating without state', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part')
+      .addView('view.1', {partId: 'part'})
+      .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+      .navigateView('view.1', ['path/to/view']);
+
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {}} satisfies MView);
+    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
+  });
+
+  it('should remove views of a part when removing a part', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part', {align: 'right'})
+      .addView('view.1', {partId: 'part'})
+      .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+      .removePart('part');
+
+    expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+  });
+
+  it('should remove associated data when removing view', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part')
+      .addView('view.1', {partId: 'part'})
+      .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+      .removeView('view.1');
+
+    expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+  });
+
+  it('should also rename associated data when renaming view', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part')
+      .addView('view.1', {partId: 'part'})
+      .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+      .renameView('view.1', 'view.2');
+
+    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+
+    expect(workbenchLayout.viewState({viewId: 'view.2'})).toEqual({some: 'state'});
+    expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual(segments(['path/to/view']));
   });
 
   it('should activate part and view when moving view to another part', () => {
@@ -998,15 +1104,15 @@ describe('WorkbenchLayout', () => {
       .activateView('view.3');
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('left');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.1');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
 
     // Move view.1 to part right
     workbenchLayout = workbenchLayout.moveView('view.1', 'right', {activatePart: true, activateView: true});
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('right');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.2');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.1');
   });
 
   it('should not activate part and view when moving view to another part', () => {
@@ -1024,15 +1130,15 @@ describe('WorkbenchLayout', () => {
       .activateView('view.3');
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('left');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.1');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
 
     // Move view.1 to part right
     workbenchLayout = workbenchLayout.moveView('view.1', 'right');
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('left');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.2');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
   });
 
   it('should activate part and view when moving view inside the part', () => {
@@ -1050,15 +1156,15 @@ describe('WorkbenchLayout', () => {
       .activateView('view.3');
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('right');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.1');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
 
     // Move view.1 to part right
     workbenchLayout = workbenchLayout.moveView('view.2', 'left', {position: 0, activatePart: true, activateView: true});
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('left');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.2');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
   });
 
   it('should not activate part and view when moving view inside the part', () => {
@@ -1076,15 +1182,15 @@ describe('WorkbenchLayout', () => {
       .activateView('view.3');
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('right');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.1');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
 
     // Move view.1 to part right
     workbenchLayout = workbenchLayout.moveView('view.2', 'left', {position: 0});
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('right');
-    expect(workbenchLayout.part({by: {partId: 'left'}}).activeViewId).toEqual('view.1');
-    expect(workbenchLayout.part({by: {partId: 'right'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'left'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'right'}).activeViewId).toEqual('view.3');
   });
 
   /**
@@ -1111,8 +1217,8 @@ describe('WorkbenchLayout', () => {
       .moveView('view.3', 'C');
 
     expect(workbenchLayout.hasPart('B')).toBeFalse();
-    expect(workbenchLayout.part({by: {partId: 'A'}}).views).toEqual([{id: 'view.1'}, {id: 'view.2'}]);
-    expect(workbenchLayout.part({by: {partId: 'C'}}).views).toEqual([{id: 'view.3'}]);
+    expect(workbenchLayout.part({partId: 'A'}).views).toEqual([{id: 'view.1'}, {id: 'view.2'}]);
+    expect(workbenchLayout.part({partId: 'C'}).views).toEqual([{id: 'view.3'}]);
   });
 
   /**
@@ -1138,9 +1244,9 @@ describe('WorkbenchLayout', () => {
       .moveView('view.2', 'A')
       .moveView('view.3', 'C');
 
-    expect(workbenchLayout.part({by: {partId: 'B'}})).toEqual(jasmine.objectContaining({id: 'B'}));
-    expect(workbenchLayout.part({by: {partId: 'A'}}).views).toEqual([{id: 'view.1'}, {id: 'view.2'}]);
-    expect(workbenchLayout.part({by: {partId: 'C'}}).views).toEqual([{id: 'view.3'}]);
+    expect(workbenchLayout.part({partId: 'B'})).toEqual(jasmine.objectContaining({id: 'B'}));
+    expect(workbenchLayout.part({partId: 'A'}).views).toEqual([{id: 'view.1'}, {id: 'view.2'}]);
+    expect(workbenchLayout.part({partId: 'C'}).views).toEqual([{id: 'view.3'}]);
   });
 
   it('should activate the most recently activated view when removing a view', () => {
@@ -1152,8 +1258,8 @@ describe('WorkbenchLayout', () => {
       .addView('view.1', {partId: 'main'})
       .addView('view.5', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
-      .addView('view.4', {partId: 'main'})
-      .addView('view.3', {partId: 'main'});
+      .addView('view.3', {partId: 'main'})
+      .addView('view.4', {partId: 'main'});
 
     // prepare the activation history
     viewActivationInstantProviderSpyObj.getActivationInstant
@@ -1166,16 +1272,16 @@ describe('WorkbenchLayout', () => {
     workbenchLayout = workbenchLayout
       .activateView('view.1')
       .removeView('view.1');
-    expect(workbenchLayout.part({by: {partId: 'main'}}).activeViewId).toEqual('view.4');
+    expect(workbenchLayout.part({partId: 'main'}).activeViewId).toEqual('view.4');
 
     workbenchLayout = workbenchLayout.removeView('view.4');
-    expect(workbenchLayout.part({by: {partId: 'main'}}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'main'}).activeViewId).toEqual('view.2');
 
     workbenchLayout = workbenchLayout.removeView('view.2');
-    expect(workbenchLayout.part({by: {partId: 'main'}}).activeViewId).toEqual('view.5');
+    expect(workbenchLayout.part({partId: 'main'}).activeViewId).toEqual('view.5');
 
     workbenchLayout = workbenchLayout.removeView('view.5');
-    expect(workbenchLayout.part({by: {partId: 'main'}}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'main'}).activeViewId).toEqual('view.3');
   });
 
   /**
@@ -1436,7 +1542,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('B');
   });
 
-  it('should compute next view id for views that are target of a primary route', async () => {
+  it('should compute next view id', async () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
 
     let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
@@ -1450,9 +1556,6 @@ describe('WorkbenchLayout', () => {
     workbenchLayout = workbenchLayout.addView('view.2', {partId: 'main'});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
 
-    workbenchLayout = workbenchLayout.addView('view.6', {partId: 'main'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
     workbenchLayout = workbenchLayout.addView('view.3', {partId: 'main'});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.4');
 
@@ -1460,6 +1563,9 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.computeNextViewId()).toEqual('view.5');
 
     workbenchLayout = workbenchLayout.addView('view.5', {partId: 'main'});
+    expect(workbenchLayout.computeNextViewId()).toEqual('view.6');
+
+    workbenchLayout = workbenchLayout.addView('view.6', {partId: 'main'});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
 
     workbenchLayout = workbenchLayout.removeView('view.3');
@@ -1524,40 +1630,40 @@ describe('WorkbenchLayout', () => {
       .addView('view.4', {partId: 'outerRight'});
 
     // Find by part id
-    expect(workbenchLayout.part({by: {partId: 'outerLeft'}}).id).toEqual('outerLeft');
-    expect(workbenchLayout.part({by: {partId: 'innerLeft'}}).id).toEqual('innerLeft');
-    expect(workbenchLayout.part({by: {partId: 'innerRight'}}).id).toEqual('innerRight');
-    expect(workbenchLayout.part({by: {partId: 'outerRight'}}).id).toEqual('outerRight');
+    expect(workbenchLayout.part({partId: 'outerLeft'}).id).toEqual('outerLeft');
+    expect(workbenchLayout.part({partId: 'innerLeft'}).id).toEqual('innerLeft');
+    expect(workbenchLayout.part({partId: 'innerRight'}).id).toEqual('innerRight');
+    expect(workbenchLayout.part({partId: 'outerRight'}).id).toEqual('outerRight');
 
     // Find by grid and part id
-    expect(workbenchLayout.part({grid: 'workbench', by: {partId: 'outerLeft'}}).id).toEqual('outerLeft');
-    expect(workbenchLayout.part({grid: 'mainArea', by: {partId: 'innerLeft'}}).id).toEqual('innerLeft');
-    expect(workbenchLayout.part({grid: 'mainArea', by: {partId: 'innerRight'}}).id).toEqual('innerRight');
-    expect(workbenchLayout.part({grid: 'workbench', by: {partId: 'outerRight'}}).id).toEqual('outerRight');
+    expect(workbenchLayout.part({grid: 'workbench', partId: 'outerLeft'}).id).toEqual('outerLeft');
+    expect(workbenchLayout.part({grid: 'mainArea', partId: 'innerLeft'}).id).toEqual('innerLeft');
+    expect(workbenchLayout.part({grid: 'mainArea', partId: 'innerRight'}).id).toEqual('innerRight');
+    expect(workbenchLayout.part({grid: 'workbench', partId: 'outerRight'}).id).toEqual('outerRight');
 
     // Find by view id
-    expect(workbenchLayout.part({by: {viewId: 'view.1'}}).id).toEqual('innerLeft');
-    expect(workbenchLayout.part({by: {viewId: 'view.2'}}).id).toEqual('innerRight');
-    expect(workbenchLayout.part({by: {viewId: 'view.3'}}).id).toEqual('outerLeft');
-    expect(workbenchLayout.part({by: {viewId: 'view.4'}}).id).toEqual('outerRight');
+    expect(workbenchLayout.part({viewId: 'view.1'}).id).toEqual('innerLeft');
+    expect(workbenchLayout.part({viewId: 'view.2'}).id).toEqual('innerRight');
+    expect(workbenchLayout.part({viewId: 'view.3'}).id).toEqual('outerLeft');
+    expect(workbenchLayout.part({viewId: 'view.4'}).id).toEqual('outerRight');
 
     // Find by grid and view id
-    expect(workbenchLayout.part({grid: 'mainArea', by: {viewId: 'view.1'}}).id).toEqual('innerLeft');
-    expect(workbenchLayout.part({grid: 'mainArea', by: {viewId: 'view.2'}}).id).toEqual('innerRight');
-    expect(workbenchLayout.part({grid: 'workbench', by: {viewId: 'view.3'}}).id).toEqual('outerLeft');
-    expect(workbenchLayout.part({grid: 'workbench', by: {viewId: 'view.4'}}).id).toEqual('outerRight');
+    expect(workbenchLayout.part({grid: 'mainArea', viewId: 'view.1'}).id).toEqual('innerLeft');
+    expect(workbenchLayout.part({grid: 'mainArea', viewId: 'view.2'}).id).toEqual('innerRight');
+    expect(workbenchLayout.part({grid: 'workbench', viewId: 'view.3'}).id).toEqual('outerLeft');
+    expect(workbenchLayout.part({grid: 'workbench', viewId: 'view.4'}).id).toEqual('outerRight');
 
     // Find by part id and view id
-    expect(workbenchLayout.part({by: {partId: 'innerLeft', viewId: 'view.1'}}).id).toEqual('innerLeft');
-    expect(workbenchLayout.part({by: {partId: 'innerRight', viewId: 'view.2'}}).id).toEqual('innerRight');
-    expect(workbenchLayout.part({by: {partId: 'outerLeft', viewId: 'view.3'}}).id).toEqual('outerLeft');
-    expect(workbenchLayout.part({by: {partId: 'outerRight', viewId: 'view.4'}}).id).toEqual('outerRight');
+    expect(workbenchLayout.part({partId: 'innerLeft', viewId: 'view.1'}).id).toEqual('innerLeft');
+    expect(workbenchLayout.part({partId: 'innerRight', viewId: 'view.2'}).id).toEqual('innerRight');
+    expect(workbenchLayout.part({partId: 'outerLeft', viewId: 'view.3'}).id).toEqual('outerLeft');
+    expect(workbenchLayout.part({partId: 'outerRight', viewId: 'view.4'}).id).toEqual('outerRight');
 
     // Find by grid, part id and view id
-    expect(workbenchLayout.part({grid: 'mainArea', by: {partId: 'innerLeft', viewId: 'view.1'}}).id).toEqual('innerLeft');
-    expect(workbenchLayout.part({grid: 'mainArea', by: {partId: 'innerRight', viewId: 'view.2'}}).id).toEqual('innerRight');
-    expect(workbenchLayout.part({grid: 'workbench', by: {partId: 'outerLeft', viewId: 'view.3'}}).id).toEqual('outerLeft');
-    expect(workbenchLayout.part({grid: 'workbench', by: {partId: 'outerRight', viewId: 'view.4'}}).id).toEqual('outerRight');
+    expect(workbenchLayout.part({grid: 'mainArea', partId: 'innerLeft', viewId: 'view.1'}).id).toEqual('innerLeft');
+    expect(workbenchLayout.part({grid: 'mainArea', partId: 'innerRight', viewId: 'view.2'}).id).toEqual('innerRight');
+    expect(workbenchLayout.part({grid: 'workbench', partId: 'outerLeft', viewId: 'view.3'}).id).toEqual('outerLeft');
+    expect(workbenchLayout.part({grid: 'workbench', partId: 'outerRight', viewId: 'view.4'}).id).toEqual('outerRight');
   });
 
   it('should throw an error if not finding the part', () => {
@@ -1567,12 +1673,12 @@ describe('WorkbenchLayout', () => {
       .addPart(MAIN_AREA)
       .addView('view.1', {partId: 'main'});
 
-    expect(() => workbenchLayout.part({by: {partId: 'does-not-exist'}})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({by: {partId: 'does-not-exist', viewId: 'view.1'}})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({by: {partId: 'main', viewId: 'view.2'}})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'workbench', by: {partId: 'main', viewId: 'view.1'}})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'workbench', by: {viewId: 'view.1'}})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'workbench', by: {partId: 'main'}})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({partId: 'does-not-exist'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({partId: 'does-not-exist', viewId: 'view.1'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({partId: 'main', viewId: 'view.2'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({grid: 'workbench', partId: 'main', viewId: 'view.1'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({grid: 'workbench', viewId: 'view.1'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({grid: 'workbench', partId: 'main'})).toThrowError(/NullPartError/);
   });
 
   it('should return `null` if not finding the part', () => {
@@ -1582,12 +1688,12 @@ describe('WorkbenchLayout', () => {
       .addPart(MAIN_AREA)
       .addView('view.1', {partId: 'main'});
 
-    expect(workbenchLayout.part({by: {partId: 'does-not-exist'}}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({by: {partId: 'does-not-exist', viewId: 'view.1'}}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({by: {partId: 'main', viewId: 'view.2'}}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'workbench', by: {partId: 'main', viewId: 'view.1'}}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'workbench', by: {viewId: 'view.1'}}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'workbench', by: {partId: 'main'}}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({partId: 'does-not-exist'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({partId: 'does-not-exist', viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({partId: 'main', viewId: 'view.2'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({grid: 'workbench', partId: 'main', viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({grid: 'workbench', viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({grid: 'workbench', partId: 'main'}, {orElse: null})).toBeNull();
   });
 
   it('should return whether a part is contained in the main area', () => {
@@ -1622,6 +1728,119 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.views({grid: 'mainArea'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
   });
 
+  it('should find views by URL segments', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.1', {partId: MAIN_AREA})
+      .addView('view.2', {partId: MAIN_AREA})
+      .addView('view.3', {partId: MAIN_AREA})
+      .navigateView('view.1', ['path', 'to', 'view', '1'])
+      .navigateView('view.2', ['path', 'to', 'view', '2'])
+      .navigateView('view.3', ['path', 'to', 'view', '2']);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path']), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view']), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '1']), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(['view.1']);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '2']), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.2', 'view.3']));
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '*']), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', '*']), {matchWildcardPath: true, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+  });
+
+  it('should find views by URL segments (matrix params matching)', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.1', {partId: MAIN_AREA})
+      .addView('view.2', {partId: MAIN_AREA})
+      .addView('view.3', {partId: MAIN_AREA})
+      .navigateView('view.1', ['path', 'to', 'view'])
+      .navigateView('view.2', ['path', 'to', 'view', {matrixParam: 'A'}])
+      .navigateView('view.3', ['path', 'to', 'view', {matrixParam: 'B'}]);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view']), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view']), {matchWildcardPath: false, matchMatrixParams: true})})
+      .map(view => view.id),
+    ).toEqual(['view.1']);
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', {matrixParam: 'A'}]), {matchWildcardPath: false, matchMatrixParams: false})})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', {matrixParam: 'A'}]), {matchWildcardPath: false, matchMatrixParams: true})})
+      .map(view => view.id),
+    ).toEqual(['view.2']);
+  });
+
+  it('should find views by navigation hint', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.1', {partId: MAIN_AREA})
+      .addView('view.2', {partId: MAIN_AREA})
+      .addView('view.3', {partId: MAIN_AREA})
+      .navigateView('view.1', ['path', 'to', 'view', '1'])
+      .navigateView('view.2', ['path', 'to', 'view', '2'], {hint: 'hint1'})
+      .navigateView('view.3', [], {hint: 'hint2'});
+
+    expect(layout
+      .views()
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({navigationHint: undefined})
+      .map(view => view.id),
+    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+
+    expect(layout
+      .views({navigationHint: ''})
+      .map(view => view.id),
+    ).toEqual([]);
+
+    expect(layout
+      .views({navigationHint: null})
+      .map(view => view.id),
+    ).toEqual(['view.1']);
+
+    expect(layout
+      .views({navigationHint: 'hint1'})
+      .map(view => view.id),
+    ).toEqual(['view.2']);
+
+    expect(layout
+      .views({navigationHint: 'hint2'})
+      .map(view => view.id),
+    ).toEqual(['view.3']);
+  });
+
   it('should activate adjacent view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
 
@@ -1633,27 +1852,27 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'part'});
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('main');
-    expect(workbenchLayout.part({by: {partId: 'part'}}).activeViewId).toBeUndefined();
+    expect(workbenchLayout.part({partId: 'part'}).activeViewId).toBeUndefined();
 
     // Activate adjacent view
     workbenchLayout = workbenchLayout.activateAdjacentView('view.2');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('main');
-    expect(workbenchLayout.part({by: {partId: 'part'}}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'part'}).activeViewId).toEqual('view.1');
 
     // Activate adjacent view
     workbenchLayout = workbenchLayout.activateAdjacentView('view.3');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('main');
-    expect(workbenchLayout.part({by: {partId: 'part'}}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'part'}).activeViewId).toEqual('view.2');
 
     // Activate adjacent view
     workbenchLayout = workbenchLayout.activateAdjacentView('view.1');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('main');
-    expect(workbenchLayout.part({by: {partId: 'part'}}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'part'}).activeViewId).toEqual('view.2');
 
     // Activate adjacent view
     workbenchLayout = workbenchLayout.activateAdjacentView('view.2', {activatePart: true});
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part');
-    expect(workbenchLayout.part({by: {partId: 'part'}}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'part'}).activeViewId).toEqual('view.1');
   });
 
   it('should allow activating a part', () => {
@@ -1709,54 +1928,48 @@ describe('WorkbenchLayout', () => {
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.10', 'view.2', 'view.3', 'view.4']));
 
     // Rename 'view.1' to 'view.10' [grid=mainArea]
-    changedLayout = workbenchLayout.renameView('view.1', 'view.10', {grid: 'mainArea'});
+    changedLayout = workbenchLayout.renameView('view.1', 'view.10');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.10', 'view.2', 'view.3', 'view.4']));
-
-    // Rename 'view.1' to 'view.10' [grid=workbench] (wrong grid)
-    expect(() => workbenchLayout.renameView('view.1', 'view.10', {grid: 'workbench'})).toThrowError(/NullPartError/);
 
     // Rename 'view.3' to 'view.30'
     changedLayout = workbenchLayout.renameView('view.3', 'view.30');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.30', 'view.4']));
 
-    // Rename 'view.3' to 'view.30' [grid=mainArea] (wrong grid)
-    expect(() => workbenchLayout.renameView('view.3', 'view.30', {grid: 'mainArea'})).toThrowError(/NullPartError/);
-
     // Rename 'view.3' to 'view.30' [grid=workbench]
-    changedLayout = workbenchLayout.renameView('view.3', 'view.30', {grid: 'workbench'});
+    changedLayout = workbenchLayout.renameView('view.3', 'view.30');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.30', 'view.4']));
 
     // Rename 'view.99' (does not exist)
-    expect(() => workbenchLayout.renameView('view.99', 'view.999')).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.renameView('view.99', 'view.999')).toThrowError(/NullViewError/);
 
     // Rename 'view.1' to 'view.2'
-    expect(() => workbenchLayout.renameView('view.1', 'view.2')).toThrowError(/\[IllegalArgumentError] View id must be unique/);
+    expect(() => workbenchLayout.renameView('view.1', 'view.2')).toThrowError(/\[ViewRenameError] View id must be unique/);
 
     // Rename 'view.2' to 'view.3'
-    expect(() => workbenchLayout.renameView('view.2', 'view.3')).toThrowError(/\[IllegalArgumentError] View id must be unique/);
+    expect(() => workbenchLayout.renameView('view.2', 'view.3')).toThrowError(/\[ViewRenameError] View id must be unique/);
 
     // Rename 'view.3' to 'view.4'
-    expect(() => workbenchLayout.renameView('view.3', 'view.4')).toThrowError(/\[IllegalArgumentError] View id must be unique/);
+    expect(() => workbenchLayout.renameView('view.3', 'view.4')).toThrowError(/\[ViewRenameError] View id must be unique/);
 
     // Rename 'view.1' to 'view.10' and expect activated view to be changed.
     changedLayout = workbenchLayout.renameView('view.1', 'view.10');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.10', 'view.2', 'view.3', 'view.4']));
-    expect(changedLayout.part({by: {viewId: 'view.10'}}).activeViewId).toEqual('view.10');
+    expect(changedLayout.part({viewId: 'view.10'}).activeViewId).toEqual('view.10');
 
     // Rename 'view.2' to 'view.20' and expect activated view not to be changed.
     changedLayout = workbenchLayout.renameView('view.2', 'view.20');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.20', 'view.3', 'view.4']));
-    expect(changedLayout.part({by: {viewId: 'view.20'}}).activeViewId).toEqual('view.1');
+    expect(changedLayout.part({viewId: 'view.20'}).activeViewId).toEqual('view.1');
 
     // Rename 'view.3' to 'view.30' and expect activated view to be changed.
     changedLayout = workbenchLayout.renameView('view.3', 'view.30');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.30', 'view.4']));
-    expect(changedLayout.part({by: {viewId: 'view.30'}}).activeViewId).toEqual('view.30');
+    expect(changedLayout.part({viewId: 'view.30'}).activeViewId).toEqual('view.30');
 
     // Rename 'view.4' to 'view.40' and expect activated view not to be changed.
     changedLayout = workbenchLayout.renameView('view.4', 'view.40');
     expect(changedLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3', 'view.40']));
-    expect(changedLayout.part({by: {viewId: 'view.40'}}).activeViewId).toEqual('view.3');
+    expect(changedLayout.part({viewId: 'view.40'}).activeViewId).toEqual('view.3');
   });
 
   it('should allow setting split ratio', () => {
@@ -1774,17 +1987,17 @@ describe('WorkbenchLayout', () => {
     expect(findParentNode('left').ratio).toEqual(.3);
 
     // Expect to error if setting the ratio for a node not contained in the layout.
-    expect(() => workbenchLayout.setSplitRatio('does-not-exist', .3)).toThrowError(/NullNodeError/);
+    expect(() => workbenchLayout.setSplitRatio('does-not-exist', .3)).toThrowError(/NullElementError/);
 
     // Expect to error if setting an illegal ratio.
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, -.1)).toThrowError(/IllegalArgumentError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 0)).not.toThrowError(/IllegalArgumentError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, .5)).not.toThrowError(/IllegalArgumentError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1)).not.toThrowError(/IllegalArgumentError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1.1)).toThrowError(/IllegalArgumentError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, -.1)).toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 0)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, .5)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1.1)).toThrowError(/LayoutModifyError/);
 
     function findParentNode(partId: string): MTreeNode {
-      const parent = workbenchLayout.part({by: {partId}}).parent;
+      const parent = workbenchLayout.part({partId}).parent;
       if (!parent) {
         throw Error(`[MTreeNodeNotFoundError] Parent MTreeNode not found [partId=${partId}].`);
       }

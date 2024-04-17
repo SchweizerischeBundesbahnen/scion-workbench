@@ -19,7 +19,7 @@ import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-dr
 import {of} from 'rxjs';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchMenuItem} from '../workbench.model';
-import {WorkbenchView} from '../view/workbench-view.model';
+import {ViewId, WorkbenchView} from '../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
@@ -226,7 +226,9 @@ export class ViewDragImageRect {
 
 class DragImageWorkbenchView implements WorkbenchView {
 
-  public readonly id: string;
+  public readonly id: ViewId;
+  public readonly alternativeId: string | undefined;
+  public readonly navigationHint: string | undefined;
   public readonly title: string;
   public readonly heading: string;
   public readonly closable: boolean;
@@ -245,6 +247,8 @@ class DragImageWorkbenchView implements WorkbenchView {
 
   constructor(dragData: ViewDragData) {
     this.id = dragData.viewId;
+    this.alternativeId = dragData.alternativeViewId;
+    this.navigationHint = dragData.navigationHint;
     this.title = dragData.viewTitle;
     this.heading = dragData.viewHeading;
     this.closable = dragData.viewClosable;
