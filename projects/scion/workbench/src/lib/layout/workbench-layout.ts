@@ -55,7 +55,7 @@ export interface WorkbenchLayout {
   /**
    * Navigates the specified view based on the provided array of commands and extras.
    *
-   * A command can be a string or an object literal. A string represents a path segment, an object literal associates data with the preceding path segment.
+   * A command can be a string or an object literal. A string represents a path segment, an object literal associates matrix parameters with the preceding segment.
    * Multiple segments can be combined into a single command, separated by a forward slash.
    *
    * By default, navigation is absolute. Set `relativeTo` in extras for relative navigation.
@@ -103,6 +103,19 @@ export interface WorkbenchLayout {
    * @return a copy of this layout with the part removed.
    */
   removePart(id: string): WorkbenchLayout;
+
+  /**
+   * Moves a view to a different part or moves it within a part.
+   *
+   * @param id - The id of the view to be moved.
+   * @param targetPartId - The id of the part to which to move the view.
+   * @param options - Controls moving of the view.
+   * @param options.position - Specifies the position where to move the view in the target part. The position is zero-based. Default is `end` when moving the view to a different part.
+   * @param options.activateView - Controls if to activate the view. Default is `false`.
+   * @param options.activatePart - Controls if to activate the target part. Default is `false`.
+   * @return a copy of this layout with the view moved.
+   */
+  moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout;
 
   /**
    * Activates the given view.

@@ -10,7 +10,7 @@
 
 import {Component, HostBinding, Input, OnChanges, SimpleChanges, TrackByFunction} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
-import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';
 import {PortalModule} from '@angular/cdk/portal';
@@ -65,7 +65,7 @@ export class GridElementComponent implements OnChanges {
   @Input({required: true})
   public element!: MTreeNode | MPart;
 
-  constructor(private _workbenchRouter: WorkbenchRouter, private _workbenchLayoutService: WorkbenchLayoutService) {
+  constructor(private _workbenchRouter: ɵWorkbenchRouter, private _workbenchLayoutService: WorkbenchLayoutService) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -82,7 +82,7 @@ export class GridElementComponent implements OnChanges {
   public onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
     this._workbenchLayoutService.notifyDragEnding();
-    this._workbenchRouter.ɵnavigate(layout => layout.setSplitRatio(treeNode.nodeId, ratio)).then();
+    this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.nodeId, ratio)).then();
   }
 
   private computeChildren(treeNode: MTreeNode): ChildElement[] {

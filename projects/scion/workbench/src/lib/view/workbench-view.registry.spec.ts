@@ -91,7 +91,7 @@ describe('WorkbenchViewRegistry', () => {
     TestBed.inject(WorkbenchViewRegistry).views$.pipe(mapArray(view => view.part.id)).subscribe(captor);
 
     // Open view in the right part.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addPart('right', {relativeTo: 'main', align: 'right'})
       .addView('view', {partId: 'right'})
       .navigateView('view', ['test-view']),

@@ -32,11 +32,12 @@ export class PerspectivesComponent {
 ```
 
 ```html
-<button *ngFor="let perspective of workbenchService.perspectives$ | async"
-        (click)="workbenchService.switchPerspective(perspective.id)"
-        [class.active]="perspective.active$ | async">
-  {{perspective.data['label']}}
-</button>
+@for (perspective of workbenchService.perspectives$ | async; track perspective) {
+  <button (click)="workbenchService.switchPerspective(perspective.id)"
+          [class.active]="perspective.active$ | async">
+    {{perspective.data['label']}}
+  </button>
+}
 ```
 ***
 

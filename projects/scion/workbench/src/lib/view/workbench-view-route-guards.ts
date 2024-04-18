@@ -10,10 +10,10 @@
 
 import {ActivatedRouteSnapshot, CanDeactivateFn, CanMatchFn} from '@angular/router';
 import {inject} from '@angular/core';
+import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {WorkbenchViewPreDestroy} from '../workbench.model';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-routes-registrator.service';
-import {WorkbenchRouter} from '../routing/workbench-router.service';
 
 /**
  * Matches the route if target of a workbench view and navigating with the given hint.
@@ -58,7 +58,7 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
           return false;
         }
 
-        const layout = inject(WorkbenchRouter).getCurrentNavigationContext().layout;
+        const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
         const view = layout.view({viewId: outlet}, {orElse: null});
         return view?.navigation?.hint === condition;
       }
@@ -78,7 +78,7 @@ export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
     throw Error(`[ViewError] CanMatchFn must be installed on a view auxiliary route. [outlet=${outlet}]`);
   }
 
-  const layout = inject(WorkbenchRouter).getCurrentNavigationContext().layout;
+  const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
   const view = layout.view({viewId: outlet}, {orElse: null});
   return !view || !!view.navigation;
 };
@@ -102,7 +102,7 @@ export const canDeactivateView: CanDeactivateFn<unknown> = ((component: unknown 
   // Depending on the route configuration, this guard may be called even if the component is not to be closed.
   // Therefore, we need to check if the view is actually being closed before invoking the `onWorkbenchViewPreDestroy`
   // lifecycle hook. See {@link Route.runGuardsAndResolvers}.
-  const isToBeClosed = inject(WorkbenchRouter).getCurrentNavigationContext().layoutDiff.removedViews.includes(outlet) ?? false;
+  const isToBeClosed = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layoutDiff.removedViews.includes(outlet) ?? false;
   if (!isToBeClosed) {
     return true;
   }

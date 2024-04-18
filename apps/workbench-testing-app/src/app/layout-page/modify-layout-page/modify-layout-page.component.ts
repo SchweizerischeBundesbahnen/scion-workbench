@@ -73,7 +73,7 @@ export default class ModifyLayoutPageComponent {
   }
 
   private navigate(): Promise<boolean> {
-    return this._workbenchRouter.ɵnavigate(layout => {
+    return this._workbenchRouter.navigate(layout => {
       // Add parts.
       for (const part of this.form.controls.parts.value) {
         layout = layout.addPart(part.id, {

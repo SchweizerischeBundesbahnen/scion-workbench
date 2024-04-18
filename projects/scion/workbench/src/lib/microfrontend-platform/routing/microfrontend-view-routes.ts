@@ -12,7 +12,7 @@ import {Params, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} 
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
 import {inject, Injector} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
-import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../../layout/workbench-layouts.util';
 
 /**
@@ -54,7 +54,7 @@ export const MicrofrontendViewRoutes = {
         return null;
       }
 
-      const {layout} = injector.get(WorkbenchRouter).getCurrentNavigationContext();
+      const {layout} = injector.get(ɵWorkbenchRouter).getCurrentNavigationContext();
       const viewState = layout.viewState({viewId: route.outlet});
       const transientParams = viewState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
       const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);

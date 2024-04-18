@@ -16,6 +16,7 @@ import {TestComponent} from '../testing/test.component';
 import {waitForInitialWorkbenchLayout} from '../testing/testing.util';
 import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {WorkbenchRouter} from './workbench-router.service';
+import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 
 describe('RouterUtils.segmentsToCommands', () => {
@@ -254,7 +255,7 @@ describe('RouterUtils.parseViewOutlets', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add view outlets view.101 and view.103 to the URL.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => {
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => {
         const activeMainAreaPart = layout.activePart({grid: 'mainArea'})!;
         return layout
           .addView('view.101', {partId: activeMainAreaPart.id})

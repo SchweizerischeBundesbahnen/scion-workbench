@@ -19,7 +19,7 @@ import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssV
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {filterArray, mapArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {SciDimensionModule} from '@scion/components/dimension';
 import {AsyncPipe, NgFor, NgIf} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
@@ -140,7 +140,7 @@ export class PartBarComponent implements OnInit {
   constructor(host: ElementRef<HTMLElement>,
               @Inject(WORKBENCH_ID) private _workbenchId: string,
               private _workbenchLayoutService: WorkbenchLayoutService,
-              private _router: WorkbenchRouter,
+              private _router: ɵWorkbenchRouter,
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
               private _part: ɵWorkbenchPart,
               private _viewDragService: ViewDragService,
@@ -161,7 +161,7 @@ export class PartBarComponent implements OnInit {
   @HostListener('dblclick', ['$event'])
   public onDoubleClick(event: MouseEvent): void {
     if (this._part.isInMainArea) {
-      this._router.ɵnavigate(layout => layout.toggleMaximized()).then();
+      this._router.navigate(layout => layout.toggleMaximized()).then();
     }
     event.stopPropagation();
   }
@@ -277,7 +277,7 @@ export class PartBarComponent implements OnInit {
 
     // Activate the view next to the view being dragged out of this tabbar. But, do not push the navigation into browsing history stack.
     if (this.dragSourceViewTab && this.dragSourceViewTab.active) {
-      this._router.ɵnavigate(layout => layout.activateAdjacentView(this.dragSourceViewTab!.viewId), {skipLocationChange: true}).then();
+      this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab!.viewId), {skipLocationChange: true}).then();
     }
   }
 

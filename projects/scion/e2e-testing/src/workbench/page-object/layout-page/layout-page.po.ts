@@ -50,7 +50,7 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
   /**
    * Modifies the current workbench layout.
    *
-   * @see WorkbenchRouter.ɵnavigate
+   * @see WorkbenchRouter.navigate
    */
   public async modifyLayout(fn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
     await this.view.tab.click();

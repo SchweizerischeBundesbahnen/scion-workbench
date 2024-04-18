@@ -270,7 +270,7 @@ In this step, we create the TODO list and place it to the left of the main area.
    [+]         .addPart(MAIN_AREA)
    [+]         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
    [+]         .addView('todos', {partId: 'left', activateView: true})
-   [+]         .navigateView('todos', ['todos']),
+   [+]         .navigateView('todos', ['todos'])
            }),
            RouterModule.forRoot([
              {path: '', loadComponent: () => import('./welcome/welcome.component')},
@@ -390,7 +390,7 @@ In this step, we will create a component to open a TODO in a view.
                 .addPart(MAIN_AREA)
                 .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
                 .addView('todos', {partId: 'left', activateView: true})
-                .navigateView('todos', ['todos']),
+                .navigateView('todos', ['todos'])
             }),
             RouterModule.forRoot([
               {path: '', loadComponent: () => import('./welcome/welcome.component')},

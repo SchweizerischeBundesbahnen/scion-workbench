@@ -11,7 +11,7 @@ import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {EnvironmentInjector, inject, InjectionToken, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
@@ -41,7 +41,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private _workbenchGridMerger = inject(WorkbenchGridMerger);
   private _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private _workbenchRouter = inject(WorkbenchRouter);
+  private _workbenchRouter = inject(ɵWorkbenchRouter);
   private _environmentInjector = inject(EnvironmentInjector);
   private _initialLayoutFn: WorkbenchLayoutFn;
   private _activePerspectiveId$ = inject(ACTIVE_PERSPECTIVE_ID$);
@@ -79,7 +79,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     const currentActivePerspectiveId = this._activePerspectiveId$.value;
 
     // Perform navigation to activate the layout of this perspective.
-    const navigated = await this._workbenchRouter.ɵnavigate(currentLayout => {
+    const navigated = await this._workbenchRouter.navigate(currentLayout => {
       // Mark this perspective as active after the initial navigation (1) but before the actual Angular routing (2).
       //
       // (1) Otherwise, if the initial navigation is asynchronous, such as when lazy loading components or using asynchronous guards,
@@ -103,7 +103,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     this._perspectiveLayout = this._initialPerspectiveLayout;
 
     // Reset to the initial layout.
-    await this._workbenchRouter.ɵnavigate(currentLayout => this.createLayoutForActivation(currentLayout));
+    await this._workbenchRouter.navigate(currentLayout => this.createLayoutForActivation(currentLayout));
   }
 
   /**

@@ -116,7 +116,7 @@ export class WorkbenchNavigator {
   /**
    * Modifies the current workbench layout.
    *
-   * @see WorkbenchRouter.ɵnavigate
+   * @see WorkbenchRouter.navigate
    */
   public async modifyLayout(modifyLayoutFn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
     const layoutPage = await this.openInNewTab(LayoutPagePO);
