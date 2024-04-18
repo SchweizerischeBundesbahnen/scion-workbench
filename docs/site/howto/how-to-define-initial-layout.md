@@ -46,7 +46,7 @@ bootstrapApplication(AppComponent, {
         // Decide which views to activate.
         .activateView('navigator')
         .activateView('explorer')
-        .activateView('console'),
+        .activateView('console')
     }),
   ],
 });

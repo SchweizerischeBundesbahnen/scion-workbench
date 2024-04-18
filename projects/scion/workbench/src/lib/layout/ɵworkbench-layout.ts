@@ -338,15 +338,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Moves a view to a different part or moves it within a part.
-   *
-   * @param id - The id of the view to be moved.
-   * @param targetPartId - The id of the part to which to move the view.
-   * @param options - Controls moving of the view.
-   * @param options.position - Specifies the position where to move the view in the target part. The position is zero-based. Default is `end` when moving the view to a different part.
-   * @param options.activateView - Controls if to activate the view. Default is `false`.
-   * @param options.activatePart - Controls if to activate the target part. Default is `false`.
-   * @return a copy of this layout with the view moved.
+   * @inheritDoc
    */
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();

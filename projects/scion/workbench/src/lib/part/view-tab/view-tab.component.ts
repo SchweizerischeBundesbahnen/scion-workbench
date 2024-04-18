@@ -21,7 +21,7 @@ import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.comp
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
-import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {NgIf} from '@angular/common';
@@ -72,7 +72,7 @@ export class ViewTabComponent implements OnChanges {
               @Inject(WORKBENCH_ID) private _workbenchId: string,
               private _workbenchModuleConfig: WorkbenchModuleConfig,
               private _viewRegistry: WorkbenchViewRegistry,
-              private _router: WorkbenchRouter,
+              private _router: ɵWorkbenchRouter,
               private _viewDragService: ViewDragService,
               private _differs: IterableDiffers,
               private _viewContextMenuService: ViewMenuService,
@@ -193,7 +193,7 @@ export class ViewTabComponent implements OnChanges {
       .subscribe(([event, enabled]) => {
         event.stopPropagation(); // prevent `PartBarComponent` handling the dblclick event which would undo maximization/minimization
         if (enabled && this.view.part.isInMainArea) {
-          this._router.ɵnavigate(layout => layout.toggleMaximized()).then();
+          this._router.navigate(layout => layout.toggleMaximized()).then();
         }
       });
   }

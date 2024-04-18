@@ -89,6 +89,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public activatePart(id: string): WorkbenchLayout {
     throw Error('[PageObjectError] Operation `WorkbenchLayout.activatePart` is not supported.');
   }
+
+  public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout {
+    throw Error('[PageObjectError] Operation `WorkbenchLayout.moveView` is not supported.');
+  }
 }
 
 /**

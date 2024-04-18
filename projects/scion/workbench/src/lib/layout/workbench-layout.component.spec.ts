@@ -55,7 +55,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
       .addPart('right', {relativeTo: 'main', align: 'right', ratio: .5})
       .addView('view.1', {partId: 'left', activateView: true})
@@ -2177,7 +2177,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addView('view.1', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
       .addView('view.3', {partId: 'main'})
@@ -2189,15 +2189,15 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Enter transient states.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -2282,7 +2282,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addView('view.1', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
       .addView('view.3', {partId: 'main'})
@@ -2294,15 +2294,15 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Enter transient states.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -2382,7 +2382,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addView('view.1', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
       .addView('view.3', {partId: 'main'})
@@ -2396,19 +2396,19 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Enter transient states.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.4'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.4'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.4', 'D');
 
@@ -2672,7 +2672,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addView('view.1', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
       .addView('view.3', {partId: 'main'})
@@ -2684,15 +2684,15 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Enter transient states.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -2813,7 +2813,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addView('view.1', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
       .addView('view.3', {partId: 'main'})
@@ -2825,15 +2825,15 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Enter transient states.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.3'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.3', 'C');
 
@@ -2954,7 +2954,7 @@ describe('WorkbenchLayout', () => {
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
       .addView('view.1', {partId: 'main'})
       .addView('view.2', {partId: 'main'})
       .navigateView('view.1', ['path/to/view'])
@@ -2964,11 +2964,11 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Enter transient states.
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.1'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.1', 'A');
 
-    await TestBed.inject(WorkbenchRouter).ɵnavigate(layout => layout.activateView('view.2'));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
     enterTransientViewState(fixture, 'view.2', 'B');
 

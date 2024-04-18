@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchRouter, WorkbenchNavigationExtras} from './workbench-router.service';
+export {WorkbenchRouter} from './workbench-router.service';
 export {WorkbenchRouterLinkDirective} from './workbench-router-link.directive';
 export {WorkbenchAuxiliaryRoutesRegistrator} from './workbench-auxiliary-routes-registrator.service';
 export {WorkbenchRouteData} from './workbench-route-data';
-export {Commands, ViewState} from './routing.model';
+export {Commands, ViewState, WorkbenchNavigationExtras, NavigateFn} from './routing.model';

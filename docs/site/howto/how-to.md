@@ -16,6 +16,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 
 #### Layout
 - [How to define the initial workbench layout](how-to-define-initial-layout.md)
+- [How to modify the workbench layout](how-to-modify-layout.md)
 - [How to provide a perspective](how-to-provide-perspective.md)
 - [How to work with perspectives](how-to-perspective.md)
 - [How to configure a start page](how-to-configure-start-page.md)

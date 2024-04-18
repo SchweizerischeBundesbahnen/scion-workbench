@@ -197,7 +197,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
         const replyTo = request.headers.get(MessageHeaders.ReplyTo);
 
         try {
-          const success = await this._workbenchRouter.ɵnavigate(layout => {
+          const success = await this._workbenchRouter.navigate(layout => {
             // Cancel pending navigation if the subscription was closed, e.g., because closed the view or navigated to another capability
             if (subscription.closed) {
               return null;

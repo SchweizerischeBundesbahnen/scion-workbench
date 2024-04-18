@@ -8,8 +8,101 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {UrlSegment} from '@angular/router';
+import {NavigationExtras, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {WorkbenchLayoutDiff} from './workbench-layout-differ';
+import {WorkbenchPopupDiff} from './workbench-popup-differ';
+import {WorkbenchDialogDiff} from './workbench-dialog-differ';
+import {WorkbenchLayout} from '../layout/workbench-layout';
+
+/**
+ * Options to control the navigation.
+ */
+export interface WorkbenchNavigationExtras extends NavigationExtras {
+  /**
+   * Controls where to open the view. Default is `auto`.
+   *
+   * One of:
+   * - 'auto':   Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
+   * - 'blank':  Navigates in a new view.
+   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
+   */
+  target?: ViewId | string | 'blank' | 'auto';
+  /**
+   * Controls which part to navigate views in.
+   *
+   * If target is `blank`, opens the view in the specified part.
+   * If target is `auto`, navigates matching views in the specified part, or opens a new view in that part otherwise.
+   *
+   * If the specified part is not in the layout, opens the view in the active part, with the active part of the main area taking precedence.
+   */
+  partId?: string;
+  /**
+   * Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
+   *
+   * For example, views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
+   * requiring a navigation hint to differentiate between the routes. See {@link canMatchWorkbenchView} for an example.
+   *
+   * Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
+   *
+   * @see canMatchWorkbenchView
+   */
+  hint?: string;
+  /**
+   * Instructs the router to activate the view. Default is `true`.
+   */
+  activate?: boolean;
+  /**
+   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
+   */
+  blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
+  /**
+   * Associates arbitrary state with a view navigation.
+   *
+   * Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
+   * Therefore, a view must be able to restore its state without relying on navigational state.
+   *
+   * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+   */
+  state?: ViewState;
+  /**
+   * Closes views that match the specified path and navigation hint. Matrix parameters do not affect view resolution.
+   * The path supports the asterisk wildcard segment (`*`) to match views with any value in a segment.
+   * To close a specific view, set a view target instead of a path.
+   */
+  close?: boolean;
+  /**
+   * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
+   */
+  cssClass?: string | string[];
+}
+
+/**
+ * Contextual data of a workbench navigation available in the router during navigation.
+ *
+ * @see WorkbenchUrlObserver
+ *
+ * @internal
+ */
+export interface WorkbenchNavigationContext {
+  /**
+   * Layout to be applied after successful navigation.
+   */
+  layout: ɵWorkbenchLayout;
+  /**
+   * Workbench layout elements added or removed by the current navigation.
+   */
+  layoutDiff: WorkbenchLayoutDiff;
+  /**
+   * Popups added or removed by the current navigation.
+   */
+  popupDiff: WorkbenchPopupDiff;
+  /**
+   * Dialogs added or removed by the current navigation.
+   */
+  dialogDiff: WorkbenchDialogDiff;
+}
 
 /**
  * Represents an ordered list of path segments instructing the router which route to navigate to.
@@ -46,3 +139,30 @@ export type ViewStates = {[viewId: ViewId]: ViewState};
  * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
  */
 export type ViewState = {[key: string]: unknown};
+/**
+ * Signature of a function to modify the workbench layout.
+ *
+ * The router will invoke this function with the current workbench layout. The layout has methods for modifying it.
+ * The layout is immutable, so each modification creates a new instance. Use the instance for further modifications and finally return it.
+ *
+ * The function can call `inject` to get any required dependencies.
+ *
+ * ## Workbench Layout
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+ *
+ * ## Example
+ * The following example adds a part to the left of the main area, inserts a view and navigates it.
+ *
+ * ```ts
+ * inject(WorkbenchRouter).navigate(layout => layout
+ *   .addPart('left', {relativeTo: MAIN_AREA, align: 'left'})
+ *   .addView('navigator', {partId: 'left'})
+ *   .navigateView('navigator', ['path/to/view'])
+ *   .activateView('navigator')
+ * );
+ * ```
+ *
+ * @param layout - Reference to the current workbench layout for modification.
+ * @return Modified layout, or `null` to cancel navigation.
+ */
+export type NavigateFn = (layout: WorkbenchLayout) => Promise<WorkbenchLayout | null> | WorkbenchLayout | null;

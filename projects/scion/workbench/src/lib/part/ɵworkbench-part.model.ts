@@ -107,7 +107,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     }
 
     const currentLayout = this._workbenchLayoutService.layout;
-    return this._workbenchRouter.ɵnavigate(
+    return this._workbenchRouter.navigate(
       layout => currentLayout === layout ? layout.activatePart(this.id) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: true}, // do not add part activation into browser history stack
     );

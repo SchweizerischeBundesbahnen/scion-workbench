@@ -98,7 +98,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public async closeViews(...viewIds: ViewId[]): Promise<boolean> {
     // TODO [#27]: Use single navigation to close multiple views.
     // For example:
-    // return this._workbenchRouter.ɵnavigate(layout => {
+    // return this._workbenchRouter.navigate(layout => {
     //   viewIds.forEach(viewId => layout = layout.removeView(viewId));
     //   return layout
     // });

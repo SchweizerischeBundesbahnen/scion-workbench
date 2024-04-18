@@ -9,13 +9,13 @@
  */
 
 import {ChangeDetectorRef, Directive, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, Optional, SimpleChanges} from '@angular/core';
-import {WorkbenchNavigationExtras, WorkbenchRouter} from './workbench-router.service';
+import {WorkbenchRouter} from './workbench-router.service';
 import {mergeWith, noop, Subject} from 'rxjs';
 import {LocationStrategy} from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {filter, takeUntil} from 'rxjs/operators';
-import {Commands} from './routing.model';
+import {Commands, WorkbenchNavigationExtras} from './routing.model';
 import {Defined} from '@scion/toolkit/util';
 
 /**

@@ -19,7 +19,6 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ViewComponent} from '../view/view.component';
-import {WorkbenchNavigationContext, WorkbenchRouter} from './workbench-router.service';
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {WorkbenchPopupDiffer} from './workbench-popup-differ';
 import {Logger, LoggerNames} from '../logging';
@@ -32,6 +31,8 @@ import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchDialogDiffer} from './workbench-dialog-differ';
 import {RouterUtils} from './router.util';
 import {ViewId} from '../view/workbench-view.model';
+import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
+import {WorkbenchNavigationContext} from './routing.model';
 import {canDeactivateView, canMatchNotFoundPage} from '../view/workbench-view-route-guards';
 
 /**
@@ -52,7 +53,7 @@ export class WorkbenchUrlObserver {
               private _partRegistry: WorkbenchPartRegistry,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _environmentInjector: EnvironmentInjector,
-              private _workbenchRouter: WorkbenchRouter,
+              private _workbenchRouter: ɵWorkbenchRouter,
               private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
               private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
               private _workbenchPopupDiffer: WorkbenchPopupDiffer,
@@ -272,7 +273,7 @@ export class WorkbenchUrlObserver {
     const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
     if (layout.mainAreaGrid?.migrated) {
       // Update the URL with the migrated URL and clear existing query params, for example, if the layout query parameter has been renamed.
-      this._workbenchRouter.ɵnavigate(layout => layout, {queryParamsHandling: null, replaceUrl: true}).then();
+      this._workbenchRouter.navigate(layout => layout, {queryParamsHandling: null, replaceUrl: true}).then();
     }
   }
 
