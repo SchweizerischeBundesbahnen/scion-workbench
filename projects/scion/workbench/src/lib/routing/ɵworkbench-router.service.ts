@@ -241,7 +241,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
     return layout
       .addView(viewId, {
         partId: partId,
-        position: extras.blankInsertionIndex ?? 'after-active-view',
+        position: extras.position ?? 'after-active-view',
         activateView: extras.activate ?? true,
       })
       .navigateView(viewId, commands, {

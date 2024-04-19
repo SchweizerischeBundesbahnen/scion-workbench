@@ -304,7 +304,7 @@ test.describe('View Tabbar', () => {
     // open view.2
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 'end',
+      position: 'end',
     });
 
     const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
@@ -317,7 +317,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 'end',
+      position: 'end',
     });
 
     const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
@@ -331,7 +331,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 'end',
+      position: 'end',
     });
 
     const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});
@@ -350,7 +350,7 @@ test.describe('View Tabbar', () => {
     // open view.2
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 'start',
+      position: 'start',
     });
 
     const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
@@ -363,7 +363,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 'start',
+      position: 'start',
     });
 
     const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
@@ -377,7 +377,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 'start',
+      position: 'start',
     });
 
     const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});
@@ -396,7 +396,7 @@ test.describe('View Tabbar', () => {
     // open view.2
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 1,
+      position: 1,
     });
 
     const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.2'});
@@ -409,7 +409,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 1,
+      position: 1,
     });
 
     const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
@@ -423,7 +423,7 @@ test.describe('View Tabbar', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      blankInsertionIndex: 1,
+      position: 1,
     });
 
     const testee4ViewPage = new ViewPagePO(appPO, {viewId: 'view.4'});

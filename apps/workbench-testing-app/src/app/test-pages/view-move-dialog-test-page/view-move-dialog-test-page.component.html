@@ -1,8 +1,8 @@
 <form autocomplete="off" [formGroup]="form">
   <!-- Workbench ID -->
   <sci-form-field label="Workbench ID" direction="column">
-    <input [formControl]="form.controls.workbenchId" class="e2e-workbench-id" list="target">
-    <datalist id="target">
+    <input [formControl]="form.controls.workbenchId" class="e2e-workbench-id" [attr.list]="targetList">
+    <datalist [attr.id]="targetList">
       <option value="new-window">new-window</option>
     </datalist>
   </sci-form-field>

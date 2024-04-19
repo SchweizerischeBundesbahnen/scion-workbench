@@ -56,7 +56,7 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
   /**
    * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
    */
-  blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
+  position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
    * Associates arbitrary state with a view navigation.
    *

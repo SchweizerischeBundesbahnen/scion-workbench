@@ -19,6 +19,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Arrays} from '@scion/toolkit/util';
 import {SettingsService} from '../../settings.service';
 import {CssClassComponent} from '../../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -47,6 +48,10 @@ export default class RegisterPartActionPageComponent {
     }),
   });
   public registerError: string | false | undefined;
+
+  protected viewList = `view-list-${UUID.randomUUID()}`;
+  protected partList = `part-list-${UUID.randomUUID()}`;
+  protected gridList = `grid-list-${UUID.randomUUID()}`;
 
   constructor(private _formBuilder: NonNullableFormBuilder,
               private _settingsService: SettingsService,

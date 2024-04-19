@@ -17,6 +17,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
 import {NotificationPageComponent} from '../notification-page/notification-page.component';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -46,6 +47,8 @@ export default class NotificationOpenerPageComponent {
     useGroupInputReducer: this._formBuilder.control(false),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
+
+  public durationList = `duration-list-${UUID.randomUUID()}`;
 
   constructor(private _formBuilder: NonNullableFormBuilder, private _notificationService: NotificationService) {
   }

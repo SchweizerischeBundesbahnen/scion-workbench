@@ -22,7 +22,7 @@
   }
 </form>
 
-<datalist [id]="viewList">
+<datalist [attr.id]="viewList">
   @for (view of viewProposals; track view) {
     <option [value]="view">{{view}}</option>
   }

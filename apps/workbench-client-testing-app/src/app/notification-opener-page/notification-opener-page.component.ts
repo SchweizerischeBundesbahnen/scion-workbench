@@ -16,6 +16,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -44,6 +45,8 @@ export default class NotificationOpenerPageComponent {
   });
 
   public notificationOpenError: string | undefined;
+
+  public durationList = `duration-list-${UUID.randomUUID()}`;
 
   constructor(view: WorkbenchView,
               private _formBuilder: NonNullableFormBuilder,

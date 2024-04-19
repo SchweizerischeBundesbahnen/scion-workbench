@@ -71,7 +71,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.enterState(extras?.state);
     await this.checkActivate(extras?.activate);
     await this.checkClose(extras?.close);
-    await this.enterInsertionIndex(extras?.blankInsertionIndex);
+    await this.enterPosition(extras?.position);
     await this.enterPartId(extras?.partId);
     await this.checkViewContext(extras?.viewContextActive);
     await this.enterCssClass(extras?.cssClass);
@@ -103,8 +103,8 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-hint').fill(hint ?? '');
   }
 
-  private async enterInsertionIndex(insertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'): Promise<void> {
-    await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex ?? ''}`);
+  private async enterPosition(position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'): Promise<void> {
+    await this.locator.locator('input.e2e-position').fill(`${position ?? ''}`);
   }
 
   private async enterPartId(partId?: string): Promise<void> {

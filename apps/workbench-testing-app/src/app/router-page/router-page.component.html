@@ -15,8 +15,8 @@
     <header>Navigation Extras</header>
 
     <sci-form-field label="Target">
-      <input [formControl]="form.controls.target" class="e2e-target" list="targets">
-      <datalist id="targets">
+      <input [formControl]="form.controls.target" class="e2e-target" [attr.list]="targetList">
+      <datalist [attr.id]="targetList">
         <option value="auto">auto</option>
         <option value="blank">blank</option>
       </datalist>
@@ -27,17 +27,19 @@
     </sci-form-field>
 
     <sci-form-field label="Part ID">
-      <input [formControl]="form.controls.partId" class="e2e-part-id" list="parts">
-      <datalist id="parts">
+      <input [formControl]="form.controls.partId" class="e2e-part-id" [attr.list]="partList">
+      <datalist [attr.id]="partList">
         <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
       </datalist>
     </sci-form-field>
 
-    <sci-form-field label="InsertionIndex">
-      <input [formControl]="form.controls.insertionIndex" list="insertionIndexHints" class="e2e-insertion-index">
-      <datalist id="insertionIndexHints">
+    <sci-form-field label="Position">
+      <input [formControl]="form.controls.position" [attr.list]="positionList" class="e2e-position">
+      <datalist [attr.id]="positionList">
         <option value="start">
         <option value="end">
+        <option value="before-active-view">
+        <option value="after-active-view">
       </datalist>
     </sci-form-field>
 
