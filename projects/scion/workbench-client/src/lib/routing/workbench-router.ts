@@ -124,6 +124,15 @@ export interface WorkbenchNavigationExtras {
    */
   paramsHandling?: 'merge' | 'replace';
   /**
+   * Controls where to open the view. Default is `auto`.
+   *
+   * One of:
+   * - 'auto':   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
+   * - 'blank':  Navigates in a new view.
+   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
+   */
+  target?: string | 'blank' | 'auto';
+  /**
    * Instructs the router to activate the view. Default is `true`.
    */
   activate?: boolean;
@@ -136,18 +145,9 @@ export interface WorkbenchNavigationExtras {
    */
   close?: boolean;
   /**
-   * Controls where to open the view. Default is `auto`.
-   *
-   * One of:
-   * - 'auto':   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
-   * - 'blank':  Navigates in a new view.
-   * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
-   */
-  target?: string | 'blank' | 'auto';
-  /**
    * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
    */
-  blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
+  position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
    * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    */

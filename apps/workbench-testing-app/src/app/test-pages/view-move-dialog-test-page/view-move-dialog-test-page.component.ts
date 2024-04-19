@@ -13,6 +13,7 @@ import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WORKBENCH_ID, WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-view-move-dialog-test-page',
@@ -35,6 +36,8 @@ export class ViewMoveDialogTestPageComponent {
     partId: this._formBuilder.control('', Validators.required),
     region: this._formBuilder.control<'north' | 'south' | 'west' | 'east' | ''>(''),
   });
+
+  public targetList = `target-list-${UUID.randomUUID()}`;
 
   constructor(private _formBuilder: NonNullableFormBuilder, private _dialog: WorkbenchDialog) {
     this._dialog.title = 'Move view';

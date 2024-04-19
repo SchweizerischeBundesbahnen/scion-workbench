@@ -22,6 +22,7 @@ import {RouterCommandsComponent} from '../router-commands/router-commands.compon
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {parseTypedObject} from '../common/parse-typed-value.util';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-router-page',
@@ -50,7 +51,7 @@ export default class RouterPageComponent {
     target: this._formBuilder.control(''),
     hint: this._formBuilder.control(''),
     partId: this._formBuilder.control(''),
-    insertionIndex: this._formBuilder.control(''),
+    position: this._formBuilder.control(''),
     queryParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     activate: this._formBuilder.control<boolean | undefined>(undefined),
     close: this._formBuilder.control<boolean | undefined>(undefined),
@@ -61,6 +62,10 @@ export default class RouterPageComponent {
 
   protected nullViewInjector: Injector;
   protected extras: WorkbenchNavigationExtras = {};
+
+  protected targetList = `target-list-${UUID.randomUUID()}`;
+  protected partList = `part-list-${UUID.randomUUID()}`;
+  protected positionList = `position-list-${UUID.randomUUID()}`;
 
   constructor(private _formBuilder: NonNullableFormBuilder,
               injector: Injector,
@@ -101,7 +106,7 @@ export default class RouterPageComponent {
       target: this.form.controls.target.value || undefined,
       hint: this.form.controls.hint.value || undefined,
       partId: this.form.controls.partId.value || undefined,
-      blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
+      position: coercePosition(this.form.controls.position.value),
       state: parseTypedObject(SciKeyValueFieldComponent.toDictionary(this.form.controls.state)) ?? undefined,
       cssClass: this.form.controls.cssClass.value,
     };
@@ -116,11 +121,11 @@ export default class RouterPageComponent {
   }
 }
 
-function coerceInsertionIndex(value: any): number | 'start' | 'end' | undefined {
+function coercePosition(value: any): number | 'start' | 'end' | undefined {
   if (value === '') {
     return undefined;
   }
-  if (value === 'start' || value === 'end' || value === undefined) {
+  if (value === 'start' || value === 'end' || value === 'before-active-view' || value === 'after-active-view' || value === undefined) {
     return value;
   }
   return coerceNumberProperty(value);

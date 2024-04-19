@@ -18,6 +18,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-notification-page',
@@ -41,6 +42,8 @@ export class NotificationPageComponent {
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | number | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
+
+  public durationList = `duration-list-${UUID.randomUUID()}`;
 
   constructor(public notification: Notification<Map<string, any>>, private _formBuilder: NonNullableFormBuilder) {
     this.form.controls.title.valueChanges

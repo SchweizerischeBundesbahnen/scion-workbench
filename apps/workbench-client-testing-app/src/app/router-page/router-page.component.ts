@@ -18,6 +18,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {parseTypedObject} from '../common/parse-typed-value.util';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-router-page',
@@ -39,12 +40,15 @@ export default class RouterPageComponent {
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([], Validators.required),
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     target: this._formBuilder.control(''),
-    insertionIndex: this._formBuilder.control(''),
+    position: this._formBuilder.control(''),
     activate: this._formBuilder.control<boolean | undefined>(undefined),
     close: this._formBuilder.control<boolean | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
   public navigateError: string | undefined;
+
+  public targetList = `target-list-${UUID.randomUUID()}`;
+  public positionList = `position-list-${UUID.randomUUID()}`;
 
   constructor(view: WorkbenchView,
               private _formBuilder: NonNullableFormBuilder,
@@ -62,7 +66,7 @@ export default class RouterPageComponent {
       activate: this.form.controls.activate.value,
       close: this.form.controls.close.value,
       target: this.form.controls.target.value || undefined,
-      blankInsertionIndex: coerceInsertionIndex(this.form.controls.insertionIndex.value),
+      position: coercePosition(this.form.controls.position.value),
       params: params || undefined,
       cssClass: this.form.controls.cssClass.value,
     };
@@ -72,11 +76,11 @@ export default class RouterPageComponent {
   }
 }
 
-function coerceInsertionIndex(value: any): number | 'start' | 'end' | undefined {
+function coercePosition(value: any): number | 'start' | 'end' | undefined {
   if (value === '') {
     return undefined;
   }
-  if (value === 'start' || value === 'end' || value === undefined) {
+  if (value === 'start' || value === 'end' || value === 'before-active-view' || value === 'after-active-view' || value === undefined) {
     return value;
   }
   return coerceNumberProperty(value);

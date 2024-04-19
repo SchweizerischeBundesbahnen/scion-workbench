@@ -27,11 +27,11 @@
   }
 </form>
 
-<datalist [id]="idList">
+<datalist [attr.id]="idList">
   <option [value]="MAIN_AREA">{{MAIN_AREA}}</option>
 </datalist>
 
-<datalist [id]="relativeToList">
+<datalist [attr.id]="relativeToList">
   @for (part of partProposals; track part) {
     <option [value]="part">{{part}}</option>
   }

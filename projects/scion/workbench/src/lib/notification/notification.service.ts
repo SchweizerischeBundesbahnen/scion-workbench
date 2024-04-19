@@ -67,15 +67,15 @@ export class NotificationService {
 
   private addNotification(config: NotificationConfig): void {
     const notifications = [...this.notifications];
-    const {insertionIndex, notification} = this.constructNotification(config, notifications);
-    notifications.splice(insertionIndex, 1, notification);
+    const {index, notification} = this.constructNotification(config, notifications);
+    notifications.splice(index, 1, notification);
     this._notifications$.next(notifications);
   }
 
   /**
    * Constructs the notification based on the given config and computes its insertion index.
    */
-  private constructNotification(config: NotificationConfig, notifications: ɵNotification[]): {notification: ɵNotification; insertionIndex: number} {
+  private constructNotification(config: NotificationConfig, notifications: ɵNotification[]): {notification: ɵNotification; index: number} {
     config = {...config};
 
     // Check whether the notification belongs to a group. If so, replace any present notification of that group.
@@ -83,7 +83,7 @@ export class NotificationService {
     if (!group) {
       return {
         notification: new ɵNotification(config),
-        insertionIndex: notifications.length,
+        index: notifications.length,
       };
     }
 
@@ -92,7 +92,7 @@ export class NotificationService {
     if (index === -1) {
       return {
         notification: new ɵNotification(config),
-        insertionIndex: notifications.length,
+        index: notifications.length,
       };
     }
 
@@ -103,7 +103,7 @@ export class NotificationService {
 
     return {
       notification: new ɵNotification(config),
-      insertionIndex: index,
+      index: index,
     };
   }
 

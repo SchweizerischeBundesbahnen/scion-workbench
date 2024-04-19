@@ -115,7 +115,7 @@ test.describe('Browser History', () => {
     await routerPage.navigate(['test-view'], {
       target: 'view.101',
       activate: false,
-      blankInsertionIndex: 'end',
+      position: 'end',
       cssClass: 'testee'
     });
 
@@ -123,7 +123,7 @@ test.describe('Browser History', () => {
     await routerPage.navigate(['test-view'], {
       target: 'view.102',
       activate: false,
-      blankInsertionIndex: 'end',
+      position: 'end',
       cssClass: 'testee'
     });
 

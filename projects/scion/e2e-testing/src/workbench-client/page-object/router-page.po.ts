@@ -46,12 +46,12 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
     await keyValueField.addEntries(params);
   }
 
-  public async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
+  public async enterTarget(target: string | 'blank' | 'auto' | undefined): Promise<void> {
     await this.locator.locator('input.e2e-target').fill(target ?? '');
   }
 
-  public async enterInsertionIndex(insertionIndex: number | 'start' | 'end' | undefined): Promise<void> {
-    await this.locator.locator('input.e2e-insertion-index').fill(`${insertionIndex}`);
+  public async enterPosition(position: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'): Promise<void> {
+    await this.locator.locator('input.e2e-position').fill(`${position}`);
   }
 
   public async checkActivate(check: boolean): Promise<void> {

@@ -20,8 +20,8 @@
   </sci-form-field>
 
   <sci-form-field label="Duration" direction="column">
-    <input [formControl]="form.controls.duration" list="duration" class="e2e-duration">
-    <datalist id="duration">
+    <input [formControl]="form.controls.duration" [attr.list]="durationList" class="e2e-duration">
+    <datalist [attr.id]="durationList">
       <option value="short">short</option>
       <option value="medium">medium</option>
       <option value="long">long</option>
