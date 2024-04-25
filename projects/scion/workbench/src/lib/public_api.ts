@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchModuleConfig, MenuItemConfig, ViewMenuItemsConfig} from './workbench-module-config';
-export {WorkbenchModule} from './workbench.module';
+export {WorkbenchConfig, MenuItemConfig, ViewMenuItemsConfig} from './workbench-config';
+export {WorkbenchModule, WorkbenchModuleConfig} from './workbench.module';
+export {provideWorkbench} from './workbench.provider';
 export {WorkbenchService} from './workbench.service';
 export {WORKBENCH_ID} from './workbench-id';
 export {WorkbenchViewPreDestroy, WorkbenchPartAction, WorkbenchTheme, CanMatchPartFn, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from './workbench.model';

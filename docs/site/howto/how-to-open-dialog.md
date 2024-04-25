@@ -40,13 +40,15 @@ dialogService.open(MyDialogComponent, {
 An application-modal dialog blocks the workbench element, still allowing interaction with elements outside the workbench element. To block the entire browser viewport, change the global modality scope setting in the workbench configuration.
 
 ```ts
-import {WorkbenchModule} from '@scion/workbench';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideWorkbench} from '@scion/workbench';
 
-WorkbenchModule.forRoot({
-  dialog: {
-    modalityScope: 'viewport',
-  },
-  ... // ommited configuration
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideWorkbench({
+      dialog: {modalityScope: 'viewport'},
+    }),
+  ],
 });
 ```
 

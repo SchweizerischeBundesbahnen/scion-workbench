@@ -7,14 +7,18 @@
 
 The workbench displays a "Not Found Page" if no route matches the requested URL. This happens when navigating to a route that does not exist or when loading the application, and the routes have changed since the last use.
 
-The built-in "Not Found Page" can be replaced as follows, e.g., to localize the page.
+The built-in "Not Found Page" can be replaced, e.g., to localize the page, as follows:
 
 ```ts
-import {WorkbenchModule} from '@scion/workbench';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideWorkbench} from '@scion/workbench';
 
-WorkbenchModule.forRoot({
-  // Register custom "Not Found Page".
-  pageNotFoundComponent: YourPageNotFoundComponent,
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideWorkbench({
+      pageNotFoundComponent: YourPageNotFoundComponent,
+    }),
+  ],
 });
 ```
 

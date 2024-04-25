@@ -22,7 +22,7 @@ import {ɵWorkbenchMessageBoxService} from './ɵworkbench-message-box.service';
  *
  * A message box can be view-modal or application-modal. A view-modal message box blocks only a specific view,
  * allowing the user to interact with other views. An application-modal message box blocks the workbench,
- * or the browser's viewport if configured in {@link WorkbenchModuleConfig.dialog.modalityScope}.
+ * or the browser's viewport if configured in {@link WorkbenchConfig.dialog.modalityScope}.
  *
  * ## Stacking
  * Multiple message boxes are stacked, and only the topmost message box in each modality stack can be interacted with.

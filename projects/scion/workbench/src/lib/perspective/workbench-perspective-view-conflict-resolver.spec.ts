@@ -17,10 +17,10 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchService} from '../workbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
@@ -30,8 +30,8 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
   it('should resolve view conflicts when switching perspective', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: {
             perspectives: [
               {id: 'perspective-1', layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'})},
@@ -41,7 +41,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
           },
           startup: {launcher: 'APP_INITIALIZER'},
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {path: 'view-1', component: TestComponent, providers: [withComponentContent('a')]},
           {path: 'view-2', component: TestComponent, providers: [withComponentContent('b')]},
         ]),

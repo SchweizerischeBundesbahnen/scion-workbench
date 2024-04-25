@@ -11,7 +11,7 @@
 import {Component, ElementRef, inject, OnDestroy, Provider, ViewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
-import {WorkbenchModuleConfig} from './workbench-module-config';
+import {WorkbenchConfig} from './workbench-config';
 import {ComponentType} from '@angular/cdk/portal';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
@@ -79,7 +79,7 @@ export class WorkbenchComponent implements OnDestroy {
     vcr && this.viewContainerReferences.viewDropPlaceholderHost.set(vcr);
   }
 
-  constructor(workbenchModuleConfig: WorkbenchModuleConfig,
+  constructor(workbenchConfig: WorkbenchConfig,
               private _workbenchLauncher: WorkbenchLauncher,
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
@@ -88,7 +88,7 @@ export class WorkbenchComponent implements OnDestroy {
       throw Error(`[WorkbenchError] Workbench must not be loaded into a view. Did you navigate to the empty path route? Make sure that the application's root route is guarded with 'canMatchWorkbenchView(false)'. Example: "{path: '', canMatch: [canMatchWorkbenchView(false), ...]}"`);
     }
     this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
-    this.splash = workbenchModuleConfig?.startup?.splash || SplashComponent;
+    this.splash = workbenchConfig?.startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
     this.startWorkbench();
   }
@@ -140,7 +140,7 @@ function configureWorkbenchGlassPane(): Provider[] {
     {
       provide: GLASS_PANE_TARGET_ELEMENT,
       useFactory: () => {
-        if (inject(WorkbenchModuleConfig).dialog?.modalityScope === 'viewport') {
+        if (inject(WorkbenchConfig).dialog?.modalityScope === 'viewport') {
           return inject(DOCUMENT).body;
         }
         else {

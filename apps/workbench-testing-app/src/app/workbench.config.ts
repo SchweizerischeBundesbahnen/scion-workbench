@@ -11,12 +11,12 @@
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {environment} from '../environments/environment';
 import {Perspectives} from './workbench.perspectives';
-import {WorkbenchModuleConfig} from '@scion/workbench';
+import {WorkbenchConfig} from '@scion/workbench';
 
 /**
  * Configures SCION Workbench for the testing application.
  */
-export const workbenchModuleConfig: WorkbenchModuleConfig = {
+export const workbenchConfig: WorkbenchConfig = {
   startup: {
     launcher: WorkbenchStartupQueryParams.launcher(),
   },

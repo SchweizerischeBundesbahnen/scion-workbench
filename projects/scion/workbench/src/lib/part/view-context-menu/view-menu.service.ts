@@ -18,7 +18,7 @@ import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
 import {firstValueFrom, fromEvent, Observable, Subject, TeardownLogic} from 'rxjs';
 import {coerceElement} from '@angular/cdk/coercion';
 import {TEXT, TextComponent} from '../view-context-menu/text.component';
-import {MenuItemConfig, WorkbenchModuleConfig} from '../../workbench-module-config';
+import {MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
 import {WorkbenchService} from '../../workbench.service';
 import {filterArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -42,7 +42,7 @@ export class ViewMenuService {
               private _zone: NgZone,
               private _viewRegistry: WorkbenchViewRegistry,
               private _workbenchService: WorkbenchService,
-              private _workbenchModuleConfig: WorkbenchModuleConfig) {
+              private _workbenchConfig: WorkbenchConfig) {
     // Registers built-in menu items added to the context menu of every view tab.
     this.registerCloseViewMenuItem();
     this.registerCloseOtherViewsMenuItem();
@@ -147,7 +147,7 @@ export class ViewMenuService {
 
   private registerCloseViewMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Close tab', group: 'close', accelerator: ['ctrl', 'k'], cssClass: 'e2e-close-tab'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.close;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.close;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -168,7 +168,7 @@ export class ViewMenuService {
 
   private registerCloseOtherViewsMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Close other tabs', group: 'close', accelerator: ['ctrl', 'shift', 'k']};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeOthers;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeOthers;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -189,7 +189,7 @@ export class ViewMenuService {
 
   private registerCloseAllViewsMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k'], cssClass: 'e2e-close-all-tabs'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeAll;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeAll;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -209,7 +209,7 @@ export class ViewMenuService {
 
   private registerCloseViewsToTheRightMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the right', group: 'close'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeToTheRight;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeToTheRight;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -230,7 +230,7 @@ export class ViewMenuService {
 
   private registerCloseViewsToTheLeftMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the left', group: 'close'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.closeToTheLeft;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeToTheLeft;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -251,7 +251,7 @@ export class ViewMenuService {
 
   private registerMoveRightMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Move right', group: 'move', accelerator: ['ctrl', 'alt', 'end']};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveRight;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveRight;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -272,7 +272,7 @@ export class ViewMenuService {
 
   private registerMoveLeftMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Move left', group: 'move'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveLeft;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveLeft;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -293,7 +293,7 @@ export class ViewMenuService {
 
   private registerMoveUpMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Move up', group: 'move'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveUp;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveUp;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -314,7 +314,7 @@ export class ViewMenuService {
 
   private registerMoveDownMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Move down', group: 'move'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveDown;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveDown;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
@@ -335,7 +335,7 @@ export class ViewMenuService {
 
   private registerMoveToNewWindowMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Move to new window', group: 'open', cssClass: 'e2e-move-to-new-window'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchModuleConfig.viewMenuItems?.moveToNewWindow;
+    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveToNewWindow;
     const config = {...defaults, ...appConfig};
 
     config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {

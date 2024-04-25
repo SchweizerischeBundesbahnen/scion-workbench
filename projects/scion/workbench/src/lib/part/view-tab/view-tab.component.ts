@@ -16,7 +16,7 @@ import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag
 import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
-import {WorkbenchModuleConfig} from '../../workbench-module-config';
+import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -70,7 +70,7 @@ export class ViewTabComponent implements OnChanges {
 
   constructor(host: ElementRef<HTMLElement>,
               @Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _workbenchModuleConfig: WorkbenchModuleConfig,
+              private _workbenchConfig: WorkbenchConfig,
               private _viewRegistry: WorkbenchViewRegistry,
               private _router: ɵWorkbenchRouter,
               private _viewDragService: ViewDragService,
@@ -227,7 +227,7 @@ export class ViewTabComponent implements OnChanges {
   }
 
   private createViewTabContentPortal(): ComponentPortal<unknown> {
-    const componentType = this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent;
+    const componentType = this._workbenchConfig.viewTabComponent || ViewTabContentComponent;
     return new ComponentPortal(componentType, null, Injector.create({
       parent: this._injector,
       providers: [

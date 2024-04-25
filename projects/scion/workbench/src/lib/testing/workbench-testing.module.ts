@@ -1,17 +1,12 @@
-import {ENVIRONMENT_INITIALIZER, importProvidersFrom, inject, Injectable, ModuleWithProviders, NgModule} from '@angular/core';
-import {WorkbenchModule} from '../workbench.module';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
-import {ActivationInstantProvider} from '../activation-instant.provider';
-import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
-import {Router} from '@angular/router';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
-import {ComponentFixtureAutoDetect} from '@angular/core/testing';
+import {ModuleWithProviders, NgModule} from '@angular/core';
+import {WorkbenchConfig} from '../workbench-config';
+import {provideWorkbenchForTest} from './workbench.provider';
 
 /**
  * Sets up the SCION Workbench to be used for testing.
  *
- * It does the following:
- * - provides the workbench applying given config
+ * Does the following:
+ * - provides the workbench with given config
  * - configures the workbench to name the initial part 'main'
  * - installs a sequence for activation instants
  * - configures the testbed to auto-detect changes
@@ -32,36 +27,19 @@ import {ComponentFixtureAutoDetect} from '@angular/core/testing';
  *    });
  * });
  * ```
+ *
+ * @deprecated since version 17.0.0-beta.8; Register SCION Workbench providers using `provideWorkbench` function instead; API will be removed in a future release; API will be removed in a future release.
  */
-@NgModule({exports: [WorkbenchModule]})
+@NgModule()
 export class WorkbenchTestingModule {
 
   /**
    * Sets up the SCION Workbench to be used for testing.
    */
-  public static forTest(config?: WorkbenchModuleConfig): ModuleWithProviders<WorkbenchTestingModule> {
+  public static forTest(config?: WorkbenchConfig): ModuleWithProviders<WorkbenchTestingModule> {
     return {
       ngModule: WorkbenchTestingModule,
-      providers: [
-        importProvidersFrom(WorkbenchModule.forRoot(config)),
-        provideNoopAnimations(),
-        {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
-        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
-        {provide: ComponentFixtureAutoDetect, useValue: true},
-        {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
-        {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},
-        {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => window.name = ''},
-      ],
+      providers: [provideWorkbenchForTest(config)],
     };
-  }
-}
-
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered only if using `WorkbenchTestingModule`. */)
-class SequenceInstantProvider implements ActivationInstantProvider {
-
-  private _sequence = 0;
-
-  public now(): number {
-    return this._sequence++;
   }
 }

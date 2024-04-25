@@ -10,7 +10,7 @@
 
 import {ComponentFixture, discardPeriodicTasks, fakeAsync, TestBed, waitForAsync} from '@angular/core/testing';
 import {Component, OnDestroy} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, provideRouter} from '@angular/router';
 import {ViewComponent} from './view.component';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -21,10 +21,9 @@ import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {advance, styleFixture} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {By} from '@angular/platform-browser';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('ViewComponent', () => {
 
@@ -32,9 +31,9 @@ describe('ViewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'view', loadComponent: () => SpecViewComponent},
           {path: 'view-with-title', loadComponent: () => SpecViewComponent, data: {[WorkbenchRouteData.title]: 'ROUTE TITLE'}},
           {path: 'view-with-heading', loadComponent: () => SpecViewComponent, data: {[WorkbenchRouteData.heading]: 'ROUTE HEADING'}},

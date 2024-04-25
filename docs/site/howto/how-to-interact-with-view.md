@@ -32,20 +32,25 @@ const isActive = inject(WorkbenchView).active;
 Some properties can also be defined on the route, such as title, heading or CSS class(es).
 
 ```ts
-import {WorkbenchRouteData} from '@scion/workbench';
+import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
+import {WorkbenchRouteData} from '@scion/workbench';
 
-provideRouter([
-  {
-    path: 'path/to/view',
-    loadComponent: () => import('./view/view.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'View Title',
-      [WorkbenchRouteData.heading]: 'View Heading',
-      [WorkbenchRouteData.cssClass]: ['class 1', 'class 2'],
-    },
-  },
-]);
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      {
+        path: 'path/to/view',
+        loadComponent: () => import('./view/view.component'),
+        data: {
+          [WorkbenchRouteData.title]: 'View Title',
+          [WorkbenchRouteData.heading]: 'View Heading',
+          [WorkbenchRouteData.cssClass]: ['class 1', 'class 2'],
+        },
+      },
+    ]),
+  ],
+});
 ````
 
 [menu-how-to]: /docs/site/howto/how-to.md

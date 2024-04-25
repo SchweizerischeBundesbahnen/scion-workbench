@@ -9,31 +9,29 @@
  */
 
 import {discardPeriodicTasks, fakeAsync, TestBed} from '@angular/core/testing';
-import {Component, NgModule} from '@angular/core';
-import {RouterModule} from '@angular/router';
+import {Component} from '@angular/core';
+import {provideRouter, Routes} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
-import {CommonModule} from '@angular/common';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {advance, clickElement, styleFixture} from '../testing/testing.util';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {WorkbenchComponent} from '../workbench.component';
-import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.directive';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 /**
  * Test setup:
  *
  *
- *           +--------------+
- *           | Test Module  |
- *           +--------------+
+ *            +-------------+
+ *            | Application |
+ *            +-------------+
  *                  |
  *               feature-a (route)
  *                  |
  *                  v
  * +-------------------------------------+
- * | Feature Module A                    |
+ * | Feature A                           |
  * |-------------------------------------|
  * | routes:                             |
  * |                                     |
@@ -46,7 +44,7 @@ import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.dir
  *                  |
  *                  v
  * +-------------------------------------+
- * | Feature Module B                    |
+ * | Feature B                           |
  * |-------------------------------------|
  * | routes:                             |
  * |                                     |
@@ -64,17 +62,17 @@ describe('Router', () => {
 
   it('allows for relative and absolute navigation', fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
-          {path: 'feature-a', loadChildren: () => FeatureAModule},
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'feature-a', loadChildren: () => routesFeatureA},
         ]),
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
-    // Navigate to entry component of feature module A
+    // Navigate to entry component of feature A
     workbenchRouter.navigate(['feature-a']).then();
     advance(fixture);
     expect(fixture).toShow(FeatureA_EntryComponent, '1');
@@ -244,10 +242,10 @@ describe('Router', () => {
 
   it('allows to close views', fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
-          {path: 'feature-a', loadChildren: () => FeatureAModule},
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'feature-a', loadChildren: () => routesFeatureA},
         ]),
       ],
     });
@@ -292,11 +290,11 @@ describe('Router', () => {
 });
 
 /****************************************************************************************************
- * Definition of Feature Module A                                                                   *
+ * Definition of Feature A                                                                          *
  ****************************************************************************************************/
 @Component({
   template: `
-    <h1>Feature Module A - Entry</h1>
+    <h1>Feature A - Entry</h1>
     <ul>
       <li><a wbRouterLink="view-1">view-1</a></li>
       <li><a wbRouterLink="./view-2">./view-2</a></li>
@@ -321,7 +319,7 @@ class FeatureA_EntryComponent {
 
 @Component({
   template: `
-    <h1>Feature Module A - View 1</h1>
+    <h1>Feature A - View 1</h1>
     <ul>
       <li><a wbRouterLink="..">..</a></li>
       <li><a wbRouterLink="../view-2">../view-2</a></li>
@@ -341,7 +339,7 @@ class FeatureA_View1Component {
 
 @Component({
   template: `
-    <h1>Feature Module A - View 2</h1>
+    <h1>Feature A - View 2</h1>
     <ul>
       <li><a wbRouterLink="..">..</a></li>
       <li><a wbRouterLink="../view-1">../view-1</a></li>
@@ -354,27 +352,19 @@ class FeatureA_View1Component {
 class FeatureA_View2Component {
 }
 
-@NgModule({
-  imports: [
-    CommonModule,
-    WorkbenchTestingModule,
-    RouterModule.forChild([
-      {path: '', component: FeatureA_EntryComponent},
-      {path: 'view-1', component: FeatureA_View1Component},
-      {path: 'view-2', component: FeatureA_View2Component},
-      {path: 'feature-b', loadChildren: () => FeatureBModule},
-    ]),
-  ],
-})
-export class FeatureAModule {
-}
+const routesFeatureA: Routes = [
+  {path: '', component: FeatureA_EntryComponent},
+  {path: 'view-1', component: FeatureA_View1Component},
+  {path: 'view-2', component: FeatureA_View2Component},
+  {path: 'feature-b', loadChildren: () => routesFeatureB},
+];
 
 /****************************************************************************************************
- * Definition of Feature Module B                                                                   *
+ * Definition of Feature B                                                                          *
  ****************************************************************************************************/
 @Component({
   template: `
-    <h1>Feature Module B - Entry</h1>
+    <h1>Feature B - Entry</h1>
     <ul>
       <li><a wbRouterLink="..">..</a></li>
       <li><a wbRouterLink="../..">../..</a></li>
@@ -397,7 +387,7 @@ class FeatureB_EntryComponent {
 
 @Component({
   template: `
-    <h1>Feature Module B - View 1</h1>
+    <h1>Feature B - View 1</h1>
     <ul>
       <li><a wbRouterLink="..">..</a></li>
       <li><a wbRouterLink="../..">..</a></li>
@@ -412,7 +402,7 @@ class FeatureB_View1Component {
 
 @Component({
   template: `
-    <h1>Feature Module B - View 2</h1>
+    <h1>Feature B - View 2</h1>
     <ul>
       <li><a wbRouterLink="..">..</a></li>
       <li><a wbRouterLink="../..">../..</a></li>
@@ -425,17 +415,8 @@ class FeatureB_View1Component {
 class FeatureB_View2Component {
 }
 
-@NgModule({
-  imports: [
-    CommonModule,
-    WorkbenchTestingModule,
-    RouterModule.forChild([
-      {path: '', component: FeatureB_EntryComponent},
-      {path: 'view-1', component: FeatureB_View1Component},
-      {path: 'view-2', component: FeatureB_View2Component},
-    ]),
-  ],
-})
-export class FeatureBModule {
-}
-
+const routesFeatureB: Routes = [
+  {path: '', component: FeatureB_EntryComponent},
+  {path: 'view-1', component: FeatureB_View1Component},
+  {path: 'view-2', component: FeatureB_View2Component},
+];

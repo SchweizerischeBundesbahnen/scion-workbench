@@ -15,7 +15,7 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {WorkbenchDialogService, WorkbenchModule, WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
+import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDialogService, WorkbenchPart, WorkbenchPartActionDirective, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
 import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.component';
@@ -28,8 +28,11 @@ import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.comp
   imports: [
     NgIf,
     AsyncPipe,
-    WorkbenchModule,
     SciMaterialIconDirective,
+    ScionWorkbenchComponent,
+    WorkbenchPartActionDirective,
+    WorkbenchRouterLinkDirective,
+    WorkbenchViewMenuItemDirective,
   ],
 })
 export class WorkbenchComponent implements OnDestroy {

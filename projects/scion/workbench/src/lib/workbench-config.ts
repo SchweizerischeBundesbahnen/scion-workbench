@@ -17,22 +17,14 @@ import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-
 import {WorkbenchStorage} from './storage/workbench-storage';
 
 /**
- * Configures the SCION Workbench module.
+ * Configuration of the SCION Workbench.
  */
-export abstract class WorkbenchModuleConfig {
+export abstract class WorkbenchConfig {
+
   /**
-   * Allows customizing the appearance of a view tab by providing a custom view tab component.
+   * Specifies the component to display a view tab, enabling custom design or functionality.
    *
-   * Inject {@link WorkbenchView} and {@link VIEW_TAB_CONTEXT} token into the component to get a reference to the view and the rendering context.
-   *
-   *
-   * ---
-   * Example:
-   *
-   * @Component(...)
-   * export class ViewTabContentComponent {
-   *   constructor(view: WorkbenchView, @Inject(VIEW_TAB_CONTEXT) context: ViewTabContext) {}
-   * }
+   * The component can inject {@link WorkbenchView} and {@link VIEW_TAB_RENDERING_CONTEXT} to get a reference to the view and the rendering context.
    */
   public abstract viewTabComponent?: ComponentType<unknown>;
 
@@ -40,6 +32,8 @@ export abstract class WorkbenchModuleConfig {
    * Specifies the component to display if no route matches the requested URL.
    *
    * This happens when navigating to a route that does not exist or when loading the application, and the routes have changed since the last use.
+   *
+   * The component can inject {@link WorkbenchView} to get a reference to the view, e.g., to obtain the requested URL.
    */
   public abstract pageNotFoundComponent?: ComponentType<unknown>;
 
@@ -49,23 +43,7 @@ export abstract class WorkbenchModuleConfig {
   public abstract viewMenuItems?: ViewMenuItemsConfig;
 
   /**
-   * Configures logging for the workbench.
-   */
-  public abstract logging?: {
-    /**
-     * Sets the minimum severity level a log message must have in order to be logged. By default, if not specified, it is set to {@link LogLevel#INFO}.
-     *
-     * At runtime, you can change the minimum required log level by setting the `loglevel` query parameter.
-     */
-    logLevel?: LogLevel;
-    /**
-     * Registers log appenders to output log messages. Multiple appenders are allowed. By default, if not specified, log messages are written to the console.
-     */
-    logAppenders?: Type<LogAppender>[];
-  };
-
-  /**
-   * Allows configuring the workbench startup.
+   * Configures the workbench startup.
    *
    * The {@link WorkbenchLauncher} is used to start the workbench. During startup, it runs registered workbench initializers
    * and waits for them to complete. You can inject {@link WorkbenchStartup} to get notified when the startup is complete.
@@ -90,7 +68,7 @@ export abstract class WorkbenchModuleConfig {
     launcher?: 'APP_INITIALIZER' | 'LAZY';
 
     /**
-     * The splash component to display when mounting the workbench root component `<wb-workbench>` to the DOM before the
+     * Specifies the component to display when mounting the workbench root component `<wb-workbench>` to the DOM before the
      * workbench startup has finished.
      *
      * Note that when launching the workbench in an Angular `APP_INITIALIZER`, no splash will display since the workbench
@@ -127,9 +105,6 @@ export abstract class WorkbenchModuleConfig {
    * Defines the workbench layout. Multiple layouts can be defined in the form of perspectives.
    * If not set, defaults to a layout with only a main area.
    *
-   * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
-   * Perspectives share the same main area, if any.
-   *
    * See {@link WorkbenchLayoutFn} for more information and an example.
    */
   public abstract layout?: WorkbenchLayoutFn | WorkbenchPerspectives;
@@ -153,6 +128,22 @@ export abstract class WorkbenchModuleConfig {
      * - **viewport** blocks the browser viewport, preventing interaction with the application until application-modal dialogs are closed.
      */
     modalityScope?: 'workbench' | 'viewport';
+  };
+
+  /**
+   * Configures logging for the workbench.
+   */
+  public abstract logging?: {
+    /**
+     * Sets the minimum severity level a log message must have in order to be logged. By default, if not specified, it is set to {@link LogLevel#INFO}.
+     *
+     * At runtime, you can change the minimum required log level by setting the `loglevel` query parameter.
+     */
+    logLevel?: LogLevel;
+    /**
+     * Registers log appenders to output log messages. Multiple appenders are allowed. By default, if not specified, log messages are written to the console.
+     */
+    logAppenders?: Type<LogAppender>[];
   };
 }
 

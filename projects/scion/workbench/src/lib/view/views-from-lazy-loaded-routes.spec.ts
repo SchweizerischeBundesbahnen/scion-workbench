@@ -9,11 +9,10 @@
  */
 
 import {discardPeriodicTasks, fakeAsync, TestBed} from '@angular/core/testing';
-import {Component, NgModule} from '@angular/core';
+import {Component} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {provideRouter, RouterModule} from '@angular/router';
+import {provideRouter, Routes} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {CommonModule} from '@angular/common';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {advance, styleFixture} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
@@ -23,9 +22,9 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
  *
  * Test setup:
  *
- *                                    +--------------+
- *                                    | Test Module  |
- *                                    +--------------+
+ *                                   +-------------+
+ *                                   | Application |
+ *                                   +-------------+
  *                                          |
  *                   +----------------------+----------------------+
  *                   |                                             |
@@ -33,7 +32,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
  *                   |                                             |
  *                   v                                             v
  * +------------------------------------------+     +--------------------------------------+
- * | Feature Module A                         |     | Feature Module B                     |
+ * | Feature A                                |     | Feature B                            |
  * |------------------------------------------|     |--------------------------------------|
  * | routes:                                  |     | routes:                              |
  * |                                          |     |                                      |
@@ -48,13 +47,13 @@ describe('Views', () => {
     jasmine.addMatchers(toShowCustomMatcher);
   });
 
-  it('can be loaded from lazy feature modules', fakeAsync(() => {
+  it('can be loaded from lazy routes', fakeAsync(() => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
         provideRouter([
-          {path: 'feature-a', loadChildren: () => FeatureAModule},
-          {path: 'feature-b', loadChildren: () => FeatureBModule},
+          {path: 'feature-a', loadChildren: () => routesFeatureA},
+          {path: 'feature-b', loadChildren: () => routesFeatureB},
         ]),
       ],
     });
@@ -85,47 +84,33 @@ describe('Views', () => {
 });
 
 /****************************************************************************************************
- * Definition of Feature Module A                                                                   *
+ * Definition of Feature A                                                                          *
  ****************************************************************************************************/
-@Component({template: 'Feature Module A - View 1', standalone: true})
+@Component({template: 'Feature A - View 1', standalone: true})
 class FeatureA_View1_Component {
 }
 
-@Component({template: 'Feature Module A - View 1', standalone: true})
+@Component({template: 'Feature A - View 1', standalone: true})
 class FeatureA_View2_Component {
 }
 
-@NgModule({
-  imports: [
-    CommonModule,
-    RouterModule.forChild([
-      {path: 'view-1', component: FeatureA_View1_Component},
-      {path: 'view-2', component: FeatureA_View2_Component},
-    ]),
-  ],
-})
-export class FeatureAModule {
-}
+const routesFeatureA: Routes = [
+  {path: 'view-1', component: FeatureA_View1_Component},
+  {path: 'view-2', component: FeatureA_View2_Component},
+];
 
 /****************************************************************************************************
- * Definition of Feature Module B                                                                   *
+ * Definition of Feature B                                                                          *
  ****************************************************************************************************/
-@Component({template: 'Feature Module B - View 1', standalone: true})
+@Component({template: 'Feature B - View 1', standalone: true})
 class FeatureB_View1_Component {
 }
 
-@Component({template: 'Feature Module B - View 1', standalone: true})
+@Component({template: 'Feature B - View 1', standalone: true})
 class FeatureB_View2_Component {
 }
 
-@NgModule({
-  imports: [
-    CommonModule,
-    RouterModule.forChild([
-      {path: 'view-1', component: FeatureB_View1_Component},
-      {path: 'view-2', component: FeatureB_View2_Component},
-    ]),
-  ],
-})
-export class FeatureBModule {
-}
+const routesFeatureB: Routes = [
+  {path: 'view-1', component: FeatureB_View1_Component},
+  {path: 'view-2', component: FeatureB_View2_Component},
+];

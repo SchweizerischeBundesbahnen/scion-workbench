@@ -14,9 +14,9 @@ import {MicrofrontendViewIntentHandler} from '../routing/microfrontend-view-inte
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MICROFRONTEND_PLATFORM_PRE_STARTUP, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {TestBed} from '@angular/core/testing';
-import {WorkbenchTestingModule} from '../../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLauncher} from '../../startup/workbench-launcher.service';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 
 describe('Microfrontend Platform Initializer', () => {
 
@@ -37,11 +37,9 @@ describe('Microfrontend Platform Initializer', () => {
 
     // Configure and start the SCION Workbench.
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({microfrontendPlatform: {applications: []}}),
-        RouterTestingModule.withRoutes([]),
-      ],
       providers: [
+        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
+        provideRouter([]),
         {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, multi: true, useClass: CustomIntentInterceptorRegisterer},
       ],
     });

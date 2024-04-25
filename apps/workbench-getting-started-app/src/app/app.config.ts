@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {provideWorkbench} from './workbench.provider';
 import {ApplicationConfig} from '@angular/core';
-import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
+import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 import {provideRouter, withHashLocation} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 

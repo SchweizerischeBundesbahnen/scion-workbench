@@ -15,13 +15,13 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {WorkbenchService} from '../workbench.service';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('WorkbenchPerspectiveStorage', () => {
 
@@ -32,8 +32,8 @@ describe('WorkbenchPerspectiveStorage', () => {
   it('should write the layout to storage on every layout change', async () => {
     // GIVEN: Single perspective with two parts
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: {
             perspectives: [
               {
@@ -47,7 +47,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           },
           startup: {launcher: 'APP_INITIALIZER'},
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {path: 'view', component: TestComponent},
         ]),
       ],
@@ -93,8 +93,8 @@ describe('WorkbenchPerspectiveStorage', () => {
   it('should load the layout from storage when activating the perspective', async () => {
     // GIVEN: Two perspectives with a part
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: {
             perspectives: [
               {
@@ -110,7 +110,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           },
           startup: {launcher: 'APP_INITIALIZER'},
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {path: 'view', component: TestComponent},
         ]),
       ],
@@ -172,8 +172,8 @@ describe('WorkbenchPerspectiveStorage', () => {
   it('should only write the layout of the active perspective to storage', async () => {
     // GIVEN: Two perspectives with a part
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: {
             perspectives: [
               {
@@ -189,7 +189,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           },
           startup: {launcher: 'APP_INITIALIZER'},
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {path: 'path/to/view', component: TestComponent},
         ]),
       ],

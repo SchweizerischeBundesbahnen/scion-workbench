@@ -16,7 +16,7 @@ import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {WorkbenchConfig} from '../workbench-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.service';
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler.service';
@@ -37,8 +37,8 @@ import './microfrontend-platform.config'; // DO NOT REMOVE to augment `Microfron
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
  */
-export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: WorkbenchModuleConfig): EnvironmentProviders | [] {
-  if (!workbenchModuleConfig.microfrontendPlatform) {
+export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchConfig): EnvironmentProviders | [] {
+  if (!workbenchConfig.microfrontendPlatform) {
     return [];
   }
 
@@ -50,7 +50,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
     },
     {
       provide: MicrofrontendPlatformConfigLoader,
-      useClass: typeof workbenchModuleConfig.microfrontendPlatform === 'function' ? workbenchModuleConfig.microfrontendPlatform : StaticMicrofrontendPlatformConfigLoader,
+      useClass: typeof workbenchConfig.microfrontendPlatform === 'function' ? workbenchConfig.microfrontendPlatform : StaticMicrofrontendPlatformConfigLoader,
     },
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
@@ -87,16 +87,16 @@ export function provideWorkbenchMicrofrontendSupport(workbenchModuleConfig: Work
 }
 
 /**
- * Provides {@link WorkbenchModuleConfig.microfrontendPlatform} config as passed to {@link WorkbenchModule.forRoot}.
+ * Provides {@link WorkbenchConfig.microfrontendPlatform} config as passed to {@link provideWorkbench}.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `MicrofrontendPlatformConfigLoader` DI token. */)
 class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformConfigLoader {
 
-  constructor(private _workbenchModuleConfig: WorkbenchModuleConfig) {
+  constructor(private _workbenchConfig: WorkbenchConfig) {
   }
 
   public async load(): Promise<MicrofrontendPlatformConfig> {
-    return this._workbenchModuleConfig.microfrontendPlatform! as MicrofrontendPlatformConfig;
+    return this._workbenchConfig.microfrontendPlatform! as MicrofrontendPlatformConfig;
   }
 }
 
