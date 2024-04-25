@@ -11,11 +11,16 @@ A start page can be used to display content when all views are closed.
 To display a start page, register an empty path route, as follows:
 
 ```ts
-import {RouterModule} from '@angular/router';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideRouter} from '@angular/router';
 
-RouterModule.forRoot([
-  {path: '', loadComponent: () => import('./start-page/start-page.component')},
-]);
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      {path: '', loadComponent: () => import('./start-page/start-page.component')},
+    ]),
+  ],
+});
 ```
 
 ### How to configure a start page per perspective
@@ -23,24 +28,28 @@ RouterModule.forRoot([
 If working with perspectives, configure a different start page per perspective by testing for the active perspective in the `canMatch` route handler.
 
 ```ts
-import {RouterModule} from '@angular/router';
-import {inject} from '@angular/core';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideRouter} from '@angular/router';
 import {WorkbenchService} from '@scion/workbench';
 
-RouterModule.forRoot([
-  // Match this route only if 'perspective A' is active.
-  {
-    path: '', 
-    loadComponent: () => import('./perspective-a/start-page.component'), 
-    canMatch: [() => inject(WorkbenchService).getPerspective('perspective-a')?.active]
-  },
-  // Match this route only if 'perspective B' is active.
-  {
-    path: '',
-    loadComponent: () => import('./perspective-b/start-page.component'),
-    canMatch: [() => inject(WorkbenchService).getPerspective('perspective-b')?.active]
-  },
-]);
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      // Match this route only if 'perspective A' is active.
+      {
+        path: '',
+        loadComponent: () => import('./perspective-a/start-page.component'),
+        canMatch: [() => inject(WorkbenchService).getPerspective('perspective-a')?.active],
+      },
+      // Match this route only if 'perspective B' is active.
+      {
+        path: '',
+        loadComponent: () => import('./perspective-b/start-page.component'),
+        canMatch: [() => inject(WorkbenchService).getPerspective('perspective-b')?.active],
+      },
+    ]),
+  ],
+});
 ```
 
 [menu-how-to]: /docs/site/howto/how-to.md

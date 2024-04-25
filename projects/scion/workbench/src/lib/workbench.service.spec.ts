@@ -9,22 +9,22 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from './testing/testing.util';
-import {WorkbenchTestingModule} from './testing/workbench-testing.module';
 import {TestComponent} from './testing/test.component';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchViewRegistry} from './view/workbench-view.registry';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from './testing/workbench.provider';
 
 describe('Workbench Service', () => {
 
   it(`should not close 'non-closable' views`, async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'view', component: TestComponent},
         ]),
       ],

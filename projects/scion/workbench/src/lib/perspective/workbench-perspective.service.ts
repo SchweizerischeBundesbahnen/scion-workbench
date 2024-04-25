@@ -37,14 +37,14 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   }
 
   public async init(): Promise<void> {
-    await this.registerPerspectivesFromModuleConfig();
+    await this.registerPerspectivesFromConfig();
     await this.registerAnonymousPerspectiveFromWindowName();
   }
 
   /**
-   * Registers perspectives configured in {@link WorkbenchModuleConfig}.
+   * Registers perspectives configured in {@link WorkbenchConfig}.
    */
-  private async registerPerspectivesFromModuleConfig(): Promise<void> {
+  private async registerPerspectivesFromConfig(): Promise<void> {
     // Register perspective either from function or object config.
     if (typeof this._layoutConfig === 'function') {
       await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: this._layoutConfig});

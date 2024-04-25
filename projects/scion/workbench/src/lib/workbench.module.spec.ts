@@ -11,17 +11,16 @@
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {NgModule} from '@angular/core';
 import {WorkbenchModule} from './workbench.module';
-import {Router} from '@angular/router';
-import {WorkbenchTestingModule} from './testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
+import {provideRouter, Router} from '@angular/router';
+import {provideWorkbenchForTest} from './testing/workbench.provider';
 
 describe('WorkbenchModule', () => {
 
   it('throws an error when forRoot() is used in a lazy context', fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'lazy-module-forroot', loadChildren: () => LazyForRootModule},
           {path: 'lazy-module-forchild', loadChildren: () => LazyForChildModule},
         ]),
@@ -32,13 +31,13 @@ describe('WorkbenchModule', () => {
     expect(() => {
       TestBed.inject(Router).navigate(['lazy-module-forroot']).then();
       tick();
-    }).toThrowError(/ModuleForRootError/);
+    }).toThrowError(/ProvideWorkbenchError/);
 
     // Navigate to LazyForChildModule
     expect(() => {
       TestBed.inject(Router).navigate(['lazy-module-forchild']).then();
       tick();
-    }).not.toThrowError(/ModuleForRootError/);
+    }).not.toThrowError(/ProvideWorkbenchError/);
   }));
 });
 

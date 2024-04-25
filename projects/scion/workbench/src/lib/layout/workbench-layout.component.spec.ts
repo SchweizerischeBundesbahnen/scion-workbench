@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {Router, RouterOutlet} from '@angular/router';
+import {provideRouter, Router, RouterOutlet} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {toBeRegisteredCustomMatcher} from '../testing/jasmine/matcher/to-be-registered.matcher';
@@ -17,17 +17,16 @@ import {WorkbenchLayoutComponent} from './workbench-layout.component';
 import {Component} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WorkbenchModule} from '../workbench.module';
 import {By} from '@angular/platform-browser';
 import {MAIN_AREA} from './workbench-layout';
 import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
 import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
 import {segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {MPart, MTreeNode} from './workbench-layout.model';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../workbench-id';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {WorkbenchComponent} from '../workbench.component';
 
 describe('WorkbenchLayout', () => {
 
@@ -43,9 +42,9 @@ describe('WorkbenchLayout', () => {
    */
   it('should support navigating via Angular router', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent},
           {path: 'path/to/outlet', component: TestComponent, outlet: 'outlet', providers: [withComponentContent('routed content')]},
         ]),
@@ -135,9 +134,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows moving a view in the tabbar', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent},
         ]),
       ],
@@ -254,9 +253,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the east', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -328,9 +327,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the west', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -402,9 +401,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the north', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -476,9 +475,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the south', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -550,9 +549,9 @@ describe('WorkbenchLayout', () => {
 
   it('disallows to move a view to a new part in the center', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -617,9 +616,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move views to another part', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
@@ -772,9 +771,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move the last view of a part to a new part in the east', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -879,9 +878,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move the last view of a part to a new part in the west', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -986,9 +985,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move the last view of a part to a new part in the north', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1092,9 +1091,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move the last view of a part to a new part in the south', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1198,9 +1197,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view around parts', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
@@ -1371,9 +1370,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the south and back to the initial part ', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1470,9 +1469,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the east and then to the south of the initial part ', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1576,9 +1575,9 @@ describe('WorkbenchLayout', () => {
 
   it('allows to move a view to a new part in the west and then to the south of the initial part ', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1682,9 +1681,9 @@ describe('WorkbenchLayout', () => {
 
   it('should open the same view multiple times', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1739,9 +1738,9 @@ describe('WorkbenchLayout', () => {
 
   it('should open the same view multiple times', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
@@ -1798,9 +1797,9 @@ describe('WorkbenchLayout', () => {
 
   it('should open views to the right and to the left, and then close them', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
           {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
@@ -2166,9 +2165,9 @@ describe('WorkbenchLayout', () => {
 
   it('should detach views before being re-parented in the DOM (1)', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
@@ -2271,9 +2270,9 @@ describe('WorkbenchLayout', () => {
 
   it('should detach views before being re-parented in the DOM (2)', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
@@ -2371,9 +2370,9 @@ describe('WorkbenchLayout', () => {
 
   it('should detach views before being re-parented in the DOM (3)', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
@@ -2661,9 +2660,9 @@ describe('WorkbenchLayout', () => {
 
   it('should detach views before being re-parented in the DOM (4)', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
@@ -2802,9 +2801,9 @@ describe('WorkbenchLayout', () => {
 
   it('should detach views before being re-parented in the DOM (5)', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
@@ -2943,9 +2942,9 @@ describe('WorkbenchLayout', () => {
 
   it('should detach views before being re-parented in the DOM (6)', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
         ]),
       ],
@@ -3067,7 +3066,7 @@ describe('WorkbenchLayout', () => {
   standalone: true,
   imports: [
     RouterOutlet,
-    WorkbenchModule,
+    WorkbenchComponent,
   ],
 })
 class RouterOutletPlusWorkbenchTestFixtureComponent {

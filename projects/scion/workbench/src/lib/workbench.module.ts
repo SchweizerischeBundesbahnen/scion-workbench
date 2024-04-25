@@ -8,27 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ENVIRONMENT_INITIALIZER, inject, Inject, ModuleWithProviders, NgModule, Optional, SkipSelf} from '@angular/core';
+import {ModuleWithProviders, NgModule} from '@angular/core';
 import {WorkbenchComponent} from './workbench.component';
-import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouterLinkDirective} from './routing/workbench-router-link.directive';
-import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
-import {WorkbenchModuleConfig} from './workbench-module-config';
-import {WORKBENCH_FORROOT_GUARD, WORKBENCH_LAYOUT_CONFIG} from './workbench.constants';
+import {WorkbenchConfig} from './workbench-config';
 import {WorkbenchPartActionDirective} from './part/part-action-bar/part-action.directive';
 import {WorkbenchViewMenuItemDirective} from './part/view-context-menu/view-menu.directive';
-import {ViewMenuService} from './part/view-context-menu/view-menu.service';
-import {ViewMoveHandler} from './view/view-move-handler.service';
-import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
-import {provideWorkbenchLauncher} from './startup/workbench-launcher.service';
-import {provideLogging} from './logging';
-import {WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './startup/workbench-initializer';
-import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
-import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
-import {provideLocationPatch} from './routing/ɵlocation';
-import {WorkbenchLayoutFactory} from './layout/workbench-layout.factory';
-import {MAIN_AREA} from './layout/workbench-layout';
-import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
+import {provideWorkbench} from './workbench.provider';
 
 /**
  * Module of the SCION Workbench.
@@ -46,6 +32,8 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
  *
  * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
  * Perspectives share the same main area, if any.
+ *
+ * @deprecated since version 17.0.0-beta.8; Register SCION Workbench providers using `provideWorkbench` function and import standalone components and directives instead; API will be removed in a future release.
  */
 @NgModule({
   imports: [
@@ -63,9 +51,6 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 })
 export class WorkbenchModule {
 
-  constructor(@Inject(WORKBENCH_FORROOT_GUARD) guard: any) { // eslint-disable-line @typescript-eslint/no-unused-vars
-  }
-
   /**
    * To manifest a dependency to the workbench module from the application module.
    *
@@ -81,65 +66,20 @@ export class WorkbenchModule {
    * })
    * export class AppModule { }
    * ```
+   *
+   * @deprecated since version 17.0.0-beta.8; Register SCION Workbench providers using `provideWorkbench` function and import standalone components and directives instead; API will be removed in a future release.
    */
   public static forRoot(config: WorkbenchModuleConfig = {}): ModuleWithProviders<WorkbenchModule> {
     return {
       ngModule: WorkbenchModule,
-      providers: [
-        {
-          provide: WorkbenchModuleConfig,
-          useValue: config,
-        },
-        {
-          provide: WorkbenchStorage,
-          useClass: config.storage ?? DefaultWorkbenchStorage,
-        },
-        {
-          provide: WORKBENCH_LAYOUT_CONFIG,
-          useFactory: () => config.layout ?? ((factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)),
-        },
-        {
-          provide: WORKBENCH_FORROOT_GUARD,
-          useFactory: provideForRootGuard,
-          deps: [[WorkbenchService, new Optional(), new SkipSelf()]],
-        },
-        {
-          provide: WORKBENCH_PRE_STARTUP,
-          useExisting: WorkbenchThemeSwitcher,
-          multi: true,
-        },
-        {
-          provide: WORKBENCH_STARTUP,
-          multi: true,
-          useExisting: WorkbenchPerspectiveService,
-        },
-        {
-          provide: WORKBENCH_POST_STARTUP,
-          useExisting: ViewMenuService,
-          multi: true,
-        },
-        {
-          provide: WORKBENCH_POST_STARTUP,
-          useClass: ViewMoveHandler,
-          multi: true,
-        },
-        {
-          provide: ENVIRONMENT_INITIALIZER,
-          multi: true,
-          useValue: () => inject(WorkbenchUrlObserver),
-        },
-        provideWorkbenchLauncher(config),
-        provideLogging(config),
-        provideLocationPatch(),
-        provideWorkbenchMicrofrontendSupport(config),
-      ],
+      providers: [provideWorkbench(config)],
     };
   }
 
   /**
    * To manifest a dependency to the workbench module from a feature module.
    *
-   * @deprecated since version 16.0.0-beta.1; Import {@link WorkbenchModule} or standalone directives directly; API will be removed in a future release.
+   * @deprecated since version 16.0.0-beta.1; use standalone workbench component and directives instead; API will be removed in a future release.
    *
    * TODO [#312]: Remove when fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/312
    */
@@ -152,11 +92,9 @@ export class WorkbenchModule {
 }
 
 /**
- * @docs-private Not public API, intended for internal use only.
+ * Configuration of the SCION Workbench.
+ *
+ * @deprecated since version 17.0.0-beta.8; Register SCION Workbench providers using `provideWorkbench` function and import standalone workbench components and directives instead; API will be removed in a future release.
  */
-export function provideForRootGuard(workbenchService: WorkbenchService): any {
-  if (workbenchService) {
-    throw new Error('[ModuleForRootError] WorkbenchModule.forRoot() called twice. Lazy loaded modules should use WorkbenchModule.forChild() instead.');
-  }
-  return 'guarded';
+export interface WorkbenchModuleConfig extends WorkbenchConfig {
 }

@@ -10,7 +10,7 @@
 
 import {Injectable, InjectionToken} from '@angular/core';
 import {CanDeactivateFn, CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
 
@@ -20,7 +20,7 @@ import {WorkbenchRouteData} from './workbench-route-data';
 @Injectable({providedIn: 'root'})
 export class WorkbenchAuxiliaryRoutesRegistrator {
 
-  constructor(private _workbenchModuleConfig: WorkbenchModuleConfig, private _router: Router) {
+  constructor(private _workbenchConfig: WorkbenchConfig, private _router: Router) {
   }
 
   /**
@@ -52,7 +52,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
         path: '**',
         outlet,
         providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}],
-        loadComponent: () => this._workbenchModuleConfig.pageNotFoundComponent ?? PageNotFoundComponent,
+        loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
         data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
         canMatch: config.canMatchNotFoundPage || [],
       }));

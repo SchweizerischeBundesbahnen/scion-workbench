@@ -11,20 +11,18 @@
 import {TestBed} from '@angular/core/testing';
 import {PlatformRef} from '@angular/core';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
 import {waitForInitialWorkbenchLayout} from '../testing/testing.util';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {provideRouter} from '@angular/router';
 
 describe('Microfrontend Platform Lifecycle', () => {
 
   it('should destroy SCION Microfrontend Platform when destroying the Angular platform', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
-          microfrontendPlatform: {applications: []},
-        }),
-        RouterTestingModule.withRoutes([]),
+      providers: [
+        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
+        provideRouter([]),
       ],
     });
 

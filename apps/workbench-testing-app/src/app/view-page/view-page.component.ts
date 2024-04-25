@@ -9,7 +9,7 @@
  */
 
 import {Component} from '@angular/core';
-import {WorkbenchModule, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -39,7 +39,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,
-    WorkbenchModule,
     SciFormFieldComponent,
     SciCheckboxComponent,
     SciAccordionComponent,
@@ -49,6 +48,7 @@ import {CssClassComponent} from '../css-class/css-class.component';
     JoinPipe,
     AppendParamDataTypePipe,
     CssClassComponent,
+    WorkbenchPartActionDirective,
   ],
 })
 export default class ViewPageComponent {

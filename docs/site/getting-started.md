@@ -39,31 +39,24 @@ npm install @scion/workbench @scion/workbench-client @scion/toolkit @scion/compo
 </details>
 
 <details>
-    <summary><strong>Import SCION Workbench Module</strong></summary>
+    <summary><strong>Register SCION Workbench Providers</strong></summary>
     <br>
 
-Open `app.module.ts` and import the `WorkbenchModule` and `BrowserAnimationsModule`. Added lines are marked with `[+]`.
+Open `app.config.ts` and register SCION Workbench providers. Added lines are marked with `[+]`.
 
 ```ts
-    import {NgModule} from '@angular/core';
-    import {AppComponent} from './app.component';
-[+] import {WorkbenchModule} from '@scion/workbench';
-[+] import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-[+] import {RouterModule} from '@angular/router';
-    import {BrowserModule} from '@angular/platform-browser';
-
-    @NgModule({
-      declarations: [AppComponent],
-      imports: [
-[+]     WorkbenchModule.forRoot(),
-[+]     RouterModule.forRoot([]),
-        BrowserModule,
-[+]     BrowserAnimationsModule,
+    import {ApplicationConfig} from '@angular/core';
+[+] import {provideWorkbench} from '@scion/workbench';
+[+] import {provideRouter} from '@angular/router';
+[+] import {provideAnimations} from '@angular/platform-browser/animations';
+    
+    export const appConfig: ApplicationConfig = {
+      providers: [
+[+]     provideWorkbench(),
+[+]     provideRouter([]), // required by the SCION Workbench
+[+]     provideAnimations(), // required by the SCION Workbench
       ],
-      bootstrap: [AppComponent],
-    })
-    export class AppModule {
-    }
+    };
 ```
 </details>
 
@@ -110,7 +103,7 @@ Also, download the workbench icon font from <a href="https://github.com/Schweize
 In this step, we will create a component that displays a welcome message when no view is open in the main area.
 
 1. Create a new component using the Angular CLI.
- 
+
     ```console
     ng generate component welcome --skip-tests
     ```
@@ -131,40 +124,33 @@ In this step, we will create a component that displays a welcome message when no
     ```
 
 3. Open `welcome.component.html` and change it as follows:
- 
+
     ```html
     What needs to be done today?
     ```
 
-4. Register a route in `app.module.ts` for the component.
+4. Register a route in `app.config.ts` for the component.
 
    In this step, we bind the component to the empty path route to display it when the application is opened.
- 
+
     ```ts
-        import {NgModule} from '@angular/core';
-        import {AppComponent} from './app.component';
-        import {WorkbenchModule} from '@scion/workbench';
-        import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-        import {RouterModule} from '@angular/router';
-        import {BrowserModule} from '@angular/platform-browser';
+        import {ApplicationConfig} from '@angular/core';
+        import {provideWorkbench} from '@scion/workbench';
+        import {provideRouter} from '@angular/router';
+        import {provideAnimations} from '@angular/platform-browser/animations';
     
-        @NgModule({
-          declarations: [AppComponent],
-          imports: [
-            WorkbenchModule.forRoot(),
-            RouterModule.forRoot([
-    [+]       {path: '', loadComponent: () => import('./welcome/welcome.component')},   
+        export const appConfig: ApplicationConfig = {
+          providers: [
+            provideWorkbench(),
+            provideRouter([
+    [+]       {path: '', loadComponent: () => import('./welcome/welcome.component')},
             ]),
-            BrowserModule,
-            BrowserAnimationsModule,
+            provideAnimations(),
           ],
-          bootstrap: [AppComponent],
-        })
-        export class AppModule {
-        }
+       };
     ```
 
-    Run `ng serve` and open a browser to http://localhost:4200. You should see the welcome message.
+   Run `ng serve` and open a browser to http://localhost:4200. You should see the welcome message.
 
 </details>
 
@@ -172,7 +158,7 @@ In this step, we will create a component that displays a welcome message when no
     <summary><strong>Create Todos Component</strong></summary>
     <br>
 
-In this step, we create the TODO list and place it to the left of the main area. We will use the `TodoService` to get some sample TODOs. You can download the `todo.service.ts` file from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/workbench-getting-started-app/src/app/todo.service.ts">here</a>.
+In this step, we will create the TODO list and place it to the left of the main area. We will use the `TodoService` to get some sample TODOs. You can download the `todo.service.ts` file from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/workbench-getting-started-app/src/app/todo.service.ts">here</a>.
 
 1. Create a new component using the Angular CLI.
     ```console
@@ -184,14 +170,12 @@ In this step, we create the TODO list and place it to the left of the main area.
         import {Component} from '@angular/core';
     [+] import {WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
     [+] import {TodoService} from '../todo.service';
-    [+] import {NgFor} from '@angular/common';
     
         @Component({
           selector: 'app-todos',
           templateUrl: './todos.component.html',
           standalone: true,
           imports: [
-    [+]     NgFor,
     [+]     WorkbenchRouterLinkDirective,
           ],
         })
@@ -204,90 +188,77 @@ In this step, we create the TODO list and place it to the left of the main area.
     [+]   }
         }
     ```
+   In the constructor, we inject the view handle `WorkbenchView`. Using this handle, we can interact with the view, for example, set the title or make the view non-closable. We also inject a reference to the `TodoService` to iterate over the todos in the template.
 
-    In the constructor, we inject the view handle `WorkbenchView`. Using this handle, we can interact with the view, for example, set the title or make the view non-closable. We also inject a reference to the `TodoService` to iterate over the todos in the template.
-
-    We also change the component to be exported by default, making it easier to register the route for the component.
+   We also change the component to be exported by default, making it easier to register the route for the component.
 
 3. Open `todos.component.html` and change it as follows:
 
     ```html
     <ol>
-      <li *ngFor="let todo of todoService.todos">
-        <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{ todo.task }}</a>
-      </li>
+      @for (todo of todoService.todos; track todo.id) {
+        <li>
+          <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{todo.task}}</a>
+        </li>
+      }
     </ol>
     ```
 
    For each TODO, we create a link. When the user clicks on a link, a new view with the TODO will open. In a next step we will create the TODO component and register it under the route `/todos/:id`.
 
    > Note that we are using the `wbRouterLink` and not the `routerLink` directive. The `wbRouterLink` directive is the Workbench equivalent of the Angular Router link to navigate views. By default, `wbRouterLink` navigates the current view. In this example, however, we want to open the `todo` component in a new view or, if already open, activate it. Therefore, we set the target to `auto`.
-
-4. Register a route in `app.module.ts` for the component.
+4. Register a route in `app.config.ts` for the component.
 
     ```ts
-        import {NgModule} from '@angular/core';
-        import {AppComponent} from './app.component';
-        import {WorkbenchModule} from '@scion/workbench';
-        import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-        import {RouterModule} from '@angular/router';
-        import {BrowserModule} from '@angular/platform-browser';
+        import {ApplicationConfig} from '@angular/core';
+        import {provideWorkbench} from '@scion/workbench';
+        import {provideRouter} from '@angular/router';
+        import {provideAnimations} from '@angular/platform-browser/animations';
     
-        @NgModule({
-          declarations: [AppComponent],
-          imports: [
-            WorkbenchModule.forRoot(),
-            RouterModule.forRoot([
+        export const appConfig: ApplicationConfig = {
+          providers: [
+            provideWorkbench(),
+            provideRouter([
               {path: '', loadComponent: () => import('./welcome/welcome.component')},
     [+]       {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
             ]),
-            BrowserModule,
-            BrowserAnimationsModule,
+            provideAnimations(),
           ],
-          bootstrap: [AppComponent],
-        })
-        export class AppModule {
-        }
+       };
     ```
 
 5. Add the TODO list to the workbench layout.
- 
-   Open `app.module.ts` to define the layout of the workbench. We define the layout by registering a layout function in the workbench config. The workbench will invoke this function with a factory to create the layout.
-   
+
+   Open `app.config.ts` and configure the workbench with the initial layout.
+
    ```ts
-       import {NgModule} from '@angular/core';
-       import {AppComponent} from './app.component';
-   [+] import {MAIN_AREA, WorkbenchLayoutFactory, WorkbenchModule} from '@scion/workbench';
-       import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-       import {RouterModule} from '@angular/router';
-       import {BrowserModule} from '@angular/platform-browser';
+       import {ApplicationConfig} from '@angular/core';
+       import {provideWorkbench} from '@scion/workbench';
+       import {provideRouter} from '@angular/router';
+       import {provideAnimations} from '@angular/platform-browser/animations';
+   [+] import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
-       @NgModule({
-         declarations: [AppComponent],
-         imports: [
-           WorkbenchModule.forRoot({
+       export const appConfig: ApplicationConfig = {
+         providers: [
+           provideWorkbench({
    [+]       layout: (factory: WorkbenchLayoutFactory) => factory
    [+]         .addPart(MAIN_AREA)
    [+]         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
    [+]         .addView('todos', {partId: 'left', activateView: true})
    [+]         .navigateView('todos', ['todos'])
            }),
-           RouterModule.forRoot([
+           provideRouter([
              {path: '', loadComponent: () => import('./welcome/welcome.component')},
              {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
            ]),
-           BrowserModule,
-           BrowserAnimationsModule,
+           provideAnimations(),
          ],
-         bootstrap: [AppComponent],
-       })
-       export class AppModule {
-       }
+      };
    ```
 
    In the above code snippet, we create a layout with two parts, the main area and a part left to it. We align the `left` part to the left of the main area. We want it to take up 25% of the available space. Next, we add the `todos` view to the left part. Finally, we navigate the `todos` view to the `todos` component.
 
-   For detailed explanations on defining a workbench layout, refer to [Defining the initial workbench layout][link-how-to-define-initial-workbench-layout].
+   For detailed explanations on defining the workbench layout, refer to [Defining the initial workbench layout][link-how-to-define-initial-workbench-layout].
 
    Open a browser to http://localhost:4200. You should see the TODO list left to the main area.
 </details>
@@ -310,7 +281,7 @@ In this step, we will create a component to open a TODO in a view.
     [+] import {Todo, TodoService} from '../todo.service';
     [+] import {ActivatedRoute} from '@angular/router';
     [+] import {map, Observable, tap} from 'rxjs';
-    [+] import {AsyncPipe, DatePipe, formatDate, NgIf} from '@angular/common';
+    [+] import {AsyncPipe, DatePipe, formatDate} from '@angular/common';
 
         @Component({
           selector: 'app-todo',
@@ -318,7 +289,7 @@ In this step, we will create a component to open a TODO in a view.
           styleUrls: ['./todo.component.scss'],
           standalone: true,
           imports: [
-    [+]     AsyncPipe, NgIf, DatePipe,
+    [+]     AsyncPipe, DatePipe,
           ],
         })
     [+] export default class TodoComponent {
@@ -348,13 +319,13 @@ In this step, we will create a component to open a TODO in a view.
 3. Open `todo.component.html` and change it as follows.
 
     ```html
-    <ng-container *ngIf="todo$ | async as todo">
+    @if (todo$ | async; as todo) {
       <span>Task:</span>{{todo.task}}
       <span>Due Date:</span>{{todo.dueDate | date:'short'}}
       <span>Notes:</span>{{todo.notes}}
-    </ng-container>
+    }
     ```
-   Using Angular's `async` pipe, we subscribe to the `todo$` observable and assign its emitted value to the template variable `todo`. Then, we render the TODO.
+    Using Angular's `async` pipe, we subscribe to the `todo$` observable and assign its emitted value to the template variable `todo`. Then, we render the TODO.
 
 4. Open `todo.component.scss` and add the following styles.
 
@@ -370,48 +341,44 @@ In this step, we will create a component to open a TODO in a view.
     }
     ```
 
-5. Register a route in `app.module.ts` for the component.
+5. Register a route in `app.config.ts` for the component.
 
    Finally, we need to register a route for the component. We can then navigate to this component in a view using the `WorkbenchRouter` or `wbRouterLink`.
 
-    ```ts
-        import {NgModule} from '@angular/core';
-        import {AppComponent} from './app.component';
-        import {WorkbenchModule} from '@scion/workbench';
-        import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-        import {RouterModule} from '@angular/router';
-        import {BrowserModule} from '@angular/platform-browser';
-    
-        @NgModule({
-          declarations: [AppComponent],
-          imports: [
-            WorkbenchModule.forRoot({
-              layout: (factory: WorkbenchLayoutFactory) => factory
-                .addPart(MAIN_AREA)
-                .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-                .addView('todos', {partId: 'left', activateView: true})
-                .navigateView('todos', ['todos'])
-            }),
-            RouterModule.forRoot([
-              {path: '', loadComponent: () => import('./welcome/welcome.component')},
-              {path: 'todos', loadComponent: () => import('./todos/todos.component')},    
-    [+]       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},  
-            ]),
-            BrowserModule,
-            BrowserAnimationsModule,
-          ],
-          bootstrap: [AppComponent],
-        })
-        export class AppModule {
-        }
-    ```
+   ```ts
+       import {ApplicationConfig} from '@angular/core';
+       import {provideWorkbench} from '@scion/workbench';
+       import {provideRouter} from '@angular/router';
+       import {provideAnimations} from '@angular/platform-browser/animations';
+       import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
+   
+       export const appConfig: ApplicationConfig = {
+         providers: [
+           provideWorkbench({
+             layout: (factory: WorkbenchLayoutFactory) => factory
+               .addPart(MAIN_AREA)
+               .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+               .addView('todos', {partId: 'left', activateView: true})
+               .navigateView('todos', ['todos'])
+           }),
+         provideRouter([
+           {path: '', loadComponent: () => import('./welcome/welcome.component')},
+           {path: 'todos', loadComponent: () => import('./todos/todos.component')},
+   [+]     {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},  
+         ]),
+         provideAnimations(),
+        ],
+       };
+   ```
 
    Below the code from the previous step how we open the TODO view using the `wbRouterLink` directive.
    ```html
    <ol>
-     <li *ngFor="let todo of todoService.todos">
-       <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{ todo.task }}</a>
-     </li>
+     @for (todo of todoService.todos; track todo.id) {
+       <li>
+         <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{todo.task}}</a>
+       </li>
+     }
    </ol>
    ```
 
@@ -424,7 +391,7 @@ In this step, we will create a component to open a TODO in a view.
     <br>
 
 This short guide has introduced you to the basics of SCION Workbench. For more advanced topics, please refer to our [How-To][link-how-to] guides.
-    
+
 </details>
 
 [link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md

@@ -9,21 +9,21 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {TestComponent} from '../testing/test.component';
 import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchPartRegistry} from './workbench-part.registry';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('WorkbenchPart', () => {
 
   it('should activate part even if view is already active', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: factory => factory
             .addPart('left-top')
             .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'})
@@ -33,7 +33,7 @@ describe('WorkbenchPart', () => {
             .navigateView('view.102', ['test-page'])
             .activatePart('left-top'),
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {path: 'test-page', component: TestComponent},
         ]),
       ],

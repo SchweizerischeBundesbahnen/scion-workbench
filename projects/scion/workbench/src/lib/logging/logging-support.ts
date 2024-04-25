@@ -9,19 +9,19 @@
  */
 
 import {EnvironmentProviders, makeEnvironmentProviders, Provider, Type} from '@angular/core';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {WorkbenchConfig} from '../workbench-config';
 import {LogAppender, LogLevel} from './logging.model';
 import {ConsoleAppender} from './console-appender.service';
 
 /**
  * Provides a set of DI providers for installing workbench logging.
  */
-export function provideLogging(workbenchModuleConfig: WorkbenchModuleConfig): EnvironmentProviders {
-  const logAppenders: Type<LogAppender>[] = workbenchModuleConfig.logging?.logAppenders || [ConsoleAppender];
+export function provideLogging(workbenchConfig: WorkbenchConfig): EnvironmentProviders {
+  const logAppenders: Type<LogAppender>[] = workbenchConfig.logging?.logAppenders || [ConsoleAppender];
   return makeEnvironmentProviders([
     {
       provide: LogLevel,
-      useValue: workbenchModuleConfig.logging?.logLevel ?? LogLevel.INFO,
+      useValue: workbenchConfig.logging?.logLevel ?? LogLevel.INFO,
     },
     logAppenders.map((logAppender: Type<LogAppender>): Provider => {
       return {

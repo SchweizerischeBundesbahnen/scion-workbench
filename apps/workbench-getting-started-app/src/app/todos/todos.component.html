@@ -1,5 +1,7 @@
 <ol>
-  <li *ngFor="let todo of todoService.todos">
-    <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{ todo.task }}</a>
-  </li>
+  @for (todo of todoService.todos; track todo.id) {
+    <li>
+      <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{todo.task}}</a>
+    </li>
+  }
 </ol>

@@ -11,7 +11,7 @@
 import {Component, HostBinding, inject, Injector} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
-import {WorkbenchModuleConfig} from '../../workbench-module-config';
+import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DOCUMENT, NgIf} from '@angular/common';
@@ -56,7 +56,7 @@ export class ViewTabDragImageComponent {
   public isDragOverPeripheralTabbar = false;
 
   constructor(public view: WorkbenchView,
-              private _workbenchModuleConfig: WorkbenchModuleConfig,
+              private _workbenchConfig: WorkbenchConfig,
               private _viewDragService: ViewDragService,
               private _injector: Injector) {
     this.installDragOverTabbarDetector();
@@ -68,7 +68,7 @@ export class ViewTabDragImageComponent {
   }
 
   private createViewTabContentPortal(): ComponentPortal<unknown> {
-    const componentType = this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent;
+    const componentType = this._workbenchConfig.viewTabComponent || ViewTabContentComponent;
     return new ComponentPortal(componentType, null, this._injector);
   }
 

@@ -9,8 +9,6 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
@@ -25,6 +23,8 @@ import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 
 describe('Workbench Perspective', () => {
@@ -33,8 +33,8 @@ describe('Workbench Perspective', () => {
 
   it('should support configuring different start page per perspective', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: {
             perspectives: [
               {id: 'perspective-1', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
@@ -42,7 +42,7 @@ describe('Workbench Perspective', () => {
             ],
           },
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {
             path: '',
             loadComponent: () => import('../testing/test.component'),
@@ -79,15 +79,15 @@ describe('Workbench Perspective', () => {
    */
   it('should display the perspective also for asynchronous/slow initial navigation', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: factory => factory
             .addPart(MAIN_AREA)
             .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
             .addView('view.101', {partId: 'left', activateView: true})
             .navigateView('view.101', [], {hint: 'navigator'}),
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {
             path: '',
             canMatch: [canMatchWorkbenchView('navigator')],
@@ -117,8 +117,8 @@ describe('Workbench Perspective', () => {
 
   it('should open a empty-path view in the active part of perspective without main area', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({
+      providers: [
+        provideWorkbenchForTest({
           layout: factory => factory
             .addPart('left')
             .addPart('right', {align: 'right'})
@@ -128,7 +128,7 @@ describe('Workbench Perspective', () => {
             .navigateView('view.102', [], {hint: 'overview'})
             .activatePart('right'),
         }),
-        RouterTestingModule.withRoutes([
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('list')], component: TestComponent},
           {path: '', canMatch: [canMatchWorkbenchView('overview')], component: TestComponent},
           {path: 'details/:id', component: TestComponent},

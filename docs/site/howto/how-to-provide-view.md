@@ -9,14 +9,18 @@
 Any component can be displayed as a view. A view is a regular Angular component associated with a route. Below are some examples of common route configurations.
 
 ```ts
-import {RouterModule} from '@angular/router';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideRouter} from '@angular/router';
 
-// Routes
-RouterModule.forRoot([
-  {path: 'path/to/view1', component: ViewComponent},
-  {path: 'path/to/view2', loadComponent: () => import('./view/view.component')}, // lazy loaded route
-  {path: 'path/to/views', loadChildren: () => import('./routes')}, // lazy loaded routes
-]);
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      {path: 'path/to/view1', component: ViewComponent},
+      {path: 'path/to/view2', loadComponent: () => import('./view/view.component')}, // lazy loaded route
+      {path: 'path/to/views', loadChildren: () => import('./routes')}, // lazy loaded routes
+    ]),
+  ],
+});
 ```
 
 ```ts
@@ -51,20 +55,25 @@ inject(WorkbenchRouter).navigate(['/path/to/views/view4']);
 The workbench supports associating view-specific data with a route, such as a tile, a heading, or a CSS class.
 
 ```ts
+import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 import {WorkbenchRouteData} from '@scion/workbench';
 
-provideRouter([
-  {
-    path: 'path/to/view',
-    loadComponent: () => import('./view/view.component'),
-    data: {
-      [WorkbenchRouteData.title]: 'View Title',
-      [WorkbenchRouteData.heading]: 'View Heading',
-      [WorkbenchRouteData.cssClass]: ['class 1', 'class 2'],
-    },
-  },
-]);
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      {
+        path: 'path/to/view',
+        loadComponent: () => import('./view/view.component'),
+        data: {
+          [WorkbenchRouteData.title]: 'View Title',
+          [WorkbenchRouteData.heading]: 'View Heading',
+          [WorkbenchRouteData.cssClass]: ['class 1', 'class 2'],
+        },
+      },
+    ]),
+  ],
+});
 ```
 
 Alternatively, the above data can be set in the view by injecting the view handle `WorkbenchView`. See [How to interact with a view][how-to-interact-with-view].

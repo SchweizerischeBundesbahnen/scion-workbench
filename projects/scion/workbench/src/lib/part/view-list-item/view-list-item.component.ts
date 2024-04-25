@@ -14,7 +14,7 @@ import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {NgIf} from '@angular/common';
-import {WorkbenchModuleConfig} from '../../workbench-module-config';
+import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 
@@ -41,7 +41,7 @@ export class ViewListItemComponent {
   }
 
   constructor(private _viewRegistry: WorkbenchViewRegistry,
-              private _workbenchModuleConfig: WorkbenchModuleConfig,
+              private _workbenchConfig: WorkbenchConfig,
               private _injector: Injector) {
   }
 
@@ -55,7 +55,7 @@ export class ViewListItemComponent {
   }
 
   private createViewTabContentPortal(): ComponentPortal<unknown> {
-    const componentType = this._workbenchModuleConfig.viewTabComponent || ViewTabContentComponent;
+    const componentType = this._workbenchConfig.viewTabComponent || ViewTabContentComponent;
     return new ComponentPortal(componentType, null, Injector.create({
       parent: this._injector,
       providers: [

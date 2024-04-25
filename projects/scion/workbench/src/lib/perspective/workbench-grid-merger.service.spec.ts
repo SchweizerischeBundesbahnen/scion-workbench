@@ -9,8 +9,6 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
@@ -18,15 +16,17 @@ import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {segments} from '../testing/testing.util';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('WorkbenchGridMerger', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([]),
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([]),
       ],
     });
   });

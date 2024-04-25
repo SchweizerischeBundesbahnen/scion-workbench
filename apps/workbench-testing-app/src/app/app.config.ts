@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {provideWorkbench} from './workbench.provider';
 import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 import {provideRouter, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
-import {workbenchModuleConfig} from './workbench.config';
+import {workbenchConfig} from './workbench.config';
 import {provideConfirmWorkbenchStartupInitializer} from './workbench/confirm-workbench-startup-initializer.service';
 import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
@@ -22,6 +21,7 @@ import {provideNotificationPage} from './notification-page/notification-page-int
 import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
+import {provideWorkbench} from '@scion/workbench';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -29,7 +29,7 @@ import {provideAnimations, provideNoopAnimations} from '@angular/platform-browse
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withHashLocation()),
-    provideWorkbench(workbenchModuleConfig),
+    provideWorkbench(workbenchConfig),
     provideConfirmWorkbenchStartupInitializer(),
     provideThrottleCapabilityLookupInterceptor(),
     provideWorkbenchLifecycleHookLoggers(),

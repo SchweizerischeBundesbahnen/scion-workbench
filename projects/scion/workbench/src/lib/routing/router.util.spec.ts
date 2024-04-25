@@ -10,13 +10,12 @@
 
 import {RouterUtils} from './router.util';
 import {TestBed} from '@angular/core/testing';
-import {Router, UrlSegment} from '@angular/router';
-import {RouterTestingModule} from '@angular/router/testing';
+import {provideRouter, Router, UrlSegment} from '@angular/router';
 import {TestComponent} from '../testing/test.component';
 import {waitForInitialWorkbenchLayout} from '../testing/testing.util';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {WorkbenchRouter} from './workbench-router.service';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 
 describe('RouterUtils.segmentsToCommands', () => {
@@ -65,9 +64,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should error if appending matrix parameters to empty-path `relativeTo`', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
         ]),
       ],
@@ -87,9 +86,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should ignore `relativeTo` for absolute commands', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
@@ -109,9 +108,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should make commands relative to another route', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
@@ -138,9 +137,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should append matrix parameters to `relativeTo`', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
@@ -160,9 +159,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should append commands to empty-path `relativeTo`', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
         ]),
       ],
@@ -182,9 +181,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should append empty commands to empty-path `relativeTo`', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
         ]),
       ],
@@ -204,9 +203,9 @@ describe('RouterUtils.commandsToSegments', () => {
 
   it('should append empty commands to `relativeTo`', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'relative/to', component: TestComponent},
         ]),
       ],
@@ -244,9 +243,9 @@ describe('RouterUtils.parseViewOutlets', () => {
 
   it('should parse view outlets from URL', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: 'path/to/view/:id', component: TestComponent},
           {path: 'a/b/c', outlet: 'otherOutlet', component: TestComponent},
         ]),
@@ -282,9 +281,9 @@ describe('RouterUtils.hasEmptyPathFromRoot', () => {
 
   it('should test', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('test-view')], component: TestComponent},
           {path: 'path/to/view', component: TestComponent},
         ]),

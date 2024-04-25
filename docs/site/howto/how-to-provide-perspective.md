@@ -11,79 +11,84 @@ The workbench layout is a grid of parts. Parts are aligned relative to each othe
 
 ### How to provide a perspective
 
-Perspectives are registered similarly to [Defining the initial workbench layout][link-how-to-define-initial-workbench-layout] via the configuration passed to `WorkbenchModule.forRoot()`. However, an array of perspective definitions is passed instead of a single workbench layout. A perspective must have a unique identity and define a workbench layout. Optionally, data can be associated with the perspective via data dictionary, e.g., to associate an icon, label or tooltip with the perspective.
+Perspectives are registered similarly to [Defining the initial workbench layout][link-how-to-define-initial-workbench-layout] via the configuration passed to `provideWorkbench()`. However, an array of perspective definitions is passed instead of a single workbench layout. A perspective must have a unique identity and define a workbench layout. Optionally, data can be associated with the perspective via data dictionary, e.g., to associate an icon, label or tooltip with the perspective.
 
 Define the perspective's layout by registering a layout function in the perspective definition. The workbench will invoke this function with a factory to create the layout. The layout is immutable, so each modification creates a new instance. Use the instance for further modifications and finally return it.
 
 Start by adding the first part. From there, you can gradually add more parts and align them relative to each other. Next, add views to the layout, specifying to which part to add the views. The final step is to navigate the views. A view can be navigated to any route.
 
 ```ts
-import {MAIN_AREA, WorkbenchLayoutFactory, WorkbenchModule} from '@scion/workbench';
+import {bootstrapApplication} from '@angular/platform-browser';
+import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 
-WorkbenchModule.forRoot({
-  layout: {
-    perspectives: [
-      {
-        id: 'admin',
-        layout: (factory: WorkbenchLayoutFactory) => factory
-          // Add parts to the layout.
-          .addPart(MAIN_AREA)
-          .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-          .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-          .addPart('bottom', {align: 'bottom', ratio: .3})
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideWorkbench({
+      layout: {
+        perspectives: [
+          {
+            id: 'admin',
+            layout: (factory: WorkbenchLayoutFactory) => factory
+              // Add parts to the layout.
+              .addPart(MAIN_AREA)
+              .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+              .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+              .addPart('bottom', {align: 'bottom', ratio: .3})
 
-          // Add views to the layout.
-          .addView('navigator', {partId: 'topLeft'})
-          .addView('explorer', {partId: 'topLeft'})
-          .addView('outline', {partId: 'bottomLeft'})
-          .addView('console', {partId: 'bottom'})
-          .addView('problems', {partId: 'bottom'})
-          .addView('search', {partId: 'bottom'})
+              // Add views to the layout.
+              .addView('navigator', {partId: 'topLeft'})
+              .addView('explorer', {partId: 'topLeft'})
+              .addView('outline', {partId: 'bottomLeft'})
+              .addView('console', {partId: 'bottom'})
+              .addView('problems', {partId: 'bottom'})
+              .addView('search', {partId: 'bottom'})
 
-          // Navigate views.
-          .navigateView('navigator', ['path/to/navigator'])
-          .navigateView('explorer', ['path/to/explorer'])
-          .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
-          .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
-          .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
-          .navigateView('search', ['path/to/search'])
+              // Navigate views.
+              .navigateView('navigator', ['path/to/navigator'])
+              .navigateView('explorer', ['path/to/explorer'])
+              .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
+              .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
+              .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
+              .navigateView('search', ['path/to/search'])
 
-          // Decide which views to activate.
-          .activateView('navigator')
-          .activateView('outline')
-          .activateView('console'),
-        data: {
-          label: 'Administrator',
-        },
+              // Decide which views to activate.
+              .activateView('navigator')
+              .activateView('outline')
+              .activateView('console'),
+            data: {
+              label: 'Administrator',
+            },
+          },
+          {
+            id: 'manager',
+            layout: (factory: WorkbenchLayoutFactory) => factory
+              // Add parts to the layout.
+              .addPart(MAIN_AREA)
+              .addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .3})
+
+              // Add views to the layout.  
+              .addView('navigator', {partId: 'bottom'})
+              .addView('explorer', {partId: 'bottom'})
+              .addView('outline', {partId: 'bottom'})
+              .addView('search', {partId: 'bottom'})
+
+              // Navigate views.
+              .navigateView('navigator', ['path/to/navigator'])
+              .navigateView('explorer', ['path/to/explorer'])
+              .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
+              .navigateView('search', ['path/to/search'])
+
+              // Decide which views to activate.
+              .activateView('explorer'),
+            data: {
+              label: 'Manager',
+            },
+          },
+        ],
+        initialPerspective: 'manager',
       },
-      {
-        id: 'manager',
-        layout: (factory: WorkbenchLayoutFactory) => factory
-          // Add parts to the layout.
-          .addPart(MAIN_AREA)
-          .addPart('bottom', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .3})
-
-          // Add views to the layout.  
-          .addView('navigator', {partId: 'bottom'})
-          .addView('explorer', {partId: 'bottom'})
-          .addView('outline', {partId: 'bottom'})
-          .addView('search', {partId: 'bottom'})
-
-          // Navigate views.
-          .navigateView('navigator', ['path/to/navigator'])
-          .navigateView('explorer', ['path/to/explorer'])
-          .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
-          .navigateView('search', ['path/to/search'])
-
-          // Decide which views to activate.
-          .activateView('explorer'),
-        data: {
-          label: 'Manager',
-        },
-      },
-    ],
-    initialPerspective: 'manager',
-  },
+    }),
+  ],
 });
 ```
 

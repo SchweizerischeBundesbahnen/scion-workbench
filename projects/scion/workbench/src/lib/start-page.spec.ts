@@ -8,15 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TestBed} from '@angular/core/testing';
-import {RouterTestingModule} from '@angular/router/testing';
 import {By} from '@angular/platform-browser';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from './testing/testing.util';
-import {WorkbenchTestingModule} from './testing/workbench-testing.module';
 import {withComponentContent} from './testing/test.component';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchLayoutFactory} from './layout/workbench-layout.factory';
 import {expect} from './testing/jasmine/matcher/custom-matchers.definition';
+import {provideRouter} from '@angular/router';
+import {provideWorkbenchForTest} from './testing/workbench.provider';
 
 describe('Start Page', () => {
 
@@ -24,9 +24,9 @@ describe('Start Page', () => {
 
     it('should display start page when all views are closed', async () => {
       TestBed.configureTestingModule({
-        imports: [
-          WorkbenchTestingModule.forTest(),
-          RouterTestingModule.withRoutes([
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
             {
               path: '',
               loadComponent: () => import('./testing/test.component'),
@@ -67,9 +67,9 @@ describe('Start Page', () => {
 
     it('should overflow start page if exceeding available vertical space ', async () => {
       TestBed.configureTestingModule({
-        imports: [
-          WorkbenchTestingModule.forTest(),
-          RouterTestingModule.withRoutes([
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
             {
               path: '',
               loadComponent: () => import('./testing/test.component'),
@@ -94,14 +94,14 @@ describe('Start Page', () => {
 
     it('should display start page when all views are closed', async () => {
       TestBed.configureTestingModule({
-        imports: [
-          WorkbenchTestingModule.forTest({
+        providers: [
+          provideWorkbenchForTest({
             layout: (factory: WorkbenchLayoutFactory) => factory
               .addPart('part')
               .addView('test-view', {partId: 'part', activateView: true})
               .navigateView('test-view', ['path/to/view']),
           }),
-          RouterTestingModule.withRoutes([
+          provideRouter([
             {
               path: '',
               loadComponent: () => import('./testing/test.component'),
@@ -134,11 +134,11 @@ describe('Start Page', () => {
 
     it('should overflow start page if exceeding available vertical space ', async () => {
       TestBed.configureTestingModule({
-        imports: [
-          WorkbenchTestingModule.forTest({
+        providers: [
+          provideWorkbenchForTest({
             layout: (factory: WorkbenchLayoutFactory) => factory.addPart('part'),
           }),
-          RouterTestingModule.withRoutes([
+          provideRouter([
             {
               path: '',
               loadComponent: () => import('./testing/test.component'),

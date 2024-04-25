@@ -16,18 +16,16 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {PartComponent} from './part.component';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchUrlObserver} from '../routing/workbench-url-observer.service';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
 import {WorkbenchPart} from './workbench-part.model';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 describe('WorkbenchPartRegistry', () => {
 
   it('should delay emitting parts until the next layout change', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-      ],
       providers: [
+        provideWorkbenchForTest(),
         {provide: WorkbenchUrlObserver, useValue: null}, // disable WorkbenchUrlObserver
       ],
     });

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {WorkbenchConfig} from '../workbench-config';
 import {APP_INITIALIZER, ApplicationInitStatus, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
@@ -20,7 +20,7 @@ import {Logger, LoggerNames} from '../logging';
  * Workbench initializers may execute in parallel. To register a workbench initializer, provide a class implementing
  * {@link WorkbenchInitializer} as a multi-provider using the DI class token {@link WorkbenchInitializer}.
  *
- * When importing the {@link WorkbenchModule}, you can configure which workbench launching strategy to use.
+ * The SCION Workbench supports the following launchers:
  *
  *  - **APP_INITIALIZER**
  *   Launches the workbench in an Angular `APP_INITIALIZER`, which is before bootstrapping the app component.
@@ -34,7 +34,7 @@ import {Logger, LoggerNames} from '../logging';
  *   tree.
  *
  * The workbench component displays a startup splash until completed startup. You can configure a custom splash in
- * {@link WorkbenchModuleConfig#startup#splash}. When launching the workbench in an Angular `APP_INITIALIZER`, no splash will
+ * {@link WorkbenchConfig#startup#splash}. When launching the workbench in an Angular `APP_INITIALIZER`, no splash will
  * display since the workbench will start upfront.
  */
 @Injectable({providedIn: 'root'})
@@ -152,8 +152,8 @@ export class WorkbenchStartup {
 /**
  * Provides a set of DI providers for launching the workbench.
  */
-export function provideWorkbenchLauncher(workbenchModuleConfig: WorkbenchModuleConfig): EnvironmentProviders | [] {
-  if (workbenchModuleConfig.startup?.launcher !== 'APP_INITIALIZER') {
+export function provideWorkbenchLauncher(workbenchConfig: WorkbenchConfig): EnvironmentProviders | [] {
+  if (workbenchConfig.startup?.launcher !== 'APP_INITIALIZER') {
     return [];
   }
 

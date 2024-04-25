@@ -12,11 +12,6 @@ import {InjectionToken} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 
 /**
- * DI token to ensure `WorkbenchModule.forRoot()` is not used in a lazy context.
- */
-export const WORKBENCH_FORROOT_GUARD = new InjectionToken<void>('WORKBENCH_FORROOT_GUARD');
-
-/**
  * Represents the id prefix of views.
  *
  * @see ViewId

@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Optional, ViewChild} from '@angular/core';
-import {WorkbenchModuleConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
+import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -67,7 +67,7 @@ export default class StartPageComponent {
               private _formBuilder: NonNullableFormBuilder,
               router: Router,
               cd: ChangeDetectorRef,
-              workbenchModuleConfig: WorkbenchModuleConfig) {
+              workbenchConfig: WorkbenchConfig) {
     // Read workbench views to be pinned to the start page.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(filterArray(route => {
@@ -77,7 +77,7 @@ export default class StartPageComponent {
         return false;
       }));
 
-    if (workbenchModuleConfig.microfrontendPlatform) {
+    if (workbenchConfig.microfrontendPlatform) {
       // Read microfrontend views to be pinned to the start page.
       this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(

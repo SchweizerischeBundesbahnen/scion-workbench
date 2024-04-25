@@ -9,3 +9,4 @@
  */
 
 export {WorkbenchTestingModule} from './workbench-testing.module';
+export {provideWorkbenchForTest} from './workbench.provider';

@@ -25,7 +25,7 @@ import {ɵWorkbenchDialogService} from './ɵworkbench-dialog.service';
  * A dialog can be view-modal or application-modal.
  *
  * A view-modal dialog blocks only a specific view, allowing the user to interact with other views. An application-modal dialog blocks
- * the workbench, or the browser's viewport if configured in {@link WorkbenchModuleConfig.dialog.modalityScope}.
+ * the workbench, or the browser's viewport if configured in {@link WorkbenchConfig.dialog.modalityScope}.
  *
  * ## Dialog Stack
  * Multiple dialogs are stacked, and only the topmost dialog in each modality stack can be interacted with.

@@ -9,30 +9,28 @@
  */
 
 import {discardPeriodicTasks, fakeAsync, TestBed} from '@angular/core/testing';
-import {Component, Inject, Injectable, InjectionToken, NgModule, Optional} from '@angular/core';
+import {Component, inject, Injectable, InjectionToken} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {RouterModule} from '@angular/router';
-import {CommonModule} from '@angular/common';
+import {provideRouter, Routes} from '@angular/router';
 import {advance, styleFixture} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {By} from '@angular/platform-browser';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 
 /**
  *
  * Test setup:
  *
- *            +--------------+
- *            | Test Module  |
- *            +--------------+
+ *             +-------------+
+ *             | Application |
+ *             +-------------+
  *                   |
  *                feature
  *                   |
  *                   v
  * +------------------------------------------+
- * | Feature Module                           |
+ * | Feature                                  |
  * |------------------------------------------|
  * | routes:                                  |
  * |                                          |
@@ -44,13 +42,11 @@ describe('Lazily loaded view', () => {
 
   it('should get services injected from its child injector', fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
-          {path: 'feature', loadChildren: () => FeatureModule},
-        ]),
-      ],
       providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'feature', loadChildren: () => featureRoutes},
+        ]),
         {provide: DI_TOKEN, useValue: 'root-injector-value'},
       ],
     });
@@ -73,13 +69,11 @@ describe('Lazily loaded view', () => {
    */
   it('should get services injected from its child injector prior to from the root injector', fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest(),
-        RouterTestingModule.withRoutes([
-          {path: 'feature', loadChildren: () => FeatureModule},
-        ]),
-      ],
       providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'feature', loadChildren: () => featureRoutes},
+        ]),
         {provide: DI_TOKEN, useValue: 'root-injector-value'},
       ],
     });
@@ -109,22 +103,20 @@ class FeatureService {
 
 @Component({template: 'Injected value: {{injectedValue}}', standalone: true})
 class Feature_View_Component {
-  constructor(@Inject(DI_TOKEN) public injectedValue: string,
-              @Optional() public featureService: FeatureService) {
-  }
+
+  public injectedValue = inject<string>(DI_TOKEN);
+  public featureService = inject(FeatureService, {optional: true});
 }
 
-@NgModule({
-  imports: [
-    CommonModule,
-    RouterModule.forChild([
+const featureRoutes: Routes = [
+  {
+    path: '',
+    providers: [
+      {provide: DI_TOKEN, useValue: 'child-injector-value'},
+      FeatureService,
+    ],
+    children: [
       {path: 'view', component: Feature_View_Component},
-    ]),
-  ],
-  providers: [
-    {provide: DI_TOKEN, useValue: 'child-injector-value'},
-    FeatureService,
-  ],
-})
-class FeatureModule {
-}
+    ],
+  },
+];

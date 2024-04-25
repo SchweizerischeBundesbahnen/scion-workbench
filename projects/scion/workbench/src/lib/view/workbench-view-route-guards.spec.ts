@@ -11,15 +11,14 @@
 import {TestBed} from '@angular/core/testing';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {RouterOutlet} from '@angular/router';
+import {provideRouter, RouterOutlet} from '@angular/router';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {Component} from '@angular/core';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchComponent} from '../workbench.component';
 import {canMatchWorkbenchView} from './workbench-view-route-guards';
-import {WorkbenchTestingModule} from '../testing/workbench-testing.module';
-import {RouterTestingModule} from '@angular/router/testing';
 
 describe('CanMatchWorkbenchView Guard', () => {
 
@@ -29,9 +28,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should match empty path route if not installed `canMatchWorkbenchView` guard', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: '', component: View1Component},
         ]),
       ],
@@ -49,9 +48,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should match empty path route based on hint passed to the navigation', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
           {path: '', canMatch: [canMatchWorkbenchView('view-2')], component: View2Component},
           {path: '', canMatch: [canMatchWorkbenchView('view-3')], component: View3Component},
@@ -80,9 +79,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should match nested empty path route based on hint passed to the navigation', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {
             path: '',
             children: [
@@ -121,9 +120,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should not match route if target of a workbench view', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'path/to/view', canMatch: [canMatchWorkbenchView(false)], component: View1Component},
         ]),
       ],
@@ -140,9 +139,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should match route if target of a workbench view', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'path/to/view', canMatch: [canMatchWorkbenchView(true)], component: View1Component},
         ]),
       ],
@@ -159,9 +158,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should match route if matching the hint passed to the navigation', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'path/to/view', canMatch: [canMatchWorkbenchView('hint')], component: View1Component},
         ]),
       ],
@@ -178,9 +177,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should not match route if navigating without hint', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'path/to/view', canMatch: [canMatchWorkbenchView('hint')], component: View1Component},
         ]),
       ],
@@ -197,9 +196,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should not match route if navigating with different hint', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: 'path/to/view', canMatch: [canMatchWorkbenchView('hint')], component: View1Component},
         ]),
       ],
@@ -217,9 +216,9 @@ describe('CanMatchWorkbenchView Guard', () => {
   it('should error when loading the application root route into a view', async () => {
     await jasmine.spyOnGlobalErrorsAsync(async errors => {
       TestBed.configureTestingModule({
-        imports: [
-          WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-          RouterTestingModule.withRoutes([
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
             {path: '', component: WorkbenchComponent}, // do not guard the application root route
             {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
           ]),
@@ -240,9 +239,9 @@ describe('CanMatchWorkbenchView Guard', () => {
 
   it('should not load the application root route into a view', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
           {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
         ]),
@@ -268,9 +267,9 @@ describe('CanMatchNotFoundPage', () => {
 
   it('should display "Page Not Found" if not matching a route', async () => {
     TestBed.configureTestingModule({
-      imports: [
-        WorkbenchTestingModule.forTest({startup: {launcher: 'APP_INITIALIZER'}}),
-        RouterTestingModule.withRoutes([
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
           {path: '', canMatch: [() => false], component: View1Component},
         ]),
       ],

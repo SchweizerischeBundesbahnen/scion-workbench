@@ -13,7 +13,7 @@ import {WorkbenchView} from '@scion/workbench';
 import {Todo, TodoService} from '../todo.service';
 import {ActivatedRoute} from '@angular/router';
 import {map, Observable, tap} from 'rxjs';
-import {AsyncPipe, DatePipe, formatDate, NgIf} from '@angular/common';
+import {AsyncPipe, DatePipe, formatDate} from '@angular/common';
 
 @Component({
   selector: 'app-todo',
@@ -21,7 +21,6 @@ import {AsyncPipe, DatePipe, formatDate, NgIf} from '@angular/common';
   styleUrls: ['./todo.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     DatePipe,
   ],

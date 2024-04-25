@@ -48,7 +48,7 @@ export interface WorkbenchMessageBoxOptions {
    * Controls which area of the application to block by the message box.
    *
    * - **Application-modal:**
-   *   Use to block the workbench, or the browser's viewport if configured in {@link WorkbenchModuleConfig.dialog.modalityScope}.
+   *   Use to block the workbench, or the browser's viewport if configured in {@link WorkbenchConfig.dialog.modalityScope}.
    *
    * - **View-modal:**
    *   Use to block only the contextual view of the message box, allowing the user to interact with other views.

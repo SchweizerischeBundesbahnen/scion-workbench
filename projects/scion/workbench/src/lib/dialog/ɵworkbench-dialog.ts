@@ -25,7 +25,7 @@ import {subscribeInside} from '@scion/toolkit/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WORKBENCH_ELEMENT_REF} from '../content-projection/view-container.reference';
 import {Arrays} from '@scion/toolkit/util';
-import {WorkbenchModuleConfig} from '../workbench-module-config';
+import {WorkbenchConfig} from '../workbench-config';
 import {distinctUntilChanged, filter} from 'rxjs/operators';
 import {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
 import {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';
@@ -42,7 +42,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _portal: ComponentPortal<WorkbenchDialogComponent>;
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _zone = inject(NgZone);
-  private readonly _workbenchModuleConfig = inject(WorkbenchModuleConfig);
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _attached$: Observable<boolean>;
   private _blink$ = new Subject<void>();
@@ -255,7 +255,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     if (this.context.view) {
       return this.context.view.portal.attached$;
     }
-    if (this._workbenchModuleConfig.dialog?.modalityScope === 'viewport') {
+    if (this._workbenchConfig.dialog?.modalityScope === 'viewport') {
       return of(true);
     }
     return inject(WORKBENCH_ELEMENT_REF).ref$.pipe(map(ref => !!ref));
@@ -289,7 +289,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    * Aligns this dialog with the boundaries of the host element.
    */
   private stickToHostElement(): void {
-    if (this._options.modality === 'application' && this._workbenchModuleConfig.dialog?.modalityScope === 'viewport') {
+    if (this._options.modality === 'application' && this._workbenchConfig.dialog?.modalityScope === 'viewport') {
       setStyle(this._overlayRef.hostElement, {inset: '0'});
     }
     else {
