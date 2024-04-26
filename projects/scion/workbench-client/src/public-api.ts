@@ -29,6 +29,7 @@ export {ɵPopupContext, ɵPOPUP_CONTEXT} from './lib/popup/workbench-popup-conte
 export {WorkbenchDialogCapability, WorkbenchDialogSize} from './lib/dialog/workbench-dialog-capability';
 export {WorkbenchDialog} from './lib/dialog/workbench-dialog';
 export {WorkbenchDialogService} from './lib/dialog/workbench-dialog-service';
+export {ɵWorkbenchDialogService} from './lib/dialog/ɵworkbench-dialog-service';
 export {WorkbenchDialogOptions} from './lib/dialog/workbench-dialog.options';
 export {ɵDialogContext, ɵDIALOG_CONTEXT} from './lib/dialog/ɵworkbench-dialog-context';
 export {ɵWorkbenchDialogMessageHeaders} from './lib/dialog/ɵworkbench-dialog';

@@ -19,7 +19,7 @@ import {MicrofrontendViewIntentHandler} from '../routing/microfrontend-view-inte
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
-import {WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
+import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter, ɵWorkbenchDialogService} from '@scion/workbench-client';
 import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendViewCapabilityValidator} from '../routing/microfrontend-view-capability-validator.interceptor';
@@ -70,6 +70,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     Beans.register(WorkbenchRouter);
     Beans.register(WorkbenchPopupService);
     Beans.register(WorkbenchMessageBoxService);
+    Beans.register(WorkbenchDialogService, {useClass: ɵWorkbenchDialogService});
     Beans.register(WorkbenchNotificationService);
 
     // Register host manifest interceptor for the workbench to register workbench-specific intentions and capabilities.
