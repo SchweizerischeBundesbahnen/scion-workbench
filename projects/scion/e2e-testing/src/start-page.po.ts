@@ -15,6 +15,7 @@ import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outlet.po';
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
 import {ViewId} from '@scion/workbench';
+import {waitForCondition} from './helper/testing.util';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -53,9 +54,12 @@ export class StartPagePO implements WorkbenchViewPagePO {
    */
   public async openWorkbenchView(cssClass: string): Promise<void> {
     const viewId = await this.view.getViewId();
+    const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-workbench-views');
     await this._tabbarLocator.locator(`.e2e-workbench-view-tiles a.${cssClass}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
+    // Wait until completed navigation.
+    await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
   }
 
   /**
@@ -63,12 +67,15 @@ export class StartPagePO implements WorkbenchViewPagePO {
    */
   public async openMicrofrontendView(cssClass: string, app: string): Promise<void> {
     const viewId = await this.view.getViewId();
+    const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-microfrontend-views');
     await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${cssClass}.workbench-client-testing-${app}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
     // Wait for microfrontend to be loaded.
     const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;
     await frameLocator.locator('app-root').waitFor({state: 'visible'});
+    // Wait until completed navigation.
+    await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
   }
 
   /**
