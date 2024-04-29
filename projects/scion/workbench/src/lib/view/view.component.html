@@ -1,7 +1,3 @@
 <sci-viewport cdkTrapFocus>
-  <router-outlet #router_outlet="outlet"
-                 [name]="viewId"
-                 (activate)="onActivateRoute(router_outlet.activatedRoute)"
-                 (deactivate)="onDeactivateRoute()">
-  </router-outlet>
+  <router-outlet [name]="viewId"/>
 </sci-viewport>

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRoute, ActivatedRouteSnapshot, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, OutletContext, PRIMARY_OUTLET, Router, UrlSegment, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
 import {DIALOG_ID_PREFIX, POPUP_ID_PREFIX} from '../workbench.constants';
 import {inject} from '@angular/core';
@@ -74,14 +74,22 @@ export const RouterUtils = {
   },
 
   /**
-   * Resolves to the actual {@link ActivatedRouteSnapshot} loaded into a router outlet.
+   * Resolves the effective (=leaf) {@link ActivatedRoute} activated in a router outlet.
    *
-   * The route that is reported as the activated route of an outlet, or the route that is passed to a guard
-   * or resolver, is not always the route that is actually loaded into the outlet, for example, if the route
-   * is a child of a component-less route.
+   * Depending on the route hierarchy, when navigating to a child route with component-less parent routes, the route of an outlet may not be the effectively activated child route.
    */
-  resolveActualRouteSnapshot: (route: ActivatedRouteSnapshot): ActivatedRouteSnapshot => {
-    return route.firstChild ? RouterUtils.resolveActualRouteSnapshot(route.firstChild) : route;
+  resolveEffectiveRoute: (route: ActivatedRoute): ActivatedRoute => {
+    return route.firstChild ? RouterUtils.resolveEffectiveRoute(route.firstChild) : route;
+  },
+
+  /**
+   * Resolves the effective (=leaf) {@link OutletContext} of a router outlet.
+   *
+   * Depending on the route hierarchy, when navigating to a child route with component-less parent routes, the context of an outlet may not be the effectively activated child context.
+   */
+  resolveEffectiveOutletContext: (outletContext: OutletContext | null): OutletContext | null => {
+    const childOutletContext = outletContext?.children.getContext(PRIMARY_OUTLET);
+    return childOutletContext ? RouterUtils.resolveEffectiveOutletContext(childOutletContext) : outletContext;
   },
 
   /**

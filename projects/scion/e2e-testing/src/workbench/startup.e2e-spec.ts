@@ -23,7 +23,7 @@ test.describe('Startup', () => {
     await appPO.waitUntilWorkbenchStarted();
 
     // Open the test view. This view would error when constructed before the workbench startup completed.
-    await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Reload the app with the current layout to simulate views being instantiated right at startup.
     await appPO.reload();
@@ -39,7 +39,6 @@ test.describe('Startup', () => {
     await expect.poll(() => consoleLogs.get({severity: 'error'})).toEqual([]);
 
     // Expect the test view to show.
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'e2e-test-view'});
     await expectView(testeeViewPage).toBeActive();
     await expect(appPO.views()).toHaveCount(1);
   });

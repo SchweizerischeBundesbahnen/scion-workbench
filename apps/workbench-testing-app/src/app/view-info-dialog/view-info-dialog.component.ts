@@ -46,7 +46,7 @@ export class ViewInfoDialogComponent implements OnInit {
 
   public ngOnInit(): void {
     const route = this._router.routerState.root.children.find(route => route.outlet === this.view.id);
-    this.route = route && resolveActualRoute(route);
+    this.route = route && resolveEffectiveRoute(route);
   }
 
   public onClose(): void {
@@ -54,6 +54,6 @@ export class ViewInfoDialogComponent implements OnInit {
   }
 }
 
-function resolveActualRoute(route: ActivatedRoute): ActivatedRoute {
-  return route.firstChild ? resolveActualRoute(route.firstChild) : route;
+function resolveEffectiveRoute(route: ActivatedRoute): ActivatedRoute {
+  return route.firstChild ? resolveEffectiveRoute(route.firstChild) : route;
 }

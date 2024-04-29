@@ -10,13 +10,16 @@
 
 import {RouterUtils} from './router.util';
 import {TestBed} from '@angular/core/testing';
-import {provideRouter, Router, UrlSegment} from '@angular/router';
+import {ActivatedRoute, ChildrenOutletContexts, provideRouter, Router, RouterOutlet, UrlSegment} from '@angular/router';
 import {TestComponent} from '../testing/test.component';
-import {waitForInitialWorkbenchLayout} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.util';
 import {WorkbenchRouter} from './workbench-router.service';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
+import {ViewId} from '../view/workbench-view.model';
+import {WorkbenchComponent} from '../workbench.component';
+import {By} from '@angular/platform-browser';
 
 describe('RouterUtils.segmentsToCommands', () => {
 
@@ -75,7 +78,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect 'RouterUtils.commandsToSegments' to error.
@@ -97,7 +100,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect 'relativeTo' to be ignored for absolute commands
@@ -119,7 +122,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect segments to be relative to 'relative/to'.
@@ -148,7 +151,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect commands to contain matrix parameters.
@@ -170,7 +173,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect segments to be 'path/to/view'.
@@ -192,7 +195,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect segments to be empty.
@@ -214,7 +217,7 @@ describe('RouterUtils.commandsToSegments', () => {
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
-    const relativeTo = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+    const relativeTo = resolveEffectiveRoute('view.100');
     expect(relativeTo).toBeDefined();
 
     // Expect segments to be 'path/to
@@ -279,7 +282,7 @@ describe('RouterUtils.parseViewOutlets', () => {
 
 describe('RouterUtils.hasEmptyPathFromRoot', () => {
 
-  it('should test', async () => {
+  it('should indicate empty path from root', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
@@ -292,14 +295,121 @@ describe('RouterUtils.hasEmptyPathFromRoot', () => {
     await waitForInitialWorkbenchLayout();
 
     const rootRoute = TestBed.inject(Router).routerState.root;
-    expect(RouterUtils.hasEmptyPathFromRoot(rootRoute)).toBeTrue();
+    expect(RouterUtils.hasEmptyPathFromRoot(RouterUtils.resolveEffectiveRoute(rootRoute))).toBeTrue();
 
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.1'});
-    const route1 = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.1')!;
+    const route1 = resolveEffectiveRoute('view.1');
     expect(RouterUtils.hasEmptyPathFromRoot(route1)).toBeTrue();
 
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.2'});
-    const route2 = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.2')!;
+    const route2 = resolveEffectiveRoute('view.2');
     expect(RouterUtils.hasEmptyPathFromRoot(route2)).toBeFalse();
   });
 });
+
+describe('RouterUtils.resolveEffectiveRoute', () => {
+
+  it('should resolve the effective route', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
+          {
+            path: 'view', loadComponent: () => TestComponent,
+          },
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.100'});
+
+    // Get the top-level `ActivatedRoute` of the view.
+    const componentInjector = fixture.debugElement.query(By.directive(TestComponent)).injector;
+    const viewRoute = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+
+    // Expect correct `ActivatedRoute`.
+    expect(RouterUtils.resolveEffectiveRoute(viewRoute)).toBe(componentInjector.get(ActivatedRoute));
+  });
+
+  it('should resolve the effective child route', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
+          {
+            path: 'path',
+            children: [
+              {
+                path: 'to',
+                loadChildren: () => [
+                  {
+                    path: 'view',
+                    loadComponent: () => TestComponent,
+                  },
+                ],
+              },
+            ],
+          },
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+
+    // Get the top-level `ActivatedRoute` of the view.
+    const componentInjector = fixture.debugElement.query(By.directive(TestComponent)).injector;
+    const viewRoute = TestBed.inject(Router).routerState.root.children.find(route => route.outlet === 'view.100')!;
+
+    // Expect correct `ActivatedRoute`.
+    expect(RouterUtils.resolveEffectiveRoute(viewRoute)).toBe(componentInjector.get(ActivatedRoute));
+  });
+
+  it('should resolve the effective child outlet', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
+        provideRouter([
+          {
+            path: 'path',
+            children: [
+              {
+                path: 'to',
+                loadChildren: () => [
+                  {
+                    path: 'view',
+                    loadComponent: () => TestComponent,
+                  },
+                ],
+              },
+            ],
+          },
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+
+    // Get the top-level `OutletContext` of the view.
+    const componentInjector = fixture.debugElement.query(By.directive(TestComponent)).injector;
+    const outletContext = TestBed.inject(ChildrenOutletContexts).getContext('view.100');
+
+    // Expect correct `OutletContext`.
+    expect(RouterUtils.resolveEffectiveOutletContext(outletContext)!.outlet).toBe(componentInjector.get(RouterOutlet));
+  });
+});
+
+/**
+ * Resolves the effective route of given view.
+ */
+function resolveEffectiveRoute(viewId: ViewId): ActivatedRoute {
+  return RouterUtils.resolveEffectiveRoute(TestBed.inject(Router).routerState.root.children.find(route => route.outlet === viewId)!);
+}

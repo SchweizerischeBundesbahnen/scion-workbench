@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, EMPTY, Observable, switchMap} from 'rxjs';
-import {ChildrenOutletContexts, UrlSegment} from '@angular/router';
+import {BehaviorSubject, combineLatest, EMPTY, Observable, pairwise, switchMap} from 'rxjs';
+import {ActivatedRouteSnapshot, ActivationStart, ChildrenOutletContexts, Event, Router, RouterEvent, UrlSegment} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
-import {distinctUntilChanged, filter, map} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, startWith} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
@@ -39,13 +39,17 @@ import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
 import {ClassList} from '../common/class-list';
 import {ViewState} from '../routing/routing.model';
+import {RouterUtils} from '../routing/router.util';
+import {WorkbenchRouteData} from '../routing/workbench-route-data';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _router = inject(Router);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _childrenOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
@@ -87,6 +91,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.trackViewActivation();
     this.touchOnActivate();
     this.blockWhenDialogOpened();
+    this.detectRouteActivation();
   }
 
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
@@ -96,7 +101,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         // For each view, the workbench registers auxiliary routes of all top-level routes, enabling routing on a per-view basis.
         // But, if the workbench component itself is displayed in a router outlet, view outlets are not top-level outlets.
         // Therefore, we instruct the outlet to act as a top-level outlet to be the target of the registered top-level view routes.
-        {provide: ChildrenOutletContexts, useValue: inject(ChildrenOutletContexts)},
+        {provide: ChildrenOutletContexts, useValue: this._childrenOutletContexts},
         // Prevent injecting this part into the view because the view may be dragged to a different part.
         {provide: WorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchPart'`)},
         {provide: ɵWorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'ɵWorkbenchPart'`)},
@@ -105,7 +110,23 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
-   * Method invoked to update this workbench model object when the workbench layout changes.
+   * Method invoked when a route is about to be activated for this view.
+   */
+  private onRouteActivate(route: ActivatedRouteSnapshot): void {
+    this.title = RouterUtils.lookupRouteData(route, WorkbenchRouteData.title) ?? null;
+    this.heading = RouterUtils.lookupRouteData(route, WorkbenchRouteData.heading) ?? null;
+    this.dirty = false;
+    this.classList.set(RouterUtils.lookupRouteData(route, WorkbenchRouteData.cssClass), {scope: 'route'});
+    this.classList.remove({scope: 'application'});
+    this.classList.remove({scope: 'navigation'});
+  }
+
+  /**
+   * Method invoked when the workbench layout has changed.
+   *
+   * This method:
+   * - is called on every layout change, including changes not relevant for this view.
+   * - is called after successful navigation, i.e., after {@link onRouteActivate}.
    */
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
     const mPart = layout.part({viewId: this.id});
@@ -117,6 +138,15 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.classList.set(mView.cssClass, {scope: 'layout'});
     this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
     this._part$.next(this._partRegistry.get(mPart.id));
+  }
+
+  /**
+   * Returns the component of this view. Returns `null` if not navigated the view, or before it was activated for the first time.
+   */
+  public getComponent<T = unknown>(): T | null {
+    const outletContext = RouterUtils.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
+    const outlet = outletContext?.outlet;
+    return outlet?.isActivated ? outlet.component as T : null;
   }
 
   /** @inheritDoc */
@@ -331,6 +361,48 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this._workbenchDialogRegistry.top$({viewId: this.id})
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(this.blockedBy$);
+  }
+
+  /**
+   * Detects when to activate a route for this view.
+   *
+   * Listening for route activations on the view's router outlet is not sufficient,
+   * as the outlet does not report subsequent activations of nested child routes.
+   *
+   * Example:
+   * ```html
+   * <router-outlet #router_outlet="outlet"
+   *                (activate)="onActivateRoute(router_outlet.activatedRoute)">
+   * </router-outlet>
+   * ```
+   *
+   * Instead, we subscribe to Angular's `ActivationStart` router events and update the view properties accordingly.
+   */
+  private detectRouteActivation(): void {
+    const activatedOutletRoute = this._router.routerState.root.children.find(route => route.outlet === this.id);
+    const activatedChildRoute = activatedOutletRoute ? RouterUtils.resolveEffectiveRoute(activatedOutletRoute).snapshot : null;
+    // The view handle is constructed at the end of the navigation (see WorkbenchUrlObserver#onNavigationEnd), i.e., after the route has been activated.
+    // Therefore, we call `onRouteActivate` manually.
+    if (activatedChildRoute) {
+      this.onRouteActivate(activatedChildRoute);
+    }
+
+    this._router.events
+      .pipe(
+        filter((event: Event | RouterEvent): event is ActivationStart => event instanceof ActivationStart),
+        filter(event => event.snapshot.pathFromRoot[1]?.outlet === this.id),
+        map(event => event.snapshot),
+        startWith(activatedChildRoute!),
+        pairwise(),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe(([previous, current]: [ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]) => {
+        // Only call `onRouteActivate` if the activated route has changed.
+        // Otherwise, e.g., when changing matrix parameters, the view properties set by the application would be overwritten.
+        if (previous?.routeConfig !== current.routeConfig) {
+          this.onRouteActivate(current);
+        }
+      });
   }
 
   public destroy(): void {
