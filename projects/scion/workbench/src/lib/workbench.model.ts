@@ -14,18 +14,30 @@ import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPart} from './part/workbench-part.model';
 
 /**
- * Lifecycle hook that is called when a view component is to be destroyed, and which is called before 'ngOnDestroy'.
+ * Guard that a view can implement to decide whether it can be closed.
  *
- * The return value controls whether destruction should be continued.
+ * The following example implements a `CanClose` guard that asks the user whether the view can be closed.
+ *
+ * ```ts
+ * class ViewComponent implements CanClose {
+ *
+ *   public async canClose(): Promise<boolean> {
+ *     const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
+ *       actions: {yes: 'Yes', no: 'No'},
+ *     });
+ *     return action === 'yes';
+ *   }
+ * }
+ * ```
  */
-export interface WorkbenchViewPreDestroy {
+export interface CanClose {
 
   /**
-   * Lifecycle hook which is called upon view destruction.
+   * Decides whether this view can be closed.
    *
-   * Return a falsy value to prevent view destruction, either as a boolean value or as an observable which emits a boolean value.
+   * This function can call `inject` to get any required dependencies.
    */
-  onWorkbenchViewPreDestroy(): Observable<boolean> | Promise<boolean> | boolean;
+  canClose(): Observable<boolean> | Promise<boolean> | boolean;
 }
 
 /**

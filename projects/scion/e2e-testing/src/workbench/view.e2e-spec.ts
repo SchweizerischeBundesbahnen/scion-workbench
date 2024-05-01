@@ -14,6 +14,10 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {NavigationTestPagePO} from './page-object/test-pages/navigation-test-page.po';
+import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {MAIN_AREA} from '../workbench.model';
+import {WorkbenchNavigator} from './workbench-navigator';
+import {StartPagePO} from '../start-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -296,13 +300,135 @@ test.describe('Workbench View', () => {
     consoleLogs.clear();
   });
 
-  test('should allow to close the view', async ({appPO, workbenchNavigator}) => {
+  test('should close a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
     await viewPage.clickClose();
 
     await expect(appPO.views()).toHaveCount(0);
     await expectView(viewPage).not.toBeAttached();
+  });
+
+  test('should prevent closing a view', async ({appPO, page, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Prevent the view from closing.
+    await testeeViewPage.checkConfirmClosing(true);
+
+    // Close view via view tab (prevent).
+    await testeeViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Close view via WorkbenchView handle (prevent).
+    await testeeViewPage.clickClose();
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Close view via close keystroke (prevent).
+    await testeeViewPage.view.tab.click();
+    await page.keyboard.press('Control+K');
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Close all views via close keystroke (prevent).
+    await testeeViewPage.view.tab.click();
+    await page.keyboard.press('Control+Shift+Alt+K');
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Close view via router (prevent).
+    // Do not wait for the navigation to complete because the message box blocks navigation.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate([], {target: await testeeViewPage.view.getViewId(), close: true, waitForNavigation: false});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeInactive();
+
+    // Close all views via router (prevent).
+    // Do not wait for the navigation to complete because the message box blocks navigation.
+    await routerPage.navigate(['test-view'], {close: true, waitForNavigation: false});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeInactive();
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+    await canCloseMessageBox.clickActionButton('yes');
+    await expectView(testeeViewPage).not.toBeAttached();
+  });
+
+  test('should close confirmed views, leaving other views open', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testee1ViewPage.checkConfirmClosing(true); // prevent the view from closing
+
+    // Open test view 2.
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testee2ViewPage.checkConfirmClosing(true); // prevent the view from closing
+
+    // Open test view 3.
+    const testee3ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Close all views.
+    const contextMenu = await testee3ViewPage.view.tab.openContextMenu();
+    await contextMenu.menuItems.closeAll.click();
+
+    // Expect all views to still be opened.
+    await expect(appPO.views()).toHaveCount(3);
+
+    // Confirm closing view 1.
+    const canCloseMessageBox1 = appPO.messagebox({cssClass: ['e2e-close-view', await testee1ViewPage.view.getViewId()]});
+    await canCloseMessageBox1.clickActionButton('yes');
+
+    // Prevent closing view 2.
+    const canCloseMessageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', await testee2ViewPage.view.getViewId()]});
+    await canCloseMessageBox2.clickActionButton('no');
+
+    // Expect view 1 and view 3 to be closed.
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
+    await expectView(testee3ViewPage).not.toBeAttached();
+  });
+
+  test('should close view and log error if `CanClose` guard errors', async ({appPO, workbenchNavigator, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testee1ViewPage.checkConfirmClosing(true); // prevent the view from closing
+
+    // Open test view 2.
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testee2ViewPage.checkConfirmClosing(true); // prevent the view from closing
+
+    // Open test view 3.
+    const testee3ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Close all views.
+    const contextMenu = await testee3ViewPage.view.tab.openContextMenu();
+    await contextMenu.menuItems.closeAll.click();
+
+    // Expect all views to still be opened.
+    await expect(appPO.views()).toHaveCount(3);
+
+    // Simulate `CanClose` guard of view 1 to error.
+    const canCloseMessageBox1 = appPO.messagebox({cssClass: ['e2e-close-view', await testee1ViewPage.view.getViewId()]});
+    await canCloseMessageBox1.clickActionButton('error');
+
+    // Prevent closing view 2.
+    const canCloseMessageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', await testee2ViewPage.view.getViewId()]});
+    await canCloseMessageBox2.clickActionButton('no');
+
+    // Expect view 1 and view 3 to be closed.
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
+    await expectView(testee3ViewPage).not.toBeAttached();
+
+    await expect.poll(() => consoleLogs.contains({severity: 'error', message: /\[CanCloseSpecError] Error in CanLoad of view 'view\.1'\./})).toBe(true);
   });
 
   test(`should disable context menu 'Close tab' for 'non-closable' view`, async ({appPO, workbenchNavigator}) => {
@@ -343,6 +469,241 @@ test.describe('Workbench View', () => {
     // Expect view 2 not to be closed because not closable.
     await expect(appPO.views()).toHaveCount(1);
     await expectView(viewPage2).toBeActive();
+  });
+
+  /**
+   * Tests to unset the "markedForRemoval" flag after navigation, i.e., that a subsequent layout operation does not invoke the `CanClose` guard again.
+   */
+  test('should unset `markedForRemoval` flag after navigation', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view.
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Prevent the view from closing.
+    await testeeViewPage.checkConfirmClosing(true);
+
+    // Try closing the view.
+    await testeeViewPage.view.tab.close();
+
+    // Prevent closing the view.
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await canCloseMessageBox.clickActionButton('no');
+
+    // Expect view not to be closed.
+    await expectView(testeeViewPage).toBeActive();
+
+    // Perform navigation after prevented closing.
+    await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Expect `CanClose` guard not to be invoked.
+    await expect(appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]}).locator).not.toBeAttached();
+  });
+
+  test('should not invoke `CanClose` guard when dragging view in the same layout in the main area', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee1ViewId = await testee1ViewPage.view.getViewId();
+
+    // Open test view 2.
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee2ViewId = await testee2ViewPage.view.getViewId();
+
+    // Prevent the view from closing.
+    await testee2ViewPage.checkConfirmClosing(true);
+
+    // Test `CanClose` guard to be installed.
+    await testee2ViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testee2ViewPage).toBeActive();
+
+    // Drag view in the layout.
+    await testee2ViewPage.view.tab.dragTo({partId: await testee2ViewPage.view.part.getPartId(), region: 'east'});
+
+    // Expect `CanClose` guard not to be invoked.
+    await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
+
+    // Expect view to be dragged.
+    await expectView(testee2ViewPage).toBeActive();
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      mainAreaGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+          child2: new MPart({
+            views: [{id: testee2ViewId}],
+            activeViewId: testee2ViewId,
+          }),
+        }),
+      },
+    });
+  });
+
+  test('should not invoke `CanClose` guard when dragging view in the same layout into the peripheral area', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee1ViewId = await testee1ViewPage.view.getViewId();
+
+    // Open test view 2.
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee2ViewId = await testee2ViewPage.view.getViewId();
+
+    // Prevent the view from closing.
+    await testee2ViewPage.checkConfirmClosing(true);
+
+    // Test `CanClose` guard to be installed.
+    await testee2ViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testee2ViewPage).toBeActive();
+
+    // Drag view in the layout.
+    await testee2ViewPage.view.tab.dragTo({grid: 'workbench', region: 'east'});
+
+    // Expect `CanClose` guard not to be invoked.
+    await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
+
+    // Expect view to be dragged.
+    await expectView(testee2ViewPage).toBeActive();
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .8,
+          child1: new MPart({id: MAIN_AREA}),
+          child2: new MPart({
+            views: [{id: testee2ViewId}],
+            activeViewId: testee2ViewId,
+          }),
+        }),
+      },
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: testee1ViewId}],
+          activeViewId: testee1ViewId,
+        }),
+      },
+    });
+  });
+
+  test('should not invoke `CanClose` guard when dragging view to a new window', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee1ViewId = await testee1ViewPage.view.getViewId();
+
+    // Open test view 2.
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee2ViewId = await testee2ViewPage.view.getViewId();
+
+    // Prevent the view from closing.
+    await testee2ViewPage.checkConfirmClosing(true);
+
+    // Test `CanClose` guard to be installed.
+    await testee2ViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testee2ViewPage).toBeActive();
+
+    // Move view to new window
+    const newAppPO = await testee2ViewPage.view.tab.moveToNewWindow();
+    const newWindow = {
+      appPO: newAppPO,
+      workbenchNavigator: new WorkbenchNavigator(newAppPO),
+    };
+
+    // Expect `CanClose` guard not to be invoked.
+    await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
+
+    // Expect view to be moved to the new window.
+    await expect(newAppPO.workbench).toEqualWorkbenchLayout({
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: 'view.1'}],
+          activeViewId: 'view.1',
+        }),
+      },
+    });
+    await expectView(new ViewPagePO(newWindow.appPO, {viewId: 'view.1'})).toBeActive();
+
+    // Expect view to be removed from the origin window.
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: testee1ViewId}],
+          activeViewId: testee1ViewId,
+        }),
+      },
+    });
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).not.toBeAttached();
+  });
+
+  test('should not invoke `CanClose` guard when dragging view to another window', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open test view 1.
+    const testee1ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee1ViewId = await testee1ViewPage.view.getViewId();
+
+    // Open test view 2.
+    const testee2ViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    const testee2ViewId = await testee2ViewPage.view.getViewId();
+
+    // Prevent the view from closing.
+    await testee2ViewPage.checkConfirmClosing(true);
+
+    // Test `CanClose` guard to be installed.
+    await testee2ViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testee2ViewPage).toBeActive();
+
+    // Open new browser window.
+    const newAppPO = await appPO.openNewWindow();
+    await newAppPO.navigateTo({microfrontendSupport: false});
+
+    // Move view to new browser window.
+    const startPagePartId = (await new StartPagePO(newAppPO).getPartId())!;
+    await testee2ViewPage.view.tab.moveTo(startPagePartId, {
+      workbenchId: await newAppPO.getWorkbenchId(),
+    });
+
+    // Expect `CanClose` guard not to be invoked.
+    await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
+
+    // Expect view to be moved to the new window.
+    await expect(newAppPO.workbench).toEqualWorkbenchLayout({
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: 'view.1'}],
+          activeViewId: 'view.1',
+        }),
+      },
+    });
+    await expectView(new ViewPagePO(newAppPO, {viewId: 'view.1'})).toBeActive();
+
+    // Expect view to be removed from the origin window.
+    await expect(appPO.workbench).toEqualWorkbenchLayout({
+      mainAreaGrid: {
+        root: new MPart({
+          views: [{id: testee1ViewId}],
+          activeViewId: testee1ViewId,
+        }),
+      },
+    });
+    await expectView(testee1ViewPage).toBeActive();
+    await expectView(testee2ViewPage).not.toBeAttached();
   });
 
   test('should detach view if not active', async ({appPO, workbenchNavigator}) => {

@@ -9,10 +9,9 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
-import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {segments} from '../testing/testing.util';
@@ -45,7 +44,7 @@ describe('WorkbenchGridMerger', () => {
 
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base
-        .removeView('view.2')
+        .removeView('view.2', {force: true})
         .addView('view.100', {partId: 'topLeft'})
         .navigateView('view.100', ['path/to/view/100'])
         .navigateView('view.1', ['PATH/TO/VIEW/1']),
@@ -110,13 +109,13 @@ describe('WorkbenchGridMerger', () => {
 
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base
-        .removeView('view.2')
+        .removeView('view.2', {force: true})
         .addView('view.100', {partId: 'topLeft'})
         .navigateView('view.100', ['path/to/view/100'])
         .navigateView('view.3', ['path/to/view/3']),
       base,
       remote: base
-        .removeView('view.1')
+        .removeView('view.1', {force: true})
         .addView('view.100', {partId: 'bottomLeft'})
         .navigateView('view.100', ['PATH/TO/VIEW/100']),
     });

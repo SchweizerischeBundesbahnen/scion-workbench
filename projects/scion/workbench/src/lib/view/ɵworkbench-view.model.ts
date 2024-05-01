@@ -22,7 +22,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, inject, Type} from '@angular/core';
+import {AbstractType, inject, Injector, Type} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -41,6 +41,7 @@ import {ClassList} from '../common/class-list';
 import {ViewState} from '../routing/routing.model';
 import {RouterUtils} from '../routing/router.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
+import {UUID} from '../common/uuid.util';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -64,6 +65,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private _activationInstant: number | undefined;
   private _closable = true;
 
+  public uid!: UUID;
   public alternativeId: string | undefined;
   public navigationHint: string | undefined;
   public urlSegments: UrlSegment[] = [];
@@ -131,6 +133,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
     const mPart = layout.part({viewId: this.id});
     const mView = layout.view({viewId: this.id});
+    this.uid = mView.uid;
     this.alternativeId = mView.alternativeId;
     this.urlSegments = layout.urlSegments({viewId: this.id});
     this.navigationHint = mView.navigation?.hint;
@@ -147,6 +150,14 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     const outletContext = RouterUtils.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
     const outlet = outletContext?.outlet;
     return outlet?.isActivated ? outlet.component as T : null;
+  }
+
+  /**
+   * Returns the injector of the component. Returns `null` if not navigated the view, or before it was activated for the first time.
+   */
+  public getComponentInjector(): Injector | null {
+    const outletContext = RouterUtils.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
+    return outletContext?.injector ?? null;
   }
 
   /** @inheritDoc */

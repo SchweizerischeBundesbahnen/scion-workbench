@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRouteSnapshot, CanDeactivateFn, CanMatchFn} from '@angular/router';
+import {CanMatchFn} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
-import {WorkbenchViewPreDestroy} from '../workbench.model';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-routes-registrator.service';
 
 /**
@@ -82,30 +81,3 @@ export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
   const view = layout.view({viewId: outlet}, {orElse: null});
   return !view || !!view.navigation;
 };
-
-/**
- * Prevents deactivation of the view if prevented by the view component.
- */
-export const canDeactivateView: CanDeactivateFn<unknown> = ((component: unknown | null, route: ActivatedRouteSnapshot) => {
-  const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
-
-  if (!WorkbenchLayouts.isViewId(outlet)) {
-    throw Error(`[ViewError] CanDeactivateFn must be installed on a view auxiliary route. [outlet=${outlet}]`);
-  }
-
-  // Test if the view component implements `onWorkbenchViewPreDestroy`.
-  const viewComponent = component as WorkbenchViewPreDestroy;
-  if (typeof viewComponent?.onWorkbenchViewPreDestroy !== 'function') {
-    return true;
-  }
-
-  // Depending on the route configuration, this guard may be called even if the component is not to be closed.
-  // Therefore, we need to check if the view is actually being closed before invoking the `onWorkbenchViewPreDestroy`
-  // lifecycle hook. See {@link Route.runGuardsAndResolvers}.
-  const isToBeClosed = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layoutDiff.removedViews.includes(outlet) ?? false;
-  if (!isToBeClosed) {
-    return true;
-  }
-
-  return viewComponent.onWorkbenchViewPreDestroy();
-});

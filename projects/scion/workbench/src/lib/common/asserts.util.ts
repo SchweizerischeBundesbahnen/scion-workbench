@@ -13,7 +13,7 @@ export function assertType(object: any, assert: {toBeOneOf: Type<any>[] | Type<a
   if (object === undefined) {
     throw Error(`[AssertError] Object must not be 'undefined'.`);
   }
-  if (!Arrays.coerce(assert.toBeOneOf).includes(object.constructor)) {
+  if (!Arrays.coerce(assert.toBeOneOf).some(expectedType => object instanceof expectedType)) {
     const expectedType = Arrays.coerce(assert.toBeOneOf).map(it => it.name).join(' or ');
     const actualType = object.constructor.name;
     throw Error(`[AssertError] Object not of the expected type [expected=${expectedType}, actual=${actualType}].`);

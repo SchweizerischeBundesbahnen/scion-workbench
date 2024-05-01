@@ -9,7 +9,7 @@
  */
 
 import {InjectionToken} from '@angular/core';
-import {UUID} from '@scion/toolkit/uuid';
+import {randomUUID} from './common/uuid.util';
 
 /**
  * DI token to get a unique id of the workbench.
@@ -18,5 +18,5 @@ import {UUID} from '@scion/toolkit/uuid';
  */
 export const WORKBENCH_ID = new InjectionToken<string>('WORKBENCH_ID', {
   providedIn: 'root',
-  factory: () => UUID.randomUUID(),
+  factory: () => randomUUID(),
 });

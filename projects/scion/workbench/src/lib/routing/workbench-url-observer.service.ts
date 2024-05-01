@@ -33,7 +33,7 @@ import {RouterUtils} from './router.util';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
-import {canDeactivateView, canMatchNotFoundPage} from '../view/workbench-view-route-guards';
+import {canMatchNotFoundPage} from '../view/workbench-view-route-guards';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -160,7 +160,6 @@ export class WorkbenchUrlObserver {
 
     const registeredRoutes = this._auxiliaryRoutesRegistrator.registerAuxiliaryRoutes(addedViews, {
       canMatchNotFoundPage: [canMatchNotFoundPage],
-      canDeactivate: [canDeactivateView],
     });
     if (registeredRoutes.length) {
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViews}`, LoggerNames.ROUTING, registeredRoutes);

@@ -9,7 +9,7 @@
  */
 import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
 import {assertType} from '../common/asserts.util';
-import {UUID} from '@scion/toolkit/uuid';
+import {randomUUID, UUID} from '../common/uuid.util';
 import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
@@ -272,12 +272,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param findBy.partId - Searches for views contained in the specified part.
    * @param findBy.segments - Searches for views navigated to the specified URL.
    * @param findBy.navigationHint - Searches for views navigated with given hint. Passing `null` searches for views navigated without a hint.
+   * @param findBy.markedForRemoval - Searches for views marked (or not marked) for removal.
    * @param findBy.grid - Searches for views contained in the specified grid.
    * @param options - Controls the search.
    * @param options.orElse - Controls to error if no view is found.
    * @return views matching the filter criteria.
    */
-  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; grid?: keyof Grids}, options?: {orElse: 'throwError'}): readonly MView[] {
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof Grids}, options?: {orElse: 'throwError'}): readonly MView[] {
     const views = this.parts({grid: findBy?.grid})
       .filter(part => {
         if (findBy?.partId !== undefined && part.id !== findBy.partId) {
@@ -296,6 +297,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         if (findBy?.navigationHint !== undefined && findBy.navigationHint !== (view.navigation?.hint ?? null)) {
           return false;
         }
+        if (findBy?.markedForRemoval !== undefined && findBy.markedForRemoval !== (view.markedForRemoval ?? false)) {
+          return false;
+        }
         return true;
       });
 
@@ -311,10 +315,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     if (WorkbenchLayouts.isViewId(id)) {
-      workingCopy.__addView({id}, options);
+      workingCopy.__addView({id, uid: randomUUID()}, options);
     }
     else {
-      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id}, options);
+      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id, uid: randomUUID()}, options);
     }
     return workingCopy;
   }
@@ -330,10 +334,27 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   /**
    * @inheritDoc
+   *
+   * @param id - @inheritDoc
+   * @param options - Controls removal of the view.
+   * @param options.force - Specifies whether to force remove the view, bypassing `CanClose` guard.
    */
-  public removeView(id: string, options?: {grid?: keyof Grids}): ɵWorkbenchLayout {
+  public removeView(id: string, options?: {force?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__removeView(view, {grid: options?.grid}));
+    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__removeView(view, {force: options?.force}));
+    return workingCopy;
+  }
+
+  /**
+   * Removes views marked for removal, optionally invoking the passed `CanClose` function to decide whether to remove a view.
+   */
+  public async removeViewsMarkedForRemoval(canCloseFn?: (viewUid: UUID) => Promise<boolean> | boolean): Promise<ɵWorkbenchLayout> {
+    const workingCopy = this.workingCopy();
+    for (const view of workingCopy.views({markedForRemoval: true})) {
+      if (!canCloseFn || await canCloseFn(view.uid)) {
+        workingCopy.__removeView(view, {force: true});
+      }
+    }
     return workingCopy;
   }
 
@@ -424,7 +445,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const newPart = new MPart({id, structural: options?.structural ?? true});
+    const newPart = new MPart({id, structural: options?.structural ?? true, views: []});
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
     const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.workbenchGrid.root;
@@ -433,7 +454,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Create a new tree node.
     const newTreeNode: MTreeNode = new MTreeNode({
-      nodeId: UUID.randomUUID(),
+      nodeId: randomUUID(),
       child1: addBefore ? newPart : referenceElement,
       child2: addBefore ? referenceElement : newPart,
       direction: relativeTo.align === 'left' || relativeTo.align === 'right' ? 'row' : 'column',
@@ -567,7 +588,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Move the view.
     if (sourcePart !== targetPart) {
-      this.__removeView(view, {removeOutlet: false, removeState: false});
+      this.__removeView(view, {removeOutlet: false, removeState: false, force: true});
       this.__addView(view, {partId: targetPartId, position: options?.position});
     }
     else if (options?.position !== undefined) {
@@ -589,8 +610,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removeView(view: MView, options?: {grid?: keyof Grids; removeOutlet?: false; removeState?: false}): void {
-    const part = this.part({viewId: view.id, grid: options?.grid});
+  private __removeView(view: MView, options?: {removeOutlet?: false; removeState?: false; force?: boolean}): void {
+    if (!options?.force) {
+      view.markedForRemoval = true;
+      return;
+    }
+
+    const part = this.part({viewId: view.id});
 
     // Remove view.
     part.views.splice(part.views.indexOf(view), 1);
@@ -792,8 +818,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private workingCopy(): ɵWorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, {includeNodeId: true}),
-      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea, {includeNodeId: true}),
+      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, {includeNodeId: true, includeUid: true, includeMarkedForRemovalFlag: true}),
+      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea, {includeNodeId: true, includeUid: true, includeMarkedForRemovalFlag: true}),
       viewOutlets: Object.fromEntries(this._viewOutlets),
       viewStates: Object.fromEntries(this._viewStates),
       maximized: this._maximized,
@@ -806,7 +832,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
  */
 function createDefaultWorkbenchGrid(): MPartGrid {
   return {
-    root: new MPart({id: MAIN_AREA, structural: true}),
+    root: new MPart({id: MAIN_AREA, structural: true, views: []}),
     activePartId: MAIN_AREA,
   };
 }
@@ -818,7 +844,7 @@ function createDefaultWorkbenchGrid(): MPartGrid {
  */
 function createInitialMainAreaGrid(): MPartGrid {
   return {
-    root: new MPart({id: inject(MAIN_AREA_INITIAL_PART_ID)}),
+    root: new MPart({id: inject(MAIN_AREA_INITIAL_PART_ID), structural: false, views: []}),
     activePartId: inject(MAIN_AREA_INITIAL_PART_ID),
   };
 }
@@ -928,7 +954,7 @@ export interface ReferenceElement extends ReferencePart {
  */
 export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<string>('MAIN_AREA_INITIAL_PART_ID', {
   providedIn: 'root',
-  factory: () => UUID.randomUUID(),
+  factory: () => randomUUID(),
 });
 
 /**

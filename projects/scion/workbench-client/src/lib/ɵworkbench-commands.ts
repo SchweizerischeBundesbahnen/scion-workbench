@@ -50,11 +50,17 @@ export const ɵWorkbenchCommands = {
   viewActiveTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/active`,
 
   /**
-   * Computes the topic for signaling that a view is about to be closed.
+   * Computes the topic to request closing confirmation of a view.
    *
-   * Just before closing the view and if the microfrontend has subscribed to this topic, the workbench requests
-   * a closing confirmation via this topic. By sending a `true` reply, the workbench continues with closing the view,
-   * by sending a `false` reply, closing is prevented.
+   * When closing a view and if the microfrontend has subscribed to this topic, the workbench requests closing confirmation
+   * via this topic. By sending a `true` reply, the workbench continues with closing the view, by sending a `false` reply,
+   * closing is prevented.
+   */
+  canCloseTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/canClose`,
+  /**
+   * TODO [Angular 20] Remove legacy topic.
+   *
+   * @deprecated since version 17.0.0-beta.8; Use `canCloseTopic` instead.
    */
   viewClosingTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/closing`,
 

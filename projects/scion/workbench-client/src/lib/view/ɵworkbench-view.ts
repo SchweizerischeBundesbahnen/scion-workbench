@@ -1,4 +1,4 @@
-/*
+  /*
  * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
@@ -9,14 +9,14 @@
  */
 
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
-import {merge, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
+import {firstValueFrom, merge, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
-import {ManifestService, mapToBody, Message, MessageClient, MessageHeaders, MicrofrontendPlatformClient, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {ManifestService, mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
-import {ViewClosingEvent, ViewClosingListener, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {CanClose, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
@@ -32,8 +32,8 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
    * Observable that emits before navigating to a different microfrontend of the same app.
    */
   private _beforeInAppNavigation$ = new Subject<void>();
-  private _closingListeners = new Set<ViewClosingListener>();
-  private _closingSubscription: Subscription | undefined;
+  private _canCloseGuards = new Set<CanClose>();
+  private _canCloseSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
   public params$: Observable<ReadonlyMap<string, any>>;
@@ -45,7 +45,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   constructor(public id: ViewId) {
     this._beforeUnload$ = Beans.get(MessageClient).observe$<void>(ɵWorkbenchCommands.viewUnloadingTopic(this.id))
-      .pipe(map(() => undefined));
+      .pipe(map(() => undefined), shareReplay({refCount: false, bufferSize: 1}));
 
     this.params$ = Beans.get(MessageClient).observe$<Map<string, any>>(ɵWorkbenchCommands.viewParamsTopic(this.id))
       .pipe(
@@ -84,8 +84,15 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       )
       .subscribe(() => {
         this._beforeInAppNavigation$.next();
-        this._closingListeners.clear();
-        this._closingSubscription?.unsubscribe();
+        this._canCloseGuards.clear();
+        this._canCloseSubscription?.unsubscribe();
+      });
+
+    // Detect navigation to a different view capability of another app.
+    this._beforeUnload$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(() => {
+        this._canCloseSubscription?.unsubscribe();
       });
   }
 
@@ -162,60 +169,38 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   /**
    * @inheritDoc
    */
-  public addClosingListener(listener: ViewClosingListener): void {
-    if (!this._closingListeners.has(listener) && this._closingListeners.add(listener).size === 1) {
-      // Subscribe to the closing event lazily when registering the first listener, so that the workbench only has to ask for a
-      // closing confirmation if a listener is actually installed.
-      this._closingSubscription = this.installClosingHandler();
+  public addCanClose(canClose: CanClose): void {
+    // Subscribe to `CanClose` requests lazily when registering the first guard.
+    // The workbench will only invoke this guard if a guard is installed.
+    if (!this._canCloseGuards.has(canClose) && this._canCloseGuards.add(canClose).size === 1) {
+      this._canCloseSubscription = Beans.get(MessageClient).onMessage(ɵWorkbenchCommands.canCloseTopic(this.id), () => this.canClose());
     }
   }
 
   /**
    * @inheritDoc
    */
-  public removeClosingListener(listener: ViewClosingListener): void {
-    if (this._closingListeners.delete(listener) && this._closingListeners.size === 0) {
-      this._closingSubscription?.unsubscribe();
-      this._closingSubscription = undefined;
+  public removeCanClose(canClose: CanClose): void {
+    if (this._canCloseGuards.delete(canClose) && this._canCloseGuards.size === 0) {
+      this._canCloseSubscription?.unsubscribe();
+      this._canCloseSubscription = undefined;
     }
   }
 
   /**
-   * Installs a handler to be invoked by the workbench before closing this view.
+   * Decides whether this view can be closed.
    */
-  private installClosingHandler(): Subscription {
-    return Beans.get(MessageClient).observe$(ɵWorkbenchCommands.viewClosingTopic(this.id))
-      .pipe(
-        switchMap(async (closeRequest: Message) => {
-          // Do not move the publishing of the response to a subsequent handler, because the subscription gets canceled when the last closing listener unsubscribes.
-          // See {@link removeClosingListener}. For example, if the listener unsubscribes immediately after handled prevention, subsequent handlers of this Observable
-          // chain would not be called, and neither would the subscribe handler.
-          const preventViewClosing = await this.isViewClosingPrevented();
-          const replyTo = closeRequest.headers.get(MessageHeaders.ReplyTo);
-          await Beans.get(MessageClient).publish(replyTo, !preventViewClosing, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
-        }),
-        takeUntil(merge(this._beforeUnload$, this._destroy$)),
-      )
-      .subscribe();
-  }
-
-  /**
-   * Lets registered listeners prevent this view from closing.
-   *
-   * @return Promise that resolves to `true` if at least one listener prevents closing, or that resolves to `false` otherwise.
-   */
-  private async isViewClosingPrevented(): Promise<boolean> {
-    for (const listener of this._closingListeners) {
-      const event = new ViewClosingEvent();
-      await listener.onClosing(event);
-      if (event.isDefaultPrevented()) {
-        return true;
+  private async canClose(): Promise<boolean> {
+    for (const guard of this._canCloseGuards) {
+      if (!await firstValueFrom(Observables.coerce(guard.canClose()), {defaultValue: true})) {
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   public preDestroy(): void {
+    this._canCloseSubscription?.unsubscribe();
     this._destroy$.next();
   }
 }

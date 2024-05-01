@@ -109,6 +109,13 @@ export class AppPO {
   }
 
   /**
+   * Opens a new browser window.
+   */
+  public async openNewWindow(): Promise<AppPO> {
+    return new AppPO(await this.page.context().newPage());
+  }
+
+  /**
    * Instructs the browser to move back one page in the session history.
    */
   public async navigateBack(): Promise<void> {

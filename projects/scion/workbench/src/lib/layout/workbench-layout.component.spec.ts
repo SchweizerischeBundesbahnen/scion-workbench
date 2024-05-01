@@ -11,7 +11,7 @@
 import {TestBed} from '@angular/core/testing';
 import {provideRouter, Router, RouterOutlet} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {toBeRegisteredCustomMatcher} from '../testing/jasmine/matcher/to-be-registered.matcher';
 import {WorkbenchLayoutComponent} from './workbench-layout.component';
 import {Component} from '@angular/core';
@@ -22,7 +22,6 @@ import {MAIN_AREA} from './workbench-layout';
 import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
 import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
 import {segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {MPart, MTreeNode} from './workbench-layout.model';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../workbench-id';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';

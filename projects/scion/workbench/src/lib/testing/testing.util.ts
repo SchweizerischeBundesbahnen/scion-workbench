@@ -11,7 +11,7 @@
 import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
 import {ApplicationRef, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
-import {firstValueFrom} from 'rxjs';
+import {animationFrameScheduler, firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {filter} from 'rxjs/operators';
@@ -44,6 +44,13 @@ export async function waitForInitialWorkbenchLayout(): Promise<void> {
  */
 export async function waitUntilStable(): Promise<void> {
   await firstValueFrom(TestBed.inject(ApplicationRef).isStable.pipe(filter(Boolean)));
+}
+
+/**
+ * Waits until all elapsed macrotasks (setTimeout) have been executed.
+ */
+export async function flushMacrotasks(): Promise<void> {
+  return new Promise<void>(resolve => animationFrameScheduler.schedule(() => setTimeout(resolve)));
 }
 
 /**
@@ -80,4 +87,11 @@ export function clickElement(appFixture: ComponentFixture<any>, viewType: Type<a
  */
 export function segments(commands: Commands): UrlSegment[] {
   return TestBed.runInInjectionContext(() => RouterUtils.commandsToSegments(commands));
+}
+
+/**
+ * Alias for {@link jasmine.anything}, but casts to the expected type.
+ */
+export function anything<T>(): T {
+  return jasmine.anything() as unknown as T;
 }

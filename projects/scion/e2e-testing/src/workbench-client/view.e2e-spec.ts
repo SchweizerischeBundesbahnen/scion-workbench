@@ -191,7 +191,7 @@ test.describe('Workbench View', () => {
     await expect(viewPage.view.tab.closeButton).not.toBeVisible();
   });
 
-  test('should allow closing the view', async ({appPO, microfrontendNavigator}) => {
+  test('should close a view', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
     const viewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
@@ -205,7 +205,7 @@ test.describe('Workbench View', () => {
     await expectView(viewPage).not.toBeAttached();
   });
 
-  test('should allow preventing the view from closing', async ({appPO, microfrontendNavigator}) => {
+  test('should prevent closing a view', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
@@ -215,7 +215,7 @@ test.describe('Workbench View', () => {
     // prevent the view from closing
     await testeeViewPage.checkConfirmClosing(true);
 
-    // try closing the view
+    // try closing the view via view tab.
     await testeeViewPage.view.tab.close();
     const messageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
     await messageBox.clickActionButton('no');
@@ -223,14 +223,14 @@ test.describe('Workbench View', () => {
     // expect the view not to be closed
     await expectView(testeeViewPage).toBeActive();
 
-    // try closing the view
+    // try closing the view via handle.
     await testeeViewPage.clickClose();
     await messageBox.clickActionButton('no');
 
     // expect the view not to be closed
     await expectView(testeeViewPage).toBeActive();
 
-    // try closing the view
+    // close the view
     await testeeViewPage.view.tab.close();
     await messageBox.clickActionButton('yes');
 
@@ -238,7 +238,7 @@ test.describe('Workbench View', () => {
     await expectView(testeeViewPage).not.toBeAttached();
   });
 
-  test('should only close confirmed views, leaving other views open', async ({appPO, microfrontendNavigator}) => {
+  test('should close confirmed views, leaving other views open', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
@@ -253,7 +253,6 @@ test.describe('Workbench View', () => {
 
     // open test view 3
     const testee3ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    await testee3ViewPage.checkConfirmClosing(true); // prevent the view from closing
 
     // open context menu of viewtab 3
     const contextMenu = await testee3ViewPage.view.tab.openContextMenu();
@@ -261,36 +260,62 @@ test.describe('Workbench View', () => {
     // click to close all tabs
     await contextMenu.menuItems.closeAll.click();
 
-    // expect all views being still open
+    // expect all views to be opened
     await expect(appPO.views()).toHaveCount(3);
 
     // confirm closing view 1
     const messageBox1 = appPO.messagebox({cssClass: ['e2e-close-view', await testee1ViewPage.view.getViewId()]});
     await messageBox1.clickActionButton('yes');
 
-    // expect view 1 being closed
-    await expect(appPO.views()).toHaveCount(2);
+    // prevent closing view 2
+    const messageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', await testee2ViewPage.view.getViewId()]});
+    await messageBox2.clickActionButton('no');
+
+    // expect view 1 and view 3 to be closed.
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
+    await expectView(testee3ViewPage).not.toBeAttached();
+  });
+
+  test('should close view and log error if `CanClose` guard throws an error', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+    // open test view 1
+    const testee1ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    await testee1ViewPage.checkConfirmClosing(true); // prevent the view from closing
+
+    // open test view 2
+    const testee2ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    await testee2ViewPage.checkConfirmClosing(true); // prevent the view from closing
+
+    // open test view 3
+    const testee3ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+
+    // open context menu of viewtab 3
+    const contextMenu = await testee3ViewPage.view.tab.openContextMenu();
+
+    // click to close all tabs
+    await contextMenu.menuItems.closeAll.click();
+
+    // expect all views to be opened
+    await expect(appPO.views()).toHaveCount(3);
+
+    // simulate view 1 to throw error
+    const messageBox1 = appPO.messagebox({cssClass: ['e2e-close-view', await testee1ViewPage.view.getViewId()]});
+    await messageBox1.clickActionButton('error');
 
     // prevent closing view 2
     const messageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', await testee2ViewPage.view.getViewId()]});
     await messageBox2.clickActionButton('no');
 
-    // expect view 2 being still open
-    await expect(appPO.views()).toHaveCount(2);
-
-    // confirm closing view 3
-    const messageBox3 = appPO.messagebox({cssClass: ['e2e-close-view', await testee3ViewPage.view.getViewId()]});
-    await messageBox3.clickActionButton('yes');
-
-    // expect view 3 to be closed
-    await expect(appPO.views()).toHaveCount(1);
+    // expect view 1 and view 3 to be closed.
+    await expectView(testee1ViewPage).not.toBeAttached();
+    await expectView(testee2ViewPage).toBeActive();
     await expectView(testee3ViewPage).not.toBeAttached();
 
-    // expect view 2 not to be closed and active
-    await expectView(testee2ViewPage).toBeActive();
-
-    // expect view 1 to be closed
-    await expectView(testee1ViewPage).not.toBeAttached();
+    await expect.poll(() => consoleLogs.contains({severity: 'error', message: /\[CanCloseSpecError] Error in CanLoad of view 'view\.1'\./})).toBe(true);
   });
 
   test('should activate viewtab when switching between tabs', async ({appPO, microfrontendNavigator}) => {
@@ -329,7 +354,7 @@ test.describe('Workbench View', () => {
     expect(activeViewSize).toEqual(inactiveViewSize);
   });
 
-  test('should not confirm closing when switching between viewtabs', async ({appPO, microfrontendNavigator}) => {
+  test('should not invoke `CanClose` guard when switching between viewtabs', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});

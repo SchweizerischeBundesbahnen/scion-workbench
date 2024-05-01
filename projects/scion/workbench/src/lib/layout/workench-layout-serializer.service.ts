@@ -10,13 +10,14 @@
 
 import {inject, Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
-import {UUID} from '@scion/toolkit/uuid';
 import {ViewOutlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration-v2.service';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
 import {ViewId} from '../view/workbench-view.model';
+import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
+import {randomUUID} from '../common/uuid.util';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -26,7 +27,8 @@ export class WorkbenchLayoutSerializer {
 
   private _workbenchLayoutMigrator = new WorkbenchMigrator()
     .registerMigration(1, inject(WorkbenchLayoutMigrationV2))
-    .registerMigration(2, inject(WorkbenchLayoutMigrationV3));
+    .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
+    .registerMigration(3, inject(WorkbenchLayoutMigrationV4));
 
   /**
    * Serializes the given grid into a URL-safe base64 string.
@@ -34,10 +36,12 @@ export class WorkbenchLayoutSerializer {
    * @param grid - Specifies the grid to be serialized.
    * @param options - Controls the serialization.
    * @param options.includeNodeId - Controls if to include the `nodeId`. By default, if not set, the `nodeId` is excluded from serialization.
+   * @param options.includeUid - Controls if to include the view `uid`. By default, if not set, the `uid` is excluded from serialization.
+   * @param options.includeMarkRemovedFlag - Controls if to include the `markedForRemoval` flag. By default, if not set, the `markedForRemoval` is excluded from serialization.
    */
-  public serializeGrid(grid: MPartGrid, options?: {includeNodeId?: boolean}): string;
-  public serializeGrid(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean}): null | string;
-  public serializeGrid(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean}): string | null {
+  public serializeGrid(grid: MPartGrid, options?: {includeNodeId?: boolean; includeUid?: boolean; includeMarkedForRemovalFlag?: boolean}): string;
+  public serializeGrid(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean; includeUid?: boolean; includeMarkedForRemovalFlag?: boolean}): null | string;
+  public serializeGrid(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean; includeUid?: boolean; includeMarkedForRemovalFlag?: boolean}): string | null {
     if (grid === null || grid === undefined) {
       return null;
     }
@@ -45,6 +49,12 @@ export class WorkbenchLayoutSerializer {
     const transientFields = new Set<string>(TRANSIENT_FIELDS);
     if (!options?.includeNodeId) {
       transientFields.add('nodeId');
+    }
+    if (!options?.includeUid) {
+      transientFields.add('uid');
+    }
+    if (!options?.includeMarkedForRemovalFlag) {
+      transientFields.add('markedForRemoval');
     }
 
     const json = JSON.stringify(grid, (key, value) => {
@@ -64,10 +74,11 @@ export class WorkbenchLayoutSerializer {
     // Parse the JSON.
     const grid: MPartGrid = JSON.parse(migratedJsonGrid, (key, value) => {
       if (MPart.isMPart(value)) {
-        return new MPart(value); // create a class object from the object literal
+        const views = value.views.map(view => ({...view, uid: view.uid ?? randomUUID()}));
+        return new MPart({...value, views}); // create a class object from the object literal
       }
       if (MTreeNode.isMTreeNode(value)) {
-        return new MTreeNode({...value, nodeId: value.nodeId ?? UUID.randomUUID()}); // create a class object from the object literal
+        return new MTreeNode({...value, nodeId: value.nodeId ?? randomUUID()}); // create a class object from the object literal
       }
       return value;
     });
@@ -115,7 +126,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 3;
+export const WORKBENCH_LAYOUT_VERSION = 4;
 
 /**
  * Fields not serialized into JSON representation.

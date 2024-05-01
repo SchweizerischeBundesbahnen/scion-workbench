@@ -54,11 +54,15 @@
   </sci-form-field>
 
   <sci-form-field label="Dirty">
-    <sci-checkbox [(ngModel)]="view.dirty" class="e2e-dirty"></sci-checkbox>
+    <sci-checkbox [(ngModel)]="view.dirty" class="e2e-dirty"/>
   </sci-form-field>
 
   <sci-form-field label="Closable">
-    <sci-checkbox [(ngModel)]="view.closable" class="e2e-closable"></sci-checkbox>
+    <sci-checkbox [(ngModel)]="view.closable" class="e2e-closable"/>
+  </sci-form-field>
+
+  <sci-form-field label="Confirm Closing">
+    <sci-checkbox [formControl]="formControls.confirmClosing" class="e2e-confirm-closing"/>
   </sci-form-field>
 
   <sci-form-field label="CSS Class(es)">

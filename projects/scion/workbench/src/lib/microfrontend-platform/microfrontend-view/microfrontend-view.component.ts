@@ -10,13 +10,13 @@
 
 import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, ViewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
-import {combineLatest, EMPTY, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
-import {catchError, first, map, takeUntil} from 'rxjs/operators';
+import {combineLatest, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
+import {first, map, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchViewPreDestroy} from '../../workbench.model';
+import {CanClose} from '../../workbench.model';
 import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -56,7 +56,7 @@ import {Objects} from '../../common/objects.util';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
-export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchViewPreDestroy {
+export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
 
   private _unsubscribeParamsUpdater$ = new Subject<void>();
   private _universalKeystrokes = [
@@ -248,23 +248,18 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, WorkbenchV
     await firstValueFrom(viewParams$);
   }
 
-  /**
-   * Method invoked just before closing this view.
-   *
-   * If the embedded microfrontend has a listener installed to be notified when closing this view,
-   * initiates a request-reply communication, allowing the microfrontend to prevent this view from closing.
-   */
-  public async onWorkbenchViewPreDestroy(): Promise<boolean> {
-    const closingTopic = ɵWorkbenchCommands.viewClosingTopic(this.view.id);
+  /** @inheritDoc */
+  public async canClose(): Promise<boolean> {
+    const canCloseTopic = ɵWorkbenchCommands.canCloseTopic(this.view.id);
+    const legacyCanCloseTopic = ɵWorkbenchCommands.viewClosingTopic(this.view.id);
 
-    // Allow the microfrontend to prevent this view from closing.
-    const count = await firstValueFrom(this._messageClient.subscriberCount$(closingTopic));
-    if (count === 0) {
+    // Initiate a request-response communication only if the embedded microfrontend implements `CanClose` guard.
+    const hasCanCloseGuard = await firstValueFrom(this._messageClient.subscriberCount$(canCloseTopic)) > 0;
+    const hasLegacyCanCloseGuard = await firstValueFrom(this._messageClient.subscriberCount$(legacyCanCloseTopic)) > 0;
+    if (!hasCanCloseGuard && !hasLegacyCanCloseGuard) {
       return true;
     }
-
-    const doit = this._messageClient.request$<boolean>(closingTopic).pipe(mapToBody(), catchError(() => EMPTY));
-    return firstValueFrom(doit, {defaultValue: true});
+    return firstValueFrom(this._messageClient.request$<boolean>(hasCanCloseGuard ? canCloseTopic : legacyCanCloseTopic).pipe(mapToBody()), {defaultValue: true});
   }
 
   public onFocusWithin(event: Event): void {

@@ -40,6 +40,10 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this.locator.locator('button.e2e-router-navigate').click();
 
+    if (!(extras?.waitForNavigation ?? true)) {
+      return;
+    }
+
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
       waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
@@ -124,6 +128,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
 
 export interface RouterPageOptions {
   viewContextActive?: boolean;
+  waitForNavigation?: false;
 }
 
 export interface RouterLinkPageOptions {
