@@ -14,6 +14,7 @@ import {inject, Injector} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../../layout/workbench-layouts.util';
+import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 
 /**
  * Provides functions and constants specific to microfrontend routes.
@@ -47,15 +48,19 @@ export const MicrofrontendViewRoutes = {
     const injector = inject(Injector);
 
     return (segments: UrlSegment[], group: UrlSegmentGroup, route: Route): UrlMatchResult | null => {
-      if (!WorkbenchLayouts.isViewId(route.outlet)) {
-        return null;
-      }
+      // Test if the path matches.
       if (!MicrofrontendViewRoutes.isMicrofrontendRoute(segments)) {
         return null;
       }
 
+      // Test if navigating a view.
+      const outlet = route.data?.[WorkbenchRouteData.ɵoutlet];
+      if (!WorkbenchLayouts.isViewId(outlet)) {
+        return null;
+      }
+
       const {layout} = injector.get(ɵWorkbenchRouter).getCurrentNavigationContext();
-      const viewState = layout.viewState({viewId: route.outlet});
+      const viewState = layout.viewState({viewId: outlet});
       const transientParams = viewState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
       const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);
 

@@ -29,4 +29,15 @@ export const WorkbenchRouteData = {
    * Property to associate CSS class(es) with a view in {@link Route.data}, e.g., to locate the view in tests.
    */
   cssClass: 'ɵworkbenchViewCssClass',
+
+  /**
+   * @internal
+   *
+   * Property to obtain the outlet name of the route. This property is only set on the top-level route.
+   *
+   * Use if the route's injection context is not available, e.g., in a {@link UrlMatcher}.
+   * Otherwise, the outlet can be injected using the {@link WORKBENCH_AUXILIARY_ROUTE_OUTLET} DI token,
+   * even in child routes, e.g., in guards.
+   */
+  ɵoutlet: 'ɵworkbenchOutlet',
 } as const;
