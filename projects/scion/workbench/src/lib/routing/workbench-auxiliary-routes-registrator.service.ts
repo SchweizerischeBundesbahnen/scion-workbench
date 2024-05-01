@@ -9,10 +9,11 @@
 */
 
 import {Injectable, InjectionToken} from '@angular/core';
-import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
+import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
+import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
 
 /**
  * Facilitates the registration of auxiliary routes of top-level routes.
@@ -34,28 +35,24 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
       return [];
     }
 
-    const registeredRoutes: Routes = [];
-    outlets.forEach(outlet => {
-      this._router.config
-        .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
-        .forEach(route => {
-          registeredRoutes.push(standardizeConfig({
-            ...route,
-            outlet,
-            providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}, ...(route.providers ?? [])],
-          }));
-        });
-
-      // Register "Page Not Found" route; must be registered as the last auxiliary route for the outlet.
-      registeredRoutes.push(standardizeConfig({
-        path: '**',
-        outlet,
-        providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}],
-        loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
-        data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
-        canMatch: config.canMatchNotFoundPage || [],
-      }));
-    });
+    const registeredRoutes = outlets.map(outlet => ({
+      path: '',
+      outlet,
+      providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}],
+      component: ɵEmptyOutletComponent,
+      children: [
+        ...this._router.config
+          .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
+          .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
+        // Register "Page Not Found" route as the last route of the outlet.
+        {
+          path: '**',
+          loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
+          data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
+          canMatch: config.canMatchNotFoundPage,
+        },
+      ],
+    }));
 
     this.replaceRouterConfig([
       ...this._router.config,
@@ -103,22 +100,8 @@ export interface AuxiliaryRouteConfig {
 }
 
 /**
- * Standardizes given route for registration. Copied from Angular 'router/src/utils/config.ts#standardizeConfig'.
- *
- * Performs the following steps:
- * - Sets the `component` property to {@link ɵEmptyOutletComponent} if given route is a component-less parent route; see Angular PR #23459.
- */
-function standardizeConfig(route: Route): Route {
-  if (!route.component && !route.loadComponent && (route.children || route.loadChildren)) {
-    route.component = ɵEmptyOutletComponent;
-  }
-  route.children?.forEach(standardizeConfig);
-  return route;
-}
-
-/**
- * DI token to inject the outlet of a workbench auxiliary route.
+ * DI token to inject the outlet name of a workbench auxiliary route.
  *
  * Can be injected in a `CanMatch` guard to obtain a reference to the workbench element.
  */
-export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('WORKBENCH_AUXILIARY_ROUTE_OUTLET');
+export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('ɵWORKBENCH_AUXILIARY_ROUTE_OUTLET');

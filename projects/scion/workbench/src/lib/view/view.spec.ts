@@ -999,6 +999,51 @@ describe('View', () => {
     expect(TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent()).toBe(getComponent(fixture, SpecView2Component));
   });
 
+  it('should fill view content to available space', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {
+            path: 'view',
+            component: SpecViewComponent,
+          },
+          {
+            path: 'path',
+            loadChildren: () => [
+              {
+                path: 'to',
+                loadChildren: () => [
+                  {
+                    path: 'view',
+                    component: SpecViewComponent,
+                  },
+                ],
+              },
+            ],
+          },
+
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "view".
+    await TestBed.inject(ɵWorkbenchRouter).navigate(['view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Expect size to be equal.
+    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(ɵWorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Expect size to be equal.
+    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+  });
+
   describe('Activated Route', () => {
 
     it('should set title and heading from route', async () => {

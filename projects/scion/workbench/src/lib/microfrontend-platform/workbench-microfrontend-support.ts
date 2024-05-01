@@ -32,6 +32,7 @@ import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/micro
 import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
+import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 import './microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
 
 /**
@@ -138,6 +139,7 @@ function provideMicrofrontendRoute(): EnvironmentProviders {
       useFactory: (): Route => ({
         matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
         component: MicrofrontendViewComponent,
+        canMatch: [canMatchWorkbenchView(true)],
       }),
     },
   ]);
