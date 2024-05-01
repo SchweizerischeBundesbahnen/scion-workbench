@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {By} from '@angular/platform-browser';
 import {TestComponent, withComponentContent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -18,7 +18,6 @@ import {WorkbenchService} from '../workbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
-import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 

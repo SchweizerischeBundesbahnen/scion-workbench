@@ -14,7 +14,7 @@ import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
-import {MPart, MPartGrid, MTreeNode} from '../../../layout/workbench-layout.model';
+import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
@@ -68,7 +68,7 @@ function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, actual: ɵWork
 /**
  * Asserts the actual model to equal the expected model. Only properties declared on the expected object are asserted.
  */
-function assertPartGridModel(expectedLayout: Partial<MPartGrid>, actualLayout: MPartGrid | null, util: MatchersUtil): void {
+function assertPartGridModel(expectedLayout: MPartGrid, actualLayout: _MPartGrid | null, util: MatchersUtil): void {
   const result = toEqual(actualLayout, objectContainingRecursive(expectedLayout), util);
   if (!result.pass) {
     throw Error(result.message);
@@ -97,7 +97,7 @@ function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualEleme
  * @see assertMTreeNodeDOM
  * @see assertMPartDOM
  */
-function assertGridElementDOM(expectedModelElement: Partial<MTreeNode | MPart>, actualElement: Element | null, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
+function assertGridElementDOM(expectedModelElement: MTreeNode | MPart, actualElement: Element | null, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
   if (!actualElement) {
     throw Error(`[DOMAssertError] Expected element to be present in the DOM, but is not. [${expectedModelElement.type}=${JSON.stringify(expectedModelElement)}]`);
   }
@@ -118,14 +118,14 @@ function assertGridElementDOM(expectedModelElement: Partial<MTreeNode | MPart>, 
 /**
  * Performs a recursive assertion of the DOM structure starting with the expected tree node.
  */
-function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
+function assertMTreeNodeDOM(expectedTreeNode: MTreeNode, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
   const nodeId = actualElement.getAttribute('data-nodeid');
   if (!nodeId) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1!);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2!);
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1 as _MTreeNode | _MPart);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2 as _MTreeNode | _MPart);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {
@@ -162,7 +162,7 @@ function assertMTreeNodeDOM(expectedTreeNode: Partial<MTreeNode>, actualElement:
 /**
  * Performs a recursive assertion of the DOM structure starting with the expected part.
  */
-function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
+function assertMPartDOM(expectedPart: MPart, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
   const partId = actualElement.getAttribute('data-partid');
   if (partId !== expectedPart.id) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}]`);
@@ -246,9 +246,37 @@ export interface ExpectedWorkbenchLayout {
   /**
    * Specifies the expected workbench grid. If not set, does not assert the workbench grid.
    */
-  workbenchGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
+  workbenchGrid?: MPartGrid;
   /**
    * Specifies the expected main area grid. If not set, does not assert the main area grid.
    */
-  mainAreaGrid?: Partial<MPartGrid> & {root: MTreeNode | MPart};
+  mainAreaGrid?: MPartGrid;
+}
+
+/**
+ * `MPartGrid` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
+ */
+export type MPartGrid = Partial<Omit<_MPartGrid, 'root'>> & {root: MTreeNode | MPart};
+
+/**
+ * `MView` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
+ */
+export type MView = Partial<_MView>;
+
+/**
+ * `MTreeNode` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
+ */
+export class MTreeNode extends _MTreeNode {
+  constructor(treeNode: Partial<Omit<_MTreeNode, 'type'>>) {
+    super(treeNode as _MTreeNode);
+  }
+}
+
+/**
+ * `MPart` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
+ */
+export class MPart extends _MPart {
+  constructor(part: Partial<Omit<_MPart, 'type' | 'views'> & {views: Array<Partial<MView>>}>) {
+    super(part as _MPart);
+  }
 }

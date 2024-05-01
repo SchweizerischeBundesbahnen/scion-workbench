@@ -29,7 +29,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
    */
   public addPart(id: string | MAIN_AREA): ɵWorkbenchLayout {
     return this.create({
-      workbenchGrid: {root: new MPart({id, structural: true}), activePartId: id},
+      workbenchGrid: {root: new MPart({id, structural: true, views: []}), activePartId: id},
     });
   }
 

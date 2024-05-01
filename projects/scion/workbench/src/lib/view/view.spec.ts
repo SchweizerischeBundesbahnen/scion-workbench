@@ -9,15 +9,15 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, inject, OnDestroy, Type} from '@angular/core';
+import {Component, inject, Injector, OnDestroy, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ViewId, WorkbenchView} from './workbench-view.model';
-import {WorkbenchViewPreDestroy} from '../workbench.model';
+import {CanClose} from '../workbench.model';
 import {Observable} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {flushMacrotasks, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {By} from '@angular/platform-browser';
@@ -27,6 +27,14 @@ import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {canMatchWorkbenchView} from './workbench-view-route-guards';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
+import {WorkbenchService} from '../workbench.service';
+import {ViewComponent} from './view.component';
+import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
+import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
+import {TestComponent} from '../testing/test.component';
+import {WorkbenchDialog} from '../dialog/workbench-dialog';
+import {throwError} from '../common/throw-error.util';
 
 describe('View', () => {
 
@@ -391,7 +399,113 @@ describe('View', () => {
     expect(view2.getComponent<SpecViewComponent>()!.activated).toBeFalse();
   });
 
-  it('should prevent the view from being closed', async () => {
+  it('should close views via WorkbenchRouter (unless prevent closing or non-closable)', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view/1', component: SpecViewComponent},
+          {path: 'path/to/view/2', component: SpecViewComponent},
+          {path: 'path/to/view/3', component: SpecViewComponent},
+          {path: 'path/to/view/4', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    const workbenchViewRegistry = TestBed.inject(WorkbenchViewRegistry);
+    const workbenchService = TestBed.inject(WorkbenchService);
+
+    await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
+    await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
+    await workbenchRouter.navigate(['path/to/view/3'], {target: 'view.103'});
+    await workbenchRouter.navigate(['path/to/view/4'], {target: 'view.104'});
+    await waitUntilStable();
+
+    const componentView1 = workbenchViewRegistry.get('view.101').getComponent<SpecViewComponent>()!;
+    const componentView2 = workbenchViewRegistry.get('view.102').getComponent<SpecViewComponent>()!;
+    const componentView3 = workbenchViewRegistry.get('view.103').getComponent<SpecViewComponent>()!;
+    const componentView4 = workbenchViewRegistry.get('view.104').getComponent<SpecViewComponent>()!;
+
+    // Prevent closing view 2.
+    componentView2.preventClosing = true;
+
+    // Make view 4 not closable.
+    componentView4.view.closable = false;
+
+    // Close all views via WorkbenchRouter.
+    await workbenchRouter.navigate(['path/to/view/*'], {close: true});
+    await waitUntilStable();
+
+    // Expect view 2 und view 4 not to be closed.
+    expect(workbenchService.views.map(view => view.id)).toEqual(['view.102', 'view.104']);
+
+    // Expect view 1 to be closed.
+    expect(componentView1.destroyed).toBeTrue();
+    // Expect view 2 not to be closed.
+    expect(componentView2.destroyed).toBeFalse();
+    // Expect view 3 to be closed.
+    expect(componentView3.destroyed).toBeTrue();
+    // Expect view 4 not to be closed.
+    expect(componentView2.destroyed).toBeFalse();
+  });
+
+  it('should close views via WorkbenchService (unless prevent closing or non-closable)', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view/1', component: SpecViewComponent},
+          {path: 'path/to/view/2', component: SpecViewComponent},
+          {path: 'path/to/view/3', component: SpecViewComponent},
+          {path: 'path/to/view/4', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    const workbenchViewRegistry = TestBed.inject(WorkbenchViewRegistry);
+    const workbenchService = TestBed.inject(WorkbenchService);
+
+    await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
+    await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
+    await workbenchRouter.navigate(['path/to/view/3'], {target: 'view.103'});
+    await workbenchRouter.navigate(['path/to/view/4'], {target: 'view.104'});
+    await waitUntilStable();
+
+    const componentView1 = workbenchViewRegistry.get('view.101').getComponent<SpecViewComponent>()!;
+    const componentView2 = workbenchViewRegistry.get('view.102').getComponent<SpecViewComponent>()!;
+    const componentView3 = workbenchViewRegistry.get('view.103').getComponent<SpecViewComponent>()!;
+    const componentView4 = workbenchViewRegistry.get('view.104').getComponent<SpecViewComponent>()!;
+
+    // Prevent closing view 2.
+    componentView2.preventClosing = true;
+
+    // Make view 4 not closable.
+    componentView4.view.closable = false;
+
+    // Close all views via WorkbenchService.
+    await workbenchService.closeViews('view.101', 'view.102', 'view.103', 'view.104');
+    await waitUntilStable();
+
+    // Expect view 2 und view 4 not to be closed.
+    expect(workbenchService.views.map(view => view.id)).toEqual(['view.102', 'view.104']);
+
+    // Expect view 1 to be closed.
+    expect(componentView1.destroyed).toBeTrue();
+    // Expect view 2 not to be closed.
+    expect(componentView2.destroyed).toBeFalse();
+    // Expect view 3 to be closed.
+    expect(componentView3.destroyed).toBeTrue();
+    // Expect view 4 not to be closed.
+    expect(componentView2.destroyed).toBeFalse();
+  });
+
+  it('should prevent closing view', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -404,7 +518,7 @@ describe('View', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitForInitialWorkbenchLayout();
 
-    // Navigate to "path/to/view/1".
+    // Navigate to "path/to/view".
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
 
@@ -412,24 +526,432 @@ describe('View', () => {
     const component = view.getComponent<SpecViewComponent>()!;
 
     // Try to close View (prevent)
-    component.preventDestroy = true;
+    component.preventClosing = true;
     await view.close();
     await waitUntilStable();
 
-    // Expect view not to be destroyed.
+    // Expect view not to be closed.
     expect(view.destroyed).toBeFalse();
     expect(component.destroyed).toBeFalse();
     expect(fixture).toShow(SpecViewComponent);
 
     // Try to close to View 1 (accept)
-    component.preventDestroy = false;
+    component.preventClosing = false;
     await view.close();
     await waitUntilStable();
 
-    // Expect view to be destroyed.
+    // Expect view to be closed.
     expect(view.destroyed).toBeTrue();
     expect(component.destroyed).toBeTrue();
     expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should prevent closing empty-path view', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: SpecViewComponent},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "" (hint: view-1)
+    await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.100'});
+    await waitUntilStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+    const component = view.getComponent<SpecViewComponent>()!;
+
+    // Try to close View (prevent)
+    component.preventClosing = true;
+    await view.close();
+    await waitUntilStable();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(component.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Try to close to View 1 (accept)
+    component.preventClosing = false;
+    await view.close();
+    await waitUntilStable();
+
+    // Expect view to be closed.
+    expect(view.destroyed).toBeTrue();
+    expect(component.destroyed).toBeTrue();
+    expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should prevent closing view navigated to a child route', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {
+            path: 'path',
+            loadChildren: () => [
+              {
+                path: 'to',
+                loadChildren: () => [
+                  {
+                    path: 'module',
+                    loadChildren: () => [
+                      {path: 'view', component: SpecViewComponent},
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/module/view".
+    await workbenchRouter.navigate(['path/to/module/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+    const component = view.getComponent<SpecViewComponent>()!;
+
+    // Try to close View (prevent)
+    component.preventClosing = true;
+    await view.close();
+    await waitUntilStable();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(component.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Try to close to View 1 (accept)
+    component.preventClosing = false;
+    await view.close();
+    await waitUntilStable();
+
+    // Expect view to be closed.
+    expect(view.destroyed).toBeTrue();
+    expect(component.destroyed).toBeTrue();
+    expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should not close view if blocked by view-modal message-box', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await fixture.whenStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+
+    // Open view-modal message box.
+    TestBed.inject(WorkbenchMessageBoxService).open('Message', {
+      modality: 'view',
+      context: {viewId: 'view.100'},
+      cssClass: 'message-box',
+    }).then();
+    await flushMacrotasks();
+
+    // Try to close the view (prevented by the message box).
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the message box.
+    const messageBox = getDialog('message-box');
+    messageBox.close();
+    await flushMacrotasks();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view to be closed.
+    expect(view.destroyed).toBeTrue();
+    expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should not close view if blocked by application-modal message-box', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await fixture.whenStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+
+    // Open application-modal message box.
+    TestBed.inject(WorkbenchMessageBoxService).open('Message', {
+      modality: 'application',
+      cssClass: 'message-box',
+    }).then();
+    await flushMacrotasks();
+
+    // Try to close the view (prevented by the message box).
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the message box.
+    const messageBox = getDialog('message-box');
+    messageBox.close();
+    await flushMacrotasks();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view to be closed.
+    expect(view.destroyed).toBeTrue();
+    expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should not close view if blocked by view-modal dialog', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await fixture.whenStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+
+    // Open view-modal dialog.
+    TestBed.inject(WorkbenchDialogService).open(TestComponent, {
+      modality: 'view',
+      context: {viewId: 'view.100'},
+      cssClass: 'dialog',
+    }).then();
+    await flushMacrotasks();
+
+    // Try to close the view (prevented by the dialog).
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the dialog.
+    const dialog = getDialog('dialog');
+    dialog.close();
+    await flushMacrotasks();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view to be closed.
+    expect(view.destroyed).toBeTrue();
+    expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should not close view if blocked by application-modal dialog', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await fixture.whenStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+
+    // Open application-modal dialog.
+    TestBed.inject(WorkbenchDialogService).open(TestComponent, {
+      modality: 'application',
+      cssClass: 'dialog',
+    }).then();
+    await flushMacrotasks();
+
+    // Try to close the view (prevented by the dialog).
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the dialog.
+    const dialog = getDialog('dialog');
+    dialog.close();
+    await flushMacrotasks();
+
+    // Expect view not to be closed.
+    expect(view.destroyed).toBeFalse();
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Close the view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {close: true});
+    await fixture.whenStable();
+
+    // Expect view to be closed.
+    expect(view.destroyed).toBeTrue();
+    expect(fixture).not.toShow(SpecViewComponent);
+  });
+
+  it('should invoke `CanClose` guard on correct view component', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: {
+            perspectives: [
+              {
+                id: 'A',
+                layout: factory => factory
+                  .addPart('left')
+                  .addView('view.100', {partId: 'left'})
+                  .navigateView('view.100', ['path/to/view/1']),
+              },
+              {
+                id: 'B',
+                layout: factory => factory
+                  .addPart('left')
+                  .addView('view.100', {partId: 'left'}) // Add view with same id as in perspective A.
+                  .navigateView('view.100', ['path/to/view/2'])
+                  .removeView('view.100'), // Remove view to test that `CanClose` of view.100 in perspective A is not invoked.
+              },
+            ],
+          },
+        }),
+        provideRouter([
+          {path: 'path/to/view/1', component: SpecViewComponent},
+          {path: 'path/to/view/2', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Spy console.
+    spyOn(console, 'log').and.callThrough();
+
+    // Switch to perspective A.
+    await TestBed.inject(WorkbenchService).switchPerspective('A');
+
+    // Switch to perspective B.
+    await TestBed.inject(WorkbenchService).switchPerspective('B');
+
+    // Expect `CanClose` guard not to be invoked for view.100 of perspective A.
+    expect(console.log).not.toHaveBeenCalledWith(`[SpecViewComponent][CanClose] CanClose invoked for view 'view.100'. [path=path/to/view/1]`);
+  });
+
+  it('should not invoke `CanClose` guard when creating URL tree', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Spy console.
+    spyOn(console, 'log').and.callThrough();
+
+    await TestBed.inject(ɵWorkbenchRouter).createUrlTree(layout => layout.removeView('view.100'));
+
+    // Expect `CanClose` guard not to be invoked.
+    expect(console.log).not.toHaveBeenCalledWith(`[SpecViewComponent][CanClose] CanClose invoked for view 'view.100'. [path=path/to/view]`);
+
+    // Expect view not to be closed.
+    expect(fixture).toShow(SpecViewComponent);
+  });
+
+  it('should invoke `CanClose` in view injection context', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await fixture.whenStable();
+
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+    const component = view.getComponent<SpecViewComponent>()!;
+
+    await view.close();
+    await fixture.whenStable();
+
+    // Except `CanClose` guard to be invoked in the component's injection context.
+    expect(component.canCloseInjector).toBe(view.getComponentInjector());
   });
 
   it('should provide navigated component', async () => {
@@ -478,6 +1000,7 @@ describe('View', () => {
   });
 
   describe('Activated Route', () => {
+
     it('should set title and heading from route', async () => {
       TestBed.configureTestingModule({
         providers: [
@@ -572,18 +1095,28 @@ describe('View', () => {
           provideWorkbenchForTest(),
           provideRouter([
             {
-              path: 'path',
-              data: {[WorkbenchRouteData.cssClass]: 'class'},
-              loadChildren: () => [
+              path: '',
+              data: {
+                [WorkbenchRouteData.title]: 'Base-Title',
+                [WorkbenchRouteData.heading]: 'Base-Heading',
+                [WorkbenchRouteData.cssClass]: 'Base-class',
+              },
+              children: [
                 {
-                  path: 'to',
-                  data: {[WorkbenchRouteData.heading]: 'Heading'},
+                  path: 'path',
+                  data: {[WorkbenchRouteData.cssClass]: 'class'},
                   loadChildren: () => [
                     {
-                      path: 'module',
-                      data: {[WorkbenchRouteData.title]: 'Title'},
+                      path: 'to',
+                      data: {[WorkbenchRouteData.heading]: 'Heading'},
                       loadChildren: () => [
-                        {path: 'view', component: SpecViewComponent},
+                        {
+                          path: 'module',
+                          data: {[WorkbenchRouteData.title]: 'Title'},
+                          loadChildren: () => [
+                            {path: 'view', component: SpecViewComponent},
+                          ],
+                        },
                       ],
                     },
                   ],
@@ -870,13 +1403,14 @@ describe('View', () => {
   template: '{{onCheckForChanges()}}',
   standalone: true,
 })
-class SpecViewComponent implements OnDestroy, WorkbenchViewPreDestroy {
+class SpecViewComponent implements OnDestroy, CanClose {
 
   public destroyed = false;
   public activated: boolean | undefined;
   public checkedForChanges = false;
-  public preventDestroy = false;
+  public preventClosing = false;
   public view = inject(WorkbenchView);
+  public canCloseInjector: Injector | undefined;
 
   constructor() {
     this.view.active$
@@ -898,8 +1432,10 @@ class SpecViewComponent implements OnDestroy, WorkbenchViewPreDestroy {
     }
   }
 
-  public onWorkbenchViewPreDestroy(): Observable<boolean> | Promise<boolean> | boolean {
-    return !this.preventDestroy;
+  public canClose(): Observable<boolean> | Promise<boolean> | boolean {
+    console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.urlSegments.join('/')}]`);
+    this.canCloseInjector = inject(Injector);
+    return !this.preventClosing;
   }
 
   public ngOnDestroy(): void {
@@ -961,4 +1497,16 @@ function getViewCssClass(fixture: ComponentFixture<unknown>, viewId: ViewId): st
 
 function getComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T | null {
   return fixture.debugElement.query(By.directive(type)).componentInstance;
+}
+
+function getDialog(cssClass: string): WorkbenchDialog {
+  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass === cssClass) ?? throwError('[NullDialogError]');
+}
+
+function getSize(fixture: ComponentFixture<unknown>, type: Type<unknown>): {width: number; height: number} {
+  const htmlElement = fixture.debugElement.query(By.directive(type)).nativeElement as HTMLElement;
+  return {
+    width: htmlElement.offsetWidth,
+    height: htmlElement.offsetHeight,
+  };
 }

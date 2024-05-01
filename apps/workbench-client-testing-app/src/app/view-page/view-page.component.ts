@@ -10,7 +10,7 @@
 
 import {Component, Inject, OnDestroy} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {ViewClosingEvent, ViewClosingListener, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {CanClose, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {MonoTypeOperatorFunction, NEVER} from 'rxjs';
@@ -49,7 +49,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     SciViewportComponent,
   ],
 })
-export default class ViewPageComponent implements ViewClosingListener, OnDestroy {
+export default class ViewPageComponent implements CanClose, OnDestroy {
 
   public form = this._formBuilder.group({
     title: this._formBuilder.control(''),
@@ -92,25 +92,22 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
       });
   }
 
-  public async onClosing(event: ViewClosingEvent): Promise<void> {
+  public async canClose(): Promise<boolean> {
     if (!this.form.controls.confirmClosing.value) {
-      return;
+      return true;
     }
 
     const action = await this._messageBoxService.open({
       content: 'Do you want to close this view?',
-      severity: 'info',
-      actions: {
-        yes: 'Yes',
-        no: 'No',
-      },
+      actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
-      modality: 'application',  // message box is displayed even if closing view is not active
+      modality: 'application',
     });
 
-    if (action === 'no') {
-      event.preventDefault();
+    if (action === 'error') {
+      throw Error(`[CanCloseSpecError] Error in CanLoad of view '${this.view.id}'.`);
     }
+    return action === 'yes';
   }
 
   public onMarkDirty(dirty?: boolean): void {
@@ -145,10 +142,10 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
       )
       .subscribe(confirmClosing => {
         if (confirmClosing) {
-          this.view.addClosingListener(this);
+          this.view.addCanClose(this);
         }
         else {
-          this.view.removeClosingListener(this);
+          this.view.removeCanClose(this);
         }
       });
   }
@@ -198,6 +195,6 @@ export default class ViewPageComponent implements ViewClosingListener, OnDestroy
   }
 
   public ngOnDestroy(): void {
-    this.view.removeClosingListener(this);
+    this.view.removeCanClose(this);
   }
 }

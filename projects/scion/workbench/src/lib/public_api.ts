@@ -13,7 +13,7 @@ export {WorkbenchModule, WorkbenchModuleConfig} from './workbench.module';
 export {provideWorkbench} from './workbench.provider';
 export {WorkbenchService} from './workbench.service';
 export {WORKBENCH_ID} from './workbench-id';
-export {WorkbenchViewPreDestroy, WorkbenchPartAction, WorkbenchTheme, CanMatchPartFn, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from './workbench.model';
+export {WorkbenchPartAction, WorkbenchTheme, CanMatchPartFn, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn, CanClose} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
 export {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from './workbench.constants';
 

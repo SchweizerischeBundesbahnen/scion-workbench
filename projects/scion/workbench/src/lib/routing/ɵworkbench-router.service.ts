@@ -10,7 +10,7 @@
 
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
-import {Defined} from '@scion/toolkit/util';
+import {Defined, Observables} from '@scion/toolkit/util';
 import {Injectable, Injector, NgZone, OnDestroy, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
@@ -23,6 +23,10 @@ import {Commands, ViewOutlets, WorkbenchNavigationContext, WorkbenchNavigationEx
 import {ViewId} from '../view/workbench-view.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
+import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {Logger} from '../logging';
+import {CanClose} from '../workbench.model';
+import {UUID} from '../common/uuid.util';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -37,7 +41,9 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
 
   constructor(private _router: Router,
               private _workbenchLayoutService: WorkbenchLayoutService,
+              private _workbenchViewRegistry: WorkbenchViewRegistry,
               private _injector: Injector,
+              private _logger: Logger,
               private _zone: NgZone) {
     // Instruct the Angular router to process navigations that do not change the current URL, i.e., when only updating navigation state.
     // For example, the workbench grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
@@ -70,10 +76,13 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
 
       // Let the navigator compute the new workbench layout.
       const currentLayout = this._workbenchLayoutService.layout!;
-      const newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => navigateFn(currentLayout)) as ɵWorkbenchLayout;
+      let newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => navigateFn(currentLayout)) as ɵWorkbenchLayout;
       if (!newLayout) {
         return true;
       }
+
+      // Remove views marked for removal, invoking `CanClose` guard if implemented.
+      newLayout = await newLayout.removeViewsMarkedForRemoval(viewUid => this.canCloseView(viewUid));
 
       // Create extras with workbench navigation instructions.
       extras = createNavigationExtras(newLayout, extras);
@@ -130,10 +139,13 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
 
       // Let the navigator compute the new workbench layout.
       const currentLayout = this._workbenchLayoutService.layout!;
-      const newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => onNavigate(currentLayout));
+      let newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => onNavigate(currentLayout));
       if (!newLayout) {
         return null;
       }
+
+      // Remove views marked for removal.
+      newLayout = await newLayout.removeViewsMarkedForRemoval();
 
       // Create extras with workbench navigation instructions.
       extras = createNavigationExtras(newLayout, extras);
@@ -142,6 +154,35 @@ export class ɵWorkbenchRouter implements WorkbenchRouter, OnDestroy {
       const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
       return this._router.createUrlTree(commands, extras);
     });
+  }
+
+  /**
+   * Decides if given view can be closed, invoking `CanClose` guard if implemented.
+   */
+  private async canCloseView(viewUid: UUID): Promise<boolean> {
+    const view = this._workbenchViewRegistry.views.find(view => view.uid === viewUid);
+    if (!view) {
+      return true;
+    }
+    if (!view.closable) {
+      return false;
+    }
+
+    // Test if the view implements `CanClose` guard.
+    const component = view.getComponent() as CanClose | null;
+    if (typeof component?.canClose !== 'function') {
+      return true;
+    }
+
+    // Invoke `CanClose` guard to decide if to close the view.
+    try {
+      const canClose = runInInjectionContext(view.getComponentInjector()!, () => component.canClose());
+      return await firstValueFrom(Observables.coerce(canClose), {defaultValue: true});
+    }
+    catch (error) {
+      this._logger.error(`Unhandled error while invoking 'CanClose' guard of view '${view.id}'.`, error);
+      return true;
+    }
   }
 
   /**

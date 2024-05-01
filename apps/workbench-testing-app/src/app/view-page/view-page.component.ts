@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
-import {WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {Component, inject} from '@angular/core';
+import {CanClose, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -51,7 +51,7 @@ import {CssClassComponent} from '../css-class/css-class.component';
     WorkbenchPartActionDirective,
   ],
 })
-export default class ViewPageComponent {
+export default class ViewPageComponent implements CanClose {
 
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
@@ -59,6 +59,7 @@ export default class ViewPageComponent {
   public formControls = {
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
+    confirmClosing: this._formBuilder.control(false),
   };
 
   public WorkbenchRouteData = WorkbenchRouteData;
@@ -79,6 +80,23 @@ export default class ViewPageComponent {
 
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
+  }
+
+  public async canClose(): Promise<boolean> {
+    if (!this.formControls.confirmClosing.value) {
+      return true;
+    }
+
+    const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
+      actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
+      cssClass: ['e2e-close-view', this.view.id],
+      modality: 'application',
+    });
+
+    if (action === 'error') {
+      throw Error(`[CanCloseSpecError] Error in CanLoad of view '${this.view.id}'.`);
+    }
+    return action === 'yes';
   }
 
   private parsePartActions(): WorkbenchPartActionDescriptor[] {

@@ -16,6 +16,7 @@ import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspectiv
 import {WorkbenchPart} from './part/workbench-part.model';
 import {Injectable} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
+import {WorkbenchLayout} from './layout/workbench-layout';
 
 /**
  * The central class of the SCION Workbench.
@@ -38,6 +39,23 @@ import {ɵWorkbenchService} from './ɵworkbench.service';
 export abstract class WorkbenchService {
 
   /**
+   * Returns the current {@link WorkbenchLayout}.
+   *
+   * The layout is an immutable object. Modifications have no side effects. The layout can be modified using {@link WorkbenchRouter.navigate}.
+   */
+  public abstract readonly layout: WorkbenchLayout;
+
+  /**
+   * Emits the current {@link WorkbenchLayout}.
+   *
+   * Upon subscription, emits the current workbench layout, and then emits continuously
+   * when the layout changes. It never completes.
+   *
+   * The layout is an immutable object. Modifications have no side effects. The layout can be modified using {@link WorkbenchRouter.navigate}.
+   */
+  public abstract readonly layout$: Observable<WorkbenchLayout>;
+
+  /**
    * Perspectives registered with the workbench.
    */
   public abstract readonly perspectives: readonly WorkbenchPerspective[];
@@ -45,7 +63,7 @@ export abstract class WorkbenchService {
   /**
    * Emits the perspectives registered with the workbench.
    *
-   * Upon subscription, the currently registered perspectives are emitted, and then emits continuously
+   * Upon subscription, emits registered perspectives, and then emits continuously
    * when new perspectives are registered or existing perspectives unregistered. It never completes.
    */
   public abstract readonly perspectives$: Observable<readonly WorkbenchPerspective[]>;
@@ -75,37 +93,45 @@ export abstract class WorkbenchService {
 
   /**
    * Parts in the workbench layout.
+   *
+   * Each {@link WorkbenchPart} object represents a part in the workbench layout that can be interacted with.
    */
   public abstract readonly parts: readonly WorkbenchPart[];
 
   /**
    * Emits the parts in the workbench layout.
    *
-   * Upon subscription, the current parts are emitted, and then emits continuously
+   * Upon subscription, emits parts contained in the layout, and then emits continuously
    * when new parts are added or existing parts removed. It never completes.
    */
   public abstract readonly parts$: Observable<readonly WorkbenchPart[]>;
 
   /**
    * Returns a reference to the specified {@link WorkbenchPart}, or `null` if not found.
+   *
+   * A {@link WorkbenchPart} object represents a part in the workbench layout that can be interacted with.
    */
   public abstract getPart(partId: string): WorkbenchPart | null;
 
   /**
-   * Views opened in the workbench.
+   * Views in the workbench layout.
+   *
+   * Each {@link WorkbenchView} object represents a view in the workbench layout that can be interacted with.
    */
   public abstract readonly views: readonly WorkbenchView[];
 
   /**
    * Emits the views opened in the workbench.
    *
-   * Upon subscription, the currently opened views are emitted, and then emits continuously
+   * Upon subscription, emits views contained in the layout, and then emits continuously
    * when new views are opened or existing views closed. It never completes.
    */
   public abstract readonly views$: Observable<readonly WorkbenchView[]>;
 
   /**
    * Returns a reference to the specified {@link WorkbenchView}, or `null` if not found.
+   *
+   * A {@link WorkbenchView} object represents a view in the workbench layout that can be interacted with.
    */
   public abstract getView(viewId: ViewId): WorkbenchView | null;
 

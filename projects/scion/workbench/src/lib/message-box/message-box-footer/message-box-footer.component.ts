@@ -7,12 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, ElementRef, EventEmitter, HostBinding, inject, Input, NgZone, Output, QueryList, ViewChildren} from '@angular/core';
+import {Component, ElementRef, EventEmitter, HostBinding, inject, Input, Output, QueryList, ViewChildren} from '@angular/core';
 import {KeyValuePipe} from '@angular/common';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {observeOn} from 'rxjs/operators';
+import {animationFrameScheduler, firstValueFrom} from 'rxjs';
 import {fromDimension$} from '@scion/toolkit/observable';
-import {take, tap} from 'rxjs/operators';
-import {observeInside} from '@scion/toolkit/operators';
 
 @Component({
   selector: 'wb-message-box-footer',
@@ -42,7 +41,7 @@ export class MessageBoxFooterComponent {
   public preferredSizeChange = new EventEmitter<number>();
 
   constructor() {
-    this.emitPreferredSize();
+    this.emitPreferredSize().then();
   }
 
   protected insertionSortOrderFn = (): number => 0;
@@ -58,22 +57,15 @@ export class MessageBoxFooterComponent {
     actionButtons[((newIndex + actionButtonCount) % actionButtonCount)].nativeElement.focus();
   }
 
-  private emitPreferredSize(): void {
-    const host = inject(ElementRef).nativeElement;
-    const zone = inject(NgZone);
-
-    fromDimension$(host)
-      .pipe(
-        observeInside(fn => zone.run(fn)), /* fromDimension$ emits outside the Angular zone */
-        tap({
-          subscribe: () => host.classList.add('calculating-min-width'),
-          finalize: () => host.classList.remove('calculating-min-width'),
-        }),
-        take(1),
-        takeUntilDestroyed(),
-      )
-      .subscribe(dimension => {
-        this.preferredSizeChange.emit(dimension.offsetWidth);
-      });
+  private async emitPreferredSize(): Promise<void> {
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    host.classList.add('calculating-min-width');
+    try {
+      const initialSize = await firstValueFrom(fromDimension$(host).pipe(observeOn(animationFrameScheduler)));
+      this.preferredSizeChange.emit(initialSize.offsetWidth);
+    }
+    finally {
+      host.classList.remove('calculating-min-width');
+    }
   }
 }

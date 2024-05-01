@@ -27,7 +27,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
   public async open(message: string | ComponentType<unknown>, options?: WorkbenchMessageBoxOptions): Promise<string> {
     // Ensure to run in Angular zone to display the message box even if called from outside the Angular zone, e.g. from an error handler.
     if (!NgZone.isInAngularZone()) {
-      return this._zone.run(() => this.open(message));
+      return this._zone.run(() => this.open(message, options));
     }
 
     return (await this._workbenchDialogService.open<string>(WorkbenchMessageBoxComponent, {

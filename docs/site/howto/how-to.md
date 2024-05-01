@@ -26,7 +26,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to open a view](how-to-open-view.md)
 - [How to interact with a view](how-to-interact-with-view.md)
 - [How to close a view](how-to-close-view.md)
-- [How to prevent a view from being closed](how-to-prevent-view-closing.md)
+- [How to prevent a view from closing](how-to-prevent-view-closing.md)
 - [How to provide a part action](how-to-provide-part-action.md)
 - [How to provide a "Not Found Page"](how-to-provide-not-found-page.md)
 

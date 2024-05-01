@@ -11,6 +11,7 @@
 import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
 import {ViewId} from '../view/workbench-view.model';
+import {UUID} from '../common/uuid.util';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -53,7 +54,7 @@ export class MTreeNode {
   public direction!: 'column' | 'row';
   public parent?: MTreeNode;
 
-  constructor(treeNode: Partial<Omit<MTreeNode, 'type'>>) {
+  constructor(treeNode: Omit<MTreeNode, 'type'>) {
     treeNode.parent && assertType(treeNode.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
     assertType(treeNode.child1, {toBeOneOf: [MTreeNode, MPart]}); // assert not to be an object literal
     assertType(treeNode.child2, {toBeOneOf: [MTreeNode, MPart]}); // assert not to be an object literal
@@ -83,11 +84,11 @@ export class MPart {
   public readonly type = 'MPart';
   public readonly id!: string;
   public parent?: MTreeNode;
-  public views: MView[] = [];
+  public views!: MView[];
   public activeViewId?: ViewId;
   public structural!: boolean;
 
-  constructor(part: Partial<Omit<MPart, 'type'>>) {
+  constructor(part: Omit<MPart, 'type'>) {
     Defined.orElseThrow(part.id, () => Error('MPart requires an id'));
     part.parent && assertType(part.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
     Object.assign(this, part);
@@ -109,7 +110,9 @@ export class MPart {
 export interface MView {
   id: ViewId;
   alternativeId?: string;
+  uid: UUID;
   cssClass?: string[];
+  markedForRemoval?: true;
   navigation?: {
     hint?: string;
     cssClass?: string[];

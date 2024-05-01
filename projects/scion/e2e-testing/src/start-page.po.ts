@@ -50,6 +50,13 @@ export class StartPagePO implements WorkbenchViewPagePO {
   }
 
   /**
+   * Returns the part in which this page is displayed.
+   */
+  public getPartId(): Promise<string | null> {
+    return this.locator.getAttribute('data-partid');
+  }
+
+  /**
    * Clicks the workbench view tile with specified CSS class set.
    */
   public async openWorkbenchView(cssClass: string): Promise<void> {

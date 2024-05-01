@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Optional, ViewChild} from '@angular/core';
-import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
+import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
-import {WorkbenchCapabilities, WorkbenchPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchPopupService as WorkbenchClientPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {filter} from 'rxjs/operators';
@@ -51,6 +51,9 @@ export default class StartPageComponent {
   @ViewChild(SciFilterFieldComponent)
   private _filterField!: SciFilterFieldComponent;
 
+  @HostBinding('attr.data-partid')
+  public partId: string | undefined;
+
   public filterControl = this._formBuilder.control('');
   public workbenchViewRoutes$: Observable<Routes>;
   public microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
@@ -58,12 +61,13 @@ export default class StartPageComponent {
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
-  constructor(@Optional() private _view: WorkbenchView, // not available on entry point page
-              @Optional() private _workbenchClientRouter: WorkbenchClientRouter, // not available when starting the workbench standalone
-              @Optional() private _workbenchRouter: WorkbenchRouter, // not available when starting the workbench standalone
-              @Optional() private _workbenchPopupService: WorkbenchPopupService, // not available when starting the workbench standalone
-              @Optional() private _intentClient: IntentClient, // not available when starting the workbench standalone
-              @Optional() private _manifestService: ManifestService, // not available when starting the workbench standalone
+  constructor(@Optional() private _view: WorkbenchView | null, // not available on entry point page
+              @Optional() private _workbenchClientRouter: WorkbenchClientRouter | null, // not available when starting the workbench standalone
+              @Optional() private _intentClient: IntentClient | null, // not available when starting the workbench standalone
+              @Optional() private _manifestService: ManifestService | null, // not available when starting the workbench standalone
+              @Optional() private _workbenchClientPopupService: WorkbenchClientPopupService | null, // not available when starting the workbench standalone
+              private _workbenchService: WorkbenchService,
+              private _workbenchRouter: WorkbenchRouter,
               private _formBuilder: NonNullableFormBuilder,
               router: Router,
               cd: ChangeDetectorRef,
@@ -79,14 +83,14 @@ export default class StartPageComponent {
 
     if (workbenchConfig.microfrontendPlatform) {
       // Read microfrontend views to be pinned to the start page.
-      this.microfrontendViewCapabilities$ = this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
+      this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
           filterArray(viewCapability => 'pinToStartPage' in viewCapability.properties && !!viewCapability.properties['pinToStartPage']),
           filterArray(viewCapability => !isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );
       // Read test capabilities to be pinned to the start page.
-      this.testCapabilities$ = this._manifestService.lookupCapabilities$()
+      this.testCapabilities$ = this._manifestService!.lookupCapabilities$()
         .pipe(
           filterArray(capability => !!capability.properties && 'pinToStartPage' in capability.properties && !!capability.properties['pinToStartPage']),
           filterArray(viewCapability => isTestCapability(viewCapability)),
@@ -96,6 +100,7 @@ export default class StartPageComponent {
 
     this.markForCheckOnUrlChange(router, cd);
     this.installFilterFieldDisplayTextSynchronizer();
+    this.memoizeContextualPart();
   }
 
   public onViewOpen(path: string, event: MouseEvent): void {
@@ -108,7 +113,7 @@ export default class StartPageComponent {
 
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
-    this._workbenchClientRouter.navigate(viewCapability.qualifier, {
+    this._workbenchClientRouter!.navigate(viewCapability.qualifier, {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
     }).then();
@@ -119,15 +124,15 @@ export default class StartPageComponent {
     // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
     switch (testCapability.type) {
       case WorkbenchCapabilities.View: {
-        await this._workbenchClientRouter.navigate(testCapability.qualifier!, {target: this._view?.id});
+        await this._workbenchClientRouter!.navigate(testCapability.qualifier!, {target: this._view?.id});
         break;
       }
       case WorkbenchCapabilities.Popup: {
-        await this._workbenchPopupService.open(testCapability.qualifier!, {anchor: event});
+        await this._workbenchClientPopupService!.open(testCapability.qualifier!, {anchor: event});
         break;
       }
       default: {
-        await this._intentClient.publish({type: testCapability.type, qualifier: testCapability.qualifier});
+        await this._intentClient!.publish({type: testCapability.type, qualifier: testCapability.qualifier});
         break;
       }
     }
@@ -164,6 +169,17 @@ export default class StartPageComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(value => {
         this.filterControl.setValue(value, {emitEvent: false});
+      });
+  }
+
+  /**
+   * Memoizes the part in which this component is displayed.
+   */
+  private memoizeContextualPart(): void {
+    this._workbenchService.layout$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => {
+        this.partId = this._view?.part.id ?? this._workbenchService.parts.filter(part => part.active).sort(a => a.isInMainArea ? -1 : 1).at(0)?.id;
       });
   }
 

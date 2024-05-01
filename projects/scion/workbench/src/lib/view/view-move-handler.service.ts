@@ -1,6 +1,5 @@
 import {Inject, Injectable} from '@angular/core';
 import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
-import {UUID} from '@scion/toolkit/uuid';
 import {Router} from '@angular/router';
 import {LocationStrategy} from '@angular/common';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
@@ -11,6 +10,7 @@ import {Defined} from '@scion/toolkit/util';
 import {generatePerspectiveWindowName} from '../perspective/workbench-perspective.service';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {WORKBENCH_ID} from '../workbench-id';
+import {randomUUID} from '../common/uuid.util';
 
 /**
  * Updates the workbench layout when the user moves a view.
@@ -67,7 +67,7 @@ export class ViewMoveHandler {
     await this._workbenchRouter.navigate(layout => {
       const newViewId = event.source.alternativeViewId ?? layout.computeNextViewId();
       if (addToNewPart) {
-        const newPartId = event.target.newPart?.id ?? UUID.randomUUID();
+        const newPartId = event.target.newPart?.id ?? randomUUID();
         return layout
           .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
           .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
@@ -101,20 +101,20 @@ export class ViewMoveHandler {
         })
         .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
     });
-    const target = generatePerspectiveWindowName(`${ANONYMOUS_PERSPECTIVE_ID_PREFIX}${UUID.randomUUID()}`);
+    const target = generatePerspectiveWindowName(`${ANONYMOUS_PERSPECTIVE_ID_PREFIX}${randomUUID()}`);
     if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree!)), target)) {
       await this.removeView(event);
     }
   }
 
   private async removeView(event: ViewMoveEvent): Promise<void> {
-    await this._workbenchRouter.navigate(layout => layout.removeView(event.source.viewId));
+    await this._workbenchRouter.navigate(layout => layout.removeView(event.source.viewId, {force: true}));
   }
 
   private async moveView(event: ViewMoveEvent): Promise<void> {
     const addToNewPart = !!event.target.region;
     if (addToNewPart) {
-      const newPartId = event.target.newPart?.id ?? UUID.randomUUID();
+      const newPartId = event.target.newPart?.id ?? randomUUID();
       await this._workbenchRouter.navigate(layout => layout
         .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(event.target.region!), ratio: event.target.newPart?.ratio}, {structural: false})
         .moveView(event.source.viewId, newPartId, {activatePart: true, activateView: true}),

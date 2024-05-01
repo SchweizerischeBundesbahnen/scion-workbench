@@ -5,29 +5,23 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-### How to prevent a view from being closed
+### How to prevent a view from closing
 
-The closing of a view can be intercepted by implementing the `WorkbenchViewPreDestroy` lifecycle hook in the view component. The `onWorkbenchViewPreDestroy` method is called when the view is about to be closed. Return `true` to continue closing or `false` otherwise. Alternatively, you can return a Promise or Observable to perform an asynchronous operation such as displaying a message box.
+A view can implement the `CanClose` interface to intercept or prevent the closing.
+
+The `canClose` method is called when the view is about to close. Return `true` to close the view or `false` to prevent closing. Instead of a `boolean`, the method can return a `Promise` or an `Observable` to perform an asynchronous operation, such as displaying a message box.
 
 The following snippet asks the user whether to save changes.
 
 ```ts 
-import {Component} from '@angular/core';
-import {WorkbenchMessageBoxService, WorkbenchView, WorkbenchViewPreDestroy} from '@scion/workbench';
+import {Component, inject} from '@angular/core';
+import {CanClose, WorkbenchMessageBoxService} from '@scion/workbench';
 
-@Component({})
-export class ViewComponent implements WorkbenchViewPreDestroy {
+@Component({...})
+class ViewComponent implements CanClose {
 
-  constructor(private view: WorkbenchView, private messageBoxService: WorkbenchMessageBoxService) {
-  }
-
-  public async onWorkbenchViewPreDestroy(): Promise<boolean> {
-    if (!this.view.dirty) {
-      return true;
-    }
-
-    const action = await this.messageBoxService.open('Do you want to save changes?', {
-      severity: 'info',
+  public async canClose(): Promise<boolean> {
+    const action = await inject(WorkbenchMessageBoxService).open('Do you want to save changes?', {
       actions: {
         yes: 'Yes',
         no: 'No',

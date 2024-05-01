@@ -25,10 +25,14 @@ import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.
 import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewId} from './view/workbench-view.model';
+import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
+import {WorkbenchLayoutService} from './layout/workbench-layout.service';
+import {throwError} from './common/throw-error.util';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
 
+  public readonly layout$: Observable<ɵWorkbenchLayout>;
   public readonly perspectives$: Observable<readonly ɵWorkbenchPerspective[]>;
   public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;
   public readonly views$: Observable<readonly ɵWorkbenchView[]>;
@@ -42,11 +46,17 @@ export class ɵWorkbenchService implements WorkbenchService {
               private _partActionRegistry: WorkbenchPartActionRegistry,
               private _viewRegistry: WorkbenchViewRegistry,
               private _perspectiveService: WorkbenchPerspectiveService,
+              private _layoutService: WorkbenchLayoutService,
               private _workbenchThemeSwitcher: WorkbenchThemeSwitcher) {
+    this.layout$ = this._layoutService.layout$;
     this.perspectives$ = this._perspectiveRegistry.perspectives$;
     this.parts$ = this._partRegistry.parts$;
     this.views$ = this._viewRegistry.views$;
     this.theme$ = this._workbenchThemeSwitcher.theme$;
+  }
+
+  public get layout(): ɵWorkbenchLayout {
+    return this._layoutService.layout ?? throwError('[NullLayoutError] Workbench layout not created yet.');
   }
 
   /** @inheritDoc */
@@ -96,20 +106,7 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   /** @inheritDoc */
   public async closeViews(...viewIds: ViewId[]): Promise<boolean> {
-    // TODO [#27]: Use single navigation to close multiple views.
-    // For example:
-    // return this._workbenchRouter.navigate(layout => {
-    //   viewIds.forEach(viewId => layout = layout.removeView(viewId));
-    //   return layout
-    // });
-
-    // To avoid canceling the entire navigation if some view(s) prevent(s) closing, close each view through a separate navigation.
-    const navigations = await Promise.all(viewIds
-      .map(viewId => this._viewRegistry.get(viewId))
-      .filter(view => view.closable)
-      .map(view => this._workbenchRouter.navigate([], {target: view.id, close: true})),
-    );
-    return navigations.every(Boolean);
+    return this._workbenchRouter.navigate(layout => viewIds.reduce((layout, viewId) => layout.removeView(viewId), layout));
   }
 
   /** @inheritDoc */

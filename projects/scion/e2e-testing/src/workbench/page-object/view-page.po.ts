@@ -86,6 +86,10 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-closable')).toggle(check);
   }
 
+  public async checkConfirmClosing(check: boolean): Promise<void> {
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-confirm-closing')).toggle(check);
+  }
+
   public async clickClose(): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
     await accordion.expand();

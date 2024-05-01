@@ -9,7 +9,7 @@
 */
 
 import {Injectable, InjectionToken} from '@angular/core';
-import {CanDeactivateFn, CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
+import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes, ɵEmptyOutletComponent} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
@@ -43,7 +43,6 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
             ...route,
             outlet,
             providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}, ...(route.providers ?? [])],
-            canDeactivate: [...(config.canDeactivate || []), ...(route.canDeactivate || [])],
           }));
         });
 
@@ -96,10 +95,6 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
  * Configures auxiliary routes.
  */
 export interface AuxiliaryRouteConfig {
-  /**
-   * Specifies "CanDeactivate" guard(s) to install on the auxiliary routes.
-   */
-  canDeactivate?: Array<CanDeactivateFn<unknown>>;
   /**
    * Specifies "CanMatch" guard(s) to install on the wildcard route (`**`),
    * selected by the router if no route matches the requested URL.

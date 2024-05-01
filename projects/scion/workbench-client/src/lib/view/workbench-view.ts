@@ -103,44 +103,46 @@ export abstract class WorkbenchView {
   public abstract close(): void;
 
   /**
-   * Adds a listener to be notified just before closing this view. The closing event is cancelable,
-   * i.e., you can invoke {@link ViewClosingEvent.preventDefault} to prevent closing.
+   * Registers a guard to decide whether this view can be closed or not.
+   * The guard will be removed when navigating to another microfrontend.
    *
-   * The listener is removed when navigating to another microfrontend, whether from the same app or a different one.
+   * @see CanClose
    */
-  public abstract addClosingListener(listener: ViewClosingListener): void;
+  public abstract addCanClose(canClose: CanClose): void;
 
   /**
-   * Removes the given listener.
+   * Unregisters the given guard.
    */
-  public abstract removeClosingListener(listener: ViewClosingListener): void;
+  public abstract removeCanClose(canClose: CanClose): void;
 }
 
 /**
- * Listener to be notified just before closing the workbench view.
+ * Guard that can be registered in {@link WorkbenchView} to decide whether the view can be closed.
  *
- * @category View
+ * The following example registers a `CanClose` guard that asks the user whether the view can be closed.
+ *
+ * ```ts
+ * class MicrofrontendComponent implements CanClose {
+ *
+ *   constructor() {
+ *     Beans.get(WorkbenchView).addCanClose(this);
+ *   }
+ *
+ *   public async canClose(): Promise<boolean> {
+ *     const action = await Beans.get(WorkbenchMessageBoxService).open('Do you want to close this view?', {
+ *       actions: {yes: 'Yes', no: 'No'},
+ *     });
+ *     return action === 'yes';
+ *   }
+ * }
+ * ```
  */
-export interface ViewClosingListener {
+export interface CanClose {
 
   /**
-   * Method invoked just before closing the workbench view.
-   *
-   * The closing event is cancelable, i.e., you can invoke {@link ViewClosingEvent.preventDefault} to prevent closing.
-   *
-   * Note that you can cancel the event only until the returned Promise resolves. For example, to ask the user
-   * for confirmation, you can use an async block and await user confirmation, as following:
-   *
-   * ```ts
-   * public async onClosing(event: ViewClosingEvent): Promise<void> {
-   *   const shouldClose = await askUserToConfirmClosing();
-   *   if (!shouldClose) {
-   *     event.preventDefault();
-   *   }
-   * }
-   * ```
+   * Decides whether this view can be closed.
    */
-  onClosing(event: ViewClosingEvent): void | Promise<void>;
+  canClose(): Observable<boolean> | Promise<boolean> | boolean;
 }
 
 /**
