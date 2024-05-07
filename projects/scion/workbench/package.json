@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench",
-  "version": "17.0.0-beta.7",
+  "version": "17.0.0-beta.8",
   "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.",
   "license": "EPL-2.0",
   "private": false,
