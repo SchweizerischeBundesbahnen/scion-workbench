@@ -11,6 +11,7 @@
 import {Directive, Input, OnDestroy, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {Disposable} from '../../common/disposable';
+import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to contribute an action to the dialog footer (only applicable if not using a custom dialog footer).
@@ -29,7 +30,7 @@ import {Disposable} from '../../common/disposable';
 @Directive({selector: 'ng-template[wbDialogAction]', standalone: true})
 export class WorkbenchDialogActionDirective implements OnDestroy {
 
-  private _action: Disposable;
+  private _action: Disposable | undefined;
 
   /**
    * Specifies where to place this action in the dialog footer. Default is `end`.
@@ -38,10 +39,12 @@ export class WorkbenchDialogActionDirective implements OnDestroy {
   public align: 'start' | 'end' = 'end';
 
   constructor(public readonly template: TemplateRef<void>, dialog: ɵWorkbenchDialog) {
-    this._action = dialog.registerAction(this);
+    // Defer registering action to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
+    asapScheduler.schedule(() => this._action = dialog.registerAction(this));
   }
 
   public ngOnDestroy(): void {
-    this._action.dispose();
+    // Defer disposing action to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
+    asapScheduler.schedule(() => this._action?.dispose());
   }
 }

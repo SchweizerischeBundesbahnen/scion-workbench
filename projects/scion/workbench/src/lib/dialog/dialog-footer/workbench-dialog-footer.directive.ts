@@ -11,6 +11,7 @@
 import {booleanAttribute, Directive, Input, OnDestroy, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {Disposable} from '../../common/disposable';
+import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to replace the default dialog footer that renders actions contributed via the {@link WorkbenchDialogActionDirective} directive.
@@ -27,7 +28,7 @@ import {Disposable} from '../../common/disposable';
 @Directive({selector: 'ng-template[wbDialogFooter]', standalone: true})
 export class WorkbenchDialogFooterDirective implements OnDestroy {
 
-  private _footer: Disposable;
+  private _footer: Disposable | undefined;
 
   /**
    * Specifies if to display a visual separator between the dialog content and this footer.
@@ -37,10 +38,12 @@ export class WorkbenchDialogFooterDirective implements OnDestroy {
   public divider?: boolean;
 
   constructor(public readonly template: TemplateRef<void>, dialog: ɵWorkbenchDialog) {
-    this._footer = dialog.registerFooter(this);
+    // Defer registering footer to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
+    asapScheduler.schedule(() => this._footer = dialog.registerFooter(this));
   }
 
   public ngOnDestroy(): void {
-    this._footer.dispose();
+    // Defer disposing footer to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
+    asapScheduler.schedule(() => this._footer?.dispose());
   }
 }
