@@ -8,16 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
-import {AppPO} from '../../app.po';
-import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
-import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
+import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../../helper/testing.util';
+import {SciKeyValueFieldPO} from '../../../@scion/components.internal/key-value-field.po';
+import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 import {Capability} from '@scion/microfrontend-platform';
-import {SciRouterOutletPO} from './sci-router-outlet.po';
-import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewPO} from '../../view.po';
+import {Application} from './application';
 
 /**
  * Playwright's test runner fails to compile when importing runtime types from `@scion/workbench` or `@scion/microfrontend-platform`, because
@@ -26,37 +23,27 @@ import {ViewPO} from '../../view.po';
  * Unlike classes or enums, interfaces can be referenced because they do not exist at runtime.
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
-export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
-export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
+export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {path: string | '<null>' | '<undefined>'}};
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {path: string | '<null>' | '<undefined>'}};
 export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'; properties: {path: string | '<null>' | '<undefined>'}};
 export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'; properties: {path: string | '<null>' | '<undefined>'}};
 
 /**
- * Page object to interact with {@link RegisterWorkbenchCapabilityPageComponent}.
+ * Page object to interact with {@link RegisterCapabilityPageComponent}.
  */
-export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPagePO {
+export class RegisterCapabilityPagePO {
 
-  public readonly locator: Locator;
-  public readonly outlet: SciRouterOutletPO;
-  public readonly view: ViewPO;
-
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
-    this.locator = this.outlet.frameLocator.locator('app-register-workbench-capability-page');
+  constructor(public locator: Locator) {
   }
 
   /**
-   * Registers the given workbench capability.
-   *
-   * This method exists as a convenience method to not have to enter all fields separately.
+   * Registers the given capability.
    *
    * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
-    if (capability.type !== undefined) {
-      await this.locator.locator('select.e2e-type').selectOption(capability.type);
-    }
+  public async registerCapability<T extends Capability>(application: Application, capability: T): Promise<T> {
+    await this.locator.locator('select.e2e-application').selectOption(application);
+    await this.locator.locator('input.e2e-type').fill(capability.type);
     if (capability.qualifier !== undefined) {
       const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
       await keyValueField.clear();
@@ -77,10 +64,10 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.private !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-private')).toggle(capability.private);
     }
-    if (capability.properties.path !== undefined) {
+    if (capability.properties?.['path'] !== undefined) {
       await this.locator.locator('input.e2e-path').fill(capability.properties.path);
     }
-    if (capability.properties.cssClass !== undefined) {
+    if (capability.properties?.['cssClass'] !== undefined) {
       await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
     if (capability.type === 'view') {
@@ -96,7 +83,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       await this.enterMessageBoxCapabilityProperties(capability as WorkbenchMessageBoxCapability);
     }
 
-    await this.clickRegister();
+    await this.locator.locator('button.e2e-register').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     const responseLocator = this.locator.locator('output.e2e-register-response');
@@ -121,9 +108,6 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     }
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
-    }
-    if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
   }
 
@@ -150,9 +134,6 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     }
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
-    }
-    if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
     }
   }
 
@@ -218,9 +199,5 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
-  }
-
-  private async clickRegister(): Promise<void> {
-    await this.locator.locator('button.e2e-register').click();
   }
 }

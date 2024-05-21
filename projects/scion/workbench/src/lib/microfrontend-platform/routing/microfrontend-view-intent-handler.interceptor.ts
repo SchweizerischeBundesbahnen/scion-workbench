@@ -9,9 +9,9 @@
  */
 
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {Injectable} from '@angular/core';
+import {Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchNavigationExtras, WorkbenchViewCapability} from '@scion/workbench-client';
-import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -19,9 +19,14 @@ import {Arrays, Dictionaries} from '@scion/toolkit/util';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 import {Objects} from '../../common/objects.util';
+import {stringifyError} from '../../common/stringify-error.util';
+import {Microfrontends} from '../common/microfrontend.util';
+import {RouterUtils} from '../../routing/router.util';
 
 /**
  * Handles microfrontend view intents, instructing the workbench to navigate to the microfrontend of the resolved capability.
+ *
+ * Microfrontends of the host are displayed in {@link ViewComponent}, microfrontends of other applications in {@link MicrofrontendViewComponent}.
  *
  * View intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
  * that are not connected to the SCION Workbench.
@@ -29,8 +34,9 @@ import {Objects} from '../../common/objects.util';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
-  constructor(private _workbenchRouter: WorkbenchRouter,
+  constructor(private _workbenchRouter: ɵWorkbenchRouter,
               private _viewRegistry: WorkbenchViewRegistry,
+              private _injector: Injector,
               private _logger: Logger) {
   }
 
@@ -48,25 +54,29 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
   private async consumeViewIntent(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<void> {
     const replyTo = message.headers.get(MessageHeaders.ReplyTo);
-    const success = await this.navigate(message);
-    await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
+    try {
+      const success = await this.navigate(message);
+      await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
+    }
+    catch (error) {
+      await Beans.get(MessageClient).publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
+    }
   }
 
   private async navigate(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<boolean> {
-    const viewCapability = message.capability as WorkbenchViewCapability;
-    const intent = message.intent;
+    const capability = message.capability as WorkbenchViewCapability;
     // TODO [Angular 20] remove backward compatibility for property 'blankInsertionIndex'
     const extras: WorkbenchNavigationExtras & {blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'} = message.body ?? {};
+    const intentParams = Objects.withoutUndefinedEntries(Dictionaries.coerce(message.intent.params));
+    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, capability);
 
-    const intentParams = Objects.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
-    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
-    const targets = this.resolveTargets(message, extras);
-    const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
+    if (Microfrontends.isHostProvider(capability)) {
+      const path = Microfrontends.substituteNamedParameters(capability.properties.path, {...urlParams, capabilityId: capability.metadata!.id});
+      const commands = runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path));
+      this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, capability, transientParams);
 
-    this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, viewCapability, transientParams);
-    const navigations = await Promise.all(Arrays.coerce(targets).map(target => {
       return this._workbenchRouter.navigate(commands, {
-        target,
+        target: extras.target,
         activate: extras.activate,
         close: extras.close,
         position: extras.position ?? extras.blankInsertionIndex,
@@ -75,8 +85,26 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
           [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
         }),
       });
-    }));
-    return navigations.every(Boolean);
+    }
+    else {
+      const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(capability.metadata!.id, urlParams);
+      const targets = Arrays.coerce(this.resolveTargets(message, extras));
+      this._logger.debug(() => `Navigating to: ${capability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, capability, transientParams);
+
+      const navigations = await Promise.all(targets.map(target => {
+        return this._workbenchRouter.navigate(commands, {
+          target,
+          activate: extras.activate,
+          close: extras.close,
+          position: extras.position ?? extras.blankInsertionIndex,
+          cssClass: extras.cssClass,
+          state: Objects.withoutUndefinedEntries({
+            [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
+          }),
+        });
+      }));
+      return navigations.every(Boolean);
+    }
   }
 
   /**

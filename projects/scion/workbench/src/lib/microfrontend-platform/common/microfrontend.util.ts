@@ -8,12 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {inject} from '@angular/core';
 import {ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchTheme} from '../../workbench.model';
+import {Maps} from '@scion/toolkit/util';
+import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
  * Provides functions related to workbench themes.
@@ -44,12 +46,20 @@ export const Microfrontends = {
    * Named parameters begin with a colon (`:`).
    */
   substituteNamedParameters,
+  /**
+   * Tests if given capability is provided by the host application.
+   */
+  isHostProvider: (capability: Capability): boolean => {
+    return capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+  },
 } as const;
 
-function substituteNamedParameters(value: string, params?: Map<string, unknown>): string;
-function substituteNamedParameters(value: string | null, params?: Map<string, unknown>): string | null;
-function substituteNamedParameters(value: string | undefined, params?: Map<string, unknown>): string | undefined;
-function substituteNamedParameters(value: string | null | undefined, params?: Map<string, unknown>): string | null | undefined {
+function substituteNamedParameters(value: string, params?: Map<string, unknown> | {[key: string]: unknown}): string;
+function substituteNamedParameters(value: string | null, params?: Map<string, unknown> | {[key: string]: unknown}): string | null;
+function substituteNamedParameters(value: string | undefined, params?: Map<string, unknown> | {[key: string]: unknown}): string | undefined;
+function substituteNamedParameters(value: string | null | undefined, params?: Map<string, unknown> | {[key: string]: unknown}): string | null | undefined {
+  params = Maps.coerce(params);
+
   if (!value || !params?.size) {
     return value;
   }

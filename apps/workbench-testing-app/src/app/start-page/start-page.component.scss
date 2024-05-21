@@ -56,17 +56,17 @@
           font-size: .5em;
         }
 
-        &.microfrontend.devtools {
+        &.microfrontend[data-app="devtools"] {
           background-color: var(--devtools-app-color);
           border-color: unset;
         }
 
-        &:is(.microfrontend, .test-capability).workbench-client-testing-app1 {
+        &.microfrontend[data-app="workbench-client-testing-app1"] {
           background-color: var(--workbench-client-testing-app1-color);
           border-color: unset;
         }
 
-        &:is(.microfrontend, .test-capability).workbench-client-testing-app2 {
+        &.microfrontend[data-app="workbench-client-testing-app2"] {
           background-color: var(--workbench-client-testing-app2-color);
           border-color: unset;
         }

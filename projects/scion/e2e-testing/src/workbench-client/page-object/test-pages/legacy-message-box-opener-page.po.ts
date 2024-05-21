@@ -60,23 +60,23 @@ export class LegacyMessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<LegacyMessageBoxOpenerPagePO> {
-    // Register view capability.
+    const identifier = `testee-${crypto.randomUUID()}`;
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'legacy-message-box-opener'},
+      qualifier: {test: identifier},
       properties: {
         path: 'test-pages/legacy-message-box-opener-page',
-        cssClass: 'legacy-message-box-opener',
         title: 'Legacy Message Box Opener',
-        pinToStartPage: true,
       },
     });
 
-    // Navigate to view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.navigate({test: 'legacy-message-box-opener'}, {
-      cssClass: 'legacy-message-box-opener',
+    await routerPage.navigate({test: identifier}, {
+      cssClass: identifier,
+      target: 'blank'
     });
-    return new LegacyMessageBoxOpenerPagePO(appPO, {cssClass: 'legacy-message-box-opener'});
+    await routerPage.view.tab.close();
+
+    return new LegacyMessageBoxOpenerPagePO(appPO, {cssClass: identifier});
   }
 }

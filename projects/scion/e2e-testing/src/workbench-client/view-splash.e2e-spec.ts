@@ -12,7 +12,7 @@ import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {expect} from '@playwright/test';
 import {ViewPagePO} from './page-object/view-page.po';
-import {MessagingPagePO} from './page-object/messaging-page.po';
+import {MicrofrontendPlatformPagePO} from '../workbench/page-object/microfrontend-platform-page/microfrontend-platform-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -46,9 +46,9 @@ test.describe('Workbench View', () => {
     await expect(testeeViewPage.outlet.splash).toBeVisible();
 
     // Publish message to dispose splash.
-    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
-    await messagingPage.publishMessage('signal-ready/view.101');
-    await messagingPage.view.tab.close();
+    const microfrontendPlatformPage = await microfrontendNavigator.openInNewTab(MicrofrontendPlatformPagePO);
+    await microfrontendPlatformPage.publishMessage('signal-ready/view.101');
+    await microfrontendPlatformPage.view.tab.close();
 
     // Expect splash not to display.
     await expect(testeeViewPage.outlet.splash).not.toBeVisible();

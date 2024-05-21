@@ -15,7 +15,7 @@ import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {ViewId} from '@scion/workbench-client';
+import {RouterPagePO} from '../router-page.po';
 
 export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
 
@@ -23,9 +23,9 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 
-  constructor(private _appPO: AppPO, viewId: ViewId) {
-    this.view = this._appPO.view({viewId});
-    this.outlet = new SciRouterOutletPO(this._appPO, {name: viewId});
+  constructor(private _appPO: AppPO, locateBy: {cssClass: string}) {
+    this.view = this._appPO.view({cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(this._appPO, {cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-bulk-navigation-test-page');
   }
 
@@ -56,25 +56,23 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<BulkNavigationTestPagePO> {
+    const identifier = `testee-${crypto.randomUUID()}`;
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'bulk-navigation'},
+      qualifier: {test: identifier},
       properties: {
         path: 'test-pages/bulk-navigation-test-page',
-        cssClass: 'e2e-test-bulk-navigation',
         title: 'Bulk Navigation Test',
-        pinToStartPage: true,
       },
     });
 
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('e2e-test-bulk-navigation', 'app1');
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({test: identifier}, {
+      cssClass: identifier,
+      target: 'blank',
+    });
+    await routerPage.view.tab.close();
 
-    // Create the page object.
-    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId: viewId});
-    await view.waitUntilAttached();
-    return new BulkNavigationTestPagePO(appPO, viewId);
+    return new BulkNavigationTestPagePO(appPO, {cssClass: identifier});
   }
 }

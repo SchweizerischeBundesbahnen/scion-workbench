@@ -48,15 +48,13 @@ export class BulkNavigationTestPagePO implements WorkbenchViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<BulkNavigationTestPagePO> {
+    const cssClass = `testee-${crypto.randomUUID()}`;
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewId = await routerPage.view.getViewId();
+    await routerPage.navigate(['test-pages/bulk-navigation-test-page'], {cssClass, target: 'blank'});
+    await routerPage.view.tab.close();
 
-    await routerPage.navigate(['test-pages/bulk-navigation-test-page'], {
-      target: viewId,
-    });
-
-    const view = appPO.view({cssClass: 'e2e-test-bulk-navigation', viewId});
+    const view = appPO.view({cssClass});
     await view.waitUntilAttached();
-    return new BulkNavigationTestPagePO(appPO, {viewId: await view.getViewId()});
+    return new BulkNavigationTestPagePO(appPO, {cssClass});
   }
 }

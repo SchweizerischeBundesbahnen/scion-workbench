@@ -132,6 +132,11 @@ export const routes: Routes = [
     loadComponent: () => import('./host-message-box-page/host-message-box-page.component'),
   },
   {
+    path: 'microfrontend-platform',
+    loadComponent: () => import('./microfrontend-platform-page/microfrontend-platform-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Microfrontend Platform', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-microfrontend-platform'},
+  },
+  {
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },

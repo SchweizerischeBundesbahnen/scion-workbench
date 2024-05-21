@@ -1,4 +1,4 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {Manifest} from '@scion/microfrontend-platform';
 
 /**
@@ -7,6 +7,19 @@ import {Manifest} from '@scion/microfrontend-platform';
 export const workbenchManifest: Manifest = {
   name: 'Workbench Host App',
   capabilities: [
+    {
+      type: WorkbenchCapabilities.View,
+      qualifier: {component: 'microfrontend-platform'},
+      private: false,
+      description: 'Allows interacting with SCION Microfrontend Platform.',
+      properties: {
+        path: 'microfrontend-platform',
+        tile: {
+          label: 'Microfrontend Platform',
+          cssClass: 'e2e-microfrontend-platform',
+        },
+      },
+    } satisfies WorkbenchViewCapability,
     {
       type: WorkbenchCapabilities.Notification,
       qualifier: {component: 'notification-page'},

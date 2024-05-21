@@ -16,7 +16,7 @@ import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {ViewId} from '@scion/workbench-client';
+import {RouterPagePO} from '../router-page.po';
 
 export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
 
@@ -30,9 +30,9 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
     activePanel: PanelPO;
   };
 
-  constructor(appPO: AppPO, viewId: ViewId) {
-    this.view = appPO.view({viewId});
-    this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
+  constructor(appPO: AppPO, locateBy: {cssClass: string}) {
+    this.view = appPO.view({cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-angular-zone-test-page');
 
     this.workbenchView = {
@@ -43,26 +43,24 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<AngularZoneTestPagePO> {
+    const identifier = `testee-${crypto.randomUUID()}`;
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'angular-zone'},
+      qualifier: {test: identifier},
       properties: {
         path: 'test-pages/angular-zone-test-page',
-        cssClass: 'e2e-test-angular-zone',
         title: 'Angular Zone Test Page',
-        pinToStartPage: true,
       },
     });
 
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('e2e-test-angular-zone', 'app1');
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({test: identifier}, {
+      cssClass: identifier,
+      target: 'blank',
+    });
+    await routerPage.view.tab.close();
 
-    // Create the page object.
-    const view = appPO.view({cssClass: 'e2e-test-angular-zone', viewId: viewId});
-    await view.waitUntilAttached();
-    return new AngularZoneTestPagePO(appPO, viewId);
+    return new AngularZoneTestPagePO(appPO, {cssClass: identifier});
   }
 }
 

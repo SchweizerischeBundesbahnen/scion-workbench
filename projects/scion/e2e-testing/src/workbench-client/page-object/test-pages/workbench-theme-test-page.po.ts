@@ -14,7 +14,7 @@ import {MicrofrontendNavigator} from '../../microfrontend-navigator';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
-import {ViewId} from '@scion/workbench-client';
+import {RouterPagePO} from '../router-page.po';
 
 export class WorkbenchThemeTestPagePO implements MicrofrontendViewPagePO {
 
@@ -25,9 +25,9 @@ export class WorkbenchThemeTestPagePO implements MicrofrontendViewPagePO {
   public readonly theme: Locator;
   public readonly colorScheme: Locator;
 
-  constructor(appPO: AppPO, viewId: ViewId) {
-    this.view = appPO.view({viewId});
-    this.outlet = new SciRouterOutletPO(appPO, {name: viewId});
+  constructor(appPO: AppPO, locateBy: {cssClass: string}) {
+    this.view = appPO.view({cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-workbench-theme-test-page');
 
     this.theme = this.locator.locator('span.e2e-theme');
@@ -35,25 +35,23 @@ export class WorkbenchThemeTestPagePO implements MicrofrontendViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<WorkbenchThemeTestPagePO> {
+    const identifier = `testee-${crypto.randomUUID()}`;
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'workbench-theme'},
+      qualifier: {test: identifier},
       properties: {
         path: 'test-pages/workbench-theme-test-page',
-        cssClass: 'e2e-test-workbench-theme',
         title: 'Workbench Theme Test Page',
-        pinToStartPage: true,
       },
     });
 
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('e2e-test-workbench-theme', 'app1');
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({test: identifier}, {
+      cssClass: identifier,
+      target: 'blank',
+    });
+    await routerPage.view.tab.close();
 
-    // Create the page object.
-    const view = appPO.view({cssClass: 'e2e-test-workbench-theme', viewId: viewId});
-    await view.waitUntilAttached();
-    return new WorkbenchThemeTestPagePO(appPO, viewId);
+    return new WorkbenchThemeTestPagePO(appPO, {cssClass: identifier});
   }
 }

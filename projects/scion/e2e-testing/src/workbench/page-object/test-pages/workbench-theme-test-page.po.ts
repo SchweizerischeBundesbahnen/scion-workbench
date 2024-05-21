@@ -32,15 +32,13 @@ export class WorkbenchThemeTestPagePO implements WorkbenchViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<WorkbenchThemeTestPagePO> {
+    const cssClass = `testee-${crypto.randomUUID()}`;
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewId = await routerPage.view.getViewId();
+    await routerPage.navigate(['test-pages/workbench-theme-test-page'], {cssClass, target: 'blank'});
+    await routerPage.view.tab.close();
 
-    await routerPage.navigate(['test-pages/workbench-theme-test-page'], {
-      target: viewId,
-    });
-
-    const view = appPO.view({cssClass: 'e2e-test-workbench-theme', viewId});
+    const view = appPO.view({cssClass});
     await view.waitUntilAttached();
-    return new WorkbenchThemeTestPagePO(appPO, {viewId});
+    return new WorkbenchThemeTestPagePO(appPO, {cssClass});
   }
 }

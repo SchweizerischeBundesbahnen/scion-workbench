@@ -1,12 +1,21 @@
 <form autocomplete="off" [formGroup]="form">
   <section>
-    <sci-form-field label="Type">
-      <select [formControl]="form.controls.type" class="e2e-type">
-        <option [value]="WorkbenchCapabilities.View">VIEW</option>
-        <option [value]="WorkbenchCapabilities.Dialog">DIALOG</option>
-        <option [value]="WorkbenchCapabilities.MessageBox">MESSAGEBOX</option>
-        <option [value]="WorkbenchCapabilities.Popup">POPUP</option>
+    <sci-form-field label="Application">
+      <select [formControl]="form.controls.application" class="e2e-application">
+        @for (application of applications; track application) {
+          <option [value]="application">{{application}}</option>
+        }
       </select>
+    </sci-form-field>
+
+    <sci-form-field label="Type">
+      <input [formControl]="form.controls.type" [attr.list]="capabilityTypeList" class="e2e-type">
+      <datalist [attr.id]="capabilityTypeList">
+        <option [value]="WorkbenchCapabilities.View">{{WorkbenchCapabilities.View}}</option>
+        <option [value]="WorkbenchCapabilities.Dialog">{{WorkbenchCapabilities.Dialog}}</option>
+        <option [value]="WorkbenchCapabilities.MessageBox">{{WorkbenchCapabilities.MessageBox}}</option>
+        <option [value]="WorkbenchCapabilities.Popup">{{WorkbenchCapabilities.Popup}}</option>
+      </datalist>
     </sci-form-field>
 
     <sci-form-field label="Qualifier">
@@ -29,10 +38,10 @@
     </sci-form-field>
   </section>
 
-  <section>
-    <header>Properties</header>
+  @if (form.controls.type.value === WorkbenchCapabilities.View) {
+    <section>
+      <header>Properties</header>
 
-    @if (form.controls.type.value === WorkbenchCapabilities.View) {
       <sci-form-field label="Path">
         <input [formControl]="form.controls.viewProperties.controls.path" class="e2e-path">
       </sci-form-field>
@@ -56,13 +65,13 @@
       <sci-form-field label="CSS Class(es)">
         <app-css-class [formControl]="form.controls.viewProperties.controls.cssClass"/>
       </sci-form-field>
+    </section>
+  }
 
-      <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControl]="form.controls.viewProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
-      </sci-form-field>
-    }
+  @if (form.controls.type.value === WorkbenchCapabilities.Popup) {
+    <section>
+      <header>Properties</header>
 
-    @if (form.controls.type.value === WorkbenchCapabilities.Popup) {
       <sci-form-field label="Path">
         <input [formControl]="form.controls.popupProperties.controls.path" class="e2e-path">
       </sci-form-field>
@@ -95,16 +104,15 @@
         <sci-checkbox [formControl]="form.controls.popupProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
       </sci-form-field>
 
-      <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControl]="form.controls.popupProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
-      </sci-form-field>
-
       <sci-form-field label="CSS Class(es)">
         <app-css-class [formControl]="form.controls.popupProperties.controls.cssClass"/>
       </sci-form-field>
-    }
+    </section>
+  }
 
-    @if (form.controls.type.value === WorkbenchCapabilities.Dialog) {
+  @if (form.controls.type.value === WorkbenchCapabilities.Dialog) {
+    <section>
+      <header>Properties</header>
       <sci-form-field label="Path">
         <input [formControl]="form.controls.dialogProperties.controls.path" class="e2e-path">
       </sci-form-field>
@@ -156,9 +164,12 @@
       <sci-form-field label="CSS Class(es)">
         <app-css-class [formControl]="form.controls.dialogProperties.controls.cssClass"/>
       </sci-form-field>
-    }
+    </section>
+  }
 
-    @if (form.controls.type.value === WorkbenchCapabilities.MessageBox) {
+  @if (form.controls.type.value === WorkbenchCapabilities.MessageBox) {
+    <section>
+      <header>Properties</header>
       <ng-container [formGroup]="this.form.controls.messageBoxProperties">
         <sci-form-field label="Path">
           <input [formControl]="this.form.controls.messageBoxProperties.controls.path" class="e2e-path">
@@ -198,8 +209,8 @@
           <app-css-class [formControl]="form.controls.messageBoxProperties.controls.cssClass"/>
         </sci-form-field>
       </ng-container>
-    }
-  </section>
+    </section>
+  }
 
   <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid" sci-primary>Register</button>
 

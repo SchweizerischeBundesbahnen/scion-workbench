@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_IDENTITY, Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
+import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchDialogCapability} from '@scion/workbench-client';
-import {Beans} from '@scion/toolkit/bean-manager';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts dialog capabilities to have required properties.
@@ -43,8 +43,7 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
   }
 
   private assertSize(capability: WorkbenchDialogCapability): void {
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
-    if (isHostProvider) {
+    if (Microfrontends.isHostProvider(capability)) {
       return;
     }
 

@@ -16,6 +16,7 @@ import {PopupPO} from '../../../popup.po';
 import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
+import {RouterPagePO} from '../router-page.po';
 
 export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
 
@@ -50,51 +51,46 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
   }
 
   public static async openInNewTab(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator): Promise<InputFieldTestPagePO> {
+    const identifier = `testee-${crypto.randomUUID()}`;
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {test: 'input-field'},
+      qualifier: {test: identifier},
       properties: {
         path: 'test-pages/input-field-test-page',
-        cssClass: 'test-input-field',
         title: 'Input Field Test Page',
-        pinToStartPage: true,
       },
     });
 
-    // Navigate to the view.
-    const startPage = await appPO.openNewViewTab();
-    const viewId = await startPage.view.getViewId();
-    await startPage.clickTestCapability('test-input-field', 'app1');
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({test: identifier}, {
+      cssClass: identifier,
+      target: 'blank',
+    });
+    await routerPage.view.tab.close();
 
-    // Create the page object.
-    const view = appPO.view({cssClass: 'test-input-field', viewId: viewId});
-    await view.waitUntilAttached();
-
-    const outlet = new SciRouterOutletPO(appPO, {name: viewId});
+    const view = appPO.view({cssClass: identifier});
+    const outlet = new SciRouterOutletPO(appPO, {cssClass: identifier});
     return new InputFieldTestPagePO(outlet, view);
   }
 
   public static async openInPopup(appPO: AppPO, microfrontendNavigator: MicrofrontendNavigator, popupOptions?: {closeOnFocusLost?: boolean}): Promise<InputFieldTestPagePO> {
+    const identifier = `testee-${crypto.randomUUID()}`;
     await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
-      qualifier: {test: 'input-field'},
+      qualifier: {test: identifier},
       properties: {
         path: 'test-pages/input-field-test-page',
-        cssClass: 'test-input-field',
       },
     });
 
-    // Open the popup.
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({test: 'input-field'});
+    await popupOpenerPage.enterQualifier({test: identifier});
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: popupOptions?.closeOnFocusLost});
+    await popupOpenerPage.enterCssClass(identifier);
     await popupOpenerPage.open();
 
-    // Create the page object.
-    const popup = appPO.popup({cssClass: 'test-input-field'});
-    await popup.locator.waitFor({state: 'attached'});
-
-    const outlet = new SciRouterOutletPO(appPO, {cssClass: ['e2e-popup', 'test-input-field']});
+    const popup = appPO.popup({cssClass: identifier});
+    const outlet = new SciRouterOutletPO(appPO, {cssClass: identifier});
     return new InputFieldTestPagePO(outlet, popup);
   }
 }

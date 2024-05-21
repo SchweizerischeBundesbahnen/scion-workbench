@@ -22,7 +22,6 @@ import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {FilterPipe} from '../common/filter.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ArrayConcatPipe} from '../common/array-concat.pipe';
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
 
 @Component({
@@ -42,7 +41,6 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
     SciTabbarComponent,
     SciTabDirective,
     FilterPipe,
-    ArrayConcatPipe,
     WorkbenchRouterLinkDirective,
   ],
 })
@@ -56,8 +54,7 @@ export default class StartPageComponent {
 
   public filterControl = this._formBuilder.control('');
   public workbenchViewRoutes$: Observable<Routes>;
-  public microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
-  public testCapabilities$: Observable<Capability[]> | undefined;
+  public microfrontendViewCapabilities$: Observable<WorkbenchViewTestingAppCapability[]> | undefined;
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
@@ -83,17 +80,9 @@ export default class StartPageComponent {
 
     if (workbenchConfig.microfrontendPlatform) {
       // Read microfrontend views to be pinned to the start page.
-      this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
+      this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewTestingAppCapability>({type: WorkbenchCapabilities.View})
         .pipe(
-          filterArray(viewCapability => 'pinToStartPage' in viewCapability.properties && !!viewCapability.properties['pinToStartPage']),
-          filterArray(viewCapability => !isTestCapability(viewCapability)),
-          sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
-        );
-      // Read test capabilities to be pinned to the start page.
-      this.testCapabilities$ = this._manifestService!.lookupCapabilities$()
-        .pipe(
-          filterArray(capability => !!capability.properties && 'pinToStartPage' in capability.properties && !!capability.properties['pinToStartPage']),
-          filterArray(viewCapability => isTestCapability(viewCapability)),
+          filterArray(viewCapability => !!viewCapability.properties.tile),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );
     }
@@ -183,12 +172,8 @@ export default class StartPageComponent {
       });
   }
 
-  public selectViewCapabilityText = (viewCapability: WorkbenchViewCapability): string | undefined => {
+  public selectViewCapabilityText = (viewCapability: WorkbenchViewTestingAppCapability): string | undefined => {
     return viewCapability.properties!.title;
-  };
-
-  public selectTestCapabilityText = (testCapability: Capability): string | undefined => {
-    return testCapability.properties?.['cssClass'];
   };
 
   public selectViewRouteText = (route: Route): string | undefined => {
@@ -196,6 +181,11 @@ export default class StartPageComponent {
   };
 }
 
-function isTestCapability(capability: Capability): boolean {
-  return Object.keys(capability.qualifier ?? {}).includes('test');
-}
+type WorkbenchViewTestingAppCapability = WorkbenchViewCapability & {
+  properties: {
+    tile: {
+      label: string;
+      cssClass: string;
+    };
+  };
+};

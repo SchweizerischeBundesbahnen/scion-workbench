@@ -9,8 +9,8 @@
  */
 
 import {test} from '../fixtures';
-import {WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {expect} from '@playwright/test';
+import {WorkbenchViewCapability} from '../workbench/page-object/microfrontend-platform-page/register-capability-page.po';
 
 test.describe('Workbench View Capability', () => {
 

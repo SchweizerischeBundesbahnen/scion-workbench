@@ -9,7 +9,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogOptions} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -18,6 +18,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchDialogService} from '../../dialog/workbench-dialog.service';
 import {MicrofrontendDialogComponent} from './microfrontend-dialog.component';
 import {MicrofrontendHostDialogComponent} from '../microfrontend-host-dialog/microfrontend-host-dialog.component';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Handles dialog intents, instructing the workbench to open a dialog with the microfrontend declared on the resolved capability.
@@ -70,10 +71,9 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
     const options = message.body ?? {};
     const capability = message.capability as WorkbenchDialogCapability;
     const params = message.intent.params ?? new Map();
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
-    this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
 
-    return this._dialogService.open(isHostProvider ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
+    this._logger.debug(() => 'Handling microfrontend dialog intent', LoggerNames.MICROFRONTEND, options);
+    return this._dialogService.open(Microfrontends.isHostProvider(capability) ? MicrofrontendHostDialogComponent : MicrofrontendDialogComponent, {
       inputs: {capability, params},
       modality: options.modality,
       context: options.context,

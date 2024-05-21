@@ -73,15 +73,12 @@ export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialo
   }
 
   public static async openInNewTab(appPO: AppPO, workbenchNavigator: WorkbenchNavigator): Promise<InputFieldTestPagePO> {
+    const cssClass = `testee-${crypto.randomUUID()}`;
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    const viewId = await routerPage.view.getViewId();
+    await routerPage.navigate(['test-pages/input-field-test-page'], {cssClass, target: 'blank'});
+    await routerPage.view.tab.close();
 
-    await routerPage.navigate(['test-pages/input-field-test-page'], {
-      target: viewId,
-      cssClass: 'input-field-test-page'
-    });
-
-    const view = appPO.view({cssClass: 'input-field-test-page', viewId});
+    const view = appPO.view({cssClass});
     await view.waitUntilAttached();
     return new InputFieldTestPagePO(view);
   }

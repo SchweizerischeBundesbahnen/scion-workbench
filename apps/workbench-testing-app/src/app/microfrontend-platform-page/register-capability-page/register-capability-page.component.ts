@@ -11,25 +11,24 @@
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchMessageBoxCapability, WorkbenchMessageBoxSize, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
+import {Capability, ManifestService, mapToBody, MessageClient, ParamDefinition} from '@scion/microfrontend-platform';
+import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchMessageBoxCapability, WorkbenchMessageBoxSize, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
-import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
+import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {JsonPipe} from '@angular/common';
-import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {parseTypedString} from '../common/parse-typed-value.util';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {parseTypedString} from '../../common/parse-typed-value.util';
+import {CssClassComponent} from '../../css-class/css-class.component';
+import {UUID} from '@scion/toolkit/uuid';
+import {stringifyError} from '../../common/stringify-error.util';
+import {SettingsService} from '../../settings.service';
 
-/**
- * Allows registering workbench capabilities.
- */
 @Component({
-  selector: 'app-register-workbench-capability-page',
-  templateUrl: './register-workbench-capability-page.component.html',
-  styleUrls: ['./register-workbench-capability-page.component.scss'],
+  selector: 'app-register-capability-page',
+  templateUrl: './register-capability-page.component.html',
+  styleUrls: ['./register-capability-page.component.scss'],
   standalone: true,
   imports: [
     JsonPipe,
@@ -41,9 +40,10 @@ import {CssClassComponent} from '../css-class/css-class.component';
     CssClassComponent,
   ],
 })
-export default class RegisterWorkbenchCapabilityPageComponent {
+export default class RegisterCapabilityPageComponent {
 
-  public form = this._formBuilder.group({
+  protected form = this._formBuilder.group({
+    application: this._formBuilder.control('', Validators.required),
     type: this._formBuilder.control('', Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     requiredParams: this._formBuilder.control(''),
@@ -57,7 +57,6 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       closable: this._formBuilder.control<boolean | null>(null),
       showSplash: this._formBuilder.control<boolean | null>(null),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
-      pinToStartPage: this._formBuilder.control(false),
     }),
     popupProperties: this._formBuilder.group({
       path: this._formBuilder.control(''),
@@ -70,7 +69,6 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         maxWidth: this._formBuilder.control(''),
       }),
       showSplash: this._formBuilder.control<boolean | null>(null),
-      pinToStartPage: this._formBuilder.control(false),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
     dialogProperties: this._formBuilder.group({
@@ -105,17 +103,22 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     }),
   });
 
-  public capability: Capability | undefined;
-  public registerError: string | undefined;
-  public WorkbenchCapabilities = WorkbenchCapabilities;
+  protected capability: Capability | undefined;
+  protected registerError: string | undefined;
+  protected applications: string[];
+  protected WorkbenchCapabilities = WorkbenchCapabilities;
+  protected capabilityTypeList = `capability-type-list-${UUID.randomUUID()}`;
 
-  constructor(view: WorkbenchView,
-              private _manifestService: ManifestService,
+  constructor(manifestService: ManifestService,
+              private _messageClient: MessageClient,
+              private _settingsService: SettingsService,
               private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+    this.applications = manifestService.applications
+      .filter(application => application.symbolicName.startsWith('workbench'))
+      .map(application => application.symbolicName);
   }
 
-  public async onRegister(): Promise<void> {
+  protected async onRegister(): Promise<void> {
     const capability: Capability = ((): Capability => {
       switch (this.form.controls.type.value) {
         case WorkbenchCapabilities.View:
@@ -127,23 +130,36 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         case WorkbenchCapabilities.MessageBox:
           return this.readMessageBoxCapabilityFromUI();
         default:
-          throw Error('Capability expected to be a workbench capability, but was not.');
+          return this.readCapabilityFromUI();
       }
     })();
 
     this.capability = undefined;
     this.registerError = undefined;
-
-    await this._manifestService.registerCapability(capability)
-      .then(async id => {
-        this.capability = (await firstValueFrom(this._manifestService.lookupCapabilities$({id})))[0];
-        this.form.reset();
-        this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
-      })
-      .catch(error => this.registerError = stringifyError(error));
+    try {
+      this.capability = await firstValueFrom(this._messageClient.request$<Capability>(`application/${this.form.controls.application.value}/capability/register`, capability).pipe(mapToBody()));
+      this.resetForm();
+    }
+    catch (error) {
+      this.registerError = stringifyError(error);
+    }
   }
 
-  private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
+  private readCapabilityFromUI(): Capability {
+    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    return {
+      type: this.form.controls.type.value,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
+      private: this.form.controls.private.value,
+    };
+  }
+
+  private readViewCapabilityFromUI(): WorkbenchViewCapability {
     const requiredParams: ViewParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ViewParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
@@ -163,12 +179,11 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         cssClass: this.form.controls.viewProperties.controls.cssClass.value,
         closable: this.form.controls.viewProperties.controls.closable.value ?? undefined,
         showSplash: this.form.controls.viewProperties.controls.showSplash.value ?? undefined,
-        pinToStartPage: this.form.controls.viewProperties.controls.pinToStartPage.value,
       },
     };
   }
 
-  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & {properties: {pinToStartPage: boolean}} {
+  private readPopupCapabilityFromUI(): WorkbenchPopupCapability {
     const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {
@@ -190,7 +205,6 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           maxHeight: this.form.controls.popupProperties.controls.size.controls.maxHeight.value || undefined,
         }),
         showSplash: this.form.controls.popupProperties.controls.showSplash.value ?? undefined,
-        pinToStartPage: this.form.controls.popupProperties.controls.pinToStartPage.value,
         cssClass: this.form.controls.popupProperties.controls.cssClass.value,
       },
     };
@@ -252,5 +266,12 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         cssClass: this.form.controls.messageBoxProperties.controls.cssClass.value,
       },
     };
+  }
+
+  private resetForm(): void {
+    if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
+      this.form.reset();
+      this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+    }
   }
 }

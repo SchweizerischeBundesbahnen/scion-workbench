@@ -10,14 +10,20 @@
 
 import {Inject, NgModule} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
+import {APP_IDENTITY, Capability, Intention, ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {firstValueFrom} from 'rxjs';
 
 @NgModule({})
 export default class ActivatorModule {
 
-  constructor(private _manifestService: ManifestService, @Inject(APP_IDENTITY) symbolicName: string) {
-    this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
+  constructor(private _manifestService: ManifestService,
+              private _messageClient: MessageClient,
+              @Inject(APP_IDENTITY) private _symbolicName: string) {
+    this.registerManifestObjects(this._symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
+    this.installCapabilityRegisterRequestHandler();
+    this.installCapabilityUnregisterRequestHandler();
+    this.installIntentionRegisterRequestHandler();
   }
 
   private async registerManifestObjects(appSymbolicName: string): Promise<void> {
@@ -25,7 +31,7 @@ export default class ActivatorModule {
     const heading = `${app}: Workbench Client E2E Testpage`;
 
     // Register view to interact with the workbench view object.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
+    await this._manifestService.registerCapability<WorkbenchViewTestingAppCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'view',
@@ -47,15 +53,18 @@ export default class ActivatorModule {
       properties: {
         path: 'test-view',
         showSplash: true,
-        pinToStartPage: true,
         title: 'Workbench View',
         heading,
         cssClass: 'e2e-test-view',
+        tile: {
+          label: 'Workbench View',
+          cssClass: 'e2e-test-view',
+        },
       },
     });
 
     // Register view to navigate using the workbench router.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
+    await this._manifestService.registerCapability<WorkbenchViewTestingAppCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'router',
@@ -66,72 +75,18 @@ export default class ActivatorModule {
       properties: {
         path: 'test-router',
         showSplash: true,
-        pinToStartPage: true,
         title: 'Workbench Router',
         heading,
         cssClass: 'e2e-test-router',
-      },
-    });
-
-    // Register view to register workbench capabilities dynamically at runtime.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
-      type: WorkbenchCapabilities.View,
-      qualifier: {
-        component: 'register-workbench-capability',
-        app,
-      },
-      description: '[e2e] Allows registering workbench capabilities',
-      private: false,
-      properties: {
-        path: 'register-workbench-capability',
-        showSplash: true,
-        pinToStartPage: true,
-        title: 'Register Capability',
-        heading,
-        cssClass: 'e2e-register-workbench-capability',
-      },
-    });
-
-    // Register view to unregister workbench capabilities dynamically at runtime.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
-      type: WorkbenchCapabilities.View,
-      qualifier: {
-        component: 'unregister-workbench-capability',
-        app,
-      },
-      description: '[e2e] Allows unregistering workbench capabilities',
-      private: false,
-      properties: {
-        path: 'unregister-workbench-capability',
-        showSplash: true,
-        pinToStartPage: true,
-        title: 'Unregister Capability',
-        heading,
-        cssClass: 'e2e-unregister-workbench-capability',
-      },
-    });
-
-    // Register view to register view intentions dynamically at runtime.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
-      type: WorkbenchCapabilities.View,
-      qualifier: {
-        component: 'register-workbench-intention',
-        app,
-      },
-      description: '[e2e] Allows registering view intentions',
-      private: false,
-      properties: {
-        path: 'register-workbench-intention',
-        showSplash: true,
-        pinToStartPage: true,
-        title: 'Register Intention',
-        heading,
-        cssClass: 'e2e-register-workbench-intention',
+        tile: {
+          label: 'Workbench Router',
+          cssClass: 'e2e-test-router',
+        },
       },
     });
 
     // Register view to open a workbench popup.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
+    await this._manifestService.registerCapability<WorkbenchViewTestingAppCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'popup',
@@ -142,10 +97,13 @@ export default class ActivatorModule {
       properties: {
         path: 'test-popup-opener',
         showSplash: true,
-        pinToStartPage: true,
         title: 'Workbench Popup',
         heading,
         cssClass: 'e2e-test-popup-opener',
+        tile: {
+          label: 'Workbench Popup',
+          cssClass: 'e2e-test-popup-opener',
+        },
       },
     });
 
@@ -165,7 +123,7 @@ export default class ActivatorModule {
     });
 
     // Register view to open a workbench dialog.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
+    await this._manifestService.registerCapability<WorkbenchViewTestingAppCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'dialog',
@@ -176,10 +134,13 @@ export default class ActivatorModule {
       properties: {
         path: 'test-dialog-opener',
         showSplash: true,
-        pinToStartPage: true,
         title: 'Workbench Dialog',
         heading,
         cssClass: 'e2e-test-dialog-opener',
+        tile: {
+          label: 'Workbench Dialog',
+          cssClass: 'e2e-test-dialog-opener',
+        },
       },
     });
 
@@ -203,7 +164,7 @@ export default class ActivatorModule {
     });
 
     // Register view to open a workbench message box.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
+    await this._manifestService.registerCapability<WorkbenchViewTestingAppCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'messagebox',
@@ -214,10 +175,13 @@ export default class ActivatorModule {
       properties: {
         path: 'test-message-box-opener',
         showSplash: true,
-        pinToStartPage: true,
         title: 'Workbench Message Box',
         heading,
         cssClass: 'e2e-test-message-box-opener',
+        tile: {
+          label: 'Workbench Message Box',
+          cssClass: 'e2e-test-message-box-opener',
+        },
       },
     });
 
@@ -241,7 +205,7 @@ export default class ActivatorModule {
     });
 
     // Register view to display a workbench notification.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
+    await this._manifestService.registerCapability<WorkbenchViewTestingAppCapability>({
       type: WorkbenchCapabilities.View,
       qualifier: {
         component: 'notification',
@@ -252,32 +216,43 @@ export default class ActivatorModule {
       properties: {
         path: 'test-notification-opener',
         showSplash: true,
-        pinToStartPage: true,
         title: 'Workbench Notification',
         heading,
         cssClass: 'e2e-test-notification-opener',
+        tile: {
+          label: 'Workbench Notification',
+          cssClass: 'e2e-test-notification-opener',
+        },
       },
     });
+  }
 
-    // Register view to exchange messages via @scion/microfrontend-platform.
-    await this._manifestService.registerCapability<TestingAppViewCapability>({
-      type: WorkbenchCapabilities.View,
-      qualifier: {
-        component: 'messaging',
-        app,
-      },
-      description: '[e2e] Allows exchanging messages via @scion/microfrontend-platform',
-      private: false,
-      properties: {
-        path: 'messaging',
-        showSplash: true,
-        pinToStartPage: true,
-        title: 'Messaging',
-        heading,
-        cssClass: 'e2e-messaging',
-      },
+  private installCapabilityRegisterRequestHandler(): void {
+    this._messageClient.onMessage<Capability>(`application/${this._symbolicName}/capability/register`, async ({body: capability}) => {
+      const capabilityId = await this._manifestService.registerCapability(capability!);
+      return (await firstValueFrom(this._manifestService.lookupCapabilities$({id: capabilityId})))[0];
+    });
+  }
+
+  private installCapabilityUnregisterRequestHandler(): void {
+    this._messageClient.onMessage<void>(`application/${this._symbolicName}/capability/:capabilityId/unregister`, async message => {
+      await this._manifestService.unregisterCapabilities({id: message.params?.get('capabilityId')});
+      return true;
+    });
+  }
+
+  private installIntentionRegisterRequestHandler(): void {
+    this._messageClient.onMessage<Intention>(`application/${this._symbolicName}/intention/register`, async ({body: intention}) => {
+      return this._manifestService.registerIntention(intention!);
     });
   }
 }
 
-type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage?: boolean}};
+type WorkbenchViewTestingAppCapability = WorkbenchViewCapability & {
+  properties: {
+    tile: {
+      label: string;
+      cssClass: string;
+    };
+  };
+};

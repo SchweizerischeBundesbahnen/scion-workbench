@@ -11,6 +11,7 @@
 import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability} from '@scion/workbench-client';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Asserts view capabilities to have required properties and assigns each view capability a stable identifer required for persistent navigation.
@@ -35,6 +36,28 @@ export class MicrofrontendViewCapabilityValidator implements CapabilityIntercept
       throw Error(`[NullPathError] View capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(viewCapability)}]`);
     }
 
+    if (Microfrontends.isHostProvider(viewCapability)) {
+      this.validateHostCapability(viewCapability);
+    }
+
     return capability;
+  }
+
+  private validateHostCapability(hostCapability: WorkbenchViewCapability): void {
+    if (hostCapability.properties.title) {
+      throw Error(`[UnsupportedCapabilityProperty] Host view capability must not define the "title" property. Set the title via route data or the view handle instead. [capability=${JSON.stringify(hostCapability)}]`);
+    }
+    if (hostCapability.properties.heading) {
+      throw Error(`[UnsupportedCapabilityProperty] Host view capability must not define the "heading" property. Set the heading via route data or the view handle instead. [capability=${JSON.stringify(hostCapability)}]`);
+    }
+    if (hostCapability.properties.closable) {
+      throw Error(`[UnsupportedCapabilityProperty] Host view capability must not define "closable" property. Set the heading via route data or the view handle instead. [capability=${JSON.stringify(hostCapability)}]`);
+    }
+    if (hostCapability.properties.cssClass) {
+      throw Error(`[UnsupportedCapabilityProperty] Host view capability must not define the "cssClass" property. Set the CSS class(es) via route data or the view handle instead. [capability=${JSON.stringify(hostCapability)}]`);
+    }
+    if (hostCapability.properties.showSplash) {
+      throw Error(`[UnsupportedCapabilityProperty] Host view capability must not define the "showSplash" property. [capability=${JSON.stringify(hostCapability)}]`);
+    }
   }
 }

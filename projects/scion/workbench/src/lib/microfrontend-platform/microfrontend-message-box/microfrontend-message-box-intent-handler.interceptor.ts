@@ -9,7 +9,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxOptions} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -18,6 +18,7 @@ import {WorkbenchMessageBoxService} from '../../message-box/workbench-message-bo
 import {Arrays} from '@scion/toolkit/util';
 import {MicrofrontendHostMessageBoxComponent} from '../microfrontend-host-message-box/microfrontend-host-message-box.component';
 import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.component';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Handles messagebox intents, instructing the workbench to open a message box with the microfrontend declared on the resolved capability.
@@ -71,10 +72,9 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
     const options = message.body ?? {};
     const capability = message.capability as WorkbenchMessageBoxCapability;
     const params = message.intent.params ?? new Map();
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
 
     this._logger.debug(() => 'Handling microfrontend messagebox intent', LoggerNames.MICROFRONTEND, options);
-    return this._messageBoxService.open(isHostProvider ? MicrofrontendHostMessageBoxComponent : MicrofrontendMessageBoxComponent, {
+    return this._messageBoxService.open(Microfrontends.isHostProvider(capability) ? MicrofrontendHostMessageBoxComponent : MicrofrontendMessageBoxComponent, {
       inputs: {capability, params},
       title: options.title,
       actions: options.actions,

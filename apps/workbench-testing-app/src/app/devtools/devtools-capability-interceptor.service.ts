@@ -41,7 +41,9 @@ class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, Workbe
     // Add property to pin DevTools to the start page.
     capability.properties = {
       ...capability.properties,
-      pinToStartPage: true,
+      tile: {
+        label: 'Developer Tools',
+      },
     };
 
     return capability;

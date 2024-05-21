@@ -16,6 +16,7 @@ import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outle
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
 import {ViewId} from '@scion/workbench';
 import {waitForCondition} from './helper/testing.util';
+import {Application} from './workbench/page-object/microfrontend-platform-page/application';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -72,24 +73,18 @@ export class StartPagePO implements WorkbenchViewPagePO {
   /**
    * Clicks the microfrontend view tile with specified CSS class set.
    */
-  public async openMicrofrontendView(cssClass: string, app: string): Promise<void> {
+  public async openMicrofrontendView(cssClass: string, app: Application): Promise<void> {
     const viewId = await this.view.getViewId();
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-microfrontend-views');
-    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${cssClass}.workbench-client-testing-${app}`).click();
+    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${cssClass}[data-app="${app}"]`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
-    // Wait for microfrontend to be loaded.
-    const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;
-    await frameLocator.locator('app-root').waitFor({state: 'visible'});
+    if (app !== 'workbench-host-app') {
+      // Wait for microfrontend to be loaded.
+      const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;
+      await frameLocator.locator('app-root').waitFor({state: 'visible'});
+    }
     // Wait until completed navigation.
     await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
-  }
-
-  /**
-   * Clicks the test capability tile with specified CSS class set.
-   */
-  public async clickTestCapability(capabilityCssClass: string, app: string): Promise<void> {
-    await this._tabbar.selectTab('e2e-test-capabilities');
-    await this._tabbarLocator.locator(`.e2e-test-capability-tiles a.${capabilityCssClass}.workbench-client-testing-${app}`).click();
   }
 }

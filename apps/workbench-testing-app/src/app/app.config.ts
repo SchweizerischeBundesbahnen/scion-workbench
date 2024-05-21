@@ -21,6 +21,7 @@ import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
+import {provideWorkbenchHostCapabilityRegistrator} from './microfrontend-platform-page/microfrontend-platform.service';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideDevToolsInterceptor(),
     provideNotificationPage(),
     provideAnimationsIfEnabled(),
+    provideWorkbenchHostCapabilityRegistrator(),
     Perspectives.provideRoutes(),
   ],
 };

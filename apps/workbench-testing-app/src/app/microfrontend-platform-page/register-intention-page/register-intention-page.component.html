@@ -1,0 +1,39 @@
+<form [formGroup]="form">
+  <section>
+    <sci-form-field label="Application">
+      <select [formControl]="form.controls.application" class="e2e-application">
+        @for (application of applications; track application) {
+          <option [value]="application">{{application}}</option>
+        }
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="Type">
+      <input [formControl]="form.controls.type" [attr.list]="intentionTypeList" class="e2e-type">
+      <datalist [attr.id]="intentionTypeList">
+        <option [value]="WorkbenchCapabilities.View">{{WorkbenchCapabilities.View}}</option>
+        <option [value]="WorkbenchCapabilities.Dialog">{{WorkbenchCapabilities.Dialog}}</option>
+        <option [value]="WorkbenchCapabilities.MessageBox">{{WorkbenchCapabilities.MessageBox}}</option>
+        <option [value]="WorkbenchCapabilities.Popup">{{WorkbenchCapabilities.Popup}}</option>
+      </datalist>
+    </sci-form-field>
+
+    <sci-form-field label="Qualifier">
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+    </sci-form-field>
+  </section>
+
+  <button (click)="onRegister()" class="e2e-register" [disabled]="form.invalid" sci-primary>Register</button>
+
+  @if (intentionId) {
+    <output class="intention-id e2e-register-response">
+      Intention ID: <span class="e2e-intention-id">{{intentionId}}</span>
+    </output>
+  }
+
+  @if (registerError) {
+    <output class="register-error e2e-register-error">
+      {{registerError}}
+    </output>
+  }
+</form>

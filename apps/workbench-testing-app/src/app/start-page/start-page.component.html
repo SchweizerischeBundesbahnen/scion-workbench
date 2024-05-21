@@ -26,28 +26,13 @@ We use this application to experiment with features and run our end-to-end tests
       <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
       <a *ngFor="let viewCapability of microfrontendViewCapabilities | appFilter$:filterControl:selectViewCapabilityText | async"
          (click)="onMicrofrontendViewOpen(viewCapability, $event)"
-         [ngClass]="[viewCapability.metadata!.appSymbolicName] | appConcatArray:viewCapability.properties.cssClass"
+         [attr.data-app]="viewCapability.metadata!.appSymbolicName"
+         [ngClass]="viewCapability.properties.tile.cssClass"
          href=""
          class="microfrontend">
-        {{viewCapability.properties.title}}
+        {{viewCapability.properties.tile.label}}
         <span class="description">
           {{viewCapability.metadata!.appSymbolicName}}
-        </span>
-      </a>
-    </section>
-  </ng-template>
-
-  <ng-template sciTab label="Test Capabilities" cssClass="e2e-test-capabilities" *ngIf="testCapabilities$ | async | appNullIfEmpty as testCapabilities">
-    <section class="tiles e2e-test-capability-tiles">
-      <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"></sci-filter-field>
-      <a *ngFor="let testCapability of testCapabilities | appFilter$:filterControl:selectTestCapabilityText | async"
-         (click)="onTestCapabilityOpen(testCapability, $event)"
-         [ngClass]="[testCapability.metadata!.appSymbolicName] | appConcatArray:testCapability.properties?.['cssClass']"
-         href=""
-         class="test-capability">
-        {{testCapability.properties?.['cssClass']}}
-        <span class="description">
-          {{testCapability.metadata!.appSymbolicName}}
         </span>
       </a>
     </section>

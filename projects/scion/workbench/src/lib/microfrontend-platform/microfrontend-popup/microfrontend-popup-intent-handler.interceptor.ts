@@ -9,7 +9,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
+import {Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
 import {Observable} from 'rxjs';
@@ -22,6 +22,7 @@ import {PopupOrigin} from '../../popup/popup.origin';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
+import {Microfrontends} from '../common/microfrontend.util';
 
 /**
  * Handles popup intents, instructing the workbench to open a popup with the microfrontend declared on the resolved capability.
@@ -87,7 +88,7 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
   private async openPopup(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<any> {
     const command = message.body!;
     const capability = message.capability as WorkbenchPopupCapability;
-    const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
+    const isHostProvider = Microfrontends.isHostProvider(capability);
     this._logger.debug(() => 'Handling microfrontend popup command', LoggerNames.MICROFRONTEND, command);
 
     const popupContext: ɵPopupContext = {

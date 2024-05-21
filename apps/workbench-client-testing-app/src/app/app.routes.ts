@@ -52,22 +52,6 @@ export const routes: Routes = [
     loadComponent: () => import('./notification-opener-page/notification-opener-page.component'),
   },
   {
-    path: 'register-workbench-capability',
-    loadComponent: () => import('./register-workbench-capability-page/register-workbench-capability-page.component'),
-  },
-  {
-    path: 'unregister-workbench-capability',
-    loadComponent: () => import('./unregister-workbench-capability-page/unregister-workbench-capability-page.component'),
-  },
-  {
-    path: 'register-workbench-intention',
-    loadComponent: () => import('./register-workbench-intention-page/register-workbench-intention-page.component'),
-  },
-  {
-    path: 'messaging',
-    loadComponent: () => import('./messaging-page/messaging-page.component'),
-  },
-  {
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },

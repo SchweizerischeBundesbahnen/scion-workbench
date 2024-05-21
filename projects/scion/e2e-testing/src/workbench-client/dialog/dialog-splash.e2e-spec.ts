@@ -12,7 +12,7 @@ import {test} from '../../fixtures';
 import {expect} from '@playwright/test';
 import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
 import {DialogPagePO} from '../page-object/dialog-page.po';
-import {MessagingPagePO} from '../page-object/messaging-page.po';
+import {MicrofrontendPlatformPagePO} from '../../workbench/page-object/microfrontend-platform-page/microfrontend-platform-page.po';
 
 test.describe('Workbench Dialog Splash', () => {
 
@@ -41,9 +41,9 @@ test.describe('Workbench Dialog Splash', () => {
     await expect(dialogPage.outlet.splash).toBeVisible();
 
     // Publish message to dispose splash.
-    const messagingPage = await microfrontendNavigator.openInNewTab(MessagingPagePO, 'app1');
-    await messagingPage.publishMessage(`signal-ready/${dialogCapability.metadata!.id}`);
-    await messagingPage.view.tab.close();
+    const microfrontendPlatformPage = await microfrontendNavigator.openInNewTab(MicrofrontendPlatformPagePO);
+    await microfrontendPlatformPage.publishMessage(`signal-ready/${dialogCapability.metadata!.id}`);
+    await microfrontendPlatformPage.view.tab.close();
 
     // Expect splash not to display.
     await expect(dialogPage.outlet.splash).not.toBeVisible();

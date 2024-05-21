@@ -1,0 +1,26 @@
+<form [formGroup]="form">
+  <section>
+    <sci-form-field label="Application">
+      <select [formControl]="form.controls.application" class="e2e-application">
+        @for (application of applications; track application) {
+          <option [value]="application">{{application}}</option>
+        }
+      </select>
+    </sci-form-field>
+
+    <sci-form-field label="ID">
+      <input [formControl]="form.controls.id" class="e2e-id">
+    </sci-form-field>
+  </section>
+
+  <button (click)="onUnregister()" class="e2e-unregister" [disabled]="form.invalid">Unregister</button>
+
+  @if (unregisterError) {
+    <output class="unregister-error e2e-unregister-error">
+      {{unregisterError}}
+    </output>
+  }
+  @if (unregistered) {
+    <output class="unregistered e2e-unregistered"></output>
+  }
+</form>

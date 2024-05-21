@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,18 +26,18 @@ import {NgIf} from '@angular/common';
     NgIf,
   ],
 })
-export default class PublishMesagePageComponent {
+export class PublishMesagePageComponent {
 
-  public publishError: string | false | undefined;
+  protected publishError: string | false | undefined;
 
-  public form = this._formBuilder.group({
+  protected form = this._formBuilder.group({
     topic: this._formBuilder.control('', Validators.required),
   });
 
   constructor(private _formBuilder: NonNullableFormBuilder, private _messageClient: MessageClient) {
   }
 
-  public onPublish(): void {
+  protected onPublish(): void {
     this.publishError = undefined;
     this._messageClient
       .publish(this.form.controls.topic.value)
