@@ -1,58 +1,51 @@
-# [1.0.0-beta.22](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.21...workbench-client-1.0.0-beta.22) (2024-05-07)
+# [1.0.0-beta.23](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.22...workbench-client-1.0.0-beta.23) (2024-05-21)
 
 
-### Bug Fixes
+### Features
 
-* **workbench-client/view:** fix issues to prevent a view from closing ([a280af9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a280af9011cb87bc97e4f29a78fbe3b54d05efb3)), closes [#27](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/27) [#344](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/344)
-
-
-### Refactor
-
-* **workbench-client/router:** remove `blank` prefix from navigation extras ([446fa51](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/446fa51c24f1e616a1e4ebd80f42cfc9300b6970))
+* **workbench-client/message-box:** enable microfrontend display in a message box ([3e9d88d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3e9d88d79665cbce03acfcf2bbd0e0bbda8d5c78)), closes [#488](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/488)
 
 
 ### BREAKING CHANGES
 
-* **workbench-client/view:** Interface and method for preventing closing of a view have changed.
-
-  To migrate, implement the `CanClose` instead of the `ViewClosingListener ` interface.
-
-  **Before migration:**
+* **workbench-client/message-box:** The signature of the `WorkbenchMessageBoxService.open` method has changed.
+  
+  To migrate:
+  - To display a text message, pass the message as the first argument, not via the `content` property in the options.
+  - To display a custom message box, pass the qualifier as the first argument and options, if any, as the second argument.
+  
+  **Example migration to display a text message**
   ```ts
-  class YourComponent implements ViewClosingListener {
-   
-    constructor() {
-      Beans.get(WorkbenchView).addClosingListener(this);
-    }
-   
-    public async onClosing(event: ViewClosingEvent): Promise<void> {
-      // invoke 'event.preventDefault()' to prevent closing the view.
-    }
-  }
+  // Before Migration
+  inject(WorkbenchMessageBoxService).open({
+    content: 'Do you want to continue?',
+    actions: {yes: 'Yes', no: 'No'},
+  });
+  
+  // After Migration
+  inject(WorkbenchMessageBoxService).open('Do you want to continue?', {
+    actions: {yes: 'Yes', no: 'No'},
+  });
   ```
-
-  **After migration:**
-
+  
+  **Example migration to open a custom message box capability**
   ```ts
-  class YourComponent implements CanClose {
-   
-    constructor() {
-      Beans.get(WorkbenchView).addCanClose(this);
-    }
-   
-    public async canClose(): Promise<boolean> {
-      // return `true` to close the view, otherwise `false`.
-    }
-  }
+  // Before Migration
+  inject(WorkbenchMessageBoxService).open({
+      title: 'Unsaved Changes',
+      params: {changes: ['change 1', 'change 2']},
+      actions: {yes: 'Yes', no: 'No'},
+    },
+    {confirmation: 'unsaved-changes'},
+  );
+  
+  // After Migration
+  inject(WorkbenchMessageBoxService).open({confirmation: 'unsaved-changes'}, {
+    title: 'Unsaved Changes',
+    params: {changes: ['change 1', 'change 2']},
+    actions: {yes: 'Yes', no: 'No'},
+  });
   ```
-
-* **workbench-client/router:** Property `blankInsertionIndex` in `WorkbenchNavigationExtras` has been renamed.
-
-  Use `WorkbenchNavigationExtras.position` instead of `WorkbenchNavigationExtras.blankInsertionIndex`.
-
-* **workbench-client/view:** Changed type of view id from `string` to `ViewId`.
-
-  If storing the view id in a variable, change its type from `string` to `ViewId`.
 
 
 
