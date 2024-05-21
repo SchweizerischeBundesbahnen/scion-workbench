@@ -11,6 +11,7 @@
 import {booleanAttribute, Directive, Input, OnDestroy, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {Disposable} from '../../common/disposable';
+import {asapScheduler} from 'rxjs';
 
 /**
  * Use this directive to replace the default dialog header that displays the title and a close button.
@@ -27,7 +28,7 @@ import {Disposable} from '../../common/disposable';
 @Directive({selector: 'ng-template[wbDialogHeader]', standalone: true})
 export class WorkbenchDialogHeaderDirective implements OnDestroy {
 
-  private _header: Disposable;
+  private _header: Disposable | undefined;
 
   /**
    * Specifies if to display a visual separator between this header and the dialog content.
@@ -37,10 +38,12 @@ export class WorkbenchDialogHeaderDirective implements OnDestroy {
   public divider?: boolean;
 
   constructor(public readonly template: TemplateRef<void>, dialog: ɵWorkbenchDialog) {
-    this._header = dialog.registerHeader(this);
+    // Defer registering header to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
+    asapScheduler.schedule(() => this._header = dialog.registerHeader(this));
   }
 
   public ngOnDestroy(): void {
-    this._header.dispose();
+    // Defer disposing header to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
+    asapScheduler.schedule(() => this._header?.dispose());
   }
 }
