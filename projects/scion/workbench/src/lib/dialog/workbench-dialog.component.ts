@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AfterViewInit, Component, DestroyRef, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
-
-import {fromEvent} from 'rxjs';
+import {Component, DestroyRef, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
+import {BehaviorSubject, fromEvent} from 'rxjs';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
-import {AsyncPipe, DOCUMENT, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
+import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -24,6 +23,8 @@ import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {DialogHeaderComponent} from './dialog-header/dialog-header.component';
 import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
+import {filter, map, startWith, takeUntil} from 'rxjs/operators';
+import {fromMutation$} from '@scion/toolkit/observable';
 
 /**
  * Renders the workbench dialog.
@@ -56,10 +57,12 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
     configureDialogGlassPane(),
   ],
 })
-export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
+export class WorkbenchDialogComponent implements OnInit {
 
-  private readonly _document = inject<Document>(DOCUMENT);
-  private _activeElement: HTMLElement | undefined;
+  /**
+   * Element of the dialog that has or last had focus.
+   */
+  private _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
   private _headerHeight: string | undefined;
 
   @ViewChild(CdkTrapFocus, {static: true})
@@ -127,22 +130,7 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
 
   public ngOnInit(): void {
     this.trackFocus();
-  }
-
-  public ngAfterViewInit(): void {
-    this.focus();
-  }
-
-  /**
-   * Focuses the last focused element, if any, or the first focusable element otherwise.
-   */
-  public focus(): void {
-    if (this._activeElement) {
-      this._activeElement.focus();
-    }
-    else if (!this._cdkTrapFocus.focusTrap.focusFirstTabbableElement()) {
-      this._dialogElement.nativeElement.focus();
-    }
+    this.autoFocus();
   }
 
   private setDialogOffset(): void {
@@ -152,16 +140,54 @@ export class WorkbenchDialogComponent implements OnInit, AfterViewInit {
   }
 
   /**
+   * Focuses this dialog, restoring the focus to the last element that had the focus,
+   * or otherwise focuses the first focusable element.
+   */
+  public focus(): void {
+    const activeElement = this._activeElement$.getValue();
+    if (activeElement) {
+      activeElement.focus();
+    }
+    else if (!this._cdkTrapFocus.focusTrap.focusFirstTabbableElement()) {
+      // Focus dialog element so that it can be closed via Escape keystroke.
+      this._dialogElement.nativeElement.focus();
+    }
+  }
+
+  /**
    * Tracks the focus of the dialog.
    */
   private trackFocus(): void {
-    fromEvent(this._dialogElement.nativeElement, 'focusin')
+    fromEvent<FocusEvent>(this._dialogElement.nativeElement, 'focusin')
       .pipe(
+        map(event => event.target instanceof HTMLElement ? event.target : undefined),
+        // The dialog is focused if it has no focusable element, so the dialog can be closed via Escape.
+        // However, in order not to cancel the autofocus, the dialog element must not be memoized as the
+        // active element. Otherwise, delayed content would not be focused.
+        filter(element => element !== this._dialogElement.nativeElement),
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
         takeUntilDestroyed(this._destroyRef),
       )
+      .subscribe(activeElement => {
+        this._activeElement$.next(activeElement);
+      });
+  }
+
+  /**
+   * Focuses the first focusable element in the dialog. Has no effect if an element in the dialog already has the focus.
+   *
+   * If no focusable element can be found, the focusing will be repeated on the next DOM change until an element has the
+   * focus, allowing delayed content to get focus.
+   */
+  private autoFocus(): void {
+    fromMutation$(this._dialogElement.nativeElement, {subtree: true, childList: true})
+      .pipe(
+        startWith(undefined as void),
+        takeUntil(this._activeElement$.pipe(filter(Boolean))),
+        takeUntilDestroyed(this._destroyRef),
+      )
       .subscribe(() => {
-        this._activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;
+        this.focus();
       });
   }
 

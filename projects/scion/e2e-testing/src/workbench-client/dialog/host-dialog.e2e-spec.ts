@@ -13,6 +13,7 @@ import {expect} from '@playwright/test';
 import {DialogOpenerPagePO} from '../page-object/dialog-opener-page.po';
 import {expectDialog} from '../../matcher/dialog-matcher';
 import {HostDialogPagePO} from '../page-object/host-dialog-page.po';
+import {FocusTestPagePO} from '../../workbench/page-object/test-pages/focus-test-page.po';
 
 test.describe('Workbench Host Dialog', () => {
 
@@ -98,6 +99,22 @@ test.describe('Workbench Host Dialog', () => {
       const dialogSize = await dialog.getDialogBoundingBox();
       expect(pageSize.width).toEqual(dialogSize.width - dialogBorder);
     }).toPass();
+  });
+
+  test('should focus first focusable element', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // TODO [#271]: Register dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+    await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog-focus-page'}});
+
+    // Open the dialog.
+    const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
+    await dialogOpenerPage.open({component: 'host-dialog-focus-page'}, {cssClass: 'testee'});
+
+    const dialog = appPO.dialog({cssClass: 'testee'});
+    const focusTestPage = new FocusTestPagePO(dialog);
+
+    await expect(focusTestPage.firstField).toBeFocused();
   });
 
   test('should pass params to the dialog component', async ({appPO, microfrontendNavigator}) => {

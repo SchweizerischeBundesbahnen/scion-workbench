@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Type} from '@angular/core';
+import {DebugElement, Predicate, Type} from '@angular/core';
 import {ExpectedWorkbenchLayout} from './to-equal-workbench-layout.matcher';
 
 /**
@@ -53,7 +53,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   toEqualWorkbenchLayout(expected: ExpectedWorkbenchLayout, expectationFailOutput?: any): boolean;
 
   /**
-   * Expects the fixture to show a component of the specified type.
+   * Expects to show a component of the specified type.
    *
    * The actual value must be a {@link ComponentFixture} or {@link DebugElement}.
    *
@@ -64,7 +64,35 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    * expect(fixture).toShow(YourViewComponent);
    * ```
    */
-  toShow(expectedComponentType: Type<any>, expectationFailOutput?: any): boolean;
+  toShow(type: Type<unknown>, expectationFailOutput?: any): boolean;
+
+  /**
+   * Expects to show the element as specified by given predicate.
+   *
+   * The actual value must be a {@link ComponentFixture} or {@link DebugElement}.
+   *
+   * ---
+   * Usage:
+   *
+   * ```ts
+   * expect(fixture).toShow(By.css('div.class'));
+   * ```
+   */
+  toShow(predicate: Predicate<DebugElement>, expectationFailOutput?: any): boolean;
+
+  /**
+   * Expects the element to be active.
+   *
+   * The actual value must be a {@link DebugElement}.
+   *
+   * ---
+   * Usage:
+   *
+   * ```ts
+   * expect(fixture.debugElement).toBeActive();
+   * ```
+   */
+  toBeActive(): boolean;
 
   /**
    * Expects the view to be registered in {@link WorkbenchViewRegistry} with specified properties.

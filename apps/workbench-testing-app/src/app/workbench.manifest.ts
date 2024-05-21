@@ -74,6 +74,18 @@ export const workbenchManifest: Manifest = {
         },
       },
     } satisfies WorkbenchDialogCapability,
+    // TODO [#271]: Remove this dialog capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Dialog,
+      qualifier: {
+        component: 'host-dialog-focus-page',
+      },
+      private: false,
+      description: 'Represents a dialog provided by the host app that displays the focus test page.',
+      properties: {
+        path: 'test-pages/focus-test-page',
+      },
+    } satisfies WorkbenchDialogCapability,
     // TODO [#271]: Remove this messagebox capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.MessageBox,

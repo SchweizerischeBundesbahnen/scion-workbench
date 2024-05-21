@@ -11,7 +11,7 @@
 import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {ComponentFixture} from '@angular/core/testing';
-import {DebugElement, Type} from '@angular/core';
+import {DebugElement, Predicate, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 
 /**
@@ -20,9 +20,10 @@ import {By} from '@angular/platform-browser';
 export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
   toShow: (): CustomMatcher => {
     return {
-      compare(element: any, expectedComponentType: Type<any>, failOutput: string | undefined): CustomMatcherResult {
-        const found = !!coerceDebugElement(element).query(By.directive(expectedComponentType));
-        return found ? pass() : fail(`Expected ${expectedComponentType.name} to show`);
+      compare(element: any, expected: Type<unknown> | Predicate<DebugElement>, failOutput: string | undefined): CustomMatcherResult {
+        const predicate = isPredicate(expected) ? expected : By.directive(expected);
+        const found = !!coerceDebugElement(element).query(predicate);
+        return found ? pass() : fail(`Expected ${isPredicate(expected) ? `${expected}` : expected.name} to show`);
 
         function pass(): CustomMatcherResult {
           return {pass: true};
@@ -35,6 +36,10 @@ export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
     };
   },
 };
+
+function isPredicate(expected: Type<unknown> | Predicate<DebugElement>): expected is Predicate<DebugElement> {
+  return !expected.prototype;
+}
 
 function coerceDebugElement(element: unknown): DebugElement {
   if (element instanceof DebugElement) {
