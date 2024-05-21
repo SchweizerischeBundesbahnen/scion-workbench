@@ -14,10 +14,11 @@ import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {coerceArray, rejectWhenAttached, waitUntilStable} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, waitForCondition} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
-import {ViewId} from '@scion/workbench-client';
+import {ViewId, WorkbenchNavigationExtras} from '@scion/workbench-client';
+import {Dictionary} from '@scion/toolkit/util';
 
 /**
  * Page object to interact with {@link RouterPageComponent} of workbench-client testing app.
@@ -34,48 +35,65 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
     this.locator = this.outlet.frameLocator.locator('app-router-page');
   }
 
-  public async enterQualifier(qualifier: Qualifier): Promise<void> {
+  /**
+   * Navigates via {@link WorkbenchRouter}.
+   */
+  public async navigate(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): Promise<void> {
+    await this.enterQualifier(qualifier);
+    await this.enterExtras(extras);
+
+    const navigationId = await this._appPO.getCurrentNavigationId();
+    await this.locator.locator('button.e2e-navigate').click();
+
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    await Promise.race([
+      waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
+      rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
+    ]);
+  }
+
+  private async enterQualifier(qualifier: Qualifier): Promise<void> {
     const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-qualifier'));
     await keyValueField.clear();
     await keyValueField.addEntries(qualifier);
   }
 
-  public async enterParams(params: Record<string, string>): Promise<void> {
-    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
-    await keyValueField.clear();
-    await keyValueField.addEntries(params);
+  private async enterExtras(extras: WorkbenchNavigationExtras | undefined): Promise<void> {
+    await this.enterTarget(extras?.target);
+    await this.enterParams(extras?.params);
+    await this.checkActivate(extras?.activate);
+    await this.checkClose(extras?.close);
+    await this.enterPosition(extras?.position);
+    await this.enterCssClass(extras?.cssClass);
   }
 
-  public async enterTarget(target: string | 'blank' | 'auto' | undefined): Promise<void> {
+  private async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
     await this.locator.locator('input.e2e-target').fill(target ?? '');
   }
 
-  public async enterPosition(position: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'): Promise<void> {
-    await this.locator.locator('input.e2e-position').fill(`${position}`);
+  private async enterParams(params?: Map<string, any> | Dictionary): Promise<void> {
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-params'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(params ?? {});
   }
 
-  public async checkActivate(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-activate')).toggle(check);
+  private async checkActivate(check?: boolean): Promise<void> {
+    if (check !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-activate')).toggle(check);
+    }
   }
 
-  public async checkClose(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close')).toggle(check);
+  private async checkClose(check?: boolean): Promise<void> {
+    if (check !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close')).toggle(check);
+    }
   }
 
-  public async enterCssClass(cssClass: string | string[]): Promise<void> {
+  private async enterPosition(position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'): Promise<void> {
+    await this.locator.locator('input.e2e-position').fill(`${position ?? ''}`);
+  }
+
+  private async enterCssClass(cssClass?: string | string[]): Promise<void> {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
-  }
-
-  /**
-   * Clicks on a button to navigate via {@link WorkbenchRouter}.
-   */
-  public async clickNavigate(): Promise<void> {
-    await this.locator.locator('button.e2e-navigate').click();
-
-    // Evaluate the response: resolve the promise on success, or reject it on error.
-    await Promise.race([
-      waitUntilStable(() => this._appPO.getCurrentNavigationId()),
-      rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
-    ]);
   }
 }

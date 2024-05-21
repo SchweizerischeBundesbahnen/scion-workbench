@@ -74,9 +74,9 @@ export class LegacyMessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
 
     // Navigate to view.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({test: 'legacy-message-box-opener'});
-    await routerPage.enterCssClass('legacy-message-box-opener');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({test: 'legacy-message-box-opener'}, {
+      cssClass: 'legacy-message-box-opener',
+    });
     return new LegacyMessageBoxOpenerPagePO(appPO, {cssClass: 'legacy-message-box-opener'});
   }
 }

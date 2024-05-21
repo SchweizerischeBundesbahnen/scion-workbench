@@ -56,9 +56,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view (app1)
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.101',
+    });
 
     const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
@@ -68,9 +68,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-2 view (app1)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-2'}, {
+      target: 'view.101',
+    });
 
     // expect testee-2 to show
     await expect(testeeViewPage.view.tab.title).toHaveText('Testee 2');
@@ -95,9 +95,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-3 view (app3)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-3'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-3'}, {
+      target: 'view.101',
+    });
 
     // expect testee-3 to show
     await expect(testeeViewPage.view.tab.title).toHaveText('Testee 3');
@@ -126,9 +126,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view (app1)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.101',
+    });
 
     // expect following Observables to complete
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /ObservableComplete/})).toEqualIgnoreOrder([
@@ -411,12 +411,11 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-1');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.101',
+    });
 
-    const testee1ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+    const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     const testee1ComponentInstanceId = await testee1ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
@@ -427,12 +426,11 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-2 view
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-2');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-2'}, {
+      target: 'view.102',
+    });
 
-    const testee2ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+    const testee2ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
     const testee2ComponentInstanceId = await testee2ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
@@ -464,12 +462,11 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-3 view
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-3'});
-    await routerPage.enterTarget('blank');
-    await routerPage.enterCssClass('testee-3');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-3'}, {
+      target: 'view.103',
+    });
 
-    const testee3ViewPage = new ViewPagePO(appPO, {cssClass: 'testee-3'});
+    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.103'});
     const testee3ComponentInstanceId = await testee3ViewPage.getComponentInstanceId();
 
     // assert emitted view active/deactivated events
@@ -525,9 +522,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view (app1)
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.100',
+    });
 
     const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
@@ -542,9 +539,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-2 view (app1)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-2'}, {
+      target: 'view.100',
+    });
 
     await testeeViewPage.view.tab.click();
     await expect.poll(() => testeeViewPage.getViewCapability()).toEqual(expect.objectContaining({
@@ -558,9 +555,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-3 view (app2)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-3'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-3'}, {
+      target: 'view.100',
+    });
 
     await testeeViewPage.view.tab.click();
     await expect.poll(() => testeeViewPage.getViewCapability()).toEqual(expect.objectContaining({
@@ -618,9 +615,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view (app1)
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.100',
+    });
 
     const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
@@ -633,9 +630,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-2 view (app1)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-2'}, {
+      target: 'view.100',
+    });
 
     // Assert the correct capability to be loaded
     await testeeViewPage.view.tab.click();
@@ -647,9 +644,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view (app1)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.100',
+    });
 
     // Assert the correct capability to be loaded
     await testeeViewPage.view.tab.click();
@@ -661,9 +658,9 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-3 view (app2)
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-3'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-3'}, {
+      target: 'view.100',
+    });
 
     // Assert the correct capability to be loaded
     await testeeViewPage.view.tab.click();
@@ -705,26 +702,26 @@ test.describe('Workbench View', () => {
 
     // navigate to testee-1 view
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.101',
+    });
 
     const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
     await expect(testee1ViewPage.viewId).toHaveText('view.101');
 
     // navigate to testee-2 view
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-2'}, {
+      target: 'view.101',
+    });
 
     await expect(testee1ViewPage.viewId).toHaveText('view.101');
 
     // navigate to testee-3 view
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({component: 'testee-3'});
-    await routerPage.enterTarget('view.102');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-3'}, {
+      target: 'view.102',
+    });
 
     const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.102'});
     await expect(testee3ViewPage.viewId).toHaveText('view.102');
@@ -847,10 +844,10 @@ test.describe('Workbench View', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.checkActivate(true);
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      activate: true,
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expect.poll(() => viewPage.outlet.getName()).toEqual('view.100');
@@ -874,10 +871,10 @@ test.describe('Workbench View', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      activate: false,
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expect.poll(() => viewPage.outlet.getName()).toEqual('view.100');

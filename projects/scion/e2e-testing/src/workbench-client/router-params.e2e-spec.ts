@@ -20,25 +20,24 @@ test.describe('Workbench Router', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {entity: 'product'},
+      qualifier: {component: 'testee'},
       params: [
         {name: 'id', required: true},
       ],
       properties: {
         path: 'test-view',
         title: 'testee',
-        cssClass: 'testee',
       },
     });
 
     // navigate
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({entity: 'product'});
-    await routerPage.enterParams({id: '123'});
-    await routerPage.enterTarget('blank');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      params: {id: '123'},
+    });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
       id: '123',
@@ -63,18 +62,17 @@ test.describe('Workbench Router', () => {
       properties: {
         path: 'test-pages/view-test-page/:segment1/:segment2;mp1=:mp1;mp2=:mp2?qp1=:qp1&qp2=:qp2#:fragment',
         title: 'testee',
-        cssClass: 'testee',
       },
     });
 
     // navigate
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterParams({segment1: 'SEG1', segment2: 'SEG2', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'});
-    await routerPage.enterTarget('blank');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      params: {segment1: 'SEG1', segment2: 'SEG2', mp1: 'MP1', mp2: 'MP2', qp1: 'QP1', qp2: 'QP2', fragment: 'FRAGMENT'},
+    });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     // expect named params to be substituted
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -96,36 +94,34 @@ test.describe('Workbench Router', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {entity: 'product'},
+      qualifier: {component: 'testee'},
       params: [
         {name: 'id', required: true},
       ],
       properties: {
         path: 'test-view',
         title: 'testee',
-        cssClass: 'testee',
       },
     });
 
     // navigate
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({entity: 'product'});
-    await routerPage.enterParams({id: '123'});
-    await routerPage.enterTarget('blank');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      params: {id: '123'},
+    });
 
-    const testeeViewId = await appPO.view({cssClass: 'testee'}).getViewId();
-    const testeeViewPage = new ViewPagePO(appPO, {viewId: testeeViewId});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     // capture the view's component instance id
     const testeeComponentInstanceId = await testeeViewPage.getComponentInstanceId();
 
     // navigate to update the view's params
     await routerPage.view.tab.click();
-    await routerPage.enterQualifier({entity: 'product'});
-    await routerPage.enterParams({id: '456'});
-    await routerPage.enterTarget(testeeViewId);
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      params: {id: '456'},
+    });
 
     await testeeViewPage.view.tab.click();
 
@@ -142,7 +138,7 @@ test.describe('Workbench Router', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {entity: 'product'},
+      qualifier: {component: 'testee'},
       params: [
         {
           name: 'id',
@@ -152,18 +148,17 @@ test.describe('Workbench Router', () => {
       properties: {
         path: 'test-view',
         title: 'testee',
-        cssClass: 'testee',
       },
     });
 
     // navigate
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({entity: 'product'});
-    await routerPage.enterParams({id: '<null>'});
-    await routerPage.enterTarget('blank');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      params: {id: '<null>'},
+    });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     // expect the optional parameter with value `null` to be contained in view params
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -176,7 +171,7 @@ test.describe('Workbench Router', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'view',
-      qualifier: {entity: 'product'},
+      qualifier: {component: 'testee'},
       params: [
         {
           name: 'id',
@@ -190,18 +185,17 @@ test.describe('Workbench Router', () => {
       properties: {
         path: 'test-view',
         title: 'testee',
-        cssClass: 'testee',
       },
     });
 
     // navigate
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({entity: 'product'});
-    await routerPage.enterParams({id: '123', param1: '<undefined>'});
-    await routerPage.enterTarget('blank');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.100',
+      params: {id: '123', param1: '<undefined>'},
+    });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
     await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
       id: '123',
@@ -451,7 +445,7 @@ test.describe('Workbench Router', () => {
 
       await microfrontendNavigator.registerCapability('app1', {
         type: 'view',
-        qualifier: {entity: 'product'},
+        qualifier: {component: 'testee'},
         params: [
           {
             name: 'id',
@@ -471,18 +465,17 @@ test.describe('Workbench Router', () => {
         properties: {
           path: 'test-view',
           title: 'testee',
-          cssClass: 'testee',
         },
       });
 
       // navigate
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({entity: 'product'});
-      await routerPage.enterParams({id: '123', param1: 'transient param1', param2: 'transient param2'});
-      await routerPage.enterTarget('blank');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({component: 'testee'}, {
+        target: 'view.100',
+        params: {id: '123', param1: 'transient param1', param2: 'transient param2'},
+      });
 
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -538,27 +531,26 @@ test.describe('Workbench Router', () => {
         properties: {
           path: 'test-view',
           title: 'testee',
-          cssClass: 'testee',
         },
       });
 
       // navigate
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({component: 'testee'});
-      await routerPage.enterParams({
-        param1: 'value',
-        param2: '<number>0</number>',
-        param3: '<number>2</number>',
-        param4: '<boolean>true</boolean>',
-        param5: '<boolean>false</boolean>',
-        param6: '<null>',
-        param7: '<undefined>',
+      await routerPage.navigate({component: 'testee'}, {
+        target: 'view.100',
+        params: {
+          param1: 'value',
+          param2: '<number>0</number>',
+          param3: '<number>2</number>',
+          param4: '<boolean>true</boolean>',
+          param5: '<boolean>false</boolean>',
+          param6: '<null>',
+          param7: '<undefined>',
+        },
       });
-      await routerPage.enterTarget('blank');
-      await routerPage.clickNavigate();
 
       // expect transient params to have actual data type
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
         param1: 'value',
         param2: '0 [number]',
@@ -577,13 +569,12 @@ test.describe('Workbench Router', () => {
 
       // navigate
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({component: 'view', app: 'app1'});
-      await routerPage.enterParams({initialTitle: 'TITLE', transientParam: 'TRANSIENT PARAM'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({component: 'view', app: 'app1'}, {
+        target: 'view.100',
+        params: {initialTitle: 'TITLE', transientParam: 'TRANSIENT PARAM'},
+      });
 
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
 
       // expect transient param to be contained in view params
       await expect.poll(() => testeeViewPage.getViewParams()).toMatchObject({
@@ -773,7 +764,7 @@ test.describe('Workbench Router', () => {
 
       await microfrontendNavigator.registerCapability('app1', {
         type: 'view',
-        qualifier: {entity: 'product', app: 'app1'},
+        qualifier: {component: 'testee', app: 'app1'},
         params: [
           {
             name: 'param',
@@ -788,13 +779,12 @@ test.describe('Workbench Router', () => {
         properties: {
           path: 'test-view',
           title: 'testee1',
-          cssClass: 'testee1',
         },
       });
 
       await microfrontendNavigator.registerCapability('app2', {
         type: 'view',
-        qualifier: {entity: 'product', app: 'app2'},
+        qualifier: {component: 'testee', app: 'app2'},
         params: [
           {
             name: 'param',
@@ -809,16 +799,16 @@ test.describe('Workbench Router', () => {
         properties: {
           path: 'test-view',
           title: 'testee2',
-          cssClass: 'testee2',
         },
       });
 
       // navigate to view of app1
       const routerPage1 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage1.enterQualifier({entity: 'product', app: 'app1'});
-      await routerPage1.enterParams({param: 'param app1', transientParam: 'transient param app1'});
-      await routerPage1.enterTarget('blank');
-      await routerPage1.clickNavigate();
+      await routerPage1.navigate({component: 'testee', app: 'app1'}, {
+        target: 'blank',
+        params: {param: 'param app1', transientParam: 'transient param app1'},
+        cssClass: 'testee1',
+      });
 
       const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee1'});
       const testeeViewId = await testeeViewPage1.view.getViewId();
@@ -831,10 +821,11 @@ test.describe('Workbench Router', () => {
 
       // self-navigate to view of app2
       const routerPage2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
-      await routerPage2.enterQualifier({entity: 'product', app: 'app2'});
-      await routerPage2.enterParams({param: 'param app2', transientParam: 'transient param app2'});
-      await routerPage2.enterTarget(testeeViewId);
-      await routerPage2.clickNavigate();
+      await routerPage2.navigate({component: 'testee', app: 'app2'}, {
+        target: testeeViewId,
+        params: {param: 'param app2', transientParam: 'transient param app2'},
+        cssClass: 'testee2',
+      });
 
       const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});
       await testeeViewPage2.view.tab.click();
@@ -851,7 +842,7 @@ test.describe('Workbench Router', () => {
 
       await microfrontendNavigator.registerCapability('app1', {
         type: 'view',
-        qualifier: {entity: 'product', app: 'app1'},
+        qualifier: {component: 'testee', app: 'app1'},
         params: [
           {
             name: 'transientParam',
@@ -862,14 +853,13 @@ test.describe('Workbench Router', () => {
         properties: {
           path: 'test-view',
           title: 'testee1',
-          cssClass: 'testee1',
         },
       });
 
       // register testee view for app2
       await microfrontendNavigator.registerCapability('app2', {
         type: 'view',
-        qualifier: {entity: 'product', app: 'app2'},
+        qualifier: {component: 'testee', app: 'app2'},
         params: [
           {
             name: 'transientParam',
@@ -880,16 +870,16 @@ test.describe('Workbench Router', () => {
         properties: {
           path: 'test-view',
           title: 'testee2',
-          cssClass: 'testee2',
         },
       });
 
       // navigate to view of app1
       const routerPage1 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage1.enterQualifier({entity: 'product', app: 'app1'});
-      await routerPage1.enterParams({transientParam: 'transient param app1'});
-      await routerPage1.enterTarget('blank');
-      await routerPage1.clickNavigate();
+      await routerPage1.navigate({component: 'testee', app: 'app1'}, {
+        target: 'blank',
+        params: {transientParam: 'transient param app1'},
+        cssClass: 'testee1',
+      });
 
       const testeeViewPage1 = new ViewPagePO(appPO, {cssClass: 'testee1'});
 
@@ -901,9 +891,10 @@ test.describe('Workbench Router', () => {
 
       // self-navigate to view of app2
       const routerPage2 = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app2');
-      await routerPage2.enterQualifier({entity: 'product', app: 'app2'});
-      await routerPage2.enterTarget(testeeViewId);
-      await routerPage2.clickNavigate();
+      await routerPage2.navigate({component: 'testee', app: 'app2'}, {
+        target: testeeViewId,
+        cssClass: 'testee2',
+      });
 
       // expect transient param not to be contained in view params
       const testeeViewPage2 = new ViewPagePO(appPO, {cssClass: 'testee2'});

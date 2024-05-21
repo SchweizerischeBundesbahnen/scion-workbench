@@ -36,9 +36,9 @@ test.describe('Workbench View', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterTarget('view.101');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.101',
+    });
 
     const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
@@ -56,10 +56,10 @@ test.describe('Workbench View', () => {
     await test.step('should not show splash if navigating to the same view again', async () => {
       // Navigate to the same view again.
       await routerPage.view.tab.click();
-      await routerPage.enterQualifier({component: 'testee'});
-      await routerPage.enterTarget('view.101');
-      await routerPage.enterParams({param: 'test'});
-      await routerPage.clickNavigate();
+      await routerPage.navigate({component: 'testee'}, {
+        target: 'view.101',
+        params: {param: 'test'},
+      });
 
       // Expect splash not to display.
       await testeeViewPage.view.tab.click();
@@ -81,11 +81,11 @@ test.describe('Workbench View', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.101',
+    });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
     // Expect splash not to display.
     await expect(testeeViewPage.outlet.splash).not.toBeVisible();
@@ -104,11 +104,11 @@ test.describe('Workbench View', () => {
     });
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee'});
-    await routerPage.enterCssClass('testee');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee'}, {
+      target: 'view.101',
+    });
 
-    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
 
     // Expect splash not to display.
     await expect(testeeViewPage.outlet.splash).not.toBeVisible();
