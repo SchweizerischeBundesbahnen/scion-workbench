@@ -26,13 +26,13 @@ test.describe('Workbench Popup', () => {
       properties: {
         path: 'test-pages/signal-ready-test-page',
         showSplash: true,
-        cssClass: 'testee',
       },
     });
 
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
@@ -60,13 +60,13 @@ test.describe('Workbench Popup', () => {
       properties: {
         path: 'test-pages/signal-ready-test-page',
         showSplash: false,
-        cssClass: 'testee',
       },
     });
 
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});
@@ -85,13 +85,13 @@ test.describe('Workbench Popup', () => {
       qualifier: {component: 'testee'},
       properties: {
         path: 'test-pages/signal-ready-test-page',
-        cssClass: 'testee',
       },
     });
 
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
     await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
 
     const popup = appPO.popup({cssClass: 'testee'});

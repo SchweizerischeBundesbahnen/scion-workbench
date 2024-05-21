@@ -31,21 +31,20 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({title: 'Title 1,Title 2,Title 3'});
-      await routerPage.enterTarget(viewId);
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: viewId,
+        params: {title: 'Title 1,Title 2,Title 3'},
+      });
       await expect(appPO.view({viewId}).tab.title).toHaveText('Title 3');
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({title: 'Title 1,Title 2,Title 3'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee-blank');
-      await routerPage.clickNavigate();
-
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: 'blank',
+        params: {title: 'Title 1,Title 2,Title 3'},
+        cssClass: 'testee-blank'
+      });
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
       await expect(viewPropertiesTest.view.tab.title).toHaveText('Title 3');
@@ -69,20 +68,20 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
-      await routerPage.enterTarget(viewId);
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: viewId,
+        params: {heading: 'Heading 1,Heading 2,Heading 3'},
+      });
       await expect(appPO.view({viewId}).tab.heading).toHaveText('Heading 3');
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({heading: 'Heading 1,Heading 2,Heading 3'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee-blank');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: 'blank',
+        params: {heading: 'Heading 1,Heading 2,Heading 3'},
+        cssClass: 'testee-blank'
+      });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
@@ -106,20 +105,20 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({dirty: 'true,false'});
-      await routerPage.enterTarget(viewId);
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: viewId,
+        params: {dirty: 'true,false'},
+      });
       await expect.poll(() => appPO.view({viewId}).tab.isDirty()).toBe(false);
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({dirty: 'true,false'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee-blank');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: 'blank',
+        params: {dirty: 'true,false'},
+        cssClass: 'testee-blank'
+      });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
@@ -143,20 +142,20 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({dirty: 'true,false,true'});
-      await routerPage.enterTarget(viewId);
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: viewId,
+        params: {dirty: 'true,false,true'},
+      });
       await expect.poll(() => appPO.view({viewId}).tab.isDirty()).toBe(true);
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({dirty: 'true,false,true'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee-blank');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: 'blank',
+        params: {dirty: 'true,false,true'},
+        cssClass: 'testee-blank'
+      });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
@@ -180,20 +179,20 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({closable: 'true,false'});
-      await routerPage.enterTarget(viewId);
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: viewId,
+        params: {closable: 'true,false'},
+      });
       await expect(appPO.view({viewId}).tab.closeButton).not.toBeVisible();
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({closable: 'true,false'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee-blank');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: 'blank',
+        params: {closable: 'true,false'},
+        cssClass: 'testee-blank'
+      });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
@@ -217,20 +216,20 @@ test.describe('Workbench View Properties', () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
       const viewId = await routerPage.view.getViewId();
 
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({closable: 'true,false,true'});
-      await routerPage.enterTarget(viewId);
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: viewId,
+        params: {closable: 'true,false,true'},
+      });
       await expect(appPO.view({viewId}).tab.closeButton).toBeVisible();
     });
 
     await test.step('navigating to new view [target="blank"]', async () => {
       const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-      await routerPage.enterQualifier({test: 'view-properties'});
-      await routerPage.enterParams({closable: 'true,false,true'});
-      await routerPage.enterTarget('blank');
-      await routerPage.enterCssClass('testee-blank');
-      await routerPage.clickNavigate();
+      await routerPage.navigate({test: 'view-properties'}, {
+        target: 'blank',
+        params: {closable: 'true,false,true'},
+        cssClass: 'testee-blank'
+      });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);

@@ -51,10 +51,11 @@ test.describe('Workbench View CSS Class', () => {
 
     // Navigate to test view 1 passing CSS class 'testee-navigation-1'.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation-1');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.100',
+      cssClass: 'testee-navigation-1'
+    });
+
     // Expect CSS classes of the navigation to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-navigation-1');
@@ -69,10 +70,11 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee-capability-1');
 
     // Navigate to test view 2 passing CSS class 'testee-navigation-2'.
-    await routerPage.enterQualifier({component: 'testee-2'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee-navigation-2');
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-2'}, {
+      target: 'view.100',
+      cssClass: 'testee-navigation-2'
+    });
+
     // Expect CSS classes of the navigation to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation-2');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee-navigation-2');
@@ -95,10 +97,11 @@ test.describe('Workbench View CSS Class', () => {
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee-capability-2');
 
     // Navigate to test view 1 without passing CSS class.
-    await routerPage.enterQualifier({component: 'testee-1'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass([]);
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'testee-1'}, {
+      target: 'view.100',
+      cssClass: []
+    });
+
     // Expect CSS classes of the previous navigation not to be set.
     await expect.poll(() => viewPage.view.getCssClasses()).not.toContain('testee-navigation-1');
     await expect.poll(() => viewPage.view.tab.getCssClasses()).not.toContain('testee-navigation-1');
@@ -123,11 +126,11 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
-    await routerPage.enterQualifier({component: 'view', app: 'app1'});
-    await routerPage.enterTarget('view.100');
-    await routerPage.enterCssClass('testee');
-    await routerPage.checkActivate(false);
-    await routerPage.clickNavigate();
+    await routerPage.navigate({component: 'view', app: 'app1'}, {
+      target: 'view.100',
+      activate: false,
+      cssClass: 'testee'
+    });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');

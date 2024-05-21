@@ -20,7 +20,7 @@ test.describe('Popup', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
-      qualifier: {entity: 'product'},
+      qualifier: {component: 'testee'},
       params: [
         {name: 'id', required: true},
       ],
@@ -31,7 +31,7 @@ test.describe('Popup', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({entity: 'product'});
+    await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterParams({id: '123'});
     await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
@@ -40,7 +40,7 @@ test.describe('Popup', () => {
     const popupPage = new PopupPagePO(popup);
 
     // expect qualifier to be contained in popup params
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', id: '123'}));
+    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee', id: '123'}));
   });
 
   test('should contain the qualifier in popup params', async ({appPO, microfrontendNavigator}) => {
@@ -48,7 +48,7 @@ test.describe('Popup', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
-      qualifier: {entity: 'products'},
+      qualifier: {component: 'testee'},
       properties: {
         path: 'test-popup',
       },
@@ -56,7 +56,7 @@ test.describe('Popup', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({entity: 'products'});
+    await popupOpenerPage.enterQualifier({component: 'testee'});
     await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
 
@@ -64,7 +64,7 @@ test.describe('Popup', () => {
     const popupPage = new PopupPagePO(popup);
 
     // expect qualifier to be contained in popup params
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({entity: 'products'}));
+    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee'}));
   });
 
   test('should not overwrite qualifier values with param values', async ({appPO, microfrontendNavigator}) => {
@@ -72,7 +72,7 @@ test.describe('Popup', () => {
 
     await microfrontendNavigator.registerCapability('app1', {
       type: 'popup',
-      qualifier: {entity: 'product', mode: 'new'},
+      qualifier: {component: 'testee', mode: 'new'},
       params: [
         {name: 'mode', required: true},
       ],
@@ -83,7 +83,7 @@ test.describe('Popup', () => {
 
     // open the popup
     const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({entity: 'product', mode: 'new'});
+    await popupOpenerPage.enterQualifier({component: 'testee', mode: 'new'});
     await popupOpenerPage.enterParams({mode: 'edit'}); // should be ignored
     await popupOpenerPage.enterCssClass('testee');
     await popupOpenerPage.open();
@@ -92,7 +92,7 @@ test.describe('Popup', () => {
     const popupPage = new PopupPagePO(popup);
 
     // expect qualifier values not to be overwritten by params
-    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({entity: 'product', mode: 'new'}));
+    await expect.poll(() => popupPage.getPopupParams()).toEqual(expect.objectContaining({component: 'testee', mode: 'new'}));
   });
 
   test('should substitute named URL params with values of the qualifier and params', async ({appPO, microfrontendNavigator}) => {

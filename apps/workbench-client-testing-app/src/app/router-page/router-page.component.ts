@@ -72,7 +72,14 @@ export default class RouterPageComponent {
     };
     await this._router.navigate(qualifier, extras)
       .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))
+      .then(() => this.resetForm())
       .catch(error => this.navigateError = error);
+  }
+
+  private resetForm(): void {
+    this.form.reset();
+    this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+    this.form.setControl('params', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
   }
 }
 
