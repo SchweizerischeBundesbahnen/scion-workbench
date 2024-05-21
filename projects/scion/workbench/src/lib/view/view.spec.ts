@@ -35,6 +35,7 @@ import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {throwError} from '../common/throw-error.util';
+import {WorkbenchPartActionDirective} from '../part/part-action-bar/part-action.directive';
 
 describe('View', () => {
 
@@ -1042,6 +1043,63 @@ describe('View', () => {
 
     // Expect size to be equal.
     expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+  });
+
+  it('should show action after one change detection cycle', async () => {
+    @Component({
+      selector: 'spec-view',
+      template: `
+        @if (showAction) {
+          <ng-template wbPartAction>
+            <button class="spec-action">click</button>
+          </ng-template>
+        }
+      `,
+      standalone: true,
+      imports: [WorkbenchPartActionDirective],
+    })
+    class SpecViewComponent {
+      public showAction = false;
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const body = fixture.debugElement.parent!;
+    await waitForInitialWorkbenchLayout();
+
+    // Spy console.
+    const errors = new Array<any>();
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+
+    // Open view.
+    TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'}).then();
+    await waitUntilStable();
+
+    // Expect dialog to show.
+    expect(body).toShow(SpecViewComponent);
+
+    // Expect action not to show.
+    expect(body).not.toShow(By.css('button.spec-action'));
+
+    // Show action.
+    const componentInstance = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
+    componentInstance.showAction = true;
+    fixture.detectChanges(); // Only trigger one change detection cycle.
+    await waitUntilStable();
+
+    // Expect action to show.
+    expect(body).toShow(By.css('button.spec-action'));
+
+    // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
+    expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });
 
   describe('Activated Route', () => {
