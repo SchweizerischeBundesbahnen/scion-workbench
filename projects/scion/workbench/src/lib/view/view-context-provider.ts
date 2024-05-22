@@ -11,16 +11,17 @@
 import {ɵWorkbenchDialogService} from '../dialog/ɵworkbench-dialog.service';
 import {ɵWorkbenchMessageBoxService} from '../message-box/ɵworkbench-message-box.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
-import {Provider} from '@angular/core';
 import {WorkbenchView} from './workbench-view.model';
 import {PopupService} from '../popup/popup.service';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
+import {WorkbenchSelectionService} from '../selection/workbench-selection.service';
+import {ɵWorkbenchSelectionService} from '../selection/ɵworkbench-selection.service';
 
 /**
  * Configures an injector with providers that are aware of the specified view.
  */
-export function provideViewContext(view: ɵWorkbenchView | null | undefined): Provider {
+export function provideViewContext(view: ɵWorkbenchView | null | undefined): any[] {
   return [
     {provide: ɵWorkbenchView, useValue: view ?? null},
     {provide: WorkbenchView, useExisting: ɵWorkbenchView},
@@ -29,5 +30,7 @@ export function provideViewContext(view: ɵWorkbenchView | null | undefined): Pr
     {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
     ɵWorkbenchMessageBoxService,
     {provide: WorkbenchMessageBoxService, useExisting: ɵWorkbenchMessageBoxService},
+    ɵWorkbenchSelectionService,
+    {provide: WorkbenchSelectionService, useExisting: ɵWorkbenchSelectionService},
   ];
 }

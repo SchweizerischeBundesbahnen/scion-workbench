@@ -1,0 +1,6 @@
+@for (object of selectionMap | keyvalue; track object) {
+  <section>
+    <header>{{ object.key }}</header>
+    <div class="selection">{{ object.value | json }}</div>
+  </section>
+}

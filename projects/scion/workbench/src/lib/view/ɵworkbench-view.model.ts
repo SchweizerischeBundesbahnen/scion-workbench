@@ -39,6 +39,7 @@ import {ClassList} from '../common/class-list';
 import {ViewState} from '../routing/routing.model';
 import {RouterUtils} from '../routing/router.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
+import {WorkbenchSelectionService} from '../selection/workbench-selection.service';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -125,15 +126,24 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
+   * Method invoked when a route is deactivated.
+   */
+  private onRouteDeactivate(route: ActivatedRouteSnapshot | null): void {
+    this.title = null;
+    this.heading = null;
+    this.dirty = false;
+    this.getElementInjector()?.get(WorkbenchSelectionService).deleteSelection();
+    this.classList.remove({scope: 'application'});
+    this.classList.remove({scope: 'navigation'});
+  }
+
+  /**
    * Method invoked when a route is about to be activated for this view.
    */
   private onRouteActivate(route: ActivatedRouteSnapshot): void {
     this.title = RouterUtils.lookupRouteData(route, WorkbenchRouteData.title) ?? null;
     this.heading = RouterUtils.lookupRouteData(route, WorkbenchRouteData.heading) ?? null;
-    this.dirty = false;
     this.classList.set(RouterUtils.lookupRouteData(route, WorkbenchRouteData.cssClass), {scope: 'route'});
-    this.classList.remove({scope: 'application'});
-    this.classList.remove({scope: 'navigation'});
   }
 
   /**
@@ -189,6 +199,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public getComponentInjector(): Injector | null {
     const outletContext = RouterUtils.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
     return outletContext?.injector ?? null;
+  }
+
+  public getElementInjector(): Injector | undefined {
+    return this.portal.elementInjector;
   }
 
   /** @inheritDoc */
@@ -427,6 +441,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         // Only call `onRouteActivate` if the activated route has changed.
         // Otherwise, e.g., when changing matrix parameters, the view properties set by the application would be overwritten.
         if (previous?.routeConfig !== current.routeConfig) {
+          this.onRouteDeactivate(previous);
           this.onRouteActivate(current);
         }
       });

@@ -88,7 +88,6 @@ export default class ViewPageComponent implements CanClose {
     const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
       actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
-      modality: 'application',
     });
 
     if (action === 'error') {

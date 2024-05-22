@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, Subject, switchMap} from 'rxjs';
 import {inject, Injector, runInInjectionContext} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
@@ -21,6 +21,8 @@ import {filterArray} from '@scion/toolkit/operators';
 import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ActiveWorkbenchElementTracker} from '../workbench-active-element-tracker.service';
 import {ViewId} from '../view/workbench-view.model';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
@@ -32,6 +34,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
+  private readonly _activeElementTracker = inject(ActiveWorkbenchElementTracker);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
   private readonly _destroy$ = new Subject<void>();
 
@@ -46,6 +49,15 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._partComponent = options.component;
     this.actions$ = this.observePartActions$();
     this.touchOnActivate();
+    this.active$
+      .pipe(
+        switchMap(partActive => partActive ? this.activeViewId$ : EMPTY),
+        filter(Boolean),
+        takeUntilDestroyed(),
+      )
+      .subscribe(activeViewId => {
+        this._activeElementTracker.setActiveElement(activeViewId);
+      });
   }
 
   /**

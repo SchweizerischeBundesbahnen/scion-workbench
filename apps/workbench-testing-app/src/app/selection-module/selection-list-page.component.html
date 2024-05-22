@@ -1,0 +1,30 @@
+<sci-list>
+  @for (listItem of items; track listItem) {
+    <!-- list item -->
+    <ng-template sciListItem [actions]="[select_action]">
+      @if (isSelected(listItem.id)) {
+        <mark>
+          {{ listItem.id }}
+        </mark>
+      } @else {
+        {{ listItem.id }}
+      }
+    </ng-template>
+
+    <!-- action -->
+    <ng-template #select_action>
+      @if (!isSelected(listItem.id)) {
+        <button (click)="onSelect(listItem.id)" sciMaterialIcon>check_box_outline_blank</button>
+      }
+      @if (isSelected(listItem.id)) {
+        <button (click)="onUnselect(listItem.id)" sciMaterialIcon>check_box</button>
+      }
+    </ng-template>
+  }
+</sci-list>
+<!--<div class="list">-->
+<!--  @for (listItem of items; track listItem) {-->
+<!--    &lt;!&ndash; list item &ndash;&gt;-->
+<!--    <span class="item" [ngClass]="{'selected': isSelected(listItem.id)}" (click)="toggleSelection(listItem.id)">{{ listItem.id }}</span>-->
+<!--  }-->
+<!--</div>-->

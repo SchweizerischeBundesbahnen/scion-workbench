@@ -17,6 +17,8 @@ const runHeadless = !!process.env['HEADLESS'];
 export default {
   forbidOnly: runInCI,
   fullyParallel: true,
+  // globalTimeout: 9999999,
+  // timeout: 9999999,
   webServer: runInCI ? [
     {
       command: 'npm run workbench-testing-app:http-server',

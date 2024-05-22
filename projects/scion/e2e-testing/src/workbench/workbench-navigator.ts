@@ -16,6 +16,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
+import {SelectionPagePO} from './page-object/selection-page/selection-page.po';
 import {WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 
 export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
@@ -58,6 +59,10 @@ export class WorkbenchNavigator {
    * Opens the page to inspect view properties in a new workbench tab.
    */
   public openInNewTab(page: Type<ViewPagePO>): Promise<ViewPagePO>;
+  /**
+   * Opens the page to provide or listen to selections.
+   */
+  public openInNewTab(page: Type<SelectionPagePO>): Promise<SelectionPagePO>;
 
   public async openInNewTab(page: Type<any>): Promise<any> {
     const startPage = await this._appPO.openNewViewTab();
@@ -91,6 +96,10 @@ export class WorkbenchNavigator {
       case ViewPagePO: {
         await startPage.openWorkbenchView('e2e-test-view');
         return new ViewPagePO(this._appPO, {viewId, cssClass: 'e2e-test-view'});
+      }
+      case SelectionPagePO: {
+        await startPage.openWorkbenchView('e2e-test-selection');
+        return new SelectionPagePO(this._appPO, {viewId, cssClass: 'e2e-test-selection'});
       }
       default: {
         throw Error(`[TestError] Page not supported to be opened in a new tab. [page=${page}]`);

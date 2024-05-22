@@ -29,21 +29,27 @@ export class WbComponentPortal<T = any> {
   private _componentRef: ComponentRef<T> | null | undefined;
   private _logger = inject(Logger);
   private _attached$ = new BehaviorSubject<boolean>(false);
+  private _elementInjector: Injector | undefined;
 
   constructor(private _componentType: ComponentType<T>, private _options?: PortalOptions) {
     // Do not construct the component here but the time attaching it to the Angular component tree. See the comment above.
+  }
+
+  public get elementInjector(): Injector | undefined {
+    return this._elementInjector;
   }
 
   /**
    * Constructs the portal's component using given injection context.
    */
   private createComponent(elementInjector: Injector): ComponentRef<T> {
+    this._elementInjector = Injector.create({
+      name: 'WbComponentPortalInjector',
+      parent: elementInjector,
+      providers: this._options?.providers || [],
+    });
     const componentRef = createComponent(this._componentType, {
-      elementInjector: Injector.create({
-        name: 'WbComponentPortalInjector',
-        parent: elementInjector,
-        providers: this._options?.providers || [],
-      }),
+      elementInjector: this._elementInjector,
       environmentInjector: elementInjector.get(EnvironmentInjector),
     });
     componentRef.onDestroy(() => this.onDestroy());

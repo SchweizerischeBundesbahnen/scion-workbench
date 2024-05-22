@@ -1,0 +1,11 @@
+<form [formGroup]="form">
+  <section>
+    <sci-form-field label="Selection">
+      <sci-key-value-field [keyValueFormArray]="form.controls.selection" [addable]="true" [removable]="true" class="e2e-selection"></sci-key-value-field>
+    </sci-form-field>
+  </section>
+</form>
+
+<button (click)="onSetSelection()" class="e2e-set-selection" [disabled]="form.invalid" sci-primary>
+  Set Selection
+</button>
