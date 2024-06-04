@@ -16,6 +16,8 @@ import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewId} from '@scion/workbench-client';
+import {Intent} from '@scion/microfrontend-platform';
+import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 
 /**
  * Page object to interact with {@link MessagingPageComponent}.
@@ -41,6 +43,37 @@ export class MessagingPagePO implements MicrofrontendViewPagePO {
 
     const locator = this.locator.locator('app-publish-message-page');
     await locator.locator('input.e2e-topic').fill(topic);
+    await locator.locator('button.e2e-publish').click();
+
+    // Evaluate the response: resolve the promise on success, or reject it on error.
+    const successLocator = locator.locator('output.e2e-publish-success');
+    const errorLocator = locator.locator('output.e2e-publish-error');
+    await Promise.race([
+      waitUntilAttached(successLocator),
+      rejectWhenAttached(errorLocator),
+    ]);
+  }
+
+  public async publishIntent(intent: Intent): Promise<void> {
+    await this.view.tab.click();
+    await this._tabbar.selectTab('e2e-publish-intent');
+
+    const locator = this.locator.locator('app-publish-intent-page');
+
+    // Enter type.
+    await locator.locator('input.e2e-type').fill(intent.type);
+
+    // Enter qualifier.
+    const qualifierField = new SciKeyValueFieldPO(locator.locator('sci-key-value-field.e2e-qualifier'));
+    await qualifierField.clear();
+    await qualifierField.addEntries(intent.qualifier ?? {});
+
+    // Enter params.
+    const paramsField = new SciKeyValueFieldPO(locator.locator('sci-key-value-field.e2e-params'));
+    await paramsField.clear();
+    await paramsField.addEntries(intent.params ?? {});
+
+    // Publish intent.
     await locator.locator('button.e2e-publish').click();
 
     // Evaluate the response: resolve the promise on success, or reject it on error.

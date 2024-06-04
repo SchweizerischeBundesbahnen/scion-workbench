@@ -13,7 +13,6 @@ import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {stringifyError} from '../../common/stringify-error.util';
-import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-publish-message-page',
@@ -23,10 +22,9 @@ import {NgIf} from '@angular/common';
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
-    NgIf,
   ],
 })
-export default class PublishMesagePageComponent {
+export class PublishMesagePageComponent {
 
   public publishError: string | false | undefined;
 

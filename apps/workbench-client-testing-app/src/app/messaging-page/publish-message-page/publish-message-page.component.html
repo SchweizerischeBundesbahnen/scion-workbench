@@ -9,11 +9,13 @@
     Publish
   </button>
 
-  <output class="publish-success e2e-publish-success" *ngIf="publishError === false">
-    Success
-  </output>
-
-  <output class="publish-error e2e-publish-error" *ngIf="publishError">
-    {{publishError}}
-  </output>
+  @if (publishError === false) {
+    <output class="publish-success e2e-publish-success">
+      Success
+    </output>
+  } @else if (publishError) {
+    <output class="publish-error e2e-publish-error">
+      {{publishError}}
+    </output>
+  }
 </form>
