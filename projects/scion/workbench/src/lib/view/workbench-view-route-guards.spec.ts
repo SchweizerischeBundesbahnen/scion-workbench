@@ -265,7 +265,7 @@ describe('CanMatchNotFoundPage', () => {
     jasmine.addMatchers(toShowCustomMatcher);
   });
 
-  it('should display "Page Not Found" if not matching a route', async () => {
+  it('should display "Not Found" page if not matching a route', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),

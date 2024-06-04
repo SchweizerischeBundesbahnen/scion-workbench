@@ -15,6 +15,7 @@ import {ViewPagePO as WorkbenchViewPagePO} from '../workbench/page-object/view-p
 import {RouterPagePO} from './page-object/router-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MicrofrontendViewTestPagePO} from './page-object/test-pages/microfrontend-view-test-page.po';
+import {PageNotFoundPagePO} from '../workbench/page-object/page-not-found-page.po';
 
 test.describe('Workbench Router', () => {
 
@@ -835,7 +836,7 @@ test.describe('Workbench Router', () => {
     await expectView(testeeViewPage).toBeActive();
   });
 
-  test('should not open views if missing the view provider', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+  test('should display "Not Found" page if missing the view provider', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -861,10 +862,10 @@ test.describe('Workbench Router', () => {
     // reload the app; after the reload, the view is not registered anymore, as registered dynamically at runtime
     await appPO.reload();
 
-    // expect the view not to be present
-    await expectView(testeeViewPage).not.toBeAttached();
-    await expect(appPO.views()).toHaveCount(1);
-    await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
+    // expect the view to display "Not Found" page
+    const notFoundPage = new PageNotFoundPagePO(appPO, {viewId: 'view.100'});
+    await expectView(notFoundPage).toBeActive();
+    await expect(appPO.views()).toHaveCount(2);
   });
 
   test('should open views as contained in the URL on initial navigation', async ({appPO, microfrontendNavigator}) => {
@@ -1171,7 +1172,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => testeeViewPage.view.tab.isDirty()).toBe(false);
   });
 
-  test('should close the view when removing the capability', async ({appPO, microfrontendNavigator, consoleLogs}) => {
+  test('should display "Not Found" page when removing the capability', async ({appPO, microfrontendNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const capability = await microfrontendNavigator.registerCapability('app1', {
@@ -1197,10 +1198,11 @@ test.describe('Workbench Router', () => {
     // unregister the capability
     await microfrontendNavigator.unregisterCapability('app1', capability.metadata!.id);
 
-    // expect the view not to be present
-    await expectView(testeeViewPage).not.toBeAttached();
-    await expectView(routerPage).toBeActive();
-    await expect(appPO.views()).toHaveCount(1);
+    // expect the view to display "Not Found" page
+    const notFoundPage = new PageNotFoundPagePO(appPO, {viewId: 'view.100'});
+    await expectView(notFoundPage).toBeActive();
+    await expectView(routerPage).toBeInactive();
+    await expect(appPO.views()).toHaveCount(2);
     await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
   });
 

@@ -9,7 +9,7 @@
  */
 
 import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, HostBinding, inject, Injector, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
-import {Application, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {ɵPopup} from '../../popup/popup.config';
@@ -71,11 +71,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     // Obtain the capability provider.
-    const application = this.lookupApplication(this.popupCapability.metadata!.appSymbolicName);
-    if (!application) {
-      this.popup.closeWithError(`[NullApplicationError] Unexpected. Cannot resolve application '${this.popupCapability.metadata!.appSymbolicName}'.`);
-      return;
-    }
+    const application = this._manifestService.getApplication(this.popupCapability.metadata!.appSymbolicName);
 
     // Listen to popup close requests.
     this._messageClient.observe$<any>(ɵWorkbenchCommands.popupCloseTopic(this.popup.id))
@@ -117,13 +113,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     if (focusWithin) {
       this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
-  }
-
-  /**
-   * Looks up the application registered under the given symbolic name. Returns `undefined` if not found.
-   */
-  private lookupApplication(symbolicName: string): Application | undefined {
-    return this._manifestService.applications.find(app => app.symbolicName === symbolicName);
   }
 
   /**
