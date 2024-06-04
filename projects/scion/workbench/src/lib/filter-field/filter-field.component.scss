@@ -15,6 +15,10 @@
     all: unset;
     flex: auto;
     min-width: 0; // allows the input to shrink past UA minimal width
+
+    &::placeholder {
+      color: var(--sci-color-gray-400);
+    }
   }
 
   > button.clear {
