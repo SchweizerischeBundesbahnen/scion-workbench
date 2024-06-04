@@ -261,7 +261,7 @@ export type MPartGrid = Partial<Omit<_MPartGrid, 'root'>> & {root: MTreeNode | M
 /**
  * `MView` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
  */
-export type MView = Partial<_MView>;
+export type MView = Partial<Omit<_MView, 'navigation'> & {navigation?: Partial<_MView['navigation']>}>;
 
 /**
  * `MTreeNode` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.

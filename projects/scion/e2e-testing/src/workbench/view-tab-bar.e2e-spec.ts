@@ -104,7 +104,7 @@ test.describe('View Tabbar', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('left')
-      .addPart('right', {align: 'right'}, {activate: true})
+      .addPart('right', {align: 'right'})
       .addView('view.1', {partId: 'left'})
       .addView('view.2', {partId: 'left', activateView: true})
       .addView('view.3', {partId: 'left'})
@@ -165,7 +165,7 @@ test.describe('View Tabbar', () => {
           direction: 'row',
           ratio: .5,
         }),
-        activePartId: 'left',
+        activePartId: 'right',
       },
     });
   });

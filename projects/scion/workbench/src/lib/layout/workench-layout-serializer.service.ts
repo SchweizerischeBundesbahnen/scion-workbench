@@ -17,6 +17,8 @@ import {WorkbenchMigrator} from '../migration/workbench-migrator';
 import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
 import {randomUUID} from '../common/uuid.util';
+import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
+import {stringify} from './stringifier';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -26,38 +28,31 @@ export class WorkbenchLayoutSerializer {
 
   private _workbenchLayoutMigrator = new WorkbenchMigrator()
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
-    .registerMigration(3, inject(WorkbenchLayoutMigrationV4));
+    .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
+    .registerMigration(4, inject(WorkbenchLayoutMigrationV5));
 
   /**
    * Serializes the given grid into a URL-safe base64 string.
    *
    * @param grid - Specifies the grid to be serialized.
-   * @param options - Controls the serialization.
-   * @param options.includeNodeId - Controls if to include the `nodeId`. By default, if not set, the `nodeId` is excluded from serialization.
-   * @param options.includeUid - Controls if to include the view `uid`. By default, if not set, the `uid` is excluded from serialization.
-   * @param options.includeMarkRemovedFlag - Controls if to include the `markedForRemoval` flag. By default, if not set, the `markedForRemoval` is excluded from serialization.
+   * @param flags - Controls which fields not to serialize. By default, all fields are serialized.
    */
-  public serializeGrid(grid: MPartGrid, options?: {includeNodeId?: boolean; includeUid?: boolean; includeMarkedForRemovalFlag?: boolean}): string;
-  public serializeGrid(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean; includeUid?: boolean; includeMarkedForRemovalFlag?: boolean}): null | string;
-  public serializeGrid(grid: MPartGrid | undefined | null, options?: {includeNodeId?: boolean; includeUid?: boolean; includeMarkedForRemovalFlag?: boolean}): string | null {
+  public serializeGrid(grid: MPartGrid, flags?: GridSerializationFlags): string;
+  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): null | string;
+  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): string | null {
     if (grid === null || grid === undefined) {
       return null;
     }
 
-    const transientFields = new Set<string>(TRANSIENT_FIELDS);
-    if (!options?.includeNodeId) {
-      transientFields.add('nodeId');
-    }
-    if (!options?.includeUid) {
-      transientFields.add('uid');
-    }
-    if (!options?.includeMarkedForRemovalFlag) {
-      transientFields.add('markedForRemoval');
-    }
+    const transientFields = new Array<string>()
+      .concat('**/parent')
+      .concat('migrated')
+      .concat(flags?.excludeNodeId ? '**/nodeId' : [])
+      .concat(flags?.excludeViewUid ? '**/views/*/uid' : [])
+      .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
+      .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : []);
 
-    const json = JSON.stringify(grid, (key, value) => {
-      return transientFields.has(key) ? undefined : value;
-    });
+    const json = stringify(grid, transientFields);
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
   }
 
@@ -124,12 +119,8 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 4;
+export const WORKBENCH_LAYOUT_VERSION = 5;
 
-/**
- * Fields not serialized into JSON representation.
- */
-const TRANSIENT_FIELDS = new Set<string>().add('parent').add('migrated');
 /**
  * Separates the serialized JSON model and its version in the base64-encoded string.
  *
@@ -145,4 +136,14 @@ const VERSION_SEPARATOR = '//';
 interface MUrlSegment {
   path: string;
   parameters: {[name: string]: string};
+}
+
+/**
+ * Controls which fields not to serialize. By default, all fields are serialized.
+ */
+export interface GridSerializationFlags {
+  excludeNodeId?: true;
+  excludeViewUid?: true;
+  excludeViewMarkedForRemoval?: true;
+  excludeViewNavigationId?: true;
 }

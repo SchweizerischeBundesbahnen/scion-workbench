@@ -118,8 +118,6 @@ export class PartComponent implements OnInit, OnDestroy {
       )
       .subscribe(inactiveView => {
         inactiveView.portal.createComponentFromInjectionContext(this._injector);
-        // Trigger manual change detection cycle because the view is not yet added to the Angular component tree. Otherwise, routed content would not be attached.
-        inactiveView.portal.componentRef.changeDetectorRef.detectChanges();
       });
   }
 

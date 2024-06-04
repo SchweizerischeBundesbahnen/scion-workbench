@@ -11,7 +11,7 @@ import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layou
 import {assertType} from '../common/asserts.util';
 import {randomUUID, UUID} from '../common/uuid.util';
 import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
-import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
+import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
@@ -420,11 +420,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Serializes this layout into a URL-safe base64 string.
    */
-  public serialize(): SerializedWorkbenchLayout {
+  public serialize(flags?: GridSerializationFlags): SerializedWorkbenchLayout {
     const isMainAreaEmpty = (this.mainAreaGrid?.root instanceof MPart && this.mainAreaGrid.root.views.length === 0) ?? true;
     return {
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
-      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea),
+      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
+      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
       workbenchViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'workbench'})),
       mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'mainArea'})),
     };
@@ -574,9 +574,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     view.navigation = Objects.withoutUndefinedEntries({
+      id: randomUUID(),
       hint: extras?.hint,
       cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
-    });
+    } satisfies MView['navigation']);
   }
 
   /**
@@ -818,8 +819,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private workingCopy(): ɵWorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, {includeNodeId: true, includeUid: true, includeMarkedForRemovalFlag: true}),
-      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea, {includeNodeId: true, includeUid: true, includeMarkedForRemovalFlag: true}),
+      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
+      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
       viewOutlets: Object.fromEntries(this._viewOutlets),
       viewStates: Object.fromEntries(this._viewStates),
       maximized: this._maximized,

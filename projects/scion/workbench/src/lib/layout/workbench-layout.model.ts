@@ -114,6 +114,7 @@ export interface MView {
   cssClass?: string[];
   markedForRemoval?: true;
   navigation?: {
+    id: string;
     hint?: string;
     cssClass?: string[];
   };

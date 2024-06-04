@@ -997,8 +997,8 @@ describe('WorkbenchLayout', () => {
       .moveView('view.2', 'right');
 
     expect(workbenchLayout.part({partId: 'right'}).views).toEqual(jasmine.arrayWithExactContents([
-      {id: 'view.1', navigation: {cssClass: ['class-navigation']}, cssClass: ['class-view'], uid: anything()} satisfies MView,
-      {id: 'view.2', navigation: {hint: 'some-hint'}, uid: anything()} satisfies MView,
+      {id: 'view.1', navigation: {id: anything(), cssClass: ['class-navigation']}, cssClass: ['class-view'], uid: anything()} satisfies MView,
+      {id: 'view.2', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView,
     ]));
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
     expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual([]);
@@ -1012,7 +1012,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
       .moveView('view.1', 'right');
 
-    expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {}, uid: anything()} satisfies MView]);
+    expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView]);
     expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({some: 'state'});
   });
 
@@ -1023,7 +1023,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', [], {hint: 'some-hint'})
       .navigateView('view.1', ['path/to/view']);
 
-    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {}, uid: anything()} satisfies MView);
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
   });
 
@@ -1034,7 +1034,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.1', [], {hint: 'some-hint'});
 
-    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {hint: 'some-hint'}, uid: anything()} satisfies MView);
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView);
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
   });
 
@@ -1045,7 +1045,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
       .navigateView('view.1', ['path/to/view']);
 
-    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {}, uid: anything()} satisfies MView);
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
     expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
   });
@@ -1637,37 +1637,6 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.view({viewId: 'view.2'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.view({viewId: 'view.3'}, {orElse: null})).toEqual(view3);
-  });
-
-  it('should not serialize `markedForRemoval` flag', () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
-
-    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart(MAIN_AREA)
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'});
-
-    // Remove view and serialize the layout.
-    const serializedLayout = workbenchLayout
-      .removeView('view.2')
-      .serialize();
-
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid, mainAreaGrid: serializedLayout.mainAreaGrid});
-
-    const view1 = deserializedLayout.view({viewId: 'view.1'});
-    const view2 = deserializedLayout.view({viewId: 'view.2'});
-    const view3 = deserializedLayout.view({viewId: 'view.3'});
-
-    // Expect views not to be removed.
-    expect(view1).toBeDefined();
-    expect(view2).toBeDefined();
-    expect(view3).toBeDefined();
-
-    // Expect views not to be marked for removal.
-    expect(view1.markedForRemoval).toBeUndefined();
-    expect(view2.markedForRemoval).toBeUndefined();
-    expect(view3.markedForRemoval).toBeUndefined();
   });
 
   it('should find parts by criteria', () => {

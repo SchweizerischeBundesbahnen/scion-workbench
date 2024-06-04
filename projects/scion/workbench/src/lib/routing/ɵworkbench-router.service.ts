@@ -310,7 +310,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
  * Creates navigation extras with workbench navigation instructions.
  */
 function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
-  const {workbenchGrid, mainAreaGrid} = layout.serialize();
+  const {workbenchGrid, mainAreaGrid} = layout.serialize({excludeNodeId: true, excludeViewUid: true, excludeViewMarkedForRemoval: true});
 
   return {
     ...extras,

@@ -217,8 +217,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       return;
     }
 
-    const serializedReferenceLayout = this._initialPerspectiveLayout!.serialize();
-    const serializedUserLayout = this._perspectiveLayout.serialize();
+    const serializedReferenceLayout = this._initialPerspectiveLayout!.serialize({excludeNodeId: true, excludeViewUid: true, excludeViewMarkedForRemoval: true});
+    const serializedUserLayout = this._perspectiveLayout.serialize({excludeNodeId: true, excludeViewUid: true, excludeViewMarkedForRemoval: true});
 
     await this._workbenchPerspectiveStorageService.storePerspectiveLayout(this.id, {
       referenceLayout: {

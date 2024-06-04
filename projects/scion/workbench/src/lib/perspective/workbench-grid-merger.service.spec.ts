@@ -14,9 +14,10 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {segments} from '../testing/testing.util';
+import {anything, segments} from '../testing/testing.util';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {MView} from '../layout/workbench-layout.model';
 
 describe('WorkbenchGridMerger', () => {
 
@@ -81,9 +82,9 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({hint: 'hint-3'});
-    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({id: anything()} satisfies MView['navigation']);
+    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({id: anything(), hint: 'hint-3'} satisfies MView['navigation']);
+    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({id: anything() satisfies MView['navigation']});
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.1': segments(['PATH/TO/VIEW/1']),
@@ -149,9 +150,9 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({hint: 'hint-3'});
-    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({id: anything()} satisfies MView['navigation']);
+    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({id: anything(), hint: 'hint-3'} satisfies MView['navigation']);
+    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({id: anything()} satisfies MView['navigation']);
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.2': segments(['path/to/view/2']),
@@ -207,8 +208,8 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({id: anything()} satisfies MView['navigation']);
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({id: anything()} satisfies MView['navigation']);
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.1': segments(['path/to/view/1']),
@@ -263,8 +264,8 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({hint: 'hint-2b'});
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({id: anything()} satisfies MView['navigation']);
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({id: anything(), hint: 'hint-2b'} satisfies MView['navigation']);
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.1': segments(['path/to/view/1']),

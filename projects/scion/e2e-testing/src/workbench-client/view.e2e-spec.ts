@@ -12,9 +12,11 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
+import {RouterPagePO as StandaloneRouterPagePO} from '../workbench/page-object/router-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
+import {ViewInfo} from '../workbench/page-object/view-info-dialog.po';
 
 test.describe('Workbench View', () => {
 
@@ -830,7 +832,7 @@ test.describe('Workbench View', () => {
     expect(view2ComponentId).toEqual(await viewPage2.getComponentInstanceId());
   });
 
-  test('should update Angular bindings for active views', async ({appPO, microfrontendNavigator}) => {
+  test('should change detect active views after construction', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const capability = await microfrontendNavigator.registerCapability('app1', {
@@ -855,9 +857,10 @@ test.describe('Workbench View', () => {
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
     await expect.poll(() => viewPage.outlet.getCapabilityId()).toEqual(capability.metadata!.id);
     await expect.poll(() => viewPage.outlet.getAppSymbolicName()).toEqual(capability.metadata!.appSymbolicName);
+    await expect(viewPage.view.tab.title).toHaveText('Testee');
   });
 
-  test('should update Angular bindings for inactive views', async ({appPO, microfrontendNavigator}) => {
+  test('should change detect inactive views after construction', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     const capability = await microfrontendNavigator.registerCapability('app1', {
@@ -882,5 +885,115 @@ test.describe('Workbench View', () => {
     await expect.poll(() => viewPage.outlet.getCssClasses()).toContain('testee');
     await expect.poll(() => viewPage.outlet.getCapabilityId()).toEqual(capability.metadata!.id);
     await expect.poll(() => viewPage.outlet.getAppSymbolicName()).toEqual(capability.metadata!.appSymbolicName);
+    await expect(viewPage.view.tab.title).toHaveText('Testee');
+  });
+
+  /**
+   * In this test, we have an inactive view which is navigated to a non-microfrontend component.
+   * This test verifies that when this view is navigated to a microfrontend, the microfrontend is loaded, e.g., to set the title of the view.
+   */
+  test('should change detect view when navigating from inactive "standalone workbench" view to inactive microfrontend view', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view 1.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'view'},
+      properties: {
+        path: 'test-view',
+        title: 'Microfrontend View',
+      },
+    });
+
+    const standaloneRouter = await workbenchNavigator.openInNewTab(StandaloneRouterPagePO);
+    const microfrontendRouter = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    const view = appPO.view({viewId: 'view.100'});
+
+    // Navigate to standalone page.
+    await standaloneRouter.view.tab.click();
+    await standaloneRouter.navigate(['test-pages/navigation-test-page', {title: 'Standalone View'}], {target: 'view.100', activate: false});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        title: 'Standalone View',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Navigate to microfrontend.
+    await microfrontendRouter.view.tab.click();
+    await microfrontendRouter.navigate({view: 'view'}, {target: 'view.100', activate: false});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        title: 'Microfrontend View',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Navigate to standalone page.
+    await standaloneRouter.view.tab.click();
+    await standaloneRouter.navigate(['test-pages/navigation-test-page', {title: 'Standalone View'}], {target: 'view.100', activate: false});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        title: 'Standalone View',
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  /**
+   * In this test, we have an active view which is navigated to a non-microfrontend component.
+   * This test verifies that when this view is navigated to a microfrontend, the microfrontend is loaded, e.g., to set the title of the view.
+   */
+  test('should change detect view when navigating from active "standalone workbench" view to active microfrontend view', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('right', {align: 'right'})
+      .addView('view.100', {partId: 'right', activateView: true})
+    );
+
+    // Register view 1.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'view'},
+      properties: {
+        path: 'test-view',
+        title: 'Microfrontend View',
+      },
+    });
+
+    const standaloneRouter = await workbenchNavigator.openInNewTab(StandaloneRouterPagePO);
+    const microfrontendRouter = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    const view = appPO.view({viewId: 'view.100'});
+
+    // Navigate to standalone page.
+    await standaloneRouter.view.tab.click();
+    await standaloneRouter.navigate(['test-pages/navigation-test-page', {title: 'Standalone View'}], {target: 'view.100'});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        title: 'Standalone View',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Navigate to microfrontend.
+    await microfrontendRouter.view.tab.click();
+    await microfrontendRouter.navigate({view: 'view'}, {target: 'view.100'});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        title: 'Microfrontend View',
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Navigate to standalone page.
+    await standaloneRouter.view.tab.click();
+    await standaloneRouter.navigate(['test-pages/navigation-test-page', {title: 'Standalone View'}], {target: 'view.100'});
+    await expect.poll(() => view.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        title: 'Standalone View',
+      } satisfies Partial<ViewInfo>,
+    );
   });
 });
