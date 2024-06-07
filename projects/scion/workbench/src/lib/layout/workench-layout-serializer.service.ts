@@ -12,7 +12,6 @@ import {inject, Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
 import {ViewOutlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
-import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration-v2.service';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
 import {ViewId} from '../view/workbench-view.model';
@@ -26,7 +25,6 @@ import {randomUUID} from '../common/uuid.util';
 export class WorkbenchLayoutSerializer {
 
   private _workbenchLayoutMigrator = new WorkbenchMigrator()
-    .registerMigration(1, inject(WorkbenchLayoutMigrationV2))
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
     .registerMigration(3, inject(WorkbenchLayoutMigrationV4));
 

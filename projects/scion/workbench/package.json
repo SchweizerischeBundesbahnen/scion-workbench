@@ -1,6 +1,6 @@
 {
   "name": "@scion/workbench",
-  "version": "17.0.0-beta.9",
+  "version": "18.0.0-beta.1",
   "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.",
   "license": "EPL-2.0",
   "private": false,
@@ -20,16 +20,16 @@
     }
   },
   "dependencies": {
-    "tslib": "^2.5.0"
+    "tslib": "^2.6.0"
   },
   "peerDependencies": {
-    "@angular/common": "^17.0.6",
-    "@angular/core": "^17.0.6",
-    "@angular/cdk": "^17.0.6",
-    "@angular/animations": "^17.0.6",
-    "@angular/forms": "^17.0.6",
-    "@angular/router": "^17.0.6",
-    "@scion/components": "^17.0.0",
+    "@angular/common": "^18.0.0",
+    "@angular/core": "^18.0.0",
+    "@angular/cdk": "^18.0.0",
+    "@angular/animations": "^18.0.0",
+    "@angular/forms": "^18.0.0",
+    "@angular/router": "^18.0.0",
+    "@scion/components": "^18.0.0",
     "@scion/toolkit": "^1.4.0",
     "@scion/microfrontend-platform": "^1.2.1",
     "@scion/workbench-client": "^1.0.0-beta.23",
