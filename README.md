@@ -46,6 +46,7 @@ SCION Workbench enables the creation of Angular web applications that require a 
 ***
 
 ### Versions
+- `v18.0.0-beta.1` and newer are compatible with Angular version 18.x.
 - `v17.0.0-beta.1` and newer are compatible with Angular version 17.x.
 - `v16.0.0-beta.1` and newer are compatible with Angular version 16.x.
 - `v15.0.0-beta.1` and newer are compatible with Angular version 15.x.
