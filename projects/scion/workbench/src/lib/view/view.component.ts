@@ -20,6 +20,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {WorkbenchView} from './workbench-view.model';
+import {NgClass} from '@angular/common';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -36,6 +37,7 @@ import {WorkbenchView} from './workbench-view.model';
   ],
   hostDirectives: [
     GlassPaneDirective,
+    NgClass,
   ],
   providers: [
     configureViewGlassPane(),
@@ -58,30 +60,18 @@ export class ViewComponent implements OnDestroy {
     return this._view.id;
   }
 
-  @HostBinding('attr.class')
-  public get cssClasses(): string {
-    return this._view.classList.value.join(' ');
-  }
-
   @HostBinding('class.view-drag')
   public get isViewDragActive(): boolean {
     return this._viewDragService.viewDragData !== null;
   }
 
   constructor(private _view: ɵWorkbenchView,
-              private _logger: Logger,
-              private _host: ElementRef<HTMLElement>,
               private _viewDragService: ViewDragService,
-              viewContextMenuService: ViewMenuService) {
+              private _logger: Logger) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
-
-    viewContextMenuService.installMenuItemAccelerators$(this._host, this._view)
-      .pipe(takeUntilDestroyed())
-      .subscribe();
-
-    combineLatest([this._view.active$, this._viewport$])
-      .pipe(takeUntilDestroyed())
-      .subscribe(([active, viewport]) => active ? this.onActivateView(viewport) : this.onDeactivateView(viewport));
+    this.installMenuItemAccelerators();
+    this.subscribeForViewActivation();
+    this.addViewClassesToHost();
   }
 
   private onActivateView(viewport: SciViewportComponent): void {
@@ -93,6 +83,29 @@ export class ViewComponent implements OnDestroy {
   private onDeactivateView(viewport: SciViewportComponent): void {
     this._view.scrollTop = viewport.scrollTop;
     this._view.scrollLeft = viewport.scrollLeft;
+  }
+
+  private installMenuItemAccelerators(): void {
+    inject(ViewMenuService).installMenuItemAccelerators$(inject(ElementRef<HTMLElement>), this._view)
+      .pipe(takeUntilDestroyed())
+      .subscribe();
+  }
+
+  private subscribeForViewActivation(): void {
+    combineLatest([this._view.active$, this._viewport$])
+      .pipe(takeUntilDestroyed())
+      .subscribe(([active, viewport]) => {
+        active ? this.onActivateView(viewport) : this.onDeactivateView(viewport);
+      });
+  }
+
+  private addViewClassesToHost(): void {
+    const ngClass = inject(NgClass);
+    this._view.classList.value$
+      .pipe(takeUntilDestroyed())
+      .subscribe(cssClasses => {
+        ngClass.ngClass = cssClasses;
+      });
   }
 
   public ngOnDestroy(): void {

@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, inject, Injector, OnDestroy, Type} from '@angular/core';
+import {Component, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -1080,7 +1080,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
 
     // Open view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'}).then();
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -1097,6 +1097,206 @@ describe('View', () => {
 
     // Expect action to show.
     expect(body).toShow(By.css('button.spec-action'));
+
+    // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
+    expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should not throw "ExpressionChangedAfterItHasBeenCheckedError" if setting view properties in constructor (navigate new view)', async () => {
+    @Component({
+      selector: 'spec-view',
+      template: 'View',
+      standalone: true,
+    })
+    class SpecViewComponent {
+      constructor(view: WorkbenchView) {
+        view.title = 'Title';
+        view.heading = 'Heading';
+        view.cssClass = ['class-1', 'class-2'];
+      }
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Spy console.
+    const errors = new Array<any>();
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Expect view to show.
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Expect view properties.
+    expect(getViewTitle(fixture, 'view.100')).toEqual('Title');
+    expect(getViewHeading(fixture, 'view.100')).toEqual('Heading');
+    expect(getViewCssClass(fixture, 'view.100')).toEqual(jasmine.arrayContaining(['class-1', 'class-2']));
+
+    // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
+    expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should not throw "ExpressionChangedAfterItHasBeenCheckedError" if setting view properties in "ngOnInit" (navigate new view)', async () => {
+    @Component({
+      selector: 'spec-view',
+      template: 'View',
+      standalone: true,
+    })
+    class SpecViewComponent implements OnInit {
+
+      constructor(private _view: WorkbenchView) {
+      }
+
+      public ngOnInit(): void {
+        this._view.title = 'Title';
+        this._view.heading = 'Heading';
+        this._view.cssClass = ['class-1', 'class-2'];
+      }
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Spy console.
+    const errors = new Array<any>();
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Expect view to show.
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Expect view properties.
+    expect(getViewTitle(fixture, 'view.100')).toEqual('Title');
+    expect(getViewHeading(fixture, 'view.100')).toEqual('Heading');
+    expect(getViewCssClass(fixture, 'view.100')).toEqual(jasmine.arrayContaining(['class-1', 'class-2']));
+
+    // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
+    expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should not throw "ExpressionChangedAfterItHasBeenCheckedError" if setting view properties in constructor (navigate existing view)', async () => {
+    @Component({
+      selector: 'spec-view',
+      template: 'View',
+      standalone: true,
+    })
+    class SpecViewComponent {
+      constructor(view: WorkbenchView) {
+        view.title = 'Title';
+        view.heading = 'Heading';
+        view.cssClass = ['class-1', 'class-2'];
+      }
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Spy console.
+    const errors = new Array<any>();
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+
+    // Open view.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId!}));
+    await waitUntilStable();
+
+    // Navigate view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Expect view to show.
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Expect view properties.
+    expect(getViewTitle(fixture, 'view.100')).toEqual('Title');
+    expect(getViewHeading(fixture, 'view.100')).toEqual('Heading');
+    expect(getViewCssClass(fixture, 'view.100')).toEqual(jasmine.arrayContaining(['class-1', 'class-2']));
+
+    // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
+    expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should not throw "ExpressionChangedAfterItHasBeenCheckedError" if setting view properties in "ngOnInit" (navigate existing view)', async () => {
+    @Component({
+      selector: 'spec-view',
+      template: 'View',
+      standalone: true,
+    })
+    class SpecViewComponent implements OnInit {
+
+      constructor(private _view: WorkbenchView) {
+      }
+
+      public ngOnInit(): void {
+        this._view.title = 'Title';
+        this._view.heading = 'Heading';
+        this._view.cssClass = ['class-1', 'class-2'];
+      }
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Spy console.
+    const errors = new Array<any>();
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+
+    // Open view.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId!}));
+    await waitUntilStable();
+
+    // Navigate view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Expect view to show.
+    expect(fixture).toShow(SpecViewComponent);
+
+    // Expect view properties.
+    expect(getViewTitle(fixture, 'view.100')).toEqual('Title');
+    expect(getViewHeading(fixture, 'view.100')).toEqual('Heading');
+    expect(getViewCssClass(fixture, 'view.100')).toEqual(jasmine.arrayContaining(['class-1', 'class-2']));
 
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
