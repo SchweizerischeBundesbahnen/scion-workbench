@@ -219,7 +219,7 @@ test.describe('Workbench View', () => {
       .addPart('part')
       .addView('view.101', {partId: 'part'})
       .addView('view.102', {partId: 'part'})
-      .addView('view.103', {partId: 'part', activateView: true})
+      .addView('view.103', {partId: 'part'})
       .navigateView('view.101', ['test-view']) // path-based view
       .navigateView('view.102', ['test-view']) // path-based view
       .navigateView('view.103', [], {hint: 'test-view'}), // empty-path view
@@ -249,7 +249,7 @@ test.describe('Workbench View', () => {
             {id: 'view.102'},
             {id: 'view.103'},
           ],
-          activeViewId: 'view.103',
+          activeViewId: 'view.102',
         }),
       },
     });

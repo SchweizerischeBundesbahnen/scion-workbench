@@ -795,7 +795,7 @@ test.describe('Workbench Router', () => {
       .addPart('left')
       .addPart('right', {align: 'right'})
       .addView('router', {partId: 'left', cssClass: 'router'})
-      .addView('view.100', {partId: 'right', activateView: true})
+      .addView('view.100', {partId: 'right'})
       .navigateView('router', ['test-router']),
     );
 
@@ -1668,7 +1668,7 @@ test.describe('Workbench Router', () => {
       await workbenchNavigator.createPerspective(factory => factory
         .addPart('left')
         .addPart('right', {relativeTo: 'left', align: 'right'})
-        .addView('router', {partId: 'left', activateView: true, cssClass: 'router'})
+        .addView('router', {partId: 'left', cssClass: 'router'})
         .addView('testee', {partId: 'right', cssClass: 'testee'})
         .navigateView('router', ['test-router']),
       );
@@ -1695,9 +1695,9 @@ test.describe('Workbench Router', () => {
       await workbenchNavigator.createPerspective(factory => factory
         .addPart('left')
         .addPart('right', {relativeTo: 'left', align: 'right'})
-        .addView('test-router', {partId: 'left', activateView: true, cssClass: 'router'})
+        .addView('test-router', {partId: 'left', cssClass: 'router'})
         .addView('testee-1', {partId: 'right', cssClass: 'testee-1'})
-        .addView('testee-2', {partId: 'right', cssClass: 'testee-2', activateView: true})
+        .addView('testee-2', {partId: 'right', cssClass: 'testee-2'})
         .navigateView('test-router', ['test-router'])
         .navigateView('testee-1', ['test-view'])
         .navigateView('testee-2', ['test-view']),
@@ -1729,10 +1729,10 @@ test.describe('Workbench Router', () => {
       await workbenchNavigator.createPerspective(factory => factory
         .addPart('left')
         .addPart('right', {relativeTo: 'left', align: 'right'})
-        .addView('test-router', {partId: 'left', activateView: true, cssClass: 'router'})
+        .addView('test-router', {partId: 'left', cssClass: 'router'})
         .addView('testee-1', {partId: 'right', cssClass: 'testee-1'})
         .addView('testee-1', {partId: 'right', cssClass: 'testee-2'})
-        .addView('testee-2', {partId: 'right', cssClass: 'testee-3', activateView: true})
+        .addView('testee-2', {partId: 'right', cssClass: 'testee-3'})
         .navigateView('test-router', ['test-router'])
         .navigateView('testee-1', ['test-view'])
         .navigateView('testee-2', ['test-view']),

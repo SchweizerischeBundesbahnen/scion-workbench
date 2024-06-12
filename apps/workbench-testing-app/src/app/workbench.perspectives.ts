@@ -115,10 +115,7 @@ function provideDeveloperPerspectiveLayout(factory: WorkbenchLayoutFactory): Wor
     .navigateView('search', [], {hint: 'search'})
     .navigateView('progress', [], {hint: 'progress'})
     .navigateView('outline', [], {hint: 'outline'})
-    .activateView('package-explorer')
-    .activateView('git-repositories')
-    .activateView('console')
-    .activateView('outline');
+    .activateView('console');
 }
 
 /** @private */
@@ -144,7 +141,5 @@ function provideDebugPerspectiveLayout(factory: WorkbenchLayoutFactory): Workben
     .navigateView('variables', [], {hint: 'variables'})
     .navigateView('expressions', [], {hint: 'expressions'})
     .navigateView('breakpoints', [], {hint: 'breakpoints'})
-    .activateView('debug')
-    .activateView('console')
-    .activateView('variables');
+    .activateView('console');
 }

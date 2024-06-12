@@ -169,8 +169,8 @@ test.describe('Navigational State', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('left')
       .addPart('right', {align: 'right'})
-      .addView('router', {partId: 'left', activateView: true, cssClass: 'router'})
-      .addView('testee', {partId: 'right', activateView: true, cssClass: 'testee'})
+      .addView('router', {partId: 'left', cssClass: 'router'})
+      .addView('testee', {partId: 'right', cssClass: 'testee'})
       .navigateView('router', ['test-router'])
       .navigateView('testee', ['test-view']),
     );
@@ -220,7 +220,7 @@ test.describe('Navigational State', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('left')
       .addPart('right', {align: 'right'})
-      .addView('workbench-router', {partId: 'left', activateView: true, cssClass: 'workbench-router'})
+      .addView('workbench-router', {partId: 'left', cssClass: 'workbench-router'})
       .addView('angular-router', {partId: 'left', cssClass: 'angular-router'})
       .navigateView('workbench-router', ['test-router'])
       .navigateView('angular-router', ['test-pages/angular-router-test-page']),

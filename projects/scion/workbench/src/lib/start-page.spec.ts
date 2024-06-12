@@ -98,7 +98,7 @@ describe('Start Page', () => {
           provideWorkbenchForTest({
             layout: (factory: WorkbenchLayoutFactory) => factory
               .addPart('part')
-              .addView('test-view', {partId: 'part', activateView: true})
+              .addView('test-view', {partId: 'part'})
               .navigateView('test-view', ['path/to/view']),
           }),
           provideRouter([

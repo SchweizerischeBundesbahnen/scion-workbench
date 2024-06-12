@@ -27,8 +27,8 @@ describe('WorkbenchPart', () => {
           layout: factory => factory
             .addPart('left-top')
             .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'})
-            .addView('view.101', {partId: 'left-top', activateView: true})
-            .addView('view.102', {partId: 'left-bottom', activateView: true})
+            .addView('view.101', {partId: 'left-top'})
+            .addView('view.102', {partId: 'left-bottom'})
             .navigateView('view.101', ['test-page'])
             .navigateView('view.102', ['test-page'])
             .activatePart('left-top'),
