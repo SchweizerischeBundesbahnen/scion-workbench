@@ -21,7 +21,7 @@ $-default-icon-font-config: (
   // To keep the workbench configuration minimal for Angular projects deployed in the context root, we reference font files by
   // their root relative path. Consequently, applications deployed in a subdirectory require additional configuration depending
   // on whether the application is built with esbuild or webpack.
-  directory: '/assets/fonts',
+  directory: '/fonts',
   filename: 'scion-workbench-icons',
   version: $-version,
 );

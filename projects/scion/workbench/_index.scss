@@ -99,7 +99,7 @@
  * ```scss
  * @use '@scion/workbench' with (
  *   $icon-font: (
- *      directory: '/path/to/font', // defaults to '/assets/fonts' if omitted
+ *      directory: '/path/to/font', // defaults to '/fonts' if omitted
  *      filename: 'scion-workbench-icons' // defaults to 'scion-workbench-icons' if omitted
  *      version: '1.0.0' // appended to the HTTP request to load the icon font, enabling browser cache invalidation when icons change
  *  );
@@ -116,7 +116,7 @@
  * ```scss
  * @use '@scion/workbench' with (
  *   $icon-font: (
- *     directory: 'path/to/font' // no leading slash, typically `assets/fonts`
+ *     directory: 'path/to/font' // no leading slash, typically `fonts`
  *   )
  * );
  * ```
@@ -134,7 +134,7 @@
  * ```scss
  * @use '@scion/workbench' with (
  *   $icon-font: (
- *     directory: '^path/to/font' // no leading slash but with a caret (^), typically `^assets/fonts`
+ *     directory: '^path/to/font' // no leading slash but with a caret (^), typically `^fonts`
  *   )
  * );
  * ```

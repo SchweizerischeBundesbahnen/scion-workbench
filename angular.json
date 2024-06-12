@@ -42,7 +42,7 @@
               {
                 "glob": "scion-workbench-icons.*",
                 "input": "resources/scion-workbench-icons/fonts",
-                "output": "/assets/fonts"
+                "output": "/fonts"
               }
             ],
             "polyfills": [
@@ -137,7 +137,7 @@
               {
                 "glob": "scion-workbench-icons.*",
                 "input": "resources/scion-workbench-icons/fonts",
-                "output": "/assets/fonts"
+                "output": "/fonts"
               }
             ],
             "styles": [
@@ -232,12 +232,12 @@
               {
                 "glob": "scion-workbench-icons.*",
                 "input": "resources/scion-workbench-icons/fonts",
-                "output": "/assets/fonts"
+                "output": "/fonts"
               },
               {
                 "glob": "scion-workbench-banner.svg",
                 "input": "resources/branding",
-                "output": "/assets"
+                "output": "/"
               }
             ],
             "styles": [
@@ -321,7 +321,7 @@
                 "apps/workbench-testing-app/src/styles-base-href-esbuild.scss"
               ],
               "externalDependencies": [
-                "assets/fonts/scion-workbench-icons.*"
+                "fonts/scion-workbench-icons.*"
               ]
             },
             "development": {
@@ -338,7 +338,7 @@
                 "apps/workbench-testing-app/src/styles-base-href-esbuild.scss"
               ],
               "externalDependencies": [
-                "assets/fonts/scion-workbench-icons.*"
+                "fonts/scion-workbench-icons.*"
               ]
             }
           },
@@ -369,12 +369,12 @@
               {
                 "glob": "scion-workbench-icons.*",
                 "input": "resources/scion-workbench-icons/fonts",
-                "output": "/assets/fonts"
+                "output": "/fonts"
               },
               {
                 "glob": "scion-workbench-banner.svg",
                 "input": "resources/branding",
-                "output": "/assets"
+                "output": "/"
               }
             ],
             "styles": [
@@ -472,7 +472,7 @@
               {
                 "glob": "scion-workbench-banner.svg",
                 "input": "resources/branding",
-                "output": "/assets"
+                "output": "/"
               }
             ],
             "styles": [

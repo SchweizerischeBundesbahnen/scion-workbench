@@ -8,7 +8,7 @@
 The SCION Workbench requires some icons packed as icon font.
 
 ### Installation
-The icon font can be downloaded from [GitHub][icon-font]. Unzip the icon font and place the extracted font files in the `/assets/fonts` folder.
+The icon font can be downloaded from [GitHub][icon-font]. Unzip the icon font and place the extracted font files in the `/public/fonts` folder.
 
 ### Workbench icons
 The workbench requires the following icons with the following ligatures:
@@ -27,14 +27,14 @@ The location of the icon font can be configured via the SCSS module `@scion/work
 ```scss
 @use '@scion/workbench' with (
   $icon-font: (
-    directory: '/path/to/font', // defaults to '/assets/fonts' if omitted
+    directory: '/path/to/font', // defaults to '/fonts' if omitted
     filename: 'custom-workbench-icons' // defaults to 'scion-workbench-icons' if omitted
   )
 );
 ```
 
 ### How to change icons
-The icons can be replaced using the [IcoMoon][ico-moon] web application. Open [IcoMoon][ico-moon] in your browser and import the icon font definition from [scion-workbench-icons.json][icon-font-definition]. After changing the icons, regenerate the icon font, download it and place it in the `/assets/fonts` directory.
+The icons can be replaced using the [IcoMoon][ico-moon] web application. Open [IcoMoon][ico-moon] in your browser and import the icon font definition from [scion-workbench-icons.json][icon-font-definition]. After changing the icons, regenerate the icon font, download it and place it in the `/public/fonts` directory.
 
 We recommend incrementing the version when modifying the icon font, enabling browser cache invalidation when icons change.
 ```scss
@@ -55,7 +55,7 @@ Configure the `@scion/workbench` SCSS module to load the icon font relative to t
 ```scss
 @use '@scion/workbench' with (
   $icon-font: (
-    directory: 'path/to/font' // no leading slash, typically `assets/fonts`
+    directory: 'path/to/font' // no leading slash, typically `fonts`
   )
 );
 ```
@@ -72,7 +72,7 @@ Configure the `@scion/workbench` SCSS module to load the icon font relative to t
 ```scss
 @use '@scion/workbench' with (
   $icon-font: (
-    directory: '^path/to/font' // no leading slash but with a caret (^), typically `^assets/fonts`
+    directory: '^path/to/font' // no leading slash but with a caret (^), typically `^fonts`
   )
 );
 ```
