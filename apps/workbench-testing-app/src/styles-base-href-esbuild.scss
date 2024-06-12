@@ -1,6 +1,6 @@
 @use '@scion/workbench' with (
   $icon-font: (
-    directory: 'assets/fonts'
+    directory: 'fonts'
   )
 );
 @use './styles';

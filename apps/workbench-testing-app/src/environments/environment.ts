@@ -29,8 +29,8 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
     manifest: workbenchManifest,
   },
   applications: [
-    {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/assets/manifest-app1.json', intentionRegisterApiDisabled: false},
-    {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/assets/manifest-app2.json', intentionRegisterApiDisabled: false},
+    {symbolicName: 'workbench-client-testing-app1', manifestUrl: 'http://localhost:4201/manifest-app1.json', intentionRegisterApiDisabled: false},
+    {symbolicName: 'workbench-client-testing-app2', manifestUrl: 'http://localhost:4202/manifest-app2.json', intentionRegisterApiDisabled: false},
     {symbolicName: 'devtools', manifestUrl: 'https://scion-microfrontend-platform-devtools-v1-3-0.vercel.app/assets/manifest.json', intentionCheckDisabled: true, scopeCheckDisabled: true},
   ],
 };
