@@ -1,0 +1,24 @@
+@if (width() > 450) {
+  <div class="table">
+    <cdk-virtual-scroll-viewport #cdkViewport
+                                 [itemSize]="25"
+                                 sciScrollable>
+      <div *cdkVirtualFor="let row of rows | appIterable" class="row">
+        @for (column of columns() | appIterable; track $index) {
+          @if ($index === 0) {
+            <div class="cell">
+              <div class="check-mark skeleton"></div>
+              <div class="cell skeleton"></div>
+            </div>
+          } @else {
+            <div class="cell skeleton"></div>
+          }
+        }
+      </div>
+    </cdk-virtual-scroll-viewport>
+    <sci-scrollbar [direction]="'vscroll'" [viewport]="cdkViewport.getElementRef().nativeElement!"/>
+  </div>
+
+} @else {
+  <app-list-skeleton/>
+}

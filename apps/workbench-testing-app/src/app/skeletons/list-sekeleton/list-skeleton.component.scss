@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+  container-name: view;
+
+  > sci-viewport {
+    flex: 1 1 0;
+
+    &::part(content) {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5em;
+    }
+
+    > div.entry {
+      display: flex;
+      gap: 1.25em;
+
+      > div.bullet {
+        flex: none;
+        width: 2em;
+        height: 2em;
+
+        @container view (max-width: 450px) {
+          display: none;
+        }
+      }
+
+      > div.content {
+        flex: auto;
+        display: flex;
+        flex-direction: column;
+        gap: .5em;
+
+        > div.title {
+          max-width: 7.5em;
+        }
+      }
+    }
+
+    div.skeleton {
+      background-color: var(--sci-color-skeleton-subtle);
+      border-radius: var(--sci-corner-small);
+      height: 1em;
+    }
+  }
+}

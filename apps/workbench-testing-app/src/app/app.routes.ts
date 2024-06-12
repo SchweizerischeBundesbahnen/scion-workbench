@@ -135,5 +135,10 @@ export const routes: Routes = [
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },
+  {
+    path: 'skeleton-page',
+    loadComponent: () => import('./skeletons/skeleton-page/skeleton-page.component'),
+    data: {tileTitle: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View', [WorkbenchRouteData.cssClass]: 'sample-view', pinToStartPage: true},
+  },
   ...topLevelTestPageRoutes,
 ];

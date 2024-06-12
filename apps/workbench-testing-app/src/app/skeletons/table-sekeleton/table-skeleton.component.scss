@@ -1,0 +1,57 @@
+@use '@scion/components/scrollbar' as sci-scrollbar;
+
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > app-list-skeleton {
+    flex: auto;
+  }
+
+  > div.table {
+    flex: 1 1 0;
+    display: grid;
+    position: relative; // positioned anchor for the scrollbars
+    overflow: hidden; // hides native scrollbars (shifted out of the visible viewport area)
+    @include sci-scrollbar.scrollbar-hide-when-inactive(); // hide scrollbars when the user is not hovering the viewport.
+
+    > cdk-virtual-scroll-viewport {
+      div.row {
+        display: flex;
+        gap: 3em;
+        padding: 1em;
+        border-bottom: 1px solid var(--sci-color-skeleton-subtle);
+
+        > div.cell {
+          flex: 1;
+
+          &:first-child {
+            flex: 1.25;
+            display: flex;
+            gap: 1em;
+
+            > div.check-mark {
+              width: 1em;
+              height: 1em;
+              flex: none;
+            }
+
+            > div.cell {
+              flex: auto;
+            }
+          }
+        }
+      }
+    }
+
+    > sci-scrollbar {
+      @include sci-scrollbar.scrollbar-position(); // positions scrollbars
+    }
+  }
+
+  div.skeleton {
+    background-color: var(--sci-color-skeleton-subtle);
+    border-radius: var(--sci-corner-small);
+    height: 1em;
+  }
+}

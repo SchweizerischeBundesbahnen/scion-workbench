@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  gap: 2em;
+  container-type: inline-size;
+  container-name: column;
+  position: relative; // positioning context for reload button
+  cursor: pointer;
+
+  > svg {
+    flex: auto;
+
+    &.line {
+      > path {
+        stroke-width: 1.5;
+        stroke: var(--sci-color-skeleton-subtle);
+        fill: transparent;
+        vector-effect: non-scaling-stroke;
+      }
+
+      &.active > path {
+        stroke: var(--sci-color-accent);
+      }
+    }
+
+    &.area {
+      > path {
+        stroke-width: 1;
+        stroke: var(--sci-color-skeleton);
+        fill: var(--sci-color-skeleton-subtle);
+        vector-effect: non-scaling-stroke;
+      }
+
+      &.active > path {
+        stroke: var(--sci-color-accent);
+        fill: var(--sci-color-background-accent);
+      }
+    }
+
+    &.bar {
+      > rect {
+        stroke-width: 0;
+        fill: color-mix(in srgb, var(--sci-color-skeleton-subtle) 75%, transparent);
+        vector-effect: non-scaling-stroke;
+      }
+
+      &.active > rect {
+        fill: var(--sci-color-background-accent);
+      }
+    }
+
+    border-bottom: .5em solid var(--sci-color-skeleton-subtle);
+    border-left: .5em solid var(--sci-color-skeleton-subtle);
+    padding-left: .5em;
+    padding-bottom: .5em;
+  }
+}

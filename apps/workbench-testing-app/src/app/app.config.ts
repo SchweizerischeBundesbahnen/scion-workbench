@@ -17,7 +17,6 @@ import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-c
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
 import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor.service';
 import {provideNotificationPage} from './notification-page/notification-page-intent-handler.service';
-import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
@@ -35,7 +34,6 @@ export const appConfig: ApplicationConfig = {
     provideDevToolsInterceptor(),
     provideNotificationPage(),
     provideAnimationsIfEnabled(),
-    Perspectives.provideRoutes(),
   ],
 };
 

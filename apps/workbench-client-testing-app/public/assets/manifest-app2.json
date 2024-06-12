@@ -12,7 +12,7 @@
       }
     },
     {
-      "type": "perspective",
+      "type": "perspective-xxx",
       "qualifier": {
         "perspective": "app2"
       },

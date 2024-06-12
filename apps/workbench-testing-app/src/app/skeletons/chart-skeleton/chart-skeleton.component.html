@@ -1,0 +1,18 @@
+<svg [attr.viewBox]="chart.viewbox"
+     preserveAspectRatio="none"
+     xmlns="http://www.w3.org/2000/svg"
+     [ngClass]="type" [class.active]="active">
+  @switch (type) {
+    @case ('line') {
+      <path [attr.d]="chart.lineChart()"/>
+    }
+    @case ('area') {
+      <path [attr.d]="chart.areaChart()"/>
+    }
+    @case ('bar') {
+      @for (point of chart.points; track point) {
+        <rect [attr.x]="point.x - $index * chart.rw / chart.n" [attr.y]="point.y" [attr.width]="chart.rw" [attr.height]="100 - point.y"></rect>
+      }
+    }
+  }
+</svg>

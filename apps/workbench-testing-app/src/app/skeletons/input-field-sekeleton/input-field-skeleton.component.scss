@@ -1,0 +1,20 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .25em;
+
+  > div.label {
+    flex: none;
+    background-color: var(--sci-color-skeleton-subtle);
+    height: .75em;
+    width: 30%;
+    border-radius: var(--sci-corner-small);
+  }
+
+  > input {
+    flex: auto;
+    @include sci-design.style-input-field();
+  }
+}

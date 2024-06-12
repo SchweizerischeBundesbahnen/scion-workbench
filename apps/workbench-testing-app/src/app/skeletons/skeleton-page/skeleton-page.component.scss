@@ -1,0 +1,129 @@
+@mixin form {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1em 3em;
+
+  @container view (max-width: 200px) {
+    grid-template-columns: 100%;
+  }
+}
+
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+  container-type: inline-size;
+  container-name: view;
+  position: absolute;
+  inset: 0;
+
+  > form {
+    flex: none;
+    @include form;
+  }
+
+  > app-tabbar-skeleton {
+    flex: none;
+    margin-top: 2em;
+
+    @container view (max-width: 450px) {
+      display: none;
+    }
+  }
+
+  > section.tab {
+    flex: auto;
+
+    &.table {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      container-type: size;
+      container-name: table;
+      height: 350px;
+      overflow: hidden;
+
+      > app-table-skeleton {
+        flex: auto;
+      }
+
+      > section.detail {
+        flex: none;
+        display: flex;
+        gap: 2em;
+        max-height: 200px;
+        container-type: inline-size;
+        container-name: detail;
+
+        > app-chart-skeleton {
+          flex: 1;
+        }
+
+        @container detail (max-width: 400px) {
+          > app-chart-skeleton:nth-child(2) {
+            display: none;
+          }
+        }
+
+        @container detail (max-width: 800px) {
+          > app-chart-skeleton:nth-child(3) {
+            display: none;
+          }
+        }
+
+        @container table (max-height: 400px) {
+          display: none;
+        }
+      }
+    }
+
+    &.form {
+      display: flex;
+      flex-direction: column;
+
+      > sci-viewport {
+        flex: 1 1 0;
+
+        &::part(content) {
+          @include form;
+        }
+      }
+    }
+
+    &.list {
+      display: grid;
+    }
+  }
+
+  @container view (min-width: 400px) {
+    &:has(app-tabbar-skeleton) {
+      > button.reload {
+        display: none;
+      }
+    }
+  }
+
+  > button.reload {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+    border: 1px solid var(--sci-color-border);
+    padding: .25em;
+    background-color: var(--sci-color-background-primary);
+    font-size: 1.5em;
+    box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+    border-radius: 50%;
+    transition: opacity ease-in-out .15s;
+
+    &:hover {
+      border-color: var(--sci-color-accent);
+    }
+  }
+
+  &:not(:hover) > button.reload {
+    opacity: 0;
+  }
+}

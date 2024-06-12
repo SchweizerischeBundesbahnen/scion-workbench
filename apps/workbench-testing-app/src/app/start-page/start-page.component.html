@@ -13,7 +13,7 @@ We use this application to experiment with features and run our end-to-end tests
          (click)="onViewOpen(route.path!, $event)"
          [ngClass]="route.data![WorkbenchRouteData.cssClass]"
          href="">
-        {{route.data![WorkbenchRouteData.title]}}
+        {{route.data![WorkbenchRouteData.title] ?? route.data!['tileTitle']}}
         <span class="description" *ngIf="route.data![WorkbenchRouteData.heading]">
           {{route.data![WorkbenchRouteData.heading]}}
         </span>

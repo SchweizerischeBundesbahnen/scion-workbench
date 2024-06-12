@@ -1,0 +1,32 @@
+:host {
+  display: flex;
+  gap: 2em;
+  border: .5em solid var(--sci-color-skeleton-subtle);
+  border-radius: var(--sci-corner);
+  padding: .25em;
+  width: 100px;
+
+  > svg {
+    flex: auto;
+    cursor: pointer;
+
+    > path {
+      stroke-width: 7;
+      //stroke: var(--sci-color-background-primary);
+      //fill: var(--sci-color-skeleton-subtle);
+      stroke-linejoin: round;
+      fill: var(--sci-color-background-primary);
+      stroke: var(--sci-color-skeleton-subtle);
+      vector-effect: non-scaling-stroke;
+    }
+
+    > circle {
+      stroke-width: 0;
+      fill: var(--sci-color-skeleton-subtle);
+    }
+
+    &.active > path {
+      stroke: var(--sci-color-accent);
+    }
+  }
+}

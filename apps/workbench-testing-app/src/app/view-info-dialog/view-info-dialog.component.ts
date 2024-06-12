@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {JoinPipe} from '../common/join.pipe';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-view-info-dialog',
@@ -27,6 +28,7 @@ import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
     WorkbenchDialogActionDirective,
     SciKeyValueComponent,
     NullIfEmptyPipe,
+    FormsModule,
   ],
 })
 export class ViewInfoDialogComponent implements OnInit {
@@ -49,6 +51,7 @@ export class ViewInfoDialogComponent implements OnInit {
     this.route = route && resolveEffectiveRoute(route);
   }
 
+  @HostListener('keydown.enter')
   public onClose(): void {
     this._dialog.close();
   }

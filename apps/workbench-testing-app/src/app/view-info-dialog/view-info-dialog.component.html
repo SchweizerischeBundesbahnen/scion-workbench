@@ -12,11 +12,11 @@
   </sci-form-field>
 
   <sci-form-field label="View Title">
-    <span class="e2e-title">{{view.title}}</span>
+    <input class="e2e-title" [(ngModel)]="view.title">
   </sci-form-field>
 
   <sci-form-field label="View Heading">
-    <span class="e2e-heading">{{view.heading}}</span>
+    <input class="e2e-heading" [(ngModel)]="view.heading">
   </sci-form-field>
 
   <sci-form-field label="Navigation Hint">
@@ -51,5 +51,5 @@
 
 <!-- Close button -->
 <ng-template wbDialogAction>
-  <button (click)="onClose()">Close</button>
+  <button (click)="onClose()">OK</button>
 </ng-template>

@@ -1,0 +1,39 @@
+:host {
+  display: flex;
+  overflow: hidden;
+
+  > button.tab, div.tab {
+    all: unset;
+    flex: none;
+    padding: .5em 2em;
+    width: 150px;
+    border-bottom: .3em solid var(--sci-color-skeleton-subtle);
+    cursor: pointer;
+
+    &:first-child {
+      padding-left: 1em;
+    }
+
+    &:last-child {
+      flex: auto;
+    }
+
+    > div.label {
+      background-color: var(--sci-color-skeleton-subtle);
+      border-radius: var(--sci-corner-small);
+      height: 1em;
+    }
+
+    &.selected {
+      border-bottom-color: var(--sci-color-skeleton);
+
+      > div.label {
+        background-color: var(--sci-color-skeleton);
+      }
+    }
+  }
+
+  &.active > button.tab.selected {
+    border-bottom-color: var(--sci-color-accent);
+  }
+}
