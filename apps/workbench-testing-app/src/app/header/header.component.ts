@@ -10,7 +10,7 @@
 
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
-import {AsyncPipe, NgFor} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
@@ -29,7 +29,6 @@ import {SettingsService} from '../settings.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgFor,
     AsyncPipe,
     ReactiveFormsModule,
     SciMaterialIconDirective,
@@ -51,7 +50,13 @@ export class HeaderComponent {
   }
 
   protected async onPerspectiveActivate(id: string): Promise<void> {
-    await this.workbenchService.switchPerspective(id);
+    const perspective = this.workbenchService.perspectives.find(perspective => perspective.id === id)!;
+    if (perspective.active) {
+      await this.workbenchService.switchPerspective('blank');
+    }
+    else {
+      await this.workbenchService.switchPerspective(id);
+    }
   }
 
   protected onMenuOpen(event: MouseEvent): void {

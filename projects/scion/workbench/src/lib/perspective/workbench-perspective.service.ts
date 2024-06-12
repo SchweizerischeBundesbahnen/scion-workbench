@@ -15,8 +15,7 @@ import {Logger} from '../logging/logger';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
-import {WORKBENCH_LAYOUT_CONFIG} from '../workbench.constants';
-import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
+import {ANONYMOUS_PERSPECTIVE_ID_PREFIX, WORKBENCH_LAYOUT_CONFIG} from '../workbench.constants';
 import {MAIN_AREA} from '../layout/workbench-layout';
 
 /**
@@ -138,7 +137,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       if (!perspectiveFromConfig) {
         return this._perspectiveRegistry.perspectives[0]?.id;
       }
-      if (typeof perspectiveFromConfig === 'string') {
+      if (typeof perspectiveFromConfig === 'string' && this._perspectiveRegistry.has(perspectiveFromConfig)) {
         return perspectiveFromConfig;
       }
       if (typeof perspectiveFromConfig === 'function') {

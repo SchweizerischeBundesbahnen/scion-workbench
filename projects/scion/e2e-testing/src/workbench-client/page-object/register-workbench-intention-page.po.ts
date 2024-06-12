@@ -40,7 +40,7 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
    *
    * Returns a Promise that resolves to the intention ID upon successful registration, or that rejects on registration error.
    */
-  public async registerIntention(intention: Intention & {type: 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
+  public async registerIntention(intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
     await this.selectType(intention.type);
     await this.enterQualifier(intention.qualifier);
     await this.clickRegister();
@@ -54,7 +54,7 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
     ]);
   }
 
-  public async selectType(type: 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'): Promise<void> {
+  public async selectType(type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'): Promise<void> {
     await this.locator.locator('select.e2e-type').selectOption(type);
   }
 

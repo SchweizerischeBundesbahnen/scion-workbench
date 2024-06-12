@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {SciRouterOutletElement} from '@scion/microfrontend-platform';
+import {Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {inject} from '@angular/core';
 import {ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchTheme} from '../../workbench.model';
+import {Crypto} from '@scion/toolkit/crypto';
 
 /**
  * Provides functions related to workbench themes.
@@ -38,6 +39,27 @@ export const Microfrontends = {
           sciRouterOutletElement.removeContextValue('color-scheme');
         }
       });
+  },
+  /**
+   * Creates a stable identifier for given capability.
+   */
+  createStableIdentifier: async (capability: Capability): Promise<string> =>{
+    const qualifier = capability.qualifier!;
+    const vendor = capability.metadata!.appSymbolicName;
+
+    // Create identifier consisting of vendor and sorted qualifier entries.
+    const identifier = Object.keys(qualifier)
+      .sort()
+      .reduce(
+        (acc, qualifierKey) => acc.concat(qualifierKey).concat(`${qualifier[qualifierKey]}`),
+        [vendor],
+      )
+      .join(';');
+
+    // Hash the identifier.
+    const identifierHash = await Crypto.digest(identifier);
+    // Use the first 7 digits of the hash.
+    return identifierHash.substring(0, 7);
   },
   /**
    * Replaces named parameters in the given value with values contained in the given {@link Map}.

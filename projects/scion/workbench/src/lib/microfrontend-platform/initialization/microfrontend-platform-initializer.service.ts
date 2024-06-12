@@ -27,6 +27,9 @@ import {MicrofrontendViewCapabilityValidator} from '../routing/microfrontend-vie
 import {MicrofrontendViewCapabilityIdAssigner} from '../routing/microfrontend-view-capability-id-assigner.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from '../microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
+import {MicrofrontendPerspectiveCapabilityValidator} from '../microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
+import {MicrofrontendPerspectiveCapabilityIdAssigner} from '../microfrontend-perspective/microfrontend-perspective-capability-id-assigner.interceptor';
+import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -39,6 +42,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
               private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
               private _ngZoneObservableDecorator: NgZoneObservableDecorator,
+              private _perspectiveIntentHandler: MicrofrontendPerspectiveIntentHandler,
               private _viewIntentHandler: MicrofrontendViewIntentHandler,
               private _popupIntentHandler: MicrofrontendPopupIntentHandler,
               private _dialogIntentHandler: MicrofrontendDialogIntentHandler,
@@ -46,6 +50,8 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
               private _messageBoxLegacyIntentTranslator: MicrofrontendMessageBoxLegacyIntentTranslator,
               private _viewCapabilityValidator: MicrofrontendViewCapabilityValidator,
               private _viewCapabilityIdAssigner: MicrofrontendViewCapabilityIdAssigner,
+              private _perspectiveCapabilityValidator: MicrofrontendPerspectiveCapabilityValidator,
+              private _perspectiveCapabilityIdAssigner: MicrofrontendPerspectiveCapabilityIdAssigner,
               private _popupCapabilityValidator: MicrofrontendPopupCapabilityValidator,
               private _dialogCapabilityValidator: MicrofrontendDialogCapabilityValidator,
               private _messageBoxCapabilityValidator: MicrofrontendMessageBoxCapabilityValidator,
@@ -85,6 +91,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Synchronize emissions of Observables exposed by the SCION Microfrontend Platform with the Angular zone.
     Beans.register(ObservableDecorator, {useValue: this._ngZoneObservableDecorator});
 
+    // Register view perspective interceptor to switch perspective.
+    Beans.register(IntentInterceptor, {useValue: this._perspectiveIntentHandler, multi: true});
+
     // Register view intent interceptor to open the corresponding view.
     Beans.register(IntentInterceptor, {useValue: this._viewIntentHandler, multi: true});
 
@@ -105,6 +114,12 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
     Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityIdAssigner, multi: true});
+
+    // Register perspective capability interceptor to assert required perspective capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityValidator, multi: true});
+
+    // Register perspective capability interceptor to assign perspective capabilities a stable identifier required for persistent navigation.
+    Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityIdAssigner, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});

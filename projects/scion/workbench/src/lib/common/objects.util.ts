@@ -35,4 +35,10 @@ export const Objects = {
   withoutUndefinedEntries: <T>(object: T & Record<string, unknown>): T => {
     return Dictionaries.withoutUndefinedEntries(object) as T;
   },
+  /**
+   * Stringifies given object to matrix notation: a=b;c=d;e=f
+   */
+  toMatrixNotation: (object: Record<string, unknown> | null | undefined): string => {
+    return Object.entries(object ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
+  },
 } as const;

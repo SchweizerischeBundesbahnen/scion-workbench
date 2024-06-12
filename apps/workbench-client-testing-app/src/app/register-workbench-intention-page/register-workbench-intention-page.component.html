@@ -2,6 +2,7 @@
   <section>
     <sci-form-field label="Type">
       <select [formControl]="form.controls.type" class="e2e-type">
+        <option [value]="WorkbenchCapabilities.Perspective">PERSPECTIVE</option>
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
         <option [value]="WorkbenchCapabilities.Dialog">DIALOG</option>
         <option [value]="WorkbenchCapabilities.Popup">POPUP</option>

@@ -1,0 +1,48 @@
+@use 'sass:map';
+
+/**
+ * Styles the element as fieldset, using passed legend as the fieldset's label.
+ *
+ * The native HTML fieldset imposes restrictions on the styling of its content,
+ * for example it does not support subgrids.
+ */
+@mixin fieldset($legend: null) {
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: 1.5em 1em 1em;
+  @include legend($legend, (top: -1px));
+}
+
+/**
+ * Adds the specified legend to the element, but does not apply any fieldset styles.
+ */
+@mixin legend($legend, $options: ()) {
+  position: relative; // positioning context for legend
+
+  &::after {
+    content: '#{$legend}';
+    font-size: .85em;
+    position: absolute;
+    height: 1px;
+    display: inline-grid;
+    place-content: center;
+    color: var(--sci-color-text-subtlest);
+    background: var(--sci-color-background-primary);
+    padding-inline: .25em;
+    top: if(map.has-key($options, top), map.get($options, top), 0);
+    left: if(map.has-key($options, left), map.get($options, left), .5em);
+  }
+
+  &:focus-within::after {
+    color: var(--sci-color-accent);
+  }
+
+  &:has(> :disabled)::after {
+    background: transparent;
+  }
+
+  &:has(> input, > select) {
+    display: inline-grid;
+    grid-template-columns: 100%;
+  }
+}

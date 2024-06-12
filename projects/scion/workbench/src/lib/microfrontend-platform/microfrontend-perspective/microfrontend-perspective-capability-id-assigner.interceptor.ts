@@ -14,13 +14,13 @@ import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {Microfrontends} from '../common/microfrontend.util';
 
 /**
- * Assigns each view capability a stable identifer required for persistent navigation.
+ * Assigns each perspective capability a stable identifer required for XXX.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendViewCapabilityIdAssigner implements CapabilityInterceptor {
+export class MicrofrontendPerspectiveCapabilityIdAssigner implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {
-    if (capability.type !== WorkbenchCapabilities.View) {
+    if (capability.type !== WorkbenchCapabilities.Perspective) {
       return capability;
     }
 

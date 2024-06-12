@@ -39,6 +39,10 @@ import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-r
 import {RouterUtils} from '../routing/router.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
+import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
+import {MicrofrontendPerspectiveCapabilityIdAssigner} from './microfrontend-perspective/microfrontend-perspective-capability-id-assigner.interceptor';
+import {MicrofrontendPerspectiveRegistrator} from './microfrontend-perspective/microfrontend-perspective-registrator.service';
+import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 import {ManifestObjectCache} from './manifest-object-cache.service';
 
 /**
@@ -71,6 +75,11 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     },
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendPerspectiveRegistrator,
+      multi: true,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
       useExisting: ManifestObjectCache,
       multi: true,
     },
@@ -78,6 +87,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
       provide: MicrofrontendPlatformConfig,
       useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
     },
+    MicrofrontendPerspectiveIntentHandler,
     MicrofrontendViewIntentHandler,
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
@@ -88,6 +98,8 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendPopupCapabilityValidator,
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
+    MicrofrontendPerspectiveCapabilityValidator,
+    MicrofrontendPerspectiveCapabilityIdAssigner,
     MicrofrontendPlatformInitializer,
     ManifestObjectCache,
     NgZoneObservableDecorator,

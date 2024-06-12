@@ -18,6 +18,6 @@ import {UrlSegment} from '@angular/router';
 export class FormatUrlPipe implements PipeTransform {
 
   public transform(url: UrlSegment[]): string {
-    return url.map(segment => segment.path).join('/');
+    return url.map(segment => `${segment}`).join('/');
   }
 }

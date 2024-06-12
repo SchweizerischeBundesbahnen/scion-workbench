@@ -18,6 +18,7 @@ import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
  */
 export const PerspectiveData = {
   label: 'label',
+  tooltip: 'tooltip',
 } as const;
 
 /**
@@ -27,7 +28,7 @@ export const Perspectives = {
   /**
    * Specifies the initial perspective of the testing app.
    */
-  initialPerspective: 'empty',
+  initialPerspective: 'blank',
 
   /**
    * Defines perspectives of the workbench testing app.
@@ -35,19 +36,24 @@ export const Perspectives = {
   provideDefinitions: (): WorkbenchPerspectiveDefinition[] => {
     return [
       {
-        id: 'developer',
-        layout: provideDeveloperPerspectiveLayout,
-        data: {[PerspectiveData.label]: 'Developer'},
-      },
-      {
-        id: 'debug',
-        layout: provideDebugPerspectiveLayout,
-        data: {[PerspectiveData.label]: 'Debug'},
-      },
-      {
-        id: 'empty',
+        id: 'blank',
         layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
-        data: {[PerspectiveData.label]: 'Empty'},
+      },
+      {
+        id: 'sample-perspective-1',
+        layout: provideDeveloperPerspectiveLayout,
+        data: {
+          [PerspectiveData.label]: 'Perspective 1',
+          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+        },
+      },
+      {
+        id: 'sample-perspective-2',
+        layout: provideDebugPerspectiveLayout,
+        data: {
+          [PerspectiveData.label]: 'Perspective 2',
+          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+        },
       },
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
       ...WorkbenchStartupQueryParams.perspectives().map(perspective => ({

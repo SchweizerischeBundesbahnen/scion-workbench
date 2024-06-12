@@ -19,6 +19,17 @@ export enum WorkbenchCapabilities {
    */
   View = 'view',
   /**
+   * Contributes a perspective to the workbench.
+   *
+   * A perspective is an arrangement of parts and views. Multiple perspectives are supported. Different perspectives
+   * provide a different perspective on the application. Only one perspective can be active at a time.
+   */
+  Perspective = 'perspective',
+  /**
+   * Contributes views to a workbench perspective.
+   */
+  PerspectiveExtension = 'perspective-extension',
+  /**
    * Contributes a microfrontend for display in workbench popup.
    *
    * A popup is a visual workbench component for displaying content above other content.
