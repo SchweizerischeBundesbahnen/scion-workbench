@@ -217,7 +217,7 @@ test.describe('View Tabbar', () => {
       .addPart('part')
       .addView('view.1', {partId: 'part'})
       .addView('view.2', {partId: 'part'})
-      .addView('view.3', {partId: 'part', activateView: true})
+      .addView('view.3', {partId: 'part'})
       .addView('view.4', {partId: 'part'}),
     );
 
@@ -245,7 +245,7 @@ test.describe('View Tabbar', () => {
       .addPart('part')
       .addView('view.1', {partId: 'part'})
       .addView('view.2', {partId: 'part'})
-      .addView('view.3', {partId: 'part', activateView: true})
+      .addView('view.3', {partId: 'part'})
       .addView('view.4', {partId: 'part'}),
     );
 
@@ -273,7 +273,7 @@ test.describe('View Tabbar', () => {
       .addPart('part')
       .addView('view.1', {partId: 'part'})
       .addView('view.2', {partId: 'part'})
-      .addView('view.3', {partId: 'part', activateView: true})
+      .addView('view.3', {partId: 'part'})
       .addView('view.4', {partId: 'part'}),
     );
 

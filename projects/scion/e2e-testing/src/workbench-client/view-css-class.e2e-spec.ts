@@ -53,7 +53,7 @@ test.describe('Workbench View CSS Class', () => {
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee-1'}, {
       target: 'view.100',
-      cssClass: 'testee-navigation-1'
+      cssClass: 'testee-navigation-1',
     });
 
     // Expect CSS classes of the navigation to be set.
@@ -72,7 +72,7 @@ test.describe('Workbench View CSS Class', () => {
     // Navigate to test view 2 passing CSS class 'testee-navigation-2'.
     await routerPage.navigate({component: 'testee-2'}, {
       target: 'view.100',
-      cssClass: 'testee-navigation-2'
+      cssClass: 'testee-navigation-2',
     });
 
     // Expect CSS classes of the navigation to be set.
@@ -99,7 +99,7 @@ test.describe('Workbench View CSS Class', () => {
     // Navigate to test view 1 without passing CSS class.
     await routerPage.navigate({component: 'testee-1'}, {
       target: 'view.100',
-      cssClass: []
+      cssClass: [],
     });
 
     // Expect CSS classes of the previous navigation not to be set.
@@ -129,7 +129,7 @@ test.describe('Workbench View CSS Class', () => {
     await routerPage.navigate({component: 'view', app: 'app1'}, {
       target: 'view.100',
       activate: false,
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});

@@ -40,7 +40,7 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true}),
+      .addView('view.101', {partId: 'left'}),
     );
 
     // Add state via separate navigation as not supported when adding views to the perspective.
@@ -420,8 +420,8 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('left')
       .addPart('right', {align: 'right'})
-      .addView('view.101', {partId: 'left', activateView: true})
-      .addView('view.102', {partId: 'right', activateView: true}),
+      .addView('view.101', {partId: 'left'})
+      .addView('view.102', {partId: 'right'}),
     );
     await workbenchNavigator.modifyLayout(layout => layout
       .navigateView('view.101', ['test-router'], {state: {navigated: 'false'}})
@@ -471,7 +471,7 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true}),
+      .addView('view.101', {partId: 'left'}),
     );
 
     // Add state via separate navigation as not supported when adding views to the perspective.
@@ -530,7 +530,7 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true}),
+      .addView('view.101', {partId: 'left'}),
     );
 
     // Add state via separate navigation as not supported when adding views to the perspective.

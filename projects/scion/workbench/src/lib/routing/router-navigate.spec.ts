@@ -298,8 +298,8 @@ describe('Router', () => {
           layout: factory => factory
             .addPart('left')
             .addPart('right', {align: 'right'})
-            .addView('view.1', {partId: 'left', activateView: true})
-            .addView('view.2', {partId: 'right', activateView: true})
+            .addView('view.1', {partId: 'left'})
+            .addView('view.2', {partId: 'right'})
             .activatePart('right'),
         }),
         provideRouter([

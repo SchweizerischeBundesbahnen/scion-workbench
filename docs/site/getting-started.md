@@ -244,7 +244,7 @@ In this step, we will create the TODO list and place it to the left of the main 
    [+]       layout: (factory: WorkbenchLayoutFactory) => factory
    [+]         .addPart(MAIN_AREA)
    [+]         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-   [+]         .addView('todos', {partId: 'left', activateView: true})
+   [+]         .addView('todos', {partId: 'left'})
    [+]         .navigateView('todos', ['todos'])
            }),
            provideRouter([
@@ -358,7 +358,7 @@ In this step, we will create a component to open a TODO in a view.
              layout: (factory: WorkbenchLayoutFactory) => factory
                .addPart(MAIN_AREA)
                .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-               .addView('todos', {partId: 'left', activateView: true})
+               .addView('todos', {partId: 'left'})
                .navigateView('todos', ['todos'])
            }),
          provideRouter([

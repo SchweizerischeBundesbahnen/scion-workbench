@@ -49,12 +49,7 @@ bootstrapApplication(AppComponent, {
               .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
               .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
               .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
-              .navigateView('search', ['path/to/search'])
-
-              // Decide which views to activate.
-              .activateView('navigator')
-              .activateView('outline')
-              .activateView('console'),
+              .navigateView('search', ['path/to/search']),
             data: {
               label: 'Administrator',
             },
@@ -76,10 +71,7 @@ bootstrapApplication(AppComponent, {
               .navigateView('navigator', ['path/to/navigator'])
               .navigateView('explorer', ['path/to/explorer'])
               .navigateView('outline', [], {hint: 'outline'}) // Set hint to differentiate between routes with an empty path.
-              .navigateView('search', ['path/to/search'])
-
-              // Decide which views to activate.
-              .activateView('explorer'),
+              .navigateView('search', ['path/to/search']),
             data: {
               label: 'Manager',
             },

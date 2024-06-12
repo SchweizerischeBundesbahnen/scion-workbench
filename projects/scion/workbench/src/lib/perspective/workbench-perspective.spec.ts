@@ -85,8 +85,9 @@ describe('Workbench Perspective', () => {
           layout: factory => factory
             .addPart(MAIN_AREA)
             .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-            .addView('view.101', {partId: 'left', activateView: true})
+            .addView('view.101', {partId: 'left'})
             .navigateView('view.101', [], {hint: 'navigator'}),
+          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {
@@ -99,7 +100,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
     await waitForInitialWorkbenchLayout();
 
     // Delay activation of the perspective.
@@ -107,7 +108,7 @@ describe('Workbench Perspective', () => {
     canActivate.next(true);
     await waitUntilStable();
 
-    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
@@ -126,11 +127,12 @@ describe('Workbench Perspective', () => {
           layout: factory => factory
             .addPart('left')
             .addPart('right', {align: 'right'})
-            .addView('view.101', {partId: 'left', activateView: true})
-            .addView('view.102', {partId: 'right', activateView: true})
+            .addView('view.101', {partId: 'left'})
+            .addView('view.102', {partId: 'right'})
             .navigateView('view.101', [], {hint: 'list'})
             .navigateView('view.102', [], {hint: 'overview'})
             .activatePart('right'),
+          startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('list')], component: TestComponent},
@@ -140,10 +142,10 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
     await waitForInitialWorkbenchLayout();
 
-    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
@@ -159,11 +161,44 @@ describe('Workbench Perspective', () => {
     await waitUntilStable();
 
     // empty-path view should be opened in the active part (right) of the workbench grid
-    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+          direction: 'row',
+          ratio: .5,
+        }),
+      },
+    });
+  });
+
+  it('should activate first view of each part if not specified', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('left')
+            .addPart('right', {align: 'right'})
+            .addView('view.101', {partId: 'left'})
+            .addView('view.102', {partId: 'left'})
+            .addView('view.103', {partId: 'left'})
+            .addView('view.201', {partId: 'right'})
+            .addView('view.202', {partId: 'right', activateView: true})
+            .addView('view.203', {partId: 'right'}),
+          startup: {launcher: 'APP_INITIALIZER'},
+        }),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    await waitForInitialWorkbenchLayout();
+
+    expect(fixture).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
+          child2: new MPart({id: 'right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),
           direction: 'row',
           ratio: .5,
         }),

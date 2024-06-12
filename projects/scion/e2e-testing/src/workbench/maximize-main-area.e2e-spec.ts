@@ -22,7 +22,7 @@ test.describe('Workbench', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
-      .addView('view.100', {partId: 'left', activateView: true})
+      .addView('view.100', {partId: 'left'})
       .navigateView('view.100', ['test-view']),
     );
 

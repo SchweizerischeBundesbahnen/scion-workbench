@@ -149,12 +149,7 @@ export interface WorkbenchPerspectiveDefinition {
  *     .navigateView('explorer', ['path/to/explorer'])
  *     .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
  *     .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
- *     .navigateView('search', ['path/to/search'])
- *
- *     // Decide which views to activate.
- *     .activateView('navigator')
- *     .activateView('explorer')
- *     .activateView('console');
+ *     .navigateView('search', ['path/to/search']);
  * }
  * ```
  *
