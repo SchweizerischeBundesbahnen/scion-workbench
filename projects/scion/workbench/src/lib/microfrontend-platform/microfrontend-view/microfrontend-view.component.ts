@@ -166,8 +166,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
       ɵcapabilityId: capability.metadata!.id,
     });
 
-    // Inactive views are detached from the Angular change detection tree.
-    // Therefore, manually detect this component for changes for updating attributes on the `sci-router-outlet`.
+    // Inactive views are not checked for changes since detached from the Angular component tree.
+    // So, we manually trigger change detection to update attributes on the `sci-router-outlet`.
     if (!this.view.active) {
       this._cd.detectChanges();
     }

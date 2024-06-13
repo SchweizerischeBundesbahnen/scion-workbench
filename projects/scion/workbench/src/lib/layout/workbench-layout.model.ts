@@ -11,7 +11,6 @@
 import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
 import {ViewId} from '../view/workbench-view.model';
-import {UUID} from '../common/uuid.util';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -47,7 +46,7 @@ export class MTreeNode {
    * Discriminator to unmarshall {@link MTreeNode} to its class type.
    */
   public readonly type = 'MTreeNode';
-  public readonly nodeId!: string;
+  public readonly id!: string;
   public child1!: MTreeNode | MPart;
   public child2!: MTreeNode | MPart;
   public ratio!: number;
@@ -110,10 +109,11 @@ export class MPart {
 export interface MView {
   id: ViewId;
   alternativeId?: string;
-  uid: UUID;
+  uid: string;
   cssClass?: string[];
   markedForRemoval?: true;
   navigation?: {
+    id: string;
     hint?: string;
     cssClass?: string[];
   };

@@ -1,4 +1,4 @@
-<wb-part-bar></wb-part-bar>
+<wb-part-bar/>
 
 <div wbViewDropZone
      [wbViewDropZoneSize]=".3"
@@ -6,5 +6,5 @@
      [wbViewDropZoneCssClass]="'e2e-part'"
      (wbViewDropZoneDrop)="onViewDrop($event)"
      class="active-view e2e-active-view">
-  <ng-container *wbPortalOutlet="part.activeViewId$ | async | wbViewPortal"></ng-container>
+  <ng-container *wbPortalOutlet="part.activeViewId$ | async | wbViewPortal"/>
 </div>

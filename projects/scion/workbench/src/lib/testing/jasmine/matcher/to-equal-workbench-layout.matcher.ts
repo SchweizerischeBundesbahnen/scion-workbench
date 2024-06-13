@@ -216,6 +216,9 @@ function objectContainingRecursive<T>(object: T): ObjectContaining<T> | T {
   if (Array.isArray(object)) {
     return object.map(objectContainingRecursive) as T;
   }
+  else if (object === ANYTHING) {
+    return jasmine.anything();
+  }
   else if (typeof object === 'object' && object !== null) {
     const workingCopy = {...object} as Record<string, any>;
     Object.entries(workingCopy).forEach(([key, value]) => {
@@ -261,7 +264,7 @@ export type MPartGrid = Partial<Omit<_MPartGrid, 'root'>> & {root: MTreeNode | M
 /**
  * `MView` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
  */
-export type MView = Partial<_MView>;
+export type MView = Partial<Omit<_MView, 'navigation'> & {navigation?: Partial<_MView['navigation']>}>;
 
 /**
  * `MTreeNode` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -280,3 +283,10 @@ export class MPart extends _MPart {
     super(part as _MPart);
   }
 }
+
+/**
+ * Use in {@link CustomMatchers.toEqualWorkbenchLayout} to match any value for a layout property.
+ *
+ * We cannot use {@link jasmine.anything} matcher because the expected layout is also used to assert the layout representation in the DOM.
+ */
+export const ANYTHING = {} as any;

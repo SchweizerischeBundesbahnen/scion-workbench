@@ -14,7 +14,7 @@ import {noop} from 'rxjs';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {randomUUID} from '../common/uuid.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * Provides a filter control.
@@ -35,7 +35,7 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
   private _cvaChangeFn: (value: any) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
-  public readonly id = randomUUID();
+  public readonly id = UUID.randomUUID();
 
   /**
    * Sets focus order in sequential keyboard navigation.

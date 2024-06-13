@@ -19,7 +19,7 @@ import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {ViewId} from '../view/workbench-view.model';
-import {randomUUID} from '../common/uuid.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -234,7 +234,7 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
   public result: unknown | ɵPopupErrorResult | undefined;
 
   constructor(private _config: PopupConfig, public readonly referrer: PopupReferrer) {
-    this.id = this._config.id ?? randomUUID();
+    this.id = this._config.id ?? UUID.randomUUID();
     this.cssClasses = Arrays.coerce(this._config.cssClass);
     this.blockWhenDialogOpened();
   }
