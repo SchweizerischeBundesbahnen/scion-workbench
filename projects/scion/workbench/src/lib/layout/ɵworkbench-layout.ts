@@ -9,9 +9,9 @@
  */
 import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
 import {assertType} from '../common/asserts.util';
-import {randomUUID, UUID} from '../common/uuid.util';
+import {UID} from '../common/uid.util';
 import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
-import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
+import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
@@ -315,10 +315,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     if (WorkbenchLayouts.isViewId(id)) {
-      workingCopy.__addView({id, uid: randomUUID()}, options);
+      workingCopy.__addView({id, uid: UID.randomUID()}, options);
     }
     else {
-      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id, uid: randomUUID()}, options);
+      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id, uid: UID.randomUID()}, options);
     }
     return workingCopy;
   }
@@ -348,7 +348,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Removes views marked for removal, optionally invoking the passed `CanClose` function to decide whether to remove a view.
    */
-  public async removeViewsMarkedForRemoval(canCloseFn?: (viewUid: UUID) => Promise<boolean> | boolean): Promise<ɵWorkbenchLayout> {
+  public async removeViewsMarkedForRemoval(canCloseFn?: (viewUid: string) => Promise<boolean> | boolean): Promise<ɵWorkbenchLayout> {
     const workingCopy = this.workingCopy();
     for (const view of workingCopy.views({markedForRemoval: true})) {
       if (!canCloseFn || await canCloseFn(view.uid)) {
@@ -420,11 +420,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Serializes this layout into a URL-safe base64 string.
    */
-  public serialize(): SerializedWorkbenchLayout {
+  public serialize(flags?: GridSerializationFlags): SerializedWorkbenchLayout {
     const isMainAreaEmpty = (this.mainAreaGrid?.root instanceof MPart && this.mainAreaGrid.root.views.length === 0) ?? true;
     return {
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
-      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea),
+      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
+      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
       workbenchViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'workbench'})),
       mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'mainArea'})),
     };
@@ -454,7 +454,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Create a new tree node.
     const newTreeNode: MTreeNode = new MTreeNode({
-      nodeId: randomUUID(),
+      id: UID.randomUID(),
       child1: addBefore ? newPart : referenceElement,
       child2: addBefore ? referenceElement : newPart,
       direction: relativeTo.align === 'left' || relativeTo.align === 'right' ? 'row' : 'column',
@@ -574,9 +574,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     view.navigation = Objects.withoutUndefinedEntries({
+      id: UID.randomUID(),
       hint: extras?.hint,
       cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
-    });
+    } satisfies MView['navigation']);
   }
 
   /**
@@ -740,12 +741,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     });
 
     if (!gridName) {
-      if (findBy.element instanceof MPart) {
-        throw Error(`[NullGridError] No grid found that contains the part '${findBy.element.id}'".`);
-      }
-      else {
-        throw Error(`[NullGridError] No grid found that contains the node '${findBy.element.nodeId}'".`);
-      }
+      throw Error(`[NullGridError] No grid found that contains the ${findBy.element instanceof MPart ? 'part' : 'node'} '${findBy.element.id}'".`);
     }
 
     return this._grids[gridName]!;
@@ -760,7 +756,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private findTreeElement<T extends MTreeNode | MPart>(findBy: {id: string}): T {
     const element = this.findTreeElements((element: MTreeNode | MPart): element is T => {
-      return element instanceof MPart ? element.id === findBy.id : element.nodeId === findBy.id;
+      return element.id === findBy.id;
     }, {findFirst: true}).at(0);
 
     if (!element) {
@@ -818,8 +814,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private workingCopy(): ɵWorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, {includeNodeId: true, includeUid: true, includeMarkedForRemovalFlag: true}),
-      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea, {includeNodeId: true, includeUid: true, includeMarkedForRemovalFlag: true}),
+      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
+      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
       viewOutlets: Object.fromEntries(this._viewOutlets),
       viewStates: Object.fromEntries(this._viewStates),
       maximized: this._maximized,
@@ -954,7 +950,7 @@ export interface ReferenceElement extends ReferencePart {
  */
 export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<string>('MAIN_AREA_INITIAL_PART_ID', {
   providedIn: 'root',
-  factory: () => randomUUID(),
+  factory: () => UID.randomUID(),
 });
 
 /**

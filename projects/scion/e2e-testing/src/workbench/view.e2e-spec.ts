@@ -776,4 +776,34 @@ test.describe('Workbench View', () => {
     // expect the component not to be constructed anew
     await expect.poll(() => viewPage.getComponentInstanceId()).toEqual(componentInstanceId);
   });
+
+  test('should change detect active views after construction', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/navigation-test-page', {title: 'View Title'}], {
+      target: 'view.100',
+      activate: true,
+      cssClass: 'testee'
+    });
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
+    await expect(viewPage.view.tab.title).toHaveText('View Title');
+  });
+
+  test('should change detect inactive views after construction', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/navigation-test-page', {title: 'View Title'}], {
+      target: 'view.100',
+      activate: false,
+      cssClass: 'testee'
+    });
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
+    await expect(viewPage.view.tab.title).toHaveText('View Title');
+  });
 });

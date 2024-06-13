@@ -42,7 +42,7 @@ export const GridDropTargets = {
       }
       default: {
         return {
-          elementId: grid.root instanceof MPart ? grid.root.id : grid.root.nodeId,
+          elementId: grid.root.id,
           region: dropRegion,
           workbenchId,
           newPart: {ratio: .2},

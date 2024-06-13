@@ -1,19 +1,25 @@
 <!-- MPart (leaf) -->
-<ng-container *ngIf="element | wbInstanceof:MPart as part" [cdkPortalOutlet]="part.id | wbPartPortal"></ng-container>
+@if (element | wbInstanceof:MPart; as part) {
+  <ng-container [cdkPortalOutlet]="part.id | wbPartPortal"/>
+}
 
 <!-- MTreeNode -->
-<ng-container *ngIf="element | wbInstanceof:MTreeNode as treeNode">
-  <!-- Node with a single visible child. -->
-  <wb-grid-element *ngIf="children.length === 1" [element]="children[0].element"></wb-grid-element>
-
-  <!-- Node with multiple visible children. -->
-  <sci-sashbox *ngIf="children.length > 1"
-               [direction]="treeNode.direction"
-               [attr.data-nodeid]="treeNode.nodeId"
-               (sashStart)="onSashStart()"
-               (sashEnd)="onSashEnd(treeNode, $event)">
-    <ng-template *ngFor="let child of children; index as i; trackBy: indexTrackByFn" sciSash [size]="child.size">
-      <wb-grid-element [element]="child.element" [class]="'sash-' + (i + 1)"></wb-grid-element>
-    </ng-template>
-  </sci-sashbox>
-</ng-container>
+@if (element | wbInstanceof:MTreeNode; as treeNode) {
+  @if (children.length === 1) {
+    <!-- Node with a single visible child. -->
+    <wb-grid-element [element]="children[0].element"/>
+  }
+  @if (children.length > 1) {
+    <!-- Node with multiple visible children. -->
+    <sci-sashbox [direction]="treeNode.direction"
+                 [attr.data-nodeid]="treeNode.id"
+                 (sashStart)="onSashStart()"
+                 (sashEnd)="onSashEnd(treeNode, $event)">
+      @for (child of children; track child.element.id) {
+        <ng-template sciSash [size]="child.size">
+          <wb-grid-element [element]="child.element" [class]="'sash-' + ($index + 1)"/>
+        </ng-template>
+      }
+    </sci-sashbox>
+  }
+}

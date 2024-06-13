@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchMessageBox} from '@scion/workbench-client';
-import {randomUUID} from '../../../common/uuid.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * Displays the text message for the built-in message box capability.
@@ -43,4 +43,4 @@ export const TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY = 'ɵidentity';
 /**
  * Value to identify the built-in text message box capability.
  */
-export const TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY = randomUUID();
+export const TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY = UUID.randomUUID();

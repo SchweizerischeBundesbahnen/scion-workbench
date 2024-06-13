@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Input, OnChanges, SimpleChanges, TrackByFunction} from '@angular/core';
+import {Component, HostBinding, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';
 import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
-import {NgFor, NgIf} from '@angular/common';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {WorkbenchLayouts} from '../workbench-layouts.util';
 
@@ -37,8 +36,6 @@ import {WorkbenchLayouts} from '../workbench-layouts.util';
   styleUrls: ['./grid-element.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     InstanceofPipe,
     PortalModule,
     PartPortalPipe,
@@ -70,8 +67,8 @@ export class GridElementComponent implements OnChanges {
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
-    this.parentNodeId = this.element.parent?.nodeId;
-    this.nodeId = this.element instanceof MTreeNode ? this.element.nodeId : undefined;
+    this.parentNodeId = this.element.parent?.id;
+    this.nodeId = this.element instanceof MTreeNode ? this.element.id : undefined;
     this.partId = this.element instanceof MPart ? this.element.id : undefined;
   }
 
@@ -82,7 +79,7 @@ export class GridElementComponent implements OnChanges {
   public onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
     this._workbenchLayoutService.notifyDragEnding();
-    this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.nodeId, ratio)).then();
+    this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio)).then();
   }
 
   private computeChildren(treeNode: MTreeNode): ChildElement[] {
@@ -104,14 +101,6 @@ export class GridElementComponent implements OnChanges {
     }
     return [];
   }
-
-  /**
-   * Each layout change creates new model object instances since the layout is deserialized from the URL.
-   * Therefore, the "correct" track-by function is critical to help Angular identify DOM elements for reuse, which significantly can
-   * improve performance. Note that we use the index instead of the object identity because a different identity may be computed for
-   * nodes when re-arranging parts. Using the index is like not using *ngFor at all.
-   */
-  public indexTrackByFn: TrackByFunction<ChildElement> = (index: number): number => index;
 }
 
 /**

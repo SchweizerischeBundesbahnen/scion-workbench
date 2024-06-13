@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -64,14 +64,14 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'topLeft',
               views: [
-                {id: 'view.1', navigation: {}}, // additional assertion below to assert the hint not to be present
-                {id: 'view.100', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.100', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'bottomLeft',
               views: [
-                {id: 'view.3', navigation: {hint: 'hint-3'}},
+                {id: 'view.3', navigation: {id: ANYTHING, hint: 'hint-3'}},
               ],
             }),
           }),
@@ -81,9 +81,8 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({hint: 'hint-3'});
-    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
+    expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.1': segments(['PATH/TO/VIEW/1']),
@@ -132,14 +131,14 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'topLeft',
               views: [
-                {id: 'view.2', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.2', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'bottomLeft',
               views: [
-                {id: 'view.3', navigation: {hint: 'hint-3'}},
-                {id: 'view.100', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.3', navigation: {id: ANYTHING, hint: 'hint-3'}},
+                {id: 'view.100', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
           }),
@@ -149,9 +148,8 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.3'}).navigation).toEqual({hint: 'hint-3'});
-    expect(mergedLayout.view({viewId: 'view.100'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
+    expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.2': segments(['path/to/view/2']),
@@ -191,13 +189,13 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'topLeft',
               views: [
-                {id: 'view.1', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'bottomLeft',
               views: [
-                {id: 'view.2', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.2', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
           }),
@@ -207,8 +205,8 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({});
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
+    expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.1': segments(['path/to/view/1']),
@@ -247,13 +245,13 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'topLeft',
               views: [
-                {id: 'view.1', navigation: {}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'bottomLeft',
               views: [
-                {id: 'view.2', navigation: {hint: 'hint-2b'}},
+                {id: 'view.2', navigation: {id: ANYTHING, hint: 'hint-2b'}},
               ],
             }),
           }),
@@ -263,8 +261,7 @@ describe('WorkbenchGridMerger', () => {
     });
 
     // Expect hint not to be present.
-    expect(mergedLayout.view({viewId: 'view.1'}).navigation).toEqual({});
-    expect(mergedLayout.view({viewId: 'view.2'}).navigation).toEqual({hint: 'hint-2b'});
+    expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
 
     expect(mergedLayout.viewOutlets()).toEqual({
       'view.1': segments(['path/to/view/1']),

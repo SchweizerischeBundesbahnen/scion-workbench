@@ -33,7 +33,7 @@ import {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-h
 import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
-import {randomUUID} from '../common/uuid.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
@@ -57,7 +57,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   /**
    * Unique identity of this dialog.
    */
-  public readonly id = randomUUID();
+  public readonly id = UUID.randomUUID();
   /**
    * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
    */

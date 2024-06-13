@@ -10,14 +10,23 @@
 
 import {MAIN_AREA_INITIAL_PART_ID, PartActivationInstantProvider, ViewActivationInstantProvider, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MAIN_AREA, WorkbenchLayout} from './workbench-layout';
-import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
-import {anything, segments} from '../testing/testing.util';
+import {anything, segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {MPart as _MPart, MTreeNode as _MTreeNode, MView} from './workbench-layout.model';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
+import {provideRouter} from '@angular/router';
+import {TestComponent} from '../testing/test.component';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {WorkbenchComponent} from '../workbench.component';
+import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {WorkbenchLayoutComponent} from './workbench-layout.component';
+import {By} from '@angular/platform-browser';
+import {WorkbenchService} from '../workbench.service';
 
 describe('WorkbenchLayout', () => {
 
@@ -997,8 +1006,8 @@ describe('WorkbenchLayout', () => {
       .moveView('view.2', 'right');
 
     expect(workbenchLayout.part({partId: 'right'}).views).toEqual(jasmine.arrayWithExactContents([
-      {id: 'view.1', navigation: {cssClass: ['class-navigation']}, cssClass: ['class-view'], uid: anything()} satisfies MView,
-      {id: 'view.2', navigation: {hint: 'some-hint'}, uid: anything()} satisfies MView,
+      {id: 'view.1', navigation: {id: anything(), cssClass: ['class-navigation']}, cssClass: ['class-view'], uid: anything()} satisfies MView,
+      {id: 'view.2', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView,
     ]));
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
     expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual([]);
@@ -1012,7 +1021,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
       .moveView('view.1', 'right');
 
-    expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {}, uid: anything()} satisfies MView]);
+    expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView]);
     expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({some: 'state'});
   });
 
@@ -1023,7 +1032,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', [], {hint: 'some-hint'})
       .navigateView('view.1', ['path/to/view']);
 
-    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {}, uid: anything()} satisfies MView);
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
   });
 
@@ -1034,7 +1043,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.1', [], {hint: 'some-hint'});
 
-    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {hint: 'some-hint'}, uid: anything()} satisfies MView);
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView);
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
   });
 
@@ -1045,7 +1054,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
       .navigateView('view.1', ['path/to/view']);
 
-    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {}, uid: anything()} satisfies MView);
+    expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
     expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
   });
@@ -1639,37 +1648,6 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.view({viewId: 'view.3'}, {orElse: null})).toEqual(view3);
   });
 
-  it('should not serialize `markedForRemoval` flag', () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
-
-    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart(MAIN_AREA)
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'});
-
-    // Remove view and serialize the layout.
-    const serializedLayout = workbenchLayout
-      .removeView('view.2')
-      .serialize();
-
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid, mainAreaGrid: serializedLayout.mainAreaGrid});
-
-    const view1 = deserializedLayout.view({viewId: 'view.1'});
-    const view2 = deserializedLayout.view({viewId: 'view.2'});
-    const view3 = deserializedLayout.view({viewId: 'view.3'});
-
-    // Expect views not to be removed.
-    expect(view1).toBeDefined();
-    expect(view2).toBeDefined();
-    expect(view3).toBeDefined();
-
-    // Expect views not to be marked for removal.
-    expect(view1.markedForRemoval).toBeUndefined();
-    expect(view2.markedForRemoval).toBeUndefined();
-    expect(view3.markedForRemoval).toBeUndefined();
-  });
-
   it('should find parts by criteria', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'});
 
@@ -2099,18 +2077,18 @@ describe('WorkbenchLayout', () => {
     expect(findParentNode('left').ratio).toEqual(.5);
 
     // Set ratio to 0.3.
-    workbenchLayout = workbenchLayout.setSplitRatio(findParentNode('left').nodeId, .3);
+    workbenchLayout = workbenchLayout.setSplitRatio(findParentNode('left').id, .3);
     expect(findParentNode('left').ratio).toEqual(.3);
 
     // Expect to error if setting the ratio for a node not contained in the layout.
     expect(() => workbenchLayout.setSplitRatio('does-not-exist', .3)).toThrowError(/NullElementError/);
 
     // Expect to error if setting an illegal ratio.
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, -.1)).toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 0)).not.toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, .5)).not.toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1)).not.toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').nodeId, 1.1)).toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').id, -.1)).toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').id, 0)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').id, .5)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').id, 1)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setSplitRatio(findParentNode('left').id, 1.1)).toThrowError(/LayoutModifyError/);
 
     function findParentNode(partId: string): MTreeNode {
       const parent = workbenchLayout.part({partId}).parent;
@@ -2119,6 +2097,195 @@ describe('WorkbenchLayout', () => {
       }
       return parent;
     }
+  });
+
+  /**
+   * This test verifies that identifiers are not re-generated when deserializing the layout.
+   *
+   * The following identifiers should be stable:
+   * - {@link MTreeNode.id}
+   * - {@link MPart.id}
+   * - {@link MView.id}
+   * - {@link MView.uid}
+   * - {@link MView.navigation.id}
+   */
+  it('should have stable identifiers', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory
+                  .addPart(MAIN_AREA)
+                  .addPart('left', {align: 'left'})
+                  .addView('view.100', {partId: 'left'})
+                  .navigateView('view.100', ['test-view']),
+              },
+              {
+                id: 'perspective-2',
+                layout: factory => factory.addPart(MAIN_AREA),
+              },
+            ],
+          },
+        }),
+        provideRouter([
+          {path: 'test-view', component: TestComponent},
+        ]),
+        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'initial'},
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+    const layoutFixture = fixture.debugElement.query(By.directive(WorkbenchLayoutComponent));
+
+    // Prepare main area to have to parts split vertically.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('top', {relativeTo: 'initial', align: 'top'})
+      .addPart('bottom', {relativeTo: 'top', align: 'bottom'})
+      .removePart('initial')
+      .addView('view.101', {partId: 'top'})
+      .addView('view.102', {partId: 'bottom'})
+      .navigateView('view.101', ['test-view'])
+      .navigateView('view.102', ['test-view'])
+      .activateView('view.101')
+      .activateView('view.102'),
+    );
+    await waitUntilStable();
+
+    // Capture model objects. The ids should not change when serializing and deserializing the layout.
+    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout.workbenchGrid!.root;
+    const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout.mainAreaGrid!.root;
+    const view100 = TestBed.inject(ɵWorkbenchService).layout.view({viewId: 'view.100'});
+    const view101 = TestBed.inject(ɵWorkbenchService).layout.view({viewId: 'view.101'});
+    const view102 = TestBed.inject(ɵWorkbenchService).layout.view({viewId: 'view.102'});
+
+    // Expect initial layout.
+    expect(layoutFixture).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          id: workbenchLayoutRoot.id,
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.100', uid: view100.uid, navigation: {id: view100.navigation!.id}}],
+            activeViewId: 'view.100',
+          }),
+          child2: new MPart({
+            id: MAIN_AREA,
+          }),
+        }),
+      },
+      mainAreaGrid: {
+        root: new MTreeNode({
+          id: mainAreaLayoutRoot.id,
+          direction: 'column',
+          ratio: .5,
+          child1: new MPart({
+            id: 'top',
+            views: [{id: 'view.101', uid: view101.uid, navigation: {id: view101.navigation!.id}}],
+            activeViewId: 'view.101',
+          }),
+          child2: new MPart({
+            id: 'bottom',
+            views: [{id: 'view.102', uid: view102.uid, navigation: {id: view102.navigation!.id}}],
+            activeViewId: 'view.102',
+          }),
+        }),
+      },
+    });
+
+    // Modify the main area layout, causing the layout to be serialized and deserialized.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addView('view.103', {partId: 'bottom'})
+      .navigateView('view.103', ['test-view']),
+    );
+    await waitUntilStable();
+
+    // Expect ids not to have changed.
+    expect(layoutFixture).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          id: workbenchLayoutRoot.id,
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.100', uid: view100.uid, navigation: {id: view100.navigation!.id}}],
+            activeViewId: 'view.100',
+          }),
+          child2: new MPart({
+            id: MAIN_AREA,
+          }),
+        }),
+      },
+      mainAreaGrid: {
+        root: new MTreeNode({
+          id: mainAreaLayoutRoot.id,
+          direction: 'column',
+          ratio: .5,
+          child1: new MPart({
+            id: 'top',
+            views: [{id: 'view.101', uid: view101.uid, navigation: {id: view101.navigation!.id}}],
+            activeViewId: 'view.101',
+          }),
+          child2: new MPart({
+            id: 'bottom',
+            views: [
+              {id: 'view.102', uid: view102.uid, navigation: {id: view102.navigation!.id}},
+              {id: 'view.103', uid: ANYTHING, navigation: {id: ANYTHING}},
+            ],
+            activeViewId: 'view.102',
+          }),
+        }),
+      },
+    });
+
+    // Switch perspective, causing the layout to be serialized and deserialized.
+    await TestBed.inject(WorkbenchService).switchPerspective('perspective-2');
+    await TestBed.inject(WorkbenchService).switchPerspective('perspective-1');
+    await waitUntilStable();
+
+    // Expect ids not to have changed.
+    expect(layoutFixture).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          id: workbenchLayoutRoot.id,
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({
+            id: 'left',
+            views: [{id: 'view.100', uid: view100.uid, navigation: {id: view100.navigation!.id}}],
+            activeViewId: 'view.100',
+          }),
+          child2: new MPart({
+            id: MAIN_AREA,
+          }),
+        }),
+      },
+      mainAreaGrid: {
+        root: new MTreeNode({
+          id: mainAreaLayoutRoot.id,
+          direction: 'column',
+          ratio: .5,
+          child1: new MPart({
+            id: 'top',
+            views: [{id: 'view.101', uid: view101.uid, navigation: {id: view101.navigation!.id}}],
+            activeViewId: 'view.101',
+          }),
+          child2: new MPart({
+            id: 'bottom',
+            views: [
+              {id: 'view.102', uid: view102.uid, navigation: {id: view102.navigation!.id}},
+              {id: 'view.103', uid: ANYTHING, navigation: {id: ANYTHING}},
+            ],
+            activeViewId: 'view.102',
+          }),
+        }),
+      },
+    });
   });
 });
 

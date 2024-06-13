@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, EMPTY, Observable, pairwise, switchMap} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, pairwise} from 'rxjs';
 import {ActivatedRouteSnapshot, ActivationStart, ChildrenOutletContexts, Event, Router, RouterEvent, UrlSegment} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
-import {distinctUntilChanged, filter, map, startWith} from 'rxjs/operators';
+import {filter, map, startWith} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {Defined} from '@scion/toolkit/util';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
 import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
@@ -29,7 +28,6 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {bufferLatestUntilLayoutChange} from '../common/operators';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -41,7 +39,6 @@ import {ClassList} from '../common/class-list';
 import {ViewState} from '../routing/routing.model';
 import {RouterUtils} from '../routing/router.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
-import {UUID} from '../common/uuid.util';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -56,7 +53,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
 
-  private readonly _part$ = new BehaviorSubject<ɵWorkbenchPart | undefined>(undefined);
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _scrolledIntoView$ = new BehaviorSubject<boolean>(true);
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
@@ -65,8 +61,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private _activationInstant: number | undefined;
   private _closable = true;
 
-  public uid!: UUID;
+  private _part: ɵWorkbenchPart | undefined;
+  public uid!: string;
   public alternativeId: string | undefined;
+  public navigationId: string | undefined;
   public navigationHint: string | undefined;
   public urlSegments: UrlSegment[] = [];
   public state: ViewState = {};
@@ -90,7 +88,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         filterArray((menuItem: WorkbenchMenuItem | null): menuItem is WorkbenchMenuItem => menuItem !== null),
       );
     this.portal = this.createPortal(options.component);
-    this.trackViewActivation();
     this.touchOnActivate();
     this.blockWhenDialogOpened();
     this.detectRouteActivation();
@@ -133,14 +130,29 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public onLayoutChange(layout: ɵWorkbenchLayout): void {
     const mPart = layout.part({viewId: this.id});
     const mView = layout.view({viewId: this.id});
+    const prevNavigationId = this.navigationId;
+
     this.uid = mView.uid;
     this.alternativeId = mView.alternativeId;
     this.urlSegments = layout.urlSegments({viewId: this.id});
+    this.navigationId = mView.navigation?.id;
     this.navigationHint = mView.navigation?.hint;
     this.state = layout.viewState({viewId: this.id});
     this.classList.set(mView.cssClass, {scope: 'layout'});
     this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
-    this._part$.next(this._partRegistry.get(mPart.id));
+    this._part = this._partRegistry.get(mPart.id);
+
+    const active = mPart.activeViewId === this.id;
+    if (active !== this.active) {
+      this.active$.next(active);
+    }
+
+    // Inactive views are not checked for changes since detached from the Angular component tree.
+    // To complete the initialization of the routed content (to ensure that `ngOnInit` is called),
+    // we manually trigger change detection.
+    if (!this.active && this.portal.isConstructed && prevNavigationId !== this.navigationId) {
+      this.portal.componentRef.changeDetectorRef.detectChanges();
+    }
   }
 
   /**
@@ -239,7 +251,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get part(): WorkbenchPart {
-    return Defined.orElseThrow(this._part$.value, () => Error(`[NullPartError] Part reference missing for view '${this.id}'.`));
+    return this._part ?? throwError(`[NullPartError] Part reference missing for view '${this.id}'.`);
   }
 
   /** @inheritDoc */
@@ -334,21 +346,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   public get destroyed(): boolean {
     return this.portal.isDestroyed;
-  }
-
-  /**
-   * Monitors the associated part to check if this view is currently active, updating the active state of this view accordingly.
-   */
-  private trackViewActivation(): void {
-    this._part$
-      .pipe(
-        switchMap(part => part?.activeViewId$ ?? EMPTY),
-        map(activeViewId => activeViewId === this.id),
-        bufferLatestUntilLayoutChange(), // Prevent the (de-)activation of potentially wrong views while updating the layout.
-        distinctUntilChanged(),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(this.active$);
   }
 
   /**

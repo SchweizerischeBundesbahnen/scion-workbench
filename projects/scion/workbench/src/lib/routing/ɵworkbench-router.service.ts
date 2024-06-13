@@ -26,7 +26,6 @@ import {Objects} from '../common/objects.util';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {Logger} from '../logging';
 import {CanClose} from '../workbench.model';
-import {UUID} from '../common/uuid.util';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -159,7 +158,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   /**
    * Decides if given view can be closed, invoking `CanClose` guard if implemented.
    */
-  private async canCloseView(viewUid: UUID): Promise<boolean> {
+  private async canCloseView(viewUid: string): Promise<boolean> {
     const view = this._workbenchViewRegistry.views.find(view => view.uid === viewUid);
     if (!view) {
       return true;
@@ -310,7 +309,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
  * Creates navigation extras with workbench navigation instructions.
  */
 function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
-  const {workbenchGrid, mainAreaGrid} = layout.serialize();
+  const {workbenchGrid, mainAreaGrid} = layout.serialize({excludeViewMarkedForRemoval: true});
 
   return {
     ...extras,
