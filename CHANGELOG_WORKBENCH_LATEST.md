@@ -1,18 +1,34 @@
-# [18.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/17.0.0-beta.9...18.0.0-beta.1) (2024-06-10)
+# [18.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.1...18.0.0-beta.2) (2024-06-13)
 
 
-### Dependencies
+### Code Refactoring
 
-* **workbench:** update @scion/workbench to Angular 18 ([d39fa85](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d39fa851908804fea3e54f3b25daedb539dd29a3))
+* **workbench:** change default icon font directory from `/assets/fonts` to `/fonts` ([d347dae](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d347daebc40f3917b867435586929725fc8c1acd))
 
 
 ### BREAKING CHANGES
 
-* **workbench:** Updating `@scion/workbench` to Angular 18 introduced a breaking change.
+* **workbench:** The default icon font directory has changed from `/assets/fonts` to `/fonts`.
 
   To migrate:
-    - update your application to Angular 18; for detailed migration instructions, refer to https://v18.angular.dev/update-guide;
-    - update @scion/components to version 18; for detailed migration instructions, refer to https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG_COMPONENTS.md;
+  - Move the `fonts` folder from `/src/assets` to `/public`.
+  - Include content of the `public` folder in angular.json:
+    ```json
+    "assets": [
+      {
+        "glob": "**/*",
+        "input": "public"
+      }
+    ]
+    ```
+  - Alternatively, to not change the folder structure, you can configure a custom path to the icon font directory in your `styles.scss`:
+    ```scss
+    use '@scion/workbench' with (
+      $icon-font: (
+        directory: 'assets/fonts'
+      )
+    );
+    ```
 
 
 
