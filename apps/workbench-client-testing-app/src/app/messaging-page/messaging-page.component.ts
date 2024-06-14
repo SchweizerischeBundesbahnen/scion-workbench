@@ -10,8 +10,9 @@
 
 import {Component} from '@angular/core';
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
-import PublishMesagePageComponent from './publish-message-page/publish-message-page.component';
 import {WorkbenchView} from '@scion/workbench-client';
+import {PublishMesagePageComponent} from './publish-message-page/publish-message-page.component';
+import {PublishIntentPageComponent} from './publish-intent-page/publish-intent-page.component';
 
 @Component({
   selector: 'app-messaging-page',
@@ -22,6 +23,7 @@ import {WorkbenchView} from '@scion/workbench-client';
     SciTabDirective,
     SciTabbarComponent,
     PublishMesagePageComponent,
+    PublishIntentPageComponent,
   ],
 })
 export default class MessagingPageComponent {
