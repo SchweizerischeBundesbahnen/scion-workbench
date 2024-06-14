@@ -1,0 +1,37 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  > form {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    > section {
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5em;
+      border: 1px solid var(--sci-color-border);
+      border-radius: var(--sci-corner);
+      padding: 1em;
+    }
+
+    > output.publish-success {
+      flex: none;
+      display: none;
+    }
+
+    > output.publish-error {
+      flex: none;
+      border: 1px solid var(--sci-color-negative);
+      background-color: var(--sci-color-background-negative);
+      color: var(--sci-color-negative);
+      border-radius: var(--sci-corner);
+      padding: 1em;
+      font-family: monospace;
+    }
+  }
+}
