@@ -10,10 +10,10 @@
 
 import {Directive, ElementRef, EmbeddedViewRef, Input, OnChanges, OnDestroy, Optional, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {Dimension, fromDimension$} from '@scion/toolkit/observable';
+import {fromDimension$} from '@scion/toolkit/observable';
 import {setStyle} from '../common/dom.util';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {animationFrameScheduler, EMPTY, merge, Subject} from 'rxjs';
+import {filter, observeOn, takeUntil} from 'rxjs/operators';
 
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.
@@ -56,17 +56,14 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
     // Position projected content out of the document flow relative to the page viewport.
     this.styleContent({position: 'fixed'});
 
-    // Align content each time the bounding box element changes its size.
-    fromDimension$(this._host.nativeElement)
-      .pipe(takeUntil(dispose$))
-      .subscribe(dimension => {
-        if (isNullDimension(dimension)) {
-          // When removing the bounding box element (this directive's host) from the DOM, its dimension drops to 0.
-          // We ignore this event to preserve the dimension of projected content, crucial, for example, if projected
-          // content implements virtual scrolling. Otherwise, its content would reload when adding the host to the DOM again.
-          // For example, inactive views are removed from the DOM.
-          return;
-        }
+    // Align content each time the size of the host element changes, or when the content is attached to the DOM.
+    // For example, moving a view to another part of the same size will not trigger a dimension change event.
+    merge(fromDimension$(this._host.nativeElement), this._view?.portal.attached$.pipe(filter(Boolean)) ?? EMPTY)
+      .pipe(
+        observeOn(animationFrameScheduler), // Align to host boundaries right before the next repaint.
+        takeUntil(dispose$),
+      )
+      .subscribe(() => {
         this.alignContentToHostBoundaries();
       });
 
@@ -83,6 +80,14 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
    */
   private alignContentToHostBoundaries(): void {
     const hostPosition: DOMRect = this._host.nativeElement.getBoundingClientRect();
+    if (!hostPosition.width && !hostPosition.height) {
+      // When removing the bounding box element (this directive's host) from the DOM, its dimension drops to 0.
+      // We ignore this event to preserve the dimension of projected content, crucial, for example, if projected
+      // content implements virtual scrolling. Otherwise, its content would reload when adding the host to the DOM again.
+      // For example, inactive views are removed from the DOM.
+      return;
+    }
+
     this.styleContent({
       top: `${hostPosition.top}px`,
       left: `${hostPosition.left}px`,
@@ -106,8 +111,4 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
   public ngOnDestroy(): void {
     this._contentViewRef?.destroy();
   }
-}
-
-function isNullDimension(dimension: Dimension): boolean {
-  return dimension.offsetWidth === 0 && dimension.offsetHeight === 0;
 }

@@ -949,7 +949,7 @@ test.describe('Workbench View', () => {
 
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('right', {align: 'right'})
-      .addView('view.100', {partId: 'right', activateView: true})
+      .addView('view.100', {partId: 'right', activateView: true}),
     );
 
     // Register view 1.
@@ -995,5 +995,57 @@ test.describe('Workbench View', () => {
         title: 'Standalone View',
       } satisfies Partial<ViewInfo>,
     );
+  });
+
+  /**
+   * Regression test that a microfrontend was not correctly aligned when moved to another part of the same size.
+   */
+  test('should align microfrontend to view bounds when moving it to another part of the same size', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'testee'},
+      properties: {
+        path: 'test-view',
+        title: 'Microfrontend View',
+      },
+    });
+
+    // Create left and right part, both of equal size.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('left', {align: 'left', ratio: .25})
+      .addPart('right', {align: 'right', ratio: .25}),
+    );
+
+    // Open view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({view: 'testee'}, {
+      target: 'view.100',
+      activate: true,
+    });
+    await routerPage.view.tab.close();
+
+    // Move view to the left part.
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await appPO.view({viewId: 'view.100'}).tab.moveTo('left');
+    // Expect the microfrontend to be aligned to the view bounds.
+    await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'left'} satisfies Partial<ViewInfo>);
+    await expect(async () => {
+      const outletBounds = await viewPage.outlet.getBoundingBox();
+      const viewBounds = await viewPage.view.getBoundingBox();
+      expect(outletBounds).toEqual(viewBounds);
+    }).toPass();
+
+    // Move view to the right part.
+    await appPO.view({viewId: 'view.100'}).tab.moveTo('right');
+    // Expect the microfrontend to be aligned to the view bounds.
+    await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'right'} satisfies Partial<ViewInfo>);
+    await expect(async () => {
+      const outletBounds = await viewPage.outlet.getBoundingBox();
+      const viewBounds = await viewPage.view.getBoundingBox();
+      expect(outletBounds).toEqual(viewBounds);
+    }).toPass();
   });
 });
