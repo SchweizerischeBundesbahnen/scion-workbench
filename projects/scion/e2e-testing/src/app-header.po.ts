@@ -49,9 +49,8 @@ export class AppHeaderPO {
       .locator('app-menu')
       .locator(`button.e2e-menu-item.${locateBy.cssClass}`);
 
-    if (await menuItem.isHidden()) {
-      throw Error(`[PageObjectError] Menu item not found [cssClass=${locateBy.cssClass}]`);
-    }
+    // Wait until the menu is attached.
+    await menuItem.waitFor({state: 'attached'});
 
     // Do not toggle the menu item if already in the expected state.
     if (options?.check !== undefined && (await menuItem.locator('span.e2e-check-mark').isVisible()) === options.check) {
