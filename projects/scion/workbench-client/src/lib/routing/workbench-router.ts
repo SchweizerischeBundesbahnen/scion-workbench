@@ -133,6 +133,15 @@ export interface WorkbenchNavigationExtras {
    */
   target?: string | 'blank' | 'auto';
   /**
+   * Controls which part to navigate views in.
+   *
+   * If target is `blank`, opens the view in the specified part.
+   * If target is `auto`, navigates matching views in the specified part, or opens a new view in that part otherwise.
+   *
+   * If the specified part is not in the layout, opens the view in the active part, with the active part of the main area taking precedence.
+   */
+  partId?: string;
+  /**
    * Instructs the router to activate the view. Default is `true`.
    */
   activate?: boolean;
