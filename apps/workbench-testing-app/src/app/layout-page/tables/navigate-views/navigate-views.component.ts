@@ -17,9 +17,9 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Commands, ViewState} from '@scion/workbench';
 import {RouterCommandsComponent} from '../../../router-commands/router-commands.component';
-import {NavigationStateComponent} from '../../../navigation-state/navigation-state.component';
 import {CssClassComponent} from '../../../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {RecordComponent} from '../../../record/record.component';
 
 @Component({
   selector: 'app-navigate-views',
@@ -32,7 +32,7 @@ import {UUID} from '@scion/toolkit/uuid';
     SciFormFieldComponent,
     SciMaterialIconDirective,
     RouterCommandsComponent,
-    NavigationStateComponent,
+    RecordComponent,
     CssClassComponent,
   ],
   providers: [
