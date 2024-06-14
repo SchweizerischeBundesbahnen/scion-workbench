@@ -31,7 +31,7 @@ import {MicrofrontendMessageBoxLegacyIntentTranslator} from '../microfrontend-me
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
  */
-@Injectable({providedIn: 'root'})
+@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
 
   public config: MicrofrontendPlatformConfig | undefined;

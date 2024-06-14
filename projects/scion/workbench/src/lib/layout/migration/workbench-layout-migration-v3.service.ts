@@ -32,7 +32,7 @@ export class WorkbenchLayoutMigrationV3 implements WorkbenchMigration {
     // Consider the ids of views contained in the URL as already used.
     // Otherwise, when migrating the main area and using a view id already present in the perspective,
     // the view outlet would not be removed from the URL, resulting the migrated view to display
-    // "Page Not Found" or incorrect content.
+    // "Not Found" page or incorrect content.
     const viewOutlets = RouterUtils.parseViewOutlets(this.getCurrentUrl());
     const usedViewIds = new Set<ViewIdV3>([...viewOutlets.keys(), ...collectViewIds(partGridV2.root)]);
 

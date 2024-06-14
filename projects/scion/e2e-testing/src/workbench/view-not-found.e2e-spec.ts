@@ -47,7 +47,7 @@ test.describe('Workbench Page Not Found', () => {
     await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
   });
 
-  test('should display "Not Found Page" when navigating to an unknown path', async ({appPO, workbenchNavigator, consoleLogs}) => {
+  test('should display "Not Found" page when navigating to an unknown path', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add view.101 in peripheral area
@@ -66,7 +66,7 @@ test.describe('Workbench Page Not Found', () => {
     await expectView(viewPage1).toBeActive();
     await expectView(viewPage2).toBeActive();
 
-    // Reload the application and expect the "Not Found Page" to still be displayed.
+    // Reload the application and expect the "Not Found" page to still be displayed.
     await test.step('Reloading the application', async () => {
       await appPO.reload();
       await expectView(viewPage1).toBeActive();
@@ -77,7 +77,7 @@ test.describe('Workbench Page Not Found', () => {
     await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
   });
 
-  test('should display "Not Found Page" when navigating with a hint that matches no route', async ({appPO, workbenchNavigator, consoleLogs}) => {
+  test('should display "Not Found" page when navigating with a hint that matches no route', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add view.101 in peripheral area
@@ -96,7 +96,7 @@ test.describe('Workbench Page Not Found', () => {
     await expectView(viewPage1).toBeActive();
     await expectView(viewPage2).toBeActive();
 
-    // Reload the application and expect the "Not Found Page" to still be displayed.
+    // Reload the application and expect the "Not Found" page to still be displayed.
     await test.step('Reloading the application', async () => {
       await appPO.reload();
       await expectView(viewPage1).toBeActive();
@@ -107,7 +107,7 @@ test.describe('Workbench Page Not Found', () => {
     await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
   });
 
-  test('should drag "Not Found Page" to another part', async ({appPO, workbenchNavigator, consoleLogs}) => {
+  test('should drag "Not Found" page to another part', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -139,7 +139,7 @@ test.describe('Workbench Page Not Found', () => {
     await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
   });
 
-  test('should drag "Not Found Page" to a new window', async ({appPO, workbenchNavigator, consoleLogs}) => {
+  test('should drag "Not Found" page to a new window', async ({appPO, workbenchNavigator, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout((layout, activePartId) => layout

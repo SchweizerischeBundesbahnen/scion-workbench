@@ -5,9 +5,9 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-The workbench displays a "Not Found Page" if no route matches the requested URL. This happens when navigating to a route that does not exist or when loading the application, and the routes have changed since the last use.
+The workbench displays a "Not Found" page if no route matches the requested URL. This happens when navigating to a route that does not exist or when loading the application, and the routes have changed since the last use.
 
-The built-in "Not Found Page" can be replaced, e.g., to localize the page, as follows:
+The built-in "Not Found" page can be replaced, e.g., to localize the page, as follows:
 
 ```ts
 import {bootstrapApplication} from '@angular/platform-browser';

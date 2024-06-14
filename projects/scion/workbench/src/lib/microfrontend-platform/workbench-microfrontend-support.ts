@@ -39,6 +39,7 @@ import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-r
 import {RouterUtils} from '../routing/router.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
+import {ManifestObjectCache} from './manifest-object-cache.service';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -69,6 +70,11 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
       multi: true,
     },
     {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useExisting: ManifestObjectCache,
+      multi: true,
+    },
+    {
       provide: MicrofrontendPlatformConfig,
       useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
     },
@@ -82,6 +88,8 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendPopupCapabilityValidator,
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
+    MicrofrontendPlatformInitializer,
+    ManifestObjectCache,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideBuiltInTextMessageBoxCapabilityRoute(),
@@ -143,7 +151,7 @@ function provideMicrofrontendViewRoute(): EnvironmentProviders {
       useFactory: (): Route => ({
         matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
         component: MicrofrontendViewComponent,
-        canMatch: [canMatchWorkbenchView(true)],
+        canMatch: [canMatchWorkbenchView(true), MicrofrontendViewRoutes.canMatchViewCapability],
       }),
     },
   ]);
