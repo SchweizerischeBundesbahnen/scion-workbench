@@ -62,11 +62,13 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
     const targets = this.resolveTargets(message, extras);
     const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
+    const partId = extras.close ? undefined : extras.partId;
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, viewCapability, transientParams);
     const navigations = await Promise.all(Arrays.coerce(targets).map(target => {
       return this._workbenchRouter.navigate(commands, {
         target,
+        partId,
         activate: extras.activate,
         close: extras.close,
         position: extras.position ?? extras.blankInsertionIndex,
@@ -88,10 +90,10 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
       throw Error(`[NavigateError] The target must be empty if closing a view [target=${(extras.target)}]`);
     }
     if (extras.close) {
-      return this.resolvePresentViewIds(intentMessage, {matchWildcardParams: true}) ?? [];
+      return this.resolvePresentViewIds(intentMessage, extras, {matchWildcardParams: true}) ?? [];
     }
     if (!extras.target || extras.target === 'auto') {
-      return this.resolvePresentViewIds(intentMessage) ?? 'blank';
+      return this.resolvePresentViewIds(intentMessage, extras) ?? 'blank';
     }
     return extras.target;
   }
@@ -102,11 +104,12 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
    *
    * Allows matching wildcard parameters by setting the option `matchWildcardParameters` to `true`.
    */
-  private resolvePresentViewIds(intentMessage: IntentMessage, options?: {matchWildcardParams?: boolean}): string[] | null {
+  private resolvePresentViewIds(intentMessage: IntentMessage, extras: WorkbenchNavigationExtras, options?: {matchWildcardParams?: boolean}): string[] | null {
     const requiredParams = intentMessage.capability.params?.filter(param => param.required).map(param => param.name) ?? [];
     const matchWildcardParams = options?.matchWildcardParams ?? false;
 
     const viewIds = this._viewRegistry.views
+      .filter(view => !extras.partId || extras.partId === view.part.id)
       .filter(view => {
         const microfrontendWorkbenchView = view.adapt(MicrofrontendWorkbenchView);
         if (!microfrontendWorkbenchView) {

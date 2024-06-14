@@ -22,6 +22,10 @@
       </datalist>
     </sci-form-field>
 
+    <sci-form-field label="Part ID">
+      <input [formControl]="form.controls.partId" class="e2e-part-id">
+    </sci-form-field>
+
     <sci-form-field label="Position">
       <input [formControl]="form.controls.position" [attr.list]="positionList" class="e2e-position">
       <datalist [attr.id]="positionList">

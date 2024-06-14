@@ -60,6 +60,7 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
 
   private async enterExtras(extras: WorkbenchNavigationExtras | undefined): Promise<void> {
     await this.enterTarget(extras?.target);
+    await this.enterPartId(extras?.partId);
     await this.enterParams(extras?.params);
     await this.checkActivate(extras?.activate);
     await this.checkClose(extras?.close);
@@ -69,6 +70,10 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
 
   private async enterTarget(target?: string | 'blank' | 'auto'): Promise<void> {
     await this.locator.locator('input.e2e-target').fill(target ?? '');
+  }
+
+  private async enterPartId(partId?: string): Promise<void> {
+    await this.locator.locator('input.e2e-part-id').fill(partId ?? '');
   }
 
   private async enterParams(params?: Map<string, any> | Dictionary): Promise<void> {
