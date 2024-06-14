@@ -8,30 +8,34 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef} from '@angular/core';
+import {Component, forwardRef, Input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {ViewState} from '@scion/workbench';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {NgClass} from '@angular/common';
 
 @Component({
-  selector: 'app-navigation-state',
-  templateUrl: './navigation-state.component.html',
-  styleUrls: ['./navigation-state.component.scss'],
+  selector: 'app-record',
+  templateUrl: './record.component.html',
+  styleUrls: ['./record.component.scss'],
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    NgClass,
   ],
   providers: [
-    {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => NavigationStateComponent)},
+    {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => RecordComponent)},
   ],
 })
-export class NavigationStateComponent implements ControlValueAccessor {
+export class RecordComponent implements ControlValueAccessor {
 
-  private _cvaChangeFn: (state: ViewState | undefined) => void = noop;
+  private _cvaChangeFn: (record: Record<string, string> | undefined) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
   protected formControl = this._formBuilder.control<string>('');
+
+  @Input('class') // eslint-disable-line @angular-eslint/no-input-rename
+  public cssClass: string | undefined;
 
   constructor(private _formBuilder: NonNullableFormBuilder) {
     this.formControl.valueChanges
@@ -42,28 +46,28 @@ export class NavigationStateComponent implements ControlValueAccessor {
       });
   }
 
-  private parse(stringified: string): ViewState | undefined {
+  private parse(stringified: string): Record<string, string> | undefined {
     if (!stringified.length) {
       return undefined;
     }
-    const state: ViewState = {};
+    const record: Record<string, string> = {};
     for (const match of stringified.matchAll(/(?<key>[^=;]+)=(?<value>[^;]+)/g)) {
       const {key, value} = match.groups!;
-      state[key] = value;
+      record[key] = value;
     }
-    return state;
+    return record;
   }
 
-  private stringify(state: ViewState | null | undefined): string {
-    return Object.entries(state ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
+  private stringify(record: Record<string, string> | null | undefined): string {
+    return Object.entries(record ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
   }
 
   /**
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public writeValue(state: ViewState | undefined | null): void {
-    this.formControl.setValue(this.stringify(state), {emitEvent: false});
+  public writeValue(record: Record<string, string> | undefined | null): void {
+    this.formControl.setValue(this.stringify(record), {emitEvent: false});
   }
 
   /**

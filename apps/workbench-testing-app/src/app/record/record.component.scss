@@ -6,5 +6,10 @@
   > input {
     @include sci-design.style-input-field();
     min-width: 0;
+
+    &::placeholder {
+      color: var(--sci-color-gray-400);
+    }
   }
 }
+
