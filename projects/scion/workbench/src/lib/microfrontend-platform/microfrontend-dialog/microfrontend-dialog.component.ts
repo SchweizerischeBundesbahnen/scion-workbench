@@ -80,7 +80,7 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
   }
 
   private navigate(): void {
-    const application = this._manifestService.applications.find(app => app.symbolicName === this.capability.metadata!.appSymbolicName)!;
+    const application = this._manifestService.getApplication(this.capability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench dialog [app=${this.capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${this.capability.properties.path}].`, LoggerNames.MICROFRONTEND, this.params, this.capability);
     this._outletRouter.navigate(this.capability.properties.path, {
       outlet: this.dialog.id,

@@ -44,7 +44,7 @@ export class WorkbenchAuxiliaryRoutesRegistrator {
         ...this._router.config
           .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
           .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
-        // Register "Page Not Found" route as the last route of the outlet.
+        // Register "Not Found" page route as the last route of the outlet.
         {
           path: '**',
           loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,

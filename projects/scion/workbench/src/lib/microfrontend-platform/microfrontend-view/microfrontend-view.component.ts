@@ -13,6 +13,7 @@ import {ActivatedRoute, Params} from '@angular/router';
 import {combineLatest, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
 import {first, map, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
+import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
@@ -64,7 +65,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     'keydown.escape', // allows closing notifications
   ];
 
-  protected capability: WorkbenchViewCapability | undefined;
+  protected capability: WorkbenchViewCapability | null = null;
 
   /**
    * Splash to display until the microfrontend signals readiness.
@@ -88,6 +89,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
               private _route: ActivatedRoute,
               private _outletRouter: OutletRouter,
               private _manifestService: ManifestService,
+              private _manifestObjectCache: ManifestObjectCache,
               private _messageClient: MessageClient,
               private _destroyRef: DestroyRef,
               private _logger: Logger,
@@ -122,10 +124,10 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
       .subscribe();
   }
 
-  private async onNavigate(prevCapability: WorkbenchViewCapability | undefined, capability: WorkbenchViewCapability | undefined, params: Params): Promise<void> {
+  private async onNavigate(prevCapability: WorkbenchViewCapability | null, capability: WorkbenchViewCapability | null, params: Params): Promise<void> {
     if (!capability) {
       this._logger.warn(() => `[NullCapabilityError] No application found to provide a view capability of id '${params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]}'. Maybe, the requested view is not public API or the providing application not available.`, LoggerNames.MICROFRONTEND_ROUTING);
-      await this.view.close();
+      this.unload();
       return;
     }
 
@@ -155,7 +157,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     }
 
     // Navigate to the microfrontend.
-    const application = this._manifestService.applications.find(app => app.symbolicName === capability.metadata!.appSymbolicName)!;
+    const application = this._manifestService.getApplication(capability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this.view.id}, app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
     await this._outletRouter.navigate(capability.properties.path, {
       outlet: this.view.id,
@@ -173,8 +175,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     }
   }
 
-  private fetchCapability$(capabilityId: string): Observable<WorkbenchViewCapability | undefined> {
-    return this._manifestService.lookupCapabilities$<WorkbenchViewCapability>({id: capabilityId}).pipe(map(capabilities => capabilities.at(0)));
+  private fetchCapability$(capabilityId: string): Observable<WorkbenchViewCapability | null> {
+    return this._manifestObjectCache.observeCapability$(capabilityId);
   }
 
   private installMenuItemAccelerators$(): void {
@@ -311,12 +313,16 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
   }
 
-  public ngOnDestroy(): void {
-    // Instruct the message broker to delete retained messages to free resources.
+  private unload(): void {
+    // Delete retained messages to free resources.
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true}).then();
     this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true}).then();
     this._outletRouter.navigate(null, {outlet: this.view.id}).then();
     this.view.unregisterAdapter(MicrofrontendWorkbenchView);
+  }
+
+  public ngOnDestroy(): void {
+    this.unload();
   }
 }
 

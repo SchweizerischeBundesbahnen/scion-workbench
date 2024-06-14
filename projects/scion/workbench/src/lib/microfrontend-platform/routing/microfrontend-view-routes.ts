@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Params, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} from '@angular/router';
+import {CanMatchFn, Params, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} from '@angular/router';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
 import {inject, Injector} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../../layout/workbench-layouts.util';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
+import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
+import {ManifestObjectCache} from '../manifest-object-cache.service';
 
 /**
  * Provides functions and constants specific to microfrontend routes.
@@ -49,7 +51,8 @@ export const MicrofrontendViewRoutes = {
 
     return (segments: UrlSegment[], group: UrlSegmentGroup, route: Route): UrlMatchResult | null => {
       // Test if the path matches.
-      if (!MicrofrontendViewRoutes.isMicrofrontendRoute(segments)) {
+      const microfrontendRoute = MicrofrontendViewRoutes.parseMicrofrontendRoute(segments);
+      if (!microfrontendRoute) {
         return null;
       }
 
@@ -93,8 +96,14 @@ export const MicrofrontendViewRoutes = {
   /**
    * Tests given URL to be a microfrontend route.
    */
-  isMicrofrontendRoute: (segments: UrlSegment[]): boolean => {
-    return segments.length === 2 && segments[0].path === MicrofrontendViewRoutes.ROUTE_PREFIX;
+  parseMicrofrontendRoute: (segments: UrlSegment[]): {capabilityId: string; params: Params} | null => {
+    if (segments.length === 2 && segments[0].path === MicrofrontendViewRoutes.ROUTE_PREFIX) {
+      return {
+        capabilityId: segments[1].path,
+        params: segments[1].parameters,
+      };
+    }
+    return null;
   },
 
   /**
@@ -113,4 +122,20 @@ export const MicrofrontendViewRoutes = {
       return groups;
     }, {urlParams: {} as Params, transientParams: {} as Params});
   },
+
+  /**
+   * Matches the route if target of a view capability (microfrontend) and the capability exists.
+   */
+  canMatchViewCapability: ((_route: Route, segments: UrlSegment[]): boolean => {
+    const microfrontendRoute = MicrofrontendViewRoutes.parseMicrofrontendRoute(segments);
+    if (!microfrontendRoute) {
+      return false;
+    }
+
+    if (MicrofrontendPlatform.state !== PlatformState.Started) {
+      return true; // match until started the microfrontend platform to avoid flickering.
+    }
+
+    return inject(ManifestObjectCache).hasCapability(microfrontendRoute.capabilityId);
+  }) satisfies CanMatchFn,
 } as const;
