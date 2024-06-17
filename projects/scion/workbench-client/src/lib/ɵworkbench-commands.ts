@@ -43,11 +43,18 @@ export const ɵWorkbenchCommands = {
   viewCloseTopic: (viewId: ViewId | ':viewId') => `ɵworkbench/views/${viewId}/close`,
 
   /**
-   * Computes the topic for notifying about view active state changes.
+   * Computes the topic to notify the active state of a view.
    *
    * The active state is published as a retained message.
    */
   viewActiveTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/active`,
+
+  /**
+   * Computes the topic to notify the part of a view.
+   *
+   * The part identity is published as a retained message.
+   */
+  viewPartIdTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/part/id`,
 
   /**
    * Computes the topic to request closing confirmation of a view.

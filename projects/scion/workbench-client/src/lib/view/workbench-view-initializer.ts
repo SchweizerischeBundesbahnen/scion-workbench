@@ -25,8 +25,8 @@ export class WorkbenchViewInitializer implements Initializer {
     if (viewId !== null) {
       const workbenchView = new ɵWorkbenchView(viewId);
       Beans.register(WorkbenchView, {useValue: workbenchView});
-      // Wait until the view received the initial params, allowing a microfrontend to access the snapshot params in its constructor.
-      await workbenchView.whenInitialParams;
+      // Wait until initialized the view, supporting synchronous access to view properties in microfrontend constructor.
+      await workbenchView.whenProperties;
     }
   }
 }

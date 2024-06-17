@@ -61,8 +61,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private _activationInstant: number | undefined;
   private _closable = true;
 
-  private _part: ɵWorkbenchPart | undefined;
-  public uid!: string;
+  public uid: string;
   public alternativeId: string | undefined;
   public navigationId: string | undefined;
   public navigationHint: string | undefined;
@@ -74,20 +73,30 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public scrollTop = 0;
   public scrollLeft = 0;
 
-  public readonly active$ = new BehaviorSubject<boolean>(false);
+  public readonly partId$: BehaviorSubject<string>;
+  public readonly active$: BehaviorSubject<boolean>;
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
-  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>}) {
+  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>; layout: ɵWorkbenchLayout}) {
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
         mapArray(menuItemFactoryFn => menuItemFactoryFn(this)),
         filterArray((menuItem: WorkbenchMenuItem | null): menuItem is WorkbenchMenuItem => menuItem !== null),
       );
+
+    const mView = options.layout.view({viewId: this.id});
+    const mPart = options.layout.part({viewId: this.id});
+
+    this.uid = mView.uid;
+    this.alternativeId = mView.alternativeId;
+    this.partId$ = new BehaviorSubject(mPart.id);
+    this.active$ = new BehaviorSubject(mPart.activeViewId === this.id);
     this.portal = this.createPortal(options.component);
+
     this.touchOnActivate();
     this.blockWhenDialogOpened();
     this.detectRouteActivation();
@@ -132,15 +141,16 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     const mView = layout.view({viewId: this.id});
     const prevNavigationId = this.navigationId;
 
-    this.uid = mView.uid;
-    this.alternativeId = mView.alternativeId;
     this.urlSegments = layout.urlSegments({viewId: this.id});
     this.navigationId = mView.navigation?.id;
     this.navigationHint = mView.navigation?.hint;
     this.state = layout.viewState({viewId: this.id});
     this.classList.set(mView.cssClass, {scope: 'layout'});
     this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
-    this._part = this._partRegistry.get(mPart.id);
+
+    if (mPart.id !== this.partId$.value) {
+      this.partId$.next(mPart.id);
+    }
 
     const active = mPart.activeViewId === this.id;
     if (active !== this.active) {
@@ -251,7 +261,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get part(): WorkbenchPart {
-    return this._part ?? throwError(`[NullPartError] Part reference missing for view '${this.id}'.`);
+    return this._partRegistry.get(this.partId$.value);
   }
 
   /** @inheritDoc */

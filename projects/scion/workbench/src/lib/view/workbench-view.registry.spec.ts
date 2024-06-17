@@ -14,8 +14,6 @@ import {ObserveCaptor} from '@scion/toolkit/testing';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {ViewComponent} from './view.component';
-import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {WorkbenchUrlObserver} from '../routing/workbench-url-observer.service';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {TestComponent} from '../testing/test.component';
@@ -36,7 +34,7 @@ describe('WorkbenchViewRegistry', () => {
     });
 
     // Register view 'view.1'.
-    TestBed.inject(WorkbenchViewRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchView('view.1', {component: ViewComponent})));
+    TestBed.inject(WorkbenchViewRegistry).register(jasmine.createSpyObj('ɵWorkbenchView', ['destroy'], {id: 'view.1'}));
 
     // Expect registry to emit registered views upon subscription.
     const viewsCaptor = new ObserveCaptor();
@@ -46,9 +44,9 @@ describe('WorkbenchViewRegistry', () => {
     ]);
 
     // Register view 'view.2'.
-    TestBed.inject(WorkbenchViewRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchView('view.2', {component: ViewComponent})));
+    TestBed.inject(WorkbenchViewRegistry).register(jasmine.createSpyObj('ɵWorkbenchView', ['destroy'], {id: 'view.2'}));
     // Register view 'view.3'.
-    TestBed.inject(WorkbenchViewRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchView('view.3', {component: ViewComponent})));
+    TestBed.inject(WorkbenchViewRegistry).register(jasmine.createSpyObj('ɵWorkbenchView', ['destroy'], {id: 'view.3'}));
 
     // Expect registry not to emit until the next layout change.
     expect(viewsCaptor.getValues()).toEqual([

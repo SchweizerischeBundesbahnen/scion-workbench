@@ -729,6 +729,39 @@ test.describe('Workbench View', () => {
     await expect(testee3ViewPage.viewId).toHaveText('view.102');
   });
 
+  test('should provide the part', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+        title: 'Testee',
+      },
+    });
+
+    // Add parts on the left and right.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('right', {align: 'right'})
+      .addPart('left', {align: 'left'}),
+    );
+
+    const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+
+    // Open view in the right part.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {
+      partId: 'right',
+      cssClass: 'testee',
+    });
+    await expect(testeeViewPage.partId).toHaveText('right');
+
+    // Move View to the left part.
+    await testeeViewPage.view.tab.moveTo('left');
+    await expect(testeeViewPage.partId).toHaveText('left');
+  });
+
   test.describe('keystroke bubbling of view context menu items', () => {
 
     test('should propagate `ctrl+k` for closing the current view', async ({appPO, microfrontendNavigator}) => {

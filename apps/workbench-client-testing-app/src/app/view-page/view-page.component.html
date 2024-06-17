@@ -3,6 +3,10 @@
     <span class="e2e-view-id">{{view.id}}</span>
   </sci-form-field>
 
+  <sci-form-field label="Part ID">
+    <span class="e2e-part-id">{{view.partId$ | async}}</span>
+  </sci-form-field>
+
   <sci-form-field label="App Instance" title="Unique identifier of this app instance">
     <span class="e2e-app-instance-id">{{appInstanceId}}</span>
   </sci-form-field>
