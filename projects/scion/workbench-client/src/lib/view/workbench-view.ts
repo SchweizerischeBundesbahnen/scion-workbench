@@ -24,7 +24,7 @@ import {WorkbenchViewCapability} from './workbench-view-capability';
 export abstract class WorkbenchView {
 
   /**
-   * Represents the identity of this workbench view.
+   * Represents the identity of this view.
    */
   public abstract readonly id: ViewId;
 
@@ -55,19 +55,27 @@ export abstract class WorkbenchView {
   public abstract readonly params$: Observable<ReadonlyMap<string, any>>;
 
   /**
-   * The current snapshot of this workbench view.
+   * The current snapshot of this view.
    */
   public abstract readonly snapshot: ViewSnapshot;
 
   /**
-   * Indicates whether this is the active view in its part.
+   * Indicates whether this view is active.
    *
-   * Upon subscription, it emits the current active state of this view, and then emits continuously when it changes. The Observable does not
-   * complete when navigating to another microfrontend of the same app. It only completes before unloading the web app, e.g., when closing
-   * the view or navigating to a microfrontend of another app. Consequently, do not forget to unsubscribe from this Observables before displaying
-   * another microfrontend.
+   * Upon subscription, emits the active state of this view, and then emits continuously when it changes.
+   * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
+   * of the same application.
    */
   public abstract readonly active$: Observable<boolean>;
+
+  /**
+   * Provides the identity of the part that contains this view.
+   *
+   * Upon subscription, emits the identity of this view's part, and then emits continuously when it changes.
+   * The Observable completes when navigating to a microfrontend of another application, but not when navigating to a different microfrontend
+   * of the same application.
+   */
+  public abstract readonly partId$: Observable<string>;
 
   /**
    * Sets the title to be displayed in the view tab.
@@ -146,36 +154,19 @@ export interface CanClose {
 }
 
 /**
- * Indicates that the workbench view is about to be closed. This event is cancelable.
- *
- * @category View
- */
-export class ViewClosingEvent {
-
-  private _defaultPrevented = false;
-
-  /**
-   * Invoke to cancel the closing of the workbench view.
-   */
-  public preventDefault(): void {
-    this._defaultPrevented = true;
-  }
-
-  /**
-   * Returns `true` if `preventDefault()` was invoked successfully to indicate cancelation, and `false` otherwise.
-   */
-  public isDefaultPrevented(): boolean {
-    return this._defaultPrevented;
-  }
-}
-
-/**
- * Contains the information about a view displayed at a particular moment in time.
+ * Provides information about a view displayed at a particular moment in time.
  *
  * @category View
  */
 export interface ViewSnapshot {
+  /**
+   * Parameters of the microfrontend loaded into the view.
+   */
   params: ReadonlyMap<string, any>;
+  /**
+   * The identity of the part that contains the view.
+   */
+  partId: string;
 }
 
 /**

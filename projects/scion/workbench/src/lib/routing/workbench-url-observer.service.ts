@@ -35,6 +35,8 @@ import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
 import {canMatchNotFoundPage} from '../view/workbench-view-route-guards';
 import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {WorkbenchViewAuxiliaryRoutesDiffer} from './workbench-view-differ';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -57,6 +59,7 @@ export class WorkbenchUrlObserver {
               private _workbenchRouter: ɵWorkbenchRouter,
               private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
               private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
+              private _workbenchViewAuxiliaryRoutesDiffer: WorkbenchViewAuxiliaryRoutesDiffer,
               private _workbenchPopupDiffer: WorkbenchPopupDiffer,
               private _workbenchDialogDiffer: WorkbenchDialogDiffer,
               private _workbenchMessageBoxDiffer: WorkbenchMessageBoxDiffer,
@@ -141,7 +144,8 @@ export class WorkbenchUrlObserver {
 
     return {
       layout,
-      layoutDiff: this._workbenchLayoutDiffer.diff(layout, urlTree),
+      layoutDiff: this._workbenchLayoutDiffer.diff(layout),
+      viewAuxiliaryRouteDiff: this._workbenchViewAuxiliaryRoutesDiffer.diff(layout, urlTree),
       popupDiff: this._workbenchPopupDiffer.diff(urlTree),
       dialogDiff: this._workbenchDialogDiffer.diff(urlTree),
       messageBoxDiff: this._workbenchMessageBoxDiffer.diff(urlTree),
@@ -155,7 +159,7 @@ export class WorkbenchUrlObserver {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
 
     // Register view auxiliary routes.
-    const addedViews = navigationContext.layoutDiff.addedViews;
+    const addedViews = navigationContext.viewAuxiliaryRouteDiff.addedViews;
     if (addedViews.length) {
       const auxiliaryRoutes = this._auxiliaryRoutesRegistrator.registerAuxiliaryRoutes(addedViews, {canMatchNotFoundPage: [canMatchNotFoundPage]});
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViews}`, LoggerNames.ROUTING, auxiliaryRoutes);
@@ -191,7 +195,8 @@ export class WorkbenchUrlObserver {
   private undoWorkbenchDiffers(): void {
     const prevNavigateLayout = this._workbenchLayoutService.layout; // Layout in `WorkbenchLayoutService` is only updated after successful navigation
     const prevNavigateUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
-    this._workbenchLayoutDiffer.diff(prevNavigateLayout, prevNavigateUrl);
+    this._workbenchLayoutDiffer.diff(prevNavigateLayout);
+    this._workbenchViewAuxiliaryRoutesDiffer.diff(prevNavigateLayout, prevNavigateUrl);
     this._workbenchPopupDiffer.diff(prevNavigateUrl);
     this._workbenchDialogDiffer.diff(prevNavigateUrl);
     this._workbenchMessageBoxDiffer.diff(prevNavigateUrl);
@@ -205,7 +210,7 @@ export class WorkbenchUrlObserver {
   private undoAuxiliaryRoutesRegistration(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const addedOutlets: string[] = [
-      ...navigationContext.layoutDiff.addedViews,
+      ...navigationContext.viewAuxiliaryRouteDiff.addedViews,
       ...navigationContext.popupDiff.addedPopupOutlets,
       ...navigationContext.dialogDiff.addedDialogOutlets,
       ...navigationContext.messageBoxDiff.addedMessageBoxOutlets,
@@ -259,7 +264,7 @@ export class WorkbenchUrlObserver {
   private unregisterRemovedOutletAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const removedOutlets: string[] = [
-      ...navigationContext.layoutDiff.removedViews,
+      ...navigationContext.viewAuxiliaryRouteDiff.removedViews,
       ...navigationContext.popupDiff.removedPopupOutlets,
       ...navigationContext.dialogDiff.removedDialogOutlets,
       ...navigationContext.messageBoxDiff.removedMessageBoxOutlets,
@@ -275,11 +280,11 @@ export class WorkbenchUrlObserver {
    * - For each removed view, destroys the {@link WorkbenchView} and unregisters it in {@link WorkbenchViewRegistry}
    */
   private updateViewRegistry(): void {
-    const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
+    const {layoutDiff, layout} = this._workbenchRouter.getCurrentNavigationContext();
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
-      this._viewRegistry.register(this.createWorkbenchView(viewId));
+      this._viewRegistry.register(this.createWorkbenchView(viewId, layout));
     });
     layoutDiff.removedViews.forEach(viewId => {
       this._logger.debug(() => `Destroying ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
@@ -310,8 +315,8 @@ export class WorkbenchUrlObserver {
     }));
   }
 
-  private createWorkbenchView(viewId: ViewId): ɵWorkbenchView {
-    return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent}));
+  private createWorkbenchView(viewId: ViewId, layout: ɵWorkbenchLayout): ɵWorkbenchView {
+    return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent, layout}));
   }
 
   private installRouterEventListeners(): void {

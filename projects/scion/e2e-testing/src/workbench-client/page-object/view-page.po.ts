@@ -29,6 +29,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   public readonly locator: Locator;
   public readonly view: ViewPO;
   public readonly viewId: Locator;
+  public readonly partId: Locator;
   public readonly outlet: SciRouterOutletPO;
   public readonly path: Locator;
 
@@ -37,6 +38,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     this.outlet = new SciRouterOutletPO(appPO, {name: locateBy?.viewId, cssClass: locateBy?.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-view-page');
     this.viewId = this.locator.locator('span.e2e-view-id');
+    this.partId = this.locator.locator('span.e2e-part-id');
     this.path = this.locator.locator('span.e2e-path');
   }
 

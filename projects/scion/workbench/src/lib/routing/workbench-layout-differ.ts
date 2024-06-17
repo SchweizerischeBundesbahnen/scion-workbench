@@ -10,8 +10,6 @@
 
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {UrlTree} from '@angular/router';
-import {RouterUtils} from './router.util';
 import {ViewId} from '../view/workbench-view.model';
 
 /**
@@ -31,15 +29,9 @@ export class WorkbenchLayoutDiffer {
   /**
    * Computes differences in the layout since last time {@link WorkbenchLayoutDiffer#diff} was invoked.
    */
-  public diff(workbenchLayout: ɵWorkbenchLayout | null, urlTree: UrlTree): WorkbenchLayoutDiff {
+  public diff(workbenchLayout: ɵWorkbenchLayout | null): WorkbenchLayoutDiff {
     const parts = workbenchLayout?.parts().map(part => part.id);
-    // Create view diff based on views in the layout plus outlets in the URL, required because the layout is unavailable during initial navigation.
-    // Otherwise, the initial navigation for a URL with outlets of views contained in the workbench grid would fail as their view routes would be
-    // registered too late.
-    const views = new Set([
-      ...RouterUtils.parseViewOutlets(urlTree).keys(),
-      ...(workbenchLayout?.views().map(view => view.id) ?? []),
-    ]);
+    const views = workbenchLayout?.views().map(view => view.id);
     return new WorkbenchLayoutDiff({
       parts: this._partsDiffer.diff(parts),
       views: this._viewsDiffer.diff(views),

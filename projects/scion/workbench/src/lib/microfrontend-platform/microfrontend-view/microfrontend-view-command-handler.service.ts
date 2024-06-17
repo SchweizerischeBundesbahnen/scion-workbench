@@ -13,10 +13,8 @@ import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platf
 import {Logger} from '../../logging';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {map, switchMap} from 'rxjs/operators';
 import {ɵWorkbenchCommands} from '@scion/workbench-client';
-import {merge, Subscription} from 'rxjs';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Subscription} from 'rxjs';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 
 /**
@@ -32,28 +30,11 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   constructor(private _messageClient: MessageClient,
               private _viewRegistry: WorkbenchViewRegistry,
               private _logger: Logger) {
-    this.installViewActiveStatePublisher();
-
     this._subscriptions.add(this.installViewTitleCommandHandler());
     this._subscriptions.add(this.installViewHeadingCommandHandler());
     this._subscriptions.add(this.installViewDirtyCommandHandler());
     this._subscriptions.add(this.installViewClosableCommandHandler());
     this._subscriptions.add(this.installViewCloseCommandHandler());
-  }
-
-  /**
-   * Notifies microfrontends about the active state of the embedding view.
-   */
-  private installViewActiveStatePublisher(): void {
-    this._viewRegistry.views$
-      .pipe(
-        switchMap(views => merge(...views.map(view => view.active$.pipe(map(() => view))))),
-        takeUntilDestroyed(),
-      )
-      .subscribe((view: WorkbenchView) => {
-        const commandTopic = ɵWorkbenchCommands.viewActiveTopic(view.id);
-        this._messageClient.publish(commandTopic, view.active, {retain: true}).then();
-      });
   }
 
   /**

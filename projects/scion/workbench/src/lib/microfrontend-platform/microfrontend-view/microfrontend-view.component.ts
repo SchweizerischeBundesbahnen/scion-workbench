@@ -104,6 +104,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
     this.installWorkbenchDragDetector();
+    this.installViewActivePublisher();
+    this.installPartIdPublisher();
     this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   }
 
@@ -239,6 +241,24 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     this.view.dirty = false;
   }
 
+  private installViewActivePublisher(): void {
+    this.view.active$
+      .pipe(takeUntilDestroyed())
+      .subscribe(active => {
+        const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
+        this._messageClient.publish(commandTopic, active, {retain: true}).then();
+      });
+  }
+
+  private installPartIdPublisher(): void {
+    this.view.partId$
+      .pipe(takeUntilDestroyed())
+      .subscribe(partId => {
+        const commandTopic = ɵWorkbenchCommands.viewPartIdTopic(this.view.id);
+        this._messageClient.publish(commandTopic, partId, {retain: true}).then();
+      });
+  }
+
   /**
    * Promise that resolves once params contain the given capability id.
    */
@@ -317,6 +337,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     // Delete retained messages to free resources.
     this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true}).then();
     this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true}).then();
+    this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true}).then();
     this._outletRouter.navigate(null, {outlet: this.view.id}).then();
     this.view.unregisterAdapter(MicrofrontendWorkbenchView);
   }

@@ -1,4 +1,4 @@
-  /*
+/*
  * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
@@ -9,7 +9,7 @@
  */
 
 import {Beans, PreDestroy} from '@scion/toolkit/bean-manager';
-import {firstValueFrom, merge, Observable, OperatorFunction, pipe, Subject, Subscription, take} from 'rxjs';
+import {combineLatest, firstValueFrom, merge, Observable, OperatorFunction, pipe, Subject, Subscription} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 import {ManifestService, mapToBody, MessageClient, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
@@ -36,11 +36,13 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   private _canCloseSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
+  public partId$: Observable<string>;
   public params$: Observable<ReadonlyMap<string, any>>;
   public capability$: Observable<WorkbenchViewCapability>;
-  public whenInitialParams: Promise<void>;
+  public whenProperties: Promise<void>;
   public snapshot: ViewSnapshot = {
     params: new Map<string, any>(),
+    partId: undefined!,
   };
 
   constructor(public id: ViewId) {
@@ -66,16 +68,26 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this.active$ = Beans.get(MessageClient).observe$<boolean>(ɵWorkbenchCommands.viewActiveTopic(this.id))
       .pipe(
         mapToBody(),
-        distinctUntilChanged(),
         shareReplay({refCount: false, bufferSize: 1}),
         decorateObservable(),
         takeUntil(this._beforeUnload$),
       );
 
-    // Notify when received initial params.
-    this.whenInitialParams = new Promise(resolve => this.params$.pipe(take(1)).subscribe(() => resolve()));
+    this.partId$ = Beans.get(MessageClient).observe$<string>(ɵWorkbenchCommands.viewPartIdTopic(this.id))
+      .pipe(
+        mapToBody(),
+        shareReplay({refCount: false, bufferSize: 1}),
+        decorateObservable(),
+        takeUntil(this._beforeUnload$),
+      );
+    // Update part id snapshot when part changes.
+    this.partId$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(partId => this.snapshot.partId = partId);
     // Update params snapshot when params change.
-    this.params$.subscribe(params => this.snapshot.params = new Map(params));
+    this.params$
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(params => this.snapshot.params = new Map(params));
     // Detect navigation to a different view capability of the same app.
     this.capability$
       .pipe(
@@ -94,6 +106,9 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .subscribe(() => {
         this._canCloseSubscription?.unsubscribe();
       });
+
+    // Signal view properties available.
+    this.whenProperties = firstValueFrom(combineLatest([this.partId$, this.params$])).then();
   }
 
   /**
