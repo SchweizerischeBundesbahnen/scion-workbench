@@ -2,6 +2,7 @@
   <section>
     <sci-form-field label="Type">
       <select [formControl]="form.controls.type" class="e2e-type">
+        <option [value]="WorkbenchCapabilities.Perspective">PERSPECTIVE</option>
         <option [value]="WorkbenchCapabilities.View">VIEW</option>
         <option [value]="WorkbenchCapabilities.Dialog">DIALOG</option>
         <option [value]="WorkbenchCapabilities.MessageBox">MESSAGEBOX</option>
@@ -10,7 +11,7 @@
     </sci-form-field>
 
     <sci-form-field label="Qualifier">
-      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
     <sci-form-field label="Required Params">
@@ -32,172 +33,174 @@
   <section>
     <header>Properties</header>
 
-    @if (form.controls.type.value === WorkbenchCapabilities.View) {
-      <sci-form-field label="Path">
-        <input [formControl]="form.controls.viewProperties.controls.path" class="e2e-path">
-      </sci-form-field>
-
-      <sci-form-field label="Title">
-        <input [formControl]="form.controls.viewProperties.controls.title" class="e2e-title">
-      </sci-form-field>
-
-      <sci-form-field label="Heading">
-        <input [formControl]="form.controls.viewProperties.controls.heading" class="e2e-heading">
-      </sci-form-field>
-
-      <sci-form-field label="Closable">
-        <sci-checkbox [formControl]="form.controls.viewProperties.controls.closable" class="e2e-closable"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="Show Splash">
-        <sci-checkbox [formControl]="form.controls.viewProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="CSS Class(es)">
-        <app-css-class [formControl]="form.controls.viewProperties.controls.cssClass"/>
-      </sci-form-field>
-
-      <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControl]="form.controls.viewProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
-      </sci-form-field>
-    }
-
-    @if (form.controls.type.value === WorkbenchCapabilities.Popup) {
-      <sci-form-field label="Path">
-        <input [formControl]="form.controls.popupProperties.controls.path" class="e2e-path">
-      </sci-form-field>
-
-      <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.popupProperties.controls.size.controls.minHeight" class="e2e-min-height">
-      </sci-form-field>
-
-      <sci-form-field label="Height">
-        <input [formControl]="form.controls.popupProperties.controls.size.controls.height" class="e2e-height">
-      </sci-form-field>
-
-      <sci-form-field label="Max Height">
-        <input [formControl]="form.controls.popupProperties.controls.size.controls.maxHeight" class="e2e-max-height">
-      </sci-form-field>
-
-      <sci-form-field label="Min Width">
-        <input [formControl]="form.controls.popupProperties.controls.size.controls.minWidth" class="e2e-min-width">
-      </sci-form-field>
-
-      <sci-form-field label="Width">
-        <input [formControl]="form.controls.popupProperties.controls.size.controls.width" class="e2e-width">
-      </sci-form-field>
-
-      <sci-form-field label="Max Width">
-        <input [formControl]="form.controls.popupProperties.controls.size.controls.maxWidth" class="e2e-max-width">
-      </sci-form-field>
-
-      <sci-form-field label="Show Splash">
-        <sci-checkbox [formControl]="form.controls.popupProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="Pin to Startpage">
-        <sci-checkbox [formControl]="form.controls.popupProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="CSS Class(es)">
-        <app-css-class [formControl]="form.controls.popupProperties.controls.cssClass"/>
-      </sci-form-field>
-    }
-
-    @if (form.controls.type.value === WorkbenchCapabilities.Dialog) {
-      <sci-form-field label="Path">
-        <input [formControl]="form.controls.dialogProperties.controls.path" class="e2e-path">
-      </sci-form-field>
-
-      <sci-form-field label="Min Height">
-        <input [formControl]="form.controls.dialogProperties.controls.size.controls.minHeight" class="e2e-min-height">
-      </sci-form-field>
-
-      <sci-form-field label="Height">
-        <input [formControl]="form.controls.dialogProperties.controls.size.controls.height" class="e2e-height">
-      </sci-form-field>
-
-      <sci-form-field label="Max Height">
-        <input [formControl]="form.controls.dialogProperties.controls.size.controls.maxHeight" class="e2e-max-height">
-      </sci-form-field>
-
-      <sci-form-field label="Min Width">
-        <input [formControl]="form.controls.dialogProperties.controls.size.controls.minWidth" class="e2e-min-width">
-      </sci-form-field>
-
-      <sci-form-field label="Width">
-        <input [formControl]="form.controls.dialogProperties.controls.size.controls.width" class="e2e-width">
-      </sci-form-field>
-
-      <sci-form-field label="Max Width">
-        <input [formControl]="form.controls.dialogProperties.controls.size.controls.maxWidth" class="e2e-max-width">
-      </sci-form-field>
-
-      <sci-form-field label="Title">
-        <input [formControl]="form.controls.dialogProperties.controls.title" class="e2e-title">
-      </sci-form-field>
-
-      <sci-form-field label="Closable">
-        <sci-checkbox [formControl]="form.controls.dialogProperties.controls.closable" class="e2e-closable"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="Resizable">
-        <sci-checkbox [formControl]="form.controls.dialogProperties.controls.resizable" class="e2e-resizable"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="Padding">
-        <sci-checkbox [formControl]="form.controls.dialogProperties.controls.padding" class="e2e-padding"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="Show Splash">
-        <sci-checkbox [formControl]="form.controls.dialogProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
-      </sci-form-field>
-
-      <sci-form-field label="CSS Class(es)">
-        <app-css-class [formControl]="form.controls.dialogProperties.controls.cssClass"/>
-      </sci-form-field>
-    }
-
-    @if (form.controls.type.value === WorkbenchCapabilities.MessageBox) {
-      <ng-container [formGroup]="this.form.controls.messageBoxProperties">
+    @switch (form.controls.type.value) {
+      @case (WorkbenchCapabilities.Perspective) {
+        <app-perspective-capability-properties [formControl]="form.controls.perspectiveProperties"/>
+      }
+      @case (WorkbenchCapabilities.View) {
         <sci-form-field label="Path">
-          <input [formControl]="this.form.controls.messageBoxProperties.controls.path" class="e2e-path">
+          <input [formControl]="form.controls.viewProperties.controls.path" class="e2e-path">
         </sci-form-field>
 
-        <ng-container [formGroup]="this.form.controls.messageBoxProperties.controls.size">
-          <sci-form-field label="Min Height">
-            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.minHeight" class="e2e-min-height">
-          </sci-form-field>
+        <sci-form-field label="Title">
+          <input [formControl]="form.controls.viewProperties.controls.title" class="e2e-title">
+        </sci-form-field>
 
-          <sci-form-field label="Height">
-            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.height" class="e2e-height">
-          </sci-form-field>
+        <sci-form-field label="Heading">
+          <input [formControl]="form.controls.viewProperties.controls.heading" class="e2e-heading">
+        </sci-form-field>
 
-          <sci-form-field label="Max Height">
-            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.maxHeight" class="e2e-max-height">
-          </sci-form-field>
-
-          <sci-form-field label="Min Width">
-            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.minWidth" class="e2e-min-width">
-          </sci-form-field>
-
-          <sci-form-field label="Width">
-            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.width" class="e2e-width">
-          </sci-form-field>
-
-          <sci-form-field label="Max Width">
-            <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.maxWidth" class="e2e-max-width">
-          </sci-form-field>
-        </ng-container>
+        <sci-form-field label="Closable">
+          <sci-checkbox [formControl]="form.controls.viewProperties.controls.closable" class="e2e-closable"></sci-checkbox>
+        </sci-form-field>
 
         <sci-form-field label="Show Splash">
-          <sci-checkbox [formControl]="this.form.controls.messageBoxProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+          <sci-checkbox [formControl]="form.controls.viewProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
         </sci-form-field>
 
         <sci-form-field label="CSS Class(es)">
-          <app-css-class [formControl]="form.controls.messageBoxProperties.controls.cssClass"/>
+          <app-css-class [formControl]="form.controls.viewProperties.controls.cssClass"/>
         </sci-form-field>
-      </ng-container>
+
+        <sci-form-field label="Pin to Startpage">
+          <sci-checkbox [formControl]="form.controls.viewProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
+        </sci-form-field>
+      }
+      @case (WorkbenchCapabilities.Popup) {
+        <sci-form-field label="Path">
+          <input [formControl]="form.controls.popupProperties.controls.path" class="e2e-path">
+        </sci-form-field>
+
+        <sci-form-field label="Min Height">
+          <input [formControl]="form.controls.popupProperties.controls.size.controls.minHeight" class="e2e-min-height">
+        </sci-form-field>
+
+        <sci-form-field label="Height">
+          <input [formControl]="form.controls.popupProperties.controls.size.controls.height" class="e2e-height">
+        </sci-form-field>
+
+        <sci-form-field label="Max Height">
+          <input [formControl]="form.controls.popupProperties.controls.size.controls.maxHeight" class="e2e-max-height">
+        </sci-form-field>
+
+        <sci-form-field label="Min Width">
+          <input [formControl]="form.controls.popupProperties.controls.size.controls.minWidth" class="e2e-min-width">
+        </sci-form-field>
+
+        <sci-form-field label="Width">
+          <input [formControl]="form.controls.popupProperties.controls.size.controls.width" class="e2e-width">
+        </sci-form-field>
+
+        <sci-form-field label="Max Width">
+          <input [formControl]="form.controls.popupProperties.controls.size.controls.maxWidth" class="e2e-max-width">
+        </sci-form-field>
+
+        <sci-form-field label="Show Splash">
+          <sci-checkbox [formControl]="form.controls.popupProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="Pin to Startpage">
+          <sci-checkbox [formControl]="form.controls.popupProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="CSS Class(es)">
+          <app-css-class [formControl]="form.controls.popupProperties.controls.cssClass"/>
+        </sci-form-field>
+      }
+      @case (WorkbenchCapabilities.Dialog) {
+        <sci-form-field label="Path">
+          <input [formControl]="form.controls.dialogProperties.controls.path" class="e2e-path">
+        </sci-form-field>
+
+        <sci-form-field label="Min Height">
+          <input [formControl]="form.controls.dialogProperties.controls.size.controls.minHeight" class="e2e-min-height">
+        </sci-form-field>
+
+        <sci-form-field label="Height">
+          <input [formControl]="form.controls.dialogProperties.controls.size.controls.height" class="e2e-height">
+        </sci-form-field>
+
+        <sci-form-field label="Max Height">
+          <input [formControl]="form.controls.dialogProperties.controls.size.controls.maxHeight" class="e2e-max-height">
+        </sci-form-field>
+
+        <sci-form-field label="Min Width">
+          <input [formControl]="form.controls.dialogProperties.controls.size.controls.minWidth" class="e2e-min-width">
+        </sci-form-field>
+
+        <sci-form-field label="Width">
+          <input [formControl]="form.controls.dialogProperties.controls.size.controls.width" class="e2e-width">
+        </sci-form-field>
+
+        <sci-form-field label="Max Width">
+          <input [formControl]="form.controls.dialogProperties.controls.size.controls.maxWidth" class="e2e-max-width">
+        </sci-form-field>
+
+        <sci-form-field label="Title">
+          <input [formControl]="form.controls.dialogProperties.controls.title" class="e2e-title">
+        </sci-form-field>
+
+        <sci-form-field label="Closable">
+          <sci-checkbox [formControl]="form.controls.dialogProperties.controls.closable" class="e2e-closable"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="Resizable">
+          <sci-checkbox [formControl]="form.controls.dialogProperties.controls.resizable" class="e2e-resizable"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="Padding">
+          <sci-checkbox [formControl]="form.controls.dialogProperties.controls.padding" class="e2e-padding"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="Show Splash">
+          <sci-checkbox [formControl]="form.controls.dialogProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+        </sci-form-field>
+
+        <sci-form-field label="CSS Class(es)">
+          <app-css-class [formControl]="form.controls.dialogProperties.controls.cssClass"/>
+        </sci-form-field>
+      }
+      @case (WorkbenchCapabilities.MessageBox) {
+        <ng-container [formGroup]="this.form.controls.messageBoxProperties">
+          <sci-form-field label="Path">
+            <input [formControl]="this.form.controls.messageBoxProperties.controls.path" class="e2e-path">
+          </sci-form-field>
+
+          <ng-container [formGroup]="this.form.controls.messageBoxProperties.controls.size">
+            <sci-form-field label="Min Height">
+              <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.minHeight" class="e2e-min-height">
+            </sci-form-field>
+
+            <sci-form-field label="Height">
+              <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.height" class="e2e-height">
+            </sci-form-field>
+
+            <sci-form-field label="Max Height">
+              <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.maxHeight" class="e2e-max-height">
+            </sci-form-field>
+
+            <sci-form-field label="Min Width">
+              <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.minWidth" class="e2e-min-width">
+            </sci-form-field>
+
+            <sci-form-field label="Width">
+              <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.width" class="e2e-width">
+            </sci-form-field>
+
+            <sci-form-field label="Max Width">
+              <input [formControl]="this.form.controls.messageBoxProperties.controls.size.controls.maxWidth" class="e2e-max-width">
+            </sci-form-field>
+          </ng-container>
+
+          <sci-form-field label="Show Splash">
+            <sci-checkbox [formControl]="this.form.controls.messageBoxProperties.controls.showSplash" class="e2e-show-splash"></sci-checkbox>
+          </sci-form-field>
+
+          <sci-form-field label="CSS Class(es)">
+            <app-css-class [formControl]="form.controls.messageBoxProperties.controls.cssClass"/>
+          </sci-form-field>
+        </ng-container>
+      }
     }
   </section>
 

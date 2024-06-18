@@ -12,10 +12,11 @@ import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 
 /**
- * A perspective is a named workbench layout.
+ * Represents a workbench perspective.
  *
- * Multiple perspectives are supported. Perspectives can be switched. Only one perspective is active at a time.
- * Perspectives share the same main area, if any.
+ * A perspective is a named arrangement of views. Different perspectives provide a different perspective on the application.
+ * A perspective can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * Views in the main area are retained when switching perspectives.
  */
 export interface WorkbenchPerspective {
   /**
@@ -25,7 +26,7 @@ export interface WorkbenchPerspective {
   /**
    * Arbitrary data associated with this perspective.
    */
-  readonly data: {[key: string]: any};
+  readonly data: {[key: string]: unknown};
   /**
    * Indicates whether this perspective is active.
    * There can only be one perspective active at a time.
@@ -45,9 +46,9 @@ export interface WorkbenchPerspective {
 /**
  * Defines perspectives to register in the workbench.
  *
- * A perspective is an arrangement of views around the main area. Multiple perspectives are supported.
- * Different perspectives provide a different perspective on the application while sharing the main area.
- * Only one perspective can be active at a time.
+ * A perspective is a named arrangement of views. Different perspectives provide a different perspective on the application.
+ * A perspective can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * Views in the main area are retained when switching perspectives. A perspective cannot add views to the main area.
  */
 export interface WorkbenchPerspectives {
   /**
@@ -82,7 +83,7 @@ export interface WorkbenchPerspectiveDefinition {
   /**
    * Associates arbitrary data with the perspective, e.g., a label, icon or tooltip.
    */
-  data?: {[key: string]: any};
+  data?: {[key: string]: unknown};
   /**
    * Decides if the perspective can be activated. The function can call `inject` to get any required dependencies.
    */

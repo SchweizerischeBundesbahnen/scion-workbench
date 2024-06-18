@@ -10,7 +10,7 @@
 
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
-import {AsyncPipe, NgFor} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
@@ -21,6 +21,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
 import {SettingsService} from '../settings.service';
+import {SortPerspectivesPipe} from './sort-perspectives.pipe';
 
 @Component({
   selector: 'app-header',
@@ -29,11 +30,11 @@ import {SettingsService} from '../settings.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgFor,
     AsyncPipe,
     ReactiveFormsModule,
     SciMaterialIconDirective,
     SciToggleButtonComponent,
+    SortPerspectivesPipe,
   ],
 })
 export class HeaderComponent {
@@ -50,8 +51,9 @@ export class HeaderComponent {
     this.installThemeSwitcher();
   }
 
-  protected async onPerspectiveActivate(id: string): Promise<void> {
-    await this.workbenchService.switchPerspective(id);
+  protected async onTogglePerspective(id: string): Promise<void> {
+    const perspective = this.workbenchService.perspectives.find(perspective => perspective.id === id)!;
+    await this.workbenchService.switchPerspective(perspective.active ? 'blank' : perspective.id);
   }
 
   protected onMenuOpen(event: MouseEvent): void {

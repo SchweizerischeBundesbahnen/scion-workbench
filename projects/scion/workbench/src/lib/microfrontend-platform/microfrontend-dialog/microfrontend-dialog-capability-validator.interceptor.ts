@@ -12,6 +12,7 @@ import {APP_IDENTITY, Capability, CapabilityInterceptor} from '@scion/microfront
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Asserts dialog capabilities to have required properties.
@@ -26,14 +27,14 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
 
     const dialogCapability = capability as WorkbenchDialogCapability;
     // Assert the dialog capability to have a qualifier.
-    if (!dialogCapability.qualifier || !Object.keys(dialogCapability.qualifier).length) {
+    if (!Object.keys(dialogCapability.qualifier ?? {}).length) {
       throw Error(`[NullQualifierError] Dialog capability requires a qualifier [capability=${JSON.stringify(dialogCapability)}]`);
     }
 
     // Assert the dialog capability to have a path.
     const path = dialogCapability.properties?.path;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] Dialog capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(dialogCapability)}]`);
+      throw Error(`[NullPathError] Dialog capability requires a path to the microfrontend in its properties [application="${dialogCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(dialogCapability.qualifier)}"]`);
     }
 
     // Assert the dialog capability to have a height and width, unless provided by the host application.
@@ -50,7 +51,7 @@ export class MicrofrontendDialogCapabilityValidator implements CapabilityInterce
 
     const size = capability.properties?.size;
     if (!size?.width || !size?.height) {
-      throw Error(`[NullSizeError] Dialog capability requires width and height in its size properties [capability=${JSON.stringify(capability)}]`);
+      throw Error(`[NullSizeError] Dialog capability requires width and height in its size properties [application="${capability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(capability.qualifier)}"]`);
     }
   }
 }

@@ -24,9 +24,11 @@ import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box
 import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendViewCapabilityValidator} from '../routing/microfrontend-view-capability-validator.interceptor';
-import {MicrofrontendViewCapabilityIdAssigner} from '../routing/microfrontend-view-capability-id-assigner.interceptor';
+import {StableCapabilityIdAssigner} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from '../microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
+import {MicrofrontendPerspectiveCapabilityValidator} from '../microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
+import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
@@ -39,16 +41,18 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
   constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
               private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
               private _ngZoneObservableDecorator: NgZoneObservableDecorator,
+              private _perspectiveIntentHandler: MicrofrontendPerspectiveIntentHandler,
               private _viewIntentHandler: MicrofrontendViewIntentHandler,
               private _popupIntentHandler: MicrofrontendPopupIntentHandler,
               private _dialogIntentHandler: MicrofrontendDialogIntentHandler,
               private _messageBoxIntentHandler: MicrofrontendMessageBoxIntentHandler,
               private _messageBoxLegacyIntentTranslator: MicrofrontendMessageBoxLegacyIntentTranslator,
               private _viewCapabilityValidator: MicrofrontendViewCapabilityValidator,
-              private _viewCapabilityIdAssigner: MicrofrontendViewCapabilityIdAssigner,
+              private _perspectiveCapabilityValidator: MicrofrontendPerspectiveCapabilityValidator,
               private _popupCapabilityValidator: MicrofrontendPopupCapabilityValidator,
               private _dialogCapabilityValidator: MicrofrontendDialogCapabilityValidator,
               private _messageBoxCapabilityValidator: MicrofrontendMessageBoxCapabilityValidator,
+              private _stableCapabilityIdAssigner: StableCapabilityIdAssigner,
               private _injector: Injector,
               private _zone: NgZone,
               private _logger: Logger) {
@@ -85,6 +89,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Synchronize emissions of Observables exposed by the SCION Microfrontend Platform with the Angular zone.
     Beans.register(ObservableDecorator, {useValue: this._ngZoneObservableDecorator});
 
+    // Register perspective interceptor to switch perspective.
+    Beans.register(IntentInterceptor, {useValue: this._perspectiveIntentHandler, multi: true});
+
     // Register view intent interceptor to open the corresponding view.
     Beans.register(IntentInterceptor, {useValue: this._viewIntentHandler, multi: true});
 
@@ -100,11 +107,11 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
     // Register message box intent interceptor to open the corresponding message box.
     Beans.register(IntentInterceptor, {useValue: this._messageBoxIntentHandler, multi: true});
 
+    // Register perspective capability interceptor to assert required perspective capability properties.
+    Beans.register(CapabilityInterceptor, {useValue: this._perspectiveCapabilityValidator, multi: true});
+
     // Register view capability interceptor to assert required view capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityValidator, multi: true});
-
-    // Register view capability interceptor to assign view capabilities a stable identifier required for persistent navigation.
-    Beans.register(CapabilityInterceptor, {useValue: this._viewCapabilityIdAssigner, multi: true});
 
     // Register popup capability interceptor to assert required popup capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._popupCapabilityValidator, multi: true});
@@ -114,6 +121,9 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Register message box capability interceptor to assert required capability properties.
     Beans.register(CapabilityInterceptor, {useValue: this._messageBoxCapabilityValidator, multi: true});
+
+    // Register capability interceptor to assign perspective and view capabilities a stable identifier.
+    Beans.register(CapabilityInterceptor, {useValue: this._stableCapabilityIdAssigner, multi: true});
 
     // Inject services registered under {MICROFRONTEND_PLATFORM_POST_STARTUP} DI token;
     // must be done in runlevel 2, i.e., before activator microfrontends are installed.

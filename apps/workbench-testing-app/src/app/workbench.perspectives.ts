@@ -18,6 +18,7 @@ import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
  */
 export const PerspectiveData = {
   label: 'label',
+  tooltip: 'tooltip',
 } as const;
 
 /**
@@ -27,7 +28,7 @@ export const Perspectives = {
   /**
    * Specifies the initial perspective of the testing app.
    */
-  initialPerspective: 'empty',
+  initialPerspective: 'blank',
 
   /**
    * Defines perspectives of the workbench testing app.
@@ -35,19 +36,24 @@ export const Perspectives = {
   provideDefinitions: (): WorkbenchPerspectiveDefinition[] => {
     return [
       {
-        id: 'developer',
-        layout: provideDeveloperPerspectiveLayout,
-        data: {[PerspectiveData.label]: 'Developer'},
-      },
-      {
-        id: 'debug',
-        layout: provideDebugPerspectiveLayout,
-        data: {[PerspectiveData.label]: 'Debug'},
-      },
-      {
-        id: 'empty',
+        id: 'blank',
         layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
-        data: {[PerspectiveData.label]: 'Empty'},
+      },
+      {
+        id: 'perspective-1',
+        layout: providePerspective1Layout,
+        data: {
+          [PerspectiveData.label]: 'Perspective 1',
+          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+        },
+      },
+      {
+        id: 'perspective-2',
+        layout: providePerspective2Layout,
+        data: {
+          [PerspectiveData.label]: 'Perspective 2',
+          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+        },
       },
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
       ...WorkbenchStartupQueryParams.perspectives().map(perspective => ({
@@ -67,79 +73,63 @@ export const Perspectives = {
         provide: ROUTES,
         multi: true,
         useValue: [
-          {path: '', canMatch: [canMatchWorkbenchView('navigator')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Navigator'}},
-          {path: '', canMatch: [canMatchWorkbenchView('package-explorer')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Package Explorer'}},
-          {path: '', canMatch: [canMatchWorkbenchView('git-repositories')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Repositories'}},
-          {path: '', canMatch: [canMatchWorkbenchView('console')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Console'}},
-          {path: '', canMatch: [canMatchWorkbenchView('problems')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Problems'}},
-          {path: '', canMatch: [canMatchWorkbenchView('search')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Search'}},
-          {path: '', canMatch: [canMatchWorkbenchView('outline')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Outline'}},
-          {path: '', canMatch: [canMatchWorkbenchView('debug')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Debug'}},
-          {path: '', canMatch: [canMatchWorkbenchView('expressions')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Expressions'}},
-          {path: '', canMatch: [canMatchWorkbenchView('breakpoints')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Breakpoints'}},
-          {path: '', canMatch: [canMatchWorkbenchView('variables')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Variables'}},
-          {path: '', canMatch: [canMatchWorkbenchView('servers')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Servers'}},
-          {path: '', canMatch: [canMatchWorkbenchView('progress')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Progress'}},
-          {path: '', canMatch: [canMatchWorkbenchView('git-staging')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Git Staging'}},
+          {path: '', canMatch: [canMatchWorkbenchView('sample-view')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View'}},
         ]  satisfies Routes,
       },
     ]);
   },
 } as const;
 
-/** @private */
-function provideDeveloperPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout { // eslint-disable-line no-inner-declarations
+function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
-    .addPart('right', {align: 'right', ratio: .2})
+    .addPart('top-right', {align: 'right', ratio: .2})
+    .addPart('bottom-right', {relativeTo: 'top-right', align: 'bottom', ratio: .5})
     .addPart('bottom', {align: 'bottom', ratio: .3})
-    .addPart('topLeft', {align: 'left', ratio: .125})
-    .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-    .addPart('searchArea', {relativeTo: 'right', align: 'bottom', ratio: .5})
-    .addPart('findArea', {relativeTo: 'right', align: 'bottom', ratio: .5})
-    .addView('package-explorer', {partId: 'topLeft'})
-    .addView('navigator', {partId: 'topLeft'})
-    .addView('git-repositories', {partId: 'bottomLeft'})
-    .addView('problems', {partId: 'bottom'})
-    .addView('git-staging', {partId: 'bottom'})
-    .addView('console', {partId: 'bottom'})
-    .addView('search', {partId: 'bottom'})
-    .addView('progress', {partId: 'bottom'})
-    .addView('outline', {partId: 'right'})
-    .navigateView('package-explorer', [], {hint: 'package-explorer'})
-    .navigateView('navigator', [], {hint: 'navigator'})
-    .navigateView('git-repositories', [], {hint: 'git-repositories'})
-    .navigateView('problems', [], {hint: 'problems'})
-    .navigateView('git-staging', [], {hint: 'git-staging'})
-    .navigateView('console', [], {hint: 'console'})
-    .navigateView('search', [], {hint: 'search'})
-    .navigateView('progress', [], {hint: 'progress'})
-    .navigateView('outline', [], {hint: 'outline'})
-    .activateView('console');
+    .addPart('left', {align: 'left', ratio: .15})
+    .addView('sample-view-1', {partId: 'left'})
+    .addView('sample-view-2', {partId: 'left'})
+    .addView('sample-view-3', {partId: 'top-right'})
+    .addView('sample-view-4', {partId: 'top-right'})
+    .addView('sample-view-5', {partId: 'bottom-right'})
+    .addView('sample-view-6', {partId: 'bottom'})
+    .addView('sample-view-7', {partId: 'bottom'})
+    .addView('sample-view-8', {partId: 'bottom'})
+    .navigateView('sample-view-1', [], {hint: 'sample-view'})
+    .navigateView('sample-view-2', [], {hint: 'sample-view'})
+    .navigateView('sample-view-3', [], {hint: 'sample-view'})
+    .navigateView('sample-view-4', [], {hint: 'sample-view'})
+    .navigateView('sample-view-5', [], {hint: 'sample-view'})
+    .navigateView('sample-view-6', [], {hint: 'sample-view'})
+    .navigateView('sample-view-7', [], {hint: 'sample-view'})
+    .navigateView('sample-view-8', [], {hint: 'sample-view'});
 }
 
-/** @private */
-function provideDebugPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout { // eslint-disable-line no-inner-declarations
+function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
-    .addPart('left', {align: 'left', ratio: .147})
-    .addPart('bottom', {align: 'bottom', ratio: .3})
-    .addPart('right', {align: 'right', ratio: .175})
-    .addView('debug', {partId: 'left'})
-    .addView('package-explorer', {partId: 'left'})
-    .addView('servers', {partId: 'bottom'})
-    .addView('console', {partId: 'bottom'})
-    .addView('problems', {partId: 'bottom'})
-    .addView('variables', {partId: 'right'})
-    .addView('expressions', {partId: 'right'})
-    .addView('breakpoints', {partId: 'right'})
-    .navigateView('debug', [], {hint: 'debug'})
-    .navigateView('package-explorer', [], {hint: 'package-explorer'})
-    .navigateView('servers', [], {hint: 'servers'})
-    .navigateView('console', [], {hint: 'console'})
-    .navigateView('problems', [], {hint: 'problems'})
-    .navigateView('variables', [], {hint: 'variables'})
-    .navigateView('expressions', [], {hint: 'expressions'})
-    .navigateView('breakpoints', [], {hint: 'breakpoints'})
-    .activateView('console');
+    .addPart('top-left', {align: 'left', ratio: .181})
+    .addPart('bottom-left', {relativeTo: 'top-left', align: 'bottom', ratio: .5})
+    .addPart('right', {align: 'right', ratio: .17})
+    .addPart('bottom', {align: 'bottom', ratio: .25})
+    .addView('sample-view-1', {partId: 'top-left'})
+    .addView('sample-view-2', {partId: 'top-left'})
+    .addView('sample-view-3', {partId: 'bottom-left'})
+    .addView('sample-view-4', {partId: 'bottom-left'})
+    .addView('sample-view-5', {partId: 'right'})
+    .addView('sample-view-6', {partId: 'right'})
+    .addView('sample-view-7', {partId: 'right'})
+    .addView('sample-view-8', {partId: 'bottom'})
+    .addView('sample-view-9', {partId: 'bottom'})
+    .addView('sample-view-10', {partId: 'bottom'})
+    .navigateView('sample-view-1', [], {hint: 'sample-view'})
+    .navigateView('sample-view-2', [], {hint: 'sample-view'})
+    .navigateView('sample-view-3', [], {hint: 'sample-view'})
+    .navigateView('sample-view-4', [], {hint: 'sample-view'})
+    .navigateView('sample-view-5', [], {hint: 'sample-view'})
+    .navigateView('sample-view-6', [], {hint: 'sample-view'})
+    .navigateView('sample-view-7', [], {hint: 'sample-view'})
+    .navigateView('sample-view-8', [], {hint: 'sample-view'})
+    .navigateView('sample-view-9', [], {hint: 'sample-view'})
+    .navigateView('sample-view-10', [], {hint: 'sample-view'});
 }

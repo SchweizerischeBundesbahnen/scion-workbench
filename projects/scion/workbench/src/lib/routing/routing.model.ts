@@ -16,7 +16,7 @@ import {WorkbenchPopupDiff} from './workbench-popup-differ';
 import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchMessageBoxDiff} from './workbench-message-box-differ';
-import {WorkbenchViewAuxiliaryRoutesDiff} from './workbench-view-differ';
+import {WorkbenchViewOutletDiff} from './workbench-view-outlet-differ';
 
 /**
  * Options to control the navigation.
@@ -99,7 +99,7 @@ export interface WorkbenchNavigationContext {
   /**
    * View auxiliary routes to register or unregister by the current navigation.
    */
-  viewAuxiliaryRouteDiff: WorkbenchViewAuxiliaryRoutesDiff;
+  viewOutletDiff: WorkbenchViewOutletDiff;
   /**
    * Popups added or removed by the current navigation.
    */

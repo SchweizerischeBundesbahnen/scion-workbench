@@ -46,3 +46,19 @@ describe('Objects.withoutUndefinedEntries', () => {
     expect(Objects.withoutUndefinedEntries(object)).toEqual({key1: 'value1', key3: 'value3'});
   });
 });
+
+describe('Objects.toMatrixNotation', () => {
+
+  it('should stringify an object to matrix notation', () => {
+    const object = {key1: 'value1', key2: undefined, key3: 'value3', key4: null};
+    expect(Objects.toMatrixNotation(object)).toEqual('key1=value1;key2=undefined;key3=value3;key4=null');
+  });
+
+  it('should stringify `null` to matrix notation', () => {
+    expect(Objects.toMatrixNotation(null)).toEqual('');
+  });
+
+  it('should stringify `undefined` to matrix notation', () => {
+    expect(Objects.toMatrixNotation(undefined)).toEqual('');
+  });
+});

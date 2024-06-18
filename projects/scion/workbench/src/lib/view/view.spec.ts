@@ -36,6 +36,10 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {throwError} from '../common/throw-error.util';
 import {WorkbenchPartActionDirective} from '../part/part-action-bar/part-action.directive';
+import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
+import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {MAIN_AREA} from '../layout/workbench-layout';
+import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 
 describe('View', () => {
 
@@ -1300,6 +1304,88 @@ describe('View', () => {
 
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should have uid from MView', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Add layout with view "view.100".
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: 'main'}));
+    const view1 = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
+    const view1Uid = view1.uid;
+
+    // Replace layout view "view.100".
+    await TestBed.inject(ɵWorkbenchRouter).navigate(() => inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.100', {partId: 'main'}),
+    );
+
+    const view2 = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
+    const view2Uid = view2.uid;
+
+    // Expect the view handle to be the same.
+    expect(view1).toBe(view2);
+    // Expect the view uid to have changed.
+    expect(view1Uid).not.toEqual(view2Uid);
+
+    // Replace layout with view "view.100".
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
+      .removeView('view.100', {force: true})
+      .addView('view.100', {partId: 'main'}),
+    );
+
+    const view3 = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
+    const view3Uid = view3.uid;
+
+    // Expect the view handle to be the same.
+    expect(view1).toBe(view3);
+    // Expect the view uid to have changed.
+    expect(view1Uid).not.toEqual(view3Uid);
+    expect(view2Uid).not.toEqual(view3Uid);
+  });
+
+  it('should have alternative id from MView', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Add layout with view "view.1" and alternative view id "testee-1"
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'main'}));
+    const view1 = TestBed.inject(ɵWorkbenchService).views.find(view => view.alternativeId === 'testee-1')!;
+
+    // Replace layout with view "view.1" and alternative view id "testee-2"
+    await TestBed.inject(ɵWorkbenchRouter).navigate(() => inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('testee-2', {partId: 'main'}),
+    );
+
+    // Expect the view handle to be the same.
+    const view2 = TestBed.inject(ɵWorkbenchService).views.find(view => view.alternativeId === 'testee-2')!;
+    expect(view1).toBe(view2);
+
+    // Replace layout with view "view.1" and alternative view id "testee-2"
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
+      .removeView('testee-2', {force: true})
+      .addView('testee-3', {partId: 'main'}),
+    );
+
+    // Expect the view handle to be the same.
+    const view3 = TestBed.inject(ɵWorkbenchService).views.find(view => view.alternativeId === 'testee-3')!;
+    expect(view1).toBe(view3);
   });
 
   describe('Activated Route', () => {
