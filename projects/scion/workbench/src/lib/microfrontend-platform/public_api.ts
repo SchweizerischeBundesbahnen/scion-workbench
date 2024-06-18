@@ -9,4 +9,5 @@
  */
 
 export {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
+export {WorkbenchPerspectiveData} from './microfrontend-perspective/workbench-perspective-data';
 export * from './microfrontend-platform.config';

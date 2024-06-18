@@ -11,9 +11,10 @@
 import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchViewCapability} from '@scion/workbench-client';
+import {Objects} from '../../common/objects.util';
 
 /**
- * Asserts view capabilities to have required properties and assigns each view capability a stable identifer required for persistent navigation.
+ * Asserts view capabilities to have required properties.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewCapabilityValidator implements CapabilityInterceptor {
@@ -25,14 +26,14 @@ export class MicrofrontendViewCapabilityValidator implements CapabilityIntercept
 
     const viewCapability = capability as WorkbenchViewCapability;
     // Assert the view capability to have a qualifier set.
-    if (!viewCapability.qualifier || !Object.keys(viewCapability.qualifier).length) {
+    if (!Object.keys(viewCapability.qualifier ?? {}).length) {
       throw Error(`[NullQualifierError] View capability requires a qualifier [capability=${JSON.stringify(viewCapability)}]`);
     }
 
     // Assert the view capability to have a path set.
     const path = viewCapability.properties?.path;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] View capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(viewCapability)}]`);
+      throw Error(`[NullPathError] View capability requires a path to the microfrontend in its properties [application="${viewCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(viewCapability.qualifier)}"]`);
     }
 
     return capability;

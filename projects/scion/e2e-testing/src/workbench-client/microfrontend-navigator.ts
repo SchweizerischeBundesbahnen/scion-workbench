@@ -11,7 +11,7 @@
 import {AppPO} from '../app.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {RegisterWorkbenchIntentionPagePO} from './page-object/register-workbench-intention-page.po';
-import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
+import {RegisterWorkbenchCapabilityPagePO, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPerspectiveCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from './page-object/register-workbench-capability-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {UnregisterWorkbenchCapabilityPagePO} from './page-object/unregister-workbench-capability-page.po';
 import {NotificationOpenerPagePO} from './page-object/notification-opener-page.po';
@@ -128,7 +128,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench capability.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability | WorkbenchPerspectiveCapability>(app: 'app1' | 'app2', capability: T): Promise<T & Capability> {
     const registerCapabilityPage = await this.openInNewTab(RegisterWorkbenchCapabilityPagePO, app);
     try {
       return await registerCapabilityPage.registerCapability(capability);
@@ -141,7 +141,7 @@ export class MicrofrontendNavigator {
   /**
    * Use to register a workbench intention.
    */
-  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
+  public async registerIntention(app: 'app1' | 'app2', intention: Intention & {type: 'perspective' | 'view' | 'dialog' | 'popup' | 'messagebox' | 'notification'}): Promise<string> {
     const registerIntentionPage = await this.openInNewTab(RegisterWorkbenchIntentionPagePO, app);
     try {
       return await registerIntentionPage.registerIntention(intention);

@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached, toMatrixNotation, waitUntilAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
+import {ViewId, WorkbenchDialogCapability as _WorkbenchDialogCapability, WorkbenchMessageBoxCapability as _WorkbenchMessageBoxCapability, WorkbenchPerspectiveCapability as _WorkbenchPerspectiveCapability, WorkbenchPerspectivePart, WorkbenchPopupCapability as _WorkbenchPopupCapability, WorkbenchViewCapability as _WorkbenchViewCapability} from '@scion/workbench-client';
 import {Capability} from '@scion/microfrontend-platform';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
@@ -26,6 +26,7 @@ import {ViewPO} from '../../view.po';
  * Unlike classes or enums, interfaces can be referenced because they do not exist at runtime.
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
+export type WorkbenchPerspectiveCapability = Omit<_WorkbenchPerspectiveCapability, 'type'> & {type: 'perspective'};
 export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
 export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
 export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'; properties: {path: string | '<null>' | '<undefined>'}};
@@ -53,7 +54,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
    *
    * Returns a Promise that resolves to the registered capability upon successful registration, or that rejects on registration error.
    */
-  public async registerCapability<T extends WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
+  public async registerCapability<T extends WorkbenchPerspectiveCapability | WorkbenchViewCapability | WorkbenchPopupCapability | WorkbenchDialogCapability | WorkbenchMessageBoxCapability>(capability: T): Promise<T & Capability> {
     if (capability.type !== undefined) {
       await this.locator.locator('select.e2e-type').selectOption(capability.type);
     }
@@ -77,23 +78,23 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.private !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-private')).toggle(capability.private);
     }
-    if (capability.properties.path !== undefined) {
-      await this.locator.locator('input.e2e-path').fill(capability.properties.path);
-    }
-    if (capability.properties.cssClass !== undefined) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
-    }
-    if (capability.type === 'view') {
-      await this.enterViewCapabilityProperties(capability as WorkbenchViewCapability);
-    }
-    else if (capability.type === 'popup') {
-      await this.enterPopupCapabilityProperties(capability as WorkbenchPopupCapability);
-    }
-    else if (capability.type === 'dialog') {
-      await this.enterDialogCapabilityProperties(capability as WorkbenchDialogCapability);
-    }
-    else if (capability.type === 'messagebox') {
-      await this.enterMessageBoxCapabilityProperties(capability as WorkbenchMessageBoxCapability);
+
+    switch (capability.type) {
+      case 'perspective':
+        await this.enterPerspectiveCapabilityProperties(capability as WorkbenchPerspectiveCapability);
+        break;
+      case 'view':
+        await this.enterViewCapabilityProperties(capability as WorkbenchViewCapability);
+        break;
+      case 'popup':
+        await this.enterPopupCapabilityProperties(capability as WorkbenchPopupCapability);
+        break;
+      case 'dialog':
+        await this.enterDialogCapabilityProperties(capability as WorkbenchDialogCapability);
+        break;
+      case 'messagebox':
+        await this.enterMessageBoxCapabilityProperties(capability as WorkbenchMessageBoxCapability);
+        break;
     }
 
     await this.clickRegister();
@@ -109,7 +110,50 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     return JSON.parse(await responseLocator.locator('div.e2e-capability').innerText());
   }
 
+  private async enterPerspectiveCapabilityProperties(capability: WorkbenchPerspectiveCapability): Promise<void> {
+    // Enter perspective data.
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(capability.properties.data ?? {});
+
+    const layoutLocator = this.locator.locator('section.e2e-layout');
+
+    // Enter parts.
+    const parts = capability.properties.layout as WorkbenchPerspectivePart[];
+    for (const [partIndex, part] of parts.entries()) {
+      await layoutLocator.locator('button.e2e-add-part').click();
+
+      const partLocator = layoutLocator.locator('section.e2e-part').nth(partIndex);
+      await partLocator.locator('input.e2e-part-id').fill(part.id);
+
+      if (partIndex > 0) {
+        await partLocator.locator('input.e2e-relative-to').fill(part.relativeTo ?? '');
+        await partLocator.locator('select.e2e-align').selectOption(part.align ?? null);
+        await partLocator.locator('input.e2e-ratio').fill(`${part.ratio ?? ''}`);
+      }
+
+      // Enter views.
+      for (const [viewIndex, view] of (part?.views ?? []).entries()) {
+        await partLocator.locator('button.e2e-add-view').click();
+
+        const viewsLocator = partLocator.locator('section.e2e-views');
+        await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).fill(toMatrixNotation(view.qualifier));
+        await viewsLocator.locator('input.e2e-params').nth(viewIndex).fill(toMatrixNotation(view.params));
+        await viewsLocator.locator('input.e2e-class').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));
+        if (view.active !== undefined) {
+          await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-active').nth(viewIndex)).toggle(view.active);
+        }
+      }
+    }
+  }
+
   private async enterViewCapabilityProperties(capability: WorkbenchViewCapability): Promise<void> {
+    if (capability.properties.path !== undefined) {
+      await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    }
+    if (capability.properties.cssClass !== undefined) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+    }
     if (capability.properties.title !== undefined) {
       await this.locator.locator('input.e2e-title').fill(capability.properties.title);
     }
@@ -129,7 +173,12 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
 
   private async enterPopupCapabilityProperties(capability: WorkbenchPopupCapability): Promise<void> {
     const size = capability.properties.size;
-
+    if (capability.properties.path !== undefined) {
+      await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    }
+    if (capability.properties.cssClass !== undefined) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+    }
     if (size?.width) {
       await this.locator.locator('input.e2e-width').fill(size.width);
     }
@@ -158,7 +207,12 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
 
   private async enterDialogCapabilityProperties(capability: WorkbenchDialogCapability): Promise<void> {
     const size = capability.properties.size;
-
+    if (capability.properties.path !== undefined) {
+      await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    }
+    if (capability.properties.cssClass !== undefined) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+    }
     if (size?.width) {
       await this.locator.locator('input.e2e-width').fill(size.width);
     }
@@ -196,7 +250,12 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
 
   private async enterMessageBoxCapabilityProperties(capability: WorkbenchMessageBoxCapability): Promise<void> {
     const size = capability.properties.size;
-
+    if (capability.properties.path !== undefined) {
+      await this.locator.locator('input.e2e-path').fill(capability.properties.path);
+    }
+    if (capability.properties.cssClass !== undefined) {
+      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+    }
     if (size?.width) {
       await this.locator.locator('input.e2e-width').fill(size.width);
     }

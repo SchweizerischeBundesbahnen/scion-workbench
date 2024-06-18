@@ -12,6 +12,7 @@ import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY} from '../microfrontend-host-message-box/text-message/text-message.component';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Asserts message box capabilities to have required properties.
@@ -29,7 +30,7 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
     // Assert capability to have a path.
     const path = messageBoxCapability.properties?.path;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] MessageBox capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(messageBoxCapability)}]`);
+      throw Error(`[NullPathError] MessageBox capability requires a path to the microfrontend in its properties [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
     }
 
     // Assert capability other than the built-in text messsage box capability to have a qualifier.

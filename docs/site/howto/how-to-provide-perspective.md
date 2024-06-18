@@ -5,9 +5,9 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-A perspective is a named workbench layout. Multiple perspectives are supported. Perspectives can be switched. Only one perspective is active at a time. Perspectives share the same main area, if any.
+A perspective is a named arrangement of views. Different perspectives provide a different perspective on the application. A perspective can be divided into a main and a peripheral area, with the main area as the primary place for opening views. Views in the main area are retained when switching perspectives.
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+The layout of a perspective is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
 
 ### How to provide a perspective
 

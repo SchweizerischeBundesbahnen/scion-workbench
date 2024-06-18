@@ -23,7 +23,7 @@ import {first, map} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {Blockable} from './glass-pane/blockable';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-routes-registrator.service';
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-route-installer.service';
 
 /**
  * Main entry point component of the SCION Workbench.

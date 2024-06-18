@@ -15,7 +15,7 @@ import {RouterUtils} from './router.util';
 import {ViewId} from '../view/workbench-view.model';
 
 /**
- * Stateful differ to compute view auxiliary routes.
+ * Stateful differ to compute view outlets.
  *
  * Use this differ to register/unregister view auxiliary routes.
  *
@@ -23,7 +23,7 @@ import {ViewId} from '../view/workbench-view.model';
  * an outlet in the URL, this differ uses both, outlets in the URL and views in the layout.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchViewAuxiliaryRoutesDiffer {
+export class WorkbenchViewOutletDiffer {
 
   private _differ: IterableDiffer<ViewId>;
 
@@ -32,34 +32,33 @@ export class WorkbenchViewAuxiliaryRoutesDiffer {
   }
 
   /**
-   * Computes differences since last time {@link WorkbenchViewAuxiliaryRoutesDiffer#diff} was invoked.
+   * Computes differences since last time {@link WorkbenchViewOutletDiffer#diff} was invoked.
    */
-  public diff(workbenchLayout: ɵWorkbenchLayout | null, urlTree: UrlTree): WorkbenchViewAuxiliaryRoutesDiff {
+  public diff(workbenchLayout: ɵWorkbenchLayout | null, urlTree: UrlTree): WorkbenchViewOutletDiff {
     const views = workbenchLayout?.views().map(view => view.id) ?? [];
     const viewOutlets = RouterUtils.parseViewOutlets(urlTree).keys();
-    return new WorkbenchViewAuxiliaryRoutesDiff({
-      views: this._differ.diff(new Set([...viewOutlets, ...views])),
-    });
+    const changes = this._differ.diff(new Set([...viewOutlets, ...views]));
+    return new WorkbenchViewOutletDiff(changes);
   }
 }
 
 /**
- * Lists the auxiliary routes to register or unregister.
+ * Lists the view outlets added/removed in the current navigation.
  */
-export class WorkbenchViewAuxiliaryRoutesDiff {
+export class WorkbenchViewOutletDiff {
 
-  public readonly addedViews = new Array<ViewId>();
-  public readonly removedViews = new Array<ViewId>();
+  public readonly addedViewOutlets = new Array<ViewId>();
+  public readonly removedViewOutlets = new Array<ViewId>();
 
-  constructor(changes: {views: IterableChanges<ViewId> | null}) {
-    changes.views?.forEachAddedItem(({item}) => this.addedViews.push(item));
-    changes.views?.forEachRemovedItem(({item}) => this.removedViews.push(item));
+  constructor(changes: IterableChanges<ViewId> | null) {
+    changes?.forEachAddedItem(({item}) => this.addedViewOutlets.push(item));
+    changes?.forEachRemovedItem(({item}) => this.removedViewOutlets.push(item));
   }
 
   public toString(): string {
     return `${new Array<string>()
-      .concat(this.addedViews.length ? `addViews=[${this.addedViews}]` : [])
-      .concat(this.removedViews.length ? `removedViews=[${this.removedViews}]` : [])
+      .concat(this.addedViewOutlets.length ? `addedViewOutlets=[${this.addedViewOutlets}]` : [])
+      .concat(this.removedViewOutlets.length ? `removedViewOutlets=[${this.removedViewOutlets}]` : [])
       .join(', ')}`;
   }
 }
