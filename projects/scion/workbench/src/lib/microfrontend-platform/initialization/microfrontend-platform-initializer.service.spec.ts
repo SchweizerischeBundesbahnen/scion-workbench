@@ -10,13 +10,12 @@
 
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Handler, IntentInterceptor, IntentMessage} from '@scion/microfrontend-platform';
-import {MicrofrontendViewIntentHandler} from '../routing/microfrontend-view-intent-handler.interceptor';
-import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MICROFRONTEND_PLATFORM_PRE_STARTUP, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchLauncher} from '../../startup/workbench-launcher.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
+import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 
 describe('Microfrontend Platform Initializer', () => {
 
@@ -29,7 +28,7 @@ describe('Microfrontend Platform Initializer', () => {
     }
 
     /** Registers the app-specific intent interceptor */
-    class CustomIntentInterceptorRegisterer implements WorkbenchInitializer {
+    class IntentInterceptorInstaller implements WorkbenchInitializer {
       public async init(): Promise<void> {
         Beans.register(IntentInterceptor, {useClass: CustomIntentInterceptor, multi: true});
       }
@@ -40,7 +39,7 @@ describe('Microfrontend Platform Initializer', () => {
       providers: [
         provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
         provideRouter([]),
-        {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, multi: true, useClass: CustomIntentInterceptorRegisterer},
+        {provide: MICROFRONTEND_PLATFORM_PRE_STARTUP, multi: true, useClass: IntentInterceptorInstaller},
       ],
     });
 
@@ -49,7 +48,6 @@ describe('Microfrontend Platform Initializer', () => {
 
     // Expect app-specific interceptor to be installed first.
     expect(Beans.all(IntentInterceptor)[0]).toBeInstanceOf(CustomIntentInterceptor);
-    expect(Beans.all(IntentInterceptor)[1]).toBeInstanceOf(MicrofrontendViewIntentHandler);
-    expect(Beans.all(IntentInterceptor)[2]).toBeInstanceOf(MicrofrontendPopupIntentHandler);
+    expect(Beans.all(IntentInterceptor)[1]).toBeInstanceOf(MicrofrontendPerspectiveIntentHandler);
   });
 });

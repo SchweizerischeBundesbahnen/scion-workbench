@@ -20,7 +20,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Observable} from 'rxjs';
-import {mapArray} from '@scion/toolkit/operators';
+import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {AsyncPipe} from '@angular/common';
 
 @Component({
@@ -58,9 +58,9 @@ export default class CreatePerspectivePageComponent {
               private _settingsService: SettingsService,
               private _workbenchService: WorkbenchService) {
     this.partProposals$ = this.form.controls.parts.valueChanges
-      .pipe(mapArray(part => part.id));
+      .pipe(mapArray(part => part.id), filterArray(partId => !!partId));
     this.viewProposals$ = this.form.controls.views.valueChanges
-      .pipe(mapArray(view => view.id));
+      .pipe(mapArray(view => view.id), filterArray(viewId => !!viewId));
   }
 
   protected async onRegister(): Promise<void> {

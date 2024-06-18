@@ -19,7 +19,7 @@ import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
  * Facilitates the registration of auxiliary routes of top-level routes.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchAuxiliaryRoutesRegistrator {
+export class WorkbenchAuxiliaryRouteInstaller {
 
   constructor(private _workbenchConfig: WorkbenchConfig, private _router: Router) {
   }

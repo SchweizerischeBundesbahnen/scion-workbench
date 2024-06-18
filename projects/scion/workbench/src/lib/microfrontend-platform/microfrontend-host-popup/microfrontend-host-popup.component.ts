@@ -19,6 +19,7 @@ import {Defined} from '@scion/toolkit/util';
 import {POPUP_ID_PREFIX} from '../../workbench.constants';
 import {Microfrontends} from '../common/microfrontend.util';
 import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -48,7 +49,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
               private _router: Router) {
     const popupContext = popup.input!;
     const capability = popupContext.capability;
-    const path = Defined.orElseThrow(capability.properties.path, () => Error(`[PopupProviderError] Missing required path for popup capability: ${JSON.stringify(capability)}`));
+    const path = Defined.orElseThrow(capability.properties.path, () => Error(`[PopupProviderError] Missing required path for popup capability [application="${capability.metadata!.appSymbolicName}", capability=${Objects.toMatrixNotation(capability.qualifier)}]`));
     const params = popupContext.params;
     this.outletName = POPUP_ID_PREFIX.concat(popup.id);
     this.outletInjector = Injector.create({

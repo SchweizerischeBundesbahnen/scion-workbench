@@ -14,6 +14,7 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
   public intercept(hostManifest: Manifest): void {
     hostManifest.intentions = [
       ...hostManifest.intentions || [],
+      providePerspectiveIntention(),
       provideViewIntention(),
     ];
     hostManifest.capabilities = [
@@ -22,6 +23,16 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
       provideBuiltInTextNotificationCapability(),
     ];
   }
+}
+
+/**
+ * Provides a wildcard perspective intention for the workbench to register perspective capabilities as workbench perspectives.
+ */
+function providePerspectiveIntention(): Intention {
+  return {
+    type: WorkbenchCapabilities.Perspective,
+    qualifier: {'*': '*'},
+  };
 }
 
 /**

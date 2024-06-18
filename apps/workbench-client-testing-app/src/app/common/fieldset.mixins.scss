@@ -1,0 +1,55 @@
+@use 'sass:map';
+
+/**
+ * Styles the element as a fieldset using the specified legend as the fieldset's label.
+ *
+ * Note: The native HTML <fieldset> element is not used because it imposes restrictions on styling its content,
+ * such as not supporting subgrids.
+ *
+ * @param legend - Specifies the legend.
+ */
+@mixin fieldset($legend: null) {
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: 1.5em 1em 1em;
+  @include legend($legend, (top: -1px));
+}
+
+/**
+ * Adds the specified legend to the element without applying any fieldset styles.
+ *
+ * @param options - Controls the position of the label.
+ * @param options.top - Specifies the distance from the top boundary of the element to position the label.
+ * @param options.left - Specifies the distance from the left boundary of the element to position the label.
+ */
+@mixin legend($legend, $options: ()) {
+  position: relative; // positioning context for the legend
+
+  &::after {
+    content: '#{$legend}';
+    font-size: .85em;
+    position: absolute;
+    height: 1px;
+    display: inline-grid;
+    align-content: center;
+    color: var(--sci-color-text-subtlest);
+    background-color: var(--sci-color-background-primary);
+    padding-inline: .25em;
+    top: if(map.has-key($options, top), map.get($options, top), 0);
+    left: if(map.has-key($options, left), map.get($options, left), .5em);
+  }
+
+  &:focus-within::after {
+    color: var(--sci-color-accent);
+  }
+
+  &:has(> :disabled)::after {
+    background-color: transparent;
+  }
+
+  // Ensure controls not to overlap the fieldset.
+  &:has(> input, > select) {
+    display: inline-grid;
+    grid-template-columns: 100%;
+  }
+}

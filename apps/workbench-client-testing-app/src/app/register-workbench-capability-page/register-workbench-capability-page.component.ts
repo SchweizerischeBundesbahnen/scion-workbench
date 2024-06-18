@@ -12,7 +12,7 @@ import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
-import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchMessageBoxCapability, WorkbenchMessageBoxSize, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
+import {PopupSize, ViewParamDefinition, WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogSize, WorkbenchMessageBoxCapability, WorkbenchMessageBoxSize, WorkbenchPerspectiveCapability, WorkbenchPopupCapability, WorkbenchView, WorkbenchViewCapability} from '@scion/workbench-client';
 import {firstValueFrom} from 'rxjs';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -22,6 +22,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapabilityProperties} from './perspective-capability-properties/perspective-capability-properties.component';
 
 /**
  * Allows registering workbench capabilities.
@@ -39,6 +40,7 @@ import {CssClassComponent} from '../css-class/css-class.component';
     SciCheckboxComponent,
     SciViewportComponent,
     CssClassComponent,
+    PerspectiveCapabilityPropertiesComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
@@ -50,6 +52,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     optionalParams: this._formBuilder.control(''),
     transientParams: this._formBuilder.control(''),
     private: this._formBuilder.control(true),
+    perspectiveProperties: this._formBuilder.control<WorkbenchPerspectiveCapabilityProperties | undefined>(undefined),
     viewProperties: this._formBuilder.group({
       path: this._formBuilder.control(''),
       title: this._formBuilder.control(''),
@@ -118,6 +121,8 @@ export default class RegisterWorkbenchCapabilityPageComponent {
   public async onRegister(): Promise<void> {
     const capability: Capability = ((): Capability => {
       switch (this.form.controls.type.value) {
+        case WorkbenchCapabilities.Perspective:
+          return this.readPerspectiveCapabilityFromUI();
         case WorkbenchCapabilities.View:
           return this.readViewCapabilityFromUI();
         case WorkbenchCapabilities.Popup:
@@ -141,6 +146,21 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
       .catch(error => this.registerError = stringifyError(error));
+  }
+
+  private readPerspectiveCapabilityFromUI(): WorkbenchPerspectiveCapability {
+    const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
+    const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
+    return {
+      type: WorkbenchCapabilities.Perspective,
+      qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
+      params: [
+        ...requiredParams,
+        ...optionalParams,
+      ],
+      private: this.form.controls.private.value,
+      properties: this.form.controls.perspectiveProperties.value!,
+    };
   }
 
   private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {

@@ -10,6 +10,82 @@
         "path": "activator",
         "readinessTopics": "activator-ready"
       }
+    },
+    {
+      "type": "perspective",
+      "qualifier": {
+        "perspective": "app2"
+      },
+      "private": false,
+      "properties": {
+        "data": {
+          "label": "Microfrontend Perspective 2",
+          "tooltip": "Sample Microfrontend Perspective Contributed by App 2"
+        },
+        "layout": [
+          {
+            "id": "main-area"
+          },
+          {
+            "id": "left-top",
+            "align": "left",
+            "ratio": 0.25,
+            "views": [
+              {
+                "qualifier": {
+                  "component": "view",
+                  "app": "app2"
+                }
+              },
+              {
+                "qualifier": {
+                  "component": "view",
+                  "app": "app2"
+                }
+              }
+            ]
+          },
+          {
+            "id": "left-bottom",
+            "align": "bottom",
+            "relativeTo": "left-top",
+            "ratio": 0.5,
+            "views": [
+              {
+                "qualifier": {
+                  "component": "view",
+                  "app": "app2"
+                }
+              }
+            ]
+          },
+          {
+            "id": "bottom",
+            "align": "bottom",
+            "ratio": 0.25,
+            "views": [
+              {
+                "qualifier": {
+                  "component": "view",
+                  "app": "app2"
+                }
+              },
+              {
+                "qualifier": {
+                  "component": "view",
+                  "app": "app2"
+                }
+              },
+              {
+                "qualifier": {
+                  "component": "view",
+                  "app": "app2"
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "intentions": [

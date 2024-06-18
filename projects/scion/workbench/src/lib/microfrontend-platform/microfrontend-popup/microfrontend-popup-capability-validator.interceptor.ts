@@ -11,6 +11,7 @@
 import {Capability, CapabilityInterceptor} from '@scion/microfrontend-platform';
 import {Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {Objects} from '../../common/objects.util';
 
 /**
  * Asserts popup capabilities to have required properties.
@@ -25,14 +26,14 @@ export class MicrofrontendPopupCapabilityValidator implements CapabilityIntercep
 
     const popupCapability = capability as WorkbenchPopupCapability;
     // Assert the popup capability to have a qualifier set.
-    if (!popupCapability.qualifier || !Object.keys(popupCapability.qualifier).length) {
+    if (!Object.keys(popupCapability.qualifier ?? {}).length) {
       throw Error(`[NullQualifierError] Popup capability requires a qualifier [capability=${JSON.stringify(popupCapability)}]`);
     }
 
     // Assert the popup capability to have a path set.
     const path = popupCapability.properties?.path;
     if (path === undefined || path === null) {
-      throw Error(`[NullPathError] Popup capability requires a path to the microfrontend in its properties [capability=${JSON.stringify(popupCapability)}]`);
+      throw Error(`[NullPathError] Popup capability requires a path to the microfrontend in its properties [application="${popupCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(popupCapability.qualifier)}"]`);
     }
 
     return popupCapability;

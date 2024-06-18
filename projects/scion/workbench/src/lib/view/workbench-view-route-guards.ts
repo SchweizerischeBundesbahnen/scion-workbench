@@ -12,7 +12,7 @@ import {CanMatchFn} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-routes-registrator.service';
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 
 /**
  * Matches the route if target of a workbench view and navigating with the given hint.

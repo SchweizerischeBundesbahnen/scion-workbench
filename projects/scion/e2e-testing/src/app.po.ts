@@ -264,9 +264,11 @@ export class AppPO {
    * Switches to the specified perspective.
    */
   public async switchPerspective(perspectiveId: string): Promise<void> {
-    const navigationId = await this.getCurrentNavigationId();
-    await this.header.perspectiveToggleButton({perspectiveId}).click();
-    await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
+    if (perspectiveId !== await this.getActivePerspectiveId()) {
+      const navigationId = await this.getCurrentNavigationId();
+      await this.header.perspectiveToggleButton({perspectiveId}).click();
+      await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
+    }
   }
 
   /**
@@ -299,8 +301,15 @@ export class AppPO {
    *
    * @see WORKBENCH_ID
    */
-  public getWorkbenchId(): Promise<string | undefined> {
-    return this.page.locator('app-root').getAttribute('data-workbench-id').then(value => value ?? undefined);
+  public getWorkbenchId(): Promise<string> {
+    return this.page.locator('app-root').getAttribute('data-workbench-id').then(id => id!);
+  }
+
+  /**
+   * Returns the id of the currently active perspective.
+   */
+  public getActivePerspectiveId(): Promise<string> {
+    return this.page.locator('app-root').getAttribute('data-perspective-id').then(id => id!);
   }
 
   /**

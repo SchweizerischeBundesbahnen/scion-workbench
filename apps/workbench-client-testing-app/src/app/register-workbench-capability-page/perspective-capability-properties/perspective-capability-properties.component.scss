@@ -1,0 +1,123 @@
+@use '@scion/components.internal/design' as sci-design;
+@use '../../common/fieldset.mixins';
+
+:host {
+  display: grid;
+
+  > form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    section.layout {
+      display: grid;
+      grid-template-columns:
+        // === Part Subgrid ===
+        10em // Part ID
+        10em // Relative To
+        10em // Align
+        10em // Ratio
+          // === Views Subgrid ===
+          1fr // Qualifier
+          1fr // Params
+          .75fr // CSS class(es)
+          auto // Active
+          min-content // Remove View
+        min-content; // Remove Part
+      align-items: start;
+      gap: 1em;
+
+      > section.part.fieldset::after {
+        content: 'Part'; // do not include fieldset mixin to reduce file size
+      }
+
+      > section.part {
+        display: grid;
+        grid-column: 1/-1;
+        grid-template-columns: subgrid;
+        align-items: start;
+
+        > div.part-id.legend::after {
+          content: 'Part ID'; // do not include legend mixin to reduce file size
+        }
+
+        > div.relative-to.legend::after {
+          content: 'Relative To'; // do not include legend mixin to reduce file size
+        }
+
+        > div.align.legend::after {
+          content: 'Align'; // do not include legend mixin to reduce file size
+        }
+
+        > div.ratio.legend::after {
+          content: 'Ratio'; // do not include legend mixin to reduce file size
+        }
+
+        > section.views.fieldset::after {
+          content: 'Views'; // do not include fieldset mixin to reduce file size
+        }
+
+        > section.views {
+          display: grid;
+          grid-column: 5/10;
+          grid-template-columns: subgrid;
+          gap: 1em;
+          align-items: start;
+
+          > app-record.qualifier.legend::after {
+            content: 'Qualifier'; // do not include legend mixin to reduce file size
+          }
+
+          > app-record.params.legend::after {
+            content: 'Params'; // do not include legend mixin to reduce file size
+          }
+
+          > app-css-class.css-class.legend::after {
+            content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
+          }
+
+          > div.active.legend::after {
+            content: 'Active'; // do not include legend mixin to reduce file size
+            left: 0;
+            top: -.25em;
+          }
+
+          > div.active {
+            display: inline-grid;
+            align-self: stretch;
+            width: 3em;
+            place-content: center;
+          }
+
+          > button.add-view {
+            grid-column: 1/-2;
+          }
+        }
+
+        > button.add-view {
+          grid-column: 5/10;
+        }
+      }
+
+      > button.add-part {
+        grid-column: 1/-1;
+      }
+    }
+  }
+
+
+  // include fieldset mixin once to reduce file size
+  .fieldset {
+    @include fieldset.fieldset(null);
+  }
+
+  // include legend mixin once to reduce file size
+  .legend {
+    @include fieldset.legend(null);
+  }
+
+  input, select {
+    @include sci-design.style-input-field();
+    height: 1.25em;
+  }
+}

@@ -27,7 +27,7 @@ import {CanMatchFn, Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityValidator} from './routing/microfrontend-view-capability-validator.interceptor';
-import {MicrofrontendViewCapabilityIdAssigner} from './routing/microfrontend-view-capability-id-assigner.interceptor';
+import {StableCapabilityIdAssigner} from './stable-capability-id-assigner.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
@@ -35,10 +35,13 @@ import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-routes-registrator.service';
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 import {RouterUtils} from '../routing/router.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
+import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
+import {MicrofrontendPerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
+import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 import {ManifestObjectCache} from './manifest-object-cache.service';
 
 /**
@@ -71,6 +74,11 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     },
     {
       provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
+      useClass: MicrofrontendPerspectiveInstaller,
+      multi: true,
+    },
+    {
+      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
       useExisting: ManifestObjectCache,
       multi: true,
     },
@@ -78,17 +86,19 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
       provide: MicrofrontendPlatformConfig,
       useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
     },
+    MicrofrontendPlatformInitializer,
+    MicrofrontendPerspectiveIntentHandler,
     MicrofrontendViewIntentHandler,
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
     MicrofrontendMessageBoxLegacyIntentTranslator,
     MicrofrontendMessageBoxIntentHandler,
+    MicrofrontendPerspectiveCapabilityValidator,
     MicrofrontendViewCapabilityValidator,
-    MicrofrontendViewCapabilityIdAssigner,
     MicrofrontendPopupCapabilityValidator,
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
-    MicrofrontendPlatformInitializer,
+    StableCapabilityIdAssigner,
     ManifestObjectCache,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
