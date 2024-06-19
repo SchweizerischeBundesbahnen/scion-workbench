@@ -11,7 +11,6 @@
 import {Component, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
-import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -25,7 +24,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   styleUrls: ['./message-box-opener-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,

@@ -1,14 +1,14 @@
-<ng-container *ngFor="let menuItem of menuItems">
-  <button *ngIf="menuItem | appInstanceof:MenuItem as menuItem; else separator_template"
-          class="menu-item e2e-menu-item"
-          [ngClass]="menuItem.cssClass"
-          [class.disabled]="menuItem.disabled"
-          [class.checked]="menuItem.checked"
-          (click)="onMenuItemClick(menuItem)">
-    <span sciMaterialIcon class="check-mark e2e-check-mark">check</span>
-    {{menuItem.text}}
-  </button>
-  <ng-template #separator_template>
+@for (menuItem of menuItems; track menuItem) {
+  @if (menuItem | appInstanceof:MenuItem; as menuItem) {
+    <button class="menu-item e2e-menu-item"
+            [ngClass]="menuItem.cssClass"
+            [class.disabled]="menuItem.disabled"
+            [class.checked]="menuItem.checked"
+            (click)="onMenuItemClick(menuItem)">
+      <span sciMaterialIcon class="check-mark e2e-check-mark">check</span>
+      {{menuItem.text}}
+    </button>
+  } @else {
     <hr>
-  </ng-template>
-</ng-container>
+  }
+}

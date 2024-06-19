@@ -3,9 +3,11 @@
     <span class="e2e-view-id">{{view.id}}</span>
   </sci-form-field>
 
-  <sci-form-field label="Alternative View ID" *ngIf="view.alternativeId">
-    <span>{{view.alternativeId}}</span>
-  </sci-form-field>
+  @if (view.alternativeId) {
+    <sci-form-field label="Alternative View ID">
+      <span>{{view.alternativeId}}</span>
+    </sci-form-field>
+  }
 
   <sci-form-field label="Part ID">
     <span class="e2e-part-id">{{view.part.id}}</span>
@@ -15,32 +17,38 @@
     <span>{{view.urlSegments | appJoin:'/'}}</span>
   </sci-form-field>
 
-  <sci-form-field label="Navigation Hint" *ngIf="view.navigationHint">
-    <span>{{view.navigationHint}}</span>
-  </sci-form-field>
+  @if (view.navigationHint) {
+    <sci-form-field label="Navigation Hint">
+      <span>{{view.navigationHint}}</span>
+    </sci-form-field>
+  }
 
   <sci-form-field label="Instantiation ID" title="Unique identifier of this component instance">
     <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
 </section>
 
-<sci-accordion class="e2e-params" variant="solid" *ngIf="route.params | async | appNullIfEmpty as params">
-  <ng-template sciAccordionItem [panel]="panel_route_params">
-    <header>Route Params</header>
-  </ng-template>
-  <ng-template #panel_route_params>
-    <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"></sci-key-value>
-  </ng-template>
-</sci-accordion>
+@if (route.params | async | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_params">
+      <header>Route Params</header>
+    </ng-template>
+    <ng-template #panel_route_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"/>
+    </ng-template>
+  </sci-accordion>
+}
 
-<sci-accordion class="e2e-state" variant="solid" *ngIf="view.state | appNullIfEmpty as state">
-  <ng-template sciAccordionItem [panel]="panel_view_state">
-    <header>View State</header>
-  </ng-template>
-  <ng-template #panel_view_state>
-    <sci-key-value [object]="state | appAppendParamDataType" class="e2e-state"></sci-key-value>
-  </ng-template>
-</sci-accordion>
+@if (view.state | appNullIfEmpty; as state) {
+  <sci-accordion class="e2e-state" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_view_state">
+      <header>View State</header>
+    </ng-template>
+    <ng-template #panel_view_state>
+      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-state"/>
+    </ng-template>
+  </sci-accordion>
+}
 
 <section>
   <header>View Properties</header>
@@ -90,9 +98,10 @@
   </ng-template>
 </sci-accordion>
 
-<ng-template wbPartAction
-             *ngFor="let action of partActions$ | async"
-             [align]="action.align"
-             [cssClass]="action.cssClass">
-  {{action.content}}
-</ng-template>
+@for (action of partActions$ | async; track action) {
+  <ng-template wbPartAction
+               [align]="action.align"
+               [cssClass]="action.cssClass">
+    {{action.content}}
+  </ng-template>
+}

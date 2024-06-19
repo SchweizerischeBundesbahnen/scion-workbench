@@ -13,7 +13,7 @@ import {ActivatedRoute} from '@angular/router';
 import {distinct, map} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {combineLatest} from 'rxjs';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDialogService, WorkbenchPart, WorkbenchPartActionDirective, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
@@ -26,7 +26,6 @@ import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.comp
   templateUrl: './workbench.component.html',
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     SciMaterialIconDirective,
     ScionWorkbenchComponent,

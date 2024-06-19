@@ -12,7 +12,6 @@ import {ApplicationRef, Component, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ViewId, WorkbenchDialogService} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
-import {NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -31,7 +30,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   styleUrls: ['./dialog-opener-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,

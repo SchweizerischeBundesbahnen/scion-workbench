@@ -18,7 +18,6 @@ import {Observable} from 'rxjs';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import {PopupOrigin} from '@scion/workbench-client';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
-import {NgIf} from '@angular/common';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -36,7 +35,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   styleUrls: ['./popup-opener-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciAccordionComponent,

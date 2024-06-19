@@ -14,7 +14,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
-import {JsonPipe, NgIf} from '@angular/common';
+import {JsonPipe} from '@angular/common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 
@@ -24,7 +24,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   styleUrls: ['./popup-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     JsonPipe,
     FormsModule,
     NullIfEmptyPipe,

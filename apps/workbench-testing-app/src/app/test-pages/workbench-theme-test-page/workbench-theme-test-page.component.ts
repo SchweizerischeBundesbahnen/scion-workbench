@@ -10,7 +10,7 @@
 
 import {Component} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {WorkbenchService} from '@scion/workbench';
 
 @Component({
@@ -19,7 +19,6 @@ import {WorkbenchService} from '@scion/workbench';
   styleUrls: ['./workbench-theme-test-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     SciFormFieldComponent,
   ],

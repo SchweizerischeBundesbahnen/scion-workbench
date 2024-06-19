@@ -12,7 +12,7 @@ import {Component, DestroyRef, HostListener, Inject, InjectionToken, OnInit} fro
 import {OverlayRef} from '@angular/cdk/overlay';
 import {fromEvent} from 'rxjs';
 import {MenuItem, MenuItemSeparator} from './menu-item';
-import {KeyValuePipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {KeyValuePipe, NgClass} from '@angular/common';
 import {InstanceofPipe} from '../common/instanceof.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
@@ -28,8 +28,6 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
   styleUrls: ['./menu.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     NgClass,
     KeyValuePipe,
     InstanceofPipe,

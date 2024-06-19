@@ -12,7 +12,7 @@ import {Component, HostBinding} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {WorkbenchPopup} from '@scion/workbench-client';
-import {AsyncPipe, JsonPipe, NgIf} from '@angular/common';
+import {AsyncPipe, JsonPipe} from '@angular/common';
 import {A11yModule} from '@angular/cdk/a11y';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -30,7 +30,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   styleUrls: ['./host-popup-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     FormsModule,
     AsyncPipe,
     JsonPipe,

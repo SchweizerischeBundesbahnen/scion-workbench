@@ -7,13 +7,17 @@
       </select>
     </sci-form-field>
 
-    <sci-form-field label="Content" *ngIf="!isUseComponent()">
-      <input [formControl]="form.controls.content" class="e2e-content">
-    </sci-form-field>
+    @if (!isUseComponent()) {
+      <sci-form-field label="Content">
+        <input [formControl]="form.controls.content" class="e2e-content">
+      </sci-form-field>
+    }
 
-    <sci-form-field label="Component Input" *ngIf="isUseComponent()">
-      <input [formControl]="form.controls.componentInput" class="e2e-component-input">
-    </sci-form-field>
+    @if (isUseComponent()) {
+      <sci-form-field label="Component Input">
+        <input [formControl]="form.controls.componentInput" class="e2e-component-input">
+      </sci-form-field>
+    }
   </section>
 
   <section>
@@ -52,7 +56,7 @@
     </sci-form-field>
 
     <sci-form-field label="Input Reducer">
-      <sci-checkbox [formControl]="form.controls.useGroupInputReducer" class="e2e-use-group-input-reducer"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.useGroupInputReducer" class="e2e-use-group-input-reducer"/>
     </sci-form-field>
   </section>
 </form>
@@ -61,6 +65,8 @@
   Show notification
 </button>
 
-<output class="notification-open-error e2e-notification-open-error" *ngIf="notificationOpenError">
-  {{notificationOpenError}}
-</output>
+@if (notificationOpenError) {
+  <output class="notification-open-error e2e-notification-open-error">
+    {{notificationOpenError}}
+  </output>
+}

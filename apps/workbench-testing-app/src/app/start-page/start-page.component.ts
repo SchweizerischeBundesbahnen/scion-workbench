@@ -18,7 +18,7 @@ import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/rou
 import {filter} from 'rxjs/operators';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciFilterFieldComponent} from '@scion/components.internal/filter-field';
-import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {FilterPipe} from '../common/filter.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -32,8 +32,6 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     NgClass,
     AsyncPipe,
     ReactiveFormsModule,

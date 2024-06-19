@@ -1,4 +1,6 @@
-<app-header *ngIf="workbenchStartup.whenStarted | async"></app-header>
+@if (workbenchStartup.whenStarted | async) {
+  <app-header/>
+}
 <main>
   <router-outlet/>
 </main>

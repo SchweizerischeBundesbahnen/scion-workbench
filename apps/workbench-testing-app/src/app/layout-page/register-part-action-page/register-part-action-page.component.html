@@ -23,14 +23,18 @@
     <sci-form-field label="View(s)">
       <input [formControl]="form.controls.canMatch.controls.view" class="e2e-view-id" [attr.list]="viewList" placeholder="Separate multiple views by space">
       <datalist [attr.id]="viewList">
-        <option *ngFor="let view of workbenchService.views$ | async" [value]="view.id">{{view.id}}</option>
+        @for (view of workbenchService.views$ | async; track view.id) {
+          <option [value]="view.id">{{view.id}}</option>
+        }
       </datalist>
     </sci-form-field>
 
     <sci-form-field label="Part(s)">
       <input [formControl]="form.controls.canMatch.controls.part" class="e2e-part-id" [attr.list]="partList" placeholder="Separate multiple parts by space">
       <datalist [attr.id]="partList">
-        <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
+        @for (part of workbenchService.parts$ | async; track part.id) {
+          <option [value]="part.id">{{part.id}}</option>
+        }
       </datalist>
     </sci-form-field>
 
@@ -49,10 +53,14 @@
   </button>
 </form>
 
-<output class="register-success e2e-register-success" *ngIf="registerError === false">
-  Success
-</output>
+@if (registerError === false) {
+  <output class="register-success e2e-register-success">
+    Success
+  </output>
+}
 
-<output class="register-error e2e-register-error" *ngIf="registerError">
-  {{registerError}}
-</output>
+@if (registerError) {
+  <output class="register-error e2e-register-error">
+    {{registerError}}
+  </output>
+}
