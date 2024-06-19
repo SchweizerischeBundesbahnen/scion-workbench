@@ -1,13 +1,13 @@
-<ng-container *ngIf="workbenchContextActive | async; else workbench_context_note">
+@if (workbenchContextActive | async) {
   <sci-viewport cdkTrapFocus>
     <router-outlet/>
   </sci-viewport>
   <section class="metadata">
-    <span class="chip has-focus e2e-has-focus" *ngIf="focusMonitor!.focus$ | async">has-focus</span>
+    @if (focusMonitor!.focus$ | async) {
+      <span class="chip has-focus e2e-has-focus">has-focus</span>
+    }
     <span class="chip app-symbolic-name" [class.has-focus]="focusMonitor!.focus$ | async">{{appSymbolicName}}</span>
   </section>
-</ng-container>
-
-<ng-template #workbench_context_note>
+} @else {
   <span class="workbench-context-note">This application is designed to run in the context of a workbench application.</span>
-</ng-template>
+}

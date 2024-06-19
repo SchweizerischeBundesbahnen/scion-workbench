@@ -11,7 +11,6 @@
 import {Component} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNotificationService, WorkbenchView} from '@scion/workbench-client';
-import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -24,7 +23,6 @@ import {UUID} from '@scion/toolkit/uuid';
   styleUrls: ['./notification-opener-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,

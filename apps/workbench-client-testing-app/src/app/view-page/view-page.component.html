@@ -20,52 +20,62 @@
   </sci-form-field>
 </section>
 
-<sci-accordion class="view-capability e2e-view-capability" variant="solid" *ngIf="view.capability$ | async as capability">
-  <ng-template sciAccordionItem [panel]="panel_capability">
-    <header>View Capability</header>
-  </ng-template>
-  <ng-template #panel_capability>
-    <sci-viewport>
-      <div class="e2e-view-capability capability">{{capability | json}}</div>
-    </sci-viewport>
-  </ng-template>
-</sci-accordion>
+@if (view.capability$ | async; as capability) {
+  <sci-accordion class="view-capability e2e-view-capability" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_capability">
+      <header>View Capability</header>
+    </ng-template>
+    <ng-template #panel_capability>
+      <sci-viewport>
+        <div class="e2e-view-capability capability">{{capability | json}}</div>
+      </sci-viewport>
+    </ng-template>
+  </sci-accordion>
+}
 
-<sci-accordion class="e2e-view-params" variant="solid" *ngIf="view.params$ | async | appNullIfEmpty as params">
-  <ng-template sciAccordionItem [panel]="panel_view_params">
-    <header>View Params</header>
-  </ng-template>
-  <ng-template #panel_view_params>
-    <sci-key-value [object]="params | appAppendParamDataType" class="e2e-view-params"></sci-key-value>
-  </ng-template>
-</sci-accordion>
+@if (view.params$ | async | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-view-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_view_params">
+      <header>View Params</header>
+    </ng-template>
+    <ng-template #panel_view_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-view-params"/>
+    </ng-template>
+  </sci-accordion>
+}
 
-<sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | appNullIfEmpty as params">
-  <ng-template sciAccordionItem [panel]="panel_route_params">
-    <header>Route Params</header>
-  </ng-template>
-  <ng-template #panel_route_params>
-    <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
-  </ng-template>
-</sci-accordion>
+@if (route.params | async | appNullIfEmpty; as params) {
+  <sci-accordion variant="solid" class="e2e-route-params">
+    <ng-template sciAccordionItem [panel]="panel_route_params">
+      <header>Route Params</header>
+    </ng-template>
+    <ng-template #panel_route_params>
+      <sci-key-value [object]="params" class="e2e-route-params"/>
+    </ng-template>
+  </sci-accordion>
+}
 
-<sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
-  <ng-template sciAccordionItem [panel]="panel_query_params">
-    <header>Route Query Params</header>
-  </ng-template>
-  <ng-template #panel_query_params>
-    <sci-key-value [object]="params" class="e2e-route-query-params"></sci-key-value>
-  </ng-template>
-</sci-accordion>
+@if (route.queryParams | async | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-route-query-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_query_params">
+      <header>Route Query Params</header>
+    </ng-template>
+    <ng-template #panel_query_params>
+      <sci-key-value [object]="params" class="e2e-route-query-params"/>
+    </ng-template>
+  </sci-accordion>
+}
 
-<sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | appNullIfEmpty as fragment">
-  <ng-template sciAccordionItem [panel]="panel_route_fragment">
-    <header>Route Fragment</header>
-  </ng-template>
-  <ng-template #panel_route_fragment>
-    <span class="e2e-route-fragment">{{fragment}}</span>
-  </ng-template>
-</sci-accordion>
+@if (route.fragment | async | appNullIfEmpty; as fragment) {
+  <sci-accordion class="e2e-route-fragment" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_fragment">
+      <header>Route Fragment</header>
+    </ng-template>
+    <ng-template #panel_route_fragment>
+      <span class="e2e-route-fragment">{{fragment}}</span>
+    </ng-template>
+  </sci-accordion>
+}
 
 <form autocomplete="off" [formGroup]="form">
   <section>
@@ -80,11 +90,11 @@
     </sci-form-field>
 
     <sci-form-field label="Closable">
-      <sci-checkbox [formControl]="form.controls.closable" class="e2e-closable"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.closable" class="e2e-closable"/>
     </sci-form-field>
 
     <sci-form-field label="Confirm Closing">
-      <sci-checkbox [formControl]="form.controls.confirmClosing" class="e2e-confirm-closing"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.confirmClosing" class="e2e-confirm-closing"/>
     </sci-form-field>
 
     <sci-form-field label="Dirty State">
@@ -111,7 +121,7 @@
     </ng-template>
     <ng-template #panel_self_navigation>
       <sci-form-field label="Params">
-        <sci-key-value-field [keyValueFormArray]="form.controls.selfNavigation.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
+        <sci-key-value-field [keyValueFormArray]="form.controls.selfNavigation.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
       </sci-form-field>
 
       <sci-form-field label="ParamsHandling">
@@ -123,7 +133,7 @@
       </sci-form-field>
 
       <sci-form-field label="Navigate per Param" title="Check to simulate the performing of bulk navigations">
-        <sci-checkbox [formControl]="form.controls.selfNavigation.controls.navigatePerParam" class="e2e-navigate-per-param"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.selfNavigation.controls.navigatePerParam" class="e2e-navigate-per-param"/>
       </sci-form-field>
 
       <button (click)="onSelfNavigate()" class="navigate-self e2e-navigate-self">Perform self-navigation</button>

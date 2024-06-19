@@ -17,7 +17,7 @@ import {ActivatedRoute} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
-import {AsyncPipe, JsonPipe, NgIf} from '@angular/common';
+import {AsyncPipe, JsonPipe} from '@angular/common';
 import {A11yModule} from '@angular/cdk/a11y';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -32,7 +32,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   styleUrls: ['./popup-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     JsonPipe,
     A11yModule,

@@ -11,7 +11,6 @@
 import {Component} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
-import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WorkbenchView} from '@scion/workbench-client';
@@ -25,7 +24,6 @@ import {WorkbenchView} from '@scion/workbench-client';
   styleUrls: ['./unregister-workbench-capability-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
   ],

@@ -1,11 +1,11 @@
 <form [formGroup]="form">
   <section>
     <sci-form-field label="Qualifier">
-      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
     <sci-form-field label="Params">
-      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
     </sci-form-field>
 
     <sci-form-field label="Contextual View ID">
@@ -41,7 +41,7 @@
           <option value="bottom-right">Coordinate (bottom-right)</option>
         </select>
       </sci-form-field>
-      <ng-container *ngIf="form.controls.anchor.controls.position.value !== 'element'">
+      @if (form.controls.anchor.controls.position.value !== 'element') {
         <sci-form-field [label]="$any(form.controls.anchor.controls.position.value) | wbPopupPositionLabel:'vertical'">
           <input [formControl]="form.controls.anchor.controls.verticalPosition" type="number" class="e2e-position-vertical">
         </sci-form-field>
@@ -54,7 +54,7 @@
         <sci-form-field label="Height">
           <input [formControl]="form.controls.anchor.controls.height" type="number" class="e2e-anchor-height">
         </sci-form-field>
-      </ng-container>
+      }
     </ng-template>
   </sci-accordion>
 
@@ -64,11 +64,11 @@
     </ng-template>
     <ng-template #panel_close_strategy>
       <sci-form-field label="onFocusLost">
-        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onFocusLost" class="e2e-close-on-focus-lost"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onFocusLost" class="e2e-close-on-focus-lost"/>
       </sci-form-field>
 
       <sci-form-field label="onEscape">
-        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onEscape" class="e2e-close-on-escape"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.closeStrategy.controls.onEscape" class="e2e-close-on-escape"/>
       </sci-form-field>
     </ng-template>
   </sci-accordion>
@@ -78,10 +78,14 @@
   Open popup
 </button>
 
-<output class="return-value e2e-return-value" *ngIf="returnValue">
-  {{returnValue}}
-</output>
+@if (returnValue) {
+  <output class="return-value e2e-return-value">
+    {{returnValue}}
+  </output>
+}
 
-<output class="popup-error e2e-popup-error" *ngIf="popupError">
-  {{popupError}}
-</output>
+@if (popupError) {
+  <output class="popup-error e2e-popup-error">
+    {{popupError}}
+  </output>
+}

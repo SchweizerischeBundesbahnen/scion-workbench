@@ -15,7 +15,6 @@ import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 import {PopupPositionLabelPipe, Position} from './popup-position-label.pipe';
-import {NgIf} from '@angular/common';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -30,7 +29,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   styleUrls: ['./popup-opener-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
