@@ -5,7 +5,7 @@
   </ng-template>
 
   <ng-template #panel1>
-    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.capability}"></ng-container>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.capability}"/>
   </ng-template>
 
   <!-- WorkbenchView#params$ -->
@@ -14,7 +14,7 @@
   </ng-template>
 
   <ng-template #panel2>
-    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.params}"></ng-container>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.params}"/>
   </ng-template>
 
   <!-- WorkbenchView#active$ -->
@@ -23,17 +23,19 @@
   </ng-template>
 
   <ng-template #panel3>
-    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.active}"></ng-container>
+    <ng-container *ngTemplateOutlet="test_template; context: {$implicit: tests.workbenchView.active}"/>
   </ng-template>
 </sci-accordion>
 
 <ng-template #test_template let-test>
   <section class="panel">
     <div class="run-in-angular-checkbox">
-      <sci-checkbox [(ngModel)]="test.runInAngular" class="e2e-run-inside-angular"></sci-checkbox>
+      <sci-checkbox [(ngModel)]="test.runInAngular" class="e2e-run-inside-angular"/>
       <span>Subscribe in NgZone</span>
     </div>
     <button (click)="test.onTestClick()" class="e2e-subscribe">Subscribe</button>
-    <output *ngFor="let emission of test.emissions" class="zone e2e-emission" [attr.data-zone]="emission.insideAngular ? 'inside-angular' : 'outside-angular'">{{emission.label}}</output>
+    @for (emission of test.emissions; track emission) {
+      <output class="zone e2e-emission" [attr.data-zone]="emission.insideAngular ? 'inside-angular' : 'outside-angular'">{{emission.label}}</output>
+    }
   </section>
 </ng-template>

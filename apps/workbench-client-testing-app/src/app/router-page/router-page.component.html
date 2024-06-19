@@ -3,11 +3,11 @@
     <header>View Intent</header>
 
     <sci-form-field label="Qualifier">
-      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
     <sci-form-field label="Params">
-      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
     </sci-form-field>
   </section>
 
@@ -37,11 +37,11 @@
     </sci-form-field>
 
     <sci-form-field label="Activate">
-      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"/>
     </sci-form-field>
 
     <sci-form-field label="Close">
-      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"/>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -51,7 +51,9 @@
 
   <button (click)="onNavigate()" class="e2e-navigate" [disabled]="form.invalid" sci-primary>Navigate</button>
 
-  <output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
-    {{navigateError}}
-  </output>
+  @if (navigateError) {
+    <output class="navigate-error e2e-navigate-error">
+      {{navigateError}}
+    </output>
+  }
 </form>

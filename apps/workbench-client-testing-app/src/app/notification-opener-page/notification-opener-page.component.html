@@ -1,11 +1,11 @@
 <form [formGroup]="form">
   <section>
     <sci-form-field label="Qualifier">
-      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.qualifier" [addable]="true" [removable]="true" class="e2e-qualifier"/>
     </sci-form-field>
 
     <sci-form-field label="Params">
-      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.params" [addable]="true" [removable]="true" class="e2e-params"/>
     </sci-form-field>
   </section>
 
@@ -52,6 +52,8 @@
   Show notification
 </button>
 
-<output class="notification-open-error e2e-notification-open-error" *ngIf="notificationOpenError">
-  {{notificationOpenError}}
-</output>
+@if (notificationOpenError) {
+  <output class="notification-open-error e2e-notification-open-error">
+    {{notificationOpenError}}
+  </output>
+}

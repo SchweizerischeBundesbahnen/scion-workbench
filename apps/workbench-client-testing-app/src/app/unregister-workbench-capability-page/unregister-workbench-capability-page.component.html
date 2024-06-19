@@ -7,8 +7,12 @@
 
   <button (click)="onUnregister()" class="e2e-unregister" [disabled]="form.invalid">Unregister</button>
 
-  <output class="unregister-error e2e-unregister-error" *ngIf="unregisterError">
-    {{unregisterError}}
-  </output>
-  <output class="unregistered e2e-unregistered" *ngIf="unregistered"></output>
+  @if (unregisterError) {
+    <output class="unregister-error e2e-unregister-error">
+      {{unregisterError}}
+    </output>
+  }
+  @if (unregistered) {
+    <output class="unregistered e2e-unregistered"></output>
+  }
 </form>

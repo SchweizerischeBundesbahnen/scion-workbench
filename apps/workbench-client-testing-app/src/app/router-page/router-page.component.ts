@@ -13,7 +13,6 @@ import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {NgIf} from '@angular/common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {parseTypedObject} from '../common/parse-typed-value.util';
@@ -26,7 +25,6 @@ import {UUID} from '@scion/toolkit/uuid';
   styleUrls: ['./router-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,

@@ -17,7 +17,7 @@ import {MonoTypeOperatorFunction, NEVER} from 'rxjs';
 import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {AsyncPipe, JsonPipe, Location, NgIf} from '@angular/common';
+import {AsyncPipe, JsonPipe, Location} from '@angular/common';
 import {parseTypedObject} from '../common/parse-typed-value.util';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
@@ -34,7 +34,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   styleUrls: ['./view-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     JsonPipe,
     ReactiveFormsModule,

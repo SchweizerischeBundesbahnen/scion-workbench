@@ -45,56 +45,66 @@
       </ng-template>
     </sci-accordion>
 
-    <sci-accordion class="e2e-popup-params" variant="solid" *ngIf="popup.params | appNullIfEmpty as params">
-      <ng-template sciAccordionItem [panel]="panel_popup_params">
-        <header>Popup Params</header>
-      </ng-template>
-      <ng-template #panel_popup_params>
-        <sci-viewport>
-          <sci-key-value [object]="params" class="e2e-popup-params"></sci-key-value>
-        </sci-viewport>
-      </ng-template>
-    </sci-accordion>
+    @if (popup.params | appNullIfEmpty; as params) {
+      <sci-accordion class="e2e-popup-params" variant="solid">
+        <ng-template sciAccordionItem [panel]="panel_popup_params">
+          <header>Popup Params</header>
+        </ng-template>
+        <ng-template #panel_popup_params>
+          <sci-viewport>
+            <sci-key-value [object]="params" class="e2e-popup-params"/>
+          </sci-viewport>
+        </ng-template>
+      </sci-accordion>
+    }
 
-    <sci-accordion variant="solid" class="e2e-route-params" *ngIf="route.params | async | appNullIfEmpty as params">
-      <ng-template sciAccordionItem [panel]="panel_route_params">
-        <header>Route Params</header>
-      </ng-template>
-      <ng-template #panel_route_params>
-        <sci-key-value [object]="params" class="e2e-route-params"></sci-key-value>
-      </ng-template>
-    </sci-accordion>
+    @if (route.params | async | appNullIfEmpty; as params) {
+      <sci-accordion variant="solid" class="e2e-route-params">
+        <ng-template sciAccordionItem [panel]="panel_route_params">
+          <header>Route Params</header>
+        </ng-template>
+        <ng-template #panel_route_params>
+          <sci-key-value [object]="params" class="e2e-route-params"/>
+        </ng-template>
+      </sci-accordion>
+    }
 
-    <sci-accordion class="e2e-route-query-params" variant="solid" *ngIf="route.queryParams | async | appNullIfEmpty as params">
-      <ng-template sciAccordionItem [panel]="panel_query_params">
-        <header>Route Query Params</header>
-      </ng-template>
-      <ng-template #panel_query_params>
-        <sci-key-value [object]="params" class="e2e-route-query-params"></sci-key-value>
-      </ng-template>
-    </sci-accordion>
+    @if (route.queryParams | async | appNullIfEmpty; as params) {
+      <sci-accordion class="e2e-route-query-params" variant="solid">
+        <ng-template sciAccordionItem [panel]="panel_query_params">
+          <header>Route Query Params</header>
+        </ng-template>
+        <ng-template #panel_query_params>
+          <sci-key-value [object]="params" class="e2e-route-query-params"/>
+        </ng-template>
+      </sci-accordion>
+    }
 
-    <sci-accordion class="e2e-route-fragment" variant="solid" *ngIf="route.fragment | async | appNullIfEmpty as fragment">
-      <ng-template sciAccordionItem [panel]="panel_route_fragment">
-        <header>Route Fragment</header>
-      </ng-template>
-      <ng-template #panel_route_fragment>
-        <span class="e2e-route-fragment">{{fragment}}</span>
-      </ng-template>
-    </sci-accordion>
+    @if (route.fragment | async | appNullIfEmpty; as fragment) {
+      <sci-accordion class="e2e-route-fragment" variant="solid">
+        <ng-template sciAccordionItem [panel]="panel_route_fragment">
+          <header>Route Fragment</header>
+        </ng-template>
+        <ng-template #panel_route_fragment>
+          <span class="e2e-route-fragment">{{fragment}}</span>
+        </ng-template>
+      </sci-accordion>
+    }
 
-    <sci-accordion *ngIf="popup.capability.properties.size | appNullIfEmpty as preferredSize"
-                   class="preferred-popup-size"
-                   variant="solid">
-      <ng-template sciAccordionItem [panel]="panel_size">
-        <header>Preferred Popup Size</header>
-      </ng-template>
-      <ng-template #panel_size>
-        <sci-viewport>
-          <div class="preferred-popup-size">{{preferredSize | json}}</div>
-        </sci-viewport>
-      </ng-template>
-    </sci-accordion>
+    @if (popup.capability.properties.size | appNullIfEmpty; as preferredSize) {
+      <sci-accordion
+        class="preferred-popup-size"
+        variant="solid">
+        <ng-template sciAccordionItem [panel]="panel_size">
+          <header>Preferred Popup Size</header>
+        </ng-template>
+        <ng-template #panel_size>
+          <sci-viewport>
+            <div class="preferred-popup-size">{{preferredSize | json}}</div>
+          </sci-viewport>
+        </ng-template>
+      </sci-accordion>
+    }
 
     <sci-accordion class="e2e-referrer" variant="solid">
       <ng-template sciAccordionItem [panel]="panel_referrer">

@@ -10,7 +10,7 @@
 
 import {Component, inject, Inject, Optional} from '@angular/core';
 import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
 import {A11yModule} from '@angular/cdk/a11y';
@@ -21,7 +21,6 @@ import {A11yModule} from '@angular/cdk/a11y';
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     RouterOutlet,
     A11yModule,
