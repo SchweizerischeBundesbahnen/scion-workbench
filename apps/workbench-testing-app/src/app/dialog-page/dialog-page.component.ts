@@ -12,7 +12,6 @@ import {Component, HostBinding, Input} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
-import {NgIf} from '@angular/common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -24,7 +23,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   styleUrls: ['./dialog-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciAccordionComponent,

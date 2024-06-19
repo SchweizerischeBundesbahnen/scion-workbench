@@ -11,7 +11,6 @@
 import {Component, Type} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
-import {NgIf} from '@angular/common';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
@@ -25,7 +24,6 @@ import {UUID} from '@scion/toolkit/uuid';
   styleUrls: ['./notification-opener-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciCheckboxComponent,

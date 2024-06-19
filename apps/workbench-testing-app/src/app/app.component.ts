@@ -13,7 +13,7 @@ import {filter, mergeMap, switchMap} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AsyncPipe, DOCUMENT, NgIf} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {EMPTY, fromEvent, merge, of} from 'rxjs';
@@ -26,7 +26,6 @@ import {SettingsService} from './settings.service';
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     RouterOutlet,
     HeaderComponent,

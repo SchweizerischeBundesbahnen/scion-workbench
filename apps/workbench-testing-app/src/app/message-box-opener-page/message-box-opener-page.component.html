@@ -7,13 +7,17 @@
       </select>
     </sci-form-field>
 
-    <sci-form-field label="Message" *ngIf="!isUseComponent()">
-      <input [formControl]="form.controls.message" class="e2e-message">
-    </sci-form-field>
+    @if (!isUseComponent()) {
+      <sci-form-field label="Message">
+        <input [formControl]="form.controls.message" class="e2e-message">
+      </sci-form-field>
+    }
 
-    <sci-form-field label="Inputs" *ngIf="isUseComponent()">
-      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
-    </sci-form-field>
+    @if (isUseComponent()) {
+      <sci-form-field label="Inputs">
+        <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.inputs" [addable]="true" [removable]="true" class="e2e-inputs"/>
+      </sci-form-field>
+    }
   </section>
 
   <section>
@@ -22,7 +26,7 @@
     </sci-form-field>
 
     <sci-form-field label="Actions">
-      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.options.controls.actions" [addable]="true" [removable]="true" class="e2e-actions"/>
     </sci-form-field>
 
     <sci-form-field label="Severity">
@@ -43,7 +47,7 @@
     </sci-form-field>
 
     <sci-form-field label="Content Selectable">
-      <sci-checkbox [formControl]="form.controls.options.controls.contentSelectable" class="e2e-content-selectable"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.options.controls.contentSelectable" class="e2e-content-selectable"/>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -56,10 +60,14 @@
   Open message box
 </button>
 
-<output class="close-action e2e-close-action" *ngIf="closeAction">
-  {{closeAction}}
-</output>
+@if (closeAction) {
+  <output class="close-action e2e-close-action">
+    {{closeAction}}
+  </output>
+}
 
-<output class="open-error e2e-message-box-error" *ngIf="messageBoxError">
-  {{messageBoxError}}
-</output>
+@if (messageBoxError) {
+  <output class="open-error e2e-message-box-error">
+    {{messageBoxError}}
+  </output>
+}

@@ -21,7 +21,7 @@
     <!-- Ratio -->
     <input [formControl]="partFormGroup.controls.relativeTo.controls.ratio" type="number" [class]="'e2e-ratio'">
     <!-- Activate -->
-    <sci-checkbox [formControl]="partFormGroup.controls.options.controls.activate" [class]="'e2e-activate-part'"></sci-checkbox>
+    <sci-checkbox [formControl]="partFormGroup.controls.options.controls.activate" [class]="'e2e-activate-part'"/>
     <!-- Remove button -->
     <button class="e2e-remove" (click)="onRemovePart($index)" title="Remove part" sciMaterialIcon>remove</button>
   }

@@ -1,10 +1,12 @@
-<sci-form-field label="Input" direction="column" *ngIf="notification.input">
-  <section class="input">
-    <sci-viewport>
-      <output class="e2e-input">{{ notification.input | appStringify }}</output>
-    </sci-viewport>
-  </section>
-</sci-form-field>
+@if (notification.input) {
+  <sci-form-field label="Input" direction="column">
+    <section class="input">
+      <sci-viewport>
+        <output class="e2e-input">{{notification.input | appStringify}}</output>
+      </sci-viewport>
+    </section>
+  </sci-form-field>
+}
 
 <ng-container [formGroup]="form">
   <sci-form-field label="Title" direction="column">

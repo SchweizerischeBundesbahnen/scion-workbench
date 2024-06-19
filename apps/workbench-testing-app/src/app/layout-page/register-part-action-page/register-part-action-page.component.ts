@@ -11,7 +11,7 @@
 import {Component, inject, InjectionToken, Injector} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
-import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
@@ -27,8 +27,6 @@ import {UUID} from '@scion/toolkit/uuid';
   styleUrls: ['./register-part-action-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     AsyncPipe,
     ReactiveFormsModule,
     SciFormFieldComponent,

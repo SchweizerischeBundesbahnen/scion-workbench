@@ -29,7 +29,7 @@
     </sci-form-field>
 
     <sci-form-field label="Animate">
-      <sci-checkbox [formControl]="form.controls.options.controls.animate" class="e2e-animate"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.options.controls.animate" class="e2e-animate"/>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -39,7 +39,7 @@
 
   <section>
     <sci-form-field label="View Context Active">
-      <sci-checkbox [formControl]="form.controls.viewContextActive" class="e2e-view-context"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.viewContextActive" class="e2e-view-context"/>
     </sci-form-field>
 
     <sci-form-field label="Count">
@@ -53,10 +53,14 @@
   Open dialog
 </button>
 
-<output class="return-value e2e-return-value" *ngIf="returnValue">
-  {{returnValue}}
-</output>
+@if (returnValue) {
+  <output class="return-value e2e-return-value">
+    {{returnValue}}
+  </output>
+}
 
-<output class="dialog-error e2e-dialog-error" *ngIf="dialogError">
-  {{dialogError}}
-</output>
+@if (dialogError) {
+  <output class="dialog-error e2e-dialog-error">
+    {{dialogError}}
+  </output>
+}

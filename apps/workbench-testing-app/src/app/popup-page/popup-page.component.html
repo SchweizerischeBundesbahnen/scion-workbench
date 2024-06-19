@@ -6,13 +6,14 @@
       </sci-form-field>
     </section>
 
-    <section *ngIf="popup.input">
-      <header>Input Data</header>
-
-      <output class="input e2e-input">
-        {{popup.input}}
-      </output>
-    </section>
+    @if (popup.input) {
+      <section>
+        <header>Input Data</header>
+        <output class="input e2e-input">
+          {{popup.input}}
+        </output>
+      </section>
+    }
 
     <section>
       <header>Component Size</header>

@@ -11,7 +11,6 @@
 import {Component} from '@angular/core';
 import {Notification} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NgIf} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -26,7 +25,6 @@ import {UUID} from '@scion/toolkit/uuid';
   styleUrls: ['./notification-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     ReactiveFormsModule,
     StringifyPipe,
     SciFormFieldComponent,

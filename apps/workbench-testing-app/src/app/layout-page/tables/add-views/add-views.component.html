@@ -17,9 +17,9 @@
     <!-- CSS class -->
     <app-css-class [formControl]="viewFormGroup.controls.options.controls.cssClass"/>
     <!-- Activate View -->
-    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activateView" [class]="'e2e-activate-view'"></sci-checkbox>
+    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activateView" [class]="'e2e-activate-view'"/>
     <!-- Activate Part -->
-    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activatePart" [class]="'e2e-activate-part'"></sci-checkbox>
+    <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activatePart" [class]="'e2e-activate-part'"/>
     <!-- Remove button -->
     <button class="e2e-remove" (click)="onRemoveView($index)" title="Remove view" sciMaterialIcon>remove</button>
   }

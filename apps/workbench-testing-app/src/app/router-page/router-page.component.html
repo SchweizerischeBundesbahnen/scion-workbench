@@ -7,7 +7,7 @@
     </sci-form-field>
 
     <sci-form-field label="State">
-      <sci-key-value-field [keyValueFormArray]="form.controls.state" [addable]="true" [removable]="true" class="e2e-state"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.state" [addable]="true" [removable]="true" class="e2e-state"/>
     </sci-form-field>
   </section>
 
@@ -29,7 +29,9 @@
     <sci-form-field label="Part ID">
       <input [formControl]="form.controls.partId" class="e2e-part-id" [attr.list]="partList">
       <datalist [attr.id]="partList">
-        <option *ngFor="let part of workbenchService.parts$ | async" [value]="part.id">{{part.id}}</option>
+        @for (part of workbenchService.parts$ | async; track part.id) {
+          <option [value]="part.id">{{part.id}}</option>
+        }
       </datalist>
     </sci-form-field>
 
@@ -44,19 +46,19 @@
     </sci-form-field>
 
     <sci-form-field label="Query parameters">
-      <sci-key-value-field [keyValueFormArray]="form.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"></sci-key-value-field>
+      <sci-key-value-field [keyValueFormArray]="form.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"/>
     </sci-form-field>
 
     <sci-form-field label="Activate">
-      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"/>
     </sci-form-field>
 
     <sci-form-field label="Close">
-      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"/>
     </sci-form-field>
 
     <sci-form-field label="View Context" title="Controls whether to navigate outside the view context (only relevant if navigating via router link)">
-      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"></sci-checkbox>
+      <sci-checkbox [formControl]="form.controls.viewContext" class="e2e-view-context"/>
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
@@ -68,7 +70,7 @@
     Navigate via Router
   </button>
 
-  <ng-container *ngTemplateOutlet="router_link; injector: form.controls.viewContext.value ? null : nullViewInjector"></ng-container>
+  <ng-container *ngTemplateOutlet="router_link; injector: form.controls.viewContext.value ? null : nullViewInjector"/>
   <ng-template #router_link>
     <!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
     <!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
@@ -81,7 +83,9 @@
     <!-- eslint-enable -->
   </ng-template>
 
-  <output class="navigate-error e2e-navigate-error" *ngIf="navigateError">
-    {{navigateError}}
-  </output>
+  @if (navigateError) {
+    <output class="navigate-error e2e-navigate-error">
+      {{navigateError}}
+    </output>
+  }
 </form>

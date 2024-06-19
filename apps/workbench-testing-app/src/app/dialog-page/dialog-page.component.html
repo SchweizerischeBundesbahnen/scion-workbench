@@ -7,9 +7,11 @@
     <input class="e2e-component-instance-id" [value]="uuid" disabled>
   </sci-form-field>
 
-  <sci-form-field label="Input" *ngIf="input">
-    <input class="e2e-input" [value]="input" disabled>
-  </sci-form-field>
+  @if (input) {
+    <sci-form-field label="Input">
+      <input class="e2e-input" [value]="input" disabled>
+    </sci-form-field>
+  }
 
   <sci-accordion class="e2e-dialog-size" variant="solid">
     <ng-template sciAccordionItem [panel]="panel_size">
@@ -63,11 +65,11 @@
     </ng-template>
     <ng-template #panel_behavior>
       <sci-form-field label="Closable">
-        <sci-checkbox [formControl]="form.controls.behavior.controls.closable" class="e2e-closable"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.behavior.controls.closable" class="e2e-closable"/>
       </sci-form-field>
 
       <sci-form-field label="Resizable">
-        <sci-checkbox [formControl]="form.controls.behavior.controls.resizable" class="e2e-resizable"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.behavior.controls.resizable" class="e2e-resizable"/>
       </sci-form-field>
     </ng-template>
   </sci-accordion>
@@ -78,7 +80,7 @@
     </ng-template>
     <ng-template #panel_styles>
       <sci-form-field label="Padding">
-        <sci-checkbox [formControl]="form.controls.styles.controls.padding" class="e2e-padding"></sci-checkbox>
+        <sci-checkbox [formControl]="form.controls.styles.controls.padding" class="e2e-padding"/>
       </sci-form-field>
     </ng-template>
   </sci-accordion>
@@ -95,7 +97,7 @@
 
 <ng-template wbDialogAction align="start">
   <label>
-    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"></sci-checkbox>
+    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"/>
     Close with error
   </label>
 </ng-template>

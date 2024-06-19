@@ -1,9 +1,11 @@
-<section *ngIf="workbenchService.theme$ | async as theme">
-  <sci-form-field label="Theme">
-    <span class="e2e-theme">{{theme.name}}</span>
-  </sci-form-field>
+@if (workbenchService.theme$ | async; as theme) {
+  <section>
+    <sci-form-field label="Theme">
+      <span class="e2e-theme">{{theme.name}}</span>
+    </sci-form-field>
 
-  <sci-form-field label="Color Scheme">
-    <span class="e2e-color-scheme">{{theme.colorScheme}}</span>
-  </sci-form-field>
-</section>
+    <sci-form-field label="Color Scheme">
+      <span class="e2e-color-scheme">{{theme.colorScheme}}</span>
+    </sci-form-field>
+  </section>
+}

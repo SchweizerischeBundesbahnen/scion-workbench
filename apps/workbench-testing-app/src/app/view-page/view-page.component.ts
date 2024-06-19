@@ -16,7 +16,7 @@ import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
-import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JoinPipe} from '../common/join.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -33,8 +33,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   styleUrls: ['./view-page.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     NgClass,
     AsyncPipe,
     FormsModule,
