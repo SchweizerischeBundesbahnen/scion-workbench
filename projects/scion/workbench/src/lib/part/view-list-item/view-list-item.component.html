@@ -1,9 +1,10 @@
 <div class="content">
-  <ng-container *cdkPortalOutlet="viewTabContentPortal"></ng-container>
+  <ng-container *cdkPortalOutlet="viewTabContentPortal"/>
 </div>
 
-<button *ngIf="view.closable"
-        class="close e2e-close scion-workbench-icons"
-        (click)="onClose()">
-  close
-</button>
+@if (view.closable) {
+  <button class="close e2e-close scion-workbench-icons"
+          (click)="onClose()">
+    close
+  </button>
+}

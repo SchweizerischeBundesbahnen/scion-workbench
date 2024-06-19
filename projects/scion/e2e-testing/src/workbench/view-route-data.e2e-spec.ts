@@ -28,7 +28,7 @@ test.describe('View Route Data', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate([`${basePath}/feature-a`], {
         target: 'blank',
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const view = appPO.view({cssClass: 'testee'});

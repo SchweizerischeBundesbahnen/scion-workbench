@@ -9,13 +9,12 @@
  */
 
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
-import {ChangeDetectionStrategy, Component, TrackByFunction} from '@angular/core';
-
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {NotificationService} from './notification.service';
 import {ɵNotification} from './ɵnotification';
 import {Observable} from 'rxjs';
 import {NotificationComponent} from './notification.component';
-import {AsyncPipe, NgClass, NgFor} from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
 
 /**
@@ -28,7 +27,6 @@ import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgFor,
     AsyncPipe,
     NgClass,
     NotificationComponent,
@@ -47,10 +45,6 @@ export class NotificationListComponent {
   public onNotificationClose(notification: ɵNotification): void {
     this._notificationService.closeNotification(notification);
   }
-
-  public trackByFn: TrackByFunction<ɵNotification> = (index: number, notification: ɵNotification): any => {
-    return notification.config.group || notification;
-  };
 
   /**
    * Returns animation metadata to slide-in a new notification, and to fade-out upon dismiss.

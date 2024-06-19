@@ -19,7 +19,6 @@ import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
-import {NgIf} from '@angular/common';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 
@@ -52,7 +51,6 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
   styleUrls: ['./main-area-layout.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     GridElementComponent,
     ViewDropZoneDirective,
     RequiresDropZonePipe,

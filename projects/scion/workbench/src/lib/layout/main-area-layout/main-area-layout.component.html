@@ -11,10 +11,8 @@
                      center: false,
                    }"
                    [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
-                   (wbViewDropZoneDrop)="onViewDrop($event)">
-  </wb-grid-element>
-}
-@else {
+                   (wbViewDropZoneDrop)="onViewDrop($event)"/>
+} @else {
   <sci-viewport class="start-page"
                 wbViewDropZone
                 [wbViewDropZoneSize]="1"

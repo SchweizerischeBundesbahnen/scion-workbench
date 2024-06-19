@@ -10,7 +10,7 @@
 
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {WorkbenchPart} from '../workbench-part.model';
-import {AsyncPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe, NgClass} from '@angular/common';
 import {PartActionFilterPipe} from './part-action-filter.pipe';
 import {NullIfEmptyPipe} from '../../common/null-if-empty.pipe';
 import {PortalModule} from '@angular/cdk/portal';
@@ -22,8 +22,6 @@ import {PortalModule} from '@angular/cdk/portal';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     AsyncPipe,
     NgClass,
     PortalModule,

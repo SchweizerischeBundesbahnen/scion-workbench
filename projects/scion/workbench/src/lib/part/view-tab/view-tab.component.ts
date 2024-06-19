@@ -24,7 +24,6 @@ import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {NgIf} from '@angular/common';
 import {WORKBENCH_ID} from '../../workbench-id';
 
 /**
@@ -38,7 +37,6 @@ import {WORKBENCH_ID} from '../../workbench-id';
   styleUrls: ['./view-tab.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     PortalModule,
   ],
 })

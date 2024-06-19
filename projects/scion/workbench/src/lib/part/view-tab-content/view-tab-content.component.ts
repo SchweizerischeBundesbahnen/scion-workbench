@@ -10,7 +10,6 @@
 
 import {Component, HostBinding, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {NgIf} from '@angular/common';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 
 @Component({
@@ -18,7 +17,6 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
   standalone: true,
-  imports: [NgIf],
 })
 export class ViewTabContentComponent {
 

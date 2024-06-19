@@ -14,7 +14,7 @@ import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {Notification} from './notification';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
@@ -29,7 +29,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
     PortalModule,
     CoerceObservablePipe,

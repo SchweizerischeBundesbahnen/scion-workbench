@@ -12,7 +12,6 @@ import {Component, Inject} from '@angular/core';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {GridElementComponent} from './grid-element/grid-element.component';
-import {NgIf} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {MPartGrid} from './workbench-layout.model';
@@ -54,7 +53,6 @@ import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
   styleUrls: ['./workbench-layout.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     RouterOutlet,
     GridElementComponent,
     GridElementIfVisiblePipe,

@@ -17,7 +17,7 @@ import {mapArray, subscribeInside} from '@scion/toolkit/operators';
 import {combineLatest, Observable, switchMap} from 'rxjs';
 import {debounceTime, map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {AsyncPipe, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -26,7 +26,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   styleUrls: ['./view-list-button.component.scss'],
   standalone: true,
   imports: [
-    NgIf,
     AsyncPipe,
   ],
 })

@@ -21,7 +21,7 @@ import {filterArray, mapArray, observeInside, subscribeInside} from '@scion/tool
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {SciDimensionModule} from '@scion/components/dimension';
-import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -58,14 +58,12 @@ import {ViewId} from '../../view/workbench-view.model';
   styleUrls: ['./part-bar.component.scss'],
   standalone: true,
   imports: [
-    NgFor,
     AsyncPipe,
     SciViewportComponent,
     SciDimensionModule,
     ViewTabComponent,
     PartActionBarComponent,
     ViewListButtonComponent,
-    NgIf,
   ],
 })
 export class PartBarComponent implements OnInit {

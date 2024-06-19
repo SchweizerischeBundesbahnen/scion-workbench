@@ -10,7 +10,7 @@
                        [ngClass]="view.classList.value"
                        (focuswithin)="onFocusWithin($event)"
                        [keystrokes]="keystrokesToBubble$ | async">
-      <ng-container *ngComponentOutlet="splash"></ng-container>
+      <ng-container *ngComponentOutlet="splash"/>
     </sci-router-outlet>
   </div>
 </wb-content-as-overlay>

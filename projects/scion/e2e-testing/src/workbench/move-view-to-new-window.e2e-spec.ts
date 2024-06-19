@@ -173,7 +173,7 @@ test.describe('Workbench View', () => {
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     const testViewPage = appPO.view({cssClass: 'testee'});
@@ -332,7 +332,7 @@ test.describe('Workbench View', () => {
     const newAppRouterPage = await newWindow.workbenchNavigator.openInNewTab(RouterPagePO);
     await newAppRouterPage.navigate(['test-view'], {
       target: 'blank',
-      cssClass: 'peripheral-view'
+      cssClass: 'peripheral-view',
     });
     await newAppRouterPage.view.tab.close();
 
@@ -412,7 +412,7 @@ test.describe('Workbench View', () => {
     // Open test view in main area.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
-      cssClass: 'test-view'
+      cssClass: 'test-view',
     });
 
     const testViewPage = appPO.view({cssClass: 'test-view'});
@@ -428,7 +428,7 @@ test.describe('Workbench View', () => {
     const newAppRouterPage = await newWindow.workbenchNavigator.openInNewTab(RouterPagePO);
     await newAppRouterPage.navigate(['test-view'], {
       target: 'blank',
-      cssClass: 'peripheral-view'
+      cssClass: 'peripheral-view',
     });
     await newAppRouterPage.view.tab.close();
 

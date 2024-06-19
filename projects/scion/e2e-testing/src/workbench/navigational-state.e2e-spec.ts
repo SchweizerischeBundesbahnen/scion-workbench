@@ -90,7 +90,7 @@ test.describe('Navigational State', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
       state: {state1: 'state 1'},
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
@@ -100,7 +100,7 @@ test.describe('Navigational State', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view', {matrix: 'param'}], {
       state: {state2: 'state 2'},
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     await expect.poll(() => viewPage.getState()).toEqual({state2: 'state 2'});
@@ -109,7 +109,7 @@ test.describe('Navigational State', () => {
     // Navigate view again without state
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     await expect.poll(() => viewPage.getState()).toEqual({});
@@ -119,7 +119,7 @@ test.describe('Navigational State', () => {
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
       state: {state3: 'state 3'},
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     await expect.poll(() => viewPage.getState()).toEqual({state3: 'state 3'});
@@ -232,7 +232,7 @@ test.describe('Navigational State', () => {
       target: 'blank',
       partId: 'right',
       state: {some: 'state'},
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     // Expect view state to be passed to the view.

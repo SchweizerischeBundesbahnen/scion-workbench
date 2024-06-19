@@ -31,14 +31,14 @@ test.describe('Workbench', () => {
     await routerPage.navigate(['test-view'], {
       target: 'blank',
       activate: false,
-      cssClass: 'view-1'
+      cssClass: 'view-1',
     });
 
     // Open view 2 in main area.
     await routerPage.navigate(['test-view'], {
       target: 'blank',
       activate: false,
-      cssClass: 'view-2'
+      cssClass: 'view-2',
     });
     await routerPage.view.tab.close();
 

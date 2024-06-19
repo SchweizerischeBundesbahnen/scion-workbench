@@ -1,4 +1,6 @@
 <span class="chevron scion-workbench-icons">
   chevron_down
 </span>
-<span class="count" *ngIf="scrolledOutOfViewTabCount$ | async as count">{{count}}</span>
+@if (scrolledOutOfViewTabCount$ | async; as count) {
+  <span class="count">{{count}}</span>
+}

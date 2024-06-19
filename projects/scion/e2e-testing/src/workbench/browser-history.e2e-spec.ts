@@ -29,7 +29,7 @@ test.describe('Browser History', () => {
     await routerPage.navigate(['test-view'], {
       target: 'view.101',
       partId: 'left',
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     // Expect view-1 to be active
@@ -40,7 +40,7 @@ test.describe('Browser History', () => {
     await routerPage.navigate(['test-view'], {
       target: 'view.102',
       partId: 'left',
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     // Expect view-2 to be active
@@ -116,7 +116,7 @@ test.describe('Browser History', () => {
       target: 'view.101',
       activate: false,
       position: 'end',
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     // Add view-2
@@ -124,7 +124,7 @@ test.describe('Browser History', () => {
       target: 'view.102',
       activate: false,
       position: 'end',
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     const testee1ViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
@@ -195,7 +195,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/standalone-view-test-page/component'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
@@ -217,7 +217,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/standalone-view-test-page/load-component'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
@@ -239,7 +239,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/standalone-view-test-page/load-children/module'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
@@ -261,7 +261,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/standalone-view-test-page/load-children/routes'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
@@ -283,7 +283,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/standalone-view-test-page/children'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const standaloneViewTestPage = new StandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
@@ -308,7 +308,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/non-standalone-view-test-page/component'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});
@@ -352,7 +352,7 @@ test.describe('Browser History', () => {
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-pages/non-standalone-view-test-page/children'], {
         target: await routerPage.view.getViewId(),
-        cssClass: 'testee'
+        cssClass: 'testee',
       });
 
       const nonStandaloneViewTestPage = new NonStandaloneViewTestPagePO(appPO, {cssClass: 'testee'});

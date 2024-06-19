@@ -3039,7 +3039,7 @@ describe('WorkbenchLayout', () => {
   selector: 'spec-router-outlet-plus-workbench-fixture',
   template: `
     <section class="outlet">
-      <router-outlet name="outlet"></router-outlet>
+      <router-outlet name="outlet"/>
     </section>
     <wb-workbench/>
   `,

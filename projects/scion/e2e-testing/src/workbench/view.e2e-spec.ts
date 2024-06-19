@@ -784,7 +784,7 @@ test.describe('Workbench View', () => {
     await routerPage.navigate(['test-pages/navigation-test-page', {title: 'View Title'}], {
       target: 'view.100',
       activate: true,
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
@@ -799,7 +799,7 @@ test.describe('Workbench View', () => {
     await routerPage.navigate(['test-pages/navigation-test-page', {title: 'View Title'}], {
       target: 'view.100',
       activate: false,
-      cssClass: 'testee'
+      cssClass: 'testee',
     });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
