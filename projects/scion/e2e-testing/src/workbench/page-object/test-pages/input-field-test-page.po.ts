@@ -78,7 +78,7 @@ export class InputFieldTestPagePO implements WorkbenchViewPagePO, WorkbenchDialo
 
     await routerPage.navigate(['test-pages/input-field-test-page'], {
       target: viewId,
-      cssClass: 'input-field-test-page'
+      cssClass: 'input-field-test-page',
     });
 
     const view = appPO.view({cssClass: 'input-field-test-page', viewId});

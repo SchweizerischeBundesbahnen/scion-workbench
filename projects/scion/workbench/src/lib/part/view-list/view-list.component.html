@@ -1,21 +1,23 @@
 <wb-filter-field [formControl]="filterFormControl"/>
-<ng-container *ngIf="{
-    scrolledOutOfView: views$ | async |
-                       wbFilterByPredicate:scrolledOutOfViewFilterFn |
-                       wbFilterByText$:filterFormControl:viewTextFn | async,
-    scrolledIntoView: views$ | async |
-                      wbFilterByPredicate:scrolledIntoViewFilterFn |
-                      wbFilterByText$:filterFormControl:viewTextFn | async
-  } as views">
-  <sci-viewport *ngIf="views.scrolledOutOfView?.length || views.scrolledIntoView?.length">
-    <wb-view-list-item *ngFor="let view of views.scrolledOutOfView"
-                       [viewId]="view.id"
-                       (click)="onActivateView(view)">
-    </wb-view-list-item>
-    <hr *ngIf="views.scrolledOutOfView?.length && views.scrolledIntoView?.length">
-    <wb-view-list-item *ngFor="let view of views.scrolledIntoView"
-                       [viewId]="view.id"
-                       (click)="onActivateView(view)">
-    </wb-view-list-item>
-  </sci-viewport>
-</ng-container>
+@if ({
+  scrolledOutOfView: views$ | async |
+    wbFilterByPredicate:scrolledOutOfViewFilterFn |
+    wbFilterByText$:filterFormControl:viewTextFn | async,
+  scrolledIntoView: views$ | async |
+    wbFilterByPredicate:scrolledIntoViewFilterFn |
+    wbFilterByText$:filterFormControl:viewTextFn | async
+}; as views) {
+  @if (views.scrolledOutOfView?.length || views.scrolledIntoView?.length) {
+    <sci-viewport>
+      @for (view of views.scrolledOutOfView; track view.id) {
+        <wb-view-list-item [viewId]="view.id" (click)="onActivateView(view)"/>
+      }
+      @if (views.scrolledOutOfView?.length && views.scrolledIntoView?.length) {
+        <hr>
+      }
+      @for (view of views.scrolledIntoView; track view.id) {
+        <wb-view-list-item [viewId]="view.id" (click)="onActivateView(view)"/>
+      }
+    </sci-viewport>
+  }
+}

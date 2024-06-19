@@ -18,7 +18,7 @@ import {mapArray} from '@scion/toolkit/operators';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {WorkbenchPart} from '../workbench-part.model';
-import {AsyncPipe, NgFor, NgIf} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {FilterByPredicatePipe} from '../../common/filter-by-predicate.pipe';
 import {FilterByTextPipe} from '../../common/filter-by-text.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -38,8 +38,6 @@ export const ViewListComponentInputs = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    NgIf,
-    NgFor,
     AsyncPipe,
     ReactiveFormsModule,
     FilterFieldComponent,

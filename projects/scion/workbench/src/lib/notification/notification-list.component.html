@@ -1,6 +1,6 @@
-<wb-notification *ngFor="let notification of notifications$ | async; trackBy: trackByFn"
-                 [notification]="notification"
-                 [ngClass]="notification | wbNotificationCssClasses$ | async"
-                 (closeNotification)="onNotificationClose(notification)"
-                 @notification-enter-or-leave>
-</wb-notification>
+@for (notification of notifications$ | async; track notification.config.group || notification) {
+  <wb-notification [notification]="notification"
+                   [ngClass]="notification | wbNotificationCssClasses$ | async"
+                   (closeNotification)="onNotificationClose(notification)"
+                   @notification-enter-or-leave/>
+}

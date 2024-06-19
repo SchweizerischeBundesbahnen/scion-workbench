@@ -1,13 +1,17 @@
-<ng-container *ngFor="let menuItemGroup of menuItemGroups$ | async | wbCoerceMap | keyvalue; last as isLast">
-  <button *ngFor="let menuItem of menuItemGroup.value"
-          class="menu-item"
-          [ngClass]="menuItem.cssClass"
-          [disabled]="menuItem.isDisabled?.()"
-          (click)="onMenuItemClick(menuItem)">
-    <div class="text">
-      <ng-container *cdkPortalOutlet="menuItem.portal"></ng-container>
-    </div>
-    <div class="accelerator">{{menuItem.accelerator | wbFormatAccelerator}}</div>
-  </button>
-  <hr *ngIf="!isLast">
-</ng-container>
+@for (menuItemGroup of menuItemGroups$ | async | wbCoerceMap | keyvalue; track menuItemGroup; let isLast = $last) {
+  @for (menuItem of menuItemGroup.value; track menuItem) {
+    <button
+      class="menu-item"
+      [ngClass]="menuItem.cssClass"
+      [disabled]="menuItem.isDisabled?.()"
+      (click)="onMenuItemClick(menuItem)">
+      <div class="text">
+        <ng-container *cdkPortalOutlet="menuItem.portal"/>
+      </div>
+      <div class="accelerator">{{menuItem.accelerator | wbFormatAccelerator}}</div>
+    </button>
+  }
+  @if (!isLast) {
+    <hr>
+  }
+}

@@ -13,7 +13,6 @@ import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
-import {NgIf} from '@angular/common';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
@@ -26,7 +25,6 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
   standalone: true,
   imports: [
     PortalModule,
-    NgIf,
   ],
 })
 export class ViewListItemComponent {

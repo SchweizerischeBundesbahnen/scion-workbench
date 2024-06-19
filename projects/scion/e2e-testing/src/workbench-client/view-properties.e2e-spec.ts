@@ -43,7 +43,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.navigate({test: 'view-properties'}, {
         target: 'blank',
         params: {title: 'Title 1,Title 2,Title 3'},
-        cssClass: 'testee-blank'
+        cssClass: 'testee-blank',
       });
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
       const viewPropertiesTest = new ViewPropertiesTestPagePO(appPO, viewId);
@@ -80,7 +80,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.navigate({test: 'view-properties'}, {
         target: 'blank',
         params: {heading: 'Heading 1,Heading 2,Heading 3'},
-        cssClass: 'testee-blank'
+        cssClass: 'testee-blank',
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
@@ -117,7 +117,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.navigate({test: 'view-properties'}, {
         target: 'blank',
         params: {dirty: 'true,false'},
-        cssClass: 'testee-blank'
+        cssClass: 'testee-blank',
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
@@ -154,7 +154,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.navigate({test: 'view-properties'}, {
         target: 'blank',
         params: {dirty: 'true,false,true'},
-        cssClass: 'testee-blank'
+        cssClass: 'testee-blank',
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
@@ -191,7 +191,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.navigate({test: 'view-properties'}, {
         target: 'blank',
         params: {closable: 'true,false'},
-        cssClass: 'testee-blank'
+        cssClass: 'testee-blank',
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();
@@ -228,7 +228,7 @@ test.describe('Workbench View Properties', () => {
       await routerPage.navigate({test: 'view-properties'}, {
         target: 'blank',
         params: {closable: 'true,false,true'},
-        cssClass: 'testee-blank'
+        cssClass: 'testee-blank',
       });
 
       const viewId = await appPO.view({cssClass: 'testee-blank'}).getViewId();

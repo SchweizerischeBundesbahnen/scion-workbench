@@ -60,7 +60,7 @@ test.describe('Workbench Message Box Capability', () => {
       type: 'messagebox',
       qualifier: {},
       properties: {
-        path: ''
+        path: '',
       },
     });
     await expect(registeredCapability).rejects.toThrow(/NullQualifierError/);

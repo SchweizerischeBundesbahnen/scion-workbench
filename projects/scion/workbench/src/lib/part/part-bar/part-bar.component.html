@@ -2,15 +2,16 @@
               [class.dragover]="dragover$ | async"
               sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
               (scroll)="onScroll()">
-  <ng-container *ngFor="let viewId of viewIds$ | async;">
-    <div class="divider" *ngIf="viewtab === dropTargetViewTab"></div>
+  @for (viewId of viewIds$ | async; track viewId) {
+    @if (viewtab === dropTargetViewTab) {
+      <div class="divider"></div>
+    }
     <wb-view-tab #viewtab
                  [viewId]="viewId"
                  [class.drag-source]="viewtab === dragSourceViewTab"
-                 [class.drop-target]="viewtab === dropTargetViewTab">
-    </wb-view-tab>
+                 [class.drop-target]="viewtab === dropTargetViewTab"/>
     <div class="divider"></div>
-  </ng-container>
+  }
 
   <!-- Placeholder element to grow the viewport to fit the drag image. -->
   <div class="drag-image-placeholder"></div>

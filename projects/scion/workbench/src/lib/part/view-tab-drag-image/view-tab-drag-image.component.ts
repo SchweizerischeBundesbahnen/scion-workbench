@@ -14,7 +14,7 @@ import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {DOCUMENT, NgIf} from '@angular/common';
+import {DOCUMENT} from '@angular/common';
 import {WorkbenchView} from '../../view/workbench-view.model';
 
 /**
@@ -29,7 +29,6 @@ import {WorkbenchView} from '../../view/workbench-view.model';
   ],
   standalone: true,
   imports: [
-    NgIf,
     PortalModule,
   ],
 })

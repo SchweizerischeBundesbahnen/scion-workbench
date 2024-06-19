@@ -1,11 +1,19 @@
-<ul class="start" *ngIf="part.actions$ | async | wbPartActionFilter:'start' | wbNullIfEmpty as startActions">
-  <li *ngFor="let startAction of startActions" class="e2e-part-action" [ngClass]="startAction.cssClass">
-    <ng-container *cdkPortalOutlet="startAction.portal"></ng-container>
-  </li>
-</ul>
+@if (part.actions$ | async | wbPartActionFilter:'start' | wbNullIfEmpty; as startActions) {
+  <ul class="start">
+    @for (startAction of startActions; track startAction) {
+      <li class="e2e-part-action" [ngClass]="startAction.cssClass">
+        <ng-container *cdkPortalOutlet="startAction.portal"/>
+      </li>
+    }
+  </ul>
+}
 
-<ul class="end" *ngIf="part.actions$ | async | wbPartActionFilter:'end' | wbNullIfEmpty as endActions">
-  <li *ngFor="let endAction of endActions" class="e2e-part-action" [ngClass]="endAction.cssClass">
-    <ng-container *cdkPortalOutlet="endAction.portal"></ng-container>
-  </li>
-</ul>
+@if (part.actions$ | async | wbPartActionFilter:'end' | wbNullIfEmpty; as endActions) {
+  <ul class="end">
+    @for (endAction of endActions; track endAction) {
+      <li class="e2e-part-action" [ngClass]="endAction.cssClass">
+        <ng-container *cdkPortalOutlet="endAction.portal"/>
+      </li>
+    }
+  </ul>
+}
