@@ -52,12 +52,12 @@ export abstract class WorkbenchConfig {
    */
   public abstract startup?: {
     /**
-     * Configures the workbench launching strategy.
+     * Configures the workbench launching strategy. Defaults to `LAZY` if not specified.
      *
      *  - **APP_INITIALIZER**
      *   Launches the workbench in an Angular `APP_INITIALIZER`, which is before bootstrapping the app component.
      *
-     * - **LAZY** (which is the default)
+     * - **LAZY**
      *   Launches the workbench at the latest when bootstrapping the workbench root component `<wb-workbench>`.
      *
      *   With this strategy, you are flexible when to start the workbench. You can start the workbench explicitly by

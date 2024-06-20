@@ -7,17 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EnvironmentInjector, Inject, Injectable, runInInjectionContext} from '@angular/core';
+import {ApplicationInitStatus, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
 import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
-import {WorkbenchLayoutFn, WorkbenchPerspectiveDefinition, WorkbenchPerspectives} from './workbench-perspective.model';
+import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
-import {Logger} from '../logging/logger';
-import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
-import {WORKBENCH_LAYOUT_CONFIG} from '../workbench.constants';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {MAIN_AREA} from '../layout/workbench-layout';
+import {WorkbenchConfig} from '../workbench-config';
+import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 
 /**
  * Enables registration and activation of perspectives.
@@ -25,34 +24,38 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
-  constructor(@Inject(WORKBENCH_LAYOUT_CONFIG) private _layoutConfig: WorkbenchLayoutFn | WorkbenchPerspectives,
+  constructor(private _workbenchConfig: WorkbenchConfig,
               private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
               private _environmentInjector: EnvironmentInjector,
-              private _workbenchPerspectiveStorageService: WorkbenchPerspectiveStorageService,
-              workbenchStartup: WorkbenchStartup,
-              logger: Logger) {
-    workbenchStartup.whenStarted
-      .then(() => this.activateInitialPerspective())
-      .catch(error => logger.error(() => 'Failed to initialize perspectives', error));
+              private _applicationInitStatus: ApplicationInitStatus,
+              private _workbenchPerspectiveStorageService: WorkbenchPerspectiveStorageService) {
   }
 
   public async init(): Promise<void> {
     await this.registerPerspectivesFromConfig();
     await this.registerAnonymousPerspectiveFromWindowName();
+    await this.activateInitialPerspective();
   }
 
   /**
    * Registers perspectives configured in {@link WorkbenchConfig}.
    */
   private async registerPerspectivesFromConfig(): Promise<void> {
-    // Register perspective either from function or object config.
-    if (typeof this._layoutConfig === 'function') {
-      await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: this._layoutConfig});
+    const layout = this._workbenchConfig.layout;
+
+    // Create perspective from layout (if any).
+    if (typeof layout === 'function') {
+      await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout});
     }
-    else {
-      for (const perspective of this._layoutConfig.perspectives) {
+    // Register configured perspectives (if any).
+    else if (layout?.perspectives?.length) {
+      for (const perspective of layout.perspectives) {
         await this.registerPerspective(perspective);
       }
+    }
+    // Register default perspective if no perspective is registered.
+    else if (!this._perspectiveRegistry.perspectives.length) {
+      await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: ((factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA))});
     }
   }
 
@@ -116,41 +119,53 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   }
 
   /**
-   * Activates the initial perspective, if any.
+   * Activates the initial perspective.
    */
   private async activateInitialPerspective(): Promise<void> {
-    // Determine the initial perspective.
-    const initialPerspectiveId = await (async (): Promise<string | undefined> => {
-      // Determine the initial perspective using information from the window name.
-      const perspectiveFromWindow = parsePerspectiveIdFromWindowName();
-      if (perspectiveFromWindow && this._perspectiveRegistry.has(perspectiveFromWindow)) {
-        return perspectiveFromWindow;
-      }
-
-      // Determine the initial perspective using information from the storage.
-      const perspectiveFromStorage = await this._workbenchPerspectiveStorageService.loadActivePerspectiveId();
-      if (perspectiveFromStorage && this._perspectiveRegistry.has(perspectiveFromStorage)) {
-        return perspectiveFromStorage;
-      }
-
-      // Determine the initial perspective using information from the config.
-      const perspectiveFromConfig = typeof this._layoutConfig === 'object' ? this._layoutConfig.initialPerspective : null;
-      if (!perspectiveFromConfig) {
-        return this._perspectiveRegistry.perspectives[0]?.id;
-      }
-      if (typeof perspectiveFromConfig === 'string') {
-        return perspectiveFromConfig;
-      }
-      if (typeof perspectiveFromConfig === 'function') {
-        return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.perspectives])))?.id;
-      }
-      return undefined;
-    })();
-
-    // Select initial perspective.
-    if (initialPerspectiveId) {
-      await this.switchPerspective(initialPerspectiveId, {storePerspectiveAsActive: false});
+    if (!this._perspectiveRegistry.perspectives.length) {
+      throw Error('[NullPerspectiveError] No perspective found to activate.');
     }
+
+    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.perspectives[0].id;
+    const activation = this.switchPerspective(perspectiveId, {storePerspectiveAsActive: false});
+
+    // Switching perspective blocks until the initial navigation has been performed. By default, Angular performs
+    // the initial navigation after running app initializers. Therefore, do not await perspective activation when
+    // starting the workbench during app initialization. Otherwise, Angular would never complete app initialization.
+    if (this._applicationInitStatus.done) {
+      await activation;
+    }
+  }
+
+  /**
+   * Determines which perspective to activate, with the following precedence:
+   *
+   * 1. Perspective defined as window name.
+   * 2. Perspective defined in storage.
+   * 3. Perspective configured in the workbench config.
+   */
+  private async determineInitialPerspective(): Promise<string | undefined> {
+    // Find perspective in window name.
+    const perspectiveFromWindow = parsePerspectiveIdFromWindowName();
+    if (perspectiveFromWindow && this._perspectiveRegistry.has(perspectiveFromWindow)) {
+      return perspectiveFromWindow;
+    }
+
+    // Find perspective in storage.
+    const perspectiveFromStorage = await this._workbenchPerspectiveStorageService.loadActivePerspectiveId();
+    if (perspectiveFromStorage && this._perspectiveRegistry.has(perspectiveFromStorage)) {
+      return perspectiveFromStorage;
+    }
+
+    // Find perspective in config.
+    const perspectiveFromConfig = typeof this._workbenchConfig.layout === 'object' && this._workbenchConfig.layout.initialPerspective;
+    if (typeof perspectiveFromConfig === 'string') {
+      return perspectiveFromConfig;
+    }
+    if (typeof perspectiveFromConfig === 'function') {
+      return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.perspectives])));
+    }
+    return undefined;
   }
 
   /**
