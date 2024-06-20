@@ -53,9 +53,12 @@ export interface WorkbenchPerspectives {
   /**
    * Specifies perspectives to register in the workbench.
    */
-  perspectives: WorkbenchPerspectiveDefinition[];
+  perspectives?: WorkbenchPerspectiveDefinition[];
   /**
-   * Specifies the perspective for the initial workbench layout.
+   * Specifies which perspective to activate. Defaults to the first registered perspective.
+   *
+   * The workbench remembers the active perspective and only evaluates this property when starting the workbench
+   * for the first time, after clearing storage, or if the active perspective no longer exists.
    *
    * Can be either the identity of a perspective or a function to resolve the perspective.
    */
@@ -185,7 +188,7 @@ export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<Wor
  *
  * The function is passed a list of registered perspectives. The function can call `inject` to get any required dependencies.
  */
-export type WorkbenchPerspectiveSelectionFn = (perspectives: WorkbenchPerspective[]) => Promise<WorkbenchPerspective | null> | WorkbenchPerspective | null;
+export type WorkbenchPerspectiveSelectionFn = (perspectives: WorkbenchPerspective[]) => Promise<string | undefined> | string | undefined;
 
 /**
  * Contains different versions of a perspective layout.

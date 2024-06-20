@@ -9,7 +9,6 @@
  */
 
 import {InjectionToken} from '@angular/core';
-import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 
 /**
  * Represents the id prefix of views.
@@ -51,11 +50,6 @@ export type ViewTabRenderingContext = 'tab' | 'list-item' | 'drag-image';
  * DI token to inject the context in which the view tab is rendered.
  */
 export const VIEW_TAB_RENDERING_CONTEXT = new InjectionToken<ViewTabRenderingContext>('VIEW_TAB_RENDERING_CONTEXT');
-
-/**
- * DI token representing the configured workbench layout.
- */
-export const WORKBENCH_LAYOUT_CONFIG = new InjectionToken<WorkbenchLayoutFn | WorkbenchPerspectives>('WORKBENCH_LAYOUT_CONFIG');
 
 /**
  * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.
