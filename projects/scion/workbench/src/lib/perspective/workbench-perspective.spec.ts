@@ -25,10 +25,291 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
+import {WorkbenchPerspective} from './workbench-perspective.model';
+import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 
 describe('Workbench Perspective', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
+
+  it('should have default perspective if not configured any perspectives', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'default', active: true} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({id: 'main'}),
+      },
+    });
+  });
+
+  it('should have configured layout', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: factory => factory
+            .addPart('left')
+            .addPart('right', {align: 'right'}),
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'default', active: true} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left'}),
+          child2: new MPart({id: 'right'}),
+        }),
+      },
+    });
+  });
+
+  it('should have configured perspectives', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                data: {label: 'Perspective 1'},
+                layout: factory => factory
+                  .addPart('left')
+                  .addPart('right', {align: 'right'}),
+              },
+              {
+                id: 'perspective-2',
+                data: {label: 'Perspective 2'},
+                layout: factory => factory
+                  .addPart('top')
+                  .addPart('bottom', {align: 'bottom'}),
+              },
+            ],
+          },
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective-1', data: {label: 'Perspective 1'}, active: true} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-2', data: {label: 'Perspective 2'}, active: false} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left'}),
+          child2: new MPart({id: 'right'}),
+        }),
+      },
+    });
+  });
+
+  it('should activate configured perspective (by id)', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory
+                  .addPart('left')
+                  .addPart('right', {align: 'right'}),
+              },
+              {
+                id: 'perspective-2',
+                layout: factory => factory
+                  .addPart('top')
+                  .addPart('bottom', {align: 'bottom'}),
+              },
+              {
+                id: 'perspective-3',
+                layout: factory => factory.addPart(MAIN_AREA),
+              },
+            ],
+            initialPerspective: 'perspective-2',
+          },
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective-1', active: false} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-2', active: true} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-3', active: false} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'top'}),
+          child2: new MPart({id: 'bottom'}),
+        }),
+      },
+    });
+  });
+
+  it('should activate configured perspective (by function)', async () => {
+    let perspectivesForActivation: string[] | undefined;
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory
+                  .addPart('left')
+                  .addPart('right', {align: 'right'}),
+              },
+              {
+                id: 'perspective-2',
+                layout: factory => factory
+                  .addPart('top')
+                  .addPart('bottom', {align: 'bottom'}),
+              },
+              {
+                id: 'perspective-3',
+                layout: factory => factory
+                  .addPart('left')
+                  .addPart(MAIN_AREA, {align: 'right'})
+                  .addPart('right', {align: 'right'}),
+              },
+            ],
+            initialPerspective: (perspectives: WorkbenchPerspective[]): string => {
+              perspectivesForActivation = perspectives.map(perspective => perspective.id);
+              return 'perspective-2';
+            },
+          },
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective-1', active: false} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-2', active: true} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-3', active: false} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'top'}),
+          child2: new MPart({id: 'bottom'}),
+        }),
+      },
+    });
+    expect(perspectivesForActivation).toEqual(['perspective-1', 'perspective-2', 'perspective-3']);
+  });
+
+  it('should activate first perspective if not configuring an initial perspective', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory
+                  .addPart('left')
+                  .addPart('right', {align: 'right'}),
+              },
+              {
+                id: 'perspective-2',
+                layout: factory => factory
+                  .addPart('top')
+                  .addPart('bottom', {align: 'bottom'}),
+              },
+            ],
+          },
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective-1', active: true} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-2', active: false} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left'}),
+          child2: new MPart({id: 'right'}),
+        }),
+      },
+    });
+  });
+
+  it('should activate first perspective if initial perspective function returns null', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory
+                  .addPart('left')
+                  .addPart('right', {align: 'right'}),
+              },
+              {
+                id: 'perspective-2',
+                layout: factory => factory
+                  .addPart('top')
+                  .addPart('bottom', {align: 'bottom'}),
+              },
+            ],
+            initialPerspective: () => undefined,
+          },
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective-1', active: true} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-2', active: false} satisfies Partial<WorkbenchPerspective>),
+    ]);
+
+    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({id: 'left'}),
+          child2: new MPart({id: 'right'}),
+        }),
+      },
+    });
+  });
 
   it('should support configuring different start page per perspective', async () => {
     TestBed.configureTestingModule({
@@ -204,5 +485,84 @@ describe('Workbench Perspective', () => {
         }),
       },
     });
+  });
+
+  it('should support registering perspectives during workbench startup (without configured perspectives)', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+        }),
+        {
+          provide: WORKBENCH_STARTUP,
+          multi: true,
+          useValue: async () => {
+            const workbenchServie = inject(WorkbenchService);
+            // Wait some time to simulate late perspective registration.
+            await firstValueFrom(timer(500));
+
+            await workbenchServie.registerPerspective({
+              id: 'perspective',
+              layout: factory => factory
+                .addPart('left')
+                .addPart('right', {align: 'right'}),
+            });
+          },
+        },
+      ],
+    });
+
+    await waitForInitialWorkbenchLayout();
+
+    // Expect only the contributed perspective to be registered (and not the default perspective too).
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective', active: true} satisfies Partial<WorkbenchPerspective>),
+    ]);
+  });
+
+  it('should support registering perspectives during workbench startup (with configured perspectives)', async () => {
+    let perspectivesForActivation: string[] | undefined;
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory.addPart(MAIN_AREA),
+              },
+            ],
+            initialPerspective: (perspectives: WorkbenchPerspective[]): string => {
+              perspectivesForActivation = perspectives.map(perspective => perspective.id);
+              return 'perspective-2';
+            },
+          },
+        }),
+        {
+          provide: WORKBENCH_STARTUP,
+          multi: true,
+          useValue: async () => {
+            const workbenchServie = inject(WorkbenchService);
+            // Wait some time to simulate late perspective registration.
+            await firstValueFrom(timer(500));
+
+            await workbenchServie.registerPerspective({
+              id: 'perspective-2',
+              layout: factory => factory.addPart(MAIN_AREA),
+            });
+          },
+        },
+      ],
+    });
+
+    await waitForInitialWorkbenchLayout();
+
+    expect(perspectivesForActivation).toEqual(['perspective-2', 'perspective-1']);
+
+    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
+      jasmine.objectContaining({id: 'perspective-2', active: true} satisfies Partial<WorkbenchPerspective>),
+      jasmine.objectContaining({id: 'perspective-1', active: false} satisfies Partial<WorkbenchPerspective>),
+    ]);
   });
 });

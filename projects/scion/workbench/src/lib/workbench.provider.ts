@@ -12,18 +12,15 @@ import {ENVIRONMENT_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentPr
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WorkbenchConfig} from './workbench-config';
-import {WORKBENCH_LAYOUT_CONFIG} from './workbench.constants';
 import {ViewMenuService} from './part/view-context-menu/view-menu.service';
 import {ViewMoveHandler} from './view/view-move-handler.service';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
 import {provideWorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideLogging} from './logging';
-import {WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './startup/workbench-initializer';
+import {WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP} from './startup/workbench-initializer';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
 import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
 import {provideLocationPatch} from './routing/ɵlocation';
-import {WorkbenchLayoutFactory} from './layout/workbench-layout.factory';
-import {MAIN_AREA} from './layout/workbench-layout';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 
 /**
@@ -74,16 +71,12 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       useClass: config.storage ?? DefaultWorkbenchStorage,
     },
     {
-      provide: WORKBENCH_LAYOUT_CONFIG,
-      useFactory: () => config!.layout ?? ((factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)),
-    },
-    {
       provide: WORKBENCH_PRE_STARTUP,
       useExisting: WorkbenchThemeSwitcher,
       multi: true,
     },
     {
-      provide: WORKBENCH_STARTUP,
+      provide: WORKBENCH_POST_STARTUP,
       multi: true,
       useExisting: WorkbenchPerspectiveService,
     },
