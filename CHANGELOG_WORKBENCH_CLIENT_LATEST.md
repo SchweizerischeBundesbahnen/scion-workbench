@@ -1,51 +1,11 @@
-# [1.0.0-beta.23](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.22...workbench-client-1.0.0-beta.23) (2024-05-21)
+# [1.0.0-beta.24](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.23...workbench-client-1.0.0-beta.24) (2024-06-21)
 
 
 ### Features
 
-* **workbench-client/message-box:** enable microfrontend display in a message box ([3e9d88d](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/3e9d88d79665cbce03acfcf2bbd0e0bbda8d5c78)), closes [#488](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/488)
-
-
-### BREAKING CHANGES
-
-* **workbench-client/message-box:** The signature of the `WorkbenchMessageBoxService.open` method has changed.
-  
-  To migrate:
-  - To display a text message, pass the message as the first argument, not via the `content` property in the options.
-  - To display a custom message box, pass the qualifier as the first argument and options, if any, as the second argument.
-  
-  **Example migration to display a text message**
-  ```ts
-  // Before Migration
-  inject(WorkbenchMessageBoxService).open({
-    content: 'Do you want to continue?',
-    actions: {yes: 'Yes', no: 'No'},
-  });
-  
-  // After Migration
-  inject(WorkbenchMessageBoxService).open('Do you want to continue?', {
-    actions: {yes: 'Yes', no: 'No'},
-  });
-  ```
-  
-  **Example migration to open a custom message box capability**
-  ```ts
-  // Before Migration
-  inject(WorkbenchMessageBoxService).open({
-      title: 'Unsaved Changes',
-      params: {changes: ['change 1', 'change 2']},
-      actions: {yes: 'Yes', no: 'No'},
-    },
-    {confirmation: 'unsaved-changes'},
-  );
-  
-  // After Migration
-  inject(WorkbenchMessageBoxService).open({confirmation: 'unsaved-changes'}, {
-    title: 'Unsaved Changes',
-    params: {changes: ['change 1', 'change 2']},
-    actions: {yes: 'Yes', no: 'No'},
-  });
-  ```
+* **workbench-client/router:** control workbench part to navigate views ([af702d0](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/af702d043d0f353906888374e18a5ec5bf39e0eb))
+* **workbench-client/view:** provide part via view handle ([849d7f3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/849d7f386f6c95b4dd07463daac3512849964a11))
+* **workbench-client/perspective:** enable micro app to contribute perspective ([f20f607](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/f20f607333a480ad9f89f3c13f52ef472ff256c4)), closes [#449](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/449)
 
 
 
