@@ -160,7 +160,8 @@ function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
 /** @private */
 function provideSelectionPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout { // eslint-disable-line no-inner-declarations
   return factory
-    .addPart('left-top')
+    .addPart(MAIN_AREA)
+    .addPart('left-top', {align: 'left'})
     .addPart('left-middle', {align: 'bottom', relativeTo: 'left-top', ratio: .5})
     .addPart('left-bottom', {align: 'bottom', relativeTo: 'left-middle', ratio: .5})
     .addPart('middle-top', {align: 'right', ratio: .4})

@@ -40,9 +40,8 @@ import {ViewState} from '../routing/routing.model';
 import {RouterUtils} from '../routing/router.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchSelectionService} from '../selection/workbench-selection.service';
-import {WorkbenchSelectionProvider} from '../selection/workbench-selection.model';
 
-export class ɵWorkbenchView implements WorkbenchView, WorkbenchSelectionProvider, Blockable {
+export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);

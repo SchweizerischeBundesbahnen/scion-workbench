@@ -9,6 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
+import {WorkbenchSelectionProvider} from '../selection/workbench-selection.model';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -17,7 +18,12 @@ import {Observable} from 'rxjs';
  *
  * Dialog inputs are available as input properties in the dialog component.
  */
-export abstract class WorkbenchDialog<R = unknown> {
+export abstract class WorkbenchDialog<R = unknown> implements WorkbenchSelectionProvider {
+
+  /**
+   * Sets the title of the dialog; can be a string literal or an Observable.
+   */
+  public abstract id: string;
 
   /**
    * Sets the title of the dialog; can be a string literal or an Observable.

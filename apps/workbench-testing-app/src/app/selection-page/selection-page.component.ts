@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import SelectionProviderPageComponent from './selection-provider-page/selection-provider-page.component';
 import SelectionListenerPageComponent from './selection-listener-page/selection-listener-page.component';
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
+import {WorkbenchDialog, WorkbenchSelectionProvider, WorkbenchView} from '@scion/workbench';
 
 @Component({
   selector: 'app-selection-page',
@@ -26,4 +27,13 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
   ],
 })
 export default class SelectionPageComponent {
+
+  constructor() {
+    const view = inject(WorkbenchView, {optional: true});
+    const dialog = inject(WorkbenchDialog, {optional: true});
+    const selectionProvider = inject(WorkbenchSelectionProvider, {optional: true});
+    console.log('>>> view', view);
+    console.log('>>> dialog', dialog);
+    console.log('>>> selectionProvider', selectionProvider);
+  }
 }

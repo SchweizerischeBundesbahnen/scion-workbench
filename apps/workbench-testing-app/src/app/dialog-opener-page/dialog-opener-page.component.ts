@@ -23,6 +23,7 @@ import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-pag
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import {CssClassComponent} from '../css-class/css-class.component';
+import SelectionPageComponent from '../selection-page/selection-page.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -89,7 +90,7 @@ export default class DialogOpenerPageComponent {
       .catch(error => this.dialogError = stringifyError(error) || 'Workbench Dialog was closed with an error');
   }
 
-  private parseComponentFromUI(): Type<DialogPageComponent | BlankTestPageComponent | DialogOpenerPageComponent> {
+  private parseComponentFromUI(): Type<DialogPageComponent | BlankTestPageComponent | DialogOpenerPageComponent | SelectionPageComponent> {
     switch (this.form.controls.component.value) {
       case 'dialog-page':
         return DialogPageComponent;
@@ -101,6 +102,8 @@ export default class DialogOpenerPageComponent {
         return FocusTestPageComponent;
       case 'input-field-test-page':
         return InputFieldTestPageComponent;
+      case 'selection-page':
+        return SelectionPageComponent;
       default:
         throw Error(`[IllegalDialogComponent] Dialog component not supported: ${this.form.controls.component.value}`);
     }

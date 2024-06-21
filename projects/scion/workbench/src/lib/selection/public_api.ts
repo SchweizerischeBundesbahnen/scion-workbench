@@ -12,3 +12,4 @@ export {WorkbenchSelectionManagerService} from './workbench-selection-manager.se
 export {ɵWorkbenchSelectionManagerService} from './ɵworkbench-selection-manager.service'; // TODO remove
 export {WorkbenchSelection, WorkbenchSelectionData} from './workbench-selection.model';
 export {WorkbenchSelectionService} from './workbench-selection.service';
+export {WorkbenchSelectionProvider} from './workbench-selection.model';

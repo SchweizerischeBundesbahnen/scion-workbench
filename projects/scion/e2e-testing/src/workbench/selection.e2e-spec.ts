@@ -597,4 +597,47 @@ test.describe('Workbench Selection', () => {
       });
     });
   });
+
+  test.describe('Dialog', () => {
+
+    test('should set selection', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('left')
+        .addPart('right', {align: 'right'})
+        .addView('selection-provider', {partId: 'left', activateView: true, cssClass: 'selection-provider'})
+        .addView('selection-listener', {partId: 'right', activateView: true, cssClass: 'selection-listener'})
+        .navigateView('selection-provider', ['test-selection'])
+        .navigateView('selection-listener', ['test-selection']),
+      );
+
+      const selectionProviderPage = new SelectionPagePO(appPO, {cssClass: 'selection-provider'});
+      const selectionListenerPage = new SelectionPagePO(appPO, {cssClass: 'selection-listener'});
+
+      // Subscribe to selection
+      await selectionListenerPage.subscribe();
+
+      // Set selection
+      await selectionProviderPage.setSelection({
+        testee: ['A', 'B'],
+      });
+
+      // Expect selection to be set
+      await expect.poll(() => selectionListenerPage.getSelection()).toEqual({
+        testee: ['A', 'B'],
+      });
+
+      // Set selection
+      await selectionProviderPage.setSelection({
+        testee: ['C', 'D'],
+      });
+
+      // Expect selection to be set
+      await expect.poll(() => selectionListenerPage.getSelection()).toEqual({
+        testee: ['C', 'D'],
+      });
+    });
+
+  });
 });

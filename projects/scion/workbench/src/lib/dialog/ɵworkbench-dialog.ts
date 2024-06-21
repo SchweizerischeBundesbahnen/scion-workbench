@@ -34,6 +34,9 @@ import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
 import {UUID} from '@scion/toolkit/uuid';
+import {WorkbenchSelectionProvider} from '../selection/workbench-selection.model';
+import {ɵWorkbenchSelectionService} from '../selection/ɵworkbench-selection.service';
+import {WorkbenchSelectionService} from '@scion/workbench';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
@@ -203,6 +206,9 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
       providers: [
         {provide: ɵWorkbenchDialog, useValue: this},
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
+        {provide: WorkbenchSelectionProvider, useExisting: ɵWorkbenchDialog},
+        ɵWorkbenchSelectionService,
+        {provide: WorkbenchSelectionService, useExisting: ɵWorkbenchSelectionService},
       ],
     }));
   }

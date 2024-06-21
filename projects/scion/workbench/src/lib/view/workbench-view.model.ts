@@ -4,6 +4,7 @@ import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ViewState} from '../routing/routing.model';
+import {WorkbenchSelectionProvider} from '../selection/workbench-selection.model';
 
 /**
  * Handle to interact with a view opened via {@link WorkbenchRouter}.
@@ -14,7 +15,7 @@ import {ViewState} from '../routing/routing.model';
  *
  * @see WorkbenchRouter
  */
-export abstract class WorkbenchView {
+export abstract class WorkbenchView implements WorkbenchSelectionProvider {
 
   /**
    * Unique identity of this view.
