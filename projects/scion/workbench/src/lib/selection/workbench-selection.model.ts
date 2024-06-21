@@ -26,3 +26,7 @@ export class ɵWorkbenchSelection implements WorkbenchSelection {
     this.provider = options.provider;
   }
 }
+
+export abstract class WorkbenchSelectionProvider {
+  public abstract readonly id: string;
+}

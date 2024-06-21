@@ -41,7 +41,7 @@ export default class SelectionListenerPageComponent {
   public onSubscribe(): void {
     this._subscription = this._selectionService.selection$
       .subscribe(selection => {
-        return this.workbenchSelection = selection;
+        this.workbenchSelection = selection;
       });
   }
 

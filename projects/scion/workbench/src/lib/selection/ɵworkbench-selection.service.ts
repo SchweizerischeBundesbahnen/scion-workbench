@@ -11,10 +11,9 @@
 import {Injectable} from '@angular/core';
 import {WorkbenchSelectionManagerService} from './workbench-selection-manager.service';
 import {Observable} from 'rxjs';
-import {WorkbenchView} from '../view/workbench-view.model';
 import {filter, map} from 'rxjs/operators';
 import {WorkbenchSelectionService} from './workbench-selection.service';
-import {WorkbenchSelectionData, ɵWorkbenchSelection} from './workbench-selection.model';
+import {WorkbenchSelectionData, WorkbenchSelectionProvider, ɵWorkbenchSelection} from './workbench-selection.model';
 
 /** @inheritDoc */
 @Injectable()
@@ -23,19 +22,19 @@ export class ɵWorkbenchSelectionService implements WorkbenchSelectionService {
   public readonly selection$: Observable<WorkbenchSelectionData>;
 
   constructor(private _selectionManager: WorkbenchSelectionManagerService,
-              private _view: WorkbenchView) {
+              private _selectionProvider: WorkbenchSelectionProvider) {
     this.selection$ = this._selectionManager.selection$
       .pipe(
-        filter(selection => selection.provider !== this._view.id),
-        map(selection => selection.data), // TODO without undefined? why?
+        filter(selection => selection.provider !== this._selectionProvider.id),
+        map(selection => selection.data),
       );
   }
 
   public setSelection(selection: WorkbenchSelectionData): void {
-    this._selectionManager.setSelection(new ɵWorkbenchSelection(selection, {provider: this._view.id}));
+    this._selectionManager.setSelection(new ɵWorkbenchSelection(selection, {provider: this._selectionProvider.id}));
   }
 
   public deleteSelection(): void {
-    this._selectionManager.deleteSelection(this._view.id);
+    this._selectionManager.deleteSelection(this._selectionProvider.id);
   }
 }

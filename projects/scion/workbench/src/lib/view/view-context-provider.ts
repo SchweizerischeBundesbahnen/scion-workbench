@@ -17,6 +17,7 @@ import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 import {WorkbenchSelectionService} from '../selection/workbench-selection.service';
 import {ɵWorkbenchSelectionService} from '../selection/ɵworkbench-selection.service';
+import {WorkbenchSelectionProvider} from '../selection/workbench-selection.model';
 
 /**
  * Configures an injector with providers that are aware of the specified view.
@@ -25,6 +26,7 @@ export function provideViewContext(view: ɵWorkbenchView | null | undefined): an
   return [
     {provide: ɵWorkbenchView, useValue: view ?? null},
     {provide: WorkbenchView, useExisting: ɵWorkbenchView},
+    {provide: WorkbenchSelectionProvider, useExisting: ɵWorkbenchView},
     PopupService,
     ɵWorkbenchDialogService,
     {provide: WorkbenchDialogService, useExisting: ɵWorkbenchDialogService},
