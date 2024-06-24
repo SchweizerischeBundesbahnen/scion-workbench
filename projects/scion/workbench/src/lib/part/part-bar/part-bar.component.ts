@@ -305,6 +305,7 @@ export class PartBarComponent implements OnInit {
         alternativeViewId: this._dragData!.alternativeViewId,
         viewUrlSegments: this._dragData!.viewUrlSegments,
         navigationHint: this._dragData!.navigationHint,
+        navigationData: this._dragData!.navigationData,
         classList: this._dragData!.classList,
       },
       target: {

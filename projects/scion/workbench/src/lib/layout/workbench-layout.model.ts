@@ -11,6 +11,7 @@
 import {assertType} from '../common/asserts.util';
 import {Defined} from '@scion/toolkit/util';
 import {ViewId} from '../view/workbench-view.model';
+import {NavigationData} from '../routing/routing.model';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -115,6 +116,7 @@ export interface MView {
   navigation?: {
     id: string;
     hint?: string;
+    data?: NavigationData;
     cssClass?: string[];
   };
 }

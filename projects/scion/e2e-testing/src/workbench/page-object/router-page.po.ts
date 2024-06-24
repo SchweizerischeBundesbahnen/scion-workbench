@@ -15,7 +15,7 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {Commands, ViewId, ViewState, WorkbenchNavigationExtras} from '@scion/workbench';
+import {Commands, NavigationData, NavigationState, ViewId, WorkbenchNavigationExtras} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RouterPageComponent}.
@@ -72,6 +72,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   private async enterExtras(extras: WorkbenchNavigationExtras & RouterPageOptions | undefined): Promise<void> {
     await this.enterTarget(extras?.target);
     await this.enterHint(extras?.hint);
+    await this.enterData(extras?.data);
     await this.enterState(extras?.state);
     await this.checkActivate(extras?.activate);
     await this.checkClose(extras?.close);
@@ -81,7 +82,13 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.enterCssClass(extras?.cssClass);
   }
 
-  private async enterState(state?: ViewState): Promise<void> {
+  private async enterData(data?: NavigationData): Promise<void> {
+    const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-data'));
+    await keyValueField.clear();
+    await keyValueField.addEntries(data ?? {});
+  }
+
+  private async enterState(state?: NavigationState): Promise<void> {
     const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-state'));
     await keyValueField.clear();
     await keyValueField.addEntries(state ?? {});

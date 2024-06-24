@@ -36,7 +36,7 @@ import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
 import {ClassList} from '../common/class-list';
-import {ViewState} from '../routing/routing.model';
+import {NavigationData, NavigationState} from '../routing/routing.model';
 import {RouterUtils} from '../routing/router.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 
@@ -72,8 +72,9 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public alternativeId: string | undefined;
   public navigationId: string | undefined;
   public navigationHint: string | undefined;
+  public navigationData: NavigationData = {};
+  public navigationState: NavigationState = {};
   public urlSegments: UrlSegment[] = [];
-  public state: ViewState = {};
   public title: string | null = null;
   public heading: string | null = null;
   public dirty = false;
@@ -153,7 +154,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.urlSegments = layout.urlSegments({viewId: this.id});
     this.navigationId = mView.navigation?.id;
     this.navigationHint = mView.navigation?.hint;
-    this.state = layout.viewState({viewId: this.id});
+    this.navigationData = mView.navigation?.data ?? {};
+    this.navigationState = layout.navigationState({viewId: this.id});
     this.classList.set(mView.cssClass, {scope: 'layout'});
     this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
 
@@ -310,6 +312,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       alternativeViewId: this.alternativeId,
       viewUrlSegments: this.urlSegments,
       navigationHint: this.navigationHint,
+      navigationData: this.navigationData,
       classList: this.classList.toMap(),
     };
 

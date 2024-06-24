@@ -59,6 +59,7 @@ export const LayoutPages = {
       await locator.locator('input.e2e-view-id').nth(i).fill(viewNavigation.id);
       await locator.locator('input.e2e-commands').nth(i).fill(commandsToPath(viewNavigation.commands));
       await locator.locator('input.e2e-hint').nth(i).fill(viewNavigation.hint ?? '');
+      await locator.locator('input.e2e-data').nth(i).fill(toMatrixNotation(viewNavigation.data));
       await locator.locator('input.e2e-state').nth(i).fill(toMatrixNotation(viewNavigation.state));
       await locator.locator('input.e2e-class').nth(i).fill(coerceArray(viewNavigation.cssClass).join(' '));
     }

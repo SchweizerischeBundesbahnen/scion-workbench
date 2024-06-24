@@ -713,7 +713,7 @@ test.describe('Workbench Router', () => {
       {
         viewId: 'view.100',
         urlSegments: 'test-view',
-        state: {navigated: '1'},
+        navigationState: {navigated: '1'},
         partId: 'left',
       } satisfies Partial<ViewInfo>,
     );
@@ -731,7 +731,7 @@ test.describe('Workbench Router', () => {
       {
         viewId: 'view.100',
         urlSegments: 'test-view',
-        state: {navigated: '1'},
+        navigationState: {navigated: '1'},
         partId: 'left',
       } satisfies Partial<ViewInfo>,
     );
@@ -741,7 +741,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        state: {navigated: '2'},
+        navigationState: {navigated: '2'},
         partId: 'right',
       } satisfies Partial<ViewInfo>,
     );
@@ -771,7 +771,7 @@ test.describe('Workbench Router', () => {
       {
         urlSegments: 'test-view',
         partId: await appPO.activePart({inMainArea: true}).getPartId(),
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -781,7 +781,7 @@ test.describe('Workbench Router', () => {
         viewId: 'view.100',
         urlSegments: 'test-view',
         partId: 'left',
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
@@ -815,7 +815,7 @@ test.describe('Workbench Router', () => {
       {
         urlSegments: 'test-view',
         partId: await appPO.activePart({inMainArea: false}).getPartId(),
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -825,7 +825,7 @@ test.describe('Workbench Router', () => {
         viewId: 'view.100',
         urlSegments: 'test-view',
         partId: 'right',
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
@@ -1116,14 +1116,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-view'},
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view.102 not to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-router'},
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1154,14 +1154,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: 'test-view'},
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view.102 to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: ''},
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1193,14 +1193,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: 'test-view'},
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view.102 to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: 'test-view'},
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1230,14 +1230,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-router'},
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect testee to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-view'},
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });

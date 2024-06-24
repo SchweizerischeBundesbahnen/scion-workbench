@@ -39,8 +39,10 @@ export interface MViewV5 {
   navigation?: {
     id: string;
     hint?: string;
+    data?: NavigationDataV5;
     cssClass?: string[];
   };
 }
 
 export type ViewIdV5 = `view.${number}`;
+export type NavigationDataV5 = {[key: string]: unknown};

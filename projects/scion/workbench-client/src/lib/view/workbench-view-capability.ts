@@ -121,8 +121,8 @@ export interface ViewParamDefinition extends ParamDefinition {
    * By default, parameters are passed via the workbench URL as matrix parameters.
    * Marking a parameter as "transient" instructs the router to pass it via navigational state, useful for large objects.
    *
-   * Transient parameters are stored in the browser's session history, supporting back/forward navigation, but are lost on page reload.
-   * Therefore, microfrontends must be able to restore their state without relying on transient parameters.
+   * Transient parameters are stored in the browser's session history, supporting back/forward navigation and page reload, but are lost when the application is closed.
+   * Microfrontends must be able to restore state without relying on transient parameters.
    */
   transient?: boolean;
   /**

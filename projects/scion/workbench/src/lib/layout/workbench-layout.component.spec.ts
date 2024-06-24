@@ -19,8 +19,8 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {By} from '@angular/platform-browser';
 import {MAIN_AREA} from './workbench-layout';
-import {toHaveTransientStateCustomMatcher} from '../testing/jasmine/matcher/to-have-transient-state.matcher';
-import {enterTransientViewState, TestComponent, withComponentContent, withTransientStateInputElement} from '../testing/test.component';
+import {toHaveComponentStateCustomMatcher} from '../testing/jasmine/matcher/to-have-component-state.matcher';
+import {enterComponentState, TestComponent, withComponentContent, withComponentStateInputElement} from '../testing/test.component';
 import {segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../workbench-id';
@@ -32,7 +32,7 @@ describe('WorkbenchLayout', () => {
   beforeEach(() => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
     jasmine.addMatchers(toBeRegisteredCustomMatcher);
-    jasmine.addMatchers(toHaveTransientStateCustomMatcher);
+    jasmine.addMatchers(toHaveComponentStateCustomMatcher);
   });
 
   /**
@@ -255,8 +255,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -266,7 +266,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -274,12 +274,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -287,9 +287,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -319,9 +319,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move a view to a new part in the west', async () => {
@@ -329,8 +329,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -340,7 +340,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -348,12 +348,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -361,9 +361,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -393,9 +393,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'WEST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move a view to a new part in the north', async () => {
@@ -403,8 +403,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -414,7 +414,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -422,12 +422,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -435,9 +435,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 1 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -467,9 +467,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'NORTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move a view to a new part in the south', async () => {
@@ -477,8 +477,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -488,7 +488,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -496,12 +496,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -509,9 +509,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 1 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -541,9 +541,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('disallows to move a view to a new part in the center', async () => {
@@ -551,8 +551,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -562,7 +562,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -570,12 +570,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -583,9 +583,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 1 to a new part in the center
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -608,9 +608,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move views to another part', async () => {
@@ -618,9 +618,9 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/3', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -630,7 +630,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -638,12 +638,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -651,14 +651,14 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Add view 3
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -666,11 +666,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: false});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -701,11 +701,11 @@ describe('WorkbenchLayout', () => {
     });
 
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to the new part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -733,11 +733,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST', active: false});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 1 to the new part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -761,11 +761,11 @@ describe('WorkbenchLayout', () => {
     });
 
     expect('view.1').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: false});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST', active: false});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('allows to move the last view of a part to a new part in the east', async () => {
@@ -773,8 +773,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -784,7 +784,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -792,12 +792,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -805,9 +805,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -838,9 +838,9 @@ describe('WorkbenchLayout', () => {
     });
 
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east of part EAST-1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -870,9 +870,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-2', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move the last view of a part to a new part in the west', async () => {
@@ -880,8 +880,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -891,7 +891,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -899,12 +899,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -912,9 +912,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -945,9 +945,9 @@ describe('WorkbenchLayout', () => {
     });
 
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -977,9 +977,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'WEST-2', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move the last view of a part to a new part in the north', async () => {
@@ -987,8 +987,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -998,7 +998,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1006,12 +1006,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1019,9 +1019,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1051,9 +1051,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the north of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1083,9 +1083,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'NORTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move the last view of a part to a new part in the south', async () => {
@@ -1093,8 +1093,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1104,7 +1104,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1112,12 +1112,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1125,9 +1125,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1157,9 +1157,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1189,9 +1189,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move a view around parts', async () => {
@@ -1199,9 +1199,9 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/3', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1211,7 +1211,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1219,12 +1219,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1232,14 +1232,14 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Add view 3
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1247,11 +1247,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: false});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1282,11 +1282,11 @@ describe('WorkbenchLayout', () => {
     });
 
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the south of part 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1321,11 +1321,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH-EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the south of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1360,11 +1360,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH-WEST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('allows to move a view to a new part in the south and back to the initial part ', async () => {
@@ -1372,8 +1372,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1383,7 +1383,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1391,12 +1391,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1404,9 +1404,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1436,9 +1436,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 back to the initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1461,9 +1461,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move a view to a new part in the east and then to the south of the initial part ', async () => {
@@ -1471,8 +1471,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1482,7 +1482,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1490,12 +1490,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1503,9 +1503,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1535,9 +1535,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1567,9 +1567,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('allows to move a view to a new part in the west and then to the south of the initial part ', async () => {
@@ -1577,8 +1577,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1588,7 +1588,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1596,12 +1596,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1609,9 +1609,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1641,9 +1641,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'WEST', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1673,9 +1673,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('should open the same view multiple times', async () => {
@@ -1683,8 +1683,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1694,7 +1694,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1703,12 +1703,12 @@ describe('WorkbenchLayout', () => {
     });
 
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1716,9 +1716,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Add view 2 again
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'main'});
@@ -1730,9 +1730,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('should open the same view multiple times', async () => {
@@ -1740,8 +1740,8 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1751,7 +1751,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1759,12 +1759,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1772,14 +1772,14 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Add view 2 again
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'main', target: 'blank'});
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1787,11 +1787,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: false});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('should open views to the right and to the left, and then close them', async () => {
@@ -1799,10 +1799,10 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view/1', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/2', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/3', component: TestComponent, providers: [withTransientStateInputElement()]},
-          {path: 'path/to/view/4', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view/1', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/2', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/3', component: TestComponent, providers: [withComponentStateInputElement()]},
+          {path: 'path/to/view/4', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -1812,7 +1812,7 @@ describe('WorkbenchLayout', () => {
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1820,12 +1820,12 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     // Add view 2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1833,9 +1833,9 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: false});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1865,14 +1865,14 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
 
     // Add view 3 to part EAST-1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1885,11 +1885,11 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: false});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1924,16 +1924,16 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST-2', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
 
     // Add view 4 to part EAST-2
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4']);
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.4', 'D');
+    enterComponentState(fixture, 'view.4', 'D');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
@@ -1951,13 +1951,13 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST-2', active: false});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
     expect('view.4').toBeRegistered({partId: 'EAST-2', active: true});
-    expect('view.4').toHaveTransientState('D');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -1997,13 +1997,13 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'EAST-2', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
-    expect('view.4').toHaveTransientState('D');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 3 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2043,13 +2043,13 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
     expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'WEST-2', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
-    expect('view.4').toHaveTransientState('D');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 2 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2089,14 +2089,14 @@ describe('WorkbenchLayout', () => {
       },
     });
     expect('view.1').toBeRegistered({partId: 'main', active: true});
-    expect('view.1').toHaveTransientState('A');
+    expect('view.1').toHaveComponentState('A');
 
     expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'WEST-2', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
-    expect('view.4').toHaveTransientState('D');
+    expect('view.4').toHaveComponentState('D');
 
     // Close view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {close: true});
@@ -2119,11 +2119,11 @@ describe('WorkbenchLayout', () => {
     });
     expect('view.1').not.toBeRegistered({partId: 'main', active: true});
     expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').toBeRegistered({partId: 'WEST-2', active: true});
-    expect('view.3').toHaveTransientState('C');
+    expect('view.3').toHaveComponentState('C');
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
-    expect('view.4').toHaveTransientState('D');
+    expect('view.4').toHaveComponentState('D');
 
     // Close view 3
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3'], {close: true});
@@ -2141,10 +2141,10 @@ describe('WorkbenchLayout', () => {
     });
     expect('view.1').not.toBeRegistered({partId: 'main', active: true});
     expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').not.toBeRegistered({partId: 'WEST-2', active: true});
     expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
-    expect('view.4').toHaveTransientState('D');
+    expect('view.4').toHaveComponentState('D');
 
     // Close view 4
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4'], {close: true});
@@ -2157,7 +2157,7 @@ describe('WorkbenchLayout', () => {
     });
     expect('view.1').not.toBeRegistered({partId: 'main', active: true});
     expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
     expect('view.3').not.toBeRegistered({partId: 'WEST-2', active: true});
     expect('view.4').not.toBeRegistered({partId: 'WEST-1', active: true});
   });
@@ -2167,7 +2167,7 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -2189,15 +2189,15 @@ describe('WorkbenchLayout', () => {
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     // Move view.2 to the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2226,9 +2226,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view.3 to the north of view.2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2262,9 +2262,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('should detach views before being re-parented in the DOM (2)', async () => {
@@ -2272,7 +2272,7 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -2294,15 +2294,15 @@ describe('WorkbenchLayout', () => {
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2331,9 +2331,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the west of the initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2362,9 +2362,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('should detach views before being re-parented in the DOM (3)', async () => {
@@ -2372,7 +2372,7 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -2396,19 +2396,19 @@ describe('WorkbenchLayout', () => {
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.4'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.4', 'D');
+    enterComponentState(fixture, 'view.4', 'D');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2437,10 +2437,10 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2474,10 +2474,10 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2516,10 +2516,10 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 3 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2558,10 +2558,10 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
+    expect('view.4').toHaveComponentState('D');
 
     // Move view 2 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2600,10 +2600,10 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
+    expect('view.4').toHaveComponentState('D');
 
     // Close view 1
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.1', close: true});
@@ -2624,9 +2624,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
+    expect('view.4').toHaveComponentState('D');
 
     // Close view 3
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.3', close: true});
@@ -2642,8 +2642,8 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.2').toHaveTransientState('B');
-    expect('view.4').toHaveTransientState('D');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.4').toHaveComponentState('D');
 
     // Close view 4
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.4', close: true});
@@ -2654,7 +2654,7 @@ describe('WorkbenchLayout', () => {
         root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.2').toHaveTransientState('B');
+    expect('view.2').toHaveComponentState('B');
   });
 
   it('should detach views before being re-parented in the DOM (4)', async () => {
@@ -2662,7 +2662,7 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -2684,15 +2684,15 @@ describe('WorkbenchLayout', () => {
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2721,9 +2721,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the south of EAST part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2757,9 +2757,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the north of EAST part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2793,9 +2793,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('should detach views before being re-parented in the DOM (5)', async () => {
@@ -2803,7 +2803,7 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -2825,15 +2825,15 @@ describe('WorkbenchLayout', () => {
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.3'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.3', 'C');
+    enterComponentState(fixture, 'view.3', 'C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2862,9 +2862,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the north of EAST part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2898,9 +2898,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the south of NORTH part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2934,9 +2934,9 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
-    expect('view.3').toHaveTransientState('C');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
+    expect('view.3').toHaveComponentState('C');
   });
 
   it('should detach views before being re-parented in the DOM (6)', async () => {
@@ -2944,7 +2944,7 @@ describe('WorkbenchLayout', () => {
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
-          {path: 'path/to/view', component: TestComponent, providers: [withTransientStateInputElement()]},
+          {path: 'path/to/view', component: TestComponent, providers: [withComponentStateInputElement()]},
         ]),
       ],
     });
@@ -2964,11 +2964,11 @@ describe('WorkbenchLayout', () => {
     // Enter transient states.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.1'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.1', 'A');
+    enterComponentState(fixture, 'view.1', 'A');
 
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.activateView('view.2'));
     await waitUntilStable();
-    enterTransientViewState(fixture, 'view.2', 'B');
+    enterComponentState(fixture, 'view.2', 'B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -2997,8 +2997,8 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west of initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -3027,8 +3027,8 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toHaveTransientState('A');
-    expect('view.2').toHaveTransientState('B');
+    expect('view.1').toHaveComponentState('A');
+    expect('view.2').toHaveComponentState('B');
   });
 });
 

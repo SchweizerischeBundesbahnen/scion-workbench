@@ -5,17 +5,13 @@
     <sci-form-field label="Path">
       <app-router-commands [formControl]="form.controls.commands"/>
     </sci-form-field>
-
-    <sci-form-field label="State">
-      <sci-key-value-field [keyValueFormArray]="form.controls.state" [addable]="true" [removable]="true" class="e2e-state"/>
-    </sci-form-field>
   </section>
 
   <section>
     <header>Navigation Extras</header>
 
     <sci-form-field label="Target">
-      <input [formControl]="form.controls.target" class="e2e-target" [attr.list]="targetList">
+      <input [formControl]="form.controls.extras.controls.target" class="e2e-target" [attr.list]="targetList">
       <datalist [attr.id]="targetList">
         <option value="auto">auto</option>
         <option value="blank">blank</option>
@@ -23,11 +19,11 @@
     </sci-form-field>
 
     <sci-form-field label="Hint">
-      <input [formControl]="form.controls.hint" class="e2e-hint">
+      <input [formControl]="form.controls.extras.controls.hint" class="e2e-hint">
     </sci-form-field>
 
     <sci-form-field label="Part ID">
-      <input [formControl]="form.controls.partId" class="e2e-part-id" [attr.list]="partList">
+      <input [formControl]="form.controls.extras.controls.partId" class="e2e-part-id" [attr.list]="partList">
       <datalist [attr.id]="partList">
         @for (part of workbenchService.parts$ | async; track part.id) {
           <option [value]="part.id">{{part.id}}</option>
@@ -36,7 +32,7 @@
     </sci-form-field>
 
     <sci-form-field label="Position">
-      <input [formControl]="form.controls.position" [attr.list]="positionList" class="e2e-position">
+      <input [formControl]="form.controls.extras.controls.position" [attr.list]="positionList" class="e2e-position">
       <datalist [attr.id]="positionList">
         <option value="start">
         <option value="end">
@@ -45,16 +41,24 @@
       </datalist>
     </sci-form-field>
 
+    <sci-form-field label="Data">
+      <sci-key-value-field [keyValueFormArray]="form.controls.extras.controls.data" [addable]="true" [removable]="true" class="e2e-data"/>
+    </sci-form-field>
+
+    <sci-form-field label="State">
+      <sci-key-value-field [keyValueFormArray]="form.controls.extras.controls.state" [addable]="true" [removable]="true" class="e2e-state"/>
+    </sci-form-field>
+
     <sci-form-field label="Query parameters">
-      <sci-key-value-field [keyValueFormArray]="form.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"/>
+      <sci-key-value-field [keyValueFormArray]="form.controls.extras.controls.queryParams" [addable]="true" [removable]="true" class="e2e-query-params"/>
     </sci-form-field>
 
     <sci-form-field label="Activate">
-      <sci-checkbox [formControl]="form.controls.activate" class="e2e-activate"/>
+      <sci-checkbox [formControl]="form.controls.extras.controls.activate" class="e2e-activate"/>
     </sci-form-field>
 
     <sci-form-field label="Close">
-      <sci-checkbox [formControl]="form.controls.close" class="e2e-close"/>
+      <sci-checkbox [formControl]="form.controls.extras.controls.close" class="e2e-close"/>
     </sci-form-field>
 
     <sci-form-field label="View Context" title="Controls whether to navigate outside the view context (only relevant if navigating via router link)">
@@ -62,7 +66,7 @@
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <app-css-class [formControl]="form.controls.cssClass"/>
+      <app-css-class [formControl]="form.controls.extras.controls.cssClass"/>
     </sci-form-field>
   </section>
 

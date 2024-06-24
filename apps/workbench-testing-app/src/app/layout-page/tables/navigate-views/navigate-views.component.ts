@@ -15,7 +15,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {Commands, ViewState} from '@scion/workbench';
+import {Commands, NavigationData, NavigationState} from '@scion/workbench';
 import {RouterCommandsComponent} from '../../../router-commands/router-commands.component';
 import {CssClassComponent} from '../../../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
@@ -54,7 +54,8 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
       commands: FormControl<Commands>;
       extras: FormGroup<{
         hint: FormControl<string | undefined>;
-        state: FormControl<ViewState | undefined>;
+        data: FormControl<NavigationData | undefined>;
+        state: FormControl<NavigationState | undefined>;
         cssClass: FormControl<string | string[] | undefined>;
       }>;
     }>>([]),
@@ -70,6 +71,7 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
           commands: navigationFormGroup.controls.commands.value,
           extras: ({
             hint: navigationFormGroup.controls.extras.controls.hint.value || undefined,
+            data: navigationFormGroup.controls.extras.controls.data.value,
             state: navigationFormGroup.controls.extras.controls.state.value,
             cssClass: navigationFormGroup.controls.extras.controls.cssClass.value,
           }),
@@ -96,7 +98,8 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
         commands: this._formBuilder.control<Commands>(navigation.commands),
         extras: this._formBuilder.group({
           hint: this._formBuilder.control<string | undefined>(navigation.extras?.hint),
-          state: this._formBuilder.control<ViewState | undefined>(navigation.extras?.state),
+          data: this._formBuilder.control<NavigationData | undefined>(navigation.extras?.data),
+          state: this._formBuilder.control<NavigationState | undefined>(navigation.extras?.state),
           cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
         }),
       }), {emitEvent: options?.emitEvent ?? true});
@@ -141,7 +144,8 @@ export interface NavigationDescriptor {
   commands: Commands;
   extras?: {
     hint?: string;
-    state?: ViewState;
+    data?: NavigationData;
+    state?: NavigationState;
     cssClass?: string | string[];
   };
 }

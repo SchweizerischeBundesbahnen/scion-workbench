@@ -60,14 +60,22 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
+   * Associates data with a view navigation.
+   *
+   * Data is stored in the workbench layout, serialized into JSON. Unlike {@link state}, data is not lost when the application is closed.
+   *
+   * Data can be read from {@link WorkbenchView.navigationData}.
+   */
+  data?: NavigationData;
+  /**
    * Associates arbitrary state with a view navigation.
    *
-   * Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
-   * Therefore, a view must be able to restore its state without relying on navigational state.
+   * State is stored in the browser's session history, supporting back/forward navigation and page reload, but is lost when the application is closed.
+   * Views must be able to restore state without relying on navigational state.
    *
-   * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+   * State can be read from {@link WorkbenchView.navigationState} or the browser's session history via `history.state`.
    */
-  state?: ViewState;
+  state?: NavigationState;
   /**
    * Closes views that match the specified path and navigation hint. Matrix parameters do not affect view resolution.
    * The path supports the asterisk wildcard segment (`*`) to match views with any value in a segment.
@@ -136,19 +144,29 @@ export type Commands = any[];
 export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
 
 /**
- * Navigational view states associated with a workbench navigation.
+ * States associated with view navigations.
  */
-export type ViewStates = {[viewId: ViewId]: ViewState};
+export type NavigationStates = {[viewId: ViewId]: NavigationState};
 
 /**
  * State associated with a view navigation.
  *
- * Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
- * Therefore, a view must be able to restore its state without relying on navigational state.
+ * Navigational state is stored in the browser's session history, supporting back/forward navigation and page reload, but is lost when the application is closed.
+ * Views must be able to restore state without relying on navigational state.
  *
- * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+ * Navigational state can be read from {@link WorkbenchView.navigationState} or the browser's session history via `history.state`.
  */
-export type ViewState = {[key: string]: unknown};
+export type NavigationState = {[key: string]: unknown};
+
+/**
+ * Data associated with a view navigation.
+ *
+ * Navigational data is stored in the workbench layout, serialized into JSON. Unlike {@link NavigationState}, data is not lost when the application is closed.
+ *
+ * Navigational data can be read from {@link WorkbenchView.navigationData}.
+ */
+export type NavigationData = {[key: string]: unknown};
+
 /**
  * Signature of a function to modify the workbench layout.
  *

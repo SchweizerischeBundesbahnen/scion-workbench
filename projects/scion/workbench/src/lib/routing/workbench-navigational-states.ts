@@ -9,7 +9,7 @@
  */
 
 import {Navigation} from '@angular/router';
-import {ViewStates} from './routing.model';
+import {NavigationStates} from './routing.model';
 
 /**
  * Provides methods to associate {@link WorkbenchNavigationalState} with a navigation.
@@ -48,9 +48,9 @@ export interface WorkbenchNavigationalState {
    */
   maximized: boolean;
   /**
-   * View states to be associated with the navigation.
+   * Provides navigation state of views contained in the workbench layout.
    */
-  viewStates: ViewStates;
+  navigationStates: NavigationStates;
 }
 
 /**

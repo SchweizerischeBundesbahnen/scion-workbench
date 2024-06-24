@@ -86,6 +86,7 @@ export class WorkbenchLayoutComponent {
         alternativeViewId: event.dragData.alternativeViewId,
         viewUrlSegments: event.dragData.viewUrlSegments,
         navigationHint: event.dragData.navigationHint,
+        navigationData: event.dragData.navigationData,
         classList: event.dragData.classList,
       },
       target: GridDropTargets.resolve({

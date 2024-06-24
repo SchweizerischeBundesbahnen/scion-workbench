@@ -284,6 +284,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
         relativeTo: extras.relativeTo,
         hint: extras.hint,
         cssClass: extras.cssClass,
+        data: extras.data,
         state: extras.state,
       });
   }
@@ -300,6 +301,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
       relativeTo: extras.relativeTo,
       hint: extras.hint,
       cssClass: extras.cssClass,
+      data: extras.data,
       state: extras.state,
     });
   }
@@ -321,7 +323,7 @@ function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<Navigat
     state: WorkbenchNavigationalStates.create({
       workbenchGrid: workbenchGrid,
       maximized: layout.maximized,
-      viewStates: layout.viewStates(),
+      navigationStates: layout.navigationStates(),
     }),
     // Add the main area as query parameter.
     queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},

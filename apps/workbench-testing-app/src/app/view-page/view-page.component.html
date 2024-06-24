@@ -39,13 +39,24 @@
   </sci-accordion>
 }
 
-@if (view.state | appNullIfEmpty; as state) {
-  <sci-accordion class="e2e-state" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_view_state">
-      <header>View State</header>
+@if (view.navigationData | appNullIfEmpty; as data) {
+  <sci-accordion class="e2e-navigation-data" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_data">
+      <header>Navigation Data</header>
     </ng-template>
-    <ng-template #panel_view_state>
-      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-state"/>
+    <ng-template #panel_navigation_data>
+      <sci-key-value [object]="data | appAppendParamDataType" class="e2e-navigation-data"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (view.navigationState | appNullIfEmpty; as state) {
+  <sci-accordion class="e2e-navigation-state" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_state">
+      <header>Navigation State</header>
+    </ng-template>
+    <ng-template #panel_navigation_state>
+      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-navigation-state"/>
     </ng-template>
   </sci-accordion>
 }

@@ -109,9 +109,9 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   toBeRegistered(expected: {partId: string; active: boolean}, expectationFailOutput?: any): boolean;
 
   /**
-   * Expects the component displayed in the view to have the specified transient state.
+   * Expects the component displayed in the view to have the specified component state.
    *
-   * Transient state is queried from an input element decorated with the CSS class 'transient-state'.
+   * Queries state on an input element having the CSS class 'component-state'.
    *
    * The actual value must be a view id.
    *
@@ -119,8 +119,8 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    * Usage:
    *
    * ```ts
-   * expect('view.1').toHaveTransientState('A');
+   * expect('view.1').toHaveComponentState('A');
    * ```
    */
-  toHaveTransientState(expected: string, expectationFailOutput?: any): boolean;
+  toHaveComponentState(expected: string, expectationFailOutput?: any): boolean;
 }

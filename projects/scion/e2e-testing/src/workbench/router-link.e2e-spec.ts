@@ -59,7 +59,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.101',
         urlSegments: 'test-view',
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -294,7 +294,7 @@ test.describe('Workbench RouterLink', () => {
     await expect.poll(() => testeeViewPage.view.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-router', navigationHint: ''},
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -441,7 +441,7 @@ test.describe('Workbench RouterLink', () => {
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -449,7 +449,7 @@ test.describe('Workbench RouterLink', () => {
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -493,7 +493,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.1',
         urlSegments: 'test-view',
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -502,7 +502,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.101',
         urlSegments: 'test-router',
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -552,7 +552,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.102',
         urlSegments: 'test-view',
-        state: {navigated: 'true'},
+        navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -561,7 +561,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.101',
         urlSegments: 'test-router',
-        state: {navigated: 'false'},
+        navigationState: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
 

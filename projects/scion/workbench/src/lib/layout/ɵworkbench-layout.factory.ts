@@ -13,7 +13,7 @@ import {MPart, MPartGrid} from './workbench-layout.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {EnvironmentInjector, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA} from './workbench-layout';
-import {ViewOutlets, ViewStates} from '../routing/routing.model';
+import {NavigationStates, ViewOutlets} from '../routing/routing.model';
 
 /**
  * @inheritDoc
@@ -41,13 +41,13 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
    *   To control the identity of the initial part, pass an injector and set the DI token {@link MAIN_AREA_INITIAL_PART_ID}.
    * - Grids and outlets can be passed in serialized or deserialized form.
    */
-  public create(options?: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: ViewOutlets | string; viewStates?: ViewStates; injector?: Injector; maximized?: boolean}): ɵWorkbenchLayout {
+  public create(options?: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: ViewOutlets | string; navigationStates?: NavigationStates; injector?: Injector; maximized?: boolean}): ɵWorkbenchLayout {
     return runInInjectionContext(options?.injector ?? this._environmentInjector, () => new ɵWorkbenchLayout({
       workbenchGrid: options?.workbenchGrid,
       mainAreaGrid: options?.mainAreaGrid,
       maximized: options?.maximized,
       viewOutlets: options?.viewOutlets,
-      viewStates: options?.viewStates,
+      navigationStates: options?.navigationStates,
     }));
   }
 }
