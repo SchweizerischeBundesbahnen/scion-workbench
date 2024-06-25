@@ -51,30 +51,51 @@ describe('Stringifier', () => {
   };
 
   it('should stringify object (1)', async () => {
-    expect(JSON.parse(stringify(null))).toBeNull();
+    expect(JSON.parse(stringify(null, ['path/to/field']))).toBeNull();
   });
 
   it('should stringify object (2)', async () => {
-    expect(JSON.parse(stringify(0))).toBe(0);
+    expect(JSON.parse(stringify(0, ['path/to/field']))).toBe(0);
   });
 
   it('should stringify object (3)', async () => {
-    expect(JSON.parse(stringify(['a', 'b', 'c']))).toEqual(['a', 'b', 'c']);
+    expect(JSON.parse(stringify(['a', 'b', 'c'], ['path/to/field']))).toEqual(['a', 'b', 'c']);
   });
 
   it('should stringify object (4)', async () => {
-    expect(JSON.parse(stringify(['a', 'b', 'c'], ['1']))).toEqual(['a', null, 'c']);
+    const object = {
+      field1: 'text',
+      field2: 123,
+      field3: true,
+      field4: [],
+      field5: ['text', 123, true, false, ['a', 'b', 'c']],
+    };
+
+    expect(JSON.parse(stringify(object, ['path/to/field']))).toEqual(object);
   });
 
   it('should stringify object (5)', async () => {
-    expect(JSON.parse(stringify(object))).toEqual(object);
+    const object = {
+      field1: null,
+      field2: undefined,
+    };
+
+    expect(JSON.parse(stringify(object, ['path/to/field']))).toEqual({field1: null});
   });
 
   it('should stringify object (6)', async () => {
-    expect(JSON.parse(stringify(object, ['A', 'B', 'C', 'D', 'E', 'F']))).toEqual({});
+    expect(JSON.parse(stringify(['a', 'b', 'c'], ['1']))).toEqual(['a', null, 'c']);
   });
 
   it('should stringify object (7)', async () => {
+    expect(JSON.parse(stringify(object))).toEqual(object);
+  });
+
+  it('should stringify object (8)', async () => {
+    expect(JSON.parse(stringify(object, ['A', 'B', 'C', 'D', 'E', 'F']))).toEqual({});
+  });
+
+  it('should stringify object (9)', async () => {
     expect(JSON.parse(stringify(object, ['B']))).toEqual({
       A: 'A',
       C: 'C',
@@ -107,7 +128,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (8)', async () => {
+  it('should stringify object (10)', async () => {
     expect(JSON.parse(stringify(object, ['A', 'B']))).toEqual({
       C: 'C',
       D: {
@@ -139,7 +160,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (9)', async () => {
+  it('should stringify object (11)', async () => {
     expect(JSON.parse(stringify(object, ['A', 'B', 'D']))).toEqual({
       C: 'C',
       E: 'E',
@@ -151,7 +172,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (10)', async () => {
+  it('should stringify object (12)', async () => {
     expect(JSON.parse(stringify(object, ['A', 'B', 'D', 'E']))).toEqual({
       C: 'C',
       F: [
@@ -162,7 +183,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (11)', async () => {
+  it('should stringify object (13)', async () => {
     expect(JSON.parse(stringify(object, ['B.B.B', 'B.B.A', 'B.B', 'B.A']))).toEqual({
       A: 'A',
       B: {},
@@ -196,7 +217,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (12)', async () => {
+  it('should stringify object (14)', async () => {
     expect(JSON.parse(stringify(object, ['B.B.B', 'B.B.A', 'B.B', 'B.A', 'B']))).toEqual({
       A: 'A',
       C: 'C',
@@ -229,7 +250,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (13)', async () => {
+  it('should stringify object (15)', async () => {
     expect(JSON.parse(stringify(object, ['B.B.B']))).toEqual({
       A: 'A',
       B: {
@@ -268,7 +289,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (14)', async () => {
+  it('should stringify object (16)', async () => {
     expect(JSON.parse(stringify(object, ['B.B.B', 'B.B.A']))).toEqual({
       A: 'A',
       B: {
@@ -305,7 +326,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (15)', async () => {
+  it('should stringify object (17)', async () => {
     expect(JSON.parse(stringify(object, ['B.B.B', 'B.B.A', 'B.B']))).toEqual({
       A: 'A',
       B: {
@@ -341,7 +362,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (16)', async () => {
+  it('should stringify object (18)', async () => {
     expect(JSON.parse(stringify(object, ['D.C.F.1.B']))).toEqual({
       A: 'A',
       B: {
@@ -381,7 +402,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (17)', async () => {
+  it('should stringify object (19)', async () => {
     expect(JSON.parse(stringify(object, ['D.C.F.1']))).toEqual({
       A: 'A',
       B: {
@@ -421,7 +442,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (18)', async () => {
+  it('should stringify object (20)', async () => {
     expect(JSON.parse(stringify(object, ['D.C.F']))).toEqual({
       A: 'A',
       B: {
@@ -456,7 +477,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (19)', async () => {
+  it('should stringify object (21)', async () => {
     expect(JSON.parse(stringify(object, ['F.2.B']))).toEqual({
       A: 'A',
       B: {
@@ -496,7 +517,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (20)', async () => {
+  it('should stringify object (22)', async () => {
     expect(JSON.parse(stringify(object, ['**/A']))).toEqual({
       A: 'A',
       B: {
@@ -532,7 +553,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (21)', async () => {
+  it('should stringify object (23)', async () => {
     expect(JSON.parse(stringify(object, ['**/C/**/B']))).toEqual({
       A: 'A',
       B: {
@@ -572,7 +593,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (22)', async () => {
+  it('should stringify object (24)', async () => {
     expect(JSON.parse(stringify(object, ['**/C/**/B', '**/B']))).toEqual({
       A: 'A',
       B: {
@@ -606,7 +627,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (23)', async () => {
+  it('should stringify object (25)', async () => {
     expect(JSON.parse(stringify(object, ['**/F/*/B']))).toEqual({
       A: 'A',
       B: {
@@ -646,7 +667,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (24)', async () => {
+  it('should stringify object (26)', async () => {
     expect(JSON.parse(stringify(object, ['**/F/2', '**/D/0']))).toEqual({
       A: 'A',
       B: {
@@ -686,7 +707,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (25)', async () => {
+  it('should stringify object (27)', async () => {
     expect(JSON.parse(stringify(object, ['D/*/B']))).toEqual({
       A: 'A',
       B: {
@@ -725,7 +746,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (26)', async () => {
+  it('should stringify object (28)', async () => {
     expect(JSON.parse(stringify(object, ['D/**/B']))).toEqual({
       A: 'A',
       B: {
@@ -764,7 +785,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (27)', async () => {
+  it('should stringify object (29)', async () => {
     expect(JSON.parse(stringify(object, ['**/B']))).toEqual({
       A: 'A',
       B: {
@@ -798,7 +819,7 @@ describe('Stringifier', () => {
     });
   });
 
-  it('should stringify object (28)', async () => {
+  it('should stringify object (30)', async () => {
     expect(JSON.parse(stringify(object, ['**/F/*']))).toEqual({
       A: 'A',
       B: {
