@@ -133,12 +133,12 @@ export type Commands = any[];
 /**
  * URL segments of views contained in the workbench layout.
  */
-export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
+export type Outlets = {[name: string]: UrlSegment[]};
 
 /**
  * Navigational view states associated with a workbench navigation.
  */
-export type ViewStates = {[viewId: ViewId]: ViewState};
+export type ViewStates = {[viewId: string]: ViewState};
 
 /**
  * State associated with a view navigation.

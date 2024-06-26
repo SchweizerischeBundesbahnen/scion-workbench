@@ -51,6 +51,10 @@ export interface WorkbenchNavigationalState {
    * View states to be associated with the navigation.
    */
   viewStates: ViewStates;
+  /**
+   * View states to be associated with the navigation.
+   */
+  desktop: string;
 }
 
 /**

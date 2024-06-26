@@ -42,7 +42,7 @@ import {RecordComponent} from '../../../record/record.component';
 })
 export class NavigateViewsComponent implements ControlValueAccessor, Validator {
 
-  private _cvaChangeFn: (value: NavigationDescriptor[]) => void = noop;
+  private _cvaChangeFn: (value: ViewNavigationDescriptor[]) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
   @Input({transform: arrayAttribute})
@@ -89,7 +89,7 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
     this.form.controls.navigations.removeAt(index);
   }
 
-  private addNavigation(navigation: NavigationDescriptor, options?: {emitEvent?: boolean}): void {
+  private addNavigation(navigation: ViewNavigationDescriptor, options?: {emitEvent?: boolean}): void {
     this.form.controls.navigations.push(
       this._formBuilder.group({
         id: this._formBuilder.control<string>(navigation.id, Validators.required),
@@ -106,7 +106,7 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public writeValue(navigations: NavigationDescriptor[] | undefined | null): void {
+  public writeValue(navigations: ViewNavigationDescriptor[] | undefined | null): void {
     this.form.controls.navigations.clear({emitEvent: false});
     navigations?.forEach(navigation => this.addNavigation(navigation, {emitEvent: false}));
   }
@@ -136,7 +136,7 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
   }
 }
 
-export interface NavigationDescriptor {
+export interface ViewNavigationDescriptor {
   id: string;
   commands: Commands;
   extras?: {

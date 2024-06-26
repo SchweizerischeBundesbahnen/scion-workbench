@@ -129,13 +129,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
     // Add view outlets of views contained in the main area.
     if (currentLayout.hasPart(MAIN_AREA, {grid: 'workbench'}) && this._perspectiveLayout.hasPart(MAIN_AREA, {grid: 'workbench'})) {
-      Object.entries(currentLayout.viewOutlets({grid: 'mainArea'})).forEach(([viewId, segments]) => {
+      Object.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([viewId, segments]) => {
         viewOutlets.set(viewId, segments);
       });
     }
 
     // Add view outlets of views contained in this perspective.
-    Object.entries(this._perspectiveLayout.viewOutlets()).forEach(([viewId, segments]) => {
+    Object.entries(this._perspectiveLayout.outlets()).forEach(([viewId, segments]) => {
       viewOutlets.set(viewId, segments);
     });
 
@@ -146,6 +146,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       viewOutlets: Object.fromEntries(viewOutlets),
       viewStates: currentLayout.viewStates({grid: 'mainArea'}), // preserve view state of views in main area; view state of perspective cannot be restored since not persisted
       // Do not preserve maximized state when switching between perspectives.
+      desktop: this._perspectiveLayout.desktop,
     });
   }
 
@@ -201,10 +202,12 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       local: this._workbenchLayoutFactory.create({
         workbenchGrid: perspectiveLayout.userLayout.workbenchGrid,
         viewOutlets: perspectiveLayout.userLayout.viewOutlets,
+        desktop: perspectiveLayout.userLayout.desktop,
       }),
       base: this._workbenchLayoutFactory.create({
         workbenchGrid: perspectiveLayout.referenceLayout.workbenchGrid,
         viewOutlets: perspectiveLayout.referenceLayout.viewOutlets,
+        desktop: perspectiveLayout.referenceLayout.desktop,
       }),
       remote: this._initialPerspectiveLayout!,
     });
@@ -219,7 +222,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     // Memoize the layout of this perspective.
     this._perspectiveLayout = this._workbenchLayoutFactory.create({
       workbenchGrid: currentLayout.workbenchGrid,
-      viewOutlets: currentLayout.viewOutlets({grid: 'workbench'}),
+      viewOutlets: currentLayout.outlets({grid: 'workbench'}),
+      desktop: currentLayout.desktop,
     });
 
     // Do not store the layout if a transient perspective.
@@ -234,10 +238,12 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       referenceLayout: {
         workbenchGrid: serializedReferenceLayout.workbenchGrid,
         viewOutlets: serializedReferenceLayout.workbenchViewOutlets,
+        desktop: serializedReferenceLayout.desktop,
       },
       userLayout: {
         workbenchGrid: serializedUserLayout.workbenchGrid,
         viewOutlets: serializedUserLayout.workbenchViewOutlets,
+        desktop: serializedUserLayout.desktop,
       },
     });
   }

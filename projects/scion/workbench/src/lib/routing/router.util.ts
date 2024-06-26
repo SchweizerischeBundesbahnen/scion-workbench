@@ -14,6 +14,7 @@ import {DIALOG_ID_PREFIX, MESSAGE_BOX_ID_PREFIX, POPUP_ID_PREFIX} from '../workb
 import {inject} from '@angular/core';
 import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
+import {DESKTOP_OUTLET} from '../layout/workbench-layout';
 
 /**
  * Provides utility functions for router operations.
@@ -114,6 +115,13 @@ export const RouterUtils = {
   },
 
   /**
+   * Tests if the given outlet matches the format of the desktop outlet.
+   */
+  isDesktopOutlet: (outlet: string | undefined | null): boolean => {
+    return outlet === DESKTOP_OUTLET;
+  },
+
+  /**
    * Tests if the given outlet matches the format of a message box outlet.
    */
   isMessageBoxOutlet: (outlet: string | undefined | null): outlet is `messagebox.${string}` => {
@@ -125,15 +133,7 @@ export const RouterUtils = {
    *
    * A view outlet contains the URL segments of a view contained in the workbench layout.
    */
-  parseViewOutlets: (url: UrlTree): Map<ViewId, UrlSegment[]> => {
-    const viewOutlets = new Map<ViewId, UrlSegment[]>();
-    Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
-      if (WorkbenchLayouts.isViewId(outlet)) {
-        viewOutlets.set(outlet, segmentGroup.segments);
-      }
-    });
-    return viewOutlets;
-  },
+  parseViewOutlets,
 
   /**
    * Tests if given route has an empty path from root.
@@ -142,3 +142,19 @@ export const RouterUtils = {
     return route.snapshot.pathFromRoot.flatMap(route => route.url).filter(segment => segment.path.length).length === 0;
   },
 } as const;
+
+function parseViewOutlets(url: UrlTree, outlets: {view: true}): Map<ViewId, UrlSegment[]>;
+function parseViewOutlets(url: UrlTree, outlets: {desktop: true}): Map<string, UrlSegment[]>;
+function parseViewOutlets(url: UrlTree, outlets: {view: true; desktop: true}): Map<string, UrlSegment[]>;
+function parseViewOutlets(url: UrlTree, outlets: {view?: true; desktop?: true}): Map<string, UrlSegment[]> {
+  const viewOutlets = new Map<string, UrlSegment[]>();
+  Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
+    if ((outlets?.view ?? false) && WorkbenchLayouts.isViewId(outlet)) {
+      viewOutlets.set(outlet, segmentGroup.segments);
+    }
+    if ((outlets?.desktop ?? false) && RouterUtils.isDesktopOutlet(outlet)) {
+      viewOutlets.set(outlet, segmentGroup.segments);
+    }
+  });
+  return viewOutlets;
+}

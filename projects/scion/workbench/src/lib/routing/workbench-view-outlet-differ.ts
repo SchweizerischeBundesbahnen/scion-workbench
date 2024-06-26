@@ -36,7 +36,7 @@ export class WorkbenchViewOutletDiffer {
    */
   public diff(workbenchLayout: ɵWorkbenchLayout | null, urlTree: UrlTree): WorkbenchViewOutletDiff {
     const views = workbenchLayout?.views().map(view => view.id) ?? [];
-    const viewOutlets = RouterUtils.parseViewOutlets(urlTree).keys();
+    const viewOutlets = RouterUtils.parseViewOutlets(urlTree, {view: true}).keys();
     const changes = this._differ.diff(new Set([...viewOutlets, ...views]));
     return new WorkbenchViewOutletDiff(changes);
   }

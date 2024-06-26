@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.component';
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
-import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
+import {NavigateViewsComponent, ViewNavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
@@ -20,6 +20,7 @@ import {combineLatestWith, Observable} from 'rxjs';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {map, startWith} from 'rxjs/operators';
 import {AsyncPipe} from '@angular/common';
+import {DesktopNavigationDescriptor, NavigateDesktopComponent} from '../tables/navigate-desktop/navigate-desktop.component';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -32,6 +33,7 @@ import {AsyncPipe} from '@angular/common';
     NavigateViewsComponent,
     ReactiveFormsModule,
     AsyncPipe,
+    NavigateDesktopComponent,
   ],
 })
 export default class ModifyLayoutPageComponent {
@@ -39,7 +41,8 @@ export default class ModifyLayoutPageComponent {
   protected form = this._formBuilder.group({
     parts: this._formBuilder.control<PartDescriptor[]>([]),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
-    viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
+    viewNavigations: this._formBuilder.control<ViewNavigationDescriptor[]>([]),
+    desktopNavigation: this._formBuilder.control<DesktopNavigationDescriptor | undefined>(undefined),
   });
 
   protected modifyError: string | false | undefined;
@@ -96,7 +99,7 @@ export default class ModifyLayoutPageComponent {
         });
       }
 
-      // Add navigations.
+      // Add view navigations.
       for (const viewNavigation of this.form.controls.viewNavigations.value) {
         layout = layout.navigateView(viewNavigation.id, viewNavigation.commands, {
           hint: viewNavigation.extras?.hint,
@@ -105,6 +108,15 @@ export default class ModifyLayoutPageComponent {
         });
       }
 
+      // Add desktop navigation.
+      const desktopNavigation = this.form.controls.desktopNavigation.value;
+      if (desktopNavigation) {
+        layout = layout.navigateDesktop(desktopNavigation.commands, {
+          hint: desktopNavigation.extras?.hint,
+          state: desktopNavigation.extras?.state,
+          cssClass: desktopNavigation.extras?.cssClass,
+        });
+      }
       return layout;
     });
   }

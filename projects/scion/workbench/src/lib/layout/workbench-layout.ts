@@ -134,6 +134,8 @@ export interface WorkbenchLayout {
    * @return a copy of this layout with the part activated.
    */
   activatePart(id: string): WorkbenchLayout;
+
+  navigateDesktop(commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout;
 }
 
 /**
@@ -167,3 +169,5 @@ export const MAIN_AREA: MAIN_AREA = 'main-area';
  * Represents the type of the constant {@link MAIN_AREA}.
  */
 export type MAIN_AREA = 'main-area';
+
+export const DESKTOP_OUTLET = 'desktop';

@@ -1009,8 +1009,8 @@ describe('WorkbenchLayout', () => {
       {id: 'view.1', navigation: {id: anything(), cssClass: ['class-navigation']}, cssClass: ['class-view'], uid: anything()} satisfies MView,
       {id: 'view.2', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView,
     ]));
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
-    expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual([]);
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual(segments(['path/to/view']));
+    expect(workbenchLayout.urlSegments({name: 'view.2'})).toEqual([]);
   });
 
   it('should retain state when moving view to another part', () => {
@@ -1022,7 +1022,7 @@ describe('WorkbenchLayout', () => {
       .moveView('view.1', 'right');
 
     expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView]);
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({some: 'state'});
+    expect(workbenchLayout.navigationalState({id: 'view.1'})).toEqual({some: 'state'});
   });
 
   it('should clear hint of previous navigation when navigating without hint', () => {
@@ -1033,7 +1033,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view']);
 
     expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual(segments(['path/to/view']));
   });
 
   it('should clear URL of previous navigation when navigating without URL', () => {
@@ -1044,7 +1044,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', [], {hint: 'some-hint'});
 
     expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView);
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual([]);
   });
 
   it('should clear state of previous navigation when navigating without state', () => {
@@ -1055,8 +1055,8 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view']);
 
     expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
+    expect(workbenchLayout.navigationalState({id: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual(segments(['path/to/view']));
   });
 
   it('should remove views of a part when removing a part', () => {
@@ -1068,8 +1068,8 @@ describe('WorkbenchLayout', () => {
       .removePart('part');
 
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+    expect(workbenchLayout.navigationalState({id: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual([]);
   });
 
   it('should remove associated data when removing view', () => {
@@ -1080,8 +1080,8 @@ describe('WorkbenchLayout', () => {
       .removeView('view.1', {force: true});
 
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+    expect(workbenchLayout.navigationalState({id: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual([]);
   });
 
   it('should also rename associated data when renaming view', () => {
@@ -1091,11 +1091,11 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
       .renameView('view.1', 'view.2');
 
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
-    expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
+    expect(workbenchLayout.navigationalState({id: 'view.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({name: 'view.1'})).toEqual([]);
 
-    expect(workbenchLayout.viewState({viewId: 'view.2'})).toEqual({some: 'state'});
-    expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual(segments(['path/to/view']));
+    expect(workbenchLayout.navigationalState({id: 'view.2'})).toEqual({some: 'state'});
+    expect(workbenchLayout.urlSegments({name: 'view.2'})).toEqual(segments(['path/to/view']));
   });
 
   it('should activate part and view when moving view to another part', () => {

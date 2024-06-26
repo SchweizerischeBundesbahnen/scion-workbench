@@ -150,10 +150,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.uid = mView.uid;
     this.alternativeId = mView.alternativeId;
-    this.urlSegments = layout.urlSegments({viewId: this.id});
+    this.urlSegments = layout.urlSegments({name: this.id});
     this.navigationId = mView.navigation?.id;
     this.navigationHint = mView.navigation?.hint;
-    this.state = layout.viewState({viewId: this.id});
+    this.state = layout.navigationalState({id: this.id});
     this.classList.set(mView.cssClass, {scope: 'layout'});
     this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
 

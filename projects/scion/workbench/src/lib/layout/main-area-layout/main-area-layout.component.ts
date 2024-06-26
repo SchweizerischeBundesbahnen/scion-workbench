@@ -21,6 +21,10 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
+import {AsyncPipe} from '@angular/common';
+import {ViewPortalPipe} from '../../view/view-portal.pipe';
+import {WorkbenchPortalOutletDirective} from '../../portal/workbench-portal-outlet.directive';
+import {WORKBENCH_DESKTOP, ɵWorkbenchDesktop} from '../../desktop/ɵworkbench-desktop.model';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -57,6 +61,9 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
     RouterOutlet,
     SciViewportComponent,
     GridElementIfVisiblePipe,
+    AsyncPipe,
+    ViewPortalPipe,
+    WorkbenchPortalOutletDirective,
   ],
 })
 export class MainAreaLayoutComponent {
@@ -67,6 +74,7 @@ export class MainAreaLayoutComponent {
   }
 
   constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
+              @Inject(WORKBENCH_DESKTOP) protected desktop: ɵWorkbenchDesktop,
               private _part: ɵWorkbenchPart,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _viewDragService: ViewDragService) {

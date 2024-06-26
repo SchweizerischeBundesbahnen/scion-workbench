@@ -20,6 +20,7 @@ import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
 import {ViewId} from '@scion/workbench';
+import {DesktopPO} from './desktop.po';
 
 export class AppPO {
 
@@ -199,6 +200,21 @@ export class AppPO {
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
+  }
+
+  /**
+   * Handle to the specified desktop in the workbench layout.
+   *
+   * @param locateBy - Specifies how to locate the view. Either `viewId` or `cssClass`, or both must be set.
+   * @param locateBy.viewId - Identifies the view by its id
+   * @param locateBy.cssClass - Identifies the view by its CSS class
+   */
+  public desktop(locateBy: {cssClass?: string}): DesktopPO {
+    if (locateBy.cssClass !== undefined) {
+      const desktopLocator = this.page.locator(`wb-desktop.${locateBy.cssClass}`);
+      return new DesktopPO(desktopLocator);
+    }
+    throw Error(`[DesktopLocateError] Missing required locator. 'cssClass' must be set.`);
   }
 
   /**

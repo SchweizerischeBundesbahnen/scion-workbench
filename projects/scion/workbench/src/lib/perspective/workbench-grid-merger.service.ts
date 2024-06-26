@@ -31,6 +31,9 @@ export class WorkbenchGridMerger {
     if (serializedBaseLayout.workbenchViewOutlets !== serializedRemoteLayout.workbenchViewOutlets) {
       return grids.remote;
     }
+    if (serializedBaseLayout.desktop !== serializedRemoteLayout.desktop) {
+      return grids.remote;
+    }
     return grids.local;
   }
 }

@@ -118,3 +118,11 @@ export interface MView {
     cssClass?: string[];
   };
 }
+
+export interface MDesktop {
+  navigation?: {
+    id: string;
+    hint?: string;
+    cssClass?: string[];
+  };
+}

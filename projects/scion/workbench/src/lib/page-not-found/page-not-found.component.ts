@@ -11,6 +11,7 @@
 import {Component, inject, isDevMode} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {FormatUrlPipe} from './format-url.pipe';
+import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
 
 @Component({
   selector: 'wb-page-not-found',
@@ -24,5 +25,6 @@ import {FormatUrlPipe} from './format-url.pipe';
 export default class PageNotFoundComponent {
 
   protected isDevMode = isDevMode();
-  protected view = inject(WorkbenchView);
+  protected view = inject(WorkbenchView, {optional: true});
+  protected desktop = inject(WorkbenchDesktop, {optional: true});
 }

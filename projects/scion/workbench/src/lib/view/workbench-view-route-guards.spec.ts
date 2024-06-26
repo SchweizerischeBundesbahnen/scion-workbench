@@ -18,7 +18,7 @@ import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../t
 import {Component} from '@angular/core';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchComponent} from '../workbench.component';
-import {canMatchWorkbenchView} from './workbench-view-route-guards';
+import {canMatchWorkbenchDesktop, canMatchWorkbenchView} from './workbench-view-route-guards';
 
 describe('CanMatchWorkbenchView Guard', () => {
 
@@ -237,12 +237,12 @@ describe('CanMatchWorkbenchView Guard', () => {
     });
   });
 
-  it('should not load the application root route into a view', async () => {
+  it('should not load the application root route into a view or desktop', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchView(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
+          {path: '', canMatch: [canMatchWorkbenchView(false), canMatchWorkbenchDesktop(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
           {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
         ]),
       ],

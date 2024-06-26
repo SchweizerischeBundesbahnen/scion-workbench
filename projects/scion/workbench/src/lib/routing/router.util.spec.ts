@@ -273,7 +273,7 @@ describe('RouterUtils.parseViewOutlets', () => {
 
     // Expect to parse view outlets contained in the URL.
     const urlTree = TestBed.inject(Router).parseUrl(TestBed.inject(Router).url);
-    expect(RouterUtils.parseViewOutlets(urlTree)).toEqual(new Map()
+    expect(RouterUtils.parseViewOutlets(urlTree, {view: true})).toEqual(new Map()
       .set('view.101', [new UrlSegment('path', {}), new UrlSegment('to', {}), new UrlSegment('view', {}), new UrlSegment('101', {})])
       .set('view.103', [new UrlSegment('path', {}), new UrlSegment('to', {}), new UrlSegment('view', {}), new UrlSegment('103', {param1: 'value1', param2: 'value2'})]),
     );

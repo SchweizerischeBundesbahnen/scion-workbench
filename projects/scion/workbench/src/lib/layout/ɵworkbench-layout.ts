@@ -7,16 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
+import {MDesktop, MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
 import {assertType} from '../common/asserts.util';
 import {UID} from '../common/uid.util';
-import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
+import {DESKTOP_OUTLET, MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
 import {RouterUtils} from '../routing/router.util';
-import {Commands, ViewOutlets, ViewState, ViewStates} from '../routing/routing.model';
+import {Commands, Outlets, ViewState, ViewStates} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {Arrays} from '@scion/toolkit/util';
@@ -41,8 +41,9 @@ import {Logger} from '../logging';
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
-  private readonly _viewOutlets: Map<ViewId, UrlSegment[]>;
-  private readonly _viewStates: Map<ViewId, ViewState>;
+  private readonly _desktop: MDesktop;
+  private readonly _outlets: Map<string, UrlSegment[]>;
+  private readonly _viewStates: Map<string, ViewState>;
   private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
@@ -52,16 +53,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private _maximized: boolean;
 
   /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: string | ViewOutlets | null; viewStates?: ViewStates | null; maximized?: boolean}) {
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; desktop?: string | MDesktop | null; outlets?: string | Outlets | null; viewStates?: ViewStates | null; maximized?: boolean}) {
     this._grids = {
       workbench: coerceMPartGrid(config.workbenchGrid, {default: createDefaultWorkbenchGrid}),
     };
     if (this.hasPart(MAIN_AREA, {grid: 'workbench'})) {
       this._grids.mainArea = coerceMPartGrid(config.mainAreaGrid, {default: createInitialMainAreaGrid});
     }
+    this._desktop = coerceMDesktop(config.desktop);
     this._gridNames = Objects.keys(this._grids);
     this._maximized = config.maximized ?? false;
-    this._viewOutlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceViewOutlets(config.viewOutlets)));
+    this._outlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceViewOutlets(config.outlets)));
     this._viewStates = new Map<ViewId, ViewState>(Objects.entries(config.viewStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
   }
@@ -103,9 +105,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param findBy.grid - Searches for views contained in the specified grid.
    * @return outlets of views matching the filter criteria.
    */
-  public viewOutlets(findBy?: {grid?: keyof Grids}): ViewOutlets {
-    const viewOutletEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._viewOutlets.get(view.id) ?? []]);
-    return Object.fromEntries(viewOutletEntries);
+  public outlets(findBy?: {grid?: keyof Grids}): Outlets {
+    const viewOutletEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._outlets.get(view.id) ?? []]);
+    return {
+      ...Object.fromEntries(viewOutletEntries),
+      [DESKTOP_OUTLET]: this._outlets.get(DESKTOP_OUTLET) ?? [],
+    };
   }
 
   /**
@@ -117,21 +122,24 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public viewStates(findBy?: {grid?: keyof Grids}): ViewStates {
     const viewStateEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._viewStates.get(view.id) ?? {}]);
-    return Object.fromEntries(viewStateEntries);
+    return {
+      ...Object.fromEntries(viewStateEntries),
+      [DESKTOP_OUTLET]: this._viewStates.get(DESKTOP_OUTLET) ?? {},
+    };
   }
 
   /**
    * Finds the navigational state of specified view.
    */
-  public viewState(findBy: {viewId: ViewId}): ViewState {
-    return this._viewStates.get(findBy.viewId) ?? {};
+  public navigationalState(findBy: {id: string}): ViewState {
+    return this._viewStates.get(findBy.id) ?? {};
   }
 
   /**
-   * Finds the URL of specified view.
+   * Finds the URL by the specified outlet name.
    */
-  public urlSegments(findBy: {viewId: ViewId}): UrlSegment[] {
-    return this._viewOutlets.get(findBy.viewId) ?? [];
+  public urlSegments(findBy: {name: string}): UrlSegment[] {
+    return this._outlets.get(findBy.name) ?? [];
   }
 
   /**
@@ -264,6 +272,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return view ?? null;
   }
 
+  public get desktop(): MDesktop {
+    return this._desktop;
+  }
+
   /**
    * Finds views based on the specified filter.
    *
@@ -291,7 +303,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         if (findBy?.id !== undefined && !matchViewById(findBy.id)(view)) {
           return false;
         }
-        if (findBy?.segments && !findBy.segments.matches(this.urlSegments({viewId: view.id}))) {
+        if (findBy?.segments && !findBy.segments.matches(this.urlSegments({name: view.id}))) {
           return false;
         }
         if (findBy?.navigationHint !== undefined && findBy.navigationHint !== (view.navigation?.hint ?? null)) {
@@ -418,6 +430,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * @inheritDoc
+   */
+  public navigateDesktop(commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; state?: ViewState; cssClass?: string | string[]}): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__navigateDesktop(workingCopy.desktop, commands, extras);
+    return workingCopy;
+  }
+
+  /**
    * Serializes this layout into a URL-safe base64 string.
    */
   public serialize(flags?: GridSerializationFlags): SerializedWorkbenchLayout {
@@ -425,8 +446,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return {
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
       mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
-      workbenchViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'workbench'})),
-      mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'mainArea'})),
+      workbenchViewOutlets: this._serializer.serializeViewOutlets(this.outlets({grid: 'workbench'})),
+      mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.outlets({grid: 'mainArea'})),
+      desktop: this._serializer.serializeDesktop(this._desktop),
     };
   }
 
@@ -510,7 +532,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove outlets and states of views contained in the part.
     part.views.forEach(view => {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
       this._viewStates.delete(view.id);
     });
 
@@ -560,10 +582,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const urlSegments = runInInjectionContext(this._injector, () => RouterUtils.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
     if (urlSegments.length) {
-      this._viewOutlets.set(view.id, urlSegments);
+      this._outlets.set(view.id, urlSegments);
     }
     else {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
     }
 
     if (extras?.state && Objects.keys(extras.state).length) {
@@ -574,6 +596,36 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     view.navigation = Objects.withoutUndefinedEntries({
+      id: UID.randomUID(),
+      hint: extras?.hint,
+      cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+    } satisfies MView['navigation']);
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __navigateDesktop(desktop: MDesktop, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; state?: ViewState; cssClass?: string | string[]}): void {
+    if (!commands.length && !extras?.hint && !extras?.relativeTo) {
+      throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
+    }
+
+    const urlSegments = runInInjectionContext(this._injector, () => RouterUtils.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
+    if (urlSegments.length) {
+      this._outlets.set(DESKTOP_OUTLET, urlSegments);
+    }
+    else {
+      this._outlets.delete(DESKTOP_OUTLET);
+    }
+
+    if (extras?.state && Objects.keys(extras.state).length) {
+      this._viewStates.set(DESKTOP_OUTLET, extras.state);
+    }
+    else {
+      this._viewStates.delete(DESKTOP_OUTLET);
+    }
+
+    desktop.navigation = Objects.withoutUndefinedEntries({
       id: UID.randomUID(),
       hint: extras?.hint,
       cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
@@ -624,7 +676,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove outlet.
     if (options?.removeOutlet ?? true) {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
     }
 
     // Remove state.
@@ -712,9 +764,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const part = this.part({viewId: view.id});
 
-    if (this._viewOutlets.has(view.id)) {
-      this._viewOutlets.set(newViewId, this._viewOutlets.get(view.id)!);
-      this._viewOutlets.delete(view.id);
+    if (this._outlets.has(view.id)) {
+      this._outlets.set(newViewId, this._outlets.get(view.id)!);
+      this._outlets.delete(view.id);
     }
     if (this._viewStates.has(view.id)) {
       this._viewStates.set(newViewId, this._viewStates.get(view.id)!);
@@ -816,7 +868,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
       mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
-      viewOutlets: Object.fromEntries(this._viewOutlets),
+      desktop: this._serializer.serializeDesktop(this._desktop),
+      outlets: Object.fromEntries(this._outlets),
       viewStates: Object.fromEntries(this._viewStates),
       maximized: this._maximized,
     }));
@@ -865,9 +918,9 @@ function coerceMPartGrid(grid: string | MPartGrid | null | undefined, options: {
 }
 
 /**
- * Coerces {@link ViewOutlets}, applying necessary migrations if the serialized outlets are outdated.
+ * Coerces {@link Outlets}, applying necessary migrations if the serialized outlets are outdated.
  */
-function coerceViewOutlets(viewOutlets: string | ViewOutlets | null | undefined): ViewOutlets {
+function coerceViewOutlets(viewOutlets: string | Outlets | null | undefined): Outlets {
   if (!viewOutlets) {
     return {};
   }
@@ -881,6 +934,27 @@ function coerceViewOutlets(viewOutlets: string | ViewOutlets | null | undefined)
   }
   catch (error) {
     inject(Logger).error('[SerializeError] Failed to deserialize view outlets. Please clear your browser storage and reload the application.', error);
+    return {};
+  }
+}
+
+/**
+ * Coerces {@link Outlets}, applying necessary migrations if the serialized outlets are outdated.
+ */
+function coerceMDesktop(desktop: string | MDesktop | null | undefined): MDesktop {
+  if (!desktop) {
+    return {};
+  }
+
+  if (typeof desktop === 'object') {
+    return desktop;
+  }
+
+  try {
+    return inject(WorkbenchLayoutSerializer).deserializeDesktop(desktop);
+  }
+  catch (error) {
+    inject(Logger).error('[SerializeError] Failed to deserialize desktop. Please clear your browser storage and reload the application.', error);
     return {};
   }
 }
@@ -1024,4 +1098,5 @@ export interface SerializedWorkbenchLayout {
   workbenchViewOutlets: string;
   mainAreaGrid: string | null;
   mainAreaViewOutlets: string;
+  desktop: string;
 }

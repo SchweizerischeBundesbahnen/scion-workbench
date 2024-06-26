@@ -70,6 +70,7 @@ export default class StartPageComponent {
               router: Router,
               cd: ChangeDetectorRef,
               workbenchConfig: WorkbenchConfig) {
+    console.log('>>> start page');
     // Read workbench views to be pinned to the start page.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(filterArray(route => {

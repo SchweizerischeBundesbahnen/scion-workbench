@@ -13,6 +13,7 @@ import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
+import {RouterUtils} from '../routing/router.util';
 
 /**
  * Matches the route if target of a workbench view and navigating with the given hint.
@@ -65,6 +66,29 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
   };
 }
 
+export function canMatchWorkbenchDesktop(navigationHint: string): CanMatchFn;
+export function canMatchWorkbenchDesktop(canMatch: boolean): CanMatchFn;
+export function canMatchWorkbenchDesktop(condition: string | boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+
+    switch (condition) {
+      case true:
+        return RouterUtils.isDesktopOutlet(outlet);
+      case false:
+        return !RouterUtils.isDesktopOutlet(outlet);
+      default: { // hint
+        if (!RouterUtils.isDesktopOutlet(outlet)) {
+          return false;
+        }
+
+        const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+        return layout?.desktop.navigation?.hint === condition;
+      }
+    }
+  };
+}
+
 /**
  * Matches if the view has been navigated (or cannot be found).
  *
@@ -72,12 +96,16 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
  */
 export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+  const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
 
-  if (!WorkbenchLayouts.isViewId(outlet)) {
-    throw Error(`[ViewError] CanMatchFn must be installed on a view auxiliary route. [outlet=${outlet}]`);
+  if (WorkbenchLayouts.isViewId(outlet)) {
+    const view = layout.view({viewId: outlet}, {orElse: null});
+    return !view || !!view.navigation;
   }
 
-  const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
-  const view = layout.view({viewId: outlet}, {orElse: null});
-  return !view || !!view.navigation;
+  if (RouterUtils.isDesktopOutlet(outlet)) {
+    return !!layout.desktop.navigation;
+  }
+
+  throw Error(`[ViewError] CanMatchFn must be installed on a view or desktop auxiliary route. [outlet=${outlet}]`);
 };

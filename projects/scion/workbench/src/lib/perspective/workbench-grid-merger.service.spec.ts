@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {MAIN_AREA} from '../layout/workbench-layout';
+import {DESKTOP_OUTLET, MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
@@ -40,7 +40,8 @@ describe('WorkbenchGridMerger', () => {
       .addView('view.3', {partId: 'bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', ['path/to/view/2'])
-      .navigateView('view.3', [], {hint: 'hint-3'});
+      .navigateView('view.3', [], {hint: 'hint-3'})
+      .navigateDesktop(['path/to/desktop']);
 
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base
@@ -84,10 +85,11 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.viewOutlets()).toEqual({
+    expect(mergedLayout.outlets()).toEqual({
       'view.1': segments(['PATH/TO/VIEW/1']),
       'view.3': [],
       'view.100': segments(['path/to/view/100']),
+      [DESKTOP_OUTLET]: segments(['path/to/desktop']),
     });
   });
 
@@ -104,7 +106,8 @@ describe('WorkbenchGridMerger', () => {
       .addView('view.3', {partId: 'bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', ['path/to/view/2'])
-      .navigateView('view.3', [], {hint: 'hint-3'});
+      .navigateView('view.3', [], {hint: 'hint-3'})
+      .navigateDesktop(['path/to/desktop']);
 
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base
@@ -151,10 +154,11 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.viewOutlets()).toEqual({
+    expect(mergedLayout.outlets()).toEqual({
       'view.2': segments(['path/to/view/2']),
       'view.3': [],
       'view.100': segments(['PATH/TO/VIEW/100']),
+      [DESKTOP_OUTLET]: segments(['path/to/desktop']),
     });
   });
 
@@ -169,7 +173,8 @@ describe('WorkbenchGridMerger', () => {
       .addView('view.1', {partId: 'topLeft'})
       .addView('view.2', {partId: 'bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
-      .navigateView('view.2', ['path/to/view/2']);
+      .navigateView('view.2', ['path/to/view/2'])
+      .navigateDesktop(['path/to/desktop']);
 
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base.navigateView('view.2', ['path/to/view/2a']),
@@ -208,9 +213,10 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.viewOutlets()).toEqual({
+    expect(mergedLayout.outlets()).toEqual({
       'view.1': segments(['path/to/view/1']),
       'view.2': segments(['path/to/view/2b']),
+      [DESKTOP_OUTLET]: segments(['path/to/desktop']),
     });
   });
 
@@ -225,7 +231,8 @@ describe('WorkbenchGridMerger', () => {
       .addView('view.1', {partId: 'topLeft'})
       .addView('view.2', {partId: 'bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
-      .navigateView('view.2', [], {hint: 'hint-2'});
+      .navigateView('view.2', [], {hint: 'hint-2'})
+      .navigateDesktop(['path/to/desktop']);
 
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base.navigateView('view.2', [], {hint: 'hint-2a'}),
@@ -263,9 +270,10 @@ describe('WorkbenchGridMerger', () => {
     // Expect hint not to be present.
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.viewOutlets()).toEqual({
+    expect(mergedLayout.outlets()).toEqual({
       'view.1': segments(['path/to/view/1']),
       'view.2': [],
+      [DESKTOP_OUTLET]: segments(['path/to/desktop']),
     });
   });
 });

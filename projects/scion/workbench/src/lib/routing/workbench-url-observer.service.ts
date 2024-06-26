@@ -10,7 +10,7 @@
 
 import {Event, GuardsCheckEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
 import {filter} from 'rxjs/operators';
-import {EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
+import {EnvironmentInjector, Inject, Injectable, runInInjectionContext} from '@angular/core';
 import {WorkbenchAuxiliaryRouteInstaller} from './workbench-auxiliary-route-installer.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
@@ -25,7 +25,7 @@ import {Logger, LoggerNames} from '../logging';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
 import {PartComponent} from '../part/part.component';
-import {MAIN_AREA} from '../layout/workbench-layout';
+import {DESKTOP_OUTLET, MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchDialogDiffer} from './workbench-dialog-differ';
@@ -37,6 +37,7 @@ import {canMatchNotFoundPage} from '../view/workbench-view-route-guards';
 import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchViewOutletDiffer} from './workbench-view-outlet-differ';
+import {WORKBENCH_DESKTOP, ɵWorkbenchDesktop} from '../desktop/ɵworkbench-desktop.model';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -50,7 +51,8 @@ import {WorkbenchViewOutletDiffer} from './workbench-view-outlet-differ';
 @Injectable({providedIn: 'root'})
 export class WorkbenchUrlObserver {
 
-  constructor(private _router: Router,
+  constructor(@Inject(WORKBENCH_DESKTOP) private _desktop: ɵWorkbenchDesktop,
+              private _router: Router,
               private _auxiliaryRouteInstaller: WorkbenchAuxiliaryRouteInstaller,
               private _viewRegistry: WorkbenchViewRegistry,
               private _partRegistry: WorkbenchPartRegistry,
@@ -65,10 +67,12 @@ export class WorkbenchUrlObserver {
               private _workbenchMessageBoxDiffer: WorkbenchMessageBoxDiffer,
               private _logger: Logger) {
     this.installRouterEventListeners();
+    this._auxiliaryRouteInstaller.registerAuxiliaryRoutes([DESKTOP_OUTLET], {canMatchNotFoundPage: [canMatchNotFoundPage]});
   }
 
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
+
     const context = this.createWorkbenchNavigationContext(event.url);
     this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, popupDiff=${context.popupDiff.toString()}, dialogDiff=${context.dialogDiff.toString()}, messageBoxDiff=${context.messageBoxDiff.toString()}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
@@ -139,7 +143,8 @@ export class WorkbenchUrlObserver {
       workbenchGrid: workbenchNavigationalState?.workbenchGrid ?? this._workbenchLayoutService.layout?.workbenchGrid,
       maximized: workbenchNavigationalState?.maximized ?? this._workbenchLayoutService.layout?.maximized,
       viewStates: workbenchNavigationalState?.viewStates ?? this._workbenchLayoutService.layout?.viewStates(),
-      viewOutlets: Object.fromEntries(RouterUtils.parseViewOutlets(urlTree)),
+      viewOutlets: Object.fromEntries(RouterUtils.parseViewOutlets(urlTree, {view: true, desktop: true})),
+      desktop: workbenchNavigationalState?.desktop ?? this._workbenchLayoutService.layout?.desktop,
     });
 
     return {
@@ -232,6 +237,7 @@ export class WorkbenchUrlObserver {
 
       layout.views().forEach(view => this._viewRegistry.get(view.id).onLayoutChange(layout));
       layout.parts().forEach(part => this._partRegistry.get(part.id).onLayoutChange(layout));
+      this._desktop.onLayoutChange(layout);
     }
   }
 

@@ -19,7 +19,7 @@ import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {RouterUtils} from './router.util';
-import {Commands, ViewOutlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
+import {Commands, Outlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
 import {ViewId} from '../view/workbench-view.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
@@ -87,7 +87,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras(newLayout, extras);
 
       // Create the new URL tree.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
       const urlTree = this._router.createUrlTree(commands, extras);
 
       // Perform the navigation.
@@ -150,7 +150,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras(newLayout, extras);
 
       // Create the new URL tree.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
       return this._router.createUrlTree(commands, extras);
     });
   }
@@ -309,7 +309,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
  * Creates navigation extras with workbench navigation instructions.
  */
 function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
-  const {workbenchGrid, mainAreaGrid} = layout.serialize({excludeViewMarkedForRemoval: true});
+  const {workbenchGrid, mainAreaGrid, desktop} = layout.serialize({excludeViewMarkedForRemoval: true});
 
   return {
     ...extras,
@@ -322,6 +322,7 @@ function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<Navigat
       workbenchGrid: workbenchGrid,
       maximized: layout.maximized,
       viewStates: layout.viewStates(),
+      desktop: desktop,
     }),
     // Add the main area as query parameter.
     queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},
@@ -334,7 +335,7 @@ function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<Navigat
 /**
  * Computes commands that can be passed to the Angular router to navigate view outlets and to remove view outlets of removed views.
  */
-function computeNavigationCommands(previousViewOutlets: ViewOutlets, nextViewOutlets: ViewOutlets): [{outlets: {[outlet: ViewId]: Commands | null}}] | [] {
+function computeNavigationCommands(previousViewOutlets: Outlets, nextViewOutlets: Outlets): [{outlets: {[outlet: ViewId]: Commands | null}}] | [] {
   const previousViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(previousViewOutlets));
   const nextViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(nextViewOutlets));
 

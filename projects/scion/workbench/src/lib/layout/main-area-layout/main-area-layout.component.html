@@ -19,6 +19,6 @@
                 [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
                 [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
                 (wbViewDropZoneDrop)="onViewDrop($event)">
-    <router-outlet/>
+    <ng-container *wbPortalOutlet="desktop.portal"/>
   </sci-viewport>
 }

@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--sci-workbench-view-background-color);
+  color: var(--sci-color-text);
+
+  > sci-viewport {
+    flex: 1 1 0;
+
+    > router-outlet {
+      position: absolute; // take router outlet out of the document flow
+    }
+  }
+}

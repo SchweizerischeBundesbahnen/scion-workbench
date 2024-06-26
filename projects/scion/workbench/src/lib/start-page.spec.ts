@@ -17,6 +17,7 @@ import {WorkbenchLayoutFactory} from './layout/workbench-layout.factory';
 import {expect} from './testing/jasmine/matcher/custom-matchers.definition';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
+import {MAIN_AREA} from '@scion/workbench';
 
 describe('Start Page', () => {
 
@@ -25,10 +26,16 @@ describe('Start Page', () => {
     it('should display start page when all views are closed', async () => {
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest(),
+          provideWorkbenchForTest(
+            {
+              layout: factory => factory
+                .addPart(MAIN_AREA)
+                .navigateDesktop(['start-page']),
+            },
+          ),
           provideRouter([
             {
-              path: '',
+              path: 'start-page',
               loadComponent: () => import('./testing/test.component'),
               providers: [withComponentContent('Start Page')],
             },
@@ -45,7 +52,7 @@ describe('Start Page', () => {
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect start page to display
-      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport.start-page > wb-desktop')).nativeElement.innerText).toEqual('Start Page');
       expect(fixture.debugElement.query(By.css('wb-part'))).toBeNull();
 
       // Open view
@@ -53,7 +60,7 @@ describe('Start Page', () => {
       await waitUntilStable();
 
       // Expect start page not to display
-      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport > router-outlet'))).toBeNull();
+      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport.start-page > wb-desktop'))).toBeNull();
       expect(fixture.debugElement.query(By.css('wb-part'))).not.toBeNull();
 
       // Close view
@@ -61,7 +68,7 @@ describe('Start Page', () => {
       await waitUntilStable();
 
       // Expect start page to display
-      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport.start-page > wb-desktop')).nativeElement.innerText).toEqual('Start Page');
       expect(fixture.debugElement.query(By.css('wb-part'))).toBeNull();
     });
 

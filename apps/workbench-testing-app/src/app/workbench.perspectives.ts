@@ -37,7 +37,9 @@ export const Perspectives = {
     return [
       {
         id: 'blank',
-        layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
+        layout: (factory: WorkbenchLayoutFactory) => factory
+          .addPart(MAIN_AREA)
+          .navigateDesktop(['test-desktop']),
       },
       {
         id: 'perspective-1',
@@ -102,7 +104,8 @@ function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-5', [], {hint: 'sample-view'})
     .navigateView('sample-view-6', [], {hint: 'sample-view'})
     .navigateView('sample-view-7', [], {hint: 'sample-view'})
-    .navigateView('sample-view-8', [], {hint: 'sample-view'});
+    .navigateView('sample-view-8', [], {hint: 'sample-view'})
+    .navigateDesktop(['start-page']);
 }
 
 function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -131,5 +134,6 @@ function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-7', [], {hint: 'sample-view'})
     .navigateView('sample-view-8', [], {hint: 'sample-view'})
     .navigateView('sample-view-9', [], {hint: 'sample-view'})
-    .navigateView('sample-view-10', [], {hint: 'sample-view'});
+    .navigateView('sample-view-10', [], {hint: 'sample-view'})
+    .navigateDesktop(['start-page']);
 }

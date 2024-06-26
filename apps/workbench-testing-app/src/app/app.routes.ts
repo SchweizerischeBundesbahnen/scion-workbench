@@ -11,19 +11,13 @@
 import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {topLevelTestPageRoutes} from './test-pages/routes';
-import {canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
+import {canMatchWorkbenchDesktop, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
 
 export const routes: Routes = [
   {
     path: '',
     component: WorkbenchComponent,
-    canMatch: [canMatchWorkbenchView(false)],
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./start-page/start-page.component'),
-      },
-    ],
+    canMatch: [canMatchWorkbenchView(false), canMatchWorkbenchDesktop(false)],
   },
   {
     path: 'workbench-page',
@@ -51,6 +45,18 @@ export const routes: Routes = [
       [WorkbenchRouteData.cssClass]: 'e2e-test-view',
       path: '',
       navigationHint: 'test-view',
+    },
+  },
+  {
+    path: '',
+    canMatch: [canMatchWorkbenchDesktop('test-desktop')],
+    loadComponent: () => import('./desktop-page/desktop-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Desktop',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-desktop',
+      path: '',
+      navigationHint: 'test-desktop',
     },
   },
   {
@@ -91,6 +97,29 @@ export const routes: Routes = [
       [WorkbenchRouteData.cssClass]: 'e2e-test-view',
       pinToStartPage: true,
       path: 'test-view',
+      navigationHint: '',
+    },
+  },
+  {
+    path: 'test-desktop',
+    canMatch: [canMatchWorkbenchDesktop('test-desktop')],
+    loadComponent: () => import('./desktop-page/desktop-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Desktop',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-desktop',
+      path: 'test-desktop',
+      navigationHint: 'test-desktop',
+    },
+  },
+  {
+    path: 'test-desktop',
+    loadComponent: () => import('./desktop-page/desktop-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Workbench Desktop',
+      [WorkbenchRouteData.heading]: 'Workbench E2E Testpage',
+      [WorkbenchRouteData.cssClass]: 'e2e-test-desktop',
+      path: 'test-desktop',
       navigationHint: '',
     },
   },

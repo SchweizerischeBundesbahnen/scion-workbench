@@ -9,8 +9,8 @@
  */
 
 import {inject, Injectable} from '@angular/core';
-import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
-import {ViewOutlets} from '../routing/routing.model';
+import {MDesktop, MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
+import {Outlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
@@ -88,7 +88,7 @@ export class WorkbenchLayoutSerializer {
   /**
    * Serializes the given outlets.
    */
-  public serializeViewOutlets(viewOutlets: ViewOutlets): string {
+  public serializeViewOutlets(viewOutlets: Outlets): string {
     return JSON.stringify(Object.fromEntries(Object.entries(viewOutlets)
       .map(([viewId, segments]: [string, UrlSegment[]]): [string, MUrlSegment[]] => {
         return [viewId, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
@@ -98,13 +98,21 @@ export class WorkbenchLayoutSerializer {
   /**
    * Deserializes the given outlets.
    */
-  public deserializeViewOutlets(serialized: string): ViewOutlets {
+  public deserializeViewOutlets(serialized: string): Outlets {
     const viewOutlets: {[viewId: ViewId]: MUrlSegment[]} = JSON.parse(serialized);
 
     return Object.fromEntries(Object.entries(viewOutlets)
       .map(([viewId, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
         return [viewId, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
       }));
+  }
+
+  public serializeDesktop(desktop: MDesktop): string {
+    return JSON.stringify(desktop);
+  }
+
+  public deserializeDesktop(serialized: string): MDesktop {
+    return JSON.parse(serialized);
   }
 }
 

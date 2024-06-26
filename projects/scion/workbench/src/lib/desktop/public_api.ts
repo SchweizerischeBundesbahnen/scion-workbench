@@ -8,6 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchView, ViewId} from './workbench-view.model';
-export {canMatchWorkbenchView, canMatchWorkbenchDesktop} from './workbench-view-route-guards';
-
+export {WorkbenchDesktop} from './workbench-desktop.model';

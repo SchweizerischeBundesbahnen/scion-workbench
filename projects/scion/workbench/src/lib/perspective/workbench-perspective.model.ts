@@ -213,6 +213,7 @@ export interface MPerspectiveLayout {
      * @see WorkbenchLayoutSerializer.deserializeViewOutlets
      */
     viewOutlets: string;
+    desktop: string;
   };
   /**
    * Layout personalized by the user.
@@ -228,5 +229,6 @@ export interface MPerspectiveLayout {
      * @see WorkbenchLayoutSerializer.deserializeViewOutlets
      */
     viewOutlets: string;
+    desktop: string;
   };
 }
