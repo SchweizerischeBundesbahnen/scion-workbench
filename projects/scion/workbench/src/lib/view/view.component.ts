@@ -75,9 +75,13 @@ export class ViewComponent implements OnDestroy {
   }
 
   private onActivateView(viewport: SciViewportComponent): void {
-    viewport.focus();
     viewport.scrollTop = this._view.scrollTop;
     viewport.scrollLeft = this._view.scrollLeft;
+
+    // Gain focus only if in the active part.
+    if (this._view.part.active) {
+      viewport.focus();
+    }
   }
 
   private onDeactivateView(viewport: SciViewportComponent): void {
