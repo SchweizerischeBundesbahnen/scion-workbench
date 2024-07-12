@@ -279,6 +279,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
         partId: partId,
         position: extras.position ?? 'after-active-view',
         activateView: extras.activate ?? true,
+        activatePart: extras.activate ?? true,
       })
       .navigateView(viewId, commands, {
         relativeTo: extras.relativeTo,
@@ -293,7 +294,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
    */
   function updateView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     if (extras.activate ?? true) {
-      layout = layout.activateView(viewId);
+      layout = layout.activateView(viewId, {activatePart: true});
     }
 
     return layout.navigateView(viewId, commands, {
