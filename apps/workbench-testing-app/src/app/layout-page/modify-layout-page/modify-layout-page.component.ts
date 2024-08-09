@@ -17,7 +17,7 @@ import {SettingsService} from '../../settings.service';
 import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {stringifyError} from '../../common/stringify-error.util';
 import {combineLatestWith, Observable} from 'rxjs';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
+import {distinctArray, filterArray, mapArray} from '@scion/toolkit/operators';
 import {map, startWith} from 'rxjs/operators';
 import {AsyncPipe} from '@angular/common';
 
@@ -55,6 +55,7 @@ export default class ModifyLayoutPageComponent {
         combineLatestWith(this.form.controls.parts.valueChanges.pipe(startWith([]))),
         map(([a, b]) => [...a, ...b]),
         mapArray(part => part.id),
+        distinctArray(),
         filterArray(partId => !!partId),
       );
     this.viewProposals$ = workbenchService.views$
@@ -62,6 +63,7 @@ export default class ModifyLayoutPageComponent {
         combineLatestWith(this.form.controls.views.valueChanges.pipe(startWith([]))),
         map(([a, b]) => [...a, ...b]),
         mapArray(view => view.id),
+        distinctArray(),
         filterArray(viewId => !!viewId),
       );
   }
