@@ -17,9 +17,9 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {CanMatchPartFn} from '../../workbench.model';
 
 /**
- * Use this directive to contribute an action to a part's action bar.
+ * Use this directive to contribute an action to the action bar of a {@link WorkbenchPart}.
  *
- * Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
+ * Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
  *
  * The host element of this modeling directive must be a <ng-template>. The action shares the lifecycle of the host element.
  *
