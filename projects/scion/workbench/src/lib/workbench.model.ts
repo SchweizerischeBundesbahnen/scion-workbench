@@ -81,6 +81,8 @@ export type CanMatchPartFn = (part: WorkbenchPart) => boolean;
 
 /**
  * Factory function to create a {@link WorkbenchMenuItem}.
+ *
+ * The function will be invoked when opening a view's context menu. Use the passed view handle to decide whether to display the menu item.
  */
 export type WorkbenchMenuItemFactoryFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
 

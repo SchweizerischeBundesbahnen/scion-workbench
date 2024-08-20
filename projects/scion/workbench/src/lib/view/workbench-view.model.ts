@@ -166,7 +166,20 @@ export abstract class WorkbenchView {
   public abstract move(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void;
 
   /**
-   * Registers a menu item which is added to the context menu of the view tab.
+   * Contributes a menu item to this view's context menu.
+   *
+   * ---
+   * As an alternative to programmatic registration, menu items can be contributed declaratively from an HTML template.
+   * Declaring a menu item in the HTML template of a workbench view adds it to that view only. To add it to every view,
+   * declare it outside a view context, such as in `app.component.html`, or register it programmatically.
+   * Refer to {@link WorkbenchViewMenuItemDirective} for more information.
+   *
+   * Example:
+   * ```html
+   * <ng-template wbViewMenuItem [accelerator]="['ctrl', 'b']" (action)="..." let-view>
+   *   ...
+   * </ng-template>
+   * ```
    *
    * @return handle to unregister the menu item.
    */
