@@ -6,7 +6,7 @@ import {TemplatePortal} from '@angular/cdk/portal';
 import {WorkbenchView} from '../../view/workbench-view.model';
 
 /**
- * Use this directive to model a menu item added to the context menu of a view.
+ * Use this directive to contribute a menu item to a view's context menu.
  *
  * The host element of this modeling directive must be a <ng-template>.
  * A menu item shares the lifecycle of the host element.

@@ -28,6 +28,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to close a view](how-to-close-view.md)
 - [How to prevent a view from closing](how-to-prevent-view-closing.md)
 - [How to provide a part action](how-to-provide-part-action.md)
+- [How to contribute to the view's context menu](how-to-provide-view-menu-item.md)
 - [How to provide a "Not Found" page](how-to-provide-not-found-page.md)
 
 #### Dialog, Popup, Messagebox, Notification
