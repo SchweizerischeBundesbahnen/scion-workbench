@@ -5,14 +5,14 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
+Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
 
 ### How to contribute a part action
-Actions can be modeled in an HTML template or contributed programmatically via `WorkbenchService`. 
+Actions can be contributed declaratively from an HTML template or registered programmatically via the `WorkbenchService`.
 
-If the action is modeled in a view template, it is inherently associated with that view, i.e., only displayed when active. To not associate an action with a view, model the action inside the `wb-workbench` HTML element or register it programmatically.
+Declaring an action in the HTML template of a workbench view displays it only if that view is active. To display it for every view or based on some condition, declare it outside a view context, such as in `app.component.html`, or register it programmatically.
 
-Specify a `canMatch` function to match a specific part, parts in a specific area, or parts from a specific perspective.
+Specifying a `canMatch` function enables the action to match a specific part, parts in a specific area, or parts from a specific perspective.
 
 The alignment of an action in the action bar can be controlled with the `align` property.
 

@@ -43,7 +43,7 @@ export interface CanClose {
 /**
  * Describes an action contributed to a part.
  *
- * Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
+ * Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
  */
 export interface WorkbenchPartAction {
   /**

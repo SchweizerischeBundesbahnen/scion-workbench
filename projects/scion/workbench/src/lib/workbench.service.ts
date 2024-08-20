@@ -117,9 +117,24 @@ export abstract class WorkbenchService {
   public abstract closeViews(...viewIds: ViewId[]): Promise<boolean>;
 
   /**
-   * Contributes an action to a part's action bar.
+   * Contributes an action to the action bar of a {@link WorkbenchPart}.
    *
-   * Part actions are displayed to the right of the view tab bar and enable interaction with the part and its content.
+   * Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
+   *
+   * ---
+   * As an alternative to programmatic registration, actions can be contributed declaratively from an HTML template.
+   * Declaring an action in the HTML template of a workbench view displays it only if that view is active. To display it for every
+   * view or based on some condition, declare it outside a view context, such as in `app.component.html`, or register it programmatically.
+   * Refer to {@link WorkbenchPartActionDirective} for more information.
+   *
+   * Example:
+   * ```html
+   * <ng-template wbPartAction>
+   *   <button wbRouterLink="/path/to/view" [wbRouterLinkExtras]="{target: 'blank'}" class="material-icons">
+   *     add
+   *   </button>
+   * </ng-template>
+   * ```
    *
    * @return handle to unregister the part action.
    */
