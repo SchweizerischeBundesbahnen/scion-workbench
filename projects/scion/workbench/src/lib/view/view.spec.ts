@@ -36,7 +36,6 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {throwError} from '../common/throw-error.util';
 import {WorkbenchPartActionDirective} from '../part/part-action-bar/part-action.directive';
-import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
@@ -1309,8 +1308,7 @@ describe('View', () => {
   it('should have uid from MView', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest(),
-        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
+        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
       ],
     });
 
@@ -1355,8 +1353,7 @@ describe('View', () => {
   it('should have alternative id from MView', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest(),
-        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
+        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
       ],
     });
 

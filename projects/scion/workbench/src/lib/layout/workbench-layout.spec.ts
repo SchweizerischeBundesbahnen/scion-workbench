@@ -2113,6 +2113,7 @@ describe('WorkbenchLayout', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
+          mainAreaInitialPartId: 'initial',
           layout: {
             perspectives: [
               {
@@ -2133,7 +2134,6 @@ describe('WorkbenchLayout', () => {
         provideRouter([
           {path: 'test-view', component: TestComponent},
         ]),
-        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'initial'},
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));

@@ -33,12 +33,12 @@ import {Router} from '@angular/router';
  * });
  * ```
  */
-export function provideWorkbenchForTest(config?: WorkbenchConfig): EnvironmentProviders {
+export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInitialPartId?: string}): EnvironmentProviders {
   return makeEnvironmentProviders([
     provideWorkbench(config),
     provideNoopAnimations(),
     {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
-    {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
+    {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config?.mainAreaInitialPartId ?? 'main'},
     {provide: ComponentFixtureAutoDetect, useValue: true},
     {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
     {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},
