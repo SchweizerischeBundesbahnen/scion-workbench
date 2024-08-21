@@ -66,9 +66,9 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 }
 
 /**
- * Matches if the view has been navigated (or cannot be found).
+ * Matches if the view has been navigated.
  *
- * The view cannot be found during initial navigation as the workbench layout is loaded asynchronously.
+ * Does not match if no navigation information is available, e.g., during initial navigation because the layout is loaded asynchronously, or when closing the view.
  */
 export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
@@ -79,5 +79,5 @@ export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
 
   const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
   const view = layout.view({viewId: outlet}, {orElse: null});
-  return !view || !!view.navigation;
+  return !!view?.navigation;
 };

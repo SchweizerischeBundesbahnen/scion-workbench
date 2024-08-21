@@ -8,7 +8,7 @@
 * SPDX-License-Identifier: EPL-2.0
 */
 
-import {Injectable, InjectionToken} from '@angular/core';
+import {Component, Injectable, InjectionToken} from '@angular/core';
 import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
@@ -44,15 +44,20 @@ export class WorkbenchAuxiliaryRouteInstaller {
         ...this._router.config
           .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
           .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
-        // Register "Not Found" page route as the last route of the outlet.
+        // Register wildcard route to display "Page Not Found".
         {
           path: '**',
           loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
           data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
           canMatch: config.canMatchNotFoundPage,
         },
+        // Register wildcard route to display blank page.
+        {
+          path: '**',
+          component: BlankComponent,
+        },
       ],
-    }));
+    } satisfies Route));
 
     this.replaceRouterConfig([
       ...this._router.config,
@@ -105,3 +110,10 @@ export interface AuxiliaryRouteConfig {
  * Can be injected in a `CanMatch` guard to obtain a reference to the workbench element.
  */
 export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('ɵWORKBENCH_AUXILIARY_ROUTE_OUTLET');
+
+/**
+ * Component to display if the outlet has not yet been navigated or no navigation information is available.
+ */
+@Component({selector: 'wb-blank', template: '', standalone: true})
+export class BlankComponent {
+}
