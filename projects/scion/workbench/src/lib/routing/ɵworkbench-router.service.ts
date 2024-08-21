@@ -18,7 +18,7 @@ import {SINGLE_NAVIGATION_EXECUTOR} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {RouterUtils} from './router.util';
+import {Routing} from './routing.util';
 import {Commands, ViewOutlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
 import {ViewId} from '../view/workbench-view.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
@@ -221,7 +221,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
         }
         return layout.removeView(extras.target);
       }
-      const urlSegments = RouterUtils.commandsToSegments(commands, {relativeTo: extras.relativeTo});
+      const urlSegments = Routing.commandsToSegments(commands, {relativeTo: extras.relativeTo});
       return layout
         .views({
           partId: extras.partId,
@@ -236,7 +236,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
           return addView(layout.computeNextViewId(), layout);
         }
         case 'auto': {
-          const urlSegments = RouterUtils.commandsToSegments(commands, {relativeTo: extras.relativeTo});
+          const urlSegments = Routing.commandsToSegments(commands, {relativeTo: extras.relativeTo});
           const views = layout.views({
             partId: extras.partId,
             segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: false}),
@@ -345,7 +345,7 @@ function computeNavigationCommands(previousViewOutlets: ViewOutlets, nextViewOut
   viewIds.forEach(viewId => {
     // Test if the view was added to the layout.
     if (!previousViewOutletMap.has(viewId)) {
-      commands.set(viewId, RouterUtils.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+      commands.set(viewId, Routing.segmentsToCommands(nextViewOutletMap.get(viewId)!));
     }
     // Test if the view was removed from the layout.
     else if (!nextViewOutletMap.has(viewId)) {
@@ -353,7 +353,7 @@ function computeNavigationCommands(previousViewOutlets: ViewOutlets, nextViewOut
     }
     // Test if the view was updated.
     else if (!new UrlSegmentMatcher(previousViewOutletMap.get(viewId)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(nextViewOutletMap.get(viewId)!)) {
-      commands.set(viewId, RouterUtils.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+      commands.set(viewId, Routing.segmentsToCommands(nextViewOutletMap.get(viewId)!));
     }
   });
 

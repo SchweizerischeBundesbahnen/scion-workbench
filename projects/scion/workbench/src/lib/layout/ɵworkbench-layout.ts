@@ -15,7 +15,7 @@ import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layo
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
-import {RouterUtils} from '../routing/router.util';
+import {Routing} from '../routing/routing.util';
 import {Commands, ViewOutlets, ViewState, ViewStates} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
@@ -558,7 +558,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
     }
 
-    const urlSegments = runInInjectionContext(this._injector, () => RouterUtils.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
+    const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
     if (urlSegments.length) {
       this._viewOutlets.set(view.id, urlSegments);
     }

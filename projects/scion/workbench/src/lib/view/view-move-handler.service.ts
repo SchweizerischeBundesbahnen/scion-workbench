@@ -3,7 +3,7 @@ import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
 import {Router} from '@angular/router';
 import {LocationStrategy} from '@angular/common';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
-import {RouterUtils} from '../routing/router.util';
+import {Routing} from '../routing/routing.util';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Defined} from '@scion/toolkit/util';
@@ -62,7 +62,7 @@ export class ViewMoveHandler {
   private async addView(event: ViewMoveEvent): Promise<void> {
     const region = event.target.region;
     const addToNewPart = !!region;
-    const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
+    const commands = Routing.segmentsToCommands(event.source.viewUrlSegments);
 
     await this._workbenchRouter.navigate(layout => {
       const newViewId = event.source.alternativeViewId ?? layout.computeNextViewId();
@@ -92,7 +92,7 @@ export class ViewMoveHandler {
     const urlTree = await this._workbenchRouter.createUrlTree(() => {
       const newLayout = this._workbenchLayoutFactory.create();
       const newViewId = event.source.alternativeViewId ?? newLayout.computeNextViewId();
-      const commands = RouterUtils.segmentsToCommands(event.source.viewUrlSegments);
+      const commands = Routing.segmentsToCommands(event.source.viewUrlSegments);
       return newLayout
         .addView(newViewId, {
           partId: newLayout.activePart({grid: 'mainArea'})!.id,

@@ -13,7 +13,7 @@ import {MPartGridV2, MPartV2, MTreeNodeV2, MViewV2} from './model/workbench-layo
 import {MPartGridV3, MPartV3, MTreeNodeV3, MViewV3, VIEW_ID_PREFIX_V3, ViewIdV3} from './model/workbench-layout-migration-v3.model';
 import {Router, UrlTree} from '@angular/router';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
-import {RouterUtils} from '../../routing/router.util';
+import {Routing} from '../../routing/routing.util';
 
 /**
  * Migrates the workbench layout from version 2 to version 3.
@@ -33,7 +33,7 @@ export class WorkbenchLayoutMigrationV3 implements WorkbenchMigration {
     // Otherwise, when migrating the main area and using a view id already present in the perspective,
     // the view outlet would not be removed from the URL, resulting the migrated view to display
     // "Not Found" page or incorrect content.
-    const viewOutlets = RouterUtils.parseViewOutlets(this.getCurrentUrl());
+    const viewOutlets = Routing.parseViewOutlets(this.getCurrentUrl());
     const usedViewIds = new Set<ViewIdV3>([...viewOutlets.keys(), ...collectViewIds(partGridV2.root)]);
 
     // Migrate the grid.

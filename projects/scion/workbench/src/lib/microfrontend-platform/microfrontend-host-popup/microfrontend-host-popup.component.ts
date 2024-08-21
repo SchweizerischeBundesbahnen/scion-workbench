@@ -10,7 +10,7 @@
 
 import {Component, inject, Injector, OnDestroy, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
-import {RouterUtils} from '../../routing/router.util';
+import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
 import {Popup, ɵPopup} from '../../popup/popup.config';
@@ -71,7 +71,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   private navigate(path: string | null, extras: {outletName: string; params?: Map<string, any>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras.params);
 
-    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => RouterUtils.pathToCommands(path!)) : null);
+    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._singleNavigationExecutor.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }

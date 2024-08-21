@@ -61,7 +61,7 @@ function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, actual: ɵWork
     assertWorkbenchLayoutDOM(expected, actualDebugElement.nativeElement);
   }
   else {
-    throw Error(`Expected testee to be of type 'ɵWorkbenchLayout' or 'DebugElement<WorkbenchLayoutComponent>' [actual=${actual.constructor.name}]`);
+    throw Error(`Expected testee to be of type 'ɵWorkbenchLayout' or 'DebugElement<WorkbenchLayoutComponent>' [actual=${actual?.constructor?.name}]`);
   }
 }
 

@@ -93,6 +93,10 @@ export interface WorkbenchNavigationContext {
    */
   layout: ɵWorkbenchLayout;
   /**
+   * Layout before the navigation.
+   */
+  previousLayout: ɵWorkbenchLayout | null;
+  /**
    * Workbench layout elements added or removed by the current navigation.
    */
   layoutDiff: WorkbenchLayoutDiff;
@@ -112,6 +116,26 @@ export interface WorkbenchNavigationContext {
    * Message boxes added or removed by the current navigation.
    */
   messageBoxDiff: WorkbenchMessageBoxDiff;
+
+  /**
+   * Reverts changes made during the navigation if it fails or is cancelled.
+   */
+  undoChanges(): void;
+
+  /**
+   * Runs post navigation actions.
+   */
+  runPostNavigationActions(): void;
+
+  /**
+   * Registers an action to be undone if the navigation fails or is cancelled.
+   */
+  registerUndoAction(action: () => void): void;
+
+  /**
+   * Registers an action to be executed after successful navigation.
+   */
+  registerPostNavigationAction(action: () => void): void;
 }
 
 /**

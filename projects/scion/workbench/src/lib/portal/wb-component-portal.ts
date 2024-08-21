@@ -58,7 +58,7 @@ export class WbComponentPortal<T = any> {
       throw Error(`[PortalConstructError] Component already constructed. [component=${this._componentType}]`);
     }
     this._componentRef = this.createComponent(injectionContext);
-    // Trigger change detection to complete the initialization of the component, important for components detached from the Angular component tree.
+    // Trigger change detection to complete the initialization of the component, necessary for components detached from the Angular component tree.
     this._componentRef.changeDetectorRef.detectChanges();
   }
 

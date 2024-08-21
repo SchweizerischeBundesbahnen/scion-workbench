@@ -10,7 +10,7 @@
 
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {UrlTree} from '@angular/router';
-import {RouterUtils} from './router.util';
+import {Routing} from './routing.util';
 
 /**
  * Stateful differ for finding added/removed message boxes.
@@ -28,7 +28,7 @@ export class WorkbenchMessageBoxDiffer {
    * Computes differences in the URL since last time {@link WorkbenchMessageBoxDiffer#diff} was invoked.
    */
   public diff(urlTree: UrlTree): WorkbenchMessageBoxDiff {
-    const messageBoxOutlets = Object.keys(urlTree.root.children).filter(RouterUtils.isMessageBoxOutlet);
+    const messageBoxOutlets = Object.keys(urlTree.root.children).filter(Routing.isMessageBoxOutlet);
 
     return new WorkbenchMessageBoxDiff(this._messageBoxDiffer.diff(messageBoxOutlets));
   }
