@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, HostListener, Inject, InjectionToken, OnInit} from '@angular/core';
+import {Component, DestroyRef, HostListener, Inject, InjectionToken, Injector, OnInit, runInInjectionContext} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {fromEvent} from 'rxjs';
 import {MenuItem, MenuItemSeparator} from './menu-item';
@@ -40,6 +40,7 @@ export class MenuComponent implements OnInit {
 
   constructor(private _overlayRef: OverlayRef,
               private _destroyRef: DestroyRef,
+              private _injector: Injector,
               @Inject(MENU_ITEMS) public menuItems: Array<MenuItem | MenuItemSeparator>) {
   }
 
@@ -53,7 +54,8 @@ export class MenuComponent implements OnInit {
     if (menuItem.disabled) {
       return;
     }
-    menuItem.onAction();
+
+    runInInjectionContext(this._injector, () => menuItem.onAction());
     this.closeMenu();
   }
 
