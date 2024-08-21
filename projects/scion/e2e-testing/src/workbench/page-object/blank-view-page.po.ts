@@ -24,6 +24,6 @@ export class BlankViewPagePO implements WorkbenchViewPagePO {
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
-    this.locator = this.view.locator.locator(':scope:has(router-outlet:first-child:last-child)');
+    this.locator = this.view.locator.locator('wb-blank');
   }
 }

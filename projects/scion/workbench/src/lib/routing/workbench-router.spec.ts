@@ -9,6 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
+import {Component, OnDestroy} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -120,5 +121,61 @@ describe('WorkbenchRouter', () => {
     function findActiveMainAreaPart(): WorkbenchPart {
       return TestBed.inject(WorkbenchService).parts.find(part => part.isInMainArea && part.active)!;
     }
+  });
+
+  it('should not display "Not Found" page when closing view', async () => {
+    const log = new Array<string>();
+
+    @Component({selector: 'spec-view', template: 'View', standalone: true})
+    class SpecViewComponent implements OnDestroy {
+
+      constructor() {
+        log.push('SpecViewComponent.construct');
+      }
+
+      public ngOnDestroy(): void {
+        log.push('SpecViewComponent.destroy');
+      }
+    }
+
+    @Component({selector: 'spec-not-found-page', template: 'View', standalone: true})
+    class PageNotFoundComponent implements OnDestroy {
+
+      constructor() {
+        log.push('PageNotFoundComponent.construct');
+      }
+
+      public ngOnDestroy(): void {
+        log.push('PageNotFoundComponent.destroy');
+      }
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          pageNotFoundComponent: PageNotFoundComponent,
+        }),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Open view.
+    await workbenchRouter.navigate(['path/to/view'], {target: 'view.101'});
+    await waitUntilStable();
+    expect(log).toEqual(['SpecViewComponent.construct']);
+    log.length = 0;
+
+    // Close view.
+    await TestBed.inject(WorkbenchService).getView('view.101')!.close();
+    await waitUntilStable();
+
+    // Expect view to be closed and "Not Found" page not to be displayed.
+    expect(log).toEqual(['SpecViewComponent.destroy']);
+    log.length = 0;
   });
 });

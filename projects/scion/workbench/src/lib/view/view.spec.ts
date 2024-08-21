@@ -39,6 +39,7 @@ import {WorkbenchPartActionDirective} from '../part/part-action-bar/part-action.
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
+import {BlankComponent} from '../routing/workbench-auxiliary-route-installer.service';
 
 describe('View', () => {
 
@@ -988,9 +989,9 @@ describe('View', () => {
 
     // Add view without navigating it.
     const workbenchRouter = TestBed.inject(ɵWorkbenchRouter);
-    await workbenchRouter.navigate(layout => layout.addView('view.100', {partId: layout.activePart({grid: 'mainArea'})!.id}));
+    await workbenchRouter.navigate(layout => layout.addView('view.100', {partId: layout.activePart({grid: 'mainArea'})!.id, activateView: true}));
     await waitUntilStable();
-    expect(TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent()).toBeNull();
+    expect(TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent()).toBe(getComponent(fixture, BlankComponent));
 
     // Navigate to "path/to/view".
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
