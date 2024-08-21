@@ -13,8 +13,6 @@ import {WorkbenchPartRegistry} from './workbench-part.registry';
 import {ObserveCaptor} from '@scion/toolkit/testing';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {PartComponent} from './part.component';
-import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchUrlObserver} from '../routing/workbench-url-observer.service';
 import {WorkbenchPart} from './workbench-part.model';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
@@ -31,7 +29,7 @@ describe('WorkbenchPartRegistry', () => {
     });
 
     // Register part 'part.1'.
-    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.1', {component: PartComponent})));
+    TestBed.inject(WorkbenchPartRegistry).register(jasmine.createSpyObj('ɵWorkbenchPart', ['destroy'], {id: 'part.1'}));
 
     // Expect registry to emit registered parts upon subscription.
     const partsCaptor = new ObserveCaptor();
@@ -41,9 +39,9 @@ describe('WorkbenchPartRegistry', () => {
     ]);
 
     // Register part 'part.2'.
-    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.2', {component: PartComponent})));
+    TestBed.inject(WorkbenchPartRegistry).register(jasmine.createSpyObj('ɵWorkbenchPart', ['destroy'], {id: 'part.2'}));
     // Register part 'part.3'.
-    TestBed.inject(WorkbenchPartRegistry).register(TestBed.runInInjectionContext(() => new ɵWorkbenchPart('part.3', {component: PartComponent})));
+    TestBed.inject(WorkbenchPartRegistry).register(jasmine.createSpyObj('ɵWorkbenchPart', ['destroy'], {id: 'part.3'}));
 
     // Expect registry not to emit until the next layout change.
     expect(partsCaptor.getValues()).toEqual([

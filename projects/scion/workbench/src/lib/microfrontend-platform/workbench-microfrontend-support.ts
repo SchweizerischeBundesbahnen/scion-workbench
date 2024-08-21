@@ -36,7 +36,7 @@ import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-messag
 import {Defined} from '@scion/toolkit/util';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
-import {RouterUtils} from '../routing/router.util';
+import {Routing} from '../routing/routing.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
@@ -190,6 +190,6 @@ function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
 function canMatchWorkbenchMessageBox(): CanMatchFn {
   return () => {
     const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
-    return RouterUtils.isMessageBoxOutlet(outlet);
+    return Routing.isMessageBoxOutlet(outlet);
   };
 }

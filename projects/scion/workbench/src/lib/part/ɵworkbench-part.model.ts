@@ -12,7 +12,6 @@ import {inject, Injector, runInInjectionContext} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
-import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
@@ -22,12 +21,14 @@ import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewId} from '../view/workbench-view.model';
+import {Event, NavigationStart, Router, RouterEvent} from '@angular/router';
+import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
   private _activationInstant: number | undefined;
 
-  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
@@ -46,6 +47,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._partComponent = options.component;
     this.actions$ = this.observePartActions$();
     this.touchOnActivate();
+    this.installModelUpdater();
+    this.onLayoutChange(this._workbenchRouter.getCurrentNavigationContext().layout);
   }
 
   /**
@@ -63,14 +66,17 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /**
-   * Method invoked to update this workbench model object when the workbench layout changes.
+   * Method invoked when the workbench layout has changed.
+   *
+   * This method:
+   * - is called on every layout change, including changes not relevant for this part.
    */
-  public onLayoutChange(layout: ɵWorkbenchLayout): void {
+  private onLayoutChange(layout: ɵWorkbenchLayout): void {
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
-    const part = layout.part({partId: this.id});
+    const mPart = layout.part({partId: this.id});
     const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
     const prevViewIds = this.viewIds$.value;
-    const currViewIds = part.views.map(view => view.id);
+    const currViewIds = mPart.views.map(view => view.id);
 
     // Update active part if changed
     if (this.active !== active) {
@@ -83,8 +89,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     }
 
     // Update active view if changed
-    if (this.activeViewId !== part.activeViewId) {
-      this.activeViewId$.next(part.activeViewId ?? null);
+    if (this.activeViewId !== mPart.activeViewId) {
+      this.activeViewId$.next(mPart.activeViewId ?? null);
     }
   }
 
@@ -150,6 +156,34 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       )
       .subscribe(() => {
         this._activationInstant = this._activationInstantProvider.now();
+      });
+  }
+
+  /**
+   * Sets up automatic synchronization of {@link WorkbenchPart} on every layout change.
+   *
+   * If the operation is cancelled (e.g., due to a navigation failure), it reverts the changes.
+   */
+  private installModelUpdater(): void {
+    inject(Router).events
+      .pipe(
+        filter((event: Event | RouterEvent): event is NavigationStart => event instanceof NavigationStart),
+        takeUntil(this._destroy$),
+      )
+      .subscribe(() => {
+        const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
+        const {layout, previousLayout, layoutDiff} = navigationContext;
+
+        if (layoutDiff.removedParts.includes(this.id)) {
+          return;
+        }
+
+        this.onLayoutChange(layout);
+
+        // Revert change in case the navigation fails.
+        if (previousLayout?.hasPart(this.id)) {
+          navigationContext.registerUndoAction(() => this.onLayoutChange(previousLayout));
+        }
       });
   }
 

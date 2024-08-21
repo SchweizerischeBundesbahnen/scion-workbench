@@ -11,7 +11,7 @@
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {UrlTree} from '@angular/router';
-import {RouterUtils} from './router.util';
+import {Routing} from './routing.util';
 import {ViewId} from '../view/workbench-view.model';
 
 /**
@@ -36,7 +36,7 @@ export class WorkbenchViewOutletDiffer {
    */
   public diff(workbenchLayout: ɵWorkbenchLayout | null, urlTree: UrlTree): WorkbenchViewOutletDiff {
     const views = workbenchLayout?.views().map(view => view.id) ?? [];
-    const viewOutlets = RouterUtils.parseViewOutlets(urlTree).keys();
+    const viewOutlets = Routing.parseViewOutlets(urlTree).keys();
     const changes = this._differ.diff(new Set([...viewOutlets, ...views]));
     return new WorkbenchViewOutletDiff(changes);
   }

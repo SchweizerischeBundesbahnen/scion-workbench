@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, Observable, pairwise} from 'rxjs';
-import {ActivatedRouteSnapshot, ActivationStart, ChildrenOutletContexts, Event, Router, RouterEvent, UrlSegment} from '@angular/router';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {ActivatedRouteSnapshot, ChildrenOutletContexts, OutletContext, UrlSegment} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
-import {filter, map, startWith} from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
@@ -24,9 +24,7 @@ import {WbComponentPortal} from '../portal/wb-component-portal';
 import {AbstractType, inject, Injector, Type} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
-import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
-import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
@@ -37,16 +35,17 @@ import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
 import {ClassList} from '../common/class-list';
 import {ViewState} from '../routing/routing.model';
-import {RouterUtils} from '../routing/router.util';
+import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
+import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _router = inject(Router);
-  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _childrenOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WorkbenchPartRegistry);
   private readonly _viewDragService = inject(ViewDragService);
@@ -68,7 +67,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * For example, when changing the layout, view handles for views with the same view id will be reused, regardless of
    * whether they have the same {@link MView}.
    */
-  public uid: string;
+  public uid!: string;
   public alternativeId: string | undefined;
   public navigationId: string | undefined;
   public navigationHint: string | undefined;
@@ -80,14 +79,14 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public scrollTop = 0;
   public scrollLeft = 0;
 
-  public readonly partId$: BehaviorSubject<string>;
-  public readonly active$: BehaviorSubject<boolean>;
+  public readonly partId$ = new BehaviorSubject<string>(null!);
+  public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
-  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>; layout: ɵWorkbenchLayout}) {
+  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>}) {
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
@@ -95,18 +94,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         filterArray((menuItem: WorkbenchMenuItem | null): menuItem is WorkbenchMenuItem => menuItem !== null),
       );
 
-    const mView = options.layout.view({viewId: this.id});
-    const mPart = options.layout.part({viewId: this.id});
-
-    this.uid = mView.uid;
-    this.alternativeId = mView.alternativeId;
-    this.partId$ = new BehaviorSubject(mPart.id);
-    this.active$ = new BehaviorSubject(mPart.activeViewId === this.id);
     this.portal = this.createPortal(options.component);
-
     this.touchOnActivate();
     this.blockWhenDialogOpened();
-    this.detectRouteActivation();
+    this.installModelUpdater();
+    this.onLayoutChange({layout: this._workbenchRouter.getCurrentNavigationContext().layout});
   }
 
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
@@ -125,52 +117,57 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
-   * Method invoked when a route is about to be activated for this view.
-   */
-  private onRouteActivate(route: ActivatedRouteSnapshot): void {
-    this.title = RouterUtils.lookupRouteData(route, WorkbenchRouteData.title) ?? null;
-    this.heading = RouterUtils.lookupRouteData(route, WorkbenchRouteData.heading) ?? null;
-    this.dirty = false;
-    this.classList.set(RouterUtils.lookupRouteData(route, WorkbenchRouteData.cssClass), {scope: 'route'});
-    this.classList.remove({scope: 'application'});
-    this.classList.remove({scope: 'navigation'});
-  }
-
-  /**
    * Method invoked when the workbench layout has changed.
    *
    * This method:
-   * - is called on every layout change, including changes not relevant for this view.
-   * - is called after successful navigation, i.e., after {@link onRouteActivate}.
+   * - is called on every layout change, including changes not relevant for this view, e.g., to update the view's part.
+   * - is called after destroyed the previous component (if any), but before constructing the new component.
    */
-  public onLayoutChange(layout: ɵWorkbenchLayout): void {
+  private onLayoutChange(change: {layout: ɵWorkbenchLayout; previousRoute?: ActivatedRouteSnapshot | null; route?: ActivatedRouteSnapshot}): void {
+    const {layout, route, previousRoute} = change;
+
     const mPart = layout.part({viewId: this.id});
     const mView = layout.view({viewId: this.id});
-    const prevNavigationId = this.navigationId;
-
-    this.uid = mView.uid;
-    this.alternativeId = mView.alternativeId;
-    this.urlSegments = layout.urlSegments({viewId: this.id});
-    this.navigationId = mView.navigation?.id;
-    this.navigationHint = mView.navigation?.hint;
-    this.state = layout.viewState({viewId: this.id});
-    this.classList.set(mView.cssClass, {scope: 'layout'});
-    this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
 
     if (mPart.id !== this.partId$.value) {
       this.partId$.next(mPart.id);
     }
 
     const active = mPart.activeViewId === this.id;
-    if (active !== this.active) {
+    if (active !== this.active$.value) {
       this.active$.next(active);
     }
 
-    // Inactive views are not checked for changes since detached from the Angular component tree.
-    // To complete the initialization of the routed content (to ensure that `ngOnInit` is called),
-    // we manually trigger change detection.
-    if (!this.active && this.portal.isConstructed && prevNavigationId !== this.navigationId) {
-      this.portal.componentRef.changeDetectorRef.detectChanges();
+    this.uid = mView.uid;
+    this.alternativeId = mView.alternativeId;
+    this.urlSegments = layout.urlSegments({viewId: this.id});
+    this.classList.set(mView.cssClass, {scope: 'layout'});
+
+    // Test if a new route has been activated for this view.
+    const routeChanged = route?.routeConfig !== previousRoute?.routeConfig;
+    if (routeChanged) {
+      this.title = Routing.lookupRouteData(route!, WorkbenchRouteData.title) ?? null;
+      this.heading = Routing.lookupRouteData(route!, WorkbenchRouteData.heading) ?? null;
+      this.dirty = false;
+      this.classList.set(Routing.lookupRouteData(route!, WorkbenchRouteData.cssClass), {scope: 'route'});
+      this.classList.remove({scope: 'application'});
+    }
+
+    // Test if this view was navigated. Navigation does not necessarily cause the route to change.
+    const navigationChanged = mView.navigation?.id !== this.navigationId;
+    if (navigationChanged) {
+      this.navigationId = mView.navigation?.id;
+      this.navigationHint = mView.navigation?.hint;
+      this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
+      this.state = layout.viewState({viewId: this.id});
+    }
+
+    // If this view is inactive, Angular does not check it for changes as it is detached from the Angular component tree.
+    // To complete the initialization of the routed component (to ensure that `ngOnInit` is called), we manually trigger change
+    // detection. We cannot perform change detection right now because the routed component has not been activated/constructed yet.
+    // Use case: Navigating an (existing) inactive view to another route.
+    if (!this.active && this.portal.isConstructed && routeChanged) {
+      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.portal.componentRef.changeDetectorRef.detectChanges());
     }
   }
 
@@ -178,8 +175,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Returns the component of this view. Returns `null` if not navigated the view, or before it was activated for the first time.
    */
   public getComponent<T = unknown>(): T | null {
-    const outletContext = RouterUtils.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
-    const outlet = outletContext?.outlet;
+    const outlet = this.getOutletContext()?.outlet;
     return outlet?.isActivated ? outlet.component as T : null;
   }
 
@@ -187,8 +183,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Returns the injector of the component. Returns `null` if not navigated the view, or before it was activated for the first time.
    */
   public getComponentInjector(): Injector | null {
-    const outletContext = RouterUtils.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
-    return outletContext?.injector ?? null;
+    return this.getOutletContext()?.injector ?? null;
   }
 
   /** @inheritDoc */
@@ -363,8 +358,16 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     return adapter ? adapter as T : null;
   }
 
+  /** @inheritDoc */
   public get destroyed(): boolean {
     return this.portal.isDestroyed;
+  }
+
+  /**
+   * Returns the outlet context of the currently activated route.
+   */
+  private getOutletContext(): OutletContext | null {
+    return Routing.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
   }
 
   /**
@@ -391,43 +394,26 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
-   * Detects when to activate a route for this view.
+   * Sets up automatic synchronization of {@link WorkbenchView} on every layout change.
    *
-   * Listening for route activations on the view's router outlet is not sufficient,
-   * as the outlet does not report subsequent activations of nested child routes.
-   *
-   * Example:
-   * ```html
-   * <router-outlet #router_outlet="outlet"
-   *                (activate)="onActivateRoute(router_outlet.activatedRoute)">
-   * </router-outlet>
-   * ```
-   *
-   * Instead, we subscribe to Angular's `ActivationStart` router events and update the view properties accordingly.
+   * If the operation is cancelled (e.g., due to a navigation failure), it reverts the changes.
    */
-  private detectRouteActivation(): void {
-    const activatedOutletRoute = this._router.routerState.root.children.find(route => route.outlet === this.id);
-    const activatedChildRoute = activatedOutletRoute ? RouterUtils.resolveEffectiveRoute(activatedOutletRoute).snapshot : null;
-    // The view handle is constructed at the end of the navigation (see WorkbenchUrlObserver#onNavigationEnd), i.e., after the route has been activated.
-    // Therefore, we call `onRouteActivate` manually.
-    if (activatedChildRoute) {
-      this.onRouteActivate(activatedChildRoute);
-    }
+  private installModelUpdater(): void {
+    Routing.activatedRoute$(this.id, {emitOn: 'always'})
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(([previousRoute, route]: [ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]) => {
+        const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
+        const {layout, previousLayout, layoutDiff} = navigationContext;
 
-    this._router.events
-      .pipe(
-        filter((event: Event | RouterEvent): event is ActivationStart => event instanceof ActivationStart),
-        filter(event => event.snapshot.pathFromRoot[1]?.outlet === this.id),
-        map(event => event.snapshot),
-        startWith(activatedChildRoute!),
-        pairwise(),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(([previous, current]: [ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]) => {
-        // Only call `onRouteActivate` if the activated route has changed.
-        // Otherwise, e.g., when changing matrix parameters, the view properties set by the application would be overwritten.
-        if (previous?.routeConfig !== current.routeConfig) {
-          this.onRouteActivate(current);
+        if (layoutDiff.removedViews.includes(this.id)) {
+          return;
+        }
+
+        this.onLayoutChange({layout, route, previousRoute});
+
+        // Revert change in case the navigation fails.
+        if (previousLayout?.hasView(this.id)) {
+          navigationContext.registerUndoAction(() => this.onLayoutChange({layout: previousLayout}));
         }
       });
   }
