@@ -18,6 +18,8 @@ export class MenuItem {
   public text: string;
   /**
    * Sets the listener invoked when the user performs the menu action.
+   *
+   * The function can call `inject` to get any required dependencies.
    */
   public onAction: () => any | Promise<any>;
   /**
