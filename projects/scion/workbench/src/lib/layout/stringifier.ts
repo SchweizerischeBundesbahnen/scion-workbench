@@ -40,7 +40,7 @@ export function stringify(data: unknown, exclusions?: Array<string | Exclusion>)
     const exclude = compiledExclusions.some(exclusion => exclusion.matches(objectStack, key, value));
 
     // Push object to stack if type of object.
-    if (!exclude && typeof value === 'object') {
+    if (!exclude && typeof value === 'object' && value !== null) {
       objectStack.push({key, value, fieldsToSerialize: new Set(Object.keys(value))});
     }
 
