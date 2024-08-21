@@ -18,7 +18,6 @@ import {WorkbenchUrlObserver} from '../routing/workbench-url-observer.service';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {TestComponent} from '../testing/test.component';
 import {mapArray} from '@scion/toolkit/operators';
-import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -72,11 +71,10 @@ describe('WorkbenchViewRegistry', () => {
   it('should have part associated when views are emitted', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest(),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
         provideRouter([
           {path: 'test-view', component: TestComponent},
         ]),
-        {provide: MAIN_AREA_INITIAL_PART_ID, useValue: 'main'},
       ],
     });
 
