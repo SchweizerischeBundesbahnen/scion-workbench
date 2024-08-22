@@ -1,7 +1,7 @@
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {TestBed} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {Component} from '@angular/core';
+import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, Type} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchDialogService} from './workbench-dialog.service';
@@ -12,6 +12,10 @@ import {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-f
 import {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
 import {WorkbenchDialog} from './workbench-dialog';
 import {toBeActiveCustomMatcher} from '../testing/jasmine/matcher/to-be-active.matcher';
+import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
+import {throwError} from '../common/throw-error.util';
+import {TestComponent} from '../testing/test.component';
+import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 
 describe('Dialog', () => {
 
@@ -20,7 +24,70 @@ describe('Dialog', () => {
     jasmine.addMatchers(toBeActiveCustomMatcher);
   });
 
+  it('should destroy handle\'s injector when closing the dialog', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Open dialog.
+    TestBed.inject(WorkbenchDialogService).open(TestComponent, {cssClass: 'testee'}).then();
+    await waitUntilStable();
+
+    // Get reference to the dialog injector.
+    const dialog = getDialog({cssClass: 'testee'});
+    let injectorDestroyed = false;
+    dialog.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
+
+    // Close the dialog.
+    dialog.close();
+
+    // Expect the injector to be destroyed.
+    expect(injectorDestroyed).toBeTrue();
+  });
+
+  it('should allow for custom injector', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
+    @Component({
+      selector: 'spec-dialog',
+      template: '',
+      standalone: true,
+    })
+    class SpecDialogComponent {
+      public injector = inject(Injector);
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Create custom injector.
+    const diToken = new InjectionToken('token');
+    const injector = Injector.create({
+      parent: TestBed.inject(EnvironmentInjector),
+      providers: [
+        {provide: diToken, useValue: 'value'},
+      ],
+    });
+
+    // Open dialog.
+    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {cssClass: 'testee', injector}).then();
+    await waitUntilStable();
+
+    // Expect DI token to be found.
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+    expect(dialogComponent.injector.get(diToken)).toEqual('value');
+  });
+
   it('should focus first focusable element', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
     @Component({
       selector: 'spec-dialog',
       template: `
@@ -30,10 +97,6 @@ describe('Dialog', () => {
     })
     class SpecDialogComponent {
     }
-
-    TestBed.configureTestingModule({
-      providers: [provideWorkbenchForTest()],
-    });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
@@ -51,6 +114,10 @@ describe('Dialog', () => {
   });
 
   it('should focus first focusable element (delayed content)', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
     @Component({
       selector: 'spec-dialog',
       template: `
@@ -63,10 +130,6 @@ describe('Dialog', () => {
     class SpecDialogComponent {
       public showInputField = false;
     }
-
-    TestBed.configureTestingModule({
-      providers: [provideWorkbenchForTest()],
-    });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
@@ -83,8 +146,8 @@ describe('Dialog', () => {
     expect(body).not.toShow(By.css('input.spec-input'));
 
     // Show input field.
-    const dialogDebugElement = body.query(By.directive(SpecDialogComponent));
-    dialogDebugElement.componentInstance.showInputField = true;
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+    dialogComponent.showInputField = true;
     fixture.detectChanges();
     await waitUntilStable();
 
@@ -93,6 +156,10 @@ describe('Dialog', () => {
   });
 
   it('should not throw `ExpressionChangedAfterItHasBeenCheckedError` if setting dialog properties during construction', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
     @Component({
       selector: 'spec-dialog',
       template: `Testee`,
@@ -111,10 +178,6 @@ describe('Dialog', () => {
         dialog.padding = false;
       }
     }
-
-    TestBed.configureTestingModule({
-      providers: [provideWorkbenchForTest()],
-    });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
@@ -135,6 +198,10 @@ describe('Dialog', () => {
   });
 
   it('should show header after one change detection cycle', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
     @Component({
       selector: 'spec-dialog',
       template: `
@@ -150,10 +217,6 @@ describe('Dialog', () => {
     class SpecDialogComponent {
       public showHeader = false;
     }
-
-    TestBed.configureTestingModule({
-      providers: [provideWorkbenchForTest()],
-    });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
@@ -174,8 +237,8 @@ describe('Dialog', () => {
     expect(body).not.toShow(By.css('header.spec-header'));
 
     // Show header.
-    const dialogDebugElement = body.query(By.directive(SpecDialogComponent));
-    dialogDebugElement.componentInstance.showHeader = true;
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+    dialogComponent.showHeader = true;
     fixture.detectChanges(); // Only trigger one change detection cycle.
     await waitUntilStable();
 
@@ -187,6 +250,10 @@ describe('Dialog', () => {
   });
 
   it('should show footer after one change detection cycle', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
     @Component({
       selector: 'spec-dialog',
       template: `
@@ -202,10 +269,6 @@ describe('Dialog', () => {
     class SpecDialogComponent {
       public showFooter = false;
     }
-
-    TestBed.configureTestingModule({
-      providers: [provideWorkbenchForTest()],
-    });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
@@ -226,8 +289,8 @@ describe('Dialog', () => {
     expect(body).not.toShow(By.css('footer.spec-footer'));
 
     // Show footer.
-    const dialogDebugElement = body.query(By.directive(SpecDialogComponent));
-    dialogDebugElement.componentInstance.showFooter = true;
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+    dialogComponent.showFooter = true;
     fixture.detectChanges(); // Only trigger one change detection cycle.
     await waitUntilStable();
 
@@ -239,6 +302,10 @@ describe('Dialog', () => {
   });
 
   it('should show action after one change detection cycle', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
     @Component({
       selector: 'spec-dialog',
       template: `
@@ -254,10 +321,6 @@ describe('Dialog', () => {
     class SpecDialogComponent {
       public showAction = false;
     }
-
-    TestBed.configureTestingModule({
-      providers: [provideWorkbenchForTest()],
-    });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
@@ -278,8 +341,8 @@ describe('Dialog', () => {
     expect(body).not.toShow(By.css('button.spec-action'));
 
     // Show action.
-    const dialogDebugElement = body.query(By.directive(SpecDialogComponent));
-    dialogDebugElement.componentInstance.showAction = true;
+    const dialogComponent = getDialogComponent(fixture, SpecDialogComponent);
+    dialogComponent.showAction = true;
     fixture.detectChanges(); // Only trigger one change detection cycle.
     await waitUntilStable();
 
@@ -290,3 +353,11 @@ describe('Dialog', () => {
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });
 });
+
+function getDialog(locator: {cssClass: string}): ɵWorkbenchDialog {
+  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass === locator.cssClass) ?? throwError('[NullDialogError]');
+}
+
+function getDialogComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {
+  return fixture.debugElement.parent!.query(By.css('wb-dialog')).query(By.directive(type)).componentInstance;
+}

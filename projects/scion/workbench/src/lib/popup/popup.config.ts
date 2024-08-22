@@ -8,18 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {ElementRef, EnvironmentInjector, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
-import {Arrays} from '@scion/toolkit/util';
+import {Arrays, Dictionaries} from '@scion/toolkit/util';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
-import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {ViewId} from '../view/workbench-view.model';
-import {UUID} from '@scion/toolkit/uuid';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -197,6 +196,8 @@ export abstract class Popup<T = any> {
 
   /**
    * Provides information about the context in which this popup was opened.
+   *
+   * @deprecated since version 18.0.0-beta.4; Inject {@link WorkbenchView} instead.
    */
   public abstract readonly referrer: PopupReferrer;
 
@@ -220,12 +221,16 @@ export abstract class Popup<T = any> {
  * @internal
  */
 export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
-  /**
-   * Unique identity of this popup.
-   */
-  public readonly id: string;
-  public readonly destroyRef = new ɵDestroyRef();
+
+  private readonly _popupEnvironmentInjector = inject(EnvironmentInjector);
+  private readonly _context = {
+    view: inject(ɵWorkbenchView, {optional: true}),
+  };
+
   public readonly cssClasses: string[];
+  public readonly referrer: PopupReferrer = Dictionaries.withoutUndefinedEntries({
+    viewId: this._context.view?.id,
+  });
 
   /**
    * Indicates whether this popup is blocked by dialog(s) that overlay it.
@@ -233,8 +238,7 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public result: unknown | ɵPopupErrorResult | undefined;
 
-  constructor(private _config: PopupConfig, public readonly referrer: PopupReferrer) {
-    this.id = this._config.id ?? UUID.randomUUID();
+  constructor(public id: string, private _config: PopupConfig) {
     this.cssClasses = Arrays.coerce(this._config.cssClass);
     this.blockWhenDialogOpened();
   }
@@ -244,12 +248,12 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
    */
   private blockWhenDialogOpened(): void {
     const workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
-    const initialTop = workbenchDialogRegistry.top({viewId: this.referrer.viewId});
+    const initialTop = workbenchDialogRegistry.top({viewId: this._context.view?.id});
 
-    workbenchDialogRegistry.top$({viewId: this.referrer.viewId})
+    workbenchDialogRegistry.top$({viewId: this._context.view?.id})
       .pipe(
         map(top => top === initialTop ? null : top),
-        takeUntilDestroyed(this.destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe(this.blockedBy$);
   }
@@ -285,10 +289,17 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
   }
 
   /**
+   * Reference to the handle's injector. The injector will be destroyed when closing the popup.
+   */
+  public get injector(): Injector {
+    return this._popupEnvironmentInjector;
+  }
+
+  /**
    * Destroys this dialog and associated resources.
    */
   public destroy(): void {
-    this.destroyRef.destroy();
+    this._popupEnvironmentInjector.destroy();
   }
 }
 

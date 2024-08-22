@@ -21,13 +21,12 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, inject, Injector, Type} from '@angular/core';
+import {AbstractType, EnvironmentInjector, inject, Injector, Type} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
-import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {provideViewContext} from './view-context-provider';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
@@ -42,6 +41,7 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
+  private readonly _viewEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
@@ -55,7 +55,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _scrolledIntoView$ = new BehaviorSubject<boolean>(true);
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
-  private readonly _destroyRef = new ɵDestroyRef();
 
   private _activationInstant: number | undefined;
   private _closable = true;
@@ -335,6 +334,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
+   * Reference to the handle's injector. The injector will be destroyed when closing the view.
+   */
+  public get injector(): Injector {
+    return this._viewEnvironmentInjector;
+  }
+
+  /**
    * Registers an adapter for this view, replacing any previously registered adapter of the same type.
    *
    * Adapters enable loosely coupled extension of an object, allowing one object to be adapted to another.
@@ -377,7 +383,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.active$
       .pipe(
         filter(Boolean),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         this._activationInstant = this._activationInstantProvider.now();
@@ -389,7 +395,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    */
   private blockWhenDialogOpened(): void {
     this._workbenchDialogRegistry.top$({viewId: this.id})
-      .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntilDestroyed())
       .subscribe(this.blockedBy$);
   }
 
@@ -400,7 +406,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    */
   private installModelUpdater(): void {
     Routing.activatedRoute$(this.id, {emitOn: 'always'})
-      .pipe(takeUntilDestroyed(this._destroyRef))
+      .pipe(takeUntilDestroyed())
       .subscribe(([previousRoute, route]: [ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]) => {
         const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
         const {layout, previousLayout, layoutDiff} = navigationContext;
@@ -419,7 +425,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   public destroy(): void {
-    this._destroyRef.destroy();
+    this._viewEnvironmentInjector.destroy();
     this._workbenchDialogRegistry.dialogs({viewId: this.id}).forEach(dialog => dialog.destroy());
     this.portal.destroy();
   }

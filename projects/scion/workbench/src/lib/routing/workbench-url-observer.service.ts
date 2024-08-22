@@ -9,7 +9,7 @@
 */
 
 import {Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
-import {EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
+import {createEnvironmentInjector, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
 import {WorkbenchAuxiliaryRouteInstaller} from './workbench-auxiliary-route-installer.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
@@ -278,13 +278,17 @@ export class WorkbenchUrlObserver {
   }
 
   private createWorkbenchPart(partId: string): ɵWorkbenchPart {
-    return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPart(partId, {
+    // Construct the handle in an injection context that shares the part's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
+    const partEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Part ${partId}`);
+    return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, {
       component: partId === MAIN_AREA ? MainAreaLayoutComponent : PartComponent,
     }));
   }
 
   private createWorkbenchView(viewId: ViewId): ɵWorkbenchView {
-    return runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent}));
+    // Construct the handle in an injection context that shares the view's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
+    const viewEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench View ${viewId}`);
+    return runInInjectionContext(viewEnvironmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent}));
   }
 
   /**

@@ -10,15 +10,43 @@
 
 import {TestBed} from '@angular/core/testing';
 import {TestComponent} from '../testing/test.component';
-import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.util';
+import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchPartRegistry} from './workbench-part.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {DestroyRef} from '@angular/core';
+import {WorkbenchRouter} from '../routing/workbench-router.service';
 
 describe('WorkbenchPart', () => {
+
+  it('should destroy handle\'s injector when removing the part', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Add part to the right.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('right', {align: 'right'}));
+    await waitUntilStable();
+
+    // Get reference to the part injector.
+    const part = TestBed.inject(WorkbenchPartRegistry).get('right');
+    let injectorDestroyed = false;
+    part.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
+
+    // Remove the part.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.removePart('right'));
+    await waitUntilStable();
+
+    // Expect the injector to be destroyed.
+    expect(injectorDestroyed).toBeTrue();
+  });
 
   it('should activate part even if view is already active', async () => {
     TestBed.configureTestingModule({

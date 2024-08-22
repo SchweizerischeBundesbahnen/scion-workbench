@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, Inject, Injectable, Injector, NgZone, Optional, runInInjectionContext} from '@angular/core';
+import {createEnvironmentInjector, DestroyRef, ElementRef, EnvironmentInjector, Inject, Injectable, Injector, NgZone, Optional, runInInjectionContext} from '@angular/core';
 import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {combineLatestWith, firstValueFrom, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {Popup, PopupConfig, PopupReferrer, ɵPopup, ɵPopupErrorResult} from './popup.config';
+import {Popup, PopupConfig, ɵPopup, ɵPopupErrorResult} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
-import {Dictionaries, Objects, Observables} from '@scion/toolkit/util';
+import {Objects, Observables} from '@scion/toolkit/util';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
 import {PopupComponent} from './popup.component';
@@ -26,6 +26,7 @@ import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, Top
 import {coerceElement} from '@angular/cdk/coercion';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {provideViewContext} from '../view/view-context-provider';
+import {UUID} from '@scion/toolkit/uuid';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};
@@ -43,7 +44,7 @@ const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 's
 @Injectable({providedIn: 'root'})
 export class PopupService {
 
-  constructor(private _injector: Injector,
+  constructor(private _environmentInjector: EnvironmentInjector,
               private _overlay: Overlay,
               private _focusManager: FocusMonitor,
               private _viewRegistry: WorkbenchViewRegistry,
@@ -85,9 +86,6 @@ export class PopupService {
 
     const align = config.align || 'north';
     const contextualView = this.resolveContextualView(config);
-    const referrer: PopupReferrer = Dictionaries.withoutUndefinedEntries({
-      viewId: contextualView?.id,
-    });
 
     // Set up the popup positioning strategy.
     const popupOrigin$ = this.observePopupOrigin$(config, contextualView).pipe(shareReplay({bufferSize: 1, refCount: false}));
@@ -124,9 +122,9 @@ export class PopupService {
 
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
-    const popup = runInInjectionContext(this._injector, () => new ɵPopup(config, referrer));
+    const popup = this.createPopup(config, {view: contextualView});
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
-      parent: config.componentConstructOptions?.injector || this._injector,
+      parent: config.componentConstructOptions?.injector || this._environmentInjector,
       providers: [
         {provide: ɵPopup, useValue: popup},
         {provide: Popup, useExisting: ɵPopup},
@@ -134,6 +132,7 @@ export class PopupService {
         ...[config.componentConstructOptions?.providers || []],
       ],
     }));
+    const popupDestroyRef = popup.injector.get(DestroyRef);
     const componentRef = overlayRef.attach(popupPortal);
     const popupElement: HTMLElement = componentRef.location.nativeElement;
 
@@ -143,12 +142,12 @@ export class PopupService {
 
     // Synchronize the CSS class that indicates where the popup docks to the anchor; is one of 'wb-north', 'wb-south', 'wb-east', or 'wb-west'.
     overlayPositionStrategy.positionChanges
-      .pipe(takeUntilDestroyed(popup.destroyRef))
+      .pipe(takeUntilDestroyed(popupDestroyRef))
       .subscribe(change => this.setPopupAlignCssClass(overlayRef, change));
 
     // Re-position the popup when the origin moves.
     popupOrigin$
-      .pipe(takeUntilDestroyed(popup.destroyRef))
+      .pipe(takeUntilDestroyed(popupDestroyRef))
       .subscribe((origin: FlexibleConnectedPositionStrategyOrigin) => {
         overlayPositionStrategy.setOrigin(origin);
         overlayRef.updatePosition();
@@ -156,7 +155,7 @@ export class PopupService {
 
     // Reposition the popup when its size changes (if necessary).
     fromDimension$(overlayRef.overlayElement)
-      .pipe(takeUntilDestroyed(popup.destroyRef))
+      .pipe(takeUntilDestroyed(popupDestroyRef))
       .subscribe(() => overlayRef.updatePosition());
 
     // Close the popup depending on the passed config.
@@ -168,12 +167,12 @@ export class PopupService {
     }
 
     // Dispose the popup when closing it.
-    popup.destroyRef.onDestroy(() => {
+    popupDestroyRef.onDestroy(() => {
       overlayRef.dispose();
     });
 
     return new Promise<R>((resolve, reject) => {
-      popup.destroyRef.onDestroy(() => {
+      popupDestroyRef.onDestroy(() => {
         if (popup.result instanceof ɵPopupErrorResult) {
           reject(popup.result.error);
         }
@@ -182,6 +181,16 @@ export class PopupService {
         }
       });
     });
+  }
+
+  /**
+   * Creates the popup handle.
+   */
+  private createPopup<R>(config: PopupConfig, context: {view: ɵWorkbenchView | null}): ɵPopup<R> {
+    // Construct the handle in an injection context that shares the popup's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
+    const popupId = config.id ?? UUID.randomUUID();
+    const popupEnvironmentInjector = createEnvironmentInjector([provideViewContext(context.view)], this._environmentInjector, `Workbench Popup ${popupId}`);
+    return runInInjectionContext(popupEnvironmentInjector, () => new ɵPopup<R>(popupId, config));
   }
 
   private setPopupAlignCssClass(overlayRef: OverlayRef, positionChange: ConnectedOverlayPositionChange): void {
@@ -206,6 +215,8 @@ export class PopupService {
    * Closes the popup depending on the configured popup closing strategy.
    */
   private installPopupCloser(config: PopupConfig, popupElement: HTMLElement, popup: ɵPopup, contextualView: ɵWorkbenchView | null): void {
+    const popupDestroyRef = popup.injector.get(DestroyRef);
+
     // Close the popup on escape keystroke.
     if (config.closeStrategy?.onEscape ?? true) {
       fromEvent<KeyboardEvent>(popupElement, 'keydown')
@@ -213,7 +224,7 @@ export class PopupService {
           filter((event: KeyboardEvent) => event.key === 'Escape'),
           subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
           observeInside(continueFn => this._zone.run(continueFn)),
-          takeUntilDestroyed(popup.destroyRef),
+          takeUntilDestroyed(popupDestroyRef),
         )
         .subscribe(() => popup.close());
     }
@@ -223,7 +234,7 @@ export class PopupService {
       this._focusManager.monitor(popupElement, true)
         .pipe(
           filter((focusOrigin: FocusOrigin) => !focusOrigin),
-          takeUntilDestroyed(popup.destroyRef),
+          takeUntilDestroyed(popupDestroyRef),
         )
         .subscribe(() => popup.close());
     }
@@ -231,7 +242,7 @@ export class PopupService {
     // Close the popup when closing the view.
     if (contextualView) {
       this._viewRegistry.views$
-        .pipe(takeUntilDestroyed(popup.destroyRef))
+        .pipe(takeUntilDestroyed(popupDestroyRef))
         .subscribe(views => {
           if (!views.some(view => view.id === contextualView.id)) {
             popup.close();
@@ -247,10 +258,11 @@ export class PopupService {
   private hidePopupOnViewDetach(overlayRef: OverlayRef, contextualView: ɵWorkbenchView, popup: ɵPopup): void {
     overlayRef.overlayElement.classList.add('wb-view-context');
 
+    const popupDestroyRef = popup.injector.get(DestroyRef);
     let activeElement: HTMLElement | undefined;
 
     contextualView.portal.attached$
-      .pipe(takeUntilDestroyed(popup.destroyRef))
+      .pipe(takeUntilDestroyed(popupDestroyRef))
       .subscribe(attached => {
         if (attached) {
           overlayRef.overlayElement.classList.add('wb-view-attached');
@@ -265,7 +277,7 @@ export class PopupService {
     fromEvent(overlayRef.overlayElement, 'focusin')
       .pipe(
         subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-        takeUntilDestroyed(popup.destroyRef),
+        takeUntilDestroyed(popupDestroyRef),
       )
       .subscribe(() => {
         activeElement = this._document.activeElement instanceof HTMLElement ? this._document.activeElement : undefined;

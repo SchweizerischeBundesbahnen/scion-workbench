@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BehaviorSubject, Observable, Subject, switchMap} from 'rxjs';
-import {inject, Injector, runInInjectionContext} from '@angular/core';
+import {BehaviorSubject, Observable, switchMap} from 'rxjs';
+import {EnvironmentInjector, inject, Injector, runInInjectionContext} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
@@ -17,24 +17,25 @@ import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
 import {filterArray} from '@scion/toolkit/operators';
-import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewId} from '../view/workbench-view.model';
 import {Event, NavigationStart, Router, RouterEvent} from '@angular/router';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
   private _activationInstant: number | undefined;
 
+  private readonly _partEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewRegistry = inject(WorkbenchViewRegistry);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
-  private readonly _destroy$ = new Subject<void>();
 
   public readonly active$ = new BehaviorSubject<boolean>(false);
   public readonly viewIds$ = new BehaviorSubject<ViewId[]>([]);
@@ -132,6 +133,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /**
+   * Reference to the handle's injector. The injector will be destroyed when removing the part.
+   */
+  public get injector(): Injector {
+    return this._partEnvironmentInjector;
+  }
+
+  /**
    * Emits actions that have contributed to this part and the currently active view.
    */
   private observePartActions$(): Observable<WorkbenchPartAction[]> {
@@ -152,7 +160,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.active$
       .pipe(
         filter(Boolean),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         this._activationInstant = this._activationInstantProvider.now();
@@ -168,7 +176,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     inject(Router).events
       .pipe(
         filter((event: Event | RouterEvent): event is NavigationStart => event instanceof NavigationStart),
-        takeUntil(this._destroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
@@ -188,7 +196,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   public destroy(): void {
-    this._destroy$.next();
+    this._partEnvironmentInjector.destroy();
     // IMPORTANT: Only detach the active view, not destroy it, because views are explicitly destroyed when view handles are removed.
     // Otherwise, moving the last view to another part would fail because the view would already be destroyed.
     if (this.activeViewId) {
