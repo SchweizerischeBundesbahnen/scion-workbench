@@ -248,7 +248,7 @@ describe('WorkbenchRouter', () => {
     // - Open view.103 [canActivate=false]
     canActivate3 = false;
     await workbenchRouter.navigate(layout => layout
-      .navigateView('view.102', ['path/to/view/2', {param: 'B'}])
+      .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
       .addView('view.103', {partId: 'main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
@@ -260,13 +260,15 @@ describe('WorkbenchRouter', () => {
     });
     // Expect view.102 not to be navigated.
     expect(view102.navigationId).toEqual(navigationId);
+    expect(view102.navigationData()).toEqual({});
+    expect(view102.state).toEqual({});
 
     // Navigate multiple views:
     // - Navigate view.102 [canActivate=true]
     // - Open view.103 [canActivate=true]
     canActivate3 = true;
     await workbenchRouter.navigate(layout => layout
-      .navigateView('view.102', ['path/to/view/2', {param: 'B'}])
+      .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
       .addView('view.103', {partId: 'main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
@@ -277,6 +279,8 @@ describe('WorkbenchRouter', () => {
       },
     });
     expect(view102.navigationId).not.toEqual(navigationId);
+    expect(view102.navigationData()).toEqual({some: 'data'});
+    expect(view102.state).toEqual({some: 'state'});
   });
 
   it('should rollback layout when navigation fails', async () => {
@@ -344,7 +348,7 @@ describe('WorkbenchRouter', () => {
     // - Open view.103 [canActivate=false]
     canActivate3 = () => throwError('navigation error');
     const navigation3 = workbenchRouter.navigate(layout => layout
-      .navigateView('view.102', ['path/to/view/2', {param: 'B'}])
+      .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
       .addView('view.103', {partId: 'main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
@@ -357,13 +361,15 @@ describe('WorkbenchRouter', () => {
     });
     // Expect view.102 not to be navigated.
     expect(view102.navigationId).toEqual(navigationId);
+    expect(view102.navigationData()).toEqual({});
+    expect(view102.state).toEqual({});
 
     // Navigate multiple views:
     // - Navigate view.102 [canActivate=true]
     // - Open view.103 [canActivate=true]
     canActivate3 = () => true;
     await workbenchRouter.navigate(layout => layout
-      .navigateView('view.102', ['path/to/view/2', {param: 'B'}])
+      .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
       .addView('view.103', {partId: 'main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
@@ -374,5 +380,7 @@ describe('WorkbenchRouter', () => {
       },
     });
     expect(view102.navigationId).not.toEqual(navigationId);
+    expect(view102.navigationData()).toEqual({some: 'data'});
+    expect(view102.state).toEqual({some: 'state'});
   });
 });

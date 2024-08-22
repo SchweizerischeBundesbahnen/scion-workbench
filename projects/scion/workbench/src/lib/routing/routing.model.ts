@@ -60,12 +60,18 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
-   * Associates arbitrary state with a view navigation.
+   * Associates data with a view navigation.
    *
-   * Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
-   * Therefore, a view must be able to restore its state without relying on navigational state.
+   * Unlike matrix parameters, navigation data is stored in the layout and not added to the path, allowing data to be passed to empty path navigations.
    *
-   * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+   * Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigationData}.
+   */
+  data?: NavigationData;
+  /**
+   * Passes state to a view navigation.
+   *
+   * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
+   * State can be read from {@link WorkbenchView.state} or from the browser's session history via `history.state`.
    */
   state?: ViewState;
   /**
@@ -160,19 +166,25 @@ export type Commands = any[];
 export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
 
 /**
- * Navigational view states associated with a workbench navigation.
+ * States associated with view navigations.
  */
 export type ViewStates = {[viewId: ViewId]: ViewState};
 
 /**
- * State associated with a view navigation.
+ * State passed to a view navigation.
  *
- * Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
- * Therefore, a view must be able to restore its state without relying on navigational state.
- *
- * Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+ * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
+ * State can be read from {@link WorkbenchView.state} or from the browser's session history via `history.state`.
  */
 export type ViewState = {[key: string]: unknown};
+
+/**
+ * Data associated with a view navigation.
+ *
+ * Data can be read from {@link WorkbenchView.navigationData}. Data must be JSON serializable.
+ */
+export type NavigationData = {[key: string]: unknown};
+
 /**
  * Signature of a function to modify the workbench layout.
  *

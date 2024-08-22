@@ -3,7 +3,8 @@ import {UrlSegment} from '@angular/router';
 import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {ViewState} from '../routing/routing.model';
+import {NavigationData, ViewState} from '../routing/routing.model';
+import {Signal} from '@angular/core';
 
 /**
  * Handle to interact with a view opened via {@link WorkbenchRouter}.
@@ -44,6 +45,16 @@ export abstract class WorkbenchView {
    * requiring a navigation hint to differentiate between the routes.
    */
   public abstract readonly navigationHint: string | undefined;
+
+  /**
+   * Data passed to the navigation.
+   */
+  public abstract readonly navigationData: Signal<NavigationData>;
+
+  /**
+   * State passed to the navigation.
+   */
+  public abstract readonly state: ViewState;
 
   /**
    * Reference to the part which contains this view.
@@ -119,13 +130,6 @@ export abstract class WorkbenchView {
    * URL associated with this view.
    */
   public abstract readonly urlSegments: UrlSegment[];
-
-  /**
-   * State associated with this view.
-   *
-   * Note that state is volatile, meaning it is not encoded in the URL but read from the browser session history; thus, it will be lost when the page is reloaded.
-   */
-  public abstract readonly state: ViewState;
 
   /**
    * Activates this view.

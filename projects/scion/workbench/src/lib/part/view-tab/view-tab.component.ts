@@ -149,6 +149,7 @@ export class ViewTabComponent implements OnChanges {
         viewUrlSegments: this.view.urlSegments,
         alternativeViewId: this.view.alternativeId,
         navigationHint: this.view.navigationHint,
+        navigationData: this.view.navigationData(),
         partId: this.view.part.id,
         viewTabPointerOffsetX: event.offsetX,
         viewTabPointerOffsetY: event.offsetY,

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone} from '@angular/core';
+import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
 import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
@@ -23,6 +23,7 @@ import {ViewId, WorkbenchView} from '../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
+import {NavigationData, ViewState} from '../routing/routing.model';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -229,6 +230,8 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly id: ViewId;
   public readonly alternativeId: string | undefined;
   public readonly navigationHint: string | undefined;
+  public readonly navigationData: Signal<NavigationData>;
+  public readonly state: ViewState;
   public readonly title: string;
   public readonly heading: string;
   public readonly closable: boolean;
@@ -239,7 +242,6 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly blocked = false;
   public readonly cssClass = [];
   public readonly urlSegments: UrlSegment[];
-  public readonly state = {};
   public readonly first = true;
   public readonly last = true;
   public readonly position = 0;
@@ -249,6 +251,8 @@ class DragImageWorkbenchView implements WorkbenchView {
     this.id = dragData.viewId;
     this.alternativeId = dragData.alternativeViewId;
     this.navigationHint = dragData.navigationHint;
+    this.navigationData = signal(dragData.navigationData ?? {}).asReadonly();
+    this.state = {};
     this.title = dragData.viewTitle;
     this.heading = dragData.viewHeading;
     this.closable = dragData.viewClosable;

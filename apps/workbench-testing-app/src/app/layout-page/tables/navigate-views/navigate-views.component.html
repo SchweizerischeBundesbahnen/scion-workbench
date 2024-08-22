@@ -2,6 +2,7 @@
   <span>View ID</span>
   <span>Path</span>
   <span>Hint</span>
+  <span>Data</span>
   <span>State</span>
   <span>CSS Class(es)</span>
   <button (click)="onAddNavigation()" class="e2e-add" title="Add navigation" sciMaterialIcon>add</button>
@@ -13,6 +14,8 @@
     <app-router-commands [formControl]="navigationFormGroup.controls.commands"/>
     <!-- Hint -->
     <input [formControl]="navigationFormGroup.controls.extras.controls.hint" class="e2e-hint">
+    <!-- Data -->
+    <app-record [formControl]="navigationFormGroup.controls.extras.controls.data" class="e2e-data"/>
     <!-- State -->
     <app-record [formControl]="navigationFormGroup.controls.extras.controls.state" class="e2e-state"/>
     <!-- CSS class -->

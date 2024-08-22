@@ -17,7 +17,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Params} from '@angular/router';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {ViewId, ViewState} from '@scion/workbench';
+import {NavigationData, ViewId, ViewState} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link ViewPageComponent}.
@@ -46,6 +46,20 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     await accordion.expand();
     try {
       return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-params')).readEntries();
+    }
+    finally {
+      await accordion.collapse();
+    }
+  }
+
+  public async getNavigationData(): Promise<NavigationData> {
+    if (await this.locator.locator('sci-accordion.e2e-navigation-data').isHidden()) {
+      return {};
+    }
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-navigation-data'));
+    await accordion.expand();
+    try {
+      return await new SciKeyValuePO(this.locator.locator('sci-key-value.e2e-navigation-data')).readEntries();
     }
     finally {
       await accordion.collapse();

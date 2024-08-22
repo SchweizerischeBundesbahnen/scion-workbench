@@ -21,7 +21,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, EnvironmentInjector, inject, Injector, Type} from '@angular/core';
+import {AbstractType, EnvironmentInjector, inject, Injector, signal, Type} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
@@ -33,7 +33,7 @@ import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
 import {ClassList} from '../common/class-list';
-import {ViewState} from '../routing/routing.model';
+import {NavigationData, ViewState} from '../routing/routing.model';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
@@ -70,6 +70,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public alternativeId: string | undefined;
   public navigationId: string | undefined;
   public navigationHint: string | undefined;
+  public navigationData = signal<NavigationData>({});
   public urlSegments: UrlSegment[] = [];
   public state: ViewState = {};
   public title: string | null = null;
@@ -158,6 +159,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       this.navigationId = mView.navigation?.id;
       this.navigationHint = mView.navigation?.hint;
       this.classList.set(mView.navigation?.cssClass, {scope: 'navigation'});
+      this.navigationData.set(mView.navigation?.data ?? {});
       this.state = layout.viewState({viewId: this.id});
     }
 
@@ -304,6 +306,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       alternativeViewId: this.alternativeId,
       viewUrlSegments: this.urlSegments,
       navigationHint: this.navigationHint,
+      navigationData: this.navigationData(),
       classList: this.classList.toMap(),
     };
 

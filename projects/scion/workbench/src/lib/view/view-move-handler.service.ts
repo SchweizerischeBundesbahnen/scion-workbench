@@ -71,7 +71,7 @@ export class ViewMoveHandler {
         return layout
           .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
           .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
-          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
+          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigationData});
       }
       else {
         return layout
@@ -82,7 +82,7 @@ export class ViewMoveHandler {
             activateView: true,
             activatePart: true,
           })
-          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
+          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigationData});
       }
     });
   }
@@ -99,7 +99,7 @@ export class ViewMoveHandler {
           activateView: true,
           cssClass: event.source.classList?.get('layout'),
         })
-        .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation')});
+        .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigationData});
     });
     const target = generatePerspectiveWindowName(`${ANONYMOUS_PERSPECTIVE_ID_PREFIX}${UID.randomUID()}`);
     if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree!)), target)) {

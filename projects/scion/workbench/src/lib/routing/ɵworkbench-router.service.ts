@@ -285,6 +285,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
         relativeTo: extras.relativeTo,
         hint: extras.hint,
         cssClass: extras.cssClass,
+        data: extras.data,
         state: extras.state,
       });
   }
@@ -301,6 +302,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
       relativeTo: extras.relativeTo,
       hint: extras.hint,
       cssClass: extras.cssClass,
+      data: extras.data,
       state: extras.state,
     });
   }

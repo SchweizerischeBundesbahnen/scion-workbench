@@ -30,23 +30,18 @@ const relativeTo = inject(ActivatedRoute);
 inject(WorkbenchRouter).navigate(['../path/to/view'], {relativeTo});
 ```
 
-The navigation can be passed additional data in the form of matrix params and/or state. The view can read matrix params from `ActivatedRoute.params`, and state from `WorkbenchView.state`.
+Additional data can be passed to the navigation as matrix parameters or navigation data. Matrix parameters are added to the path, while navigation data is stored in the layout. Unlike matrix parameters, navigation data can be passed to empty path navigations. The view can read matrix parameters from `ActivatedRoute.params` and navigation data from `WorkbenchView.navigationData`.
 
 ```ts
 import {inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench';
 
 // Pass matrix parameters to the view.
-const matrixParams = {param1: 'value1', param2: 'value2'};
-inject(WorkbenchRouter).navigate(['path/to/view', matrixParams]);
+inject(WorkbenchRouter).navigate(['path/to/view', {some: 'param'}]);
 
-// Pass state to the view.
-inject(WorkbenchRouter).navigate(['path/to/view'], {
-  state: {some: 'state'}
-});
+// Pass navigation data to the view.
+inject(WorkbenchRouter).navigate(['path/to/view'], {data: {some: 'data'}});
 ```
-
-Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload. Therefore, a view must be able to restore its state without relying on navigational state.
 
 ### How to control the navigation target
 By default, the router navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.

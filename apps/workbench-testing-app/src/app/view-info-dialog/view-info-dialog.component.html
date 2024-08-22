@@ -42,6 +42,13 @@
   </section>
 }
 
+@if (view.navigationData() | appNullIfEmpty; as data) {
+  <section>
+    <header>Navigation Data</header>
+    <sci-key-value [object]="data" class="e2e-navigation-data"/>
+  </section>
+}
+
 @if (view.state | appNullIfEmpty; as state) {
   <section>
     <header>View State</header>
