@@ -16,7 +16,7 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
-import {Commands, ViewOutlets, ViewState, ViewStates} from '../routing/routing.model';
+import {Commands, NavigationData, ViewOutlets, ViewState, ViewStates} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {Arrays} from '@scion/toolkit/util';
@@ -326,7 +326,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * @inheritDoc
    */
-  public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; state?: ViewState; cssClass?: string | string[]}): ɵWorkbenchLayout {
+  public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__navigateView(view, commands, extras));
     return workingCopy;
@@ -553,7 +553,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __navigateView(view: MView, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; state?: ViewState; cssClass?: string | string[]}): void {
+  private __navigateView(view: MView, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): void {
     if (!commands.length && !extras?.hint && !extras?.relativeTo) {
       throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
     }
@@ -576,6 +576,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     view.navigation = Objects.withoutUndefinedEntries({
       id: UID.randomUID(),
       hint: extras?.hint,
+      data: extras?.data,
       cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
     } satisfies MView['navigation']);
   }

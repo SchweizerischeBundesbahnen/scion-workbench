@@ -39,6 +39,17 @@
   </sci-accordion>
 }
 
+@if (view.navigationData() | appNullIfEmpty; as data) {
+  <sci-accordion class="e2e-navigation-data" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_data">
+      <header>Navigation Data</header>
+    </ng-template>
+    <ng-template #panel_navigation_data>
+      <sci-key-value [object]="data | appAppendParamDataType" class="e2e-navigation-data"/>
+    </ng-template>
+  </sci-accordion>
+}
+
 @if (view.state | appNullIfEmpty; as state) {
   <sci-accordion class="e2e-state" variant="solid">
     <ng-template sciAccordionItem [panel]="panel_view_state">

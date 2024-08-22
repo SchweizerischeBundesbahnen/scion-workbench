@@ -102,6 +102,7 @@ export default class ModifyLayoutPageComponent {
       for (const viewNavigation of this.form.controls.viewNavigations.value) {
         layout = layout.navigateView(viewNavigation.id, viewNavigation.commands, {
           hint: viewNavigation.extras?.hint,
+          data: viewNavigation.extras?.data,
           state: viewNavigation.extras?.state,
           cssClass: viewNavigation.extras?.cssClass,
         });

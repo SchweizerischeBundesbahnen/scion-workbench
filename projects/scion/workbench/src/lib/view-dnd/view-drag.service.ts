@@ -18,6 +18,7 @@ import {observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewId} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
+import {NavigationData} from '../routing/routing.model';
 
 /**
  * Events fired during view drag and drop operation.
@@ -270,6 +271,7 @@ export interface ViewDragData {
   viewTitle: string;
   viewUrlSegments: UrlSegment[];
   navigationHint?: string;
+  navigationData?: NavigationData;
   viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
@@ -295,6 +297,7 @@ export interface ViewMoveEventSource {
   viewId: ViewId;
   partId: string;
   navigationHint?: string;
+  navigationData?: NavigationData;
   alternativeViewId?: string;
   viewUrlSegments: UrlSegment[];
   workbenchId: string;

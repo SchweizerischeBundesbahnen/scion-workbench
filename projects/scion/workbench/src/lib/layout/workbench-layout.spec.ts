@@ -1000,17 +1000,33 @@ describe('WorkbenchLayout', () => {
       .addPart('right', {relativeTo: 'left', align: 'right'})
       .addView('view.1', {partId: 'left', cssClass: 'class-view'})
       .addView('view.2', {partId: 'left'})
+      .addView('view.3', {partId: 'left'})
       .navigateView('view.1', ['path/to/view'], {cssClass: 'class-navigation'})
       .navigateView('view.2', [], {hint: 'some-hint'})
+      .navigateView('view.3', ['path/to/view'], {data: {some: 'data'}})
       .moveView('view.1', 'right')
-      .moveView('view.2', 'right');
+      .moveView('view.2', 'right')
+      .moveView('view.3', 'right');
 
     expect(workbenchLayout.part({partId: 'right'}).views).toEqual(jasmine.arrayWithExactContents([
       {id: 'view.1', navigation: {id: anything(), cssClass: ['class-navigation']}, cssClass: ['class-view'], uid: anything()} satisfies MView,
       {id: 'view.2', navigation: {id: anything(), hint: 'some-hint'}, uid: anything()} satisfies MView,
+      {id: 'view.3', navigation: {id: anything(), data: {some: 'data'}}, uid: anything()} satisfies MView,
     ]));
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
     expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual([]);
+    expect(workbenchLayout.urlSegments({viewId: 'view.3'})).toEqual(segments(['path/to/view']));
+  });
+
+  it('should add navigation data to the layout', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('main')
+      .addView('view.1', {partId: 'main'})
+      .navigateView('view.1', ['path/to/view'], {data: {some: 'data'}});
+
+    expect(workbenchLayout.part({partId: 'main'}).views).toEqual(jasmine.arrayWithExactContents([
+      {id: 'view.1', navigation: {id: anything(), data: {some: 'data'}}, uid: anything()} satisfies MView,
+    ]));
   });
 
   it('should retain state when moving view to another part', () => {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, ViewState} from '../routing/routing.model';
+import {Commands, NavigationData, ViewState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
 
 /**
@@ -74,14 +74,16 @@ export interface WorkbenchLayout {
    *                      requiring a navigation hint to differentiate between the routes. See {@link canMatchWorkbenchView} for an example.
    *                      Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
    * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
-   * @param extras.state - Associates arbitrary state with a view navigation.
-   *                       Navigational state is stored in the browser's session history, supporting back/forward navigation, but is lost on page reload.
-   *                       Therefore, a view must be able to restore its state without relying on navigational state.
-   *                       Navigational state can be read from {@link WorkbenchView.state} or the browser's session history via `history.state`.
+   * @param extras.data - Associates data with a view navigation.
+   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the path, allowing data to be passed to empty path navigations.
+   *                      Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigationData}.
+   * @param extras.state - Passes state to a view navigation.
+   *                       State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
+   *                       State can be read from {@link WorkbenchView.state} or from the browser's session history via `history.state`.
    * @param extras.cssClass - Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    * @return a copy of this layout with the view navigated.
    */
-  navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout;
+  navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Removes given view from the layout.

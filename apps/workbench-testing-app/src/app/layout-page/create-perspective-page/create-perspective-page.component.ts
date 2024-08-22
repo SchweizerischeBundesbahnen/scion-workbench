@@ -116,6 +116,7 @@ export default class CreatePerspectivePageComponent {
       for (const viewNavigation of viewNavigations) {
         layout = layout.navigateView(viewNavigation.id, viewNavigation.commands, {
           hint: viewNavigation.extras?.hint,
+          data: viewNavigation.extras?.data,
           state: viewNavigation.extras?.state,
           cssClass: viewNavigation.extras?.cssClass,
         });

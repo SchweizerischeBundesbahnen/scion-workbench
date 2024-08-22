@@ -45,15 +45,18 @@ export default class RouterPageComponent {
 
   protected form = this._formBuilder.group({
     commands: this._formBuilder.control([]),
-    state: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    target: this._formBuilder.control(''),
-    hint: this._formBuilder.control(''),
-    partId: this._formBuilder.control(''),
-    position: this._formBuilder.control(''),
-    queryParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    activate: this._formBuilder.control<boolean | undefined>(undefined),
-    close: this._formBuilder.control<boolean | undefined>(undefined),
-    cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+    extras: this._formBuilder.group({
+      data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      state: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      target: this._formBuilder.control(''),
+      hint: this._formBuilder.control(''),
+      partId: this._formBuilder.control(''),
+      position: this._formBuilder.control(''),
+      queryParams: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+      activate: this._formBuilder.control<boolean | undefined>(undefined),
+      close: this._formBuilder.control<boolean | undefined>(undefined),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+    }),
     viewContext: this._formBuilder.control(true),
   });
   protected navigateError: string | undefined;
@@ -97,24 +100,27 @@ export default class RouterPageComponent {
   }
 
   private readExtrasFromUI(): WorkbenchNavigationExtras {
+    const extras = this.form.controls.extras.controls;
     return {
-      queryParams: SciKeyValueFieldComponent.toDictionary(this.form.controls.queryParams),
-      activate: this.form.controls.activate.value,
-      close: this.form.controls.close.value,
-      target: this.form.controls.target.value || undefined,
-      hint: this.form.controls.hint.value || undefined,
-      partId: this.form.controls.partId.value || undefined,
-      position: coercePosition(this.form.controls.position.value),
-      state: parseTypedObject(SciKeyValueFieldComponent.toDictionary(this.form.controls.state)) ?? undefined,
-      cssClass: this.form.controls.cssClass.value,
+      queryParams: SciKeyValueFieldComponent.toDictionary(extras.queryParams),
+      activate: extras.activate.value,
+      close: extras.close.value,
+      target: extras.target.value || undefined,
+      hint: extras.hint.value || undefined,
+      partId: extras.partId.value || undefined,
+      position: coercePosition(extras.position.value),
+      data: parseTypedObject(SciKeyValueFieldComponent.toDictionary(extras.data)) ?? undefined,
+      state: parseTypedObject(SciKeyValueFieldComponent.toDictionary(extras.state)) ?? undefined,
+      cssClass: extras.cssClass.value,
     };
   }
 
   private resetForm(): void {
     if (this._settingsService.isEnabled('resetFormsOnSubmit')) {
       this.form.reset();
-      this.form.setControl('queryParams', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
-      this.form.setControl('state', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+      this.form.controls.extras.setControl('queryParams', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+      this.form.controls.extras.setControl('data', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
+      this.form.controls.extras.setControl('state', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
     }
   }
 }
