@@ -21,8 +21,8 @@ import {ViewId, WorkbenchView} from '../view/workbench-view.model';
     @if (content) {
       <main>{{content}}</main>
     }
-    @if (withTransientStateInputElement) {
-      <input class="transient-state"/>
+    @if (renderComponentStateInputElement) {
+      <input class="component-state"/>
     }
   `,
   standalone: true,
@@ -30,7 +30,7 @@ import {ViewId, WorkbenchView} from '../view/workbench-view.model';
 export default class _TestComponent {
 
   protected content = inject(COMPONENT_CONTENT, {optional: true});
-  protected withTransientStateInputElement = inject(TRANSIENT_STATE_INPUT_ELEMENT, {optional: true});
+  protected renderComponentStateInputElement = inject(COMPONENT_STATE_INPUT_ELEMENT, {optional: true});
 
   constructor() {
     const view = inject(WorkbenchView, {optional: true});
@@ -51,9 +51,9 @@ export const TestComponent = _TestComponent;
 const COMPONENT_CONTENT = new InjectionToken<string>('COMPONENT_CONTENT');
 
 /**
- * DI token to instruct the component to render an input field to test a view's transient state.
+ * DI token to instruct the component to render an input field to test the state of a component.
  */
-const TRANSIENT_STATE_INPUT_ELEMENT = new InjectionToken<boolean>('TRANSIENT_STATE_INPUT_ELEMENT');
+const COMPONENT_STATE_INPUT_ELEMENT = new InjectionToken<boolean>('COMPONENT_STATE_INPUT_ELEMENT');
 
 /**
  * Configures the component to display the specified content.
@@ -63,17 +63,17 @@ export function withComponentContent(content: string): EnvironmentProviders {
 }
 
 /**
- * Configures the component to add an input element in order to test a view's transient state.
+ * Configures the component to add an input element in order to test the state of a component.
  */
-export function withTransientStateInputElement(): EnvironmentProviders {
-  return makeEnvironmentProviders([{provide: TRANSIENT_STATE_INPUT_ELEMENT, useValue: true}]);
+export function withComponentStateInputElement(): EnvironmentProviders {
+  return makeEnvironmentProviders([{provide: COMPONENT_STATE_INPUT_ELEMENT, useValue: true}]);
 }
 
 /**
- * Enters given textual state on the input field of the component.
+ * Enters the specified text in the "Component State" input field of the specified view.
  *
  * Use that state to check whether the component has been re-created.
  */
-export function enterTransientViewState(fixture: ComponentFixture<any>, viewId: ViewId, textualState: string): void {
-  fixture.nativeElement.querySelector(`wb-view[data-viewid="${viewId}"] input.transient-state`).value = textualState;
+export function enterComponentState(fixture: ComponentFixture<any>, viewId: ViewId, textualState: string): void {
+  fixture.nativeElement.querySelector(`wb-view[data-viewid="${viewId}"] input.component-state`).value = textualState;
 }
