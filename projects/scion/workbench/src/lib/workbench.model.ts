@@ -73,7 +73,9 @@ export interface WorkbenchPartAction {
 /**
  * The signature of a function used as a `canMatch` condition for a part.
  *
- * The function can call `inject` to get any required dependencies.
+ * - The function can call `inject` to get any required dependencies.
+ * - The function runs in a reactive context, re-evaluating when tracked signals change.
+ *   To execute code outside this reactive context, use Angular's `untracked` function.
  */
 export type CanMatchPartFn = (part: WorkbenchPart) => boolean;
 

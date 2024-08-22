@@ -8,23 +8,23 @@
   </sci-form-field>
 
   <sci-form-field label="Part ID">
-    <span class="e2e-part-id">{{view.part.id}}</span>
+    <span class="e2e-part-id">{{view.part().id}}</span>
   </sci-form-field>
 
   <sci-form-field label="View Title">
-    <span class="e2e-title">{{view.title}}</span>
+    <span class="e2e-title">{{view.title()}}</span>
   </sci-form-field>
 
   <sci-form-field label="View Heading">
-    <span class="e2e-heading">{{view.heading}}</span>
+    <span class="e2e-heading">{{view.heading()}}</span>
   </sci-form-field>
 
   <sci-form-field label="Navigation Hint">
-    <span class="e2e-navigation-hint">{{view.navigationHint}}</span>
+    <span class="e2e-navigation-hint">{{view.navigationHint()}}</span>
   </sci-form-field>
 
   <sci-form-field label="URL Segments">
-    <span class="e2e-url-segments">{{view.urlSegments | appJoin:'/'}}</span>
+    <span class="e2e-url-segments">{{view.urlSegments() | appJoin:'/'}}</span>
   </sci-form-field>
 </section>
 
@@ -49,10 +49,10 @@
   </section>
 }
 
-@if (view.state | appNullIfEmpty; as state) {
+@if (view.navigationState() | appNullIfEmpty; as state) {
   <section>
-    <header>View State</header>
-    <sci-key-value [object]="state" class="e2e-state"/>
+    <header>Navigation State</header>
+    <sci-key-value [object]="state" class="e2e-navigation-state"/>
   </section>
 }
 

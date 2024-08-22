@@ -109,7 +109,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const matchWildcardParams = options?.matchWildcardParams ?? false;
 
     const viewIds = this._viewRegistry.views
-      .filter(view => !extras.partId || extras.partId === view.part.id)
+      .filter(view => !extras.partId || extras.partId === view.part().id)
       .filter(view => {
         const microfrontendWorkbenchView = view.adapt(MicrofrontendWorkbenchView);
         if (!microfrontendWorkbenchView) {

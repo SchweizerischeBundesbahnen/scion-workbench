@@ -45,7 +45,7 @@ export class ViewListItemComponent {
 
   @HostBinding('class.active')
   public get active(): boolean {
-    return this.view.active;
+    return this.view.active();
   }
 
   public onClose(): void {

@@ -1,9 +1,8 @@
-import {Observable} from 'rxjs';
 import {UrlSegment} from '@angular/router';
 import {Disposable} from '../common/disposable';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {NavigationData, ViewState} from '../routing/routing.model';
+import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
 
 /**
@@ -44,7 +43,7 @@ export abstract class WorkbenchView {
    * For example, the views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
    * requiring a navigation hint to differentiate between the routes.
    */
-  public abstract readonly navigationHint: string | undefined;
+  public abstract readonly navigationHint: Signal<string | undefined>;
 
   /**
    * Data passed to the navigation.
@@ -54,72 +53,70 @@ export abstract class WorkbenchView {
   /**
    * State passed to the navigation.
    */
-  public abstract readonly state: ViewState;
+  public abstract readonly navigationState: Signal<NavigationState>;
 
   /**
-   * Reference to the part which contains this view.
+   * Part which contains this view.
    *
-   * Note: the part of a view can change, e.g. when the view is moved to another part.
+   * Note: the part of a view can change, e.g., when the view is moved to another part.
    */
-  public abstract readonly part: WorkbenchPart;
+  public abstract readonly part: Signal<WorkbenchPart>;
 
   /**
-   * Specifies the title to be displayed in the view tab.
+   * Title to be displayed in the view tab.
    */
-  public abstract title: string | null;
+  public abstract get title(): Signal<string | null>;
+  public abstract set title(title: string | null);
 
   /**
    * Specifies the subtitle to be displayed in the view tab.
    */
-  public abstract heading: string | null;
+  public abstract get heading(): Signal<string | null>;
+  public abstract set heading(heading: string | null);
 
   /**
    * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    */
-  public abstract cssClass: string | string[];
+  public abstract get cssClass(): Signal<string[]>;
+  public abstract set cssClass(cssClass: string | string[]);
 
   /**
-   * Specifies if the content of the current view is dirty.
-   * If dirty, a dirty marker is displayed in the view tab.
+   * Indicates whether the view has unsaved changes.
+   * If marked as dirty, a visual indicator is displayed in the view tab.
    */
-  public abstract dirty: boolean;
+  public abstract get dirty(): Signal<boolean>;
+  public abstract set dirty(dirty: boolean);
 
   /**
-   * Specifies if a close button should be displayed in the view tab.
+   * Controls whether the view can be closed. Default is `true`.
    */
-  public abstract closable: boolean;
+  public abstract get closable(): Signal<boolean>;
+  public abstract set closable(closable: boolean);
 
   /**
    * Indicates whether this view is active or inactive.
    */
-  public abstract readonly active: boolean;
-
-  /**
-   * Notifies when this view becomes active or inactive.
-   *
-   * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
-   */
-  public abstract readonly active$: Observable<boolean>;
+  public abstract readonly active: Signal<boolean>;
 
   /**
    * The position of this view in the tabbar.
    */
-  public abstract readonly position: number;
+  public abstract readonly position: Signal<number>;
 
   /**
    * `True` when this view is the first view in the tabbar.
    */
-  public abstract readonly first: boolean;
+  public abstract readonly first: Signal<boolean>;
 
   /**
    * `True` when this view is the last view in the tabbar.
    */
-  public abstract readonly last: boolean;
+  public abstract readonly last: Signal<boolean>;
 
   /**
-   * Inidcates whether the tab of this view is scrolled into view in the tabbar.
+   * Indicates whether the tab of this view is scrolled into the tabbar.
    */
-  public abstract readonly scrolledIntoView: boolean;
+  public abstract readonly scrolledIntoView: Signal<boolean>;
 
   /**
    * Indicates whether this view is destroyed.
@@ -129,7 +126,7 @@ export abstract class WorkbenchView {
   /**
    * URL associated with this view.
    */
-  public abstract readonly urlSegments: UrlSegment[];
+  public abstract readonly urlSegments: Signal<UrlSegment[]>;
 
   /**
    * Activates this view.

@@ -163,7 +163,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     if (!view) {
       return true;
     }
-    if (!view.closable) {
+    if (!view.closable()) {
       return false;
     }
 
@@ -324,7 +324,7 @@ function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<Navigat
     state: WorkbenchNavigationalStates.create({
       workbenchGrid: workbenchGrid,
       maximized: layout.maximized,
-      viewStates: layout.viewStates(),
+      navigationStates: layout.navigationStates(),
     }),
     // Add the main area as query parameter.
     queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},

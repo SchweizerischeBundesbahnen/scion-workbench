@@ -261,7 +261,7 @@ describe('WorkbenchRouter', () => {
     // Expect view.102 not to be navigated.
     expect(view102.navigationId).toEqual(navigationId);
     expect(view102.navigationData()).toEqual({});
-    expect(view102.state).toEqual({});
+    expect(view102.navigationState()).toEqual({});
 
     // Navigate multiple views:
     // - Navigate view.102 [canActivate=true]
@@ -280,7 +280,7 @@ describe('WorkbenchRouter', () => {
     });
     expect(view102.navigationId).not.toEqual(navigationId);
     expect(view102.navigationData()).toEqual({some: 'data'});
-    expect(view102.state).toEqual({some: 'state'});
+    expect(view102.navigationState()).toEqual({some: 'state'});
   });
 
   it('should rollback layout when navigation fails', async () => {
@@ -362,7 +362,7 @@ describe('WorkbenchRouter', () => {
     // Expect view.102 not to be navigated.
     expect(view102.navigationId).toEqual(navigationId);
     expect(view102.navigationData()).toEqual({});
-    expect(view102.state).toEqual({});
+    expect(view102.navigationState()).toEqual({});
 
     // Navigate multiple views:
     // - Navigate view.102 [canActivate=true]
@@ -381,6 +381,6 @@ describe('WorkbenchRouter', () => {
     });
     expect(view102.navigationId).not.toEqual(navigationId);
     expect(view102.navigationData()).toEqual({some: 'data'});
-    expect(view102.state).toEqual({some: 'state'});
+    expect(view102.navigationState()).toEqual({some: 'state'});
   });
 });

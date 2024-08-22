@@ -268,11 +268,11 @@ export interface ViewDragData {
   viewTabPointerOffsetY: number;
   viewId: ViewId;
   alternativeViewId?: string;
-  viewTitle: string;
+  viewTitle: string | null;
+  viewHeading: string | null;
   viewUrlSegments: UrlSegment[];
   navigationHint?: string;
   navigationData?: NavigationData;
-  viewHeading: string;
   viewClosable: boolean;
   viewDirty: boolean;
   partId: string;

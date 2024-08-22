@@ -2,7 +2,7 @@
   <ng-container *cdkPortalOutlet="viewTabContentPortal"/>
 </div>
 
-@if (view.closable) {
+@if (view.closable()) {
   <button class="close e2e-close scion-workbench-icons"
           (click)="onClose()">
     close

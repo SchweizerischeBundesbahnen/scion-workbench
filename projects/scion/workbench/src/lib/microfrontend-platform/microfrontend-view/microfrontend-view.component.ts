@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, untracked, ViewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
 import {combineLatest, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
 import {first, map, takeUntil} from 'rxjs/operators';
@@ -172,7 +172,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
 
     // Inactive views are not checked for changes since detached from the Angular component tree.
     // So, we manually trigger change detection to update attributes on the `sci-router-outlet`.
-    if (!this.view.active) {
+    if (!this.view.active()) {
       this._cd.detectChanges();
     }
   }
@@ -236,27 +236,29 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
   private setViewProperties(viewCapability: WorkbenchViewCapability, params: Params): void {
     this.view.title = Microfrontends.substituteNamedParameters(viewCapability.properties.title, Maps.coerce(params)) ?? null;
     this.view.heading = Microfrontends.substituteNamedParameters(viewCapability.properties.heading, Maps.coerce(params)) ?? null;
-    this.view.classList.set(viewCapability.properties.cssClass, {scope: 'application'});
+    this.view.classList.application = viewCapability.properties.cssClass;
     this.view.closable = viewCapability.properties.closable ?? true;
     this.view.dirty = false;
   }
 
   private installViewActivePublisher(): void {
-    this.view.active$
-      .pipe(takeUntilDestroyed())
-      .subscribe(active => {
+    effect(() => {
+      const active = this.view.active();
+      untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
         this._messageClient.publish(commandTopic, active, {retain: true}).then();
       });
+    });
   }
 
   private installPartIdPublisher(): void {
-    this.view.partId$
-      .pipe(takeUntilDestroyed())
-      .subscribe(partId => {
+    effect(() => {
+      const part = this.view.part();
+      untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewPartIdTopic(this.view.id);
-        this._messageClient.publish(commandTopic, partId, {retain: true}).then();
+        this._messageClient.publish(commandTopic, part.id, {retain: true}).then();
       });
+    });
   }
 
   /**

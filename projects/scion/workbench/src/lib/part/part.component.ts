@@ -8,15 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, inject, Injector, OnDestroy, OnInit} from '@angular/core';
-import {EMPTY, from, fromEvent, merge, mergeMap, switchMap} from 'rxjs';
+import {ChangeDetectorRef, Component, effect, ElementRef, HostBinding, Inject, inject, Injector, OnDestroy, OnInit, untracked} from '@angular/core';
+import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {AsyncPipe} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
@@ -30,7 +28,6 @@ import {WORKBENCH_ID} from '../workbench-id';
   styleUrls: ['./part.component.scss'],
   standalone: true,
   imports: [
-    AsyncPipe,
     RouterOutlet,
     PartBarComponent,
     ViewDropZoneDirective,
@@ -110,15 +107,15 @@ export class PartComponent implements OnInit, OnDestroy {
    * Constructs view components of inactive views, so they can initialize, e.g., to set the view tab title.
    */
   private constructInactiveViewComponents(): void {
-    toObservable(this.part.viewIds)
-      .pipe(
-        mapArray(viewId => this._viewRegistry.get(viewId)),
-        filterArray(view => !view.active && !view.portal.isConstructed),
-        mergeMap(views => from(views)),
-      )
-      .subscribe(inactiveView => {
-        inactiveView.portal.createComponentFromInjectionContext(this._injector);
-      });
+    effect(() => {
+      const viewIds = this.part.viewIds();
+      untracked(() => viewIds
+        .map(viewId => this._viewRegistry.get(viewId))
+        .filter(view => !view.active() && !view.portal.isConstructed)
+        .forEach(inactiveView => {
+          inactiveView.portal.createComponentFromInjectionContext(this._injector);
+        }));
+    });
   }
 
   /**

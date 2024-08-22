@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable} from 'rxjs';
 import {WorkbenchPartAction} from '../workbench.model';
 import {ViewId} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
@@ -38,14 +37,9 @@ export abstract class WorkbenchPart {
   public abstract readonly active: Signal<boolean>;
 
   /**
-   * Emits the currently active view in this part.
+   * Identifies the active view, or `null` if none.
    */
-  public abstract readonly activeViewId$: Observable<ViewId | null>;
-
-  /**
-   * The currently active view, if any.
-   */
-  public abstract readonly activeViewId: ViewId | null;
+  public abstract readonly activeViewId: Signal<ViewId | null>;
 
   /**
    * Identifies views opened in this part.

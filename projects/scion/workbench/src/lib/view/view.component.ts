@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding, inject, OnDestroy, Provider, ViewChild} from '@angular/core';
-import {AsyncSubject, combineLatest} from 'rxjs';
+import {Component, effect, ElementRef, HostBinding, inject, OnDestroy, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -45,15 +44,7 @@ import {NgClass} from '@angular/common';
 })
 export class ViewComponent implements OnDestroy {
 
-  private _viewport$ = new AsyncSubject<SciViewportComponent>();
-
-  @ViewChild(SciViewportComponent)
-  public set setViewport(viewport: SciViewportComponent) {
-    if (viewport) {
-      this._viewport$.next(viewport);
-      this._viewport$.complete();
-    }
-  }
+  private _viewport = viewChild.required(SciViewportComponent);
 
   @HostBinding('attr.data-viewid')
   public get viewId(): string {
@@ -71,22 +62,22 @@ export class ViewComponent implements OnDestroy {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
     this.installMenuItemAccelerators();
     this.subscribeForViewActivation();
-    this.addViewClassesToHost();
+    this.addHostCssClasses();
   }
 
-  private onActivateView(viewport: SciViewportComponent): void {
-    viewport.scrollTop = this._view.scrollTop;
-    viewport.scrollLeft = this._view.scrollLeft;
+  private onActivateView(): void {
+    this._viewport().scrollTop = this._view.scrollTop;
+    this._viewport().scrollLeft = this._view.scrollLeft;
 
     // Gain focus only if in the active part.
-    if (this._view.part.active()) {
-      viewport.focus();
+    if (this._view.part().active()) {
+      this._viewport().focus();
     }
   }
 
-  private onDeactivateView(viewport: SciViewportComponent): void {
-    this._view.scrollTop = viewport.scrollTop;
-    this._view.scrollLeft = viewport.scrollLeft;
+  private onDeactivateView(): void {
+    this._view.scrollTop = this._viewport().scrollTop;
+    this._view.scrollLeft = this._viewport().scrollLeft;
   }
 
   private installMenuItemAccelerators(): void {
@@ -96,20 +87,15 @@ export class ViewComponent implements OnDestroy {
   }
 
   private subscribeForViewActivation(): void {
-    combineLatest([this._view.active$, this._viewport$])
-      .pipe(takeUntilDestroyed())
-      .subscribe(([active, viewport]) => {
-        active ? this.onActivateView(viewport) : this.onDeactivateView(viewport);
-      });
+    effect(() => {
+      const active = this._view.active();
+      untracked(() => active ? this.onActivateView() : this.onDeactivateView());
+    });
   }
 
-  private addViewClassesToHost(): void {
+  private addHostCssClasses(): void {
     const ngClass = inject(NgClass);
-    this._view.classList.value$
-      .pipe(takeUntilDestroyed())
-      .subscribe(cssClasses => {
-        ngClass.ngClass = cssClasses;
-      });
+    effect(() => ngClass.ngClass = this._view.classList.asList());
   }
 
   public ngOnDestroy(): void {

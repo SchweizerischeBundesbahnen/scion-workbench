@@ -71,9 +71,9 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    * Passes state to a view navigation.
    *
    * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
-   * State can be read from {@link WorkbenchView.state} or from the browser's session history via `history.state`.
+   * State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
    */
-  state?: ViewState;
+  state?: NavigationState;
   /**
    * Closes views that match the specified path and navigation hint. Matrix parameters do not affect view resolution.
    * The path supports the asterisk wildcard segment (`*`) to match views with any value in a segment.
@@ -168,15 +168,15 @@ export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
 /**
  * States associated with view navigations.
  */
-export type ViewStates = {[viewId: ViewId]: ViewState};
+export type NavigationStates = {[viewId: ViewId]: NavigationState};
 
 /**
  * State passed to a view navigation.
  *
  * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
- * State can be read from {@link WorkbenchView.state} or from the browser's session history via `history.state`.
+ * State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
  */
-export type ViewState = {[key: string]: unknown};
+export type NavigationState = {[key: string]: unknown};
 
 /**
  * Data associated with a view navigation.

@@ -19,7 +19,6 @@ import {Observable} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
@@ -41,8 +40,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
-import {take} from 'rxjs/operators';
-import {NavigationData, ViewState} from '../routing/routing.model';
+import {NavigationData, NavigationState} from '../routing/routing.model';
 import {BlankComponent} from '../routing/workbench-auxiliary-route-installer.service';
 
 describe('View', () => {
@@ -414,28 +412,22 @@ describe('View', () => {
     await view1.activate();
     await waitUntilStable();
 
-    expect(view1.active).toBeTrue();
-    expect(view1.getComponent<SpecViewComponent>()!.activated).toBeTrue();
-    expect(view2.active).toBeFalse();
-    expect(view2.getComponent<SpecViewComponent>()!.activated).toBeFalse();
+    expect(view1.active()).toBeTrue();
+    expect(view2.active()).toBeFalse();
 
     // Activate view 2.
     await view2.activate();
     await waitUntilStable();
 
-    expect(view1.active).toBeFalse();
-    expect(view1.getComponent<SpecViewComponent>()!.activated).toBeFalse();
-    expect(view2.active).toBeTrue();
-    expect(view2.getComponent<SpecViewComponent>()!.activated).toBeTrue();
+    expect(view1.active()).toBeFalse();
+    expect(view2.active()).toBeTrue();
 
     // Activate view 1.
     await view1.activate();
     await waitUntilStable();
 
-    expect(view1.active).toBeTrue();
-    expect(view1.getComponent<SpecViewComponent>()!.activated).toBeTrue();
-    expect(view2.active).toBeFalse();
-    expect(view2.getComponent<SpecViewComponent>()!.activated).toBeFalse();
+    expect(view1.active()).toBeTrue();
+    expect(view2.active()).toBeFalse();
   });
 
   it('should close views via WorkbenchRouter (unless prevent closing or non-closable)', async () => {
@@ -1849,40 +1841,40 @@ describe('View', () => {
         public navigationDataReadInConstructor: NavigationData;
         public navigationDataReadInDestroy: NavigationData | undefined;
 
-        public navigationStateReadInConstructor: ViewState;
-        public navigationStateReadInDestroy: ViewState | undefined;
+        public navigationStateReadInConstructor: NavigationState;
+        public navigationStateReadInDestroy: NavigationState | undefined;
 
         public navigationCssClassReadInConstructor: string[];
         public navigationCssClassReadInDestroy: string[] | undefined;
 
         constructor() {
           // Title
-          this.titleReadInConstructor = this._view.title;
+          this.titleReadInConstructor = this._view.title();
           // Heading
-          this.headingReadInConstructor = this._view.heading;
+          this.headingReadInConstructor = this._view.heading();
           // Navigation Data
           this.navigationDataReadInConstructor = this._view.navigationData();
           // Navigation State
-          this.navigationStateReadInConstructor = this._view.state;
+          this.navigationStateReadInConstructor = this._view.navigationState();
           // Navigation Hint
-          this.navigationHintReadInConstructor = this._view.navigationHint;
+          this.navigationHintReadInConstructor = this._view.navigationHint();
           // Navigation CSS Class
-          this.navigationCssClassReadInConstructor = this._view.classList.get({scope: 'navigation'});
+          this.navigationCssClassReadInConstructor = this._view.classList.navigation();
         }
 
         public ngOnDestroy(): void {
           // Title
-          this.titleReadInDestroy = this._view.title;
+          this.titleReadInDestroy = this._view.title();
           // Heading
-          this.headingReadInDestroy = this._view.heading;
+          this.headingReadInDestroy = this._view.heading();
           // Navigation Hint
-          this.navigationHintReadInDestroy = this._view.navigationHint;
+          this.navigationHintReadInDestroy = this._view.navigationHint();
           // Navigation Data
           this.navigationDataReadInDestroy = this._view.navigationData();
           // Navigation State
-          this.navigationStateReadInDestroy = this._view.state;
+          this.navigationStateReadInDestroy = this._view.navigationState();
           // Navigation CSS Class
-          this.navigationCssClassReadInDestroy = this._view.classList.get({scope: 'navigation'});
+          this.navigationCssClassReadInDestroy = this._view.classList.navigation();
         }
       }
 
@@ -2129,22 +2121,14 @@ describe('View', () => {
         private _view = inject(ɵWorkbenchView);
 
         public partReadInConstructor: string | null = null;
-        public partEmittedInConstructor = new Array<string | null>();
         public partReadInDestroy: string | null = null;
-        public partEmittedInDestroy = new Array<string | null>();
 
         constructor() {
-          this.partReadInConstructor = this._view.part.id;
-          this._view.partId$
-            .pipe(takeUntilDestroyed())
-            .subscribe(partId => this.partEmittedInConstructor.push(partId));
+          this.partReadInConstructor = this._view.part().id;
         }
 
         public ngOnDestroy(): void {
-          this.partReadInDestroy = this._view.part.id;
-          this._view.partId$
-            .pipe(take(1))
-            .subscribe(partId => this.partEmittedInDestroy.push(partId));
+          this.partReadInDestroy = this._view.part().id;
         }
       }
 
@@ -2200,7 +2184,6 @@ describe('View', () => {
       const componentInstanceView1 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.partReadInConstructor).toEqual('left');
-      expect(componentInstanceView1.partEmittedInConstructor).toEqual(['left']);
 
       // Navigate "view.100" to "path/to/module-b/view-2" in the right part.
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
@@ -2215,17 +2198,14 @@ describe('View', () => {
       const componentInstanceView2 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.partReadInConstructor).toEqual('right');
-      expect(componentInstanceView2.partEmittedInConstructor).toEqual(['right']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView1.partReadInDestroy).toEqual('left');
-      expect(componentInstanceView1.partEmittedInDestroy).toEqual(['left']);
 
       // Close view
       await workbenchRouter.navigate([], {target: 'view.100', close: true});
       await waitUntilStable();
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView2.partReadInDestroy).toEqual('right');
-      expect(componentInstanceView2.partEmittedInDestroy).toEqual(['right']);
     });
 
     /**
@@ -2241,22 +2221,14 @@ describe('View', () => {
         private _view = inject(ɵWorkbenchView);
 
         public activeReadInConstructor: boolean | undefined;
-        public activeEmittedInConstructor = new Array<boolean>();
         public activeReadInDestroy: boolean | undefined;
-        public activeEmittedInDestroy = new Array<boolean>();
 
         constructor() {
-          this.activeReadInConstructor = this._view.active;
-          this._view.active$
-            .pipe(takeUntilDestroyed())
-            .subscribe(active => this.activeEmittedInConstructor.push(active));
+          this.activeReadInConstructor = this._view.active();
         }
 
         public ngOnDestroy(): void {
-          this.activeReadInDestroy = this._view.active;
-          this._view.active$
-            .pipe(take(1))
-            .subscribe(active => this.activeEmittedInDestroy.push(active));
+          this.activeReadInDestroy = this._view.active();
         }
       }
 
@@ -2311,7 +2283,6 @@ describe('View', () => {
       const componentInstanceView1 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.activeReadInConstructor).toBeTrue();
-      expect(componentInstanceView1.activeEmittedInConstructor).toEqual([true]);
 
       // Navigate "view.100" to "path/to/module-b/view-2".
       await workbenchRouter.navigate(layout => layout
@@ -2324,17 +2295,14 @@ describe('View', () => {
       const componentInstanceView2 = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.activeReadInConstructor).toBeFalse();
-      expect(componentInstanceView2.activeEmittedInConstructor).toEqual([false]);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView1.activeReadInDestroy).toBeTrue();
-      expect(componentInstanceView1.activeEmittedInDestroy).toEqual([true]);
 
       // Close view
       await workbenchRouter.navigate([], {target: 'view.100', close: true});
       await waitUntilStable();
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView2.activeReadInDestroy).toBeFalse();
-      expect(componentInstanceView2.activeEmittedInDestroy).toEqual([false]);
     });
 
     /**
@@ -2352,11 +2320,11 @@ describe('View', () => {
         public dirtyReadInDestroy: boolean | undefined;
 
         constructor() {
-          this.dirtyReadInConstructor = this.view.dirty;
+          this.dirtyReadInConstructor = this.view.dirty();
         }
 
         public ngOnDestroy(): void {
-          this.dirtyReadInDestroy = this.view.dirty;
+          this.dirtyReadInDestroy = this.view.dirty();
         }
       }
 
@@ -2479,10 +2447,57 @@ describe('View', () => {
       expect(viewComponent.navigationDataCaptor).toEqual([{data: 'a'}, {data: 'b'}, {data: 'c'}]);
     });
 
+    it('should observe navigation state', async () => {
+      @Component({selector: 'spec-view', template: 'View', standalone: true})
+      class SpecViewComponent {
+
+        public navigationStateCaptor = new Array<NavigationState>();
+
+        constructor(public view: WorkbenchView) {
+          effect(() => this.navigationStateCaptor.push(view.navigationState()));
+        }
+      }
+
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideRouter([
+            {path: 'path/to/view', component: SpecViewComponent},
+          ]),
+        ],
+      });
+      styleFixture(TestBed.createComponent(WorkbenchComponent));
+      const workbenchRouter = TestBed.inject(WorkbenchRouter);
+      await waitForInitialWorkbenchLayout();
+
+      // Navigate view with state.
+      await workbenchRouter.navigate(layout => layout
+        .addView('view.100', {partId: 'main'})
+        .navigateView('view.100', ['path/to/view'], {state: {state: 'a'}})
+        .activateView('view.100'),
+      );
+      await waitUntilStable();
+      const viewComponent = TestBed.inject(WorkbenchViewRegistry).get('view.100').getComponent<SpecViewComponent>()!;
+      expect(viewComponent.view.navigationState()).toEqual({state: 'a'});
+      expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}]);
+
+      // Navigate view with different state.
+      await workbenchRouter.navigate(layout => layout.navigateView('view.100', ['path/to/view'], {state: {state: 'b'}}));
+      await waitUntilStable();
+      expect(viewComponent.view.navigationState()).toEqual({state: 'b'});
+      expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}, {state: 'b'}]);
+
+      // Navigate view with different state.
+      await workbenchRouter.navigate(['path/to/view'], {state: {state: 'c'}});
+      await waitUntilStable();
+      expect(viewComponent.view.navigationState()).toEqual({state: 'c'});
+      expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}, {state: 'b'}, {state: 'c'}]);
+    });
+
     it('should change detect inactive path-based view', async () => {
       const log = new Array<string>();
 
-      @Component({selector: 'spec-view-1', template: '{{view.title}}', standalone: true})
+      @Component({selector: 'spec-view-1', template: '{{view.title()}}', standalone: true})
       class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2496,7 +2511,7 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-2', template: '{{view.title}}', standalone: true})
+      @Component({selector: 'spec-view-2', template: '{{view.title()}}', standalone: true})
       class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2541,7 +2556,7 @@ describe('View', () => {
     it('should change detect inactive empty-path view', async () => {
       const log = new Array<string>();
 
-      @Component({selector: 'spec-view-1', template: '{{view.title}}', standalone: true})
+      @Component({selector: 'spec-view-1', template: '{{view.title()}}', standalone: true})
       class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2555,7 +2570,7 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-2', template: '{{view.title}}', standalone: true})
+      @Component({selector: 'spec-view-2', template: '{{view.title()}}', standalone: true})
       class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2607,17 +2622,12 @@ describe('View', () => {
 class SpecViewComponent implements OnDestroy, CanClose {
 
   public destroyed = false;
-  public activated: boolean | undefined;
   public checkedForChanges = false;
   public preventClosing = false;
   public view = inject(WorkbenchView);
   public canCloseInjector: Injector | undefined;
 
   constructor() {
-    this.view.active$
-      .pipe(takeUntilDestroyed())
-      .subscribe(active => this.activated = active);
-
     const params = inject(ActivatedRoute).snapshot.paramMap;
     if (params.has('title')) {
       this.view.title = params.get('title');
@@ -2634,7 +2644,7 @@ class SpecViewComponent implements OnDestroy, CanClose {
   }
 
   public canClose(): Observable<boolean> | Promise<boolean> | boolean {
-    console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.urlSegments.join('/')}]`);
+    console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.urlSegments().join('/')}]`);
     this.canCloseInjector = inject(Injector);
     return !this.preventClosing;
   }

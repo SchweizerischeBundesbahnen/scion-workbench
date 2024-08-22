@@ -8,22 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, HostBinding, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, HostBinding, HostListener, inject, Input, OnInit, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {combineLatest, Observable, switchMap} from 'rxjs';
-import {map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {mapArray} from '@scion/toolkit/operators';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {WorkbenchPart} from '../workbench-part.model';
-import {AsyncPipe} from '@angular/common';
-import {FilterByPredicatePipe} from '../../common/filter-by-predicate.pipe';
-import {FilterByTextPipe} from '../../common/filter-by-text.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
-import {toObservable} from '@angular/core/rxjs-interop';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 /**
  * Reference to inputs of {@link ViewListComponent}.
@@ -39,22 +33,23 @@ export const ViewListComponentInputs = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    AsyncPipe,
     ReactiveFormsModule,
     FilterFieldComponent,
-    FilterByPredicatePipe,
-    FilterByTextPipe,
     ViewListItemComponent,
     SciViewportComponent,
   ],
 })
 export class ViewListComponent implements OnInit {
 
-  public views$: Observable<WorkbenchView[]>;
-  public filterFormControl = new FormControl<string>('', {nonNullable: true});
+  private _filterFieldComponent = viewChild.required(FilterFieldComponent);
+  private _part = inject(WorkbenchPart);
+  private _overlayRef = inject(OverlayRef);
 
-  @ViewChild(FilterFieldComponent, {static: true})
-  private _filterFieldComponent!: FilterFieldComponent;
+  /** Views that are scrolled into the tab bar. */
+  protected viewsInsideTabbar: Signal<WorkbenchView[]>;
+  /** Views that are scrolled out of the tab bar. */
+  protected viewsOutsideTabbar: Signal<WorkbenchView[]>;
+  protected filterFormControl = new FormControl<string>('', {nonNullable: true});
 
   @Input(ViewListComponentInputs.POSITION)
   public position?: 'north' | 'south' | undefined;
@@ -69,18 +64,24 @@ export class ViewListComponent implements OnInit {
     return this._part.id;
   }
 
-  constructor(private _part: WorkbenchPart,
-              viewRegistry: WorkbenchViewRegistry,
-              private _overlayRef: OverlayRef) {
-    this.views$ = toObservable(this._part.viewIds)
-      .pipe(
-        mapArray(viewId => viewRegistry.get(viewId)),
-        switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
-      );
+  constructor() {
+    const viewRegistry = inject(WorkbenchViewRegistry);
+    const filterText = toSignal(this.filterFormControl.valueChanges, {initialValue: this.filterFormControl.value});
+
+    this.viewsInsideTabbar = computed(() => this._part.viewIds()
+      .map(viewId => viewRegistry.get(viewId))
+      .filter(view => view.scrolledIntoView())
+      .filter(view => matchesView(filterText(), view)),
+    );
+    this.viewsOutsideTabbar = computed(() => this._part.viewIds()
+      .map(viewId => viewRegistry.get(viewId))
+      .filter(view => !view.scrolledIntoView())
+      .filter(view => matchesView(filterText(), view)),
+    );
   }
 
   public ngOnInit(): void {
-    this._filterFieldComponent.focus();
+    this._filterFieldComponent().focus();
   }
 
   public onActivateView(view: WorkbenchView): void {
@@ -104,25 +105,21 @@ export class ViewListComponent implements OnInit {
   public onDocumentCloseEvent(): void {
     this._overlayRef.dispose();
   }
+}
 
-  /**
-   * Returns the filter text of given view.
-   */
-  public viewTextFn = (view: WorkbenchView): string => {
-    return `${view.title ?? ''} ${view.heading ?? ''}`;
-  };
+/**
+ * Tests if given filter matches given view.
+ */
+function matchesView(filterText: string, view: WorkbenchView): boolean {
+  const viewText = `${view.title() ?? ''} ${view.heading() ?? ''}`;
+  return !filterText || !!viewText.match(toFilterRegExp(filterText));
+}
 
-  /**
-   * Tests if given view is scrolled into view.
-   */
-  public scrolledIntoViewFilterFn = (view: WorkbenchView): boolean => {
-    return view.scrolledIntoView;
-  };
-
-  /**
-   * Tests if given view is scrolled out of view.
-   */
-  public scrolledOutOfViewFilterFn = (view: WorkbenchView): boolean => {
-    return !view.scrolledIntoView;
-  };
+/**
+ * Creates a regular expression of the given filter text.
+ */
+function toFilterRegExp(filterText: string): RegExp {
+  // Escape the user input
+  const escapedString = filterText.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
+  return new RegExp(escapedString, 'i');
 }

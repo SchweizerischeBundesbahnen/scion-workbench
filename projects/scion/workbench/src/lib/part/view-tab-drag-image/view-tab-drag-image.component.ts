@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Injector} from '@angular/core';
+import {Component, HostBinding, inject, Injector, signal, Signal} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
@@ -34,7 +34,8 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 })
 export class ViewTabDragImageComponent {
 
-  public viewTabContentPortal!: ComponentPortal<unknown>;
+  public readonly view = signal(inject(WorkbenchView));
+  public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
 
   @HostBinding('class.active')
   public active = true;
@@ -54,12 +55,11 @@ export class ViewTabDragImageComponent {
   @HostBinding('class.drag-over-peripheral-tabbar')
   public isDragOverPeripheralTabbar = false;
 
-  constructor(public view: WorkbenchView,
-              private _workbenchConfig: WorkbenchConfig,
+  constructor(private _workbenchConfig: WorkbenchConfig,
               private _viewDragService: ViewDragService,
               private _injector: Injector) {
     this.installDragOverTabbarDetector();
-    this.viewTabContentPortal = this.createViewTabContentPortal();
+    this.viewTabContentPortal = signal(this.createViewTabContentPortal());
   }
 
   public onClose(..._: unknown[]): void {

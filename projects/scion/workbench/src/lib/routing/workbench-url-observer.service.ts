@@ -136,7 +136,7 @@ export class WorkbenchUrlObserver {
       })(),
       workbenchGrid: workbenchNavigationalState?.workbenchGrid ?? previousLayout?.workbenchGrid,
       maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
-      viewStates: workbenchNavigationalState?.viewStates ?? previousLayout?.viewStates(),
+      navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
       viewOutlets: Object.fromEntries(Routing.parseViewOutlets(urlTree)),
     });
 

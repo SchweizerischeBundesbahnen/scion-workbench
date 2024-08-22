@@ -81,7 +81,7 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
 
   private matchesContextualView(part: WorkbenchPart): boolean {
     if (this._view?.id) {
-      return part.activeViewId === this._view.id;
+      return part.activeViewId() === this._view.id;
     }
     return true;
   }

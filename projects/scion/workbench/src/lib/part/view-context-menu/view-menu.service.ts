@@ -160,7 +160,7 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => !view.closable,
+        isDisabled: (): boolean => !view.closable(),
         onAction: (): void => void view.close().then(),
       });
     });
@@ -181,7 +181,7 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first && view.last,
+        isDisabled: (): boolean => view.first() && view.last(),
         onAction: (): void => void view.close('other-views').then(),
       });
     });
@@ -222,7 +222,7 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.last,
+        isDisabled: (): boolean => view.last(),
         onAction: (): void => void view.close('views-to-the-right').then(),
       };
     });
@@ -243,7 +243,7 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first,
+        isDisabled: (): boolean => view.first(),
         onAction: (): void => void view.close('views-to-the-left').then(),
       };
     });
@@ -264,8 +264,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: () => view.first && view.last,
-        onAction: () => view.move(view.part.id, {region: 'east'}),
+        isDisabled: () => view.first() && view.last(),
+        onAction: () => view.move(view.part().id, {region: 'east'}),
       };
     });
   }
@@ -285,8 +285,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: () => view.first && view.last,
-        onAction: () => view.move(view.part.id, {region: 'west'}),
+        isDisabled: () => view.first() && view.last(),
+        onAction: () => view.move(view.part().id, {region: 'west'}),
       };
     });
   }
@@ -306,8 +306,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: () => view.first && view.last,
-        onAction: () => view.move(view.part.id, {region: 'north'}),
+        isDisabled: () => view.first() && view.last(),
+        onAction: () => view.move(view.part().id, {region: 'north'}),
       };
     });
   }
@@ -327,8 +327,8 @@ export class ViewMenuService {
         accelerator: config.accelerator,
         group: config.group,
         cssClass: config.cssClass,
-        isDisabled: () => view.first && view.last,
-        onAction: () => view.move(view.part.id, {region: 'south'}),
+        isDisabled: () => view.first() && view.last(),
+        onAction: () => view.move(view.part().id, {region: 'south'}),
       };
     });
   }

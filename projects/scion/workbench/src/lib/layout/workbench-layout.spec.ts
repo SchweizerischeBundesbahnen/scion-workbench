@@ -1029,7 +1029,7 @@ describe('WorkbenchLayout', () => {
     ]));
   });
 
-  it('should retain state when moving view to another part', () => {
+  it('should retain navigation state when moving view to another part', () => {
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('left')
       .addPart('right', {relativeTo: 'left', align: 'right'})
@@ -1038,7 +1038,7 @@ describe('WorkbenchLayout', () => {
       .moveView('view.1', 'right');
 
     expect(workbenchLayout.part({partId: 'right'}).views).toEqual([{id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView]);
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({some: 'state'});
+    expect(workbenchLayout.navigationState({viewId: 'view.1'})).toEqual({some: 'state'});
   });
 
   it('should clear hint of previous navigation when navigating without hint', () => {
@@ -1063,7 +1063,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
   });
 
-  it('should clear state of previous navigation when navigating without state', () => {
+  it('should clear navigation state of previous navigation when navigating without state', () => {
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part')
       .addView('view.1', {partId: 'part'})
@@ -1071,7 +1071,7 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view']);
 
     expect(workbenchLayout.view({viewId: 'view.1'})).toEqual({id: 'view.1', navigation: {id: anything()}, uid: anything()} satisfies MView);
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.navigationState({viewId: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual(segments(['path/to/view']));
   });
 
@@ -1084,7 +1084,7 @@ describe('WorkbenchLayout', () => {
       .removePart('part');
 
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.navigationState({viewId: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
   });
 
@@ -1096,7 +1096,7 @@ describe('WorkbenchLayout', () => {
       .removeView('view.1', {force: true});
 
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.navigationState({viewId: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
   });
 
@@ -1107,10 +1107,10 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
       .renameView('view.1', 'view.2');
 
-    expect(workbenchLayout.viewState({viewId: 'view.1'})).toEqual({});
+    expect(workbenchLayout.navigationState({viewId: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({viewId: 'view.1'})).toEqual([]);
 
-    expect(workbenchLayout.viewState({viewId: 'view.2'})).toEqual({some: 'state'});
+    expect(workbenchLayout.navigationState({viewId: 'view.2'})).toEqual({some: 'state'});
     expect(workbenchLayout.urlSegments({viewId: 'view.2'})).toEqual(segments(['path/to/view']));
   });
 

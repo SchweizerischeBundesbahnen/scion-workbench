@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, ViewState} from '../routing/routing.model';
+import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
 
 /**
@@ -79,11 +79,11 @@ export interface WorkbenchLayout {
    *                      Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigationData}.
    * @param extras.state - Passes state to a view navigation.
    *                       State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
-   *                       State can be read from {@link WorkbenchView.state} or from the browser's session history via `history.state`.
+   *                       State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
    * @param extras.cssClass - Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    * @return a copy of this layout with the view navigated.
    */
-  navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout;
+  navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Removes given view from the layout.

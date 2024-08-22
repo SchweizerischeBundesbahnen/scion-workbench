@@ -80,7 +80,7 @@ describe('WorkbenchViewRegistry', () => {
 
     // Subscribe for view changes (before routing).
     const captor = new ObserveCaptor<string[]>();
-    TestBed.inject(WorkbenchViewRegistry).views$.pipe(mapArray(view => view.part.id)).subscribe(captor);
+    TestBed.inject(WorkbenchViewRegistry).views$.pipe(mapArray(view => view.part().id)).subscribe(captor);
 
     // Open view in the right part.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout

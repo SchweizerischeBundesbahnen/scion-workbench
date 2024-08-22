@@ -1,22 +1,22 @@
 <!-- IMPORTANT: THIS HTML FILE IS ALSO USED BY `ViewTabDragImageComponent` -->
 
-@if (view.active) {
+@if (view().active()) {
   <div class="corner-radius start">
     <div class="circle"></div>
   </div>
 }
 
 <div class="content">
-  <ng-container *cdkPortalOutlet="viewTabContentPortal"/>
+  <ng-container *cdkPortalOutlet="viewTabContentPortal()"/>
 </div>
 
-@if (view.active) {
+@if (view().active()) {
   <div class="corner-radius end">
     <div class="circle"></div>
   </div>
 }
 
-@if (view.closable) {
+@if (view().closable()) {
   <button class="close e2e-close scion-workbench-icons"
           (click)="onClose($event)">
     close

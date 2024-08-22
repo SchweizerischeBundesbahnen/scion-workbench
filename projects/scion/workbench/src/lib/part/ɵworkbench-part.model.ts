@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BehaviorSubject} from 'rxjs';
-import {computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal, untracked} from '@angular/core';
+import {computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
@@ -38,7 +37,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
-  public readonly activeViewId$ = new BehaviorSubject<ViewId | null>(null);
+  public readonly activeViewId = signal<ViewId | null>(null);
   public readonly actions: Signal<WorkbenchPartAction[]>;
 
   private _isInMainArea: boolean | undefined;
@@ -77,14 +76,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
     this.active.set(active);
     this.viewIds.set(mPart.views.map(view => view.id));
-    // Update active view if changed
-    if (this.activeViewId !== mPart.activeViewId) {
-      this.activeViewId$.next(mPart.activeViewId ?? null);
-    }
-  }
-
-  public get activeViewId(): ViewId | null {
-    return this.activeViewId$.value;
+    this.activeViewId.set(mPart.activeViewId ?? null);
   }
 
   /**
@@ -126,15 +118,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     const injector = inject(Injector);
 
     const actions = toSignal(this._partActionRegistry.actions$, {requireSync: true});
-    const activeViewId = toSignal(this.activeViewId$, {requireSync: true});
+
     return computed(() => {
-      // Add the part's active view to the reactive (tracking) context, evaluating the `canMatch` function also when the active view changes.
-      activeViewId();
       // Filter actions by calling `canMatch`, if any.
       return actions().filter(action => {
-        // - Execute function in non-reactive (non-tracking) context.
         // - Run function in injection context for `canMatch` function to inject dependencies.
-        return untracked(() => runInInjectionContext(injector, () => action.canMatch?.(this) ?? true));
+        // - Run function in a reactive context to track signals. (e.g., view's active state).
+        return runInInjectionContext(injector, () => action.canMatch?.(this) ?? true);
       });
     });
   }
@@ -182,8 +172,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._partEnvironmentInjector.destroy();
     // IMPORTANT: Only detach the active view, not destroy it, because views are explicitly destroyed when view handles are removed.
     // Otherwise, moving the last view to another part would fail because the view would already be destroyed.
-    if (this.activeViewId) {
-      this._viewRegistry.get(this.activeViewId, {orElse: null})?.portal.detach();
+    if (this.activeViewId()) {
+      this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
     }
   }
 }

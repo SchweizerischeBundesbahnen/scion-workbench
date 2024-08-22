@@ -16,7 +16,7 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
-import {Commands, NavigationData, ViewOutlets, ViewState, ViewStates} from '../routing/routing.model';
+import {Commands, NavigationData, NavigationState, NavigationStates, ViewOutlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {Arrays} from '@scion/toolkit/util';
@@ -42,7 +42,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
   private readonly _viewOutlets: Map<ViewId, UrlSegment[]>;
-  private readonly _viewStates: Map<ViewId, ViewState>;
+  private readonly _navigationStates: Map<ViewId, NavigationState>;
   private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
@@ -52,7 +52,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private _maximized: boolean;
 
   /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: string | ViewOutlets | null; viewStates?: ViewStates | null; maximized?: boolean}) {
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: string | ViewOutlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
     this._grids = {
       workbench: coerceMPartGrid(config.workbenchGrid, {default: createDefaultWorkbenchGrid}),
     };
@@ -62,7 +62,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     this._gridNames = Objects.keys(this._grids);
     this._maximized = config.maximized ?? false;
     this._viewOutlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceViewOutlets(config.viewOutlets)));
-    this._viewStates = new Map<ViewId, ViewState>(Objects.entries(config.viewStates ?? {}));
+    this._navigationStates = new Map<ViewId, NavigationState>(Objects.entries(config.navigationStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
   }
 
@@ -109,22 +109,22 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Finds the navigational state of views based on the specified filter.
+   * Finds navigational state for views based on the specified filter.
    *
    * @param findBy - Defines the search scope.
    * @param findBy.grid - Searches for views contained in the specified grid.
-   * @return view state matching the filter criteria.
+   * @return navigation state of views matching the filter criteria.
    */
-  public viewStates(findBy?: {grid?: keyof Grids}): ViewStates {
-    const viewStateEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._viewStates.get(view.id) ?? {}]);
-    return Object.fromEntries(viewStateEntries);
+  public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
+    const navigationStateEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._navigationStates.get(view.id) ?? {}]);
+    return Object.fromEntries(navigationStateEntries);
   }
 
   /**
    * Finds the navigational state of specified view.
    */
-  public viewState(findBy: {viewId: ViewId}): ViewState {
-    return this._viewStates.get(findBy.viewId) ?? {};
+  public navigationState(findBy: {viewId: ViewId}): NavigationState {
+    return this._navigationStates.get(findBy.viewId) ?? {};
   }
 
   /**
@@ -326,7 +326,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * @inheritDoc
    */
-  public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): ɵWorkbenchLayout {
+  public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__navigateView(view, commands, extras));
     return workingCopy;
@@ -511,7 +511,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     // Remove outlets and states of views contained in the part.
     part.views.forEach(view => {
       this._viewOutlets.delete(view.id);
-      this._viewStates.delete(view.id);
+      this._navigationStates.delete(view.id);
     });
 
     // If the removed part was the active part, make the last used part the active part.
@@ -553,7 +553,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __navigateView(view: MView, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): void {
+  private __navigateView(view: MView, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): void {
     if (!commands.length && !extras?.hint && !extras?.relativeTo) {
       throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
     }
@@ -567,10 +567,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     if (extras?.state && Objects.keys(extras.state).length) {
-      this._viewStates.set(view.id, extras.state);
+      this._navigationStates.set(view.id, extras.state);
     }
     else {
-      this._viewStates.delete(view.id);
+      this._navigationStates.delete(view.id);
     }
 
     view.navigation = Objects.withoutUndefinedEntries({
@@ -590,7 +590,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Move the view.
     if (sourcePart !== targetPart) {
-      this.__removeView(view, {removeOutlet: false, removeState: false, force: true});
+      this.__removeView(view, {removeOutlet: false, removeNavigationState: false, force: true});
       this.__addView(view, {partId: targetPartId, position: options?.position});
     }
     else if (options?.position !== undefined) {
@@ -612,7 +612,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removeView(view: MView, options?: {removeOutlet?: false; removeState?: false; force?: boolean}): void {
+  private __removeView(view: MView, options?: {removeOutlet?: false; removeNavigationState?: false; force?: boolean}): void {
     if (!options?.force) {
       view.markedForRemoval = true;
       return;
@@ -629,8 +629,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     // Remove state.
-    if (options?.removeState ?? true) {
-      this._viewStates.delete(view.id);
+    if (options?.removeNavigationState ?? true) {
+      this._navigationStates.delete(view.id);
     }
 
     // Activate the last used view if this view was active.
@@ -717,9 +717,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._viewOutlets.set(newViewId, this._viewOutlets.get(view.id)!);
       this._viewOutlets.delete(view.id);
     }
-    if (this._viewStates.has(view.id)) {
-      this._viewStates.set(newViewId, this._viewStates.get(view.id)!);
-      this._viewStates.delete(view.id);
+    if (this._navigationStates.has(view.id)) {
+      this._navigationStates.set(newViewId, this._navigationStates.get(view.id)!);
+      this._navigationStates.delete(view.id);
     }
 
     if (part.activeViewId === view.id) {
@@ -818,7 +818,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
       mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
       viewOutlets: Object.fromEntries(this._viewOutlets),
-      viewStates: Object.fromEntries(this._viewStates),
+      navigationStates: Object.fromEntries(this._navigationStates),
       maximized: this._maximized,
     }));
   }

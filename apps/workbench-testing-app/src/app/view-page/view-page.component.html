@@ -10,16 +10,16 @@
   }
 
   <sci-form-field label="Part ID">
-    <span class="e2e-part-id">{{view.part.id}}</span>
+    <span class="e2e-part-id">{{view.part().id}}</span>
   </sci-form-field>
 
   <sci-form-field label="Path">
-    <span>{{view.urlSegments | appJoin:'/'}}</span>
+    <span>{{view.urlSegments() | appJoin:'/'}}</span>
   </sci-form-field>
 
-  @if (view.navigationHint) {
+  @if (view.navigationHint()) {
     <sci-form-field label="Navigation Hint">
-      <span>{{view.navigationHint}}</span>
+      <span>{{view.navigationHint()}}</span>
     </sci-form-field>
   }
 
@@ -50,13 +50,13 @@
   </sci-accordion>
 }
 
-@if (view.state | appNullIfEmpty; as state) {
-  <sci-accordion class="e2e-state" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_view_state">
-      <header>View State</header>
+@if (view.navigationState() | appNullIfEmpty; as state) {
+  <sci-accordion class="e2e-navigation-state" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_state">
+      <header>Navigation State</header>
     </ng-template>
-    <ng-template #panel_view_state>
-      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-state"/>
+    <ng-template #panel_navigation_state>
+      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-navigation-state"/>
     </ng-template>
   </sci-accordion>
 }
@@ -65,19 +65,19 @@
   <header>View Properties</header>
 
   <sci-form-field label="Title">
-    <input [(ngModel)]="view.title" class="e2e-title">
+    <input [ngModel]="view.title()" (ngModelChange)="view.title = $event" class="e2e-title">
   </sci-form-field>
 
   <sci-form-field label="Heading">
-    <input [(ngModel)]="view.heading" class="e2e-heading">
+    <input [ngModel]="view.heading()" (ngModelChange)="view.heading = $event" class="e2e-heading">
   </sci-form-field>
 
   <sci-form-field label="Dirty">
-    <sci-checkbox [(ngModel)]="view.dirty" class="e2e-dirty"/>
+    <sci-checkbox [ngModel]="view.dirty()" (ngModelChange)="view.dirty = $event" class="e2e-dirty"/>
   </sci-form-field>
 
   <sci-form-field label="Closable">
-    <sci-checkbox [(ngModel)]="view.closable" class="e2e-closable"/>
+    <sci-checkbox [ngModel]="view.closable()" (ngModelChange)="view.closable = $event" class="e2e-closable"/>
   </sci-form-field>
 
   <sci-form-field label="Confirm Closing">

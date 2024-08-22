@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ComponentFactoryResolver, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
+import {ApplicationRef, ComponentFactoryResolver, computed, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
 import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
@@ -16,14 +16,14 @@ import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-drag-image.component';
-import {of} from 'rxjs';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchMenuItem} from '../workbench.model';
 import {ViewId, WorkbenchView} from '../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
-import {NavigationData, ViewState} from '../routing/routing.model';
+import {NavigationData, NavigationState} from '../routing/routing.model';
+import {throwError} from '../common/throw-error.util';
 
 export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 
@@ -229,39 +229,36 @@ class DragImageWorkbenchView implements WorkbenchView {
 
   public readonly id: ViewId;
   public readonly alternativeId: string | undefined;
-  public readonly navigationHint: string | undefined;
+  public readonly navigationHint: Signal<string | undefined>;
   public readonly navigationData: Signal<NavigationData>;
-  public readonly state: ViewState;
-  public readonly title: string;
-  public readonly heading: string;
-  public readonly closable: boolean;
-  public readonly dirty: boolean;
+  public readonly navigationState: Signal<NavigationState>;
+  public readonly part: Signal<WorkbenchPart>;
+  public readonly title: Signal<string | null>;
+  public readonly heading: Signal<string | null>;
+  public readonly dirty: Signal<boolean>;
+  public readonly closable: Signal<boolean>;
   public readonly destroyed = false;
-  public readonly active$ = of(true);
-  public readonly active = true;
+  public readonly active = signal(true).asReadonly();
   public readonly blocked = false;
-  public readonly cssClass = [];
-  public readonly urlSegments: UrlSegment[];
-  public readonly first = true;
-  public readonly last = true;
-  public readonly position = 0;
-  public readonly scrolledIntoView = true;
+  public readonly cssClass = signal([]).asReadonly();
+  public readonly urlSegments: Signal<UrlSegment[]>;
+  public readonly first = signal(true).asReadonly();
+  public readonly last = signal(true).asReadonly();
+  public readonly position = signal(0).asReadonly();
+  public readonly scrolledIntoView = signal(true).asReadonly();
 
   constructor(dragData: ViewDragData) {
     this.id = dragData.viewId;
     this.alternativeId = dragData.alternativeViewId;
-    this.navigationHint = dragData.navigationHint;
+    this.part = computed(() => throwError('UnsupportedOperationError'));
+    this.navigationHint = signal(dragData.navigationHint).asReadonly();
     this.navigationData = signal(dragData.navigationData ?? {}).asReadonly();
-    this.state = {};
-    this.title = dragData.viewTitle;
-    this.heading = dragData.viewHeading;
-    this.closable = dragData.viewClosable;
-    this.dirty = dragData.viewDirty;
-    this.urlSegments = dragData.viewUrlSegments;
-  }
-
-  public get part(): WorkbenchPart {
-    throw Error('[UnsupportedOperationError]');
+    this.navigationState = signal({}).asReadonly();
+    this.title = signal(dragData.viewTitle).asReadonly();
+    this.heading = signal(dragData.viewHeading).asReadonly();
+    this.dirty = signal(dragData.viewDirty).asReadonly();
+    this.closable = signal(dragData.viewClosable).asReadonly();
+    this.urlSegments = signal(dragData.viewUrlSegments).asReadonly();
   }
 
   public close(): Promise<boolean> {

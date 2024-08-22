@@ -317,7 +317,7 @@ export class PopupService {
           map(dimension => dimension.element.getBoundingClientRect()),
           filter(clientRect => !isNullClientRect(clientRect)), // Omit viewport change if not having a size, for example, if the view is deactivated.
           map(clientRect => ({x: clientRect.left, y: clientRect.top, width: clientRect.width, height: clientRect.height})),
-          startWithNullBoundsIf(() => !view.active), // Ensure initial bounds to be emitted even if the view is inactive. Otherwise, the popup would not be attached to the DOM until the view is activated.
+          startWithNullBoundsIf(() => !view.active()), // Ensure initial bounds to be emitted even if the view is inactive. Otherwise, the popup would not be attached to the DOM until the view is activated.
         );
     }
     else {
