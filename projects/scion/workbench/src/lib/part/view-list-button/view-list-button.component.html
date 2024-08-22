@@ -1,6 +1,6 @@
 <span class="chevron scion-workbench-icons">
   chevron_down
 </span>
-@if (scrolledOutOfViewTabCount$ | async; as count) {
+@if (scrolledOutOfViewTabCount(); as count) {
   <span class="count">{{count}}</span>
 }

@@ -25,7 +25,7 @@ test.describe('Navigational State', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({});
   });
 
   test('should pass state (WorkbenchRouter.navigate)', async ({appPO, workbenchNavigator}) => {
@@ -38,7 +38,7 @@ test.describe('Navigational State', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
   });
 
   test('should pass state (WorkbenchLayout.navigateView)', async ({appPO, workbenchNavigator}) => {
@@ -51,7 +51,7 @@ test.describe('Navigational State', () => {
     );
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
   });
 
   test('should preserve data type of state', async ({appPO, workbenchNavigator}) => {
@@ -72,7 +72,7 @@ test.describe('Navigational State', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({
       state1: 'value',
       state2: '0 [number]',
       state3: '2 [number]',
@@ -94,7 +94,7 @@ test.describe('Navigational State', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({state1: 'state 1'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state1: 'state 1'});
 
     // Navigate view again with a different state
     await routerPage.view.tab.click();
@@ -103,7 +103,7 @@ test.describe('Navigational State', () => {
       cssClass: 'testee',
     });
 
-    await expect.poll(() => viewPage.getState()).toEqual({state2: 'state 2'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state2: 'state 2'});
     await expect.poll(() => viewPage.getParams()).toEqual({matrix: 'param'});
 
     // Navigate view again without state
@@ -112,7 +112,7 @@ test.describe('Navigational State', () => {
       cssClass: 'testee',
     });
 
-    await expect.poll(() => viewPage.getState()).toEqual({});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({});
     await expect.poll(() => viewPage.getParams()).toEqual({});
 
     // Navigate view again with a different state
@@ -122,10 +122,10 @@ test.describe('Navigational State', () => {
       cssClass: 'testee',
     });
 
-    await expect.poll(() => viewPage.getState()).toEqual({state3: 'state 3'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state3: 'state 3'});
   });
 
-  test('should discard state when reloading the page', async ({appPO, workbenchNavigator}) => {
+  test('should discard state when closing the application', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -135,10 +135,11 @@ test.describe('Navigational State', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
 
+    // Close and open the application.
     await appPO.reload();
-    await expect.poll(() => viewPage.getState()).toEqual({});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({});
   });
 
   test('should maintain state when navigating a different view', async ({appPO, workbenchNavigator}) => {
@@ -151,7 +152,7 @@ test.describe('Navigational State', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
 
     await routerPage.view.tab.click();
     await routerPage.navigate(['test-view'], {
@@ -160,7 +161,7 @@ test.describe('Navigational State', () => {
 
     // Expect view state to be preserved.
     await viewPage.view.tab.click();
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
   });
 
   test('should maintain state when navigating back and forth in browser history', async ({appPO, workbenchNavigator}) => {
@@ -182,7 +183,7 @@ test.describe('Navigational State', () => {
       target: 'testee',
       state: {'state': 'a'},
     });
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'a'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'a'});
 
     // Move the view to the left and back again, simulating navigation without explicitly setting the state.
     // When navigating back, expect the view state to be restored.
@@ -193,25 +194,25 @@ test.describe('Navigational State', () => {
       target: 'testee',
       state: {'state': 'b'},
     });
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'b'});
 
     await routerPage.navigate(['test-view'], {
       target: 'testee',
       state: {'state': 'c'},
     });
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'c'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'c'});
 
     await appPO.navigateBack();
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'b'});
 
     await appPO.navigateBack();
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'a'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'a'});
 
     await appPO.navigateForward();
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'b'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'b'});
 
     await appPO.navigateForward();
-    await expect.poll(() => viewPage.getState()).toEqual({state: 'c'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state: 'c'});
   });
 
   test('should maintain state when navigating through the Angular router', async ({appPO, workbenchNavigator}) => {
@@ -237,7 +238,7 @@ test.describe('Navigational State', () => {
 
     // Expect view state to be passed to the view.
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
 
     // Navigate through the Angular router
     const angularRouterPage = new AngularRouterTestPagePO(appPO, {cssClass: 'angular-router'});
@@ -245,6 +246,43 @@ test.describe('Navigational State', () => {
     await angularRouterPage.navigate(['test-view'], {outlet: await angularRouterPage.view.getViewId()});
 
     // Expect view state to be preserved.
-    await expect.poll(() => viewPage.getState()).toEqual({some: 'state'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
+  });
+
+  test('should not affect view resolution', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Navigate view.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {
+      state: {state1: 'state 1'},
+      target: 'view.100',
+    });
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state1: 'state 1'});
+    await expect(appPO.views()).toHaveCount(2);
+
+    // Navigate view again with different state.
+    await routerPage.view.tab.click();
+    await routerPage.navigate(['test-view'], {
+      state: {state2: 'state 2'},
+    });
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state2: 'state 2'});
+    await expect(appPO.views()).toHaveCount(2);
+
+    // Navigate view again without state.
+    await routerPage.view.tab.click();
+    await routerPage.navigate(['test-view']);
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({});
+    await expect(appPO.views()).toHaveCount(2);
+
+    // Navigate view again with different state.
+    await routerPage.view.tab.click();
+    await routerPage.navigate(['test-view'], {
+      state: {state3: 'state 3'},
+    });
+    await expect.poll(() => viewPage.getNavigationState()).toEqual({state3: 'state 3'});
+    await expect(appPO.views()).toHaveCount(2);
   });
 });

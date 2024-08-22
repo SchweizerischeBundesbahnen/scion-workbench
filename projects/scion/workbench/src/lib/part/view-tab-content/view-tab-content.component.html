@@ -1,12 +1,12 @@
 <span class="title e2e-title">
-  @if (view.dirty) {
+  @if (view.dirty()) {
     <span class="scion-workbench-icons dirty e2e-dirty">dirty</span>
   }
-  {{view.title}}
+  {{view.title()}}
 </span>
 
-@if (view.heading) {
+@if (view.heading()) {
   <span class="heading e2e-heading">
-    {{view.heading}}
+    {{view.heading()}}
   </span>
 }

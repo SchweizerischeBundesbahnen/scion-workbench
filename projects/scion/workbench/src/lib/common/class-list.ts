@@ -8,68 +8,97 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable, Subject} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
+import {computed, Signal, signal} from '@angular/core';
 
 /**
  * Container for managing CSS classes set in different scopes.
  */
 export class ClassList {
 
-  private readonly _cssClasses = new Map<ClassListScopes, string[]>();
-  private readonly _change$ = new Subject<void>();
+  private readonly _layout = signal<string[]>([], {equal: isEqualArray});
+  private readonly _navigation = signal<string[]>([], {equal: isEqualArray});
+  private readonly _route = signal<string[]>([], {equal: isEqualArray});
+  private readonly _application = signal<string[]>([], {equal: isEqualArray});
 
-  public readonly value = new Array<string>();
-  public readonly value$: Observable<string[]>;
+  /**
+   * CSS classes as list.
+   */
+  public readonly asList: Signal<string[]>;
+
+  /**
+   * CSS classes as {@link Map} grouped by scope.
+   */
+  public readonly asMap: Signal<ClassListMap>;
 
   constructor() {
-    this.value$ = this._change$
-      .pipe(
-        startWith(undefined as void),
-        map(() => [...this.value]),
-      );
+    this.asList = computed(() => Arrays.distinct(new Array<string>()
+      .concat(this._layout())
+      .concat(this._navigation())
+      .concat(this._route())
+      .concat(this._application())));
+
+    this.asMap = computed(() => removeEmptyEntries(new Map<ClassListScopes, string[]>()
+      .set('layout', this._layout())
+      .set('navigation', this._navigation())
+      .set('route', this._route())
+      .set('application', this._application())));
   }
 
   /**
-   * Sets CSS classes for a specific scope.
+   * Specifies CSS classes defined by the layout.
    */
-  public set(cssClasses: string | string[] | null | undefined, options: {scope: ClassListScopes}): void {
-    this._cssClasses.set(options.scope, Arrays.coerce(cssClasses));
-    this.computeValue();
+  public set layout(cssClasses: string | string[] | null | undefined) {
+    this._layout.set(Arrays.coerce(cssClasses));
   }
 
   /**
-   * Retuns CSS classes of a specific scope.
+   * Returns CSS classes defined in the scope 'layout'.
    */
-  public get(options: {scope: ClassListScopes}): string[] {
-    return this._cssClasses.get(options.scope) ?? [];
+  public get layout(): Signal<string[]> {
+    return this._layout;
   }
 
   /**
-   * Removes CSS classes of a specific scope.
+   * Specifies CSS classes associated with the navigation.
    */
-  public remove(options: {scope: ClassListScopes}): void {
-    this._cssClasses.delete(options.scope);
-    this.computeValue();
+  public set navigation(cssClasses: string | string[] | null | undefined) {
+    this._navigation.set(Arrays.coerce(cssClasses));
   }
 
   /**
-   * Returns the CSS classes as readonly {@link Map} grouped by scope,
-   * useful to transfer the class list to a different browsing context.
+   * Returns CSS classes defined in the scope 'navigation'.
    */
-  public toMap(): ReadonlyMap<ClassListScopes, string[]> {
-    return new Map(this._cssClasses.entries());
+  public get navigation(): Signal<string[]> {
+    return this._navigation;
   }
 
   /**
-   * Computes the aggregated list of CSS classes.
+   * Specifies CSS classes defined by the route.
    */
-  private computeValue(): void {
-    this.value.length = 0;
-    const classes = new Set(Array.from(this._cssClasses.values()).flat());
-    classes.forEach(clazz => this.value.push(clazz));
-    this._change$.next();
+  public set route(cssClasses: string | string[] | null | undefined) {
+    this._route.set(Arrays.coerce(cssClasses));
+  }
+
+  /**
+   * Returns CSS classes defined in the scope 'route'.
+   */
+  public get route(): Signal<string[]> {
+    return this._route;
+  }
+
+  /**
+   * Specifies CSS classes set by the application.
+   */
+  public set application(cssClasses: string | string[] | null | undefined) {
+    this._application.set(Arrays.coerce(cssClasses));
+  }
+
+  /**
+   * Returns classes defined in the scope 'application'.
+   */
+  public get application(): Signal<string[]> {
+    return this._application;
   }
 }
 
@@ -87,3 +116,23 @@ export type ClassListScopes = 'layout' | 'navigation' | 'route' | 'application';
  * CSS classes grouped by scope.
  */
 export type ClassListMap = ReadonlyMap<ClassListScopes, string[]>;
+
+/**
+ * Creates a copy with empty map entries removed.
+ */
+function removeEmptyEntries<K, V>(map: Map<K, V[]>): Map<K, V[]> {
+  const copy = new Map<K, V[]>(map);
+  for (const key of copy.keys()) {
+    if (!copy.get(key)?.length) {
+      copy.delete(key);
+    }
+  }
+  return copy;
+}
+
+/**
+ * Compares two arrays of strings for equality, ignoring element order.
+ */
+function isEqualArray(a: string[], b: string[]): boolean {
+  return Arrays.isEqual(a, b, {exactOrder: false});
+}

@@ -11,4 +11,4 @@
 export {WorkbenchRouter} from './workbench-router.service';
 export {WorkbenchRouterLinkDirective} from './workbench-router-link.directive';
 export {WorkbenchRouteData} from './workbench-route-data';
-export {Commands, ViewState, NavigationData, WorkbenchNavigationExtras, NavigateFn} from './routing.model';
+export {Commands, NavigationData, NavigationState, WorkbenchNavigationExtras, NavigateFn} from './routing.model';

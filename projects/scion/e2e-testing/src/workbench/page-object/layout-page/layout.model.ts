@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, ReferencePart, ViewState, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {Commands, NavigationData, NavigationState, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -59,7 +59,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this;
   }
 
-  public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: ViewState; cssClass?: string | string[]}): WorkbenchLayout {
+  public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout {
     if (extras?.relativeTo) {
       throw Error('[PageObjectError] Property `relativeTo` in `WorkbenchLayout.navigateView` is not supported.');
     }
@@ -127,6 +127,6 @@ export interface ViewNavigationDescriptor {
   commands: Commands;
   hint?: string;
   data?: NavigationData;
-  state?: ViewState;
+  state?: NavigationState;
   cssClass?: string | string[];
 }

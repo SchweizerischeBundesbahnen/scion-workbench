@@ -9,7 +9,8 @@
  */
 
 import {ClassList} from './class-list';
-import {ObserveCaptor} from '@scion/toolkit/testing';
+import {effect} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
 
 describe('ClassList', () => {
 
@@ -17,32 +18,32 @@ describe('ClassList', () => {
     const classList = new ClassList();
 
     // Set CSS classes in different scopes.
-    classList.set(['testee-application-1', 'testee-application-2'], {scope: 'application'});
-    classList.set('testee-navigation', {scope: 'navigation'});
-    classList.set('testee-layout', {scope: 'layout'});
+    classList.application = ['testee-application-1', 'testee-application-2'];
+    classList.navigation = 'testee-navigation';
+    classList.layout = 'testee-layout';
 
-    expect(classList.value).toEqual(jasmine.arrayWithExactContents([
+    expect(classList.asList()).toEqual(jasmine.arrayWithExactContents([
       'testee-application-1',
       'testee-application-2',
       'testee-navigation',
       'testee-layout',
     ]));
-    expect(classList.get({scope: 'application'})).toEqual(jasmine.arrayWithExactContents([
+    expect(classList.application()).toEqual(jasmine.arrayWithExactContents([
       'testee-application-1',
       'testee-application-2',
     ]));
-    expect(classList.get({scope: 'navigation'})).toEqual(['testee-navigation']);
-    expect(classList.get({scope: 'layout'})).toEqual(['testee-layout']);
-    expect(classList.get({scope: 'route'})).toEqual([]);
+    expect(classList.navigation()).toEqual(['testee-navigation']);
+    expect(classList.layout()).toEqual(['testee-layout']);
+    expect(classList.route()).toEqual([]);
   });
 
   it('should not overwrite CSS classes of other scopes', () => {
     const classList = new ClassList();
-    classList.set('testee-application', {scope: 'application'});
+    classList.application = 'testee-application';
 
     // Overwrite CSS classes of scope 'layout'.
-    classList.set('testee-layout', {scope: 'layout'});
-    expect(classList.value).toEqual(jasmine.arrayWithExactContents([
+    classList.layout = 'testee-layout';
+    expect(classList.asList()).toEqual(jasmine.arrayWithExactContents([
       'testee-application',
       'testee-layout',
     ]));
@@ -50,56 +51,38 @@ describe('ClassList', () => {
 
   it('should remove CSS classes by scope', () => {
     const classList = new ClassList();
-    classList.set('testee-application', {scope: 'application'});
-    classList.set('testee-layout', {scope: 'layout'});
+    classList.application = 'testee-application';
+    classList.layout = 'testee-layout';
 
     // Remove CSS classes of scope 'layout'.
-    classList.remove({scope: 'layout'});
-    expect(classList.value).toEqual(['testee-application']);
+    classList.layout = null;
+    expect(classList.asList()).toEqual(['testee-application']);
   });
 
   it('should remove duplicate CSS classes', () => {
     const classList = new ClassList();
-    classList.set(['testee', 'testee-application'], {scope: 'application'});
-    classList.set(['testee', 'testee-layout'], {scope: 'layout'});
+    classList.application = ['testee', 'testee-application'];
+    classList.layout = ['testee', 'testee-layout'];
 
     // Remove CSS classes of scope 'layout'.
-    expect(classList.value).toEqual(jasmine.arrayWithExactContents([
+    expect(classList.asList()).toEqual(jasmine.arrayWithExactContents([
       'testee',
       'testee-application',
       'testee-layout',
     ]));
   });
 
-  it('should return same reference to value array', () => {
-    const classList = new ClassList();
-    const value = classList.value;
-
-    // Set CSS classes in scope 'application'.
-    classList.set('testee-application-1', {scope: 'application'});
-    expect(value).toEqual(['testee-application-1']);
-
-    // Replace CSS classes in scope 'application'.
-    classList.set('testee-application-2', {scope: 'application'});
-    expect(value).toEqual(['testee-application-2']);
-
-    // Set CSS classes in scope 'layout'.
-    classList.set(['testee-layout-1', 'testee-layout-2'], {scope: 'layout'});
-    expect(value).toEqual(jasmine.arrayWithExactContents([
-      'testee-layout-1',
-      'testee-layout-2',
-      'testee-application-2',
-    ]));
-  });
-
   it('should emit on change', () => {
     const classList = new ClassList();
-    const captor = new ObserveCaptor();
-    classList.value$.subscribe(captor);
+    const captor = new Array<string[]>();
+
+    TestBed.runInInjectionContext(() => effect(() => captor.push(classList.asList())));
+    TestBed.flushEffects();
 
     // Set CSS classes in scope 'application'.
-    classList.set('testee-application-1', {scope: 'application'});
-    expect(captor.getValues()).toEqual([
+    classList.application = 'testee-application-1';
+    TestBed.flushEffects();
+    expect(captor).toEqual([
       [],
       jasmine.arrayWithExactContents([
         'testee-application-1',
@@ -107,8 +90,9 @@ describe('ClassList', () => {
     ]);
 
     // Set CSS classes in scope 'layout'.
-    classList.set(['testee-layout-1', 'testee-layout-2'], {scope: 'layout'});
-    expect(captor.getValues()).toEqual([
+    classList.layout = ['testee-layout-1', 'testee-layout-2'];
+    TestBed.flushEffects();
+    expect(captor).toEqual([
       [],
       jasmine.arrayWithExactContents([
         'testee-application-1',
@@ -121,8 +105,9 @@ describe('ClassList', () => {
     ]);
 
     // Replace CSS classes in scope 'application'.
-    classList.set(['testee-application-3'], {scope: 'application'});
-    expect(captor.getValues()).toEqual([
+    classList.application = ['testee-application-3'];
+    TestBed.flushEffects();
+    expect(captor).toEqual([
       [],
       jasmine.arrayWithExactContents([
         'testee-application-1',
@@ -144,11 +129,11 @@ describe('ClassList', () => {
     const classList = new ClassList();
 
     // Set CSS classes in different scopes.
-    classList.set(['testee-application-1', 'testee-application-2'], {scope: 'application'});
-    classList.set('testee-navigation', {scope: 'navigation'});
-    classList.set('testee-layout', {scope: 'layout'});
+    classList.application = ['testee-application-1', 'testee-application-2'];
+    classList.navigation = 'testee-navigation';
+    classList.layout = 'testee-layout';
 
-    const actual = classList.toMap();
+    const actual = classList.asMap();
     expect(actual).toEqual(new Map()
       .set('navigation', ['testee-navigation'])
       .set('layout', ['testee-layout'])
@@ -156,11 +141,53 @@ describe('ClassList', () => {
     );
 
     // Expect Map to be immutable.
-    classList.set('testee-layout-2', {scope: 'layout'});
+    classList.layout = 'testee-layout-2';
     expect(actual).toEqual(new Map()
       .set('navigation', ['testee-navigation'])
       .set('layout', ['testee-layout'])
       .set('application', ['testee-application-1', 'testee-application-2']),
     );
+  });
+
+  it('should not change if setting same CSS classes', () => {
+    const classList = new ClassList();
+    const captor = new Array<string[]>();
+
+    TestBed.runInInjectionContext(() => effect(() => captor.push(classList.asList())));
+
+    // Set CSS classes.
+    classList.application = ['a'];
+    classList.route = ['b'];
+    classList.navigation = ['c'];
+    classList.layout = ['d'];
+    TestBed.flushEffects();
+    expect(captor).toEqual([
+      jasmine.arrayWithExactContents(['a', 'b', 'c', 'd']),
+    ]);
+
+    // Set same CSS classes.
+    classList.application = ['a'];
+    classList.route = ['b'];
+    classList.navigation = ['c'];
+    classList.layout = ['d'];
+    TestBed.flushEffects();
+
+    // Expect no change.
+    expect(captor).toEqual([
+      jasmine.arrayWithExactContents(['a', 'b', 'c', 'd']),
+    ]);
+
+    // Set different CSS classes.
+    classList.application = ['A'];
+    classList.route = ['b'];
+    classList.navigation = ['C'];
+    classList.layout = ['d'];
+    TestBed.flushEffects();
+
+    // Expect change.
+    expect(captor).toEqual([
+      jasmine.arrayWithExactContents(['a', 'b', 'c', 'd']),
+      jasmine.arrayWithExactContents(['A', 'b', 'C', 'd']),
+    ]);
   });
 });

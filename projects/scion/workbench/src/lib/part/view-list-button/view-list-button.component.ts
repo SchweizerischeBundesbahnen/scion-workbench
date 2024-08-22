@@ -8,26 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ComponentRef, DestroyRef, ElementRef, HostListener, Injector, NgZone, OnDestroy} from '@angular/core';
+import {Component, ComponentRef, computed, DestroyRef, ElementRef, HostListener, Injector, NgZone, OnDestroy, Signal} from '@angular/core';
 import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent, ViewListComponentInputs} from '../view-list/view-list.component';
 import {WorkbenchPart} from '../workbench-part.model';
-import {mapArray, subscribeInside} from '@scion/toolkit/operators';
-import {combineLatest, Observable, switchMap} from 'rxjs';
-import {debounceTime, map} from 'rxjs/operators';
+import {subscribeInside} from '@scion/toolkit/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
-import {AsyncPipe} from '@angular/common';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
   styleUrls: ['./view-list-button.component.scss'],
   standalone: true,
-  imports: [
-    AsyncPipe,
-  ],
 })
 export class ViewListButtonComponent implements OnDestroy {
 
@@ -35,8 +29,8 @@ export class ViewListButtonComponent implements OnDestroy {
   private static readonly NORTH: ConnectedPosition = {originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom'};
 
   private _overlayRef: OverlayRef | undefined;
-
-  public scrolledOutOfViewTabCount$: Observable<number>;
+  /** Number of views that are scrolled out of the tab bar. */
+  protected scrolledOutOfViewTabCount: Signal<number>;
 
   constructor(private _host: ElementRef,
               private _overlay: Overlay,
@@ -44,13 +38,9 @@ export class ViewListButtonComponent implements OnDestroy {
               private _zone: NgZone,
               part: WorkbenchPart,
               viewRegistry: WorkbenchViewRegistry) {
-    this.scrolledOutOfViewTabCount$ = toObservable(part.viewIds)
-      .pipe(
-        mapArray(viewId => viewRegistry.get(viewId)),
-        switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),
-        map(views => views.reduce((count, view) => view.scrolledIntoView ? count : count + 1, 0)),
-        debounceTime(25),
-      );
+    this.scrolledOutOfViewTabCount = computed(() => part.viewIds()
+      .map(viewId => viewRegistry.get(viewId))
+      .reduce((count, view) => view.scrolledIntoView() ? count : count + 1, 0));
   }
 
   @HostListener('click')

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {CanClose, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -111,16 +111,14 @@ export default class ViewPageComponent implements CanClose {
   }
 
   private installViewActiveStateLogger(): void {
-    this.view.active$
-      .pipe(takeUntilDestroyed())
-      .subscribe(active => {
-        if (active) {
-          console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
-        }
-        else {
-          console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
-        }
-      });
+    effect(() => {
+      if (this.view.active()) {
+        console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
+      }
+      else {
+        console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
+      }
+    });
   }
 
   private installCssClassUpdater(): void {

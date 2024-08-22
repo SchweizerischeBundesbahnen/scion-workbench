@@ -1,23 +1,15 @@
 <wb-filter-field [formControl]="filterFormControl"/>
-@if ({
-  scrolledOutOfView: views$ | async |
-    wbFilterByPredicate:scrolledOutOfViewFilterFn |
-    wbFilterByText$:filterFormControl:viewTextFn | async,
-  scrolledIntoView: views$ | async |
-    wbFilterByPredicate:scrolledIntoViewFilterFn |
-    wbFilterByText$:filterFormControl:viewTextFn | async
-}; as views) {
-  @if (views.scrolledOutOfView?.length || views.scrolledIntoView?.length) {
-    <sci-viewport>
-      @for (view of views.scrolledOutOfView; track view.id) {
-        <wb-view-list-item [viewId]="view.id" (click)="onActivateView(view)"/>
-      }
-      @if (views.scrolledOutOfView?.length && views.scrolledIntoView?.length) {
-        <hr>
-      }
-      @for (view of views.scrolledIntoView; track view.id) {
-        <wb-view-list-item [viewId]="view.id" (click)="onActivateView(view)"/>
-      }
-    </sci-viewport>
-  }
+
+@if (viewsOutsideTabbar().length || viewsInsideTabbar().length) {
+  <sci-viewport>
+    @for (view of viewsOutsideTabbar(); track view.id) {
+      <wb-view-list-item [viewId]="view.id" (click)="onActivateView(view)"/>
+    }
+    @if (viewsOutsideTabbar().length && viewsInsideTabbar().length) {
+      <hr>
+    }
+    @for (view of viewsInsideTabbar(); track view.id) {
+      <wb-view-list-item [viewId]="view.id" (click)="onActivateView(view)"/>
+    }
+  </sci-viewport>
 }

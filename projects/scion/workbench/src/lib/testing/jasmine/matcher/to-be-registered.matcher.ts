@@ -28,8 +28,8 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
           return fail(`Expected view '${viewId}' to be registered in 'WorkbenchViewRegistry'.`);
         }
         // Assert the view to reference the expected part.
-        if (view.part.id !== expected.partId) {
-          return fail(`Expected view '${viewId}' to reference part '${expected.partId}', but instead referencing part '${view.part.id}'.`);
+        if (view.part().id !== expected.partId) {
+          return fail(`Expected view '${viewId}' to reference part '${expected.partId}', but instead referencing part '${view.part().id}'.`);
         }
         // Assert the view to be contained in the expected part.
         const viewIds = TestBed.inject(WorkbenchPartRegistry).get(expected.partId, {orElse: null})?.viewIds();
@@ -38,19 +38,19 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
         }
         // Assert the view's active state.
         if (expected.active) {
-          if (!view.active) {
+          if (!view.active()) {
             return fail(`Expected view '${viewId}' to be active.`);
           }
-          if (view.part.activeViewId !== view.id) {
-            return fail(`Expected view '${viewId}' to be the active view in its part '${view.part.id}', But, view '${view.part.activeViewId}' is the active view.`);
+          if (view.part().activeViewId() !== view.id) {
+            return fail(`Expected view '${viewId}' to be the active view in its part '${view.part().id}', But, view '${view.part().activeViewId()}' is the active view.`);
           }
         }
         else {
-          if (view.active) {
+          if (view.active()) {
             return fail(`Expected view '${viewId}' to be inactive.`);
           }
-          if (view.part.activeViewId === view.id) {
-            return fail(`Expected view '${viewId}' to be inactive, but is the active view in its part '${view.part.id}'.`);
+          if (view.part().activeViewId() === view.id) {
+            return fail(`Expected view '${viewId}' to be inactive, but is the active view in its part '${view.part().id}'.`);
           }
         }
 
