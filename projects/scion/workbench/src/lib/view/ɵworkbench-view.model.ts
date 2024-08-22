@@ -194,12 +194,12 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get last(): boolean {
-    return this.position === this.part.viewIds.length - 1;
+    return this.position === this.part.viewIds().length - 1;
   }
 
   /** @inheritDoc */
   public get position(): number {
-    return this.part.viewIds.indexOf(this.id);
+    return this.part.viewIds().indexOf(this.id);
   }
 
   /** @inheritDoc */
@@ -229,7 +229,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
-    if (this.active && this.part.active) {
+    if (this.active && this.part.active()) {
       return true;
     }
 
@@ -276,17 +276,17 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         return this._workbenchService.closeViews(this.id);
       }
       case 'all-views': {
-        return this._workbenchService.closeViews(...this.part.viewIds);
+        return this._workbenchService.closeViews(...this.part.viewIds());
       }
       case 'other-views': {
-        return this._workbenchService.closeViews(...this.part.viewIds.filter(viewId => viewId !== this.id));
+        return this._workbenchService.closeViews(...this.part.viewIds().filter(viewId => viewId !== this.id));
       }
       case 'views-to-the-right': {
-        const viewIds = this.part.viewIds;
+        const viewIds = this.part.viewIds();
         return this._workbenchService.closeViews(...viewIds.slice(viewIds.indexOf(this.id) + 1));
       }
       case 'views-to-the-left': {
-        const viewIds = this.part.viewIds;
+        const viewIds = this.part.viewIds();
         return this._workbenchService.closeViews(...viewIds.slice(0, viewIds.indexOf(this.id)));
       }
       default: {

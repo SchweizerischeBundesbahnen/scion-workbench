@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, Signal} from '@angular/core';
 import {WorkbenchPart} from '../workbench-part.model';
-import {AsyncPipe, NgClass} from '@angular/common';
-import {PartActionFilterPipe} from './part-action-filter.pipe';
-import {NullIfEmptyPipe} from '../../common/null-if-empty.pipe';
+import {NgClass} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
+import {WorkbenchPartAction} from '../../workbench.model';
 
 @Component({
   selector: 'wb-part-action-bar',
@@ -22,15 +21,17 @@ import {PortalModule} from '@angular/cdk/portal';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    AsyncPipe,
     NgClass,
     PortalModule,
-    PartActionFilterPipe,
-    NullIfEmptyPipe,
   ],
 })
 export class PartActionBarComponent {
 
-  constructor(public part: WorkbenchPart) {
+  protected startActions: Signal<WorkbenchPartAction[]>;
+  protected endActions: Signal<WorkbenchPartAction[]>;
+
+  constructor(part: WorkbenchPart) {
+    this.startActions = computed(() => part.actions().filter(action => action.align !== 'end'));
+    this.endActions = computed(() => part.actions().filter(action => action.align === 'end'));
   }
 }

@@ -23,6 +23,7 @@ import {FilterByPredicatePipe} from '../../common/filter-by-predicate.pipe';
 import {FilterByTextPipe} from '../../common/filter-by-text.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
+import {toObservable} from '@angular/core/rxjs-interop';
 
 /**
  * Reference to inputs of {@link ViewListComponent}.
@@ -71,7 +72,7 @@ export class ViewListComponent implements OnInit {
   constructor(private _part: WorkbenchPart,
               viewRegistry: WorkbenchViewRegistry,
               private _overlayRef: OverlayRef) {
-    this.views$ = this._part.viewIds$
+    this.views$ = toObservable(this._part.viewIds)
       .pipe(
         mapArray(viewId => viewRegistry.get(viewId)),
         switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),

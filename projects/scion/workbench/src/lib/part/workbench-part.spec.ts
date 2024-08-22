@@ -70,14 +70,14 @@ describe('WorkbenchPart', () => {
     await waitForInitialWorkbenchLayout();
 
     // Expect part 'left-top' to be active.
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active).toBeTrue();
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active).toBeFalse();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active()).toBeTrue();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active()).toBeFalse();
 
     // WHEN activating already active view
     await TestBed.inject(WorkbenchViewRegistry).get('view.102').activate();
 
     // THEN expect part to be activated.
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active).toBeFalse();
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active).toBeTrue();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active()).toBeFalse();
+    expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active()).toBeTrue();
   });
 });

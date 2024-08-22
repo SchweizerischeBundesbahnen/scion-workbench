@@ -79,7 +79,7 @@ export class ViewComponent implements OnDestroy {
     viewport.scrollLeft = this._view.scrollLeft;
 
     // Gain focus only if in the active part.
-    if (this._view.part.active) {
+    if (this._view.part.active()) {
       viewport.focus();
     }
   }

@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BehaviorSubject, Observable, switchMap} from 'rxjs';
-import {EnvironmentInjector, inject, Injector, runInInjectionContext} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
+import {computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal, untracked} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
@@ -16,14 +16,13 @@ import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
-import {filterArray} from '@scion/toolkit/operators';
-import {distinctUntilChanged, filter, map} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewId} from '../view/workbench-view.model';
 import {Event, NavigationStart, Router, RouterEvent} from '@angular/router';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -37,16 +36,16 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
 
-  public readonly active$ = new BehaviorSubject<boolean>(false);
-  public readonly viewIds$ = new BehaviorSubject<ViewId[]>([]);
+  public readonly active = signal(false);
+  public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId$ = new BehaviorSubject<ViewId | null>(null);
-  public readonly actions$: Observable<readonly WorkbenchPartAction[]>;
+  public readonly actions: Signal<WorkbenchPartAction[]>;
 
   private _isInMainArea: boolean | undefined;
 
   constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaLayoutComponent>}) {
     this._partComponent = options.component;
-    this.actions$ = this.observePartActions$();
+    this.actions = this.selectPartActions();
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange(this._workbenchRouter.getCurrentNavigationContext().layout);
@@ -76,27 +75,12 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
     const mPart = layout.part({partId: this.id});
     const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
-    const prevViewIds = this.viewIds$.value;
-    const currViewIds = mPart.views.map(view => view.id);
-
-    // Update active part if changed
-    if (this.active !== active) {
-      this.active$.next(active);
-    }
-
-    // Update views if changed
-    if (!Arrays.isEqual(prevViewIds, currViewIds, {exactOrder: true})) {
-      this.viewIds$.next(currViewIds);
-    }
-
+    this.active.set(active);
+    this.viewIds.set(mPart.views.map(view => view.id));
     // Update active view if changed
     if (this.activeViewId !== mPart.activeViewId) {
       this.activeViewId$.next(mPart.activeViewId ?? null);
     }
-  }
-
-  public get viewIds(): ViewId[] {
-    return this.viewIds$.value;
   }
 
   public get activeViewId(): ViewId | null {
@@ -109,7 +93,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public async activate(): Promise<boolean> {
-    if (this.active) {
+    if (this.active()) {
       return true;
     }
 
@@ -118,10 +102,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       layout => currentLayout === layout ? layout.activatePart(this.id) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: true}, // do not add part activation into browser history stack
     );
-  }
-
-  public get active(): boolean {
-    return this.active$.value;
   }
 
   public get activationInstant(): number | undefined {
@@ -140,31 +120,34 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /**
-   * Emits actions that have contributed to this part and the currently active view.
+   * Selects actions matching this part and the currently active view.
    */
-  private observePartActions$(): Observable<WorkbenchPartAction[]> {
+  private selectPartActions(): Signal<WorkbenchPartAction[]> {
     const injector = inject(Injector);
-    return this._partActionRegistry.actions$
-      .pipe(
-        switchMap(actions => this.activeViewId$.pipe(map(() => actions))),
-        // Run in injection context for `canMatch` function to inject dependencies.
-        filterArray((action: WorkbenchPartAction): boolean => runInInjectionContext(injector, () => action.canMatch?.(this) ?? true)),
-        distinctUntilChanged(),
-      );
+
+    const actions = toSignal(this._partActionRegistry.actions$, {requireSync: true});
+    const activeViewId = toSignal(this.activeViewId$, {requireSync: true});
+    return computed(() => {
+      // Add the part's active view to the reactive (tracking) context, evaluating the `canMatch` function also when the active view changes.
+      activeViewId();
+      // Filter actions by calling `canMatch`, if any.
+      return actions().filter(action => {
+        // - Execute function in non-reactive (non-tracking) context.
+        // - Run function in injection context for `canMatch` function to inject dependencies.
+        return untracked(() => runInInjectionContext(injector, () => action.canMatch?.(this) ?? true));
+      });
+    });
   }
 
   /**
    * Updates the activation instant when this part is activated.
    */
   private touchOnActivate(): void {
-    this.active$
-      .pipe(
-        filter(Boolean),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
+    effect(() => {
+      if (this.active()) {
         this._activationInstant = this._activationInstantProvider.now();
-      });
+      }
+    });
   }
 
   /**

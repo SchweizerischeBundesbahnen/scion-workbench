@@ -1,6 +1,6 @@
-@if (part.actions$ | async | wbPartActionFilter:'start' | wbNullIfEmpty; as startActions) {
+@if (startActions().length) {
   <ul class="start">
-    @for (startAction of startActions; track startAction) {
+    @for (startAction of startActions(); track startAction) {
       <li class="e2e-part-action" [ngClass]="startAction.cssClass">
         <ng-container *cdkPortalOutlet="startAction.portal"/>
       </li>
@@ -8,9 +8,9 @@
   </ul>
 }
 
-@if (part.actions$ | async | wbPartActionFilter:'end' | wbNullIfEmpty; as endActions) {
+@if (endActions().length) {
   <ul class="end">
-    @for (endAction of endActions; track endAction) {
+    @for (endAction of endActions(); track endAction) {
       <li class="e2e-part-action" [ngClass]="endAction.cssClass">
         <ng-container *cdkPortalOutlet="endAction.portal"/>
       </li>

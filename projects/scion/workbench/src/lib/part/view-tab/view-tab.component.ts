@@ -94,7 +94,7 @@ export class ViewTabComponent implements OnChanges {
 
   @HostBinding('class.part-active')
   public get partActive(): boolean {
-    return this.view.part.active;
+    return this.view.part.active();
   }
 
   @HostBinding('class.e2e-dirty')
