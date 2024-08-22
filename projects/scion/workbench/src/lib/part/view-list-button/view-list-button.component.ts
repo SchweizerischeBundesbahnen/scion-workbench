@@ -18,7 +18,7 @@ import {combineLatest, Observable, switchMap} from 'rxjs';
 import {debounceTime, map} from 'rxjs/operators';
 import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
 import {AsyncPipe} from '@angular/common';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'wb-view-list-button',
@@ -44,7 +44,7 @@ export class ViewListButtonComponent implements OnDestroy {
               private _zone: NgZone,
               part: WorkbenchPart,
               viewRegistry: WorkbenchViewRegistry) {
-    this.scrolledOutOfViewTabCount$ = part.viewIds$
+    this.scrolledOutOfViewTabCount$ = toObservable(part.viewIds)
       .pipe(
         mapArray(viewId => viewRegistry.get(viewId)),
         switchMap(views => combineLatest(views.map(view => view.scrolledIntoView$.pipe(map(() => view))))),

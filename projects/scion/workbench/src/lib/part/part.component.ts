@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, inject, Injector, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {combineLatestWith, EMPTY, from, fromEvent, merge, mergeMap, switchMap} from 'rxjs';
+import {ChangeDetectorRef, Component, ElementRef, HostBinding, Inject, inject, Injector, OnDestroy, OnInit} from '@angular/core';
+import {EMPTY, from, fromEvent, merge, mergeMap, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
-import {take} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
@@ -22,7 +21,7 @@ import {RouterOutlet} from '@angular/router';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 
 @Component({
@@ -61,7 +60,7 @@ export class PartComponent implements OnInit, OnDestroy {
 
   @HostBinding('class.active')
   public get isActive(): boolean {
-    return this.part.active;
+    return this.part.active();
   }
 
   constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
@@ -111,7 +110,7 @@ export class PartComponent implements OnInit, OnDestroy {
    * Constructs view components of inactive views, so they can initialize, e.g., to set the view tab title.
    */
   private constructInactiveViewComponents(): void {
-    this.part.viewIds$
+    toObservable(this.part.viewIds)
       .pipe(
         mapArray(viewId => this._viewRegistry.get(viewId)),
         filterArray(view => !view.active && !view.portal.isConstructed),
@@ -128,13 +127,9 @@ export class PartComponent implements OnInit, OnDestroy {
   private activatePartOnFocusIn(): void {
     const host = inject(ElementRef).nativeElement;
 
-    this.part.active$
+    toObservable(this.part.active)
       .pipe(
-        // Wait until the zone has stabilized to not activate the part on creation, but only on user interaction.
-        // For example, if the view sets the initial focus, the related `focusin` event should not activate the part.
-        combineLatestWith(inject(NgZone).onStable.pipe(take(1))),
-        // Suspend listening for `focusin` or `sci-microfrontend-focusin` events while this part is active.
-        switchMap(([active]) => active ? EMPTY : merge(fromEvent<FocusEvent>(host, 'focusin', {once: true}), fromEvent(host, 'sci-microfrontend-focusin', {once: true}))),
+        switchMap(active => active ? EMPTY : merge(fromEvent<FocusEvent>(host, 'focusin', {once: true}), fromEvent(host, 'sci-microfrontend-focusin', {once: true}))),
         takeUntilDestroyed(),
       )
       .subscribe(() => {

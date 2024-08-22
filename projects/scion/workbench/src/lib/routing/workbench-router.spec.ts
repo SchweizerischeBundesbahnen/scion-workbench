@@ -72,7 +72,7 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      return TestBed.inject(WorkbenchService).parts.find(part => part.isInMainArea && part.active)!;
+      return TestBed.inject(WorkbenchService).parts.find(part => part.isInMainArea && part.active())!;
     }
   });
 
@@ -124,7 +124,7 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      return TestBed.inject(WorkbenchService).parts.find(part => part.isInMainArea && part.active)!;
+      return TestBed.inject(WorkbenchService).parts.find(part => part.isInMainArea && part.active())!;
     }
   });
 

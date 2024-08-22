@@ -32,7 +32,7 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
           return fail(`Expected view '${viewId}' to reference part '${expected.partId}', but instead referencing part '${view.part.id}'.`);
         }
         // Assert the view to be contained in the expected part.
-        const viewIds = TestBed.inject(WorkbenchPartRegistry).get(expected.partId, {orElse: null})?.viewIds;
+        const viewIds = TestBed.inject(WorkbenchPartRegistry).get(expected.partId, {orElse: null})?.viewIds();
         if (!viewIds?.includes(viewId)) {
           return fail(`Expected view '${viewId}' to be contained in part '${expected.partId}'. But, part '${expected.partId}' contains the following views: '${viewIds}'.`);
         }

@@ -2,7 +2,7 @@
               [class.dragover]="dragover$ | async"
               sciDimension (sciDimensionChange)="onTabbarViewportDimensionChange()"
               (scroll)="onScroll()">
-  @for (viewId of viewIds$ | async; track viewId) {
+  @for (viewId of part.viewIds(); track viewId) {
     @if (viewtab === dropTargetViewTab) {
       <div class="divider"></div>
     }

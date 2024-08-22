@@ -27,7 +27,6 @@ import {ViewListButtonComponent} from '../view-list-button/view-list-button.comp
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {fromDimension$} from '@scion/toolkit/observable';
 import {WORKBENCH_ID} from '../../workbench-id';
-import {ViewId} from '../../view/workbench-view.model';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -137,15 +136,15 @@ export class PartBarComponent implements OnInit {
 
   constructor(host: ElementRef<HTMLElement>,
               @Inject(WORKBENCH_ID) private _workbenchId: string,
+              protected part: ɵWorkbenchPart,
               private _workbenchLayoutService: WorkbenchLayoutService,
               private _router: ɵWorkbenchRouter,
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
-              private _part: ɵWorkbenchPart,
               private _viewDragService: ViewDragService,
               private _destroyRef: DestroyRef,
               private _zone: NgZone) {
     this._host = host.nativeElement;
-    this.dragover$ = this._viewDragService.tabbarDragOver$.pipe(map(partId => partId === this._part.id));
+    this.dragover$ = this._viewDragService.tabbarDragOver$.pipe(map(partId => partId === this.part.id));
   }
 
   public ngOnInit(): void {
@@ -158,14 +157,10 @@ export class PartBarComponent implements OnInit {
 
   @HostListener('dblclick', ['$event'])
   public onDoubleClick(event: MouseEvent): void {
-    if (this._part.isInMainArea) {
+    if (this.part.isInMainArea) {
       this._router.navigate(layout => layout.toggleMaximized()).then();
     }
     event.stopPropagation();
-  }
-
-  public get viewIds$(): Observable<ViewId[]> {
-    return this._part.viewIds$;
   }
 
   public onTabbarViewportDimensionChange(): void {
@@ -193,7 +188,7 @@ export class PartBarComponent implements OnInit {
     // Constrain function for snapping the drag image to the tabbar when dragging near it.
     this._constrainFn = this.createDragImageConstrainFn();
     this._viewTabDragImageRenderer.setConstrainDragImageRectFn(this._constrainFn);
-    this._viewDragService.setTabbarDragover(this._part.id);
+    this._viewDragService.setTabbarDragover(this.part.id);
 
     // When start dragging a view tab, we remove it from the tabbar by setting its `display` to `none` and render its drag image in `ViewTabDragImageRenderer` instead.
     // However, do not unset the `display` of the drag source during `dragstart`. Otherwise, the native drag operation would be corrupted in Chrome and Edge (but not in Firefox).
@@ -235,7 +230,7 @@ export class PartBarComponent implements OnInit {
    */
   private onTabbarDragEnter(event: DragEvent): void {
     this._dragenter$.next();
-    this._viewDragService.setTabbarDragover(this._part.id);
+    this._viewDragService.setTabbarDragover(this.part.id);
     this._dragData = this._viewDragService.viewDragData!;
 
     // Constrain function for snapping the drag image to the tabbar when dragging near it.
@@ -311,7 +306,7 @@ export class PartBarComponent implements OnInit {
       target: {
         workbenchId: this._workbenchId,
         position: this.dropTargetViewTab === 'end' ? 'end' : this._viewTabs.indexOf(this.dropTargetViewTab!),
-        elementId: this._part.id,
+        elementId: this.part.id,
       },
     });
 
@@ -432,7 +427,7 @@ export class PartBarComponent implements OnInit {
 
     unsetCssClass(this._host, 'drag-over');
     unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-image-placeholder-width');
-    this._viewDragService.unsetTabbarDragover(this._part.id);
+    this._viewDragService.unsetTabbarDragover(this.part.id);
   }
 
   private get _viewTabs(): ViewTabComponent[] {

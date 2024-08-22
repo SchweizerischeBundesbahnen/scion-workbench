@@ -1,6 +1,17 @@
+/*
+ * Copyright (c) 2018-2024 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
 import {Observable} from 'rxjs';
 import {WorkbenchPartAction} from '../workbench.model';
 import {ViewId} from '../view/workbench-view.model';
+import {Signal} from '@angular/core';
 
 /**
  * Represents a part of the workbench layout.
@@ -24,14 +35,7 @@ export abstract class WorkbenchPart {
   /**
    * Indicates whether this part is active or inactive.
    */
-  public abstract readonly active: boolean;
-
-  /**
-   * Notifies when this part becomes active or inactive.
-   *
-   * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
-   */
-  public abstract readonly active$: Observable<boolean>;
+  public abstract readonly active: Signal<boolean>;
 
   /**
    * Emits the currently active view in this part.
@@ -44,22 +48,12 @@ export abstract class WorkbenchPart {
   public abstract readonly activeViewId: ViewId | null;
 
   /**
-   * Emits the views opened in this part.
-   *
-   * Upon subscription, emits the current views, and then each time the views change. The observable never completes.
+   * Identifies views opened in this part.
    */
-  public abstract readonly viewIds$: Observable<ViewId[]>;
+  public abstract readonly viewIds: Signal<ViewId[]>;
 
   /**
-   * The currently opened views in this part.
+   * Actions matching this part and its active view.
    */
-  public abstract readonly viewIds: ViewId[];
-
-  /**
-   * Emits actions associated with this part.
-   *
-   * Upon subscription, the currently associated actions are emitted, and then emits continuously
-   * when new actions are registered or unregistered. It never completes.
-   */
-  public abstract readonly actions$: Observable<readonly WorkbenchPartAction[]>;
+  public abstract readonly actions: Signal<WorkbenchPartAction[]>;
 }
