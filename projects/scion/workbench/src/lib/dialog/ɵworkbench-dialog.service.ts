@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, Injector, NgZone, Optional, runInInjectionContext} from '@angular/core';
+import {createEnvironmentInjector, EnvironmentInjector, inject, Injectable, NgZone, Optional, runInInjectionContext} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
@@ -20,6 +20,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialogService} from './workbench-dialog.service';
 import {DOCUMENT} from '@angular/common';
 import {provideViewContext} from '../view/view-context-provider';
+import {UUID} from '@scion/toolkit/uuid';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -30,7 +31,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
   constructor(private _viewRegistry: WorkbenchViewRegistry,
               private _dialogRegistry: WorkbenchDialogRegistry,
               private _zone: NgZone,
-              private _injector: Injector,
+              private _environmentInjector: EnvironmentInjector,
               @Optional() private _view?: ɵWorkbenchView) {
   }
 
@@ -50,15 +51,8 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
       await this.waitUntilApplicationModalDialogsClosed();
     }
 
-    // Propagate view context.
-    const injector = Injector.create({
-      parent: options?.injector ?? this._injector,
-      providers: [
-        provideViewContext(contextualView),
-      ],
-    });
-
-    const dialog = runInInjectionContext(injector, () => new ɵWorkbenchDialog<R>(component, options ?? {}));
+    // Create the dialog.
+    const dialog = this.createDialog<R>(component, {...options, contextualView});
     this._dialogRegistry.register(dialog);
 
     // Capture focused element to restore focus when closing the dialog.
@@ -74,6 +68,16 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
         previouslyFocusedElement.focus();
       }
     }
+  }
+
+  /**
+   * Creates the dialog handle.
+   */
+  private createDialog<R>(component: ComponentType<unknown>, options: WorkbenchDialogOptions & {contextualView: ɵWorkbenchView | null}): ɵWorkbenchDialog<R> {
+    // Construct the handle in an injection context that shares the dialog's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
+    const dialogId = UUID.randomUUID();
+    const dialogEnvironmentInjector = createEnvironmentInjector([provideViewContext(options.contextualView)], this._environmentInjector, `Workbench Dialog ${dialogId}`);
+    return runInInjectionContext(dialogEnvironmentInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, options ?? {}));
   }
 
   /**

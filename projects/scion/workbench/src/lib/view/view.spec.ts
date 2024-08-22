@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, Directive, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
+import {Component, DestroyRef, Directive, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WorkbenchViewRegistry} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -49,6 +49,36 @@ describe('View', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toShowCustomMatcher);
+  });
+
+  it('should destroy handle\'s injector when closing the view', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', component: SpecViewComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
+    await waitUntilStable();
+
+    // Get reference to the view injector.
+    const view = TestBed.inject(WorkbenchViewRegistry).get('view.100');
+    let injectorDestroyed = false;
+    view.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
+
+    // Close the view.
+    await view.close();
+    await waitUntilStable();
+
+    // Expect the injector to be destroyed.
+    expect(injectorDestroyed).toBeTrue();
   });
 
   it('should render dirty state', async () => {

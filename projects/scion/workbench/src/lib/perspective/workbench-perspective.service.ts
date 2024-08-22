@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ApplicationInitStatus, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
+import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
 import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
@@ -87,8 +87,13 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       return;
     }
 
-    const perspective = runInInjectionContext(this._environmentInjector, () => new ɵWorkbenchPerspective(definition));
-    this._perspectiveRegistry.register(perspective);
+    this._perspectiveRegistry.register(this.createPerspective(definition));
+  }
+
+  private createPerspective(definition: WorkbenchPerspectiveDefinition): ɵWorkbenchPerspective {
+    // Construct the handle in an injection context that shares the perspective's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
+    const perspectiveEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Perspective ${definition.id}`);
+    return runInInjectionContext(perspectiveEnvironmentInjector, () => new ɵWorkbenchPerspective(definition));
   }
 
   /**

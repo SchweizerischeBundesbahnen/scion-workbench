@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {EnvironmentInjector, inject, InjectionToken, runInInjectionContext} from '@angular/core';
+import {EnvironmentInjector, inject, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
@@ -21,7 +21,6 @@ import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-
 import {serializeExecution} from '../common/operators';
 import {UrlSegment} from '@angular/router';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
@@ -37,16 +36,15 @@ const ACTIVE_PERSPECTIVE_ID$ = new InjectionToken<BehaviorSubject<string | undef
  */
 export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
+  private _perspectiveEnvironmentInjector = inject(EnvironmentInjector);
   private _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
   private _workbenchGridMerger = inject(WorkbenchGridMerger);
   private _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
   private _workbenchRouter = inject(ɵWorkbenchRouter);
-  private _environmentInjector = inject(EnvironmentInjector);
   private _initialLayoutFn: WorkbenchLayoutFn;
   private _activePerspectiveId$ = inject(ACTIVE_PERSPECTIVE_ID$);
   private _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
-  private _destroyRef = new ɵDestroyRef();
 
   private _initialPerspectiveLayout: ɵWorkbenchLayout | undefined;
   private _perspectiveLayout: ɵWorkbenchLayout | undefined;
@@ -107,6 +105,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
+   * Reference to the handle's injector. The injector will be destroyed when unregistering the perspective.
+   */
+  public get injector(): Injector {
+    return this._perspectiveEnvironmentInjector;
+  }
+
+  /**
    * Creates layout with the workbench grid of this perspective and the main area of the current layout.
    *
    * When switching perspective, id clashes between the views contained in the perspective and the
@@ -157,7 +162,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * Creates the initial layout of this perspective as defined in the perspective definition.
    */
   private async createInitialPerspectiveLayout(): Promise<ɵWorkbenchLayout> {
-    const initialLayout = await runInInjectionContext(this._environmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory)) as ɵWorkbenchLayout;
+    const initialLayout = await runInInjectionContext(this._perspectiveEnvironmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory)) as ɵWorkbenchLayout;
     return this.ensureActiveView(initialLayout);
   }
 
@@ -178,7 +183,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       .pipe(
         filter(() => this.active),
         serializeExecution(callback),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe();
   }
@@ -243,6 +248,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   public destroy(): void {
-    this._destroyRef.destroy();
+    this._perspectiveEnvironmentInjector.destroy();
   }
 }

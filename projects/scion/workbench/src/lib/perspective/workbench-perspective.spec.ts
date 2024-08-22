@@ -14,7 +14,7 @@ import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
 import {By} from '@angular/platform-browser';
-import {inject} from '@angular/core';
+import {DestroyRef, inject} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {firstValueFrom, Subject, timer} from 'rxjs';
@@ -27,10 +27,37 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 import {WorkbenchPerspective} from './workbench-perspective.model';
 import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
+import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 
 describe('Workbench Perspective', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
+
+  it('should destroy handle\'s injector when unregistering the perspective', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Register perspective.
+    await TestBed.inject(WorkbenchService).registerPerspective({id: 'perspective', layout: factory => factory.addPart('main')});
+    await waitUntilStable();
+
+    // Get reference to the perspective injector.
+    const perspective = TestBed.inject(WorkbenchPerspectiveRegistry).get('perspective');
+    let injectorDestroyed = false;
+    perspective.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
+
+    // Unregister the perspective.
+    TestBed.inject(WorkbenchPerspectiveRegistry).unregister('perspective');
+    await waitUntilStable();
+
+    // Expect the injector to be destroyed.
+    expect(injectorDestroyed).toBeTrue();
+  });
 
   it('should have default perspective if not configured any perspectives', async () => {
     TestBed.configureTestingModule({

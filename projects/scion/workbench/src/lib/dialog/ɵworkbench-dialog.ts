@@ -9,7 +9,7 @@
  */
 
 import {BehaviorSubject, combineLatest, concatWith, delay, EMPTY, firstValueFrom, map, merge, Observable, of, Subject, switchMap} from 'rxjs';
-import {ComponentRef, inject, Injector, NgZone} from '@angular/core';
+import {ApplicationRef, ComponentRef, EnvironmentInjector, inject, Injector, NgZone} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
@@ -33,10 +33,12 @@ import {WorkbenchDialogHeaderDirective} from './dialog-header/workbench-dialog-h
 import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
-import {UUID} from '@scion/toolkit/uuid';
+import {provideViewContext} from '../view/view-context-provider';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
+
+  private readonly _dialogEnvironmentInjector = inject(EnvironmentInjector);
 
   private readonly _overlayRef: OverlayRef;
   private readonly _portal: ComponentPortal<WorkbenchDialogComponent>;
@@ -45,7 +47,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _attached$: Observable<boolean>;
-  private _blink$ = new Subject<void>();
+  private readonly _blink$ = new Subject<void>();
 
   /**
    * Result (or error) to be passed to the dialog opener.
@@ -54,10 +56,6 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private _componentRef: ComponentRef<WorkbenchDialogComponent> | undefined;
   private _cssClass: string;
 
-  /**
-   * Unique identity of this dialog.
-   */
-  public readonly id = UUID.randomUUID();
   /**
    * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
    */
@@ -75,7 +73,9 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     view: inject(ɵWorkbenchView, {optional: true}),
   };
 
-  constructor(public component: ComponentType<unknown>, public _options: WorkbenchDialogOptions) {
+  constructor(public id: string,
+              public component: ComponentType<unknown>,
+              private _options: WorkbenchDialogOptions) {
     this._overlayRef = this.createOverlay();
     this._portal = this.createPortal();
     this._cssClass = Arrays.coerce(this._options.cssClass).join(' ');
@@ -197,10 +197,23 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     this._blink$.next();
   }
 
+  /**
+   * Reference to the handle's injector. The injector will be destroyed when closing the dialog.
+   */
+  public get injector(): Injector {
+    return this._dialogEnvironmentInjector;
+  }
+
   private createPortal(): ComponentPortal<WorkbenchDialogComponent> {
     return new ComponentPortal(WorkbenchDialogComponent, null, Injector.create({
-      parent: inject(Injector),
+      // Use the root environment injector instead of the dialog's environment injector.
+      // Otherwise, if an application-modal dialog opens a view-modal dialog, the view-modal dialog
+      // would not open because it uses the same environment injector, which, however, was destroyed
+      // when closed the application-modal dialog. View-modal dialogs are only opened after
+      // all application-modal dialogs have been closed.
+      parent: this._options.injector ?? inject(ApplicationRef).injector,
       providers: [
+        provideViewContext(this.context.view),
         {provide: ɵWorkbenchDialog, useValue: this},
         {provide: WorkbenchDialog, useExisting: ɵWorkbenchDialog},
       ],
@@ -275,7 +288,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     combineLatest([this._attached$, viewDrag$])
       .pipe(
         subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe(([attached, dragging]) => {
         const hideDialog = !attached || dragging;
@@ -302,7 +315,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
           switchMap(hostElement => hostElement ? fromDimension$(hostElement) : EMPTY),
           map(({element: hostElement}) => hostElement.getBoundingClientRect()),
           subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-          takeUntilDestroyed(this._destroyRef),
+          takeUntilDestroyed(),
         )
         .subscribe(({top, left, width, height}) => {
           setStyle(this._overlayRef.hostElement, {
@@ -322,7 +335,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     this._workbenchDialogRegistry.top$({viewId: this.context.view?.id})
       .pipe(
         map(top => top === this ? null : top),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe(this.blockedBy$);
   }
@@ -332,7 +345,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
       .pipe(
         switchMap(() => of(true).pipe(concatWith(of(false).pipe(delay(300))))),
         distinctUntilChanged(),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe(this.blinking$);
   }
@@ -342,6 +355,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    */
   public destroy(): void {
     if (!this._destroyRef.destroyed) {
+      this._dialogEnvironmentInjector.destroy();
       this._destroyRef.destroy();
       this._overlayRef.dispose();
     }
