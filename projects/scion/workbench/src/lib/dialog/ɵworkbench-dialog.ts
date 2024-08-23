@@ -9,8 +9,8 @@
  */
 
 import {BehaviorSubject, combineLatest, concatWith, delay, EMPTY, firstValueFrom, map, merge, Observable, of, Subject, switchMap} from 'rxjs';
-import {ApplicationRef, ComponentRef, EnvironmentInjector, inject, Injector, NgZone} from '@angular/core';
-import {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
+import {ApplicationRef, ComponentRef, EnvironmentInjector, inject, Injector, NgZone, Signal, signal} from '@angular/core';
+import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {Overlay, OverlayRef} from '@angular/cdk/overlay';
@@ -48,23 +48,23 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _attached$: Observable<boolean>;
   private readonly _blink$ = new Subject<void>();
+  private readonly _title = signal<string | undefined>(undefined);
+  private readonly _closable = signal(true);
+  private readonly _resizable = signal(true);
+  private readonly _padding = signal(true);
+  private readonly _cssClass = signal<string[]>([]);
 
   /**
    * Result (or error) to be passed to the dialog opener.
    */
   private _result: R | Error | undefined;
   private _componentRef: ComponentRef<WorkbenchDialogComponent> | undefined;
-  private _cssClass: string;
 
   /**
    * Indicates whether this dialog is blocked by other dialog(s) that overlay this dialog.
    */
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
-  public readonly size: WorkbenchDialogSize = {};
-  public title: string | Observable<string | undefined> | undefined;
-  public closable = true;
-  public resizable = true;
-  public padding = true;
+  public readonly size: WorkbenchDialogSize = new ɵWorkbenchDialogSize();
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;
   public actions = new Array<WorkbenchDialogActionDirective>();
@@ -78,7 +78,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
               private _options: WorkbenchDialogOptions) {
     this._overlayRef = this.createOverlay();
     this._portal = this.createPortal();
-    this._cssClass = Arrays.coerce(this._options.cssClass).join(' ');
+    this._cssClass.set(Arrays.coerce(this._options.cssClass));
     this._attached$ = this.monitorHostElementAttached$();
 
     this.hideOnHostElementDetachOrViewDrag();
@@ -175,21 +175,61 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     };
   }
 
+  /** @inheritDoc */
+  public get title(): Signal<string | undefined> {
+    return this._title;
+  }
+
+  /** @inheritDoc */
+  public set title(title: string | undefined) {
+    this._title.set(title);
+  }
+
+  /** @inheritDoc */
+  public get closable(): Signal<boolean> {
+    return this._closable;
+  }
+
+  /** @inheritDoc */
+  public set closable(closable: boolean) {
+    this._closable.set(closable);
+  }
+
+  /** @inheritDoc */
+  public get resizable(): Signal<boolean> {
+    return this._resizable;
+  }
+
+  /** @inheritDoc */
+  public set resizable(resizable: boolean) {
+    this._resizable.set(resizable);
+  }
+
+  /** @inheritDoc */
+  public get padding(): Signal<boolean> {
+    return this._padding;
+  }
+
+  /** @inheritDoc */
+  public set padding(padding: boolean) {
+    this._padding.set(padding);
+  }
+
+  /** @inheritDoc */
+  public get cssClass(): Signal<string[]> {
+    return this._cssClass;
+  }
+
+  /** @inheritDoc */
+  public set cssClass(cssClass: string | string[]) {
+    this._cssClass.set(new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass));
+  }
+
   /**
    * Returns the position of the dialog in the dialog stack.
    */
   public getPositionInDialogStack(): number {
     return this._workbenchDialogRegistry.indexOf(this);
-  }
-
-  /** @inheritDoc */
-  public set cssClass(cssClass: string | string[]) {
-    this._cssClass = new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass).join(' ');
-  }
-
-  /** @inheritDoc */
-  public get cssClass(): string {
-    return this._cssClass;
   }
 
   /** @inheritDoc */

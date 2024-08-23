@@ -49,11 +49,11 @@ export class DialogPageComponent {
       width: this._formBuilder.control(''),
     }),
     behavior: new FormGroup({
-      closable: this._formBuilder.control(this.dialog.closable),
-      resizable: this._formBuilder.control(this.dialog.resizable),
+      closable: this._formBuilder.control(this.dialog.closable()),
+      resizable: this._formBuilder.control(this.dialog.resizable()),
     }),
     styles: new FormGroup({
-      padding: this._formBuilder.control(this.dialog.padding),
+      padding: this._formBuilder.control(this.dialog.padding()),
     }),
     closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),

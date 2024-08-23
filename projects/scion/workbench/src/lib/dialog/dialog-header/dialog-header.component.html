@@ -1,10 +1,10 @@
-@if (dialog.title | wbCoerceObservable$ | async; as title) {
+@if (dialog.title(); as title) {
   <div class="title e2e-title">
     <span>{{title}}</span>
   </div>
 }
 
-@if (dialog.closable) {
+@if (dialog.closable()) {
   <button tabindex="-1" class="close scion-workbench-icons e2e-close"
           (mousedown)="onCloseMouseDown($event)"
           (click)="onCloseClick()">

@@ -12,7 +12,6 @@ import {Locator} from '@playwright/test';
 import {SciAccordionPO} from './@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from './@scion/components.internal/checkbox.po';
 import {DialogPO} from './dialog.po';
-import {WorkbenchDialogSize} from '@scion/workbench';
 import {WorkbenchDialogPagePO} from './workbench/page-object/workbench-dialog-page.po';
 
 /**
@@ -95,4 +94,13 @@ export class DialogPagePO implements WorkbenchDialogPagePO {
     await accordion.itemLocator().locator('input.e2e-return-value').fill(returnValue);
     await accordion.collapse();
   }
+}
+
+export interface WorkbenchDialogSize {
+  height?: string;
+  width?: string;
+  minHeight?: string;
+  maxHeight?: string;
+  minWidth?: string;
+  maxWidth?: string;
 }

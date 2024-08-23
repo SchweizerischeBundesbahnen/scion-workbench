@@ -2711,7 +2711,7 @@ function getComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T |
 }
 
 function getDialog(cssClass: string): WorkbenchDialog {
-  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass === cssClass) ?? throwError('[NullDialogError]');
+  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass().includes(cssClass)) ?? throwError('[NullDialogError]');
 }
 
 function getSize(fixture: ComponentFixture<unknown>, type: Type<unknown>): {width: number; height: number} {

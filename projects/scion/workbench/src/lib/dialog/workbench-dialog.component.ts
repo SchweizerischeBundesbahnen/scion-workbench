@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
 import {BehaviorSubject, fromEvent} from 'rxjs';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
-import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
+import {AsyncPipe, NgClass, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -53,6 +53,9 @@ import {fromMutation$} from '@scion/toolkit/observable';
   animations: [
     trigger('enter', provideEnterAnimation()),
   ],
+  hostDirectives: [
+    NgClass,
+  ],
   viewProviders: [
     configureDialogGlassPane(),
   ],
@@ -79,42 +82,37 @@ export class WorkbenchDialogComponent implements OnInit {
 
   @HostBinding('style.--ɵdialog-min-height')
   protected get minHeight(): string | undefined {
-    return this.dialog.size.minHeight || this._headerHeight;
+    return this.dialog.size.minHeight() || this._headerHeight;
   }
 
   @HostBinding('style.--ɵdialog-height')
   protected get height(): string | undefined {
-    return this.dialog.size.height;
+    return this.dialog.size.height();
   }
 
   @HostBinding('style.--ɵdialog-max-height')
   protected get maxHeight(): string | undefined {
-    return this.dialog.size.maxHeight;
+    return this.dialog.size.maxHeight();
   }
 
   @HostBinding('style.--ɵdialog-min-width')
   protected get minWidth(): string | undefined {
-    return this.dialog.size.minWidth || '100px';
+    return this.dialog.size.minWidth() || '100px';
   }
 
   @HostBinding('style.--ɵdialog-width')
   protected get width(): string | undefined {
-    return this.dialog.size.width;
+    return this.dialog.size.width();
   }
 
   @HostBinding('style.--ɵdialog-max-width')
   protected get maxWidth(): string | undefined {
-    return this.dialog.size.maxWidth;
+    return this.dialog.size.maxWidth();
   }
 
   @HostBinding('class.justified')
   protected get justified(): boolean {
-    return !this.dialog.padding;
-  }
-
-  @HostBinding('attr.class')
-  public get cssClasses(): string {
-    return this.dialog.cssClass;
+    return !this.dialog.padding();
   }
 
   @HostBinding('attr.data-dialogid')
@@ -126,6 +124,7 @@ export class WorkbenchDialogComponent implements OnInit {
               private _zone: NgZone,
               private _destroyRef: DestroyRef) {
     this.setDialogOffset();
+    this.addHostCssClasses();
   }
 
   public ngOnInit(): void {
@@ -137,6 +136,11 @@ export class WorkbenchDialogComponent implements OnInit {
     const stackPosition = this.dialog.getPositionInDialogStack();
     this.transformTranslateX = stackPosition * 10;
     this.transformTranslateY = stackPosition * 10;
+  }
+
+  private addHostCssClasses(): void {
+    const ngClass = inject(NgClass);
+    effect(() => ngClass.ngClass = this.dialog.cssClass());
   }
 
   /**
@@ -193,7 +197,7 @@ export class WorkbenchDialogComponent implements OnInit {
 
   @HostListener('keydown.escape', ['$event'])
   protected onEscape(event: Event): void {
-    if (this.dialog.closable) {
+    if (this.dialog.closable()) {
       this.dialog.close();
       event.stopPropagation();
     }

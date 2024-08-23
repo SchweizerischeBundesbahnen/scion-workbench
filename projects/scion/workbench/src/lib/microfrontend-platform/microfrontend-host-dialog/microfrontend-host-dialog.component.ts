@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -17,10 +17,13 @@ import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 import {WorkbenchDialog} from '../../dialog/workbench-dialog';
 import {NgTemplateOutlet} from '@angular/common';
 import {DIALOG_ID_PREFIX} from '../../workbench.constants';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {throwError} from '../../common/throw-error.util';
 import {Microfrontends} from '../common/microfrontend.util';
 import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
+import {Observables} from '@scion/toolkit/util';
+import {filter, takeUntil} from 'rxjs/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Navigates to the microfrontend of a given {@link WorkbenchDialogCapability} via {@link Router}.
@@ -112,18 +115,26 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
 /**
  * Provides the {WorkbenchDialog} handle to the routed component.
  */
-export function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapability, params: Map<string, unknown>): StaticProvider {
+function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapability, params: Map<string, unknown>): StaticProvider {
   return {
     provide: WorkbenchClientDialog,
     useFactory: (): WorkbenchClientDialog => {
       const dialog = inject(ɵWorkbenchDialog);
+      const propertyChange$ = new Subject<'title'>();
 
       return new class<R = unknown> implements WorkbenchClientDialog<R> {
         public readonly capability = capability;
         public readonly params = params;
 
         public setTitle(title: string | Observable<string>): void {
-          dialog.title = title;
+          propertyChange$.next('title');
+
+          Observables.coerce(title)
+            .pipe(
+              takeUntil(propertyChange$.pipe(filter(prop => prop === 'title'))),
+              takeUntilDestroyed(dialog.injector.get(DestroyRef)),
+            )
+            .subscribe(title => dialog.title = title);
         }
 
         public close(result?: R | Error): void {

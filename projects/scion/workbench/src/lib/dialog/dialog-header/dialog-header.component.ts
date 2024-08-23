@@ -9,8 +9,6 @@
  */
 
 import {Component} from '@angular/core';
-import {AsyncPipe} from '@angular/common';
-import {CoerceObservablePipe} from '../../common/coerce-observable.pipe';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 
 /**
@@ -21,10 +19,6 @@ import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
   templateUrl: './dialog-header.component.html',
   styleUrls: ['./dialog-header.component.scss'],
   standalone: true,
-  imports: [
-    AsyncPipe,
-    CoerceObservablePipe,
-  ],
 })
 export class DialogHeaderComponent {
 

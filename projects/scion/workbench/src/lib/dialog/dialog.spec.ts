@@ -355,7 +355,7 @@ describe('Dialog', () => {
 });
 
 function getDialog(locator: {cssClass: string}): ɵWorkbenchDialog {
-  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass === locator.cssClass) ?? throwError('[NullDialogError]');
+  return TestBed.inject(WorkbenchDialogRegistry).dialogs().find(dialog => dialog.cssClass().includes(locator.cssClass)) ?? throwError('[NullDialogError]');
 }
 
 function getDialogComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {
