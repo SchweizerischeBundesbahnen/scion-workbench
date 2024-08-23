@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {Injectable, Signal} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {Disposable} from './common/disposable';
@@ -16,7 +16,7 @@ import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {WorkbenchViewRegistry} from './view/workbench-view.registry';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
-import {WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
+import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPartRegistry} from './part/workbench-part.registry';
 import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
@@ -37,6 +37,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;
   public readonly views$: Observable<readonly ɵWorkbenchView[]>;
   public readonly theme$: Observable<WorkbenchTheme | null>;
+  public readonly activePerspective: Signal<WorkbenchPerspective | null>;
 
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 
@@ -53,6 +54,7 @@ export class ɵWorkbenchService implements WorkbenchService {
     this.parts$ = this._partRegistry.parts$;
     this.views$ = this._viewRegistry.views$;
     this.theme$ = this._workbenchThemeSwitcher.theme$;
+    this.activePerspective = this._perspectiveService.activePerspective;
   }
 
   public get layout(): ɵWorkbenchLayout {
