@@ -1,0 +1,25 @@
+<section class="e2e-title-observable-1">
+  <header>Title Observable 1</header>
+
+  <button (click)="onTitleObservable1Install()" class="e2e-install-observable">Install Observable</button>
+  <sci-form-field label="Title">
+    <div class="title">
+      <input class="e2e-title" #title1>
+      <button (click)="onTitleObservable1Emit(title1.value)" class="e2e-emit-title">Emit</button>
+    </div>
+  </sci-form-field>
+</section>
+
+<section class="e2e-title-observable-2">
+  <header>Title Observable 2</header>
+
+  <button (click)="onTitleObservable2Install()" class="e2e-install-observable">Install Observable</button>
+  <sci-form-field label="Title">
+    <div class="title">
+      <input class="e2e-title" #title2>
+      <button (click)="onTitleObservable2Emit(title2.value)" class="e2e-emit-title">Emit</button>
+    </div>
+  </sci-form-field>
+</section>
+
+
