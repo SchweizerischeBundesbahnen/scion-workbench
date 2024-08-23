@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable} from 'rxjs';
+import {signal, Signal} from '@angular/core';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -20,9 +20,10 @@ import {Observable} from 'rxjs';
 export abstract class WorkbenchDialog<R = unknown> {
 
   /**
-   * Sets the title of the dialog; can be a string literal or an Observable.
+   * Sets the title of the dialog.
    */
-  public abstract title: string | Observable<string | undefined> | undefined;
+  public abstract get title(): Signal<string | undefined>;
+  public abstract set title(title: string | undefined);
 
   /**
    * Specifies the preferred dialog size.
@@ -36,22 +37,26 @@ export abstract class WorkbenchDialog<R = unknown> {
    *
    * The default padding can be changed via the CSS variable `--sci-workbench-dialog-padding`.
    */
-  public abstract padding: boolean;
+  public abstract get padding(): Signal<boolean>;
+  public abstract set padding(padding: boolean);
 
   /**
    * Specifies if to display a close button in the dialog header. Default is `true`.
    */
-  public abstract closable: boolean;
+  public abstract get closable(): Signal<boolean>;
+  public abstract set closable(closable: boolean);
 
   /**
    * Specifies if the user can resize the dialog. Default is `true`.
    */
-  public abstract resizable: boolean;
+  public abstract get resizable(): Signal<boolean>;
+  public abstract set resizable(resizable: boolean);
 
   /**
    * Specifies CSS class(es) to add to the dialog, e.g., to locate the dialog in tests.
    */
-  public abstract cssClass: string | string[];
+  public abstract get cssClass(): Signal<string[]>;
+  public abstract set cssClass(cssClass: string | string[]);
 
   /**
    * Closes the dialog. Optionally, pass a result or an error to the dialog opener.
@@ -63,30 +68,119 @@ export abstract class WorkbenchDialog<R = unknown> {
  * Represents the preferred dialog size.
  */
 export interface WorkbenchDialogSize {
+
   /**
    * Specifies the minimum height of the dialog.
    */
-  minHeight?: string;
+  get minHeight(): Signal<string | undefined>;
+
+  set minHeight(minHeight: string | undefined);
+
   /**
    * Specifies the height of the dialog, displaying a vertical scrollbar if its content overflows.
    * If not specified, the dialog adapts its height to its context height, respecting any `minHeight' or `maxHeight' constraint.
    */
-  height?: string;
+  get height(): Signal<string | undefined>;
+
+  set height(height: string | undefined);
+
   /**
    * Specifies the maximum height of the dialog.
    */
-  maxHeight?: string;
+  get maxHeight(): Signal<string | undefined>;
+
+  set maxHeight(maxHeight: string | undefined);
+
   /**
    * Specifies the minimum width of the dialog.
    */
-  minWidth?: string;
+  get minWidth(): Signal<string | undefined>;
+
+  set minWidth(minWidth: string | undefined);
+
   /**
    * Specifies the width of the dialog, displaying a horizontal scrollbar if its content overflows.
    * If not specified, the dialog adapts its width to its context width, respecting any `minWidth' or `maxWidth' constraint.
    */
-  width?: string;
+  get width(): Signal<string | undefined>;
+
+  set width(width: string | undefined);
+
   /**
    * Specifies the maximum width of the dialog.
    */
-  maxWidth?: string;
+  get maxWidth(): Signal<string | undefined>;
+
+  set maxWidth(maxWidth: string | undefined);
+}
+
+/** @inheritDoc */
+export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
+
+  private readonly _minHeight = signal<string | undefined>(undefined);
+  private readonly _height = signal<string | undefined>(undefined);
+  private readonly _maxHeight = signal<string | undefined>(undefined);
+  private readonly _minWidth = signal<string | undefined>(undefined);
+  private readonly _width = signal<string | undefined>(undefined);
+  private readonly _maxWidth = signal<string | undefined>(undefined);
+
+  /** @inheritDoc */
+  public get minHeight(): Signal<string | undefined> {
+    return this._minHeight;
+  }
+
+  /** @inheritDoc */
+  public set minHeight(minHeight: string | undefined) {
+    this._minHeight.set(minHeight);
+  }
+
+  /** @inheritDoc */
+  public get height(): Signal<string | undefined> {
+    return this._height;
+  }
+
+  /** @inheritDoc */
+  public set height(height: string | undefined) {
+    this._height.set(height);
+  }
+
+  /** @inheritDoc */
+  public get maxHeight(): Signal<string | undefined> {
+    return this._maxHeight;
+  }
+
+  /** @inheritDoc */
+  public set maxHeight(maxHeight: string | undefined) {
+    this._maxHeight.set(maxHeight);
+  }
+
+  /** @inheritDoc */
+  public get minWidth(): Signal<string | undefined> {
+    return this._minWidth;
+  }
+
+  /** @inheritDoc */
+  public set minWidth(minWidth: string | undefined) {
+    this._minWidth.set(minWidth);
+  }
+
+  /** @inheritDoc */
+  public get width(): Signal<string | undefined> {
+    return this._width;
+  }
+
+  /** @inheritDoc */
+  public set width(width: string | undefined) {
+    this._width.set(width);
+  }
+
+  /** @inheritDoc */
+  public get maxWidth(): Signal<string | undefined> {
+    return this._maxWidth;
+  }
+
+  /** @inheritDoc */
+  public set maxWidth(maxWidth: string | undefined) {
+    this._maxWidth.set(maxWidth);
+  }
 }
