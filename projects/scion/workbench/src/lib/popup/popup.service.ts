@@ -289,7 +289,10 @@ export class PopupService {
   private observePopupOrigin$(config: PopupConfig, contextualView: ɵWorkbenchView | null): Observable<FlexibleConnectedPositionStrategyOrigin> {
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       return fromBoundingClientRect$(coerceElement<HTMLElement>(config.anchor as HTMLElement))
-        .pipe(map(clientRect => ({x: clientRect.x, y: clientRect.y, width: clientRect.width, height: clientRect.height})));
+        .pipe(
+          filter(clientRect => !isNullClientRect(clientRect)), // Omit changes without dimension, for example, emitted when the view is deactivated.
+          map(clientRect => ({x: clientRect.x, y: clientRect.y, width: clientRect.width, height: clientRect.height})),
+        );
     }
     else {
       return Observables.coerce(config.anchor)
@@ -312,7 +315,7 @@ export class PopupService {
       return fromDimension$(view.portal.componentRef.location.nativeElement)
         .pipe(
           map(dimension => dimension.element.getBoundingClientRect()),
-          filter(clientRect => !isNullClientRect(clientRect)), // Omit viewport change if not having a size, for example, if the view is deactivated.
+          filter(clientRect => !isNullClientRect(clientRect)), // Omit changes without dimension, for example, emitted when the view is deactivated.
           map(clientRect => ({x: clientRect.left, y: clientRect.top, width: clientRect.width, height: clientRect.height})),
           startWithNullBoundsIf(() => !view.active()), // Ensure initial bounds to be emitted even if the view is inactive. Otherwise, the popup would not be attached to the DOM until the view is activated.
         );
