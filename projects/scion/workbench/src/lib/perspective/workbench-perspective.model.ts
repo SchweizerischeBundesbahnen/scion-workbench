@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Observable} from 'rxjs';
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
+import {Signal} from '@angular/core';
 
 /**
  * Represents a workbench perspective.
@@ -29,14 +29,8 @@ export interface WorkbenchPerspective {
   readonly data: {[key: string]: unknown};
   /**
    * Indicates whether this perspective is active.
-   * There can only be one perspective active at a time.
    */
-  readonly active: boolean;
-  /**
-   * Upon subscription, emits the current active state of this perspective, and then
-   * emits continuously when its active state changes. The Observable never completes.
-   */
-  readonly active$: Observable<boolean>;
+  readonly active: Signal<boolean>;
   /**
    * Indicates whether this perspective is transient, with its layout only memoized, not persisted.
    */

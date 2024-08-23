@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
-import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
+import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, inject, Injectable, runInInjectionContext} from '@angular/core';
+import {ACTIVE_PERSPECTIVE, ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
 import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
@@ -23,6 +23,8 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveService implements WorkbenchInitializer {
+
+  public readonly activePerspective = inject(ACTIVE_PERSPECTIVE);
 
   constructor(private _workbenchConfig: WorkbenchConfig,
               private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
@@ -105,7 +107,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    * @return `true` if activated the perspective, otherwise `false`.
    */
   public async switchPerspective(id: string, options?: {storePerspectiveAsActive?: boolean}): Promise<boolean> {
-    if (this.activePerspective?.id === id) {
+    if (this.activePerspective()?.id === id) {
       return true;
     }
     const activated = await this._perspectiveRegistry.get(id).activate();
@@ -120,7 +122,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    * Resets the currently active perspective to its initial layout. The main area will not change.
    */
   public async resetPerspective(): Promise<void> {
-    await this.activePerspective?.reset();
+    await this.activePerspective()?.reset();
   }
 
   /**
@@ -171,13 +173,6 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.perspectives])));
     }
     return undefined;
-  }
-
-  /**
-   * Returns the currently active perspective, or `null` if there is no current perspective.
-   */
-  private get activePerspective(): ɵWorkbenchPerspective | null {
-    return this._perspectiveRegistry.perspectives.find(perspective => perspective.active) ?? null;
   }
 }
 
