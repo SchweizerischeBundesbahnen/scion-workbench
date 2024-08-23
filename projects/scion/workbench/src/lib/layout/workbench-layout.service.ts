@@ -14,6 +14,7 @@ import {map} from 'rxjs/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {filterNull} from '../common/operators';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 /**
  * Provides access to the workbench layout.
@@ -24,6 +25,11 @@ export class WorkbenchLayoutService {
   private _layout$ = new BehaviorSubject<ɵWorkbenchLayout | null>(null);
   private _dragStart$ = new Subject<void>();
   private _dragEnd$ = new Subject<void>();
+
+  /**
+   * Provides the current {@link WorkbenchLayout}, or `null` until Angular has performed the initial navigation.
+   */
+  public layout = toSignal(this._layout$, {requireSync: true});
 
   /**
    * Emits the current {@link WorkbenchLayout}.
@@ -71,12 +77,5 @@ export class WorkbenchLayoutService {
    */
   public setLayout(layout: ɵWorkbenchLayout): void {
     this._layout$.next(layout);
-  }
-
-  /**
-   * Returns a reference to current {@link WorkbenchLayout}, if any. Is `null` until Angular has performed the initial navigation.
-   */
-  public get layout(): ɵWorkbenchLayout | null {
-    return this._layout$.value;
   }
 }

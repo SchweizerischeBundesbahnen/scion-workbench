@@ -55,7 +55,7 @@ export class WorkbenchPerspectiveRegistry implements OnDestroy {
     return this._registry.objects;
   }
 
-  public get perspectives$(): Observable<readonly ɵWorkbenchPerspective[]> {
+  public get perspectives$(): Observable<ɵWorkbenchPerspective[]> {
     return this._registry.objects$;
   }
 

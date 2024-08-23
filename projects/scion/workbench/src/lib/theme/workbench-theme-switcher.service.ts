@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable, ReplaySubject, share} from 'rxjs';
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, Signal} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {distinctUntilChanged, map, startWith} from 'rxjs/operators';
 import {WorkbenchStorage} from '../storage/workbench-storage';
 import {WorkbenchTheme} from '../workbench.model';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 /**
  * Represents the key to associate the activated theme in the storage.
@@ -30,14 +30,12 @@ export class WorkbenchThemeSwitcher {
   private readonly _documentRoot = inject<Document>(DOCUMENT).documentElement;
 
   /**
-   * Emits the current workbench theme.
-   *
-   * Upon subscription, emits the current theme, and then continuously emits when switching the theme. It never completes.
+   * Provides the current workbench theme.
    */
-  public readonly theme$: Observable<WorkbenchTheme | null>;
+  public readonly theme: Signal<WorkbenchTheme | null>;
 
   constructor(private _workbenchStorage: WorkbenchStorage) {
-    this.theme$ = this.detectTheme$();
+    this.theme = this.detectTheme();
     this.activateThemeFromStorage().then();
   }
 
@@ -54,28 +52,22 @@ export class WorkbenchThemeSwitcher {
   /**
    * Detects the current workbench theme from the HTML root element.
    */
-  private detectTheme$(): Observable<WorkbenchTheme | null> {
-    return new Observable<WorkbenchTheme | null>(observer => {
-      const subscription = fromMutation$(this._documentRoot, {attributeFilter: ['sci-theme']})
-        .pipe(
-          startWith(undefined as void),
-          map((): WorkbenchTheme | null => {
-            const activeTheme = getComputedStyle(this._documentRoot).getPropertyValue('--sci-theme') || null;
-            if (!activeTheme) {
-              return null;
-            }
-            return {
-              name: activeTheme,
-              colorScheme: getComputedStyle(this._documentRoot).colorScheme as 'light' | 'dark',
-            };
-          }),
-          distinctUntilChanged(),
-          share({connector: () => new ReplaySubject(1), resetOnRefCountZero: false}),
-        )
-        .subscribe(observer);
-
-      return () => subscription.unsubscribe();
-    });
+  private detectTheme(): Signal<WorkbenchTheme | null> {
+    return toSignal(fromMutation$(this._documentRoot, {attributeFilter: ['sci-theme']})
+      .pipe(
+        startWith(undefined as void),
+        map((): WorkbenchTheme | null => {
+          const activeTheme = getComputedStyle(this._documentRoot).getPropertyValue('--sci-theme') || null;
+          if (!activeTheme) {
+            return null;
+          }
+          return {
+            name: activeTheme,
+            colorScheme: getComputedStyle(this._documentRoot).colorScheme as 'light' | 'dark',
+          };
+        }),
+        distinctUntilChanged((a, b) => a?.name === b?.name),
+      ), {requireSync: true});
   }
 
   /**

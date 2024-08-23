@@ -75,7 +75,7 @@ export class MainAreaLayoutComponent {
   protected get mainAreaGrid(): MPartGrid {
     // It is critical that both `WorkbenchLayoutComponent` and `MainAreaLayoutComponent` operate on the same layout,
     // so we do not subscribe to the layout but reference it directly.
-    return this._workbenchLayoutService.layout!.mainAreaGrid!;
+    return this._workbenchLayoutService.layout()!.mainAreaGrid!;
   }
 
   protected onViewDrop(event: WbViewDropEvent): void {

@@ -26,7 +26,7 @@ export class WorkbenchPartRegistry implements OnDestroy {
     nullObjectErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
   });
 
-  public parts$: Observable<readonly ɵWorkbenchPart[]> = concat(
+  public parts$: Observable<ɵWorkbenchPart[]> = concat(
     this._registry.objects$.pipe(take(1)), // immediate emission upon subscription
     this._registry.objects$.pipe(bufferLatestUntilLayoutChange()),
   );

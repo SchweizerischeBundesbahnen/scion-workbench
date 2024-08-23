@@ -52,7 +52,7 @@ describe('Workbench Service', () => {
     await waitUntilStable();
 
     // Expect view.2 not to be closed.
-    expect(TestBed.inject(WorkbenchService).views.map(view => view.id)).toEqual(['view.2']);
+    expect(TestBed.inject(WorkbenchService).views().map(view => view.id)).toEqual(['view.2']);
   });
 
   it('should provide activated perspective', async () => {

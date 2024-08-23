@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
 import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService as WorkbenchClientPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
-import {NavigationEnd, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
-import {filter} from 'rxjs/operators';
+import {PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciFilterFieldComponent} from '@scion/components.internal/filter-field';
 import {AsyncPipe, NgClass} from '@angular/common';
@@ -67,8 +66,8 @@ export default class StartPageComponent {
               private _workbenchService: WorkbenchService,
               private _workbenchRouter: WorkbenchRouter,
               private _formBuilder: NonNullableFormBuilder,
+              private _cd: ChangeDetectorRef,
               router: Router,
-              cd: ChangeDetectorRef,
               workbenchConfig: WorkbenchConfig) {
     // Read workbench views to be pinned to the start page.
     this.workbenchViewRoutes$ = of(router.config)
@@ -96,7 +95,6 @@ export default class StartPageComponent {
         );
     }
 
-    this.markForCheckOnUrlChange(router, cd);
     this.installFilterFieldDisplayTextSynchronizer();
     this.memoizeContextualPart();
   }
@@ -141,17 +139,6 @@ export default class StartPageComponent {
     this._filterField.focusAndApplyKeyboardEvent(event);
   }
 
-  private markForCheckOnUrlChange(router: Router, cd: ChangeDetectorRef): void {
-    router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        cd.markForCheck();
-      });
-  }
-
   /**
    * Returns `true` if in the context of the welcome page.
    */
@@ -174,11 +161,10 @@ export default class StartPageComponent {
    * Memoizes the part in which this component is displayed.
    */
   private memoizeContextualPart(): void {
-    this._workbenchService.layout$
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => {
-        this.partId = this._view?.part().id ?? this._workbenchService.parts.filter(part => part.active()).sort(a => a.isInMainArea ? -1 : 1).at(0)?.id;
-      });
+    effect(() => {
+      this.partId = this._view?.part().id ?? this._workbenchService.parts().filter(part => part.active()).sort(a => a.isInMainArea ? -1 : 1).at(0)?.id;
+      this._cd.markForCheck();
+    });
   }
 
   public selectViewCapabilityText = (viewCapability: WorkbenchViewCapability): string | undefined => {

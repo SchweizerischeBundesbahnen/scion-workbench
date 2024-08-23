@@ -2171,11 +2171,11 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Capture model objects. The ids should not change when serializing and deserializing the layout.
-    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout.workbenchGrid!.root;
-    const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout.mainAreaGrid!.root;
-    const view100 = TestBed.inject(ɵWorkbenchService).layout.view({viewId: 'view.100'});
-    const view101 = TestBed.inject(ɵWorkbenchService).layout.view({viewId: 'view.101'});
-    const view102 = TestBed.inject(ɵWorkbenchService).layout.view({viewId: 'view.102'});
+    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().workbenchGrid!.root;
+    const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().mainAreaGrid!.root;
+    const view100 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.100'});
+    const view101 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.101'});
+    const view102 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.102'});
 
     // Expect initial layout.
     expect(layoutFixture).toEqualWorkbenchLayout({

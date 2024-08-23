@@ -23,7 +23,7 @@
     <sci-form-field label="View(s)">
       <input [formControl]="form.controls.canMatch.controls.view" class="e2e-view-id" [attr.list]="viewList" placeholder="Separate multiple views by space">
       <datalist [attr.id]="viewList">
-        @for (view of workbenchService.views$ | async; track view.id) {
+        @for (view of workbenchService.views(); track view.id) {
           <option [value]="view.id">{{view.id}}</option>
         }
       </datalist>
@@ -32,7 +32,7 @@
     <sci-form-field label="Part(s)">
       <input [formControl]="form.controls.canMatch.controls.part" class="e2e-part-id" [attr.list]="partList" placeholder="Separate multiple parts by space">
       <datalist [attr.id]="partList">
-        @for (part of workbenchService.parts$ | async; track part.id) {
+        @for (part of workbenchService.parts(); track part.id) {
           <option [value]="part.id">{{part.id}}</option>
         }
       </datalist>

@@ -12,7 +12,7 @@ import {Component, Injector} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {coerceNumberProperty} from '@angular/cdk/coercion';
-import {AsyncPipe, NgTemplateOutlet} from '@angular/common';
+import {NgTemplateOutlet} from '@angular/common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -30,7 +30,6 @@ import {UUID} from '@scion/toolkit/uuid';
   styleUrls: ['./router-page.component.scss'],
   standalone: true,
   imports: [
-    AsyncPipe,
     NgTemplateOutlet,
     WorkbenchRouterLinkDirective,
     ReactiveFormsModule,

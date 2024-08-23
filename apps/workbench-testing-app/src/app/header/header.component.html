@@ -5,9 +5,9 @@
 </div>
 
 <div class="toggle-buttons e2e-perspective-toggles">
-  @for (perspective of workbenchService.perspectives$ | async | appSortPerspectives; track perspective.id) {
+  @for (perspective of perspectives(); track perspective.id) {
     @if (perspective.id !== 'blank') {
-      <button (click)="onTogglePerspective(perspective.id)"
+      <button (click)="onTogglePerspective(perspective)"
               class="e2e-perspective"
               [title]="perspective.data[PerspectiveData.tooltip]"
               [attr.data-perspectiveid]="perspective.id"
