@@ -13,9 +13,9 @@ import {ɵDialogContext} from './ɵworkbench-dialog-context';
 import {WorkbenchDialog} from './workbench-dialog';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
-import {Observable, Subject} from 'rxjs';
+import {merge, Observable, Subject} from 'rxjs';
 import {Observables} from '@scion/toolkit/util';
-import {takeUntil} from 'rxjs/operators';
+import {filter, takeUntil} from 'rxjs/operators';
 import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 
 /**
@@ -25,6 +25,7 @@ import {WorkbenchDialogCapability} from './workbench-dialog-capability';
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
 
   private _destroy$ = new Subject<void>();
+  private _propertyChange$ = new Subject<'title'>();
 
   public readonly capability: WorkbenchDialogCapability;
   public readonly params: Map<string, unknown>;
@@ -38,8 +39,10 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog {
    * @inheritDoc
    */
   public setTitle(title: string | Observable<string>): void {
+    this._propertyChange$.next('title');
+
     Observables.coerce(title)
-      .pipe(takeUntil(this._destroy$))
+      .pipe(takeUntil(merge(this._destroy$, this._propertyChange$.pipe(filter(prop => prop === 'title')))))
       .subscribe(value => Beans.get(MessageClient).publish(ɵWorkbenchCommands.dialogTitleTopic(this._context.dialogId), value).then());
   }
 

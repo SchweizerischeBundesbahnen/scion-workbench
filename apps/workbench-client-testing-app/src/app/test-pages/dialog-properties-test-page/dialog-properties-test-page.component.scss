@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+
+  > section {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+
+    > header {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+
+    > sci-form-field div.title {
+      display: flex;
+      gap: .25em;
+    }
+  }
+}
