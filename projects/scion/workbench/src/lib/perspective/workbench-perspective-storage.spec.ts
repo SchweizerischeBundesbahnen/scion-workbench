@@ -21,6 +21,9 @@ import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {WorkbenchStorage} from '../storage/workbench-storage';
+import {Maps} from '@scion/toolkit/util';
+import {firstValueFrom, Subject} from 'rxjs';
 
 describe('WorkbenchPerspectiveStorage', () => {
 
@@ -84,6 +87,107 @@ describe('WorkbenchPerspectiveStorage', () => {
             child2: new MPart({id: 'left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           }),
           child2: new MPart({id: MAIN_AREA}),
+        }),
+      },
+    });
+  });
+
+  it('should write to storage sequentially, debouncing pending request', async () => {
+    /**
+     * Test storage that records write operations and can simulate slow writes.
+     */
+    class TestStorage implements WorkbenchStorage {
+
+      public writes = new Map<string, string[]>();
+
+      private _throttling = false;
+      private _unblock$ = new Subject<void>();
+
+      public load(key: string): string | null {
+        return this.writes.get(key)?.at(-1) ?? null;
+      }
+
+      public async store(key: string, value: string): Promise<void> {
+        Maps.addListValue(this.writes, key, value);
+
+        // Simulate slow write (if enabled).
+        if (this._throttling) {
+          await firstValueFrom(this._unblock$);
+        }
+      }
+
+      public enableThrottling(): void {
+        this._throttling = true;
+      }
+
+      public disableThrottlinig(): void {
+        this._throttling = false;
+        this._unblock$.next();
+      }
+
+      public clear(): void {
+        this.writes.clear();
+      }
+    }
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective',
+                layout: factory => factory.addPart('main'),
+              },
+            ],
+          },
+          storage: TestStorage,
+          startup: {launcher: 'APP_INITIALIZER'},
+        }),
+        provideRouter([
+          {path: 'view', component: TestComponent},
+        ]),
+      ],
+    });
+    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    await waitForInitialWorkbenchLayout();
+
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    const storage = TestBed.inject(WorkbenchStorage) as TestStorage;
+
+    // Clear storage and enable throttling.
+    storage.clear();
+    storage.enableThrottling();
+
+    // Modify the layout in quick succession.
+    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.1'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.2'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.3'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.4'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.5'}).then();
+    await waitUntilStable();
+
+    // The first write is still in progress (because writes are throttled), blocking subsequent writes (serial execution).
+    // Disable throttling to continue.
+    storage.disableThrottlinig();
+    await waitUntilStable();
+
+    // Expect only the most recent write to be executed.
+    expect(storage.writes.get('scion.workbench.perspectives.perspective')!.length).toBe(2);
+
+    // Expect the most recent layout to be stored.
+    expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({
+          id: 'main',
+          views: [
+            {id: 'view.1'},
+            {id: 'view.2'},
+            {id: 'view.3'},
+            {id: 'view.4'},
+            {id: 'view.5'},
+          ],
+          activeViewId: 'view.5',
         }),
       },
     });
