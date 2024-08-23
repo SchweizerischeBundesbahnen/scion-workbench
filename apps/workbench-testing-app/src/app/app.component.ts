@@ -12,7 +12,7 @@ import {Component, DoCheck, HostBinding, inject, NgZone} from '@angular/core';
 import {filter, mergeMap, switchMap} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
@@ -102,7 +102,7 @@ export class AppComponent implements DoCheck {
   private installActivePerspectiveListener(): void {
     inject(WorkbenchService).perspectives$
       .pipe(
-        switchMap(perspectives => merge(...perspectives.map(perspective => perspective.active$.pipe(mergeMap(active => active ? of(perspective) : EMPTY))))),
+        switchMap(perspectives => merge(...perspectives.map(perspective => toObservable(perspective.active).pipe(mergeMap(active => active ? of(perspective) : EMPTY))))),
         takeUntilDestroyed(),
       )
       .subscribe(activePerspective => {

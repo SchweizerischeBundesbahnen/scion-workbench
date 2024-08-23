@@ -8,15 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {EnvironmentInjector, inject, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
+import {computed, EnvironmentInjector, inject, InjectionToken, Injector, runInInjectionContext, Signal, signal, WritableSignal} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
-import {BehaviorSubject, Observable} from 'rxjs';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {filter, map} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
 import {serializeExecution} from '../common/operators';
 import {UrlSegment} from '@angular/router';
@@ -24,11 +23,11 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
- * DI token that holds the identity of the active perspective.
+ * Provides the activated perspective.
  */
-const ACTIVE_PERSPECTIVE_ID$ = new InjectionToken<BehaviorSubject<string | undefined>>('ACTIVE_PERSPECTIVE_ID$', {
+export const ACTIVE_PERSPECTIVE = new InjectionToken<WritableSignal<ɵWorkbenchPerspective | null>>('ACTIVE_PERSPECTIVE', {
   providedIn: 'root',
-  factory: () => new BehaviorSubject<string | undefined>(undefined),
+  factory: () => signal<ɵWorkbenchPerspective | null>(null),
 });
 
 /**
@@ -43,7 +42,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
   private _workbenchRouter = inject(ɵWorkbenchRouter);
   private _initialLayoutFn: WorkbenchLayoutFn;
-  private _activePerspectiveId$ = inject(ACTIVE_PERSPECTIVE_ID$);
+  private _activePerspective = inject(ACTIVE_PERSPECTIVE);
   private _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
 
   private _initialPerspectiveLayout: ɵWorkbenchLayout | undefined;
@@ -52,13 +51,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   public id: string;
   public transient: boolean;
   public data: {[key: string]: any};
-  public active$: Observable<boolean>;
+  public active: Signal<boolean>;
 
   constructor(definition: WorkbenchPerspectiveDefinition) {
     this.id = definition.id;
     this.transient = definition.transient ?? false;
     this.data = definition.data ?? {};
-    this.active$ = this._activePerspectiveId$.pipe(map(activePerspectiveId => activePerspectiveId === this.id));
+    this.active = computed(() => this._activePerspective()?.id === this.id);
     this._initialLayoutFn = definition.layout;
     this.onPerspectiveLayoutChange(layout => this.storePerspectiveLayout(layout));
   }
@@ -74,7 +73,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     this._perspectiveLayout = (await this.loadPerspectiveLayout()) ?? this._initialPerspectiveLayout;
 
     // Memoize currently active perspective for a potential rollback in case the activation fails.
-    const currentActivePerspectiveId = this._activePerspectiveId$.value;
+    const previousPerspective = this._activePerspective();
 
     // Perform navigation to activate the layout of this perspective.
     const navigated = await this._workbenchRouter.navigate(currentLayout => {
@@ -83,13 +82,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       // (1) Otherwise, if the initial navigation is asynchronous, such as when lazy loading components or using asynchronous guards,
       //     the activation of the initial perspective would apply the "default" grid with only the main area.
       // (2) Enables routes to evaluate the active perspective in a `canMatch` guard, e.g., to display a perspective-specific start page.
-      this._activePerspectiveId$.next(this.id);
+      this._activePerspective.set(this);
 
       // Create layout with the workbench grid of this perspective and the main area of the current layout.
       return this.createLayoutForActivation(currentLayout);
     });
     if (!navigated) {
-      this._activePerspectiveId$.next(currentActivePerspectiveId);
+      this._activePerspective.set(previousPerspective);
     }
     return navigated;
   }
@@ -154,10 +153,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     });
   }
 
-  public get active(): boolean {
-    return this._activePerspectiveId$.value === this.id;
-  }
-
   /**
    * Creates the initial layout of this perspective as defined in the perspective definition.
    */
@@ -181,7 +176,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private onPerspectiveLayoutChange(callback: (layout: ɵWorkbenchLayout) => Promise<void>): void {
     this._workbenchLayoutService.layout$
       .pipe(
-        filter(() => this.active),
+        filter(() => this.active()),
         serializeExecution(callback),
         takeUntilDestroyed(),
       )

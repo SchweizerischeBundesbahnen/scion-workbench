@@ -11,8 +11,8 @@
               class="e2e-perspective"
               [title]="perspective.data[PerspectiveData.tooltip]"
               [attr.data-perspectiveid]="perspective.id"
-              [class.active]="perspective.active$ | async"
-              [class.e2e-active]="perspective.active$ | async">
+              [class.active]="perspective.active()"
+              [class.e2e-active]="perspective.active()">
         {{perspective.data[PerspectiveData.label] ?? perspective.id}}
       </button>
     }

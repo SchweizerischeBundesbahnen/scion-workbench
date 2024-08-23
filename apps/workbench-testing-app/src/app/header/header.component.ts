@@ -53,7 +53,7 @@ export class HeaderComponent {
 
   protected async onTogglePerspective(id: string): Promise<void> {
     const perspective = this.workbenchService.perspectives.find(perspective => perspective.id === id)!;
-    await this.workbenchService.switchPerspective(perspective.active ? 'blank' : perspective.id);
+    await this.workbenchService.switchPerspective(perspective.active() ? 'blank' : perspective.id);
   }
 
   protected onMenuOpen(event: MouseEvent): void {

@@ -14,7 +14,7 @@ import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
 import {By} from '@angular/platform-browser';
-import {DestroyRef, inject} from '@angular/core';
+import {DestroyRef, inject, isSignal} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {firstValueFrom, Subject, timer} from 'rxjs';
@@ -69,9 +69,7 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'default', active: true} satisfies Partial<WorkbenchPerspective>),
-    ]);
+    expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
       workbenchGrid: {
@@ -96,9 +94,7 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'default', active: true} satisfies Partial<WorkbenchPerspective>),
-    ]);
+    expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
       workbenchGrid: {
@@ -138,9 +134,9 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective-1', data: {label: 'Perspective 1'}, active: true} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-2', data: {label: 'Perspective 2'}, active: false} satisfies Partial<WorkbenchPerspective>),
+    expectPerspectives([
+      {id: 'perspective-1', data: {label: 'Perspective 1'}, active: true},
+      {id: 'perspective-2', data: {label: 'Perspective 2'}, active: false},
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
@@ -184,10 +180,10 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective-1', active: false} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-2', active: true} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-3', active: false} satisfies Partial<WorkbenchPerspective>),
+    expectPerspectives([
+      {id: 'perspective-1', active: false},
+      {id: 'perspective-2', active: true},
+      {id: 'perspective-3', active: false},
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
@@ -238,10 +234,10 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective-1', active: false} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-2', active: true} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-3', active: false} satisfies Partial<WorkbenchPerspective>),
+    expectPerspectives([
+      {id: 'perspective-1', active: false},
+      {id: 'perspective-2', active: true},
+      {id: 'perspective-3', active: false},
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
@@ -281,9 +277,9 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective-1', active: true} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-2', active: false} satisfies Partial<WorkbenchPerspective>),
+    expectPerspectives([
+      {id: 'perspective-1', active: true},
+      {id: 'perspective-2', active: false},
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
@@ -323,9 +319,9 @@ describe('Workbench Perspective', () => {
     });
     await waitForInitialWorkbenchLayout();
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective-1', active: true} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-2', active: false} satisfies Partial<WorkbenchPerspective>),
+    expectPerspectives([
+      {id: 'perspective-1', active: true},
+      {id: 'perspective-2', active: false},
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
@@ -354,13 +350,13 @@ describe('Workbench Perspective', () => {
             path: '',
             loadComponent: () => import('../testing/test.component'),
             providers: [withComponentContent('Start Page Perspective 1')],
-            canMatch: [() => inject(WorkbenchService).getPerspective('perspective-1')?.active],
+            canMatch: [() => inject(WorkbenchService).getPerspective('perspective-1')?.active()],
           },
           {
             path: '',
             loadComponent: () => import('../testing/test.component'),
             providers: [withComponentContent('Start Page Perspective 2')],
-            canMatch: [() => inject(WorkbenchService).getPerspective('perspective-2')?.active],
+            canMatch: [() => inject(WorkbenchService).getPerspective('perspective-2')?.active()],
           },
         ]),
       ],
@@ -542,9 +538,7 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     // Expect only the contributed perspective to be registered (and not the default perspective too).
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective', active: true} satisfies Partial<WorkbenchPerspective>),
-    ]);
+    expectPerspectives([{id: 'perspective', active: true}]);
   });
 
   it('should support registering perspectives during workbench startup (with configured perspectives)', async () => {
@@ -587,9 +581,23 @@ describe('Workbench Perspective', () => {
 
     expect(perspectivesForActivation).toEqual(['perspective-2', 'perspective-1']);
 
-    expect(TestBed.inject(WorkbenchService).perspectives).toEqual([
-      jasmine.objectContaining({id: 'perspective-2', active: true} satisfies Partial<WorkbenchPerspective>),
-      jasmine.objectContaining({id: 'perspective-1', active: false} satisfies Partial<WorkbenchPerspective>),
+    expectPerspectives([
+      {id: 'perspective-2', active: true},
+      {id: 'perspective-1', active: false},
     ]);
   });
 });
+
+/**
+ * Expects specified perspectives to be registered, resolving signals to their effective value.
+ */
+function expectPerspectives(expected: Array<Partial<Omit<WorkbenchPerspective, 'active'> & {active: boolean}>>): void {
+  expect(TestBed.inject(WorkbenchService).perspectives.map(resolveSignals)).toEqual(expected.map(perspective => jasmine.objectContaining(perspective)));
+}
+
+/**
+ * Resolves signal properties.
+ */
+function resolveSignals<T>(object: T): T {
+  return Object.fromEntries(Object.entries(object as Record<any, any>).map(([key, value]) => [key, isSignal(value) ? value() : value])) as T;
+}
