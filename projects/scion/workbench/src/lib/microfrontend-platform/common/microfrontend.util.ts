@@ -9,9 +9,8 @@
  */
 
 import {Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
-import {inject} from '@angular/core';
+import {effect, inject} from '@angular/core';
 import {ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchTheme} from '../../workbench.model';
 import {Crypto} from '@scion/toolkit/crypto';
@@ -27,18 +26,18 @@ export const Microfrontends = {
    * This method should be invoked in the component's injection context to stop propagation when the component is destroyed.
    */
   propagateTheme: (sciRouterOutletElement: SciRouterOutletElement): void => {
-    inject(WorkbenchService).theme$
-      .pipe(takeUntilDestroyed())
-      .subscribe(theme => {
-        if (theme) {
-          sciRouterOutletElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
-          sciRouterOutletElement.setContextValue('color-scheme', theme.colorScheme);
-        }
-        else {
-          sciRouterOutletElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
-          sciRouterOutletElement.removeContextValue('color-scheme');
-        }
-      });
+    const workbenchService = inject(WorkbenchService);
+    effect(() => {
+      const theme = workbenchService.theme();
+      if (theme) {
+        sciRouterOutletElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
+        sciRouterOutletElement.setContextValue('color-scheme', theme.colorScheme);
+      }
+      else {
+        sciRouterOutletElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
+        sciRouterOutletElement.removeContextValue('color-scheme');
+      }
+    });
   },
   /**
    * Creates a stable identifier for given capability.

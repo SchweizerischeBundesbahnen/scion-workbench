@@ -71,7 +71,7 @@ describe('Workbench Perspective', () => {
 
     expectPerspectives([{id: 'default', active: true}]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
@@ -96,7 +96,7 @@ describe('Workbench Perspective', () => {
 
     expectPerspectives([{id: 'default', active: true}]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left'}),
@@ -139,7 +139,7 @@ describe('Workbench Perspective', () => {
       {id: 'perspective-2', data: {label: 'Perspective 2'}, active: false},
     ]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left'}),
@@ -186,7 +186,7 @@ describe('Workbench Perspective', () => {
       {id: 'perspective-3', active: false},
     ]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'top'}),
@@ -240,7 +240,7 @@ describe('Workbench Perspective', () => {
       {id: 'perspective-3', active: false},
     ]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'top'}),
@@ -282,7 +282,7 @@ describe('Workbench Perspective', () => {
       {id: 'perspective-2', active: false},
     ]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left'}),
@@ -324,7 +324,7 @@ describe('Workbench Perspective', () => {
       {id: 'perspective-2', active: false},
     ]);
 
-    expect(TestBed.inject(WorkbenchService).layout).toEqualWorkbenchLayout({
+    expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left'}),
@@ -592,7 +592,7 @@ describe('Workbench Perspective', () => {
  * Expects specified perspectives to be registered, resolving signals to their effective value.
  */
 function expectPerspectives(expected: Array<Partial<Omit<WorkbenchPerspective, 'active'> & {active: boolean}>>): void {
-  expect(TestBed.inject(WorkbenchService).perspectives.map(resolveSignals)).toEqual(expected.map(perspective => jasmine.objectContaining(perspective)));
+  expect(TestBed.inject(WorkbenchService).perspectives().map(resolveSignals)).toEqual(expected.map(perspective => jasmine.objectContaining(perspective)));
 }
 
 /**

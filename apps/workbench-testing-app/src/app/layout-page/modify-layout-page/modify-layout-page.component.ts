@@ -8,18 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, computed, inject, Signal} from '@angular/core';
 import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.component';
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
-import {WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {stringifyError} from '../../common/stringify-error.util';
-import {combineLatestWith, Observable} from 'rxjs';
-import {distinctArray, filterArray, mapArray} from '@scion/toolkit/operators';
-import {map, startWith} from 'rxjs/operators';
-import {AsyncPipe} from '@angular/common';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -31,7 +28,6 @@ import {AsyncPipe} from '@angular/common';
     AddViewsComponent,
     NavigateViewsComponent,
     ReactiveFormsModule,
-    AsyncPipe,
   ],
 })
 export default class ModifyLayoutPageComponent {
@@ -43,29 +39,40 @@ export default class ModifyLayoutPageComponent {
   });
 
   protected modifyError: string | false | undefined;
-  protected partProposals$: Observable<string[]>;
-  protected viewProposals$: Observable<string[]>;
+  protected partProposals: Signal<string[]>;
+  protected viewProposals: Signal<string[]>;
 
-  constructor(workbenchService: WorkbenchService,
-              private _formBuilder: NonNullableFormBuilder,
+  constructor(private _formBuilder: NonNullableFormBuilder,
               private _settingsService: SettingsService,
               private _workbenchRouter: WorkbenchRouter) {
-    this.partProposals$ = workbenchService.parts$
-      .pipe(
-        combineLatestWith(this.form.controls.parts.valueChanges.pipe(startWith([]))),
-        map(([a, b]) => [...a, ...b]),
-        mapArray(part => part.id),
-        distinctArray(),
-        filterArray(partId => !!partId),
-      );
-    this.viewProposals$ = workbenchService.views$
-      .pipe(
-        combineLatestWith(this.form.controls.views.valueChanges.pipe(startWith([]))),
-        map(([a, b]) => [...a, ...b]),
-        mapArray(view => view.id),
-        distinctArray(),
-        filterArray(viewId => !!viewId),
-      );
+    this.partProposals = this.computePartProposals();
+    this.viewProposals = this.computeViewProposals();
+  }
+
+  private computePartProposals(): Signal<string[]> {
+    const partsFromUI = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
+    const workbenchService = inject(WorkbenchService);
+
+    return computed(() => new Array<WorkbenchPart | PartDescriptor>()
+      .concat(workbenchService.parts())
+      .concat(partsFromUI())
+      .map(part => part.id)
+      .filter(Boolean)
+      .reduce((acc, partId) => acc.includes(partId) ? acc : acc.concat(partId), new Array<string>()),
+    );
+  }
+
+  private computeViewProposals(): Signal<string[]> {
+    const viewsFromUI = toSignal(this.form.controls.views.valueChanges, {initialValue: []});
+    const workbenchService = inject(WorkbenchService);
+
+    return computed(() => new Array<WorkbenchView | ViewDescriptor>()
+      .concat(workbenchService.views())
+      .concat(viewsFromUI())
+      .map(view => view.id)
+      .filter(Boolean)
+      .reduce((acc, viewId) => acc.includes(viewId) ? acc : acc.concat(viewId), new Array<string>()),
+    );
   }
 
   protected async onModify(): Promise<void> {

@@ -251,7 +251,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       return true;
     }
 
-    const currentLayout = this._workbenchLayoutService.layout;
+    const currentLayout = this._workbenchLayoutService.layout();
     return this._workbenchRouter.navigate(
       layout => currentLayout === layout ? layout.activateView(this.id, {activatePart: true}) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: options?.skipLocationChange},

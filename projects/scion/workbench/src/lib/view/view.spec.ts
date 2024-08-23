@@ -471,7 +471,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view 2 und view 4 not to be closed.
-    expect(workbenchService.views.map(view => view.id)).toEqual(['view.102', 'view.104']);
+    expect(workbenchService.views().map(view => view.id)).toEqual(['view.102', 'view.104']);
 
     // Expect view 1 to be closed.
     expect(componentView1.destroyed).toBeTrue();
@@ -524,7 +524,7 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect view 2 und view 4 not to be closed.
-    expect(workbenchService.views.map(view => view.id)).toEqual(['view.102', 'view.104']);
+    expect(workbenchService.views().map(view => view.id)).toEqual(['view.102', 'view.104']);
 
     // Expect view 1 to be closed.
     expect(componentView1.destroyed).toBeTrue();
@@ -1389,7 +1389,7 @@ describe('View', () => {
 
     // Add layout with view "view.1" and alternative view id "testee-1"
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'main'}));
-    const view1 = TestBed.inject(ɵWorkbenchService).views.find(view => view.alternativeId === 'testee-1')!;
+    const view1 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-1')!;
 
     // Replace layout with view "view.1" and alternative view id "testee-2"
     await TestBed.inject(ɵWorkbenchRouter).navigate(() => inject(ɵWorkbenchLayoutFactory)
@@ -1398,7 +1398,7 @@ describe('View', () => {
     );
 
     // Expect the view handle to be the same.
-    const view2 = TestBed.inject(ɵWorkbenchService).views.find(view => view.alternativeId === 'testee-2')!;
+    const view2 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-2')!;
     expect(view1).toBe(view2);
 
     // Replace layout with view "view.1" and alternative view id "testee-2"
@@ -1408,7 +1408,7 @@ describe('View', () => {
     );
 
     // Expect the view handle to be the same.
-    const view3 = TestBed.inject(ɵWorkbenchService).views.find(view => view.alternativeId === 'testee-3')!;
+    const view3 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-3')!;
     expect(view1).toBe(view3);
   });
 

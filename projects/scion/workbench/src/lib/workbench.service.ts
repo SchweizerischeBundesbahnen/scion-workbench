@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable} from 'rxjs';
 import {Disposable} from './common/disposable';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
@@ -39,34 +38,19 @@ import {WorkbenchLayout} from './layout/workbench-layout';
 export abstract class WorkbenchService {
 
   /**
-   * Returns the current {@link WorkbenchLayout}.
+   * Provides the snapshot of the current workbench layout.
    *
    * The layout is an immutable object. Modifications have no side effects. The layout can be modified using {@link WorkbenchRouter.navigate}.
    */
-  public abstract readonly layout: WorkbenchLayout;
+  public abstract readonly layout: Signal<WorkbenchLayout>;
 
   /**
-   * Emits the current {@link WorkbenchLayout}.
+   * Provides the handles of the perspectives registered in the workbench.
    *
-   * Upon subscription, emits the current workbench layout, and then emits continuously
-   * when the layout changes. It never completes.
-   *
-   * The layout is an immutable object. Modifications have no side effects. The layout can be modified using {@link WorkbenchRouter.navigate}.
+   * Each handle represents a perspective registered in the workbench. The handle has methods to interact with the perspective.
+   * Perspectives are registered via {@link WorkbenchConfig} passed to {@link provideWorkbench} or via {@link WorkbenchService}.
    */
-  public abstract readonly layout$: Observable<WorkbenchLayout>;
-
-  /**
-   * Perspectives registered with the workbench.
-   */
-  public abstract readonly perspectives: readonly WorkbenchPerspective[];
-
-  /**
-   * Emits the perspectives registered with the workbench.
-   *
-   * Upon subscription, emits registered perspectives, and then emits continuously
-   * when new perspectives are registered or existing perspectives unregistered. It never completes.
-   */
-  public abstract readonly perspectives$: Observable<readonly WorkbenchPerspective[]>;
+  public abstract readonly perspectives: Signal<WorkbenchPerspective[]>;
 
   /**
    * Provides the currently active perspective, or `null` if the initial perspective is not yet activated, e.g., during startup.
@@ -74,69 +58,54 @@ export abstract class WorkbenchService {
   public abstract readonly activePerspective: Signal<WorkbenchPerspective | null>;
 
   /**
-   * Returns a reference to the specified {@link WorkbenchPerspective}, or `null` if not found.
+   * Returns the handle of the specified perspective, or `null` if not found.
    */
   public abstract getPerspective(perspectiveId: string): WorkbenchPerspective | null;
 
   /**
-   * Registers the given perspective to arrange views around the main area.
-   * The perspective can be activated via the {@link WorkbenchService#switchPerspective} method.
+   * Registers the given perspective.
    *
-   * @see WorkbenchPerspective
+   * The perspective can be activated via {@link WorkbenchService#switchPerspective}.
    */
   public abstract registerPerspective(perspective: WorkbenchPerspectiveDefinition): Promise<void>;
 
   /**
-   * Switches to the specified perspective. Layout and views of the main area do not change.
+   * Switches to the specified perspective.
+   *
+   * Switching perspective does not change the layout of the main area, if any.
    */
   public abstract switchPerspective(id: string): Promise<boolean>;
 
   /**
-   * Resets the currently active perspective to its initial layout. Layout and views of the main area do not change.
+   * Resets the currently active perspective to its initial layout. Resetting the perspective does not change the layout of the main area, if any.
    */
   public abstract resetPerspective(): Promise<void>;
 
   /**
-   * Parts in the workbench layout.
+   * Provides the handles of the parts in the current workbench layout.
    *
-   * Each {@link WorkbenchPart} object represents a part in the workbench layout that can be interacted with.
+   * Each handle represents a part in the layout. The handle has methods to interact with the part. Parts are added to the layout via {@link WorkbenchRouter}.
    */
-  public abstract readonly parts: readonly WorkbenchPart[];
+  public abstract readonly parts: Signal<WorkbenchPart[]>;
 
   /**
-   * Emits the parts in the workbench layout.
+   * Returns the handle of the specified part, or `null` if not found.
    *
-   * Upon subscription, emits parts contained in the layout, and then emits continuously
-   * when new parts are added or existing parts removed. It never completes.
-   */
-  public abstract readonly parts$: Observable<readonly WorkbenchPart[]>;
-
-  /**
-   * Returns a reference to the specified {@link WorkbenchPart}, or `null` if not found.
-   *
-   * A {@link WorkbenchPart} object represents a part in the workbench layout that can be interacted with.
+   * A handle represents a part in the layout. The handle has methods to interact with the part. A part is added to the layout via {@link WorkbenchRouter}.
    */
   public abstract getPart(partId: string): WorkbenchPart | null;
 
   /**
-   * Views in the workbench layout.
+   * Provides the handles of the views in the current workbench layout.
    *
-   * Each {@link WorkbenchView} object represents a view in the workbench layout that can be interacted with.
+   * Each handle represents a view in the layout. The handle has methods to interact with the view. Views are opened via {@link WorkbenchRouter}.
    */
-  public abstract readonly views: readonly WorkbenchView[];
+  public abstract readonly views: Signal<WorkbenchView[]>;
 
   /**
-   * Emits the views opened in the workbench.
+   * Returns the handle of the specified view, or `null` if not found.
    *
-   * Upon subscription, emits views contained in the layout, and then emits continuously
-   * when new views are opened or existing views closed. It never completes.
-   */
-  public abstract readonly views$: Observable<readonly WorkbenchView[]>;
-
-  /**
-   * Returns a reference to the specified {@link WorkbenchView}, or `null` if not found.
-   *
-   * A {@link WorkbenchView} object represents a view in the workbench layout that can be interacted with.
+   * A handle represents a view in the layout. The handle has methods to interact with the view. A view is opened via {@link WorkbenchRouter}.
    */
   public abstract getView(viewId: ViewId): WorkbenchView | null;
 
@@ -178,9 +147,7 @@ export abstract class WorkbenchService {
   public abstract switchTheme(theme: string): Promise<void>;
 
   /**
-   * Emits the current workbench theme.
-   *
-   * Upon subscription, emits the current theme, and then continuously emits when switching the theme. It never completes.
+   * Provides the current workbench theme, if any.
    */
-  public abstract readonly theme$: Observable<WorkbenchTheme | null>;
+  public abstract readonly theme: Signal<WorkbenchTheme | null>;
 }

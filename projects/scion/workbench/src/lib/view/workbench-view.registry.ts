@@ -27,7 +27,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
     nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
   });
 
-  public views$: Observable<readonly ɵWorkbenchView[]> = concat(
+  public views$: Observable<ɵWorkbenchView[]> = concat(
     this._registry.objects$.pipe(take(1)), // immediate emission upon subscription
     this._registry.objects$.pipe(bufferLatestUntilLayoutChange()),
   );
@@ -55,7 +55,7 @@ export class WorkbenchViewRegistry implements OnDestroy {
     return this._registry.get(viewId, options);
   }
 
-  public get views(): readonly ɵWorkbenchView[] {
+  public get views(): ɵWorkbenchView[] {
     return this._registry.objects;
   }
 

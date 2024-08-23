@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, OnDestroy} from '@angular/core';
+import {Component, effect, OnDestroy} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {distinct, map} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {combineLatest} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDialogService, WorkbenchPart, WorkbenchPartActionDirective, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
@@ -70,15 +69,12 @@ export class WorkbenchComponent implements OnDestroy {
    * If enabled, installs the handler to automatically open the start tab when the user closes the last tab.
    */
   private installStickyStartViewTab(): void {
-    const stickyStartViewTab$ = this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))), distinct());
-    const views$ = this.workbenchService.views$;
-    combineLatest([stickyStartViewTab$, views$])
-      .pipe(takeUntilDestroyed())
-      .subscribe(([stickyStartViewTab, views]) => {
-        if (stickyStartViewTab && views.length === 0) {
-          this._wbRouter.navigate(['/start-page']).then();
-        }
-      });
+    const stickyStartViewTab = toSignal(this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))), distinct()), {requireSync: true});
+    effect(() => {
+      if (stickyStartViewTab() && !this.workbenchService.views().length) {
+        this._wbRouter.navigate(['/start-page']).then();
+      }
+    });
   }
 
   public ngOnDestroy(): void {

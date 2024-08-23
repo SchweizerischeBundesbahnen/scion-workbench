@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Signal} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {computed, Injectable, Signal} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
@@ -28,15 +28,16 @@ import {ViewId} from './view/workbench-view.model';
 import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {throwError} from './common/throw-error.util';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
 
-  public readonly layout$: Observable<ɵWorkbenchLayout>;
-  public readonly perspectives$: Observable<readonly ɵWorkbenchPerspective[]>;
-  public readonly parts$: Observable<readonly ɵWorkbenchPart[]>;
-  public readonly views$: Observable<readonly ɵWorkbenchView[]>;
-  public readonly theme$: Observable<WorkbenchTheme | null>;
+  public readonly layout: Signal<ɵWorkbenchLayout>;
+  public readonly perspectives: Signal<ɵWorkbenchPerspective[]>;
+  public readonly parts: Signal<ɵWorkbenchPart[]>;
+  public readonly views: Signal<ɵWorkbenchView[]>;
+  public readonly theme: Signal<WorkbenchTheme | null>;
   public readonly activePerspective: Signal<WorkbenchPerspective | null>;
 
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
@@ -49,21 +50,12 @@ export class ɵWorkbenchService implements WorkbenchService {
               private _perspectiveService: WorkbenchPerspectiveService,
               private _layoutService: WorkbenchLayoutService,
               private _workbenchThemeSwitcher: WorkbenchThemeSwitcher) {
-    this.layout$ = this._layoutService.layout$;
-    this.perspectives$ = this._perspectiveRegistry.perspectives$;
-    this.parts$ = this._partRegistry.parts$;
-    this.views$ = this._viewRegistry.views$;
-    this.theme$ = this._workbenchThemeSwitcher.theme$;
+    this.layout = computed(() => this._layoutService.layout() ?? throwError('[NullLayoutError] Workbench layout not created yet.'));
+    this.perspectives = toSignal(this._perspectiveRegistry.perspectives$, {requireSync: true});
+    this.parts = toSignal(this._partRegistry.parts$, {requireSync: true});
+    this.views = toSignal(this._viewRegistry.views$, {requireSync: true});
+    this.theme = this._workbenchThemeSwitcher.theme;
     this.activePerspective = this._perspectiveService.activePerspective;
-  }
-
-  public get layout(): ɵWorkbenchLayout {
-    return this._layoutService.layout ?? throwError('[NullLayoutError] Workbench layout not created yet.');
-  }
-
-  /** @inheritDoc */
-  public get perspectives(): readonly ɵWorkbenchPerspective[] {
-    return this._perspectiveRegistry.perspectives;
   }
 
   /** @inheritDoc */
@@ -72,18 +64,8 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public get parts(): readonly ɵWorkbenchPart[] {
-    return this._partRegistry.parts;
-  }
-
-  /** @inheritDoc */
   public getPart(partId: string): ɵWorkbenchPart | null {
     return this._partRegistry.get(partId, {orElse: null});
-  }
-
-  /** @inheritDoc */
-  public get views(): readonly ɵWorkbenchView[] {
-    return this._viewRegistry.views;
   }
 
   /** @inheritDoc */

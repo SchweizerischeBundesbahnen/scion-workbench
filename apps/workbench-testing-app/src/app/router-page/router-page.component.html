@@ -25,7 +25,7 @@
     <sci-form-field label="Part ID">
       <input [formControl]="form.controls.extras.controls.partId" class="e2e-part-id" [attr.list]="partList">
       <datalist [attr.id]="partList">
-        @for (part of workbenchService.parts$ | async; track part.id) {
+        @for (part of workbenchService.parts(); track part.id) {
           <option [value]="part.id">{{part.id}}</option>
         }
       </datalist>

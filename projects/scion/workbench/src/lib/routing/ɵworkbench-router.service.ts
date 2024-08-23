@@ -69,12 +69,12 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     return this._singleNavigationExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, this navigation would override the initial layout as given in the URL.
-      if (!this._workbenchLayoutService.layout) {
+      if (!this._workbenchLayoutService.layout()) {
         await this.waitForInitialLayout();
       }
 
       // Let the navigator compute the new workbench layout.
-      const currentLayout = this._workbenchLayoutService.layout!;
+      const currentLayout = this._workbenchLayoutService.layout()!;
       let newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => navigateFn(currentLayout)) as ɵWorkbenchLayout;
       if (!newLayout) {
         return true;
@@ -132,12 +132,12 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     return this._singleNavigationExecutor.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, would override the initial layout as given in the URL.
-      if (!this._workbenchLayoutService.layout) {
+      if (!this._workbenchLayoutService.layout()) {
         await this.waitForInitialLayout();
       }
 
       // Let the navigator compute the new workbench layout.
-      const currentLayout = this._workbenchLayoutService.layout!;
+      const currentLayout = this._workbenchLayoutService.layout()!;
       let newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => onNavigate(currentLayout));
       if (!newLayout) {
         return null;

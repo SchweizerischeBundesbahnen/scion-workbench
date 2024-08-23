@@ -23,7 +23,7 @@ export class WorkbenchObjectRegistry<KEY, T> {
   private readonly _nullObjectErrorFn: (key: KEY) => Error;
   private readonly _change$ = new Subject<void>();
 
-  public readonly objects$: Observable<readonly T[]>;
+  public readonly objects$: Observable<T[]>;
 
   /**
    * Creates an instance of the registry.
@@ -89,9 +89,9 @@ export class WorkbenchObjectRegistry<KEY, T> {
   }
 
   /**
-   * Readonly reference to registered objects.
+   * Returns registered objects.
    */
-  public get objects(): readonly T[] {
+  public get objects(): T[] {
     return this._objects;
   }
 

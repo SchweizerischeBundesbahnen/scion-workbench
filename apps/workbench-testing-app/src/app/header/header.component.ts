@@ -8,20 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, Signal, untracked} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
-import {AsyncPipe} from '@angular/common';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
 import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
-import {Logger, LogLevel, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
+import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
 import {SettingsService} from '../settings.service';
-import {SortPerspectivesPipe} from './sort-perspectives.pipe';
+import {sortPerspectives} from './sort-perspectives.util';
 
 @Component({
   selector: 'app-header',
@@ -30,17 +29,16 @@ import {SortPerspectivesPipe} from './sort-perspectives.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [
-    AsyncPipe,
     ReactiveFormsModule,
     SciMaterialIconDirective,
     SciToggleButtonComponent,
-    SortPerspectivesPipe,
   ],
 })
 export class HeaderComponent {
 
   protected readonly PerspectiveData = PerspectiveData;
   protected readonly lightThemeActiveFormControl = new FormControl<boolean>(true);
+  protected readonly perspectives: Signal<WorkbenchPerspective[]>;
 
   constructor(private _router: Router,
               private _wbRouter: WorkbenchRouter,
@@ -49,10 +47,13 @@ export class HeaderComponent {
               private _logger: Logger,
               protected workbenchService: WorkbenchService) {
     this.installThemeSwitcher();
+    this.perspectives = computed(() => {
+      const perspectives = this.workbenchService.perspectives();
+      return untracked(() => sortPerspectives(perspectives));
+    });
   }
 
-  protected async onTogglePerspective(id: string): Promise<void> {
-    const perspective = this.workbenchService.perspectives.find(perspective => perspective.id === id)!;
+  protected async onTogglePerspective(perspective: WorkbenchPerspective): Promise<void> {
     await this.workbenchService.switchPerspective(perspective.active() ? 'blank' : perspective.id);
   }
 
@@ -76,11 +77,9 @@ export class HeaderComponent {
   private contributePerspectiveMenuItems(): MenuItem[] {
     return [
       new MenuItem({
-          text: 'Reset Perspective',
-          disabled: !this.workbenchService.perspectives.length,
-          onAction: () => this.workbenchService.resetPerspective(),
-        },
-      ),
+        text: 'Reset Perspective',
+        onAction: () => this.workbenchService.resetPerspective(),
+      }),
     ];
   }
 
@@ -176,11 +175,9 @@ export class HeaderComponent {
   }
 
   private installThemeSwitcher(): void {
-    this.workbenchService.theme$
-      .pipe(takeUntilDestroyed())
-      .subscribe(theme => {
-        this.lightThemeActiveFormControl.setValue(theme?.colorScheme === 'light', {emitEvent: false});
-      });
+    effect(() => {
+      this.lightThemeActiveFormControl.setValue(this.workbenchService.theme()?.colorScheme === 'light', {emitEvent: false});
+    });
 
     this.lightThemeActiveFormControl.valueChanges
       .pipe(takeUntilDestroyed())
@@ -204,5 +201,4 @@ export class HeaderComponent {
       }),
     ];
   }
-
 }
