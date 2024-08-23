@@ -9,14 +9,14 @@
  */
 
 import {Component, DoCheck, HostBinding, inject, NgZone} from '@angular/core';
-import {filter, mergeMap, switchMap} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
-import {EMPTY, fromEvent, merge, of} from 'rxjs';
+import {fromEvent} from 'rxjs';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {SettingsService} from './settings.service';
 
@@ -40,7 +40,9 @@ export class AppComponent implements DoCheck {
   public workbenchId = inject(WORKBENCH_ID);
 
   @HostBinding('attr.data-perspective-id')
-  public activePerspectiveId: string | undefined;
+  public get activePerspectiveId(): string | undefined {
+    return this._workbenchService.activePerspective()?.id;
+  }
 
   /**
    * Unique id that is set after a navigation has been performed.
@@ -53,11 +55,11 @@ export class AppComponent implements DoCheck {
 
   constructor(settingsService: SettingsService,
               private _router: Router,
+              private _workbenchService: WorkbenchService,
               private _zone: NgZone,
               protected workbenchStartup: WorkbenchStartup) {
     this.installRouterEventListeners();
     this.installPropagatedKeyboardEventLogger();
-    this.installActivePerspectiveListener();
 
     settingsService.observe$('logAngularChangeDetectionCycles')
       .pipe(takeUntilDestroyed())
@@ -96,17 +98,6 @@ export class AppComponent implements DoCheck {
         if (!event.isTrusted && (event.target as Element).tagName === 'SCI-ROUTER-OUTLET') {
           console.debug(`[AppComponent][synth-event][event=${event.type}][key=${event.key}][key.control=${event.ctrlKey}][key.shift=${event.shiftKey}][key.alt=${event.altKey}][key.meta=${event.metaKey}]`);
         }
-      });
-  }
-
-  private installActivePerspectiveListener(): void {
-    inject(WorkbenchService).perspectives$
-      .pipe(
-        switchMap(perspectives => merge(...perspectives.map(perspective => toObservable(perspective.active).pipe(mergeMap(active => active ? of(perspective) : EMPTY))))),
-        takeUntilDestroyed(),
-      )
-      .subscribe(activePerspective => {
-        this.activePerspectiveId = activePerspective.id;
       });
   }
 }

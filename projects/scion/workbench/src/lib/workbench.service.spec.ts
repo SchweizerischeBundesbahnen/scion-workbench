@@ -54,5 +54,39 @@ describe('Workbench Service', () => {
     // Expect view.2 not to be closed.
     expect(TestBed.inject(WorkbenchService).views.map(view => view.id)).toEqual(['view.2']);
   });
-});
 
+  it('should provide activated perspective', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          startup: {launcher: 'APP_INITIALIZER'},
+          layout: {
+            perspectives: [
+              {
+                id: 'perspective-1',
+                layout: factory => factory.addPart('main'),
+              },
+              {
+                id: 'perspective-2',
+                layout: factory => factory.addPart('main'),
+              },
+            ],
+          },
+        }),
+      ],
+    });
+    await waitForInitialWorkbenchLayout();
+    const workbenchService = TestBed.inject(WorkbenchService);
+
+    // Expect initial perspective.
+    expect(workbenchService.activePerspective()!.id).toEqual('perspective-1');
+
+    // Switch to perspective-1.
+    await workbenchService.switchPerspective('perspective-2');
+    expect(workbenchService.activePerspective()!.id).toEqual('perspective-2');
+
+    // Switch perspective-1.
+    await workbenchService.switchPerspective('perspective-1');
+    expect(workbenchService.activePerspective()!.id).toEqual('perspective-1');
+  });
+});

@@ -14,7 +14,7 @@ import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from '.
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WorkbenchPart} from './part/workbench-part.model';
-import {Injectable} from '@angular/core';
+import {Injectable, Signal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
 
@@ -67,6 +67,11 @@ export abstract class WorkbenchService {
    * when new perspectives are registered or existing perspectives unregistered. It never completes.
    */
   public abstract readonly perspectives$: Observable<readonly WorkbenchPerspective[]>;
+
+  /**
+   * Provides the currently active perspective, or `null` if the initial perspective is not yet activated, e.g., during startup.
+   */
+  public abstract readonly activePerspective: Signal<WorkbenchPerspective | null>;
 
   /**
    * Returns a reference to the specified {@link WorkbenchPerspective}, or `null` if not found.
