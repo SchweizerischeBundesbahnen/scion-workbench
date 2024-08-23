@@ -11,8 +11,7 @@
 import {asapScheduler, AsyncSubject, lastValueFrom, Subject} from 'rxjs';
 import {serializeExecution} from '../common/operators';
 import {catchError, observeOn} from 'rxjs/operators';
-import {DestroyRef, inject, InjectionToken} from '@angular/core';
-import {ɵDestroyRef} from '../common/ɵdestroy-ref';
+import {InjectionToken} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
@@ -20,23 +19,20 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
  */
 export const SINGLE_NAVIGATION_EXECUTOR = new InjectionToken<SingleTaskExecutor>('SINGLE_NAVIGATION_EXECUTOR', {
   providedIn: 'root',
-  factory: () => {
-    const executor = new SingleTaskExecutor();
-    inject(DestroyRef).onDestroy(() => executor.destroy());
-    return executor;
-  },
+  factory: () => new SingleTaskExecutor(),
 });
 
 /**
  * Allows the serial execution of tasks.
  *
- * At any given time, there is only one task executing. When submitting a task and if there is a task already executing,
+ * At any one time, there is only one task executing. When submitting a task and if there is a task already executing,
  * the submitted task will be queued for later execution.
+ *
+ * This executor must be constructed within an injection context. Destroying the injection context will also destroy the executor.
  */
 export class SingleTaskExecutor {
 
   private _task$ = new Subject<Task>();
-  private _destroyRef = new ɵDestroyRef();
 
   constructor() {
     this._task$
@@ -48,7 +44,7 @@ export class SingleTaskExecutor {
         observeOn(asapScheduler),
         serializeExecution(task => task.execute()),
         catchError((error, caught) => caught),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe();
   }
@@ -62,13 +58,6 @@ export class SingleTaskExecutor {
     const ɵtask = new Task<T>(task);
     this._task$.next(ɵtask);
     return ɵtask.await();
-  }
-
-  /**
-   * Destroys this executor.
-   */
-  public destroy(): void {
-    this._destroyRef.destroy();
   }
 }
 

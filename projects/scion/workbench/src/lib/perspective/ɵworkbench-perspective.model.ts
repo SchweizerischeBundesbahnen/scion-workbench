@@ -17,7 +17,7 @@ import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storag
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {filter} from 'rxjs/operators';
 import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
-import {serializeExecution} from '../common/operators';
+import {LatestTaskExecutor} from '../executor/latest-task-executor';
 import {UrlSegment} from '@angular/router';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -59,7 +59,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     this.data = definition.data ?? {};
     this.active = computed(() => this._activePerspective()?.id === this.id);
     this._initialLayoutFn = definition.layout;
-    this.onPerspectiveLayoutChange(layout => this.storePerspectiveLayout(layout));
+    this.installLayoutPersister();
   }
 
   /**
@@ -171,16 +171,19 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
-   * Subscribes to workbench layout changes, invoking the given callback on layout change, but only if this perspective is active.
+   * Sets up automatic persistence of the perspective layout on every layout change.
    */
-  private onPerspectiveLayoutChange(callback: (layout: ɵWorkbenchLayout) => Promise<void>): void {
-    this._workbenchLayoutService.layout$
+  private installLayoutPersister(): void {
+    const executor = new LatestTaskExecutor();
+
+    this._workbenchLayoutService.onLayoutChange$
       .pipe(
         filter(() => this.active()),
-        serializeExecution(callback),
         takeUntilDestroyed(),
       )
-      .subscribe();
+      .subscribe(layout => {
+        executor.submit(() => this.storePerspectiveLayout(layout));
+      });
   }
 
   /**
