@@ -35,23 +35,23 @@ export const ACTIVE_PERSPECTIVE = new InjectionToken<WritableSignal<ɵWorkbenchP
  */
 export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
-  private _perspectiveEnvironmentInjector = inject(EnvironmentInjector);
-  private _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
-  private _workbenchGridMerger = inject(WorkbenchGridMerger);
-  private _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
-  private _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private _workbenchRouter = inject(ɵWorkbenchRouter);
-  private _initialLayoutFn: WorkbenchLayoutFn;
-  private _activePerspective = inject(ACTIVE_PERSPECTIVE);
-  private _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
+  private readonly _perspectiveEnvironmentInjector = inject(EnvironmentInjector);
+  private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
+  private readonly _workbenchGridMerger = inject(WorkbenchGridMerger);
+  private readonly _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
+  private readonly _initialLayoutFn: WorkbenchLayoutFn;
+  private readonly _activePerspective = inject(ACTIVE_PERSPECTIVE);
+  private readonly _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
+
+  public readonly id: string;
+  public readonly transient: boolean;
+  public readonly data: {[key: string]: any};
+  public readonly active: Signal<boolean>;
 
   private _initialPerspectiveLayout: ɵWorkbenchLayout | undefined;
   private _perspectiveLayout: ɵWorkbenchLayout | undefined;
-
-  public id: string;
-  public transient: boolean;
-  public data: {[key: string]: any};
-  public active: Signal<boolean>;
 
   constructor(definition: WorkbenchPerspectiveDefinition) {
     this.id = definition.id;

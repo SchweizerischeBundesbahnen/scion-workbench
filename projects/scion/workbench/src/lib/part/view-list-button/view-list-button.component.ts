@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ComponentRef, computed, DestroyRef, ElementRef, HostListener, Injector, NgZone, OnDestroy, Signal} from '@angular/core';
+import {Component, ComponentRef, computed, DestroyRef, ElementRef, HostListener, inject, Injector, NgZone, OnDestroy, Signal} from '@angular/core';
 import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent, ViewListComponentInputs} from '../view-list/view-list.component';
 import {WorkbenchPart} from '../workbench-part.model';
 import {subscribeInside} from '@scion/toolkit/operators';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -28,16 +28,18 @@ export class ViewListButtonComponent implements OnDestroy {
   private static readonly SOUTH: ConnectedPosition = {originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top'};
   private static readonly NORTH: ConnectedPosition = {originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom'};
 
+  private readonly _host = inject(ElementRef);
+  private readonly _overlay = inject(Overlay);
+  private readonly _injector = inject(Injector);
+  private readonly _zone = inject(NgZone);
+
   private _overlayRef: OverlayRef | undefined;
   /** Number of views that are scrolled out of the tab bar. */
-  protected scrolledOutOfViewTabCount: Signal<number>;
+  protected readonly scrolledOutOfViewTabCount: Signal<number>;
 
-  constructor(private _host: ElementRef,
-              private _overlay: Overlay,
-              private _injector: Injector,
-              private _zone: NgZone,
-              part: WorkbenchPart,
-              viewRegistry: WorkbenchViewRegistry) {
+  constructor() {
+    const part = inject(WorkbenchPart);
+    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
     this.scrolledOutOfViewTabCount = computed(() => part.viewIds()
       .map(viewId => viewRegistry.get(viewId))
       .reduce((count, view) => view.scrolledIntoView() ? count : count + 1, 0));

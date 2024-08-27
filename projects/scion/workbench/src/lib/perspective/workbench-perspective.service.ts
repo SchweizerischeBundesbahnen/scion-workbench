@@ -11,12 +11,12 @@ import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, i
 import {ACTIVE_PERSPECTIVE, ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
-import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchConfig} from '../workbench-config';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
+import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
 
 /**
  * Enables registration and activation of perspectives.
@@ -24,14 +24,13 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveService implements WorkbenchInitializer {
 
-  public readonly activePerspective = inject(ACTIVE_PERSPECTIVE);
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
+  private readonly _perspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
+  private readonly _environmentInjector = inject(EnvironmentInjector);
+  private readonly _applicationInitStatus = inject(ApplicationInitStatus);
+  private readonly _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
 
-  constructor(private _workbenchConfig: WorkbenchConfig,
-              private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
-              private _environmentInjector: EnvironmentInjector,
-              private _applicationInitStatus: ApplicationInitStatus,
-              private _workbenchPerspectiveStorageService: WorkbenchPerspectiveStorageService) {
-  }
+  public readonly activePerspective = inject(ACTIVE_PERSPECTIVE);
 
   public async init(): Promise<void> {
     await this.registerPerspectivesFromConfig();
@@ -56,7 +55,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       }
     }
     // Register default perspective if no perspective is registered.
-    else if (!this._perspectiveRegistry.perspectives.length) {
+    else if (this._perspectiveRegistry.isEmpty()) {
       await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: ((factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA))});
     }
   }
@@ -129,11 +128,11 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    * Activates the initial perspective.
    */
   private async activateInitialPerspective(): Promise<void> {
-    if (!this._perspectiveRegistry.perspectives.length) {
+    if (this._perspectiveRegistry.isEmpty()) {
       throw Error('[NullPerspectiveError] No perspective found to activate.');
     }
 
-    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.perspectives[0].id;
+    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.objects()[0].id;
     const activation = this.switchPerspective(perspectiveId, {storePerspectiveAsActive: false});
 
     // Switching perspective blocks until the initial navigation has been performed. By default, Angular performs
@@ -170,7 +169,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       return perspectiveFromConfig;
     }
     if (typeof perspectiveFromConfig === 'function') {
-      return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.perspectives])));
+      return (await runInInjectionContext(this._environmentInjector, () => perspectiveFromConfig([...this._perspectiveRegistry.objects()])));
     }
     return undefined;
   }

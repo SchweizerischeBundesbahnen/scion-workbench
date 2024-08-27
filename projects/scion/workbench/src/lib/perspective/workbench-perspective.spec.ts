@@ -27,7 +27,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
 import {WorkbenchPerspective} from './workbench-perspective.model';
 import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
-import {WorkbenchPerspectiveRegistry} from './workbench-perspective.registry';
+import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
 
 describe('Workbench Perspective', () => {
 
@@ -47,12 +47,12 @@ describe('Workbench Perspective', () => {
     await waitUntilStable();
 
     // Get reference to the perspective injector.
-    const perspective = TestBed.inject(WorkbenchPerspectiveRegistry).get('perspective');
+    const perspective = TestBed.inject(WORKBENCH_PERSPECTIVE_REGISTRY).get('perspective');
     let injectorDestroyed = false;
     perspective.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
 
     // Unregister the perspective.
-    TestBed.inject(WorkbenchPerspectiveRegistry).unregister('perspective');
+    TestBed.inject(WORKBENCH_PERSPECTIVE_REGISTRY).unregister('perspective');
     await waitUntilStable();
 
     // Expect the injector to be destroyed.

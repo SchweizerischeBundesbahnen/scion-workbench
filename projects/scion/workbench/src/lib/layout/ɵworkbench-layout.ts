@@ -12,8 +12,8 @@ import {assertType} from '../common/asserts.util';
 import {UID} from '../common/uid.util';
 import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, ViewOutlets} from '../routing/routing.model';
@@ -965,8 +965,7 @@ export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<string>('MAIN_AREA_I
 @Injectable({providedIn: 'root'})
 export class PartActivationInstantProvider {
 
-  constructor(private _partRegistry: WorkbenchPartRegistry) {
-  }
+  private _partRegistry = inject(WORKBENCH_PART_REGISTRY);
 
   /**
    * Returns the instant when the specified part was last activated.
@@ -987,8 +986,7 @@ export class PartActivationInstantProvider {
 @Injectable({providedIn: 'root'})
 export class ViewActivationInstantProvider {
 
-  constructor(private _viewRegistry: WorkbenchViewRegistry) {
-  }
+  private _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
 
   /**
    * Returns the instant when the specified view was last activated.

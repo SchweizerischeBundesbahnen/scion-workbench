@@ -8,38 +8,40 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Observable, Subject} from 'rxjs';
-import {map, startWith} from 'rxjs/operators';
+import {DestroyRef, inject, signal} from '@angular/core';
 
 /**
  * Provides a registry for workbench model objects.
  */
 export class WorkbenchObjectRegistry<KEY, T> {
 
-  private readonly _objects = new Array<T>();
+  private readonly _objects = signal<T[]>([]);
   private readonly _objectsById = new Map<KEY, T>();
 
   private readonly _keyFn: (object: T) => KEY;
   private readonly _nullObjectErrorFn: (key: KEY) => Error;
-  private readonly _change$ = new Subject<void>();
+  private readonly _onUnregister: ((object: T) => void) | undefined;
 
-  public readonly objects$: Observable<T[]>;
+  public readonly objects = this._objects.asReadonly();
 
   /**
    * Creates an instance of the registry.
    *
+   * This registry must be constructed within an injection context. Destroying the injection context will also destroy the registry,
+   * invoking the specified `onUnregister` function for each object in the registry.
+   *
    * @param config - Controls the creation of the registry.
    * @param config.keyFn - Function to extract the key of an object.
    * @param config.nullObjectErrorFn - Function to provide an error when looking up an object not contained in the registry.
+   * @param config.onUnregister - Function invoked when an object is unregistered.
    */
-  constructor(config: {keyFn: (object: T) => KEY; nullObjectErrorFn: (key: KEY) => Error}) {
+  constructor(config: {keyFn: (object: T) => KEY; nullObjectErrorFn?: (key: KEY) => Error; onUnregister?: (object: T) => void}) {
     this._keyFn = config.keyFn;
-    this._nullObjectErrorFn = config.nullObjectErrorFn;
-    this.objects$ = this._change$
-      .pipe(
-        startWith(undefined as void),
-        map(() => [...this._objects]),
-      );
+    this._nullObjectErrorFn = config.nullObjectErrorFn ?? ((key: KEY) => Error(`[NullObjectError] Object '${key}' not found.`));
+    this._onUnregister = config.onUnregister;
+
+    // Clear registry when the current injection context is destroyed.
+    inject(DestroyRef).onDestroy(() => this.clear());
   }
 
   /**
@@ -48,9 +50,21 @@ export class WorkbenchObjectRegistry<KEY, T> {
   public register(object: T): void {
     const key = this._keyFn(object);
     const prevObject = this._objectsById.get(key);
+
+    // Add to Map.
     this._objectsById.set(key, object);
-    prevObject ? this._objects.splice(this._objects.indexOf(prevObject), 1, object) : this._objects.push(object);
-    this._change$.next();
+
+    // Add to Signal.
+    this._objects.update(objects => {
+      const copy = [...objects];
+      if (prevObject) {
+        copy.splice(copy.indexOf(prevObject), 1, object); // Replace object.
+      }
+      else {
+        copy.push(object); // Append object.
+      }
+      return copy;
+    });
   }
 
   /**
@@ -62,9 +76,17 @@ export class WorkbenchObjectRegistry<KEY, T> {
       return null;
     }
 
+    // Invoke unregister function.
+    this._onUnregister?.(object);
+
+    // Remove from Map.
     this._objectsById.delete(key);
-    this._objects.splice(this._objects.indexOf(object), 1);
-    this._change$.next();
+    // Remove from Signal.
+    this._objects.update(objects => {
+      const copy = [...objects];
+      copy.splice(copy.indexOf(object), 1);
+      return copy;
+    });
     return object;
   }
 
@@ -89,18 +111,18 @@ export class WorkbenchObjectRegistry<KEY, T> {
   }
 
   /**
-   * Returns registered objects.
+   * Indicates whether this registry is empty.
    */
-  public get objects(): T[] {
-    return this._objects;
+  public isEmpty(): boolean {
+    return this._objectsById.size === 0;
   }
 
   /**
    * Clears this registry.
    */
   public clear(): void {
+    this._onUnregister && this.objects().forEach(this._onUnregister);
     this._objectsById.clear();
-    this._objects.length = 0;
-    this._change$.next();
+    this._objects.set([]);
   }
 }

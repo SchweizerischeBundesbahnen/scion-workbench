@@ -23,7 +23,7 @@ import {Commands, ViewOutlets, WorkbenchNavigationContext, WorkbenchNavigationEx
 import {ViewId} from '../view/workbench-view.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {Logger} from '../logging';
 import {CanClose} from '../workbench.model';
 
@@ -31,19 +31,18 @@ import {CanClose} from '../workbench.model';
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchRouter implements WorkbenchRouter {
 
-  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
+  private readonly _router = inject(Router);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _workbenchViewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _injector = inject(Injector);
+  private readonly _logger = inject(Logger);
+  private readonly _zone = inject(NgZone);
+  private readonly _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
 
-  /**
-   * Holds the current navigational context during a workbench navigation, or `null` if no navigation is in progress.
-   */
+  /** Holds the current navigational context during a workbench navigation, or `null` if no navigation is in progress. */
   private _currentNavigationContext: WorkbenchNavigationContext | null = null;
 
-  constructor(private _router: Router,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _workbenchViewRegistry: WorkbenchViewRegistry,
-              private _injector: Injector,
-              private _logger: Logger,
-              private _zone: NgZone) {
+  constructor() {
     // Instruct the Angular router to process navigations that do not change the current URL, i.e., when only updating navigation state.
     // For example, the workbench grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
     // the workbench grid would not be added to the browsing history stack.
@@ -159,7 +158,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
    * Decides if given view can be closed, invoking `CanClose` guard if implemented.
    */
   private async canCloseView(viewUid: string): Promise<boolean> {
-    const view = this._workbenchViewRegistry.views.find(view => view.uid === viewUid);
+    const view = this._workbenchViewRegistry.objects().find(view => view.uid === viewUid);
     if (!view) {
       return true;
     }

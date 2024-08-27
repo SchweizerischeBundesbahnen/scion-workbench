@@ -12,9 +12,9 @@ import {TestBed} from '@angular/core/testing';
 import {TestComponent} from '../testing/test.component';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {WorkbenchPartRegistry} from './workbench-part.registry';
+import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {DestroyRef} from '@angular/core';
@@ -36,7 +36,7 @@ describe('WorkbenchPart', () => {
     await waitUntilStable();
 
     // Get reference to the part injector.
-    const part = TestBed.inject(WorkbenchPartRegistry).get('right');
+    const part = TestBed.inject(WORKBENCH_PART_REGISTRY).get('right');
     let injectorDestroyed = false;
     part.injector.get(DestroyRef).onDestroy(() => injectorDestroyed = true);
 
@@ -70,14 +70,14 @@ describe('WorkbenchPart', () => {
     await waitForInitialWorkbenchLayout();
 
     // Expect part 'left-top' to be active.
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active()).toBeTrue();
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active()).toBeFalse();
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('left-top').active()).toBeTrue();
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('left-bottom').active()).toBeFalse();
 
     // WHEN activating already active view
-    await TestBed.inject(WorkbenchViewRegistry).get('view.102').activate();
+    await TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.102').activate();
 
     // THEN expect part to be activated.
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-top').active()).toBeFalse();
-    expect(TestBed.inject(WorkbenchPartRegistry).get('left-bottom').active()).toBeTrue();
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('left-top').active()).toBeFalse();
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('left-bottom').active()).toBeTrue();
   });
 });

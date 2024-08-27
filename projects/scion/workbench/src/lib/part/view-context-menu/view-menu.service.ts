@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {ElementRef, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
 import {WorkbenchMenuItem} from '../../workbench.model';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
 import {firstValueFrom, fromEvent, Observable, Subject, TeardownLogic} from 'rxjs';
 import {coerceElement} from '@angular/cdk/coercion';
@@ -37,12 +37,14 @@ export class ViewMenuService {
   private static readonly BOTTOM_LEFT: ConnectedPosition = {originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom'};
   private static readonly BOTTOM_RIGHT: ConnectedPosition = {originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'bottom'};
 
-  constructor(private _overlay: Overlay,
-              private _injector: Injector,
-              private _zone: NgZone,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _workbenchService: WorkbenchService,
-              private _workbenchConfig: WorkbenchConfig) {
+  private readonly _overlay = inject(Overlay);
+  private readonly _injector = inject(Injector);
+  private readonly _zone = inject(NgZone);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _workbenchService = inject(WorkbenchService);
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
+
+  constructor() {
     // Registers built-in menu items added to the context menu of every view tab.
     this.registerCloseViewMenuItem();
     this.registerCloseOtherViewsMenuItem();

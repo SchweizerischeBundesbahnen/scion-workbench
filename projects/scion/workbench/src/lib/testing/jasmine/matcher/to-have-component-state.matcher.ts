@@ -11,7 +11,7 @@
 import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
-import {WorkbenchViewRegistry} from '../../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../../view/workbench-view.registry';
 import {ViewId} from '../../../view/workbench-view.model';
 
 /**
@@ -21,7 +21,7 @@ export const toHaveComponentStateCustomMatcher: jasmine.CustomMatcherFactories =
   toHaveComponentState: (): CustomMatcher => {
     return {
       compare(viewId: ViewId, expected: string, failOutput: string | undefined): CustomMatcherResult {
-        const componentRef = TestBed.inject(WorkbenchViewRegistry).get(viewId).portal.componentRef;
+        const componentRef = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(viewId).portal.componentRef;
         const actual = componentRef.location.nativeElement.querySelector('input.component-state').value;
         if (actual !== expected) {
           return fail(`Expected transient state '${actual}' of view '${viewId}' to equal '${expected}'. Maybe, the component was not detached but destroyed during layout change.`);

@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, HostBinding, HostListener, Inject, inject, Injector, input, NgZone, Signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
 import {fromEvent, merge, withLatestFrom} from 'rxjs';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {map, switchMap} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
@@ -45,8 +45,15 @@ import {NgClass} from '@angular/common';
 })
 export class ViewTabComponent {
 
-  public host: HTMLElement;
+  private readonly _workbenchId = inject(WORKBENCH_ID);
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _router = inject(ɵWorkbenchRouter);
+  private readonly _viewDragService = inject(ViewDragService);
+  private readonly _viewContextMenuService = inject(ViewMenuService);
+  private readonly _injector = inject(Injector);
 
+  public readonly host = inject(ElementRef<HTMLElement>).nativeElement;
   public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))});
   public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
 
@@ -69,15 +76,7 @@ export class ViewTabComponent {
     return this.view().id;
   }
 
-  constructor(host: ElementRef<HTMLElement>,
-              @Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _workbenchConfig: WorkbenchConfig,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _router: ɵWorkbenchRouter,
-              private _viewDragService: ViewDragService,
-              private _viewContextMenuService: ViewMenuService,
-              private _injector: Injector) {
-    this.host = host.nativeElement;
+  constructor() {
     this.installMaximizeListener();
     this.addHostCssClasses();
     this.installViewMenuItemAccelerators();

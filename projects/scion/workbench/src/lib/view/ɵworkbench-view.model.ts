@@ -24,7 +24,7 @@ import {WbComponentPortal} from '../portal/wb-component-portal';
 import {AbstractType, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, Type} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
-import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
+import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
@@ -47,7 +47,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _childrenOutletContexts = inject(ChildrenOutletContexts);
-  private readonly _partRegistry = inject(WorkbenchPartRegistry);
+  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);

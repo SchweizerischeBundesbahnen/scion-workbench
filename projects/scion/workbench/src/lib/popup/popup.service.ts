@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {createEnvironmentInjector, DestroyRef, ElementRef, EnvironmentInjector, Inject, Injectable, Injector, NgZone, Optional, runInInjectionContext} from '@angular/core';
+import {createEnvironmentInjector, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {combineLatestWith, firstValueFrom, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/operators';
@@ -16,7 +16,7 @@ import {ComponentPortal} from '@angular/cdk/portal';
 import {Popup, PopupConfig, ɵPopup, ɵPopupErrorResult} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {Objects, Observables} from '@scion/toolkit/util';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
 import {PopupComponent} from './popup.component';
 import {DOCUMENT} from '@angular/common';
@@ -44,14 +44,13 @@ const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 's
 @Injectable({providedIn: 'root'})
 export class PopupService {
 
-  constructor(private _environmentInjector: EnvironmentInjector,
-              private _overlay: Overlay,
-              private _focusManager: FocusMonitor,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _zone: NgZone,
-              @Inject(DOCUMENT) private _document: Document,
-              @Optional() private _view?: ɵWorkbenchView) {
-  }
+  private readonly _environmentInjector = inject(EnvironmentInjector);
+  private readonly _overlay = inject(Overlay);
+  private readonly _focusManager = inject(FocusMonitor);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _zone = inject(NgZone);
+  private readonly _document = inject(DOCUMENT);
+  private readonly _view = inject(ɵWorkbenchView, {optional: true});
 
   /**
    * Displays the specified component in a popup.
@@ -241,13 +240,11 @@ export class PopupService {
 
     // Close the popup when closing the view.
     if (contextualView) {
-      this._viewRegistry.views$
-        .pipe(takeUntilDestroyed(popupDestroyRef))
-        .subscribe(views => {
-          if (!views.some(view => view.id === contextualView.id)) {
-            popup.close();
-          }
-        });
+      effect(() => {
+        if (!this._viewRegistry.objects().some(view => view.id === contextualView.id)) {
+          popup.close();
+        }
+      }, {injector: popup.injector});
     }
   }
 

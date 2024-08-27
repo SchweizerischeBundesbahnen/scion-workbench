@@ -9,14 +9,14 @@
  */
 
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchNavigationExtras, WorkbenchViewCapability} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 import {Objects} from '../../common/objects.util';
 
@@ -29,10 +29,9 @@ import {Objects} from '../../common/objects.util';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
-  constructor(private _workbenchRouter: WorkbenchRouter,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _logger: Logger) {
-  }
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _logger = inject(Logger);
 
   /**
    * View intents are handled in this interceptor and then swallowed.
@@ -108,7 +107,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const requiredParams = intentMessage.capability.params?.filter(param => param.required).map(param => param.name) ?? [];
     const matchWildcardParams = options?.matchWildcardParams ?? false;
 
-    const viewIds = this._viewRegistry.views
+    const viewIds = this._viewRegistry.objects()
       .filter(view => !extras.partId || extras.partId === view.part().id)
       .filter(view => {
         const microfrontendWorkbenchView = view.adapt(MicrofrontendWorkbenchView);

@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, OnDestroy} from '@angular/core';
+import {inject, Injectable, OnDestroy} from '@angular/core';
 import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
 import {Logger} from '../../logging';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
@@ -25,11 +25,12 @@ import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendViewCommandHandler implements OnDestroy {
 
-  private _subscriptions = new Set<Subscription>();
+  private readonly _messageClient = inject(MessageClient);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _logger = inject(Logger);
+  private readonly _subscriptions = new Set<Subscription>();
 
-  constructor(private _messageClient: MessageClient,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _logger: Logger) {
+  constructor() {
     this._subscriptions.add(this.installViewTitleCommandHandler());
     this._subscriptions.add(this.installViewHeadingCommandHandler());
     this._subscriptions.add(this.installViewDirtyCommandHandler());
