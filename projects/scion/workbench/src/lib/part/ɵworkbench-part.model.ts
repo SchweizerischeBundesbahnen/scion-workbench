@@ -11,28 +11,26 @@ import {computed, effect, EnvironmentInjector, inject, Injector, runInInjectionC
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
-import {WorkbenchPartActionRegistry} from './workbench-part-action.registry';
 import {filter} from 'rxjs/operators';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewId} from '../view/workbench-view.model';
 import {Event, NavigationStart, Router, RouterEvent} from '@angular/router';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
-import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
-
-  private _activationInstant: number | undefined;
 
   private readonly _partEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _viewRegistry = inject(WorkbenchViewRegistry);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
-  private readonly _partActionRegistry = inject(WorkbenchPartActionRegistry);
+  private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
 
   public readonly active = signal(false);
@@ -41,6 +39,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly actions: Signal<WorkbenchPartAction[]>;
 
   private _isInMainArea: boolean | undefined;
+  private _activationInstant: number | undefined;
 
   constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaLayoutComponent>}) {
     this._partComponent = options.component;
@@ -117,11 +116,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private selectPartActions(): Signal<WorkbenchPartAction[]> {
     const injector = inject(Injector);
 
-    const actions = toSignal(this._partActionRegistry.actions$, {requireSync: true});
-
     return computed(() => {
       // Filter actions by calling `canMatch`, if any.
-      return actions().filter(action => {
+      return this._partActionRegistry.objects().filter(action => {
         // - Run function in injection context for `canMatch` function to inject dependencies.
         // - Run function in a reactive context to track signals. (e.g., view's active state).
         return runInInjectionContext(injector, () => action.canMatch?.(this) ?? true);

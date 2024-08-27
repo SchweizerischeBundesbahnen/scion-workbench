@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {createEnvironmentInjector, EnvironmentInjector, inject, Injectable, NgZone, Optional, runInInjectionContext} from '@angular/core';
+import {createEnvironmentInjector, EnvironmentInjector, inject, Injectable, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {filter} from 'rxjs/operators';
@@ -27,13 +27,11 @@ import {UUID} from '@scion/toolkit/uuid';
 export class ɵWorkbenchDialogService implements WorkbenchDialogService {
 
   private readonly _document = inject<Document>(DOCUMENT);
-
-  constructor(private _viewRegistry: WorkbenchViewRegistry,
-              private _dialogRegistry: WorkbenchDialogRegistry,
-              private _zone: NgZone,
-              private _environmentInjector: EnvironmentInjector,
-              @Optional() private _view?: ɵWorkbenchView) {
-  }
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _dialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _zone = inject(NgZone);
+  private readonly _environmentInjector = inject(EnvironmentInjector);
+  private readonly _view = inject(ɵWorkbenchView, {optional: true});
 
   /** @inheritDoc */
   public async open<R>(component: ComponentType<unknown>, options?: WorkbenchDialogOptions): Promise<R | undefined> {

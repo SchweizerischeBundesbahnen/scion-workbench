@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, HostBinding, Injector, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostBinding, inject, Injector, Input} from '@angular/core';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
@@ -29,6 +29,10 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
 })
 export class ViewListItemComponent {
 
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
+  private readonly _injector = inject(Injector);
+
   public view!: ɵWorkbenchView;
   public viewTabContentPortal!: ComponentPortal<unknown>;
 
@@ -36,11 +40,6 @@ export class ViewListItemComponent {
   public set viewId(viewId: ViewId) {
     this.view = this._viewRegistry.get(viewId);
     this.viewTabContentPortal = this.createViewTabContentPortal();
-  }
-
-  constructor(private _viewRegistry: WorkbenchViewRegistry,
-              private _workbenchConfig: WorkbenchConfig,
-              private _injector: Injector) {
   }
 
   @HostBinding('class.active')

@@ -8,30 +8,38 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, Injectable, Signal} from '@angular/core';
+import {computed, inject, Injectable, Signal} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
-import {WorkbenchViewRegistry} from './view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from './view/workbench-view.registry';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
-import {WorkbenchPartRegistry} from './part/workbench-part.registry';
+import {WORKBENCH_PART_REGISTRY} from './part/workbench-part.registry';
 import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
 import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.model';
-import {WorkbenchPerspectiveRegistry} from './perspective/workbench-perspective.registry';
-import {WorkbenchPartActionRegistry} from './part/workbench-part-action.registry';
+import {WORKBENCH_PERSPECTIVE_REGISTRY} from './perspective/workbench-perspective.registry';
+import {WORKBENCH_PART_ACTION_REGISTRY} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewId} from './view/workbench-view.model';
 import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {throwError} from './common/throw-error.util';
-import {toSignal} from '@angular/core/rxjs-interop';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
+
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _perspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
+  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
+  private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
+  private readonly _layoutService = inject(WorkbenchLayoutService);
+  private readonly _workbenchThemeSwitcher = inject(WorkbenchThemeSwitcher);
 
   public readonly layout: Signal<ɵWorkbenchLayout>;
   public readonly perspectives: Signal<ɵWorkbenchPerspective[]>;
@@ -39,21 +47,13 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly theme: Signal<WorkbenchTheme | null>;
   public readonly activePerspective: Signal<WorkbenchPerspective | null>;
-
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 
-  constructor(private _workbenchRouter: WorkbenchRouter,
-              private _perspectiveRegistry: WorkbenchPerspectiveRegistry,
-              private _partRegistry: WorkbenchPartRegistry,
-              private _partActionRegistry: WorkbenchPartActionRegistry,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _perspectiveService: WorkbenchPerspectiveService,
-              private _layoutService: WorkbenchLayoutService,
-              private _workbenchThemeSwitcher: WorkbenchThemeSwitcher) {
+  constructor() {
     this.layout = computed(() => this._layoutService.layout() ?? throwError('[NullLayoutError] Workbench layout not created yet.'));
-    this.perspectives = toSignal(this._perspectiveRegistry.perspectives$, {requireSync: true});
-    this.parts = toSignal(this._partRegistry.parts$, {requireSync: true});
-    this.views = toSignal(this._viewRegistry.views$, {requireSync: true});
+    this.perspectives = this._perspectiveRegistry.objects;
+    this.parts = this._partRegistry.objects;
+    this.views = this._viewRegistry.objects;
     this.theme = this._workbenchThemeSwitcher.theme;
     this.activePerspective = this._perspectiveService.activePerspective;
   }
@@ -95,7 +95,10 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   /** @inheritDoc */
   public registerPartAction(action: WorkbenchPartAction): Disposable {
-    return this._partActionRegistry.register(action);
+    this._partActionRegistry.register(action);
+    return {
+      dispose: () => this._partActionRegistry.unregister(action),
+    };
   }
 
   /** @inheritDoc */

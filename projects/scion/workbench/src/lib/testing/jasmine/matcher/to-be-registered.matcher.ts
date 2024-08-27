@@ -11,8 +11,8 @@
 import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
-import {WorkbenchViewRegistry} from '../../../view/workbench-view.registry';
-import {WorkbenchPartRegistry} from '../../../part/workbench-part.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../../view/workbench-view.registry';
+import {WORKBENCH_PART_REGISTRY} from '../../../part/workbench-part.registry';
 import {ViewId} from '../../../view/workbench-view.model';
 
 /**
@@ -22,7 +22,7 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
   toBeRegistered: (): CustomMatcher => {
     return {
       compare(viewId: ViewId, expected: {partId: string; active: boolean}, failOutput: string | undefined): CustomMatcherResult {
-        const view = TestBed.inject(WorkbenchViewRegistry).get(viewId, {orElse: null});
+        const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(viewId, {orElse: null});
         // Assert the view to be registered.
         if (!view) {
           return fail(`Expected view '${viewId}' to be registered in 'WorkbenchViewRegistry'.`);
@@ -32,7 +32,7 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
           return fail(`Expected view '${viewId}' to reference part '${expected.partId}', but instead referencing part '${view.part().id}'.`);
         }
         // Assert the view to be contained in the expected part.
-        const viewIds = TestBed.inject(WorkbenchPartRegistry).get(expected.partId, {orElse: null})?.viewIds();
+        const viewIds = TestBed.inject(WORKBENCH_PART_REGISTRY).get(expected.partId, {orElse: null})?.viewIds();
         if (!viewIds?.includes(viewId)) {
           return fail(`Expected view '${viewId}' to be contained in part '${expected.partId}'. But, part '${expected.partId}' contains the following views: '${viewIds}'.`);
         }

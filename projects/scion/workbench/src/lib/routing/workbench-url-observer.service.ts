@@ -9,11 +9,11 @@
 */
 
 import {Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterEvent} from '@angular/router';
-import {createEnvironmentInjector, EnvironmentInjector, Injectable, runInInjectionContext} from '@angular/core';
+import {createEnvironmentInjector, EnvironmentInjector, inject, Injectable, runInInjectionContext} from '@angular/core';
 import {WorkbenchAuxiliaryRouteInstaller} from './workbench-auxiliary-route-installer.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
-import {WorkbenchPartRegistry} from '../part/workbench-part.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
@@ -49,20 +49,22 @@ import {filter} from 'rxjs/operators';
 @Injectable({providedIn: 'root'})
 export class WorkbenchUrlObserver {
 
-  constructor(private _router: Router,
-              private _auxiliaryRouteInstaller: WorkbenchAuxiliaryRouteInstaller,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _partRegistry: WorkbenchPartRegistry,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _environmentInjector: EnvironmentInjector,
-              private _workbenchRouter: ɵWorkbenchRouter,
-              private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
-              private _workbenchLayoutDiffer: WorkbenchLayoutDiffer,
-              private _workbenchViewOutletDiffer: WorkbenchViewOutletDiffer,
-              private _workbenchPopupDiffer: WorkbenchPopupDiffer,
-              private _workbenchDialogDiffer: WorkbenchDialogDiffer,
-              private _workbenchMessageBoxDiffer: WorkbenchMessageBoxDiffer,
-              private _logger: Logger) {
+  private readonly _router = inject(Router);
+  private readonly _auxiliaryRouteInstaller = inject(WorkbenchAuxiliaryRouteInstaller);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _environmentInjector = inject(EnvironmentInjector);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
+  private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
+  private readonly _workbenchLayoutDiffer = inject(WorkbenchLayoutDiffer);
+  private readonly _workbenchViewOutletDiffer = inject(WorkbenchViewOutletDiffer);
+  private readonly _workbenchPopupDiffer = inject(WorkbenchPopupDiffer);
+  private readonly _workbenchDialogDiffer = inject(WorkbenchDialogDiffer);
+  private readonly _workbenchMessageBoxDiffer = inject(WorkbenchMessageBoxDiffer);
+  private readonly _logger = inject(Logger);
+
+  constructor() {
     this.installRouterEventListeners();
   }
 
@@ -226,7 +228,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each added part, constructs a {@link WorkbenchPart} and registers it in {@link WorkbenchPartRegistry}.
+   * For each added part, constructs a {@link WorkbenchPart} and registers it in {@link WORKBENCH_PART_REGISTRY}.
    */
   private registerAddedWorkbenchParts(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
@@ -240,7 +242,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each removed part, destroys the {@link WorkbenchPart} and unregisters it in {@link WorkbenchPartRegistry}.
+   * For each removed part, destroys the {@link WorkbenchPart} and unregisters it in {@link WORKBENCH_PART_REGISTRY}.
    */
   private unregisterRemovedWorkbenchParts(): void {
     const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();
@@ -252,7 +254,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each added view, constructs a {@link WorkbenchView} and registers it in {@link WorkbenchViewRegistry}.
+   * For each added view, constructs a {@link WorkbenchView} and registers it in {@link WORKBENCH_VIEW_REGISTRY}.
    */
   private registerAddedWorkbenchViews(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
@@ -266,7 +268,7 @@ export class WorkbenchUrlObserver {
   }
 
   /**
-   * For each removed view, destroys the {@link WorkbenchView} and unregisters it in {@link WorkbenchViewRegistry}.
+   * For each removed view, destroys the {@link WorkbenchView} and unregisters it from {@link WORKBENCH_VIEW_REGISTRY}.
    */
   private unregisterRemovedWorkbenchViews(): void {
     const {layoutDiff} = this._workbenchRouter.getCurrentNavigationContext();

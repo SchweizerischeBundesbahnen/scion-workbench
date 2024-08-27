@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, mapToBody, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPopupCapability, WorkbenchPopupReferrer, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupCommand} from '@scion/workbench-client';
 import {MicrofrontendPopupComponent} from './microfrontend-popup.component';
@@ -19,7 +19,7 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {Arrays, Maps} from '@scion/toolkit/util';
 import {PopupService} from '../../popup/popup.service';
 import {PopupOrigin} from '../../popup/popup.origin';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
 
@@ -34,12 +34,10 @@ import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-wo
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
-  private _openedPopups = new Set<string>();
-
-  constructor(private _popupService: PopupService,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _logger: Logger) {
-  }
+  private readonly _popupService = inject(PopupService);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _logger = inject(Logger);
+  private readonly _openedPopups = new Set<string>();
 
   /**
    * Popup intents are handled in this interceptor and then swallowed.

@@ -14,7 +14,7 @@ import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from './te
 import {TestComponent} from './testing/test.component';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchService} from './workbench.service';
-import {WorkbenchViewRegistry} from './view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from './view/workbench-view.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
 
@@ -45,7 +45,7 @@ describe('Workbench Service', () => {
     await waitUntilStable();
 
     // Mark view.2 non-closable
-    TestBed.inject(WorkbenchViewRegistry).get('view.2').closable = false;
+    TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.2').closable = false;
 
     // Close all views.
     await TestBed.inject(WorkbenchService).closeViews('view.1', 'view.2', 'view.3');

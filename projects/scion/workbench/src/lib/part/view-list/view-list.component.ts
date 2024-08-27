@@ -10,7 +10,7 @@
 
 import {ChangeDetectionStrategy, Component, computed, HostBinding, HostListener, inject, Input, OnInit, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {WorkbenchViewRegistry} from '../../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
@@ -65,7 +65,7 @@ export class ViewListComponent implements OnInit {
   }
 
   constructor() {
-    const viewRegistry = inject(WorkbenchViewRegistry);
+    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
     const filterText = toSignal(this.filterFormControl.valueChanges, {initialValue: this.filterFormControl.value});
 
     this.viewsInsideTabbar = computed(() => this._part.viewIds()

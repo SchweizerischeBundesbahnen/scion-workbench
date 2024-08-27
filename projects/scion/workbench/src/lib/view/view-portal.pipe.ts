@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Pipe, PipeTransform} from '@angular/core';
-import {WorkbenchViewRegistry} from './workbench-view.registry';
+import {inject, Pipe, PipeTransform} from '@angular/core';
+import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import type {ViewComponent} from '../view/view.component';
 import {ViewId} from './workbench-view.model';
@@ -20,8 +20,7 @@ import {ViewId} from './workbench-view.model';
 @Pipe({name: 'wbViewPortal', standalone: true})
 export class ViewPortalPipe implements PipeTransform {
 
-  constructor(private _viewRegistry: WorkbenchViewRegistry) {
-  }
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
 
   public transform(viewId: ViewId | null): WbComponentPortal<ViewComponent> | null {
     if (!viewId) {

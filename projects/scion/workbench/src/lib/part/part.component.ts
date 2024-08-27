@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, effect, ElementRef, HostBinding, Inject, inject, Injector, OnDestroy, OnInit, untracked} from '@angular/core';
+import {ChangeDetectorRef, Component, effect, ElementRef, HostBinding, inject, Injector, OnDestroy, OnInit, untracked} from '@angular/core';
 import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
-import {WorkbenchViewRegistry} from '../view/workbench-view.registry';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {RouterOutlet} from '@angular/router';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
@@ -60,13 +60,16 @@ export class PartComponent implements OnInit, OnDestroy {
     return this.part.active();
   }
 
-  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _viewRegistry: WorkbenchViewRegistry,
-              private _viewDragService: ViewDragService,
-              private _injector: Injector,
-              private _logger: Logger,
-              private _cd: ChangeDetectorRef,
-              public part: ɵWorkbenchPart) {
+  private readonly _workbenchId = inject(WORKBENCH_ID);
+  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _viewDragService = inject(ViewDragService);
+  private readonly _injector = inject(Injector);
+  private readonly _logger = inject(Logger);
+  private readonly _cd = inject(ChangeDetectorRef);
+
+  protected readonly part = inject(ɵWorkbenchPart);
+
+  constructor() {
     this._logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
     this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
