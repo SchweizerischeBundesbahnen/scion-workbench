@@ -1,0 +1,49 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  container-name: list;
+  container-type: inline-size;
+
+  > sci-viewport {
+    flex: 1 1 0;
+
+    &::part(content) {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5em;
+    }
+
+    > div.list-item {
+      display: flex;
+      gap: 1.25em;
+
+      > div.check-mark {
+        flex: none;
+        width: 2em;
+        height: 2em;
+
+        // Hide check mark if the list width is 250px or less.
+        @container list (max-width: 250px) {
+          display: none;
+        }
+      }
+
+      > div.content {
+        flex: auto;
+        display: flex;
+        flex-direction: column;
+        gap: .5em;
+
+        > div.title {
+          max-width: 7.5em;
+        }
+      }
+    }
+
+    div.skeleton {
+      background-color: var(--sci-color-skeleton-subtle);
+      border-radius: var(--sci-corner-small);
+      height: 1em;
+    }
+  }
+}

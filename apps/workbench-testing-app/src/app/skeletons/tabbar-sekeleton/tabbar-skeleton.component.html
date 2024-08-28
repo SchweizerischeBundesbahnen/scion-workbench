@@ -1,0 +1,6 @@
+@for (tab of tabs() | appArray; track tab) {
+  <button class="tab" [class.selected]="tab === selectedTab()" (click)="onTabSelect(tab)">
+    <div class="label"></div>
+  </button>
+}
+<div class="filler"></div>

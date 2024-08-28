@@ -15,6 +15,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {JoinPipe} from '../common/join.pipe';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-view-info-dialog',
@@ -27,6 +28,7 @@ import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
     WorkbenchDialogActionDirective,
     SciKeyValueComponent,
     NullIfEmptyPipe,
+    FormsModule,
   ],
 })
 export class ViewInfoDialogComponent implements OnInit {

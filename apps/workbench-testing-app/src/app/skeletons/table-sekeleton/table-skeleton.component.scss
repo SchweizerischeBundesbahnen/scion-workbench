@@ -1,0 +1,61 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  container-name: table;
+  container-type: inline-size;
+  --columns: 0;
+
+  > sci-viewport {
+    flex: 1 1 0;
+
+    &::part(content) {
+      display: grid;
+      --ɵcolumns: calc(var(--columns) - 1);
+      grid-template-columns: 1.25fr repeat(var(--ɵcolumns), 1fr);
+      column-gap: 3em;
+    }
+
+    // Hide table if the table width is 450px or less.
+    @container table (max-width: 450px) {
+      display: none;
+    }
+
+    > div.row {
+      grid-column: 1/-1;
+      display: grid;
+      grid-template-columns: subgrid;
+      padding: 1em 0;
+      border-bottom: 1px solid var(--sci-color-skeleton-subtle);
+
+      > div.cell:first-child {
+        display: flex;
+        gap: 1em;
+
+        > div.check-mark {
+          width: 1em;
+          height: 1em;
+          flex: none;
+        }
+
+        > div.cell {
+          flex: auto;
+        }
+      }
+    }
+  }
+
+  > app-list-skeleton {
+    flex: auto;
+
+    // Hide list if the table width is greater than 450px.
+    @container table (min-width: 451px) {
+      display: none;
+    }
+  }
+
+  div.skeleton {
+    background-color: var(--sci-color-skeleton-subtle);
+    border-radius: var(--sci-corner-small);
+    height: 1em;
+  }
+}

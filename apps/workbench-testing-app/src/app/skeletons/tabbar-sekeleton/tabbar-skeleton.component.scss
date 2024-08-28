@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+
+  > button.tab {
+    all: unset;
+    flex: none;
+    padding: .5em 1.5em;
+    width: 150px;
+    border-bottom: .3em solid var(--sci-color-skeleton-subtle);
+    cursor: pointer;
+
+    > div.label {
+      background-color: var(--sci-color-skeleton-subtle);
+      border-radius: var(--sci-corner-small);
+      height: 1em;
+    }
+
+    &.selected {
+      border-bottom-color: var(--sci-color-skeleton);
+
+      > div.label {
+        background-color: var(--sci-color-skeleton);
+      }
+    }
+  }
+
+  > div.filler {
+    flex: auto;
+    border-bottom: .3em solid var(--sci-color-skeleton-subtle);
+  }
+
+  &.active > button.tab.selected {
+    border-bottom-color: var(--sci-color-accent);
+  }
+}

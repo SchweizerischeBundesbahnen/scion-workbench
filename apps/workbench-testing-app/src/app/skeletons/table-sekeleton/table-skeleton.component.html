@@ -1,0 +1,20 @@
+<!-- Visible if the width is >= 450px. -->
+<sci-viewport>
+  @for (row of rows | appArray; track row) {
+    <div class="row">
+      @for (column of columns() | appArray; track column) {
+        @if (column === 0) {
+          <div class="cell">
+            <div class="check-mark skeleton"></div>
+            <div class="cell skeleton"></div>
+          </div>
+        } @else {
+          <div class="cell skeleton"></div>
+        }
+      }
+    </div>
+  }
+</sci-viewport>
+
+<!-- Hidden if the width is >= 450px. -->
+<app-list-skeleton/>
