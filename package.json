@@ -85,7 +85,7 @@
     "zone.js": "0.14.7"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "18.0.3",
+    "@angular-devkit/build-angular": "18.2.1",
     "@angular-eslint/builder": "18.0.1",
     "@angular-eslint/eslint-plugin": "18.0.1",
     "@angular-eslint/eslint-plugin-template": "18.0.1",
@@ -115,7 +115,7 @@
     "typedoc": "0.25.13",
     "typedoc-plugin-extras": "3.0.0",
     "typescript": "5.4.5",
-    "vercel": "34.2.6"
+    "vercel": "34.4.0"
   },
   "repository": {
     "type": "git",
