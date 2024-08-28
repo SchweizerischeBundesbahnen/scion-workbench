@@ -1,0 +1,107 @@
+@mixin form {
+  display: grid;
+  align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1em 3em;
+
+  // Switch to single column layout if the view width is 450px or less.
+  @container view (max-width: 450px) {
+    grid-template-columns: 100%;
+  }
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+  container-name: view;
+  container-type: inline-size;
+
+  > form {
+    flex: none;
+    @include form;
+  }
+
+  > app-tabbar-skeleton {
+    flex: none;
+    margin-top: 2em;
+
+    // Hide tabbar if the view width is 450px or less.
+    @container view (max-width: 450px) {
+      display: none;
+    }
+  }
+
+  > section.tab {
+    flex: auto;
+
+    &.table {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      container-name: table;
+      container-type: size;
+
+      > app-table-skeleton {
+        flex: 1 1 0;
+      }
+
+      > app-chart-skeleton {
+        flex: none;
+
+        // Hide chart if the table height is 400px or less.
+        @container table (max-height: 400px) {
+          display: none;
+        }
+      }
+    }
+
+    &.form {
+      display: flex;
+      flex-direction: column;
+
+      > sci-viewport {
+        flex: 1 1 0;
+
+        &::part(content) {
+          @include form;
+        }
+      }
+    }
+
+    &.list {
+      display: grid;
+    }
+  }
+
+  // Hide reload button if in the main area and the tabbar is showing.
+  &.main-area {
+    @container view (min-width: 450px) {
+      > button.reload {
+        display: none;
+      }
+    }
+  }
+
+  > button.reload {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+    border: 1px solid var(--sci-color-border);
+    padding: .25em;
+    background-color: var(--sci-color-background-primary);
+    font-size: 1.5em;
+    box-shadow: var(--sci-elevation) var(--sci-static-color-black);
+    border-radius: 50%;
+    transition: opacity ease-in-out .15s;
+
+    &:hover {
+      border-color: var(--sci-color-accent);
+    }
+  }
+
+  &:not(:hover) > button.reload {
+    opacity: 0;
+  }
+}

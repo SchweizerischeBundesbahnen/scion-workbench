@@ -12,11 +12,11 @@
   </sci-form-field>
 
   <sci-form-field label="View Title">
-    <span class="e2e-title">{{view.title()}}</span>
+    <input class="e2e-title" [ngModel]="view.title()" (ngModelChange)="view.title = $event">
   </sci-form-field>
 
   <sci-form-field label="View Heading">
-    <span class="e2e-heading">{{view.heading()}}</span>
+    <input class="e2e-heading" [ngModel]="view.heading()" (ngModelChange)="view.heading = $event">
   </sci-form-field>
 
   <sci-form-field label="Navigation Hint">

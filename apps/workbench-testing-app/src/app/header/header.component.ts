@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, effect, Signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, Signal, untracked} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
@@ -111,9 +111,13 @@ export class HeaderComponent {
   private contributeStartPageMenuItem(): MenuItem[] {
     return [
       new MenuItem({
-        text: 'Open start page in new view tab',
+        text: 'Open Start Page',
         cssClass: 'e2e-open-start-page',
         onAction: () => this._wbRouter.navigate(['start-page'], {target: 'blank'}),
+      }),
+      new MenuItem({
+        text: 'Open Sample View',
+        onAction: () => this._wbRouter.navigate(['sample-view'], {target: 'blank'}),
       }),
     ];
   }
@@ -192,6 +196,15 @@ export class HeaderComponent {
         text: 'Reset forms on submit',
         checked: this._settingsService.isEnabled('resetFormsOnSubmit'),
         onAction: () => this._settingsService.toggle('resetFormsOnSubmit'),
+      }),
+      new MenuItem({
+        text: 'Display skeletons in sample view',
+        checked: this._settingsService.isEnabled('displaySkeletons'),
+        onAction: () => {
+          this._settingsService.toggle('displaySkeletons');
+          // Perform navigation for Angular to evaluate `CanMatch` guards.
+          inject(Router).navigate([{outlets: {}}], {skipLocationChange: true}).then();
+        },
       }),
       new MenuItem({
         text: 'Log Angular change detection cycles',

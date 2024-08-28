@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {Injectable, isDevMode} from '@angular/core';
 import {WebStorage} from '@scion/toolkit/storage';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
@@ -62,6 +62,10 @@ const SETTINGS = {
   logAngularChangeDetectionCycles: {
     default: environment.logAngularChangeDetectionCycles,
     storageKey: 'scion.workbench.testing-app.settings.log-angular-change-detection-cycles',
+  },
+  displaySkeletons: {
+    default: !isDevMode(),
+    storageKey: 'scion.workbench.testing-app.settings.display-skeletons',
   },
 } as const;
 

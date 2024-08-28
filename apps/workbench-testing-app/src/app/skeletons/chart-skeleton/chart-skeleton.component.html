@@ -1,0 +1,13 @@
+<svg [attr.viewBox]="chart.viewbox()"
+     preserveAspectRatio="none"
+     xmlns="http://www.w3.org/2000/svg"
+     [ngClass]="chartType()" [class.active]="view.part().active()">
+    @switch (chartType()) {
+      @case ('line') {
+        <path [attr.d]="chart.lineChart()"/>
+      }
+      @case ('area') {
+        <path [attr.d]="chart.areaChart()"/>
+      }
+    }
+</svg>

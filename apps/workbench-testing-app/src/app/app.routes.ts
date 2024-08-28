@@ -59,6 +59,11 @@ export const routes: Routes = [
     data: {[WorkbenchRouteData.title]: 'New Tab', [WorkbenchRouteData.cssClass]: 'e2e-start-page'},
   },
   {
+    path: 'sample-view',
+    loadComponent: () => import('./sample-view/sample-view.component'),
+    data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'},
+  },
+  {
     path: 'test-router',
     loadComponent: () => import('./router-page/router-page.component'),
     data: {
