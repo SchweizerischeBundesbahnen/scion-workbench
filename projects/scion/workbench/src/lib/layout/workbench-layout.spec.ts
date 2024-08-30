@@ -24,8 +24,6 @@ import {TestComponent} from '../testing/test.component';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {WorkbenchLayoutComponent} from './workbench-layout.component';
-import {By} from '@angular/platform-browser';
 import {WorkbenchService} from '../workbench.service';
 
 describe('WorkbenchLayout', () => {
@@ -2154,7 +2152,6 @@ describe('WorkbenchLayout', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
-    const layoutFixture = fixture.debugElement.query(By.directive(WorkbenchLayoutComponent));
 
     // Prepare main area to have to parts split vertically.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -2178,7 +2175,7 @@ describe('WorkbenchLayout', () => {
     const view102 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.102'});
 
     // Expect initial layout.
-    expect(layoutFixture).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           id: workbenchLayoutRoot.id,
@@ -2221,7 +2218,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Expect ids not to have changed.
-    expect(layoutFixture).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           id: workbenchLayoutRoot.id,
@@ -2265,7 +2262,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Expect ids not to have changed.
-    expect(layoutFixture).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           id: workbenchLayoutRoot.id,
