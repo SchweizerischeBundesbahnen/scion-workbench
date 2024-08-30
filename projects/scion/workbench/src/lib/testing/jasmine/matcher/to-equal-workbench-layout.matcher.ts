@@ -20,6 +20,7 @@ import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
+import {By} from '@angular/platform-browser';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -27,9 +28,34 @@ import {Arrays} from '@scion/toolkit/util';
 export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories = {
   toEqualWorkbenchLayout: (util: MatchersUtil): CustomMatcher => {
     return {
-      compare(actual: ɵWorkbenchLayout | ComponentFixture<WorkbenchLayoutComponent> | DebugElement, expected: ExpectedWorkbenchLayout, failOutput: string | undefined): CustomMatcherResult {
+      compare(actual: ɵWorkbenchLayout | ComponentFixture<unknown> | DebugElement | unknown, expected: ExpectedWorkbenchLayout, failOutput: string | undefined): CustomMatcherResult {
         try {
-          assertWorkbenchLayout(expected, actual, util);
+          // Expect actual to be of the expected type.
+          if (!(actual instanceof ɵWorkbenchLayout) && !(actual instanceof ComponentFixture) && !(actual instanceof DebugElement)) {
+            return fail(`Expected actual to be of type 'ɵWorkbenchLayout', or 'ComponentFixture', or 'DebugElement', but was '${actual?.constructor?.name}'`);
+          }
+
+          // Assert model if only passed a layout instance.
+          if (actual instanceof ɵWorkbenchLayout) {
+            assertWorkbenchLayoutModel(expected, actual, util);
+            return pass();
+          }
+
+          // Resolve debug element for `WorkbenchLayoutComponent`.
+          let debugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
+          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
+            debugElement = debugElement.query(By.directive(WorkbenchLayoutComponent));
+          }
+
+          // Expect debug element to represent `WorkbenchLayoutComponent` element.
+          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${actual?.componentInstance?.constructor?.name}.`);
+          }
+
+          // Assert model.
+          assertWorkbenchLayoutModel(expected, debugElement.componentInstance.layout!, util);
+          // Assert DOM.
+          assertWorkbenchLayoutDOM(expected, debugElement.nativeElement);
           return pass();
         }
         catch (error: unknown) {
@@ -48,28 +74,11 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
   },
 };
 
-function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout | ComponentFixture<WorkbenchLayoutComponent> | DebugElement, util: MatchersUtil): void {
-  if (actual instanceof ɵWorkbenchLayout) {
-    expected.workbenchGrid && assertPartGridModel(expected.workbenchGrid, actual.workbenchGrid, util);
-    expected.mainAreaGrid && assertPartGridModel(expected.mainAreaGrid, actual.mainAreaGrid, util);
-  }
-  else if ((actual instanceof ComponentFixture || actual instanceof DebugElement) && actual.componentInstance instanceof WorkbenchLayoutComponent) {
-    const actualDebugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-    const workbenchLayoutComponent: WorkbenchLayoutComponent = actualDebugElement.componentInstance;
-    expected.workbenchGrid && assertPartGridModel(expected.workbenchGrid, workbenchLayoutComponent.layout!.workbenchGrid, util);
-    expected.mainAreaGrid && assertPartGridModel(expected.mainAreaGrid, workbenchLayoutComponent.layout!.mainAreaGrid, util);
-    assertWorkbenchLayoutDOM(expected, actualDebugElement.nativeElement);
-  }
-  else {
-    throw Error(`Expected testee to be of type 'ɵWorkbenchLayout' or 'DebugElement<WorkbenchLayoutComponent>' [actual=${actual?.constructor?.name}]`);
-  }
-}
-
 /**
- * Asserts the actual model to equal the expected model. Only properties declared on the expected object are asserted.
+ * Asserts the actual layout model to equal the expected model. Only properties declared on the expected object are asserted.
  */
-function assertPartGridModel(expectedLayout: MPartGrid, actualLayout: _MPartGrid | null, util: MatchersUtil): void {
-  const result = toEqual(actualLayout, objectContainingRecursive(expectedLayout), util);
+function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout, util: MatchersUtil): void {
+  const result = toEqual(actual, objectContainingRecursive(expected), util);
   if (!result.pass) {
     throw Error(result.message);
   }

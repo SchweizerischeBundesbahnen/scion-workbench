@@ -17,7 +17,6 @@ import {WorkbenchLayoutComponent} from './workbench-layout.component';
 import {Component} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {By} from '@angular/platform-browser';
 import {MAIN_AREA} from './workbench-layout';
 import {toHaveComponentStateCustomMatcher} from '../testing/jasmine/matcher/to-have-component-state.matcher';
 import {enterComponentState, TestComponent, withComponentContent, withComponentStateInputElement} from '../testing/test.component';
@@ -63,7 +62,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Assert initial workbench layout
-    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -87,7 +86,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Expect the layout not to be discarded.
-    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -111,7 +110,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Expect the layout to be changed.
-    expect(fixture.debugElement.query(By.directive(WorkbenchLayoutComponent))).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),

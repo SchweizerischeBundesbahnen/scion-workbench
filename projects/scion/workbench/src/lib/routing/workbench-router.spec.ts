@@ -19,8 +19,6 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {MPart, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {By} from '@angular/platform-browser';
-import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {throwError} from '../common/throw-error.util';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
@@ -206,14 +204,13 @@ describe('WorkbenchRouter', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
-    const layout = fixture.debugElement.query(By.directive(WorkbenchLayoutComponent));
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Open view.101 [canActivate=true].
     await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
@@ -223,7 +220,7 @@ describe('WorkbenchRouter', () => {
     canActivate2 = false;
     await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
@@ -235,7 +232,7 @@ describe('WorkbenchRouter', () => {
     canActivate2 = true;
     await workbenchRouter.navigate(['path/to/view/2', {param: 'A'}], {target: 'view.102'});
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
@@ -253,7 +250,7 @@ describe('WorkbenchRouter', () => {
       .navigateView('view.103', ['path/to/view/3']),
     );
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
@@ -273,7 +270,7 @@ describe('WorkbenchRouter', () => {
       .navigateView('view.103', ['path/to/view/3']),
     );
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
       },
@@ -305,14 +302,13 @@ describe('WorkbenchRouter', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
-    const layout = fixture.debugElement.query(By.directive(WorkbenchLayoutComponent));
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Open view.101 [canActivate=true].
     await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
@@ -323,7 +319,7 @@ describe('WorkbenchRouter', () => {
     const navigation2 = workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
     await expectAsync(navigation2).toBeRejectedWithError('navigation error');
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
@@ -335,7 +331,7 @@ describe('WorkbenchRouter', () => {
     canActivate2 = () => true;
     await workbenchRouter.navigate(['path/to/view/2', {param: 'A'}], {target: 'view.102'});
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
@@ -354,7 +350,7 @@ describe('WorkbenchRouter', () => {
     );
     await expectAsync(navigation3).toBeRejectedWithError('navigation error');
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
@@ -374,7 +370,7 @@ describe('WorkbenchRouter', () => {
       .navigateView('view.103', ['path/to/view/3']),
     );
     await waitUntilStable();
-    expect(layout).toEqualWorkbenchLayout({
+    expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
       },
