@@ -3,7 +3,7 @@
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
-## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
+## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Installation
 
 ### How to install the SCION Workbench
 
