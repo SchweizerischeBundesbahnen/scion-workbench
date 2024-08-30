@@ -21,6 +21,7 @@ import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
 import {By} from '@angular/platform-browser';
+import {NavigationStates, ViewOutlets} from '../../../routing/routing.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -78,7 +79,15 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
  * Asserts the actual layout model to equal the expected model. Only properties declared on the expected object are asserted.
  */
 function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout, util: MatchersUtil): void {
-  const result = toEqual(actual, objectContainingRecursive(expected), util);
+  const actualLayout: ExpectedWorkbenchLayout = {
+    perspectiveId: actual.perspectiveId,
+    mainAreaGrid: actual.mainAreaGrid ?? undefined,
+    workbenchGrid: actual.workbenchGrid,
+    maximized: actual.maximized,
+    navigationStates: actual.navigationStates(),
+    viewOutlets: actual.viewOutlets(),
+  };
+  const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
     throw Error(result.message);
   }
@@ -256,13 +265,29 @@ function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFail
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Specifies the expected workbench grid. If not set, does not assert the workbench grid.
+   * Asserts specified workbench grid, if set.
    */
   workbenchGrid?: MPartGrid;
   /**
-   * Specifies the expected main area grid. If not set, does not assert the main area grid.
+   * Asserts specified main area grid, if set.
    */
   mainAreaGrid?: MPartGrid;
+  /**
+   * Asserts the layout to belong to specified perspective, if set.
+   */
+  perspectiveId?: string | undefined;
+  /**
+   * Asserts specified maximized state, if set.
+   */
+  maximized?: boolean;
+  /**
+   * Asserts specified navigation states, if set.
+   */
+  navigationStates?: NavigationStates;
+  /**
+   * Asserts specified view outlets, if set.
+   */
+  viewOutlets?: ViewOutlets;
 }
 
 /**
