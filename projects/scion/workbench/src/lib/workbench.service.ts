@@ -53,9 +53,9 @@ export abstract class WorkbenchService {
   public abstract readonly perspectives: Signal<WorkbenchPerspective[]>;
 
   /**
-   * Provides the currently active perspective, or `null` if the initial perspective is not yet activated, e.g., during startup.
+   * Provides the active perspective, or `undefined` if none is active (e.g., during workbench startup).
    */
-  public abstract readonly activePerspective: Signal<WorkbenchPerspective | null>;
+  public abstract readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
 
   /**
    * Returns the handle of the specified perspective, or `null` if not found.

@@ -51,8 +51,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private _maximized: boolean;
 
+  /** Identifies the perspective of this layout, if any. */
+  public readonly perspectiveId: string | undefined;
+
   /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; viewOutlets?: string | ViewOutlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; perspectiveId?: string; viewOutlets?: string | ViewOutlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
     this._grids = {
       workbench: coerceMPartGrid(config.workbenchGrid, {default: createDefaultWorkbenchGrid}),
     };
@@ -64,6 +67,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     this._viewOutlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceViewOutlets(config.viewOutlets)));
     this._navigationStates = new Map<ViewId, NavigationState>(Objects.entries(config.navigationStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
+    this.perspectiveId = config.perspectiveId;
   }
 
   /**
@@ -817,6 +821,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
       mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
+      perspectiveId: this.perspectiveId,
       viewOutlets: Object.fromEntries(this._viewOutlets),
       navigationStates: Object.fromEntries(this._navigationStates),
       maximized: this._maximized,

@@ -16,7 +16,7 @@ import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.ut
 import {WorkbenchRouter} from './workbench-router.service';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
+import {canMatchWorkbenchView} from './workbench-route-guards';
 import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';

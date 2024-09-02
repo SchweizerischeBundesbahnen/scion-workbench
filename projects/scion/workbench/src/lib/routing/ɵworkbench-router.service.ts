@@ -83,14 +83,11 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       newLayout = await newLayout.removeViewsMarkedForRemoval(viewUid => this.canCloseView(viewUid));
 
       // Create extras with workbench navigation instructions.
-      extras = createNavigationExtras(newLayout, extras);
-
-      // Create the new URL tree.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
-      const urlTree = this._router.createUrlTree(commands, extras);
+      extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Perform the navigation.
-      if (!(await this._router.navigateByUrl(urlTree, extras))) {
+      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      if (!(await this._router.navigate(commands, extras))) {
         return false;
       }
 
@@ -146,7 +143,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       newLayout = await newLayout.removeViewsMarkedForRemoval();
 
       // Create extras with workbench navigation instructions.
-      extras = createNavigationExtras(newLayout, extras);
+      extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Create the new URL tree.
       const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
@@ -310,8 +307,9 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
 /**
  * Creates navigation extras with workbench navigation instructions.
  */
-function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
-  const {workbenchGrid, mainAreaGrid} = layout.serialize({excludeViewMarkedForRemoval: true});
+function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentLayout?: ɵWorkbenchLayout | undefined}, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
+  const {newLayout, currentLayout} = layouts;
+  const {workbenchGrid, mainAreaGrid} = newLayout.serialize({excludeViewMarkedForRemoval: true});
 
   return {
     ...extras,
@@ -322,8 +320,11 @@ function createNavigationExtras(layout: ɵWorkbenchLayout, extras?: Omit<Navigat
     // Associate workbench-specific state with the navigation.
     state: WorkbenchNavigationalStates.create({
       workbenchGrid: workbenchGrid,
-      maximized: layout.maximized,
-      navigationStates: layout.navigationStates(),
+      // Fall back to the current layout's perspective if not specified by the new layout,
+      // e.g., the navigator provides a new layout to replace the current layout.
+      perspectiveId: newLayout.perspectiveId ?? currentLayout?.perspectiveId,
+      maximized: newLayout.maximized,
+      navigationStates: newLayout.navigationStates(),
     }),
     // Add the main area as query parameter.
     queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},

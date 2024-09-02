@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {computed, EnvironmentInjector, inject, InjectionToken, Injector, runInInjectionContext, Signal, signal, WritableSignal} from '@angular/core';
+import {computed, EnvironmentInjector, inject, InjectionToken, Injector, runInInjectionContext, Signal} from '@angular/core';
 import {WorkbenchLayoutFn, WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
@@ -21,14 +21,8 @@ import {LatestTaskExecutor} from '../executor/latest-task-executor';
 import {UrlSegment} from '@angular/router';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
-/**
- * Provides the activated perspective.
- */
-export const ACTIVE_PERSPECTIVE = new InjectionToken<WritableSignal<ɵWorkbenchPerspective | null>>('ACTIVE_PERSPECTIVE', {
-  providedIn: 'root',
-  factory: () => signal<ɵWorkbenchPerspective | null>(null),
-});
+import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
+import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 
 /**
  * @inheritDoc
@@ -42,7 +36,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _initialLayoutFn: WorkbenchLayoutFn;
-  private readonly _activePerspective = inject(ACTIVE_PERSPECTIVE);
   private readonly _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
 
   public readonly id: string;
@@ -57,7 +50,10 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     this.id = definition.id;
     this.transient = definition.transient ?? false;
     this.data = definition.data ?? {};
-    this.active = computed(() => this._activePerspective()?.id === this.id);
+
+    const activePerspective = inject(ACTIVE_PERSPECTIVE);
+    this.active = computed(() => activePerspective()?.id === this.id);
+
     this._initialLayoutFn = definition.layout;
     this.installLayoutPersister();
   }
@@ -72,25 +68,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     // Load the layout from the storage, if present, or use the initial layout otherwise.
     this._perspectiveLayout = (await this.loadPerspectiveLayout()) ?? this._initialPerspectiveLayout;
 
-    // Memoize currently active perspective for a potential rollback in case the activation fails.
-    const previousPerspective = this._activePerspective();
-
     // Perform navigation to activate the layout of this perspective.
-    const navigated = await this._workbenchRouter.navigate(currentLayout => {
-      // Mark this perspective as active after the initial navigation (1) but before the actual Angular routing (2).
-      //
-      // (1) Otherwise, if the initial navigation is asynchronous, such as when lazy loading components or using asynchronous guards,
-      //     the activation of the initial perspective would apply the "default" grid with only the main area.
-      // (2) Enables routes to evaluate the active perspective in a `canMatch` guard, e.g., to display a perspective-specific start page.
-      this._activePerspective.set(this);
-
-      // Create layout with the workbench grid of this perspective and the main area of the current layout.
-      return this.createLayoutForActivation(currentLayout);
-    });
-    if (!navigated) {
-      this._activePerspective.set(previousPerspective);
-    }
-    return navigated;
+    return this._workbenchRouter.navigate(currentLayout => this.createLayoutForActivation(currentLayout));
   }
 
   /**
@@ -111,7 +90,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   }
 
   /**
-   * Creates layout with the workbench grid of this perspective and the main area of the current layout.
+   * Creates the perspective layout using the main area of the current layout.
    *
    * When switching perspective, id clashes between the views contained in the perspective and the
    * views contained in the main area are possible. The activation detects and resolves conflicts,
@@ -147,9 +126,10 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     return this._workbenchLayoutFactory.create({
       workbenchGrid: this._perspectiveLayout.workbenchGrid,
       mainAreaGrid: currentLayout.mainAreaGrid,
+      perspectiveId: this.id,
       viewOutlets: Object.fromEntries(viewOutlets),
       navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of views in the main area; navigation state of other views cannot be restored since not persisted
-      // Do not preserve maximized state when switching between perspectives.
+      maximized: undefined, // Do not preserve maximized state when switching between perspectives.
     });
   }
 
@@ -249,3 +229,29 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     this._perspectiveEnvironmentInjector.destroy();
   }
 }
+
+/**
+ * Provides the currently active perspective in the workbench.
+ */
+export const ACTIVE_PERSPECTIVE = new InjectionToken<Signal<ɵWorkbenchPerspective | undefined>>('ACTIVE_PERSPECTIVE', {
+  providedIn: 'root',
+  factory: (): Signal<ɵWorkbenchPerspective | undefined> => {
+    const workbenchLayoutService = inject(WorkbenchLayoutService);
+    const workbenchPerspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
+    const workbenchStartup = inject(WorkbenchStartup);
+
+    return computed(() => {
+      // Perspectives are not registered until the workbench startup is complete.
+      if (!workbenchStartup.isStarted()) {
+        return undefined;
+      }
+
+      const perspectiveId = workbenchLayoutService.layout()?.perspectiveId;
+      if (!perspectiveId) {
+        return undefined; // The initial perspective has not been activated yet.
+      }
+
+      return workbenchPerspectiveRegistry.get(perspectiveId);
+    });
+  },
+});

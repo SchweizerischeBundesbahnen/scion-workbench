@@ -17,7 +17,7 @@ import {NavigationStates} from './routing.model';
 export const WorkbenchNavigationalStates = {
 
   /**
-   * Returns workbench-specific state associated with given navigation, or `null` if not a workbench navigation.
+   * Returns workbench-specific state associated with given navigation, or `null` if the navigation was not performed through the workbench router.
    */
   fromNavigation: (navigation: Navigation): WorkbenchNavigationalState | null => {
     return navigation.extras?.state?.[WORKBENCH_NAVIGATION_STATE_KEY] ?? null;
@@ -43,6 +43,10 @@ export interface WorkbenchNavigationalState {
    * Note: The main area grid is not passed as navigational state, but as query parameter {@link MAIN_AREA_LAYOUT_QUERY_PARAM}.
    */
   workbenchGrid: string;
+  /**
+   * Identifies the perspective that is navigated.
+   */
+  perspectiveId?: string | undefined;
   /**
    * Indicates whether to maximize the main area.
    */

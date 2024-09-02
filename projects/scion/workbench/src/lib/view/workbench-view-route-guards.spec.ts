@@ -18,7 +18,7 @@ import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../t
 import {Component} from '@angular/core';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchComponent} from '../workbench.component';
-import {canMatchWorkbenchView} from './workbench-view-route-guards';
+import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 
 describe('CanMatchWorkbenchView Guard', () => {
 

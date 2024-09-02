@@ -34,7 +34,7 @@ import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/mic
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
-import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
+import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 import {Routing} from '../routing/routing.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';

@@ -24,28 +24,27 @@ bootstrapApplication(AppComponent, {
 ```
 
 ### How to configure a start page per perspective
-
-If working with perspectives, configure a different start page per perspective by testing for the active perspective in the `canMatch` route handler.
+Different perspectives can have a different start page. Use the `canMatchWorkbenchPerspective` guard to match a route only if the specified perspective is active.
 
 ```ts
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
-import {WorkbenchService} from '@scion/workbench';
+import {canMatchWorkbenchPerspective} from '@scion/workbench';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter([
-      // Match this route only if 'perspective A' is active.
+      // Match this route only if 'perspective-a' is active.
       {
         path: '',
         loadComponent: () => import('./perspective-a/start-page.component'),
-        canMatch: [() => inject(WorkbenchService).getPerspective('perspective-a')?.active],
+        canMatch: [canMatchWorkbenchPerspective('perspective-a')],
       },
-      // Match this route only if 'perspective B' is active.
+      // Match this route only if 'perspective-b' is active.
       {
         path: '',
         loadComponent: () => import('./perspective-b/start-page.component'),
-        canMatch: [() => inject(WorkbenchService).getPerspective('perspective-b')?.active],
+        canMatch: [canMatchWorkbenchPerspective('perspective-b')],
       },
     ]),
   ],

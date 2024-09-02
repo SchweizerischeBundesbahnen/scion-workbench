@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {APP_INITIALIZER, ApplicationInitStatus, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone} from '@angular/core';
+import {APP_INITIALIZER, ApplicationInitStatus, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 
@@ -128,7 +128,10 @@ enum StartupState {
 @Injectable({providedIn: 'root'})
 export class WorkbenchStartup {
 
-  private _started = false;
+  /**
+   * Signals when the workbench completed startup.
+   */
+  public readonly isStarted = signal(false);
 
   /* @internal */
   public notifyStarted!: () => void;
@@ -137,16 +140,9 @@ export class WorkbenchStartup {
    * Promise that resolves when the workbench has completed the startup.
    */
   public readonly whenStarted = new Promise<true>(resolve => this.notifyStarted = () => {
-    this._started = true;
+    this.isStarted.set(true);
     resolve(true);
   });
-
-  /**
-   * Returns whether the workbench completed startup.
-   */
-  public isStarted(): boolean {
-    return this._started;
-  }
 }
 
 /**

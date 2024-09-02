@@ -16,7 +16,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
-import {WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {WorkbenchLayout, WorkbenchLayoutFn} from '@scion/workbench';
 
 export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
   new(...args: any[]): T;
@@ -104,10 +104,14 @@ export class WorkbenchNavigator {
    * @see WorkbenchService.registerPerspective
    * @see WorkbenchService.switchPerspective
    */
-  public async createPerspective(defineLayoutFn: (factory: WorkbenchLayoutFactory) => WorkbenchLayout): Promise<string> {
-    const id = crypto.randomUUID();
+  public async createPerspective(id: string, layoutFn: WorkbenchLayoutFn): Promise<string>;
+  public async createPerspective(layoutFn: WorkbenchLayoutFn): Promise<string>;
+  public async createPerspective(arg1: string | WorkbenchLayoutFn, arg2?: WorkbenchLayoutFn): Promise<string> {
+    const id = typeof arg1 === 'string' ? arg1 : crypto.randomUUID();
+    const layoutFn = typeof arg1 === 'function' ? arg1 : arg2!;
+
     const layoutPage = await this.openInNewTab(LayoutPagePO);
-    await layoutPage.createPerspective(id, {layout: defineLayoutFn});
+    await layoutPage.createPerspective(id, {layout: layoutFn});
     await layoutPage.view.tab.close();
     await this._appPO.switchPerspective(id);
     return id;
@@ -118,9 +122,9 @@ export class WorkbenchNavigator {
    *
    * @see WorkbenchRouter.navigate
    */
-  public async modifyLayout(modifyLayoutFn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
+  public async modifyLayout(layoutFn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
     const layoutPage = await this.openInNewTab(LayoutPagePO);
-    await layoutPage.modifyLayout(modifyLayoutFn);
+    await layoutPage.modifyLayout(layoutFn);
     await layoutPage.view.tab.close();
   }
 }
