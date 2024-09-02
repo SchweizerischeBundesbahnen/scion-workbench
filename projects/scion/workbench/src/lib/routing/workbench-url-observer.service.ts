@@ -32,7 +32,7 @@ import {Routing} from './routing.util';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
-import {canMatchNotFoundPage} from '../view/workbench-view-route-guards';
+import {canMatchNotFoundPage} from './workbench-route-guards';
 import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
 import {WorkbenchViewOutletDiffer} from './workbench-view-outlet-differ';
 import {filter} from 'rxjs/operators';
@@ -137,6 +137,7 @@ export class WorkbenchUrlObserver {
         return previousLayout?.mainAreaGrid;
       })(),
       workbenchGrid: workbenchNavigationalState?.workbenchGrid ?? previousLayout?.workbenchGrid,
+      perspectiveId: workbenchNavigationalState?.perspectiveId ?? previousLayout?.perspectiveId,
       maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
       navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
       viewOutlets: Object.fromEntries(Routing.parseViewOutlets(urlTree)),

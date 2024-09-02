@@ -46,7 +46,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly parts: Signal<ɵWorkbenchPart[]>;
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly theme: Signal<WorkbenchTheme | null>;
-  public readonly activePerspective: Signal<WorkbenchPerspective | null>;
+  public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
   public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 
   constructor() {

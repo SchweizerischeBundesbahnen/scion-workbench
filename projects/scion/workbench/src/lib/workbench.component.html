@@ -1,4 +1,4 @@
-@if (workbenchStartup.whenStarted | async) {
+@if (workbenchStartup.isStarted()) {
   <div class="stacking-context-barrier" wbGlassPane>
     @if (whenViewContainersInjected | async) {
       <wb-workbench-layout/>

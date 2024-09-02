@@ -23,7 +23,7 @@ import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {canMatchWorkbenchView} from './workbench-view-route-guards';
+import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchService} from '../workbench.service';

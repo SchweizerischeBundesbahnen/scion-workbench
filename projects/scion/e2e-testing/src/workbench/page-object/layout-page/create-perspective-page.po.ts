@@ -12,7 +12,7 @@ import {rejectWhenAttached, waitUntilAttached} from '../../../helper/testing.uti
 import {Locator} from '@playwright/test';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 import {SciKeyValueFieldPO} from '../../../@scion/components.internal/key-value-field.po';
-import {WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {WorkbenchLayoutFn} from '@scion/workbench';
 import {LayoutPages} from './layout-pages.po';
 import {ɵWorkbenchLayout, ɵWorkbenchLayoutFactory} from './layout.model';
 
@@ -31,7 +31,7 @@ export class CreatePerspectivePagePO {
     await this.enterData(definition.data);
 
     // Enter the layout.
-    const {parts, views, viewNavigations} = definition.layout(new ɵWorkbenchLayoutFactory()) as ɵWorkbenchLayout;
+    const {parts, views, viewNavigations} = await definition.layout(new ɵWorkbenchLayoutFactory()) as ɵWorkbenchLayout;
     await LayoutPages.enterParts(this.locator.locator('app-add-parts'), parts);
     await LayoutPages.enterViews(this.locator.locator('app-add-views'), views);
     await LayoutPages.enterViewNavigations(this.locator.locator('app-navigate-views'), viewNavigations);
@@ -54,7 +54,7 @@ export class CreatePerspectivePagePO {
 }
 
 export interface PerspectiveDefinition {
-  layout: (factory: WorkbenchLayoutFactory) => WorkbenchLayout;
+  layout: WorkbenchLayoutFn;
   data?: {[key: string]: any};
   transient?: true;
 }

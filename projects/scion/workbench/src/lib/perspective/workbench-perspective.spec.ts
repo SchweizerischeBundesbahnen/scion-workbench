@@ -24,7 +24,7 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {canMatchWorkbenchView} from '../view/workbench-view-route-guards';
+import {canMatchWorkbenchPerspective, canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchPerspective} from './workbench-perspective.model';
 import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
@@ -342,6 +342,7 @@ describe('Workbench Perspective', () => {
             perspectives: [
               {id: 'perspective-1', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
               {id: 'perspective-2', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
+              {id: 'perspective-3', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
             ],
           },
         }),
@@ -350,13 +351,18 @@ describe('Workbench Perspective', () => {
             path: '',
             loadComponent: () => import('../testing/test.component'),
             providers: [withComponentContent('Start Page Perspective 1')],
-            canMatch: [() => inject(WorkbenchService).activePerspective()?.id === 'perspective-1'],
+            canMatch: [canMatchWorkbenchPerspective('perspective-1')],
           },
           {
             path: '',
             loadComponent: () => import('../testing/test.component'),
             providers: [withComponentContent('Start Page Perspective 2')],
-            canMatch: [() => inject(WorkbenchService).activePerspective()?.id === 'perspective-2'],
+            canMatch: [canMatchWorkbenchPerspective('perspective-2')],
+          },
+          {
+            path: '',
+            loadComponent: () => import('../testing/test.component'),
+            providers: [withComponentContent('Start Page')],
           },
         ]),
       ],
@@ -370,6 +376,10 @@ describe('Workbench Perspective', () => {
     // Switch to perspective-2
     await workbenchService.switchPerspective('perspective-2');
     expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 2');
+
+    // Switch to perspective-3
+    await workbenchService.switchPerspective('perspective-3');
+    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
 
     // Switch to perspective-1
     await workbenchService.switchPerspective('perspective-1');

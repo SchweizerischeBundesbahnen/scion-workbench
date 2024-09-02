@@ -10,9 +10,9 @@
 
 import {CanMatchFn} from '@angular/router';
 import {inject} from '@angular/core';
-import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
+import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './workbench-auxiliary-route-installer.service';
 
 /**
  * Matches the route if target of a workbench view and navigating with the given hint.
@@ -62,6 +62,17 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
         return view?.navigation?.hint === condition;
       }
     }
+  };
+}
+
+/**
+ * Matches the route based on the active perspective.
+ *
+ * Can be used to have a different start page per perspective.
+ */
+export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
+  return (): boolean => {
+    return inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout.perspectiveId === id;
   };
 }
 

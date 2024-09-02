@@ -9,4 +9,3 @@
  */
 
 export {WorkbenchView, ViewId} from './workbench-view.model';
-export {canMatchWorkbenchView} from './workbench-view-route-guards';
