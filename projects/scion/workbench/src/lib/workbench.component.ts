@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, OnDestroy, Provider, ViewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, Provider, ViewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchConfig} from './workbench-config';
@@ -24,6 +24,8 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, Gla
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {Blockable} from './glass-pane/blockable';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-route-installer.service';
+import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -91,6 +93,7 @@ export class WorkbenchComponent implements OnDestroy {
     this.splash = workbenchConfig?.startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
     this.startWorkbench();
+    this.disableChangeDetectionDuringNavigation();
   }
 
   /**
@@ -119,6 +122,25 @@ export class WorkbenchComponent implements OnDestroy {
    */
   private unsetViewContainerReferences(): void {
     Object.values(this.viewContainerReferences).forEach(ref => ref.unset());
+  }
+
+  /**
+   * Disables change detection during navigation to avoid partial DOM updates of the workbench layout
+   * if the navigation is asynchronous (e.g., because of lazy loading, async guards, or resolvers).
+   */
+  private disableChangeDetectionDuringNavigation(): void {
+    const changeDetector = inject(ChangeDetectorRef);
+
+    inject(Router).events
+      .pipe(takeUntilDestroyed())
+      .subscribe(event => {
+        if (event instanceof NavigationStart) {
+          changeDetector.detach();
+        }
+        else if (event instanceof NavigationEnd || event instanceof NavigationError || event instanceof NavigationCancel) {
+          changeDetector.reattach();
+        }
+      });
   }
 
   public ngOnDestroy(): void {
