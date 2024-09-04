@@ -25,6 +25,8 @@ import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../workbench-id';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchComponent} from '../workbench.component';
+import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
+import {WorkbenchService} from '../workbench.service';
 
 describe('WorkbenchLayout', () => {
 
@@ -3028,6 +3030,91 @@ describe('WorkbenchLayout', () => {
     });
     expect('view.1').toHaveComponentState('A');
     expect('view.2').toHaveComponentState('B');
+  });
+
+  /**
+   * Verifies the DOM not to be updated until the navigation completes (consistent read).
+   *
+   * Note that workbench handles (part, view) are updated during navigation.
+   */
+  it('should not update DOM until navigation completes (consistent read)', async () => {
+    const onCanActivate$ = new ReplaySubject<void>(1);
+    const canActivate$ = new Subject<boolean>();
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideRouter([
+          {
+            path: 'path/to/view/1',
+            loadComponent: () => TestViewComponent,
+          },
+          {
+            path: 'path/to/view/2',
+            loadComponent: () => TestViewComponent,
+            canActivate: [() => {
+              onCanActivate$.next();
+              return canActivate$;
+            }],
+          },
+        ]),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-view',
+      template: 'View',
+      standalone: true,
+    })
+    class TestViewComponent {
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Open view 1.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.101'});
+    await waitUntilStable();
+
+    // Open view 2 but block the navigation.
+    const navigation2 = TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.102'});
+
+    // Wait until entering 'CanActivate' guard.
+    await firstValueFrom(onCanActivate$);
+    await waitUntilStable();
+
+    // Expect part handle to already be updated.
+    expect(TestBed.inject(WorkbenchService).getPart('main')!.activeViewId()).toEqual('view.102');
+    expect(TestBed.inject(WorkbenchService).getPart('main')!.viewIds()).toEqual(['view.101', 'view.102']);
+
+    // Expect view handle to be partially updated.
+    expect(TestBed.inject(WorkbenchService).getView('view.101')!.active()).toBeTrue();
+    expect(TestBed.inject(WorkbenchService).getView('view.102')!.active()).toBeTrue();
+
+    // Expect DOM not to be updated.
+    expect(fixture).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+      },
+    });
+
+    // Continue navigation of view 2.
+    canActivate$.next(true);
+    await navigation2;
+    await waitUntilStable();
+
+    // Expect DOM to be updated.
+    expect(fixture).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({id: MAIN_AREA}),
+      },
+      mainAreaGrid: {
+        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+      },
+    });
   });
 });
 
