@@ -15,7 +15,7 @@ import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ViewId, WorkbenchView} from './workbench-view.model';
 import {CanClose} from '../workbench.model';
-import {Observable} from 'rxjs';
+import {firstValueFrom, Observable, ReplaySubject, Subject} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
@@ -42,11 +42,14 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {BlankComponent} from '../routing/workbench-auxiliary-route-installer.service';
+import {SciViewportComponent} from '@scion/components/viewport';
+import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 
 describe('View', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toShowCustomMatcher);
+    jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
   });
 
   it('should destroy handle\'s injector when closing the view', async () => {
@@ -2610,6 +2613,329 @@ describe('View', () => {
       await workbenchRouter.navigate([], {target: 'view.102', hint: 'view-102', activate: false});
       await waitUntilStable();
       expect(log).toEqual(['SpecViewComponent2.construct', 'SpecViewComponent2.ngOnInit']);
+    });
+  });
+
+  describe('Scroll Position', () => {
+
+    it('should retain view scroll position when switching views', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
+            {path: 'path/to/view', loadComponent: () => TestViewComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-view',
+        template: '<div style="height: 2000px">Content</div>',
+        standalone: true,
+      })
+      class TestViewComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Open two views.
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.101'});
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.102'});
+      await waitUntilStable();
+
+      const view1 = TestBed.inject(ɵWorkbenchService).getView('view.101')!;
+      const view2 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
+      const viewportView2 = view2.getComponent<TestViewComponent>()!.viewport;
+
+      // Scroll view 2 to the bottom.
+      viewportView2.scrollTop = 2000;
+      const scrollTop = viewportView2.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Activate view 1.
+      await view1.activate();
+      await waitUntilStable();
+
+      // Activate view 2.
+      await view2.activate();
+      await waitUntilStable();
+
+      // Expect scroll position to be restored.
+      expect(viewportView2.scrollTop).toBe(scrollTop);
+    });
+
+    it('should retain view scroll position when opening new view (synchronous route activation)', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
+            {
+              path: 'path/to/view', loadComponent: () => TestViewComponent,
+            },
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-view',
+        template: '<div style="height: 2000px">Content</div>',
+        standalone: true,
+      })
+      class TestViewComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Open view 1.
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.101'});
+      await waitUntilStable();
+
+      const view1 = TestBed.inject(ɵWorkbenchService).getView('view.101')!;
+      const viewportView1 = view1.getComponent<TestViewComponent>()!.viewport;
+
+      // Scroll view 1 to the bottom.
+      viewportView1.scrollTop = 2000;
+      const scrollTop = viewportView1.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Open new view.
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.102'});
+      await waitUntilStable();
+
+      // Expect view 1 to be inactive.
+      expect(view1.active()).toBeFalse();
+
+      // Activate view 1.
+      await view1.activate();
+      await waitUntilStable();
+
+      // Expect scroll position to be restored.
+      expect(viewportView1.scrollTop).toBe(scrollTop);
+    });
+
+    it('should retain view scroll position when opening new view (asynchronous route activation)', async () => {
+      const onCanActivate$ = new ReplaySubject<void>(1);
+      const canActivate$ = new Subject<boolean>();
+
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
+            {
+              path: 'path/to/view/1',
+              loadComponent: () => TestViewComponent,
+            },
+            {
+              path: 'path/to/view/2',
+              loadComponent: () => TestViewComponent,
+              canActivate: [() => {
+                onCanActivate$.next();
+                return canActivate$;
+              }],
+            },
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-view',
+        template: '<div style="height: 2000px">Content</div>',
+        standalone: true,
+      })
+      class TestViewComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Open view 1.
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.101'});
+      await waitUntilStable();
+
+      const view1 = TestBed.inject(ɵWorkbenchService).getView('view.101')!;
+      const viewportView1 = view1.getComponent<TestViewComponent>()!.viewport;
+
+      // Scroll view 1 to the bottom.
+      viewportView1.scrollTop = 2000;
+      const scrollTop = viewportView1.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Open view 2 but block the navigation.
+      const navigation2 = TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.102'});
+
+      // Wait until entering 'CanActivate' guard.
+      await firstValueFrom(onCanActivate$);
+      await waitUntilStable();
+
+      // Continue navigation of view 2.
+      canActivate$.next(true);
+      await navigation2;
+      await waitUntilStable();
+
+      // Expect view 1 to be inactive.
+      expect(view1.active()).toBeFalse();
+
+      // Activate view 1.
+      await view1.activate();
+      await waitUntilStable();
+
+      // Expect scroll position to be restored.
+      expect(viewportView1.scrollTop).toBe(scrollTop);
+    });
+
+    it('should retain view scroll position when moving view', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideRouter([
+            {path: 'path/to/view', loadComponent: () => TestViewComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-view',
+        template: '<div style="height: 2000px">Content</div>',
+        standalone: true,
+      })
+      class TestViewComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Open two views.
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.101'});
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.102'});
+      await waitUntilStable();
+
+      const view2 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
+      const viewportView2 = view2.getComponent<TestViewComponent>()!.viewport;
+
+      // Scroll view 2 to the bottom.
+      viewportView2.scrollTop = 2000;
+      const scrollTop = viewportView2.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Add right part.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('right', {relativeTo: 'main', align: 'right'}));
+      await waitUntilStable();
+
+      // Move view to the right part.
+      view2.move('right');
+      await waitUntilStable();
+
+      // Expect scroll position to be restored.
+      expect(viewportView2.scrollTop).toBe(scrollTop);
+
+      // Expect view to be moved.
+      expect(fixture).toEqualWorkbenchLayout({
+        workbenchGrid: {
+          root: new MPart({id: MAIN_AREA}),
+        },
+        mainAreaGrid: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          }),
+        },
+      });
+    });
+
+    it('should retain view scroll position when changing the layout', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideRouter([
+            {path: 'path/to/view', loadComponent: () => TestViewComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-view',
+        template: '<div style="height: 2000px">Content</div>',
+        standalone: true,
+      })
+      class TestViewComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Open two views.
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.101'});
+      await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.102'});
+      await waitUntilStable();
+
+      const view2 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
+      const viewportView2 = view2.getComponent<TestViewComponent>()!.viewport;
+
+      // Scroll view 2 to the bottom.
+      viewportView2.scrollTop = 2000;
+      const scrollTop = viewportView2.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Change layout.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+        .addPart('left', {relativeTo: 'main', align: 'left'})
+        .addPart('right', {relativeTo: 'main', align: 'right'})
+        .addPart('top', {relativeTo: 'main', align: 'top'})
+        .addPart('bottom', {relativeTo: 'main', align: 'bottom'})
+        .addView('view.103', {partId: 'left', activateView: true})
+        .addView('view.104', {partId: 'right', activateView: true})
+        .addView('view.105', {partId: 'top', activateView: true})
+        .addView('view.106', {partId: 'bottom', activateView: true}),
+      );
+      await waitUntilStable();
+
+      // Expect scroll position to be restored.
+      expect(viewportView2.scrollTop).toBe(scrollTop);
+
+      // Move view to part 'top'.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'top', {activateView: true}));
+      await waitUntilStable();
+      // Expect view to be moved and scroll position to be restored.
+      expect(view2.part().id).toEqual('top');
+      expect(viewportView2.scrollTop).toBe(scrollTop);
+
+      // // Move view to part 'bottom'.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'bottom', {activateView: true}));
+      await waitUntilStable();
+      // Expect view to be moved and scroll position to be restored.
+      expect(view2.part().id).toEqual('bottom');
+      expect(viewportView2.scrollTop).toBe(scrollTop);
+
+      // // Move view to part 'right'.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'right', {activateView: true}));
+      await waitUntilStable();
+      // Expect view to be moved and scroll position to be restored.
+      expect(view2.part().id).toEqual('right');
+      expect(viewportView2.scrollTop).toBe(scrollTop);
+
+      // // Move view to part 'left'.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'left', {activateView: true}));
+      await waitUntilStable();
+      // Expect view to be moved and scroll position to be restored.
+      expect(view2.part().id).toEqual('left');
+      expect(viewportView2.scrollTop).toBe(scrollTop);
     });
   });
 });

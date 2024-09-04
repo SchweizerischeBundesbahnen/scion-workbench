@@ -82,8 +82,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public position = computed(() => this.part().viewIds().indexOf(this.id));
   public first = computed(() => this.position() === 0);
   public last = computed(() => this.position() === this.part().viewIds().length - 1);
-  public scrollTop = 0;
-  public scrollLeft = 0;
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly active = signal<boolean>(false);
@@ -311,8 +309,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         source,
         target: {
           elementId: target,
-          region: options!.region,
-          workbenchId: options!.workbenchId ?? this._workbenchId,
+          region: options?.region,
+          workbenchId: options?.workbenchId ?? this._workbenchId,
         },
       });
     }

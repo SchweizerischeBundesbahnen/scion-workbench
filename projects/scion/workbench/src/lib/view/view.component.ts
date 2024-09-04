@@ -20,6 +20,7 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {WorkbenchView} from './workbench-view.model';
 import {NgClass} from '@angular/common';
+import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -42,9 +43,11 @@ import {NgClass} from '@angular/common';
     configureViewGlassPane(),
   ],
 })
-export class ViewComponent implements OnDestroy {
+export class ViewComponent implements OnDestroy, OnAttach, OnDetach {
 
   private _viewport = viewChild.required(SciViewportComponent);
+  private _scrollTop = 0;
+  private _scrollLeft = 0;
 
   @HostBinding('attr.data-viewid')
   public get viewId(): string {
@@ -61,23 +64,31 @@ export class ViewComponent implements OnDestroy {
               private _logger: Logger) {
     this._logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
     this.installMenuItemAccelerators();
-    this.subscribeForViewActivation();
+    this.installOnActivateView();
     this.addHostCssClasses();
   }
 
-  private onActivateView(): void {
-    this._viewport().scrollTop = this._view.scrollTop;
-    this._viewport().scrollLeft = this._view.scrollLeft;
+  /**
+   * Method invoked after attached this component to the DOM.
+   */
+  public onAttach(): void {
+    this._viewport().scrollTop = this._scrollTop;
+    this._viewport().scrollLeft = this._scrollLeft;
+  }
 
+  /**
+   * Method invoked before detaching this component from the DOM.
+   */
+  public onDetach(): void {
+    this._scrollTop = this._viewport().scrollTop;
+    this._scrollLeft = this._viewport().scrollLeft;
+  }
+
+  private onActivateView(): void {
     // Gain focus only if in the active part.
     if (this._view.part().active()) {
       this._viewport().focus();
     }
-  }
-
-  private onDeactivateView(): void {
-    this._view.scrollTop = this._viewport().scrollTop;
-    this._view.scrollLeft = this._viewport().scrollLeft;
   }
 
   private installMenuItemAccelerators(): void {
@@ -86,10 +97,11 @@ export class ViewComponent implements OnDestroy {
       .subscribe();
   }
 
-  private subscribeForViewActivation(): void {
+  private installOnActivateView(): void {
     effect(() => {
-      const active = this._view.active();
-      untracked(() => active ? this.onActivateView() : this.onDeactivateView());
+      if (this._view.active()) {
+        untracked(() => this.onActivateView());
+      }
     });
   }
 
