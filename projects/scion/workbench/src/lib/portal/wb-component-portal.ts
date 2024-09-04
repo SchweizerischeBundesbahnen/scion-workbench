@@ -79,10 +79,12 @@ export class WbComponentPortal<T = any> {
 
     this._viewContainerRef = viewContainerRef;
     this._componentRef = this._componentRef || this.createComponent(this._viewContainerRef.injector);
+    this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef);
+
     this._componentRef.changeDetectorRef.reattach();
     this._viewContainerRef.insert(this._componentRef.hostView);
     this._attached$.next(true);
-    this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef);
+    (this._componentRef.instance as OnAttach)?.onAttach();
   }
 
   /**
@@ -97,6 +99,7 @@ export class WbComponentPortal<T = any> {
     }
 
     this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._componentRef);
+    (this._componentRef!.instance as OnDetach)?.onDetach();
     const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
     this._viewContainerRef!.detach(index);
     this._componentRef!.changeDetectorRef.detach();
@@ -156,4 +159,26 @@ export interface PortalOptions {
    * Providers registered with the injector for the instantiation of the component.
    */
   providers?: Provider[];
+}
+
+/**
+ * Lifecycle hook for component rendered by {@link WbComponentPortal} when attaching to the DOM.
+ */
+export interface OnAttach {
+
+  /**
+   * Method invoked after attached this component to the DOM.
+   */
+  onAttach(): void;
+}
+
+/**
+ * Lifecycle hook for component rendered by {@link WbComponentPortal} when detaching from the DOM.
+ */
+export interface OnDetach {
+
+  /**
+   * Method invoked before detaching this component from the DOM.
+   */
+  onDetach(): void;
 }
