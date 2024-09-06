@@ -22,8 +22,8 @@ Add a `<ng-template>` to an HTML template and decorate it with the `wbViewMenuIt
 ```
 
 #### Contribute a menu item via WorkbenchService
-As an alternative to modeling a menu item in HTML templates, menu items can be contributed programmatically as a factory function registered via the `WorkbenchService.registerViewMenuItem` method.
-The function will be invoked when opening a view's context menu. Use the passed view handle to decide whether to display the menu item. The content of the menu item is specified in the form of a CDK portal, i.e., a component portal or a template portal. The component can inject `WorkbenchView`.
+As an alternative to modeling menu items in HTML templates, menu items can be contributed programmatically as a factory function registered via the `WorkbenchService.registerViewMenuItem` method.
+The function is invoked when opening the menu. Use the passed view handle to decide whether to display the menu item. The content of the menu item is specified in the form of a CDK portal, i.e., a component portal or a template portal. The component can inject `WorkbenchView`.
 
 ```ts
 import {WorkbenchMenuItem, WorkbenchService, WorkbenchView} from '@scion/workbench';
