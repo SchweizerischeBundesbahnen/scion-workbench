@@ -1,0 +1,15 @@
+:host {
+  display: grid;
+  grid-template-columns: 1.5em auto;
+  gap: .5em;
+  align-items: center;
+
+  > span.check-mark {
+    grid-column: 1/2;
+    font-size: 1.5em;
+  }
+
+  > span.content {
+    grid-column: 2/3;
+  }
+}

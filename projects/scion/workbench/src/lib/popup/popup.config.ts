@@ -206,6 +206,10 @@ export abstract class Popup<T = any> {
    */
   public abstract readonly cssClasses: string[];
 
+  public abstract setResult<R = any>(result: R): void;
+
+  public abstract clearResult(): void;
+
   /**
    * Closes the popup. Optionally, pass a result to the popup opener.
    */
@@ -256,6 +260,16 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
         takeUntilDestroyed(),
       )
       .subscribe(this.blockedBy$);
+  }
+
+  /** @inheritDoc */
+  public setResult<R = any>(result: R): void {
+    this.result = result;
+  }
+
+  /** @inheritDoc */
+  public clearResult(): void {
+    this.result = undefined;
   }
 
   /** @inheritDoc */

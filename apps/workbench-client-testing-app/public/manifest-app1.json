@@ -12,6 +12,22 @@
       }
     },
     {
+      "type": "popup",
+      "qualifier": {
+        "a": "b"
+      },
+      "params": [
+        {
+          "name": "selection",
+          "required": false
+        }
+      ],
+      "private": false,
+      "properties": {
+        "path": "proposal-popup-page"
+      }
+    },
+    {
       "type": "perspective",
       "qualifier": {
         "perspective": "app1"

@@ -82,6 +82,18 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
         }
       });
 
+    // Listen to popup result requests.
+    this._messageClient.observe$<any>(ɵWorkbenchCommands.popupResultTopic(this.popup.id))
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(result => {
+        if (result === undefined) {
+          this.popup.clearResult();
+        }
+        else {
+          this.popup.setResult(result.body);
+        }
+      });
+
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
 
@@ -105,7 +117,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
     // Close the popup on focus loss.
     if (this._popupContext.closeOnFocusLost && !focusWithin) {
-      this.popup.close();
+      this.popup.close(this.popup.result);
     }
 
     if (focusWithin) {

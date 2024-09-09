@@ -1,0 +1,34 @@
+<input class="filter" #filter_element
+       [formControl]="filterControl"
+       [placeholder]="filterPlaceholder() ?? ''"
+       (keydown.arrowDown)="onFilterArrowDown()">
+<section class="list-items"
+         [style.height.px]="height()"
+         (keydown.arrowDown)="onArrowDown()"
+         (keydown.arrowUp)="onArrowUp()"
+         (keydown)="onKeyDown($event)"
+         tabindex="-1">
+  <cdk-virtual-scroll-viewport #cdkViewport [itemSize]="proposalItemHeight()" sciScrollable>
+    <ng-container *cdkVirtualFor="let listItem of listItems(); index as i; trackBy:trackByFn">
+      @if (listItem.type === 'proposal') {
+        <app-proposal [item]="listItem.item"
+                      [selected]="selection().includes(listItem.key)"
+                      [template]="proposalContent()?.template"
+                      [appInjectElementRef]="listItem"
+                      [style.height.px]="proposalItemHeight()"
+                      (click)="onSelectProposal(listItem)"
+                      (keydown.space)="onSelectProposal(listItem)"
+                      (keydown.enter)="onSelectProposal(listItem)"
+                      (focusin)="onListItemFocusIn(i)"
+                      tabindex="0"/>
+      } @else if (listItem.type === 'separator') {
+        <header class="separator" [style.height.px]="proposalItemHeight()">{{listItem.label()}}</header>
+      } @else if (listItem.type === 'button') {
+        <div class="button" tabindex="0" [style.height.px]="proposalItemHeight()" (focusin)="onListItemFocusIn(i)" [appInjectElementRef]="listItem">
+          <ng-container *ngTemplateOutlet="listItem.template"/>
+        </div>
+      }
+    </ng-container>
+  </cdk-virtual-scroll-viewport>
+  <sci-scrollbar [direction]="'vscroll'" [viewport]="cdkViewport.getElementRef().nativeElement"/>
+</section>

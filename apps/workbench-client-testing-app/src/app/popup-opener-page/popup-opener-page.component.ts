@@ -46,15 +46,20 @@ export default class PopupOpenerPageComponent {
   public form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
       this._formBuilder.group({
-        key: this._formBuilder.control('component'),
-        value: this._formBuilder.control('popup'),
+        key: this._formBuilder.control('a'),
+        value: this._formBuilder.control('b'),
       }),
-      this._formBuilder.group({
-        key: this._formBuilder.control('app'),
-        value: this._formBuilder.control('app1'),
-      }),
+      // this._formBuilder.group({
+      //   key: this._formBuilder.control('app'),
+      //   value: this._formBuilder.control('app1'),
+      // }),
     ], Validators.required),
-    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    params: this._formBuilder.array<FormGroup<KeyValueEntry>>([
+      this._formBuilder.group({
+        key: this._formBuilder.control('selection'),
+        value: this._formBuilder.control('1,2,3'),
+      }),
+    ]),
     anchor: this._formBuilder.group({
       position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
       verticalPosition: this._formBuilder.control(0, Validators.required),
@@ -63,7 +68,7 @@ export default class PopupOpenerPageComponent {
       height: this._formBuilder.control<number | undefined>(undefined),
     }),
     contextualViewId: this._formBuilder.control<ViewId | ''>(''),
-    align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>(''),
+    align: this._formBuilder.control<'east' | 'west' | 'north' | 'south' | ''>('south'),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     closeStrategy: this._formBuilder.group({
       onFocusLost: this._formBuilder.control(true),

@@ -63,6 +63,10 @@ export abstract class WorkbenchPopup {
    */
   public abstract readonly params: Map<string, any>;
 
+  public abstract setResult<R = any>(result: R): void;
+
+  public abstract clearResult(): void;
+
   /**
    * Closes the popup. Optionally, pass a result to the popup opener.
    */
@@ -95,6 +99,20 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
    */
   public signalReady(): void {
     MicrofrontendPlatformClient.signalReady();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public setResult<R = any>(result: R): void {
+    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupResultTopic(this._context.popupId), result).then();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public clearResult(): void {
+    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupResultTopic(this._context.popupId), undefined).then();
   }
 
   /**

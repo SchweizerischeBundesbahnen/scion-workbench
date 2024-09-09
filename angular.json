@@ -570,5 +570,10 @@
         }
       }
     }
+  },
+  "cli": {
+    "cache": {
+      "enabled": false
+    }
   }
 }

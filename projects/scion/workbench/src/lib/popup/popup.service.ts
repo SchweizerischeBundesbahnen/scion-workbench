@@ -235,7 +235,7 @@ export class PopupService {
           filter((focusOrigin: FocusOrigin) => !focusOrigin),
           takeUntilDestroyed(popupDestroyRef),
         )
-        .subscribe(() => popup.close());
+        .subscribe(() => popup.close(popup.result));
     }
 
     // Close the popup when closing the view.

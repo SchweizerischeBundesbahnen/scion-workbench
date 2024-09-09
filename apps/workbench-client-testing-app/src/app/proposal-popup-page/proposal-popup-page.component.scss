@@ -1,0 +1,24 @@
+@use '@scion/components/scrollbar' as sci-scrollbar;
+
+:host {
+  position: absolute;
+
+  > app-proposal-popup-field {
+    max-height: 400px;
+    width: 280px;
+  }
+
+  button.custom-button {
+    all: unset;
+    display: grid;
+    grid-template-columns: 1.5em auto;
+    align-items: center;
+    gap: .5em;
+    width: 100%;
+
+    > span.icon {
+      font-size: 1em;
+      justify-self: center;
+    }
+  }
+}

@@ -1,0 +1,63 @@
+@use '@scion/components/scrollbar' as sci-scrollbar;
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  font-size: .9em;
+
+  > input.filter {
+    flex: none;
+    @include sci-design.style-input-field();
+    margin: .5em;
+  }
+
+  > section.list-items {
+    flex: auto;
+    display: grid;
+    position: relative; // positioned anchor for the scrollbars
+    overflow: hidden; // hides native scrollbars (shifted out of the visible viewport area)
+    @include sci-scrollbar.scrollbar-hide-when-inactive(); // hide scrollbars when the user is not hovering the viewport.
+
+    > sci-scrollbar {
+      @include sci-scrollbar.scrollbar-position(); // positions scrollbars
+    }
+
+    app-proposal, div.button {
+      cursor: pointer;
+      padding: .25em .5em;
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover, &:focus {
+        background-color: var(--sci-color-accent);
+        color: var(--sci-color-accent-inverse);
+      }
+    }
+
+    div.button {
+      display: grid;
+    }
+
+    header.separator {
+      display: flex;
+      align-items: center;
+      padding: .25em .5em;
+      background-color: var(--sci-color-background-secondary);
+      font-weight: bold;
+      color: var(--sci-color-text-subtle);
+    }
+
+    :is(app-proposal, header.separator, div.button) {
+      border-top: 1px solid var(--sci-color-border);
+      user-select: none;
+      box-sizing: border-box;
+
+      &:last-child {
+        border-bottom: 1px solid var(--sci-color-border);
+      }
+    }
+  }
+}

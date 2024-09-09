@@ -1,0 +1,10 @@
+@if (selected()) {
+  <span sciMaterialIcon class="check-mark">check</span>
+}
+<span class="content">
+  @if (template()) {
+    <ng-container *ngTemplateOutlet="template()!; context: {$implicit: item()}"/>
+  } @else {
+    Missing template {{item()}}
+  }
+</span>

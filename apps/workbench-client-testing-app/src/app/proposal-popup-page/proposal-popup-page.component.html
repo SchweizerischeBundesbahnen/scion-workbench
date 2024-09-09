@@ -1,0 +1,24 @@
+<app-proposal-popup-field [proposalProviderFn]="proposalProviderFn"
+                          [proposalKeyFn]="proposalKeyFn"
+                          [filterPlaceholder]="'Type or choose a user'"
+                          [(selection)]="selection">
+  <ng-template appProposalFieldContent let-person>
+    {{person.firstname}} {{person.lastname}}
+  </ng-template>
+
+  @if (initialSelection.length) {
+    <ng-template appProposalFieldButton>
+      <button class="custom-button" (click)="onClear()">
+        <span sciMaterialIcon class="icon">clear</span>
+        Clear assignes
+      </button>
+    </ng-template>
+  }
+
+  <ng-template appProposalFieldButton>
+    <button class="custom-button" (click)="onAssignMe()">
+      <span sciMaterialIcon class="icon">person</span>
+      Assign to me
+    </button>
+  </ng-template>
+</app-proposal-popup-field>

@@ -28,6 +28,10 @@ export const routes: Routes = [
     loadComponent: () => import('./popup-opener-page/popup-opener-page.component'),
   },
   {
+    path: 'proposal-popup-page',
+    loadComponent: () => import('./proposal-popup-page/proposal-popup-page.component'),
+  },
+  {
     path: 'test-popup',
     loadComponent: () => import('./popup-page/popup-page.component'),
   },
