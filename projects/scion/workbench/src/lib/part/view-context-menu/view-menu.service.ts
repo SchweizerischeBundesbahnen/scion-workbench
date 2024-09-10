@@ -46,11 +46,11 @@ export class ViewMenuService {
 
   constructor() {
     // Registers built-in menu items added to the context menu of every view tab.
-    this.registerCloseViewMenuItem();
-    this.registerCloseOtherViewsMenuItem();
-    this.registerCloseAllViewsMenuItem();
-    this.registerCloseViewsToTheRightMenuItem();
-    this.registerCloseViewsToTheLeftMenuItem();
+    this.registerCloseMenuItem();
+    this.registerCloseOtherTabsMenuItem();
+    this.registerCloseAllTabsMenuItem();
+    this.registerCloseRightTabsMenuItem();
+    this.registerCloseLeftTabsMenuItem();
     this.registerMoveRightMenuItem();
     this.registerMoveLeftMenuItem();
     this.registerMoveUpMenuItem();
@@ -147,8 +147,8 @@ export class ViewMenuService {
     });
   }
 
-  private registerCloseViewMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close tab', group: 'close', accelerator: ['ctrl', 'k'], cssClass: 'e2e-close-tab'};
+  private registerCloseMenuItem(): void {
+    const defaults: MenuItemConfig = {visible: true, text: 'Close', group: 'close', accelerator: ['ctrl', 'k'], cssClass: 'e2e-close'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.close;
     const config = {...defaults, ...appConfig};
 
@@ -168,8 +168,8 @@ export class ViewMenuService {
     });
   }
 
-  private registerCloseOtherViewsMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close other tabs', group: 'close', accelerator: ['ctrl', 'shift', 'k']};
+  private registerCloseOtherTabsMenuItem(): void {
+    const defaults: MenuItemConfig = {visible: true, text: 'Close other tabs', group: 'close', accelerator: ['ctrl', 'shift', 'k'], cssClass: ' e2e-close-other-tabs'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeOthers;
     const config = {...defaults, ...appConfig};
 
@@ -189,7 +189,7 @@ export class ViewMenuService {
     });
   }
 
-  private registerCloseAllViewsMenuItem(): void {
+  private registerCloseAllTabsMenuItem(): void {
     const defaults: MenuItemConfig = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k'], cssClass: 'e2e-close-all-tabs'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeAll;
     const config = {...defaults, ...appConfig};
@@ -209,8 +209,8 @@ export class ViewMenuService {
     });
   }
 
-  private registerCloseViewsToTheRightMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the right', group: 'close'};
+  private registerCloseRightTabsMenuItem(): void {
+    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the right', group: 'close', cssClass: 'e2e-close-right-tabs'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeToTheRight;
     const config = {...defaults, ...appConfig};
 
@@ -230,8 +230,8 @@ export class ViewMenuService {
     });
   }
 
-  private registerCloseViewsToTheLeftMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the left', group: 'close'};
+  private registerCloseLeftTabsMenuItem(): void {
+    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the left', group: 'close', cssClass: 'e2e-close-left-tabs'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeToTheLeft;
     const config = {...defaults, ...appConfig};
 
@@ -252,7 +252,7 @@ export class ViewMenuService {
   }
 
   private registerMoveRightMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move right', group: 'move', accelerator: ['ctrl', 'alt', 'end']};
+    const defaults: MenuItemConfig = {visible: true, text: 'Move right', group: 'move', accelerator: ['ctrl', 'alt', 'end'], cssClass: 'e2e-move-right'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveRight;
     const config = {...defaults, ...appConfig};
 
@@ -273,7 +273,7 @@ export class ViewMenuService {
   }
 
   private registerMoveLeftMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move left', group: 'move'};
+    const defaults: MenuItemConfig = {visible: true, text: 'Move left', group: 'move', cssClass: 'e2e-move-left'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveLeft;
     const config = {...defaults, ...appConfig};
 
@@ -294,7 +294,7 @@ export class ViewMenuService {
   }
 
   private registerMoveUpMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move up', group: 'move'};
+    const defaults: MenuItemConfig = {visible: true, text: 'Move up', group: 'move', cssClass: 'e2e-move-up'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveUp;
     const config = {...defaults, ...appConfig};
 
@@ -315,7 +315,7 @@ export class ViewMenuService {
   }
 
   private registerMoveDownMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move down', group: 'move'};
+    const defaults: MenuItemConfig = {visible: true, text: 'Move down', group: 'move', cssClass: 'e2e-move-down'};
     const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveDown;
     const config = {...defaults, ...appConfig};
 

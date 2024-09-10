@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {Type} from '@angular/core';
+import {Signal, Type} from '@angular/core';
 import {LogAppender, LogLevel} from './logging';
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
@@ -148,7 +148,9 @@ export abstract class WorkbenchConfig {
 }
 
 /**
- * Controls which built-in menu items to display in the view context menu.
+ * Configuration of built-in menu items in the view's context menu.
+ *
+ * Each property represents a menu item, allowing customization of visibility, text, accelerators, and more.
  */
 export interface ViewMenuItemsConfig {
   close?: MenuItemConfig;
@@ -163,9 +165,19 @@ export interface ViewMenuItemsConfig {
   moveToNewWindow?: MenuItemConfig;
 }
 
+/**
+ * Configures a built-in menu item.
+ */
 export interface MenuItemConfig {
   visible?: boolean;
-  text?: string;
+  /**
+   * Specifies the text of this menu item.
+   *
+   * Can be a string or a function that returns a string or a {@link Signal}.
+   *
+   * The function can call `inject` to get any required dependencies, or use `toSignal` to convert an observable to a signal.
+   */
+  text?: string | (() => string | Signal<string>);
   accelerator?: string[];
   group?: string;
   cssClass?: string | string[];
