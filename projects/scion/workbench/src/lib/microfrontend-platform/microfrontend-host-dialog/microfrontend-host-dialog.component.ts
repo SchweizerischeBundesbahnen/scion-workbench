@@ -20,7 +20,7 @@ import {DIALOG_ID_PREFIX} from '../../workbench.constants';
 import {Observable, Subject} from 'rxjs';
 import {throwError} from '../../common/throw-error.util';
 import {Microfrontends} from '../common/microfrontend.util';
-import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
+import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Observables} from '@scion/toolkit/util';
 import {filter, takeUntil} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -54,7 +54,8 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   protected outletName: string;
   protected outletInjector!: Injector;
 
-  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
   constructor(private _dialog: ɵWorkbenchDialog,
               private _injector: Injector,
@@ -80,7 +81,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
-    return this._singleNavigationExecutor.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
+    return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 
   private createOutletInjector(): void {

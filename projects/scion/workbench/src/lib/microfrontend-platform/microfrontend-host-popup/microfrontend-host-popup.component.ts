@@ -18,7 +18,7 @@ import {NgTemplateOutlet} from '@angular/common';
 import {Defined} from '@scion/toolkit/util';
 import {POPUP_ID_PREFIX} from '../../workbench.constants';
 import {Microfrontends} from '../common/microfrontend.util';
-import {SINGLE_NAVIGATION_EXECUTOR} from '../../executor/single-task-executor';
+import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Objects} from '../../common/objects.util';
 
 /**
@@ -42,7 +42,8 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   public readonly outletName: string;
   public readonly outletInjector: Injector;
 
-  private _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
   constructor(popup: ɵPopup<ɵPopupContext>,
               private _injector: Injector,
@@ -73,7 +74,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path!)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
-    return this._singleNavigationExecutor.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
+    return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 
   public ngOnDestroy(): void {

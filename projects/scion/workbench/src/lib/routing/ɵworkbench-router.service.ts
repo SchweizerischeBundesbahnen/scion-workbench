@@ -14,7 +14,7 @@ import {Defined, Observables} from '@scion/toolkit/util';
 import {inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
-import {SINGLE_NAVIGATION_EXECUTOR} from '../executor/single-task-executor';
+import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
@@ -37,8 +37,10 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private readonly _injector = inject(Injector);
   private readonly _logger = inject(Logger);
   private readonly _zone = inject(NgZone);
-  private readonly _singleNavigationExecutor = inject(SINGLE_NAVIGATION_EXECUTOR);
-
+  /** Mutex to serialize Workbench Router navigation requests, preventing race conditions when modifying the active workbench layout to operate on the most-recent layout. */
+  private readonly _workbenchRouterMutex = new SingleTaskExecutor();
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
   /** Holds the current navigational context during a workbench navigation, or `null` if no navigation is in progress. */
   private _currentNavigationContext: WorkbenchNavigationContext | null = null;
 
@@ -64,8 +66,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 
     const navigateFn = typeof commandsOrNavigateFn === 'function' ? commandsOrNavigateFn : createNavigationFromCommands(commandsOrNavigateFn, extras ?? {});
 
-    // Serialize navigation requests to prevent race conditions when modifying the currently active workbench layout.
-    return this._singleNavigationExecutor.submit(async () => {
+    // Serialize navigation requests to avoid race conditions when modifying the active workbench layout, ensuring layout operations are performed on the most-recent layout.
+    return this._workbenchRouterMutex.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, this navigation would override the initial layout as given in the URL.
       if (!this._workbenchLayoutService.layout()) {
@@ -87,7 +89,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 
       // Perform the navigation.
       const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
-      if (!(await this._router.navigate(commands, extras))) {
+      if (!await this._angularRouterMutex.submit(() => this._router.navigate(commands, extras))) {
         return false;
       }
 
@@ -125,7 +127,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       return this._zone.run(() => this.createUrlTree(onNavigate, extras));
     }
 
-    return this._singleNavigationExecutor.submit(async () => {
+    // Serialize navigation requests to avoid race conditions when modifying the active workbench layout, ensuring layout operations are performed on the most-recent layout.
+    return this._workbenchRouterMutex.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, would override the initial layout as given in the URL.
       if (!this._workbenchLayoutService.layout()) {

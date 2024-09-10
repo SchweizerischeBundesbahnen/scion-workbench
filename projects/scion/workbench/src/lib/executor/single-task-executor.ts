@@ -15,9 +15,9 @@ import {InjectionToken} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
- * Serializes navigation requests to the Angular Router to prevent cancelling of parallel navigations or race conditions when modifying the currently active workbench layout.
+ * Serializes navigation requests to the Angular Router to prevent the cancellation of previously initiated asynchronous navigations.
  */
-export const SINGLE_NAVIGATION_EXECUTOR = new InjectionToken<SingleTaskExecutor>('SINGLE_NAVIGATION_EXECUTOR', {
+export const ANGULAR_ROUTER_MUTEX = new InjectionToken<SingleTaskExecutor>('ANGULAR_ROUTER_MUTEX', {
   providedIn: 'root',
   factory: () => new SingleTaskExecutor(),
 });

@@ -17,6 +17,7 @@ import {expectView} from '../matcher/view-matcher';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 import {ViewInfo} from '../workbench/page-object/view-info-dialog.po';
+import {TextMessagePO} from './page-object/text-message.po';
 
 test.describe('Workbench View', () => {
 
@@ -379,6 +380,23 @@ test.describe('Workbench View', () => {
     // switch to view 2, should not ask for confirmation
     await viewPage2.view.tab.click();
     await expectMessageBox(messageBoxPage).not.toBeAttached();
+  });
+
+  test('should display text and title of message box opened in `CanClose` guard', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+    const testeeViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    await testeeViewPage.checkConfirmClosing(true);
+    await testeeViewPage.view.tab.close();
+
+    const messageBox = appPO.messagebox({cssClass: 'e2e-close-view'});
+    const messageBoxPage = new TextMessagePO(messageBox);
+
+    await expectMessageBox(messageBoxPage).toBeVisible();
+    await expect(messageBoxPage.messageBox.title).toHaveText('Confirm Close');
+    await expect(messageBoxPage.text).toHaveText('Do you want to close this view?');
   });
 
   test('should emit when activating or deactivating a viewtab', async ({appPO, microfrontendNavigator, consoleLogs}) => {
