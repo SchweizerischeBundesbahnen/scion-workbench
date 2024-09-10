@@ -39,46 +39,114 @@ test.describe('Workbench Host Popup', () => {
     await expectPopup(popupPage).toBeVisible();
   });
 
-  test('should allow closing the popup and returning a value to the popup opener', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
+  test.describe('popup result', () => {
+    test('should allow closing the popup and returning a value to the popup opener', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
-    // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
+      // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
+      // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
-    // open the popup
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'host-popup'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new HostPopupPagePO(popup);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
 
-    await popupPage.close({returnValue: 'RETURN VALUE'});
-    await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
-  });
+      await popupPage.close({returnValue: 'RETURN VALUE'});
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
+    });
 
-  test('should allow closing the popup with an error', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
+    test('should allow closing the popup with an error', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
-    // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
+      // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
+      // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
 
-    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
 
-    // open the popup
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'host-popup'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new HostPopupPagePO(popup);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
 
-    await popupPage.close({returnValue: 'ERROR', closeWithError: true});
-    await expect(popupOpenerPage.error).toHaveText('ERROR');
+      await popupPage.close({returnValue: 'ERROR', closeWithError: true});
+      await expect(popupOpenerPage.error).toHaveText('ERROR');
+    });
+
+    test('should allow returning value on focus loss', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
+      // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
+
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE', {apply: true});
+
+      await popupOpenerPage.view.tab.click();
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
+    });
+
+    test('should return only the latest result value on close', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
+      // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
+
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE 1', {apply: true});
+
+      await popupPage.close({returnValue: 'RETURN VALUE 2'});
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE 2');
+    });
+
+    test('should not return value on escape keystroke', async ({appPO, microfrontendNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented the issue #271
+      // https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/271
+
+      await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup'}});
+
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'host-popup'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new HostPopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE', {apply: true});
+
+      await page.keyboard.press('Escape');
+      await expect(popupOpenerPage.returnValue).not.toBeAttached();
+    });
   });
 
   test('should stick to the popup anchor', async ({appPO, microfrontendNavigator}) => {

@@ -60,12 +60,16 @@
       </ng-template>
       <ng-template #panel_return_value>
         <input class="e2e-return-value" [formControl]="form.controls.result" placeholder="Optional data to return to the popup opener">
+        <button (click)="onApplyReturnValue()" class="e2e-apply-return-value">Apply</button>
       </ng-template>
     </sci-accordion>
   </form>
 </sci-viewport>
 
 <div class="buttons">
+  <label class="close-with-error">
+    <sci-checkbox [formControl]="form.controls.closeWithError" class="e2e-close-with-error"/>
+    Close with error
+  </label>
   <button (click)="onClose()" class="e2e-close" sci-primary>Close</button>
-  <button (click)="onCloseWithError()" class="e2e-close-with-error">Close (with error)</button>
 </div>

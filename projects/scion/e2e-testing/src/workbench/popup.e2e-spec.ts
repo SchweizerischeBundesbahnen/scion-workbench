@@ -263,34 +263,86 @@ test.describe('Workbench Popup', () => {
     await expect(popupPage.input).toHaveText('TEST INPUT');
   });
 
-  test('should allow closing the popup and returning a value to the popup opener', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+  test.describe('popup result', () => {
+    test('should allow closing the popup and returning a value to the popup opener', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
 
-    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.selectPopupComponent('popup-page');
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(popup);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-    await popupPage.close({returnValue: 'RETURN VALUE'});
-    await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
-  });
+      await popupPage.close({returnValue: 'RETURN VALUE'});
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
+    });
 
-  test('should allow closing the popup with an error', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    test('should allow closing the popup with an error', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
 
-    const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-    await popupOpenerPage.selectPopupComponent('popup-page');
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(popup);
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-    await popupPage.close({returnValue: 'ERROR', closeWithError: true});
-    await expect(popupOpenerPage.error).toHaveText('ERROR');
+      await popupPage.close({returnValue: 'ERROR', closeWithError: true});
+      await expect(popupOpenerPage.error).toHaveText('ERROR');
+    });
+
+    test('should allow returning value on focus loss', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: true});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE', {apply: true});
+
+      await popupOpenerPage.view.tab.click();
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
+    });
+
+    test('should return only the latest result value on close', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE 1', {apply: true});
+
+      await popupPage.close({returnValue: 'RETURN VALUE 2'});
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE 2');
+    });
+
+    test('should not return value on escape keystroke', async ({appPO, workbenchNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      const popupOpenerPage = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+      await popupOpenerPage.selectPopupComponent('popup-page');
+      await popupOpenerPage.enterCloseStrategy({closeOnEscape: true});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE', {apply: true});
+
+      await page.keyboard.press('Escape');
+      await expect(popupOpenerPage.returnValue).not.toBeAttached();
+    });
   });
 
   test('should associate popup with specified CSS class(es) ', async ({appPO, workbenchNavigator}) => {

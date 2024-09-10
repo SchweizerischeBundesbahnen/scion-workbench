@@ -24,7 +24,7 @@ const result = await popupService.open({
 });
 ```
 
-To interact with the popup in the popup component, inject the popup handle `Popup`, e.g., to close the popup or read input passed to the popup by the popup opener.
+To interact with the popup in the popup component, inject the popup handle `Popup`, e.g., to read input passed to the popup or to close the popup, optionally passing a result to the popup opener.
 
 
 ```typescript

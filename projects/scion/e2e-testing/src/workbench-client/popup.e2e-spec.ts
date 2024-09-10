@@ -151,52 +151,130 @@ test.describe('Workbench Popup', () => {
     await expect.poll(() => popup.getAlign()).toEqual('west');
   });
 
-  test('should allow closing the popup with a return value', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
+  test.describe('popup result', () => {
+    test('should allow closing the popup with a return value', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'popup',
-      qualifier: {component: 'testee'},
-      properties: {
-        path: 'test-popup',
-      },
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-popup',
+        },
+      });
+
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+
+      await popupPage.close({returnValue: 'RETURN VALUE'});
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
     });
 
-    // open the popup
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    test('should allow closing the popup with an error', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(popup);
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-popup',
+        },
+      });
 
-    await popupPage.close({returnValue: 'RETURN VALUE'});
-    await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
-  });
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
 
-  test('should allow closing the popup with an error', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
 
-    await microfrontendNavigator.registerCapability('app1', {
-      type: 'popup',
-      qualifier: {component: 'testee'},
-      properties: {
-        path: 'test-popup',
-      },
+      await popupPage.close({returnValue: 'ERROR', closeWithError: true});
+      await expect(popupOpenerPage.error).toHaveText('ERROR');
     });
 
-    // open the popup
-    const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-    await popupOpenerPage.enterQualifier({component: 'testee'});
-    await popupOpenerPage.enterCssClass('testee');
-    await popupOpenerPage.open();
+    test('should allow returning value on focus loss', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
 
-    const popup = appPO.popup({cssClass: 'testee'});
-    const popupPage = new PopupPagePO(popup);
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-popup',
+        },
+      });
 
-    await popupPage.close({returnValue: 'ERROR', closeWithError: true});
-    await expect(popupOpenerPage.error).toHaveText('ERROR');
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: true});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE', {apply: true});
+
+      await popupOpenerPage.view.tab.click();
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE');
+    });
+
+    test('should return only the latest result value on close', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-popup',
+        },
+      });
+
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE 1', {apply: true});
+
+      await popupPage.close({returnValue: 'RETURN VALUE 2'});
+      await expect(popupOpenerPage.returnValue).toHaveText('RETURN VALUE 2');
+    });
+
+    test('should not return value on escape keystroke', async ({appPO, microfrontendNavigator, page}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      await microfrontendNavigator.registerCapability('app1', {
+        type: 'popup',
+        qualifier: {component: 'testee'},
+        properties: {
+          path: 'test-popup',
+        },
+      });
+
+      // open the popup
+      const popupOpenerPage = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
+      await popupOpenerPage.enterQualifier({component: 'testee'});
+      await popupOpenerPage.enterCssClass('testee');
+      await popupOpenerPage.open();
+
+      const popup = appPO.popup({cssClass: 'testee'});
+      const popupPage = new PopupPagePO(popup);
+      await popupPage.enterReturnValue('RETURN VALUE', {apply: true});
+
+      await page.keyboard.press('Escape');
+      await expect(popupOpenerPage.returnValue).not.toBeAttached();
+    });
   });
 
   test('should stick to the popup anchor', async ({appPO, microfrontendNavigator}) => {

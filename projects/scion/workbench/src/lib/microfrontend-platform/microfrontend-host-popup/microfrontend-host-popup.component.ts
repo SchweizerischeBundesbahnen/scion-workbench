@@ -61,7 +61,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     // Perform navigation in the named router outlet.
     this.navigate(path, {outletName: this.outletName, params}).then(success => {
       if (!success) {
-        popup.closeWithError(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+        popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
     });
   }
@@ -91,17 +91,17 @@ function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvid
     useFactory: (): WorkbenchPopup => {
       const popup = inject(Popup);
 
-      return new class implements WorkbenchPopup {
+      return new class<R = unknown> implements WorkbenchPopup {
         public readonly capability = popupContext.capability;
         public readonly params = popupContext.params;
         public readonly referrer = popupContext.referrer;
 
-        public close<R = any>(result?: R | undefined): void {
-          popup.close(result);
+        public setResult(result?: R): void {
+          popup.setResult(result);
         }
 
-        public closeWithError(error: Error | string): void {
-          popup.closeWithError(error);
+        public close(result?: R | Error): void {
+          popup.close(result);
         }
 
         public signalReady(): void {

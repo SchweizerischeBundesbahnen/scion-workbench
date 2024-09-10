@@ -17,6 +17,7 @@ import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JsonPipe} from '@angular/common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 @Component({
   selector: 'app-popup-page',
@@ -32,6 +33,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
     SciAccordionComponent,
     SciAccordionItemDirective,
     ReactiveFormsModule,
+    SciCheckboxComponent,
   ],
 })
 export class PopupPageComponent {
@@ -75,17 +77,19 @@ export class PopupPageComponent {
     minWidth: this._formBuilder.control(''),
     width: this._formBuilder.control(''),
     maxWidth: this._formBuilder.control(''),
+    closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
 
   constructor(public popup: Popup, private _formBuilder: NonNullableFormBuilder) {
   }
 
-  public onClose(): void {
-    this.popup.close(this.form.controls.result.value);
+  protected onApplyReturnValue(): void {
+    this.popup.setResult(this.form.controls.result.value);
   }
 
-  public onCloseWithError(): void {
-    this.popup.closeWithError(this.form.controls.result.value);
+  protected onClose(): void {
+    const result = this.form.controls.closeWithError.value ? new Error(this.form.controls.result.value) : this.form.controls.result.value;
+    this.popup.close(result);
   }
 }

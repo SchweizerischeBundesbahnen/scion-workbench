@@ -22,6 +22,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 /**
  * Popup test component which can grow and shrink.
@@ -43,6 +44,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
     SciAccordionItemDirective,
     SciKeyValueComponent,
     ReactiveFormsModule,
+    SciCheckboxComponent,
   ],
 })
 export default class PopupPageComponent {
@@ -91,6 +93,7 @@ export default class PopupPageComponent {
     minWidth: this._formBuilder.control('100vw'),
     width: this._formBuilder.control(''),
     maxWidth: this._formBuilder.control(''),
+    closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
 
@@ -107,11 +110,12 @@ export default class PopupPageComponent {
     popup.signalReady();
   }
 
-  public onClose(): void {
-    this.popup.close(this.form.controls.result.value);
+  protected onApplyReturnValue(): void {
+    this.popup.setResult(this.form.controls.result.value);
   }
 
-  public onCloseWithError(): void {
-    this.popup.closeWithError(this.form.controls.result.value);
+  protected onClose(): void {
+    const result = this.form.controls.closeWithError.value ? new Error(this.form.controls.result.value) : this.form.controls.result.value;
+    this.popup.close(result);
   }
 }

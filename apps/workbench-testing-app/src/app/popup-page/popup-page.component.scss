@@ -41,9 +41,16 @@
 
   > div.buttons {
     flex: none;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: .25em;
-    margin-top: 1em;
+    display: flex;
+    gap: 1em;
+    padding-top: 1em;
+    align-items: center;
+    justify-content: space-between;
+
+    > label.close-with-error {
+      display: flex;
+      align-items: center;
+      gap: .5em;
+    }
   }
 }

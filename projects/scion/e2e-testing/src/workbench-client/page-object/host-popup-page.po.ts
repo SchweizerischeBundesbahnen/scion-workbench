@@ -17,6 +17,7 @@ import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from '../../workbench/page-object/workbench-popup-page.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 
 /**
  * Page object to interact with {@link HostPopupPageComponent}.
@@ -92,11 +93,15 @@ export class HostPopupPagePO implements WorkbenchPopupPagePO {
     await this.locator.locator('input.e2e-max-height').fill(size.maxHeight ?? '');
   }
 
-  public async enterReturnValue(returnValue: string): Promise<void> {
+  public async enterReturnValue(returnValue: string, options?: {apply?: boolean}): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-return-value'));
     await accordion.expand();
     try {
       await accordion.itemLocator().locator('input.e2e-return-value').fill(returnValue);
+
+      if (options?.apply) {
+        await this.locator.locator('button.e2e-apply-return-value').click();
+      }
     }
     finally {
       await accordion.collapse();
@@ -108,11 +113,10 @@ export class HostPopupPagePO implements WorkbenchPopupPagePO {
       await this.enterReturnValue(options.returnValue);
     }
 
-    if (options?.closeWithError === true) {
-      await this.locator.locator('button.e2e-close-with-error').click();
+    if (options?.closeWithError) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-with-error')).toggle(true);
     }
-    else {
-      await this.locator.locator('button.e2e-close').click();
-    }
+
+    await this.locator.locator('button.e2e-close').click();
   }
 }
