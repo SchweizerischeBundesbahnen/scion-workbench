@@ -136,14 +136,13 @@ export abstract class PopupConfig {
  */
 export interface CloseStrategy {
   /**
-   * If `true`, which is by default, will close the popup on focus loss.
-   * No return value will be passed to the popup opener.
+   * Controls if to close the popup on focus loss, returning the result set via {@link Popup#setResult} to the popup opener.
+   * Defaults to `true`.
    */
   onFocusLost?: boolean;
   /**
-   * If `true`, which is by default, will close the popup when the user
-   * hits the escape key. No return value will be passed to the popup
-   * opener.
+   * Controls if to close the popup when pressing escape. Defaults to `true`.
+   * No return value will be passed to the popup opener.
    */
   onEscape?: boolean;
 }
@@ -182,7 +181,7 @@ export interface PopupSize {
  * Represents a handle that a popup component can inject to interact with the popup, for example,
  * to read input data or the configured size, or to close the popup.
  */
-export abstract class Popup<T = any> {
+export abstract class Popup<T = unknown, R = unknown> {
 
   /**
    * Input data as passed by the popup opener when opened the popup, or `undefined` if not passed.
@@ -207,20 +206,20 @@ export abstract class Popup<T = any> {
   public abstract readonly cssClasses: string[];
 
   /**
-   * Closes the popup. Optionally, pass a result to the popup opener.
+   * Sets a result that will be passed to the popup opener when the popup is closed on focus loss {@link CloseStrategy#onFocusLost}.
    */
-  public abstract close<R = any>(result?: R | undefined): void;
+  public abstract setResult(result?: R): void;
 
   /**
-   * Closes the popup returning the given error to the popup opener.
+   * Closes the popup. Optionally, pass a result or an error to the popup opener.
    */
-  public abstract closeWithError(error: Error | string): void;
+  public abstract close(result?: R | Error): void;
 }
 
 /**
  * @internal
  */
-export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
+export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable {
 
   private readonly _popupEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _context = {
@@ -236,7 +235,7 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
    * Indicates whether this popup is blocked by dialog(s) that overlay it.
    */
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
-  public result: unknown | ɵPopupErrorResult | undefined;
+  public result: R | Error | undefined;
 
   constructor(public id: string, private _config: PopupConfig) {
     this.cssClasses = Arrays.coerce(this._config.cssClass);
@@ -259,14 +258,13 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
   }
 
   /** @inheritDoc */
-  public close<R = any>(result?: R | undefined): void {
+  public setResult(result?: R): void {
     this.result = result;
-    this.destroy();
   }
 
   /** @inheritDoc */
-  public closeWithError(error: Error | string): void {
-    this.result = new ɵPopupErrorResult(error);
+  public close(result?: R | Error): void {
+    this.result = result;
     this.destroy();
   }
 
@@ -300,15 +298,6 @@ export class ɵPopup<T = unknown> implements Popup<T>, Blockable {
    */
   public destroy(): void {
     this._popupEnvironmentInjector.destroy();
-  }
-}
-
-/**
- * @internal
- */
-export class ɵPopupErrorResult {
-
-  constructor(public error: string | Error) {
   }
 }
 

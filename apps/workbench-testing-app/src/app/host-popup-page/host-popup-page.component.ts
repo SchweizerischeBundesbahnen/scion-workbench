@@ -20,6 +20,7 @@ import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
+import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 
 /**
  * Popup component provided by the host app via a popup capability.
@@ -41,6 +42,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
     SciAccordionItemDirective,
     SciKeyValueComponent,
     ReactiveFormsModule,
+    SciCheckboxComponent,
   ],
 })
 export default class HostPopupPageComponent {
@@ -84,6 +86,7 @@ export default class HostPopupPageComponent {
     minWidth: this._formBuilder.control(''),
     width: this._formBuilder.control(''),
     maxWidth: this._formBuilder.control(''),
+    closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
 
@@ -92,11 +95,12 @@ export default class HostPopupPageComponent {
               private _formBuilder: NonNullableFormBuilder) {
   }
 
-  public onClose(): void {
-    this.popup.close(this.form.controls.result.value);
+  protected onApplyReturnValue(): void {
+    this.popup.setResult(this.form.controls.result.value);
   }
 
-  public onCloseWithError(): void {
-    this.popup.closeWithError(this.form.controls.result.value);
+  protected onClose(): void {
+    const result = this.form.controls.closeWithError.value ? new Error(this.form.controls.result.value) : this.form.controls.result.value;
+    this.popup.close(result);
   }
 }

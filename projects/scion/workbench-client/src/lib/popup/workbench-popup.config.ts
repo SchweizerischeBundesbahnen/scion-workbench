@@ -83,14 +83,13 @@ export interface WorkbenchPopupConfig {
  */
 export interface CloseStrategy {
   /**
-   * If `true`, which is by default, will close the popup on focus loss.
-   * No return value will be passed to the popup opener.
+   * Controls if to close the popup on focus loss, returning the result set via {@link Popup#setResult} to the popup opener.
+   * Defaults to `true`.
    */
   onFocusLost?: boolean;
   /**
-   * If `true`, which is by default, will close the popup when the user
-   * hits the escape key. No return value will be passed to the popup
-   * opener.
+   * Controls if to close the popup when pressing escape. Defaults to `true`.
+   * No return value will be passed to the popup opener.
    */
   onEscape?: boolean;
 }

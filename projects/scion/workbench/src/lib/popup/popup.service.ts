@@ -13,7 +13,7 @@ import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPosi
 import {combineLatestWith, firstValueFrom, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {Popup, PopupConfig, ɵPopup, ɵPopupErrorResult} from './popup.config';
+import {Popup, PopupConfig, ɵPopup} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {Objects, Observables} from '@scion/toolkit/util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
@@ -77,7 +77,7 @@ export class PopupService {
    *          - resolves to the result if closed with a result
    *          - resolves to `undefined` if closed without a result
    */
-  public async open<R>(config: PopupConfig): Promise<R> {
+  public async open<R>(config: PopupConfig): Promise<R | undefined> {
     // Ensure to run in Angular zone to display the popup even when called from outside of the Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(config));
@@ -170,14 +170,9 @@ export class PopupService {
       overlayRef.dispose();
     });
 
-    return new Promise<R>((resolve, reject) => {
+    return new Promise<R | undefined>((resolve, reject) => {
       popupDestroyRef.onDestroy(() => {
-        if (popup.result instanceof ɵPopupErrorResult) {
-          reject(popup.result.error);
-        }
-        else {
-          resolve(popup.result as R);
-        }
+        popup.result instanceof Error ? reject(popup.result) : resolve(popup.result as R);
       });
     });
   }
@@ -235,7 +230,7 @@ export class PopupService {
           filter((focusOrigin: FocusOrigin) => !focusOrigin),
           takeUntilDestroyed(popupDestroyRef),
         )
-        .subscribe(() => popup.close());
+        .subscribe(() => popup.close(popup.result));
     }
 
     // Close the popup when closing the view.

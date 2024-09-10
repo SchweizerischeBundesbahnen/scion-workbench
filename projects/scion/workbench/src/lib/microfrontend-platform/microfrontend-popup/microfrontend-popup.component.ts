@@ -71,16 +71,16 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     // Listen to popup close requests.
-    this._messageClient.observe$<any>(ɵWorkbenchCommands.popupCloseTopic(this.popup.id))
+    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupCloseTopic(this.popup.id))
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(closeRequest => {
-        if (closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) === true) {
-          this.popup.closeWithError(closeRequest.body);
-        }
-        else {
-          this.popup.close(closeRequest.body);
-        }
+        this.popup.close(closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) ? new Error(closeRequest.body as string) : closeRequest.body);
       });
+
+    // Listen to popup result requests.
+    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupResultTopic(this.popup.id))
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(result => this.popup.setResult(result.body));
 
     // Make the popup context available to embedded content.
     this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
@@ -105,7 +105,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
 
     // Close the popup on focus loss.
     if (this._popupContext.closeOnFocusLost && !focusWithin) {
-      this.popup.close();
+      this.popup.close(this.popup.result);
     }
 
     if (focusWithin) {

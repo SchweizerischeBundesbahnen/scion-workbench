@@ -14,6 +14,7 @@ import {PopupReferrer, PopupSize} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
+import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 
 /**
  * Page object to interact with {@link PopupPageComponent}.
@@ -47,18 +48,21 @@ export class PopupPagePO implements WorkbenchPopupPagePO {
     }
 
     if (options?.closeWithError) {
-      await this.locator.locator('button.e2e-close-with-error').click();
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-close-with-error')).toggle(true);
     }
-    else {
-      await this.locator.locator('button.e2e-close').click();
-    }
+
+    await this.locator.locator('button.e2e-close').click();
   }
 
-  public async enterReturnValue(returnValue: string): Promise<void> {
+  public async enterReturnValue(returnValue: string, options?: {apply?: boolean}): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-return-value'));
     await accordion.expand();
     try {
       await accordion.itemLocator().locator('input.e2e-return-value').fill(returnValue);
+
+      if (options?.apply) {
+        await this.locator.locator('button.e2e-apply-return-value').click();
+      }
     }
     finally {
       await accordion.collapse();

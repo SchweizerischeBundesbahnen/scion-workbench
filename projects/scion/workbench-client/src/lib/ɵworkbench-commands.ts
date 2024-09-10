@@ -102,6 +102,11 @@ export const ɵWorkbenchCommands = {
   popupCloseTopic: (popupId: string) => `ɵworkbench/popups/${popupId}/close`,
 
   /**
+   * Computes the topic via which to set a result
+   */
+  popupResultTopic: (popupId: string) => `ɵworkbench/popups/${popupId}/result`,
+
+  /**
    * Computes the topic via which the title of a dialog can be set.
    */
   dialogTitleTopic: (dialogId: string) => `ɵworkbench/dialogs/${dialogId}/title`,

@@ -37,7 +37,7 @@ import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
  *
  * @category Popup
  */
-export abstract class WorkbenchPopup {
+export abstract class WorkbenchPopup<R = unknown> {
 
   /**
    * Capability that represents the microfrontend loaded into this workbench popup.
@@ -64,20 +64,20 @@ export abstract class WorkbenchPopup {
   public abstract readonly params: Map<string, any>;
 
   /**
-   * Closes the popup. Optionally, pass a result to the popup opener.
+   * Sets a result that will be passed to the popup opener when the popup is closed on focus loss {@link CloseStrategy#onFocusLost}.
    */
-  public abstract close<R = any>(result?: R | undefined): void;
+  public abstract setResult(result?: R): void;
 
   /**
-   * Closes the popup returning the given error to the popup opener.
+   * Closes the popup. Optionally, pass a result or an error to the popup opener.
    */
-  public abstract closeWithError(error: Error | string): void;
+  public abstract close(result?: R | Error): void;
 }
 
 /**
  * @ignore
  */
-export class ɵWorkbenchPopup implements WorkbenchPopup {
+export class ɵWorkbenchPopup<R = unknown> implements WorkbenchPopup {
 
   public params: Map<string, any>;
   public capability: WorkbenchPopupCapability;
@@ -100,17 +100,21 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
   /**
    * @inheritDoc
    */
-  public close<R = any>(result?: R | undefined): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result).then();
+  public setResult(result?: R): void {
+    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupResultTopic(this._context.popupId), result).then();
   }
 
   /**
    * @inheritDoc
    */
-  public closeWithError(error: Error | string): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), readErrorMessage(error), {
-      headers: new Map().set(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR, true),
-    }).then();
+  public async close(result?: R | Error): Promise<void> {
+    if (result instanceof Error) {
+      const headers = new Map().set(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR, true);
+      Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result.message, {headers}).then();
+    }
+    else {
+      Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result).then();
+    }
   }
 
   /**
@@ -150,16 +154,4 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
  */
 export enum ɵWorkbenchPopupMessageHeaders {
   CLOSE_WITH_ERROR = 'ɵWORKBENCH-POPUP:CLOSE_WITH_ERROR',
-}
-
-/**
- * Returns the error message if given an error object, or the `toString` representation otherwise.
- *
- * @internal
- */
-function readErrorMessage(error: any): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return error?.toString();
 }
