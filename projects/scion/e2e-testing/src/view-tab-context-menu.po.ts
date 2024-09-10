@@ -16,7 +16,7 @@ import {Locator} from '@playwright/test';
 export class ViewTabContextMenuPO {
 
   public readonly menuItems = {
-    closeTab: new ContextMenuItem(this.locator.locator('button.e2e-close-tab')),
+    closeTab: new ContextMenuItem(this.locator.locator('button.e2e-close')),
     closeAll: new ContextMenuItem(this.locator.locator('button.e2e-close-all-tabs')),
     moveToNewWindow: new ContextMenuItem(this.locator.locator('button.e2e-move-to-new-window')),
     moveView: new ContextMenuItem(this.locator.locator('button.e2e-move-view')),
