@@ -61,6 +61,31 @@ Open `app.config.ts` and register SCION Workbench providers. Added lines are mar
 </details>
 
 <details>
+    <summary><strong>Import SCION Workbench Component</strong></summary>
+    <br>
+
+Open `app.component.ts` and import the SCION Workbench component. Added lines are marked with `[+]`.
+
+```ts
+    import { Component } from '@angular/core';
+[+] import { WorkbenchComponent } from '@scion/workbench';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [
+[+]     WorkbenchComponent
+      ],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.scss'
+    })
+    export class AppComponent {
+      title = 'workbench-getting-started';
+    }
+```
+</details>
+
+<details>
     <summary><strong>Insert SCION Workbench Component</strong></summary>
     <br>
 
