@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Inject, Injectable, Optional} from '@angular/core';
+import {inject, Inject, Injectable, Optional} from '@angular/core';
 import {NavigationStart, ParamMap, Router, RouterEvent} from '@angular/router';
 import {filter, map, startWith} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import {LogAppender, LogEvent, LoggerName, LogLevel} from './logging.model';
 import {Logger} from './logger';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WorkbenchConfig} from '../workbench-config';
 
 type LogLevelStrings = keyof typeof LogLevel;
 
@@ -23,13 +24,12 @@ export class ɵLogger implements Logger {
 
   public logLevel!: LogLevel;
 
-  constructor(@Inject(LogAppender) @Optional() private _logAppenders: LogAppender[],
-              router: Router,
-              logLevel: LogLevel) {
-    this.observeLogLevelQueryParam$(router)
+  constructor(@Inject(LogAppender) @Optional() private _logAppenders: LogAppender[]) {
+    const defaultLogLevel = inject(WorkbenchConfig, {optional: true})?.logging?.logLevel ?? LogLevel.INFO;
+    this.observeLogLevelQueryParam$(inject(Router))
       .pipe(takeUntilDestroyed())
       .subscribe((queryParamLogLevel: LogLevel | undefined) => {
-        this.logLevel = queryParamLogLevel ?? logLevel;
+        this.logLevel = queryParamLogLevel ?? defaultLogLevel;
       });
   }
 
