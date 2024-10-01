@@ -81,8 +81,7 @@ export class WorkbenchComponent implements OnDestroy {
     vcr && this.viewContainerReferences.viewDropPlaceholderHost.set(vcr);
   }
 
-  constructor(workbenchConfig: WorkbenchConfig,
-              private _workbenchLauncher: WorkbenchLauncher,
+  constructor(private _workbenchLauncher: WorkbenchLauncher,
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
@@ -90,7 +89,7 @@ export class WorkbenchComponent implements OnDestroy {
       throw Error(`[WorkbenchError] Workbench must not be loaded into a view. Did you navigate to the empty path route? Make sure that the application's root route is guarded with 'canMatchWorkbenchView(false)'. Example: "{path: '', canMatch: [canMatchWorkbenchView(false), ...]}"`);
     }
     this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
-    this.splash = workbenchConfig?.startup?.splash || SplashComponent;
+    this.splash = inject(WorkbenchConfig).startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
     this.startWorkbench();
     this.disableChangeDetectionDuringNavigation();
