@@ -46,6 +46,10 @@ export class WorkbenchLauncher {
               private _logger: Logger,
               private _zone: NgZone,
               private _injector: Injector) {
+    const workbenchConfig = inject(WorkbenchConfig, {optional: true});
+    if (!workbenchConfig) {
+      throw Error(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
+    }
   }
 
   /**

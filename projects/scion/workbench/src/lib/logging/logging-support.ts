@@ -10,7 +10,7 @@
 
 import {EnvironmentProviders, makeEnvironmentProviders, Provider, Type} from '@angular/core';
 import {WorkbenchConfig} from '../workbench-config';
-import {LogAppender, LogLevel} from './logging.model';
+import {LogAppender} from './logging.model';
 import {ConsoleAppender} from './console-appender.service';
 
 /**
@@ -19,16 +19,10 @@ import {ConsoleAppender} from './console-appender.service';
 export function provideLogging(workbenchConfig: WorkbenchConfig): EnvironmentProviders {
   const logAppenders: Type<LogAppender>[] = workbenchConfig.logging?.logAppenders || [ConsoleAppender];
   return makeEnvironmentProviders([
-    {
-      provide: LogLevel,
-      useValue: workbenchConfig.logging?.logLevel ?? LogLevel.INFO,
-    },
-    logAppenders.map((logAppender: Type<LogAppender>): Provider => {
-      return {
-        provide: LogAppender,
-        multi: true,
-        useClass: logAppender,
-      };
-    }),
+    logAppenders.map((logAppender: Type<LogAppender>): Provider => ({
+      provide: LogAppender,
+      multi: true,
+      useClass: logAppender,
+    })),
   ]);
 }
