@@ -9,11 +9,10 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {getDesktopElement, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
-import {By} from '@angular/platform-browser';
 import {DestroyRef, inject, isSignal} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
@@ -24,7 +23,7 @@ import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {canMatchWorkbenchPerspective, canMatchWorkbenchView} from '../routing/workbench-route-guards';
+import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchPerspective} from './workbench-perspective.model';
 import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
@@ -334,35 +333,41 @@ describe('Workbench Perspective', () => {
     });
   });
 
-  it('should support configuring different start page per perspective', async () => {
+  it('should support different desktop per perspective (fall back to primary outlet)', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
           layout: {
             perspectives: [
-              {id: 'perspective-1', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
-              {id: 'perspective-2', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
+              {
+                id: 'perspective-1', layout: (factory: WorkbenchLayoutFactory) => factory
+                  .addPart(MAIN_AREA)
+                  .navigateDesktop(['path/to/desktop/1']),
+              },
+              {
+                id: 'perspective-2', layout: (factory: WorkbenchLayoutFactory) => factory
+                  .addPart(MAIN_AREA)
+                  .navigateDesktop(['path/to/desktop/2']),
+              },
               {id: 'perspective-3', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
             ],
           },
         }),
         provideRouter([
           {
-            path: '',
+            path: 'path/to/desktop/1',
             loadComponent: () => import('../testing/test.component'),
-            providers: [withComponentContent('Start Page Perspective 1')],
-            canMatch: [canMatchWorkbenchPerspective('perspective-1')],
+            providers: [withComponentContent('Desktop 1')],
+          },
+          {
+            path: 'path/to/desktop/2',
+            loadComponent: () => import('../testing/test.component'),
+            providers: [withComponentContent('Desktop 2')],
           },
           {
             path: '',
             loadComponent: () => import('../testing/test.component'),
-            providers: [withComponentContent('Start Page Perspective 2')],
-            canMatch: [canMatchWorkbenchPerspective('perspective-2')],
-          },
-          {
-            path: '',
-            loadComponent: () => import('../testing/test.component'),
-            providers: [withComponentContent('Start Page')],
+            providers: [withComponentContent('Desktop')],
           },
         ]),
       ],
@@ -371,19 +376,21 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
     const workbenchService = TestBed.inject(WorkbenchService);
 
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
+    // Switch to perspective-1
+    await workbenchService.switchPerspective('perspective-1');
+    expect(getDesktopElement(fixture, 'spec-test-component', {mainArea: true})!.innerText).toEqual('Desktop 1');
 
     // Switch to perspective-2
     await workbenchService.switchPerspective('perspective-2');
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 2');
+    expect(getDesktopElement(fixture, 'spec-test-component', {mainArea: true})!.innerText).toEqual('Desktop 2');
 
     // Switch to perspective-3
     await workbenchService.switchPerspective('perspective-3');
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+    expect(getDesktopElement(fixture, 'spec-test-component', {mainArea: true})!.innerText).toEqual('Desktop');
 
     // Switch to perspective-1
     await workbenchService.switchPerspective('perspective-1');
-    expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
+    expect(getDesktopElement(fixture, 'spec-test-component', {mainArea: true})!.innerText).toEqual('Desktop 1');
   });
 
   /**
@@ -574,11 +581,11 @@ describe('Workbench Perspective', () => {
           provide: WORKBENCH_STARTUP,
           multi: true,
           useValue: async () => {
-            const workbenchServie = inject(WorkbenchService);
+            const workbenchService = inject(WorkbenchService);
             // Wait some time to simulate late perspective registration.
             await firstValueFrom(timer(500));
 
-            await workbenchServie.registerPerspective({
+            await workbenchService.registerPerspective({
               id: 'perspective-2',
               layout: factory => factory.addPart(MAIN_AREA),
             });

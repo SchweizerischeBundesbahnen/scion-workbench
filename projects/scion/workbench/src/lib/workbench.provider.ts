@@ -22,6 +22,7 @@ import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.s
 import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
 import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
+import {WorkbenchDesktopInitializer} from './desktop/workbench-desktop-initializer';
 
 /**
  * Enables and configures the SCION Workbench in an application, returning a set of dependency-injection providers to be registered in Angular.
@@ -94,6 +95,11 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       provide: ENVIRONMENT_INITIALIZER,
       multi: true,
       useValue: () => inject(WorkbenchUrlObserver),
+    },
+    {
+      provide: ENVIRONMENT_INITIALIZER,
+      multi: true,
+      useValue: () => inject(WorkbenchDesktopInitializer),
     },
     {
       provide: ENVIRONMENT_INITIALIZER,

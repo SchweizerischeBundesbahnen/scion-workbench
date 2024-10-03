@@ -40,6 +40,10 @@ export const routes: Routes = [
     loadComponent: () => import('./dialog-page/dialog-page.component'),
   },
   {
+    path: 'test-desktop',
+    loadComponent: () => import('./desktop-page/desktop-page.component'),
+  },
+  {
     path: 'test-message-box-opener',
     loadComponent: () => import('./message-box-opener-page/message-box-opener-page.component'),
   },

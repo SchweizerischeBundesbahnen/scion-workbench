@@ -19,6 +19,8 @@ import {PageNotFoundPagePO} from '../../workbench/page-object/page-not-found-pag
 import {ViewInfo} from '../../workbench/page-object/view-info-dialog.po';
 import {Manifest} from '@scion/microfrontend-platform';
 import {RouterPagePO} from '../page-object/router-page.po';
+import {DesktopPagePO} from '../page-object/desktop-page.po';
+import {expectDesktop} from '../../matcher/desktop-matcher';
 
 test.describe('Workbench Perspective', () => {
 
@@ -1193,5 +1195,230 @@ test.describe('Workbench Perspective', () => {
         expect(outletBounds).toEqual(viewBounds);
       }).toPass();
     });
+  });
+
+  test('should align microfrontend to desktop bounds when switching perspective', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register view 1.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: '1'},
+      properties: {
+        path: 'test-view',
+        title: 'Test View 1',
+      },
+    });
+
+    // Register view 2.
+    await microfrontendNavigator.registerCapability('app2', {
+      type: 'view',
+      qualifier: {view: '2'},
+      properties: {
+        path: 'test-view',
+        title: 'Test View 2',
+      },
+    });
+
+    // Register perspective 1.
+    const perspective1 = await microfrontendNavigator.registerCapability('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'app-1'},
+      properties: {
+        layout: [
+          {
+            id: MAIN_AREA,
+          },
+          {
+            id: 'left',
+            align: 'left',
+            views: [{
+              qualifier: {view: '1'},
+            }],
+          },
+        ],
+        desktop: {
+          path: 'test-desktop',
+          cssClass: 'app-1',
+        },
+      },
+    });
+
+    // Register perspective 2.
+    const perspective2 = await microfrontendNavigator.registerCapability('app2', {
+      type: 'perspective',
+      qualifier: {perspective: 'app-2'},
+      properties: {
+        layout: [
+          {
+            id: MAIN_AREA,
+          },
+          {
+            id: 'right',
+            align: 'right',
+            views: [{
+              qualifier: {view: '2'},
+            }],
+          },
+        ],
+        desktop: {
+          path: 'test-desktop',
+          cssClass: 'app-2',
+        },
+      },
+    });
+
+    const desktopPage1 = new DesktopPagePO(appPO, {cssClass: 'app-1'});
+    const desktopPage2 = new DesktopPagePO(appPO, {cssClass: 'app-2'});
+
+    await test.step('Switching to perspective 1', async () => {
+      await appPO.switchPerspective(perspective1.metadata!.id);
+
+      // Expect microfrontend to display.
+      await expectDesktop(desktopPage1).toBeVisible();
+      // Expect the microfrontend to be aligned to the desktop bounds.
+      await expect(async () => {
+        const outletBounds = await desktopPage1.outlet.getBoundingBox();
+        const desktopBounds = await desktopPage1.desktop.getBoundingBox();
+        expect(outletBounds).toEqual(desktopBounds);
+      }).toPass();
+    });
+
+    await test.step('Switching to perspective 2', async () => {
+      await appPO.switchPerspective(perspective2.metadata!.id);
+
+      // Expect microfrontend to display.
+      await expectDesktop(desktopPage2).toBeVisible();
+      // Expect the microfrontend to be aligned to the desktop bounds.
+      await expect(async () => {
+        const outletBounds = await desktopPage2.outlet.getBoundingBox();
+        const desktopBounds = await desktopPage2.desktop.getBoundingBox();
+        expect(outletBounds).toEqual(desktopBounds);
+      }).toPass();
+    });
+
+    await test.step('Switching to perspective 1', async () => {
+      await appPO.switchPerspective(perspective1.metadata!.id);
+
+      // Expect microfrontend to display.
+      await expectDesktop(desktopPage1).toBeVisible();
+      // Expect the microfrontend to be aligned to the desktop bounds.
+      await expect(async () => {
+        const outletBounds = await desktopPage1.outlet.getBoundingBox();
+        const desktopBounds = await desktopPage1.desktop.getBoundingBox();
+        expect(outletBounds).toEqual(desktopBounds);
+      }).toPass();
+    });
+
+    await test.step('Switching to perspective 2', async () => {
+      await appPO.switchPerspective(perspective2.metadata!.id);
+
+      // Expect microfrontend to display.
+      await expectDesktop(desktopPage2).toBeVisible();
+      // Expect the microfrontend to be aligned to the desktop bounds.
+      await expect(async () => {
+        const outletBounds = await desktopPage2.outlet.getBoundingBox();
+        const desktopBounds = await desktopPage2.desktop.getBoundingBox();
+        expect(outletBounds).toEqual(desktopBounds);
+      }).toPass();
+    });
+  });
+
+  test('should navigate desktop per perspective (layout with main area)', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const perspective1 = await microfrontendNavigator.registerCapability('app1', {
+      type: 'perspective',
+      qualifier: {perspective: '1'},
+      properties: {
+        layout: [
+          {id: MAIN_AREA},
+        ],
+        desktop: {
+          path: 'test-desktop',
+          cssClass: 'testee-1',
+        },
+      },
+    });
+
+    // Register perspective 2.
+    const perspective2 = await microfrontendNavigator.registerCapability('app2', {
+      type: 'perspective',
+      qualifier: {perspective: '2'},
+      private: false,
+      properties: {
+        layout: [
+          {id: MAIN_AREA},
+        ],
+        desktop: {
+          path: 'test-desktop',
+          cssClass: 'testee-2',
+        },
+      },
+    });
+
+    const desktopPage1 = new DesktopPagePO(appPO, {cssClass: 'testee-1'});
+    const desktopPage2 = new DesktopPagePO(appPO, {cssClass: 'testee-2'});
+
+    // Switch to perspective 1.
+    await appPO.switchPerspective(perspective1.metadata!.id);
+
+    // Expect desktop of perspective 1 to be visible.
+    await expectDesktop(desktopPage1).toBeVisible();
+
+    // Switch to perspective 2.
+    await appPO.switchPerspective(perspective2.metadata!.id);
+
+    // Expect desktop of perspective 2 to be visible.
+    await expectDesktop(desktopPage2).toBeVisible();
+  });
+
+  test('should navigate desktop per perspective (layout without main area)', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const perspective1 = await microfrontendNavigator.registerCapability('app1', {
+      type: 'perspective',
+      qualifier: {perspective: '1'},
+      properties: {
+        layout: [
+          {id: 'left'},
+        ],
+        desktop: {
+          path: 'test-desktop',
+          cssClass: 'testee-1',
+        },
+      },
+    });
+
+    // Register perspective 2.
+    const perspective2 = await microfrontendNavigator.registerCapability('app2', {
+      type: 'perspective',
+      qualifier: {perspective: '2'},
+      private: false,
+      properties: {
+        layout: [
+          {id: 'left'},
+        ],
+        desktop: {
+          path: 'test-desktop',
+          cssClass: 'testee-2',
+        },
+      },
+    });
+
+    const desktopPage1 = new DesktopPagePO(appPO, {cssClass: 'testee-1'});
+    const desktopPage2 = new DesktopPagePO(appPO, {cssClass: 'testee-2'});
+
+    // Switch to perspective 1.
+    await appPO.switchPerspective(perspective1.metadata!.id);
+
+    // Expect desktop of perspective 1 to be visible.
+    await expectDesktop(desktopPage1).toBeVisible();
+
+    // Switch to perspective 2.
+    await appPO.switchPerspective(perspective2.metadata!.id);
+
+    // Expect desktop of perspective 2 to be visible.
+    await expectDesktop(desktopPage2).toBeVisible();
   });
 });

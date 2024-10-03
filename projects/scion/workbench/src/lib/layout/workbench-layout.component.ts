@@ -21,6 +21,8 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../workbench-id';
 import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
+import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
+import {ɵWorkbenchDesktop} from '../desktop/ɵworkbench-desktop.model';
 
 /**
  * Renders the layout of the workbench.
@@ -58,12 +60,14 @@ import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
     ViewDropZoneDirective,
     RequiresDropZonePipe,
     SciViewportComponent,
+    WorkbenchPortalOutletDirective,
   ],
 })
 export class WorkbenchLayoutComponent {
 
   public layout: ɵWorkbenchLayout | undefined;
   protected grid: MPartGrid | undefined;
+  protected desktop = inject(ɵWorkbenchDesktop);
 
   private _workbenchId = inject(WORKBENCH_ID);
   private _viewDragService = inject(ViewDragService);

@@ -16,13 +16,14 @@ import {PopupPO} from '../../../popup.po';
 import {PopupOpenerPagePO} from '../popup-opener-page.po';
 import {SciRouterOutletPO} from '../sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../../workbench/page-object/workbench-view-page.po';
+import {DesktopPO} from '../../../desktop.po';
 
 export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
 
   public readonly locator: Locator;
   public readonly input: Locator;
 
-  constructor(public outlet: SciRouterOutletPO, private _locateBy: ViewPO | PopupPO) {
+  constructor(public outlet: SciRouterOutletPO, private _locateBy: ViewPO | PopupPO | DesktopPO) {
     this.locator = this.outlet.frameLocator.locator('app-input-field-test-page');
     this.input = this.locator.locator('input.e2e-input');
   }
@@ -49,6 +50,15 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
     }
   }
 
+  public get desktop(): DesktopPO {
+    if (this._locateBy instanceof DesktopPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a desktop.');
+    }
+  }
+
   public async clickInputField(options?: {timeout?: number}): Promise<void> {
     await this.input.click({timeout: options?.timeout});
   }
@@ -61,7 +71,7 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
         path: 'test-pages/input-field-test-page',
         cssClass: 'test-input-field',
         title: 'Input Field Test Page',
-        pinToStartPage: true,
+        pinToDesktop: true,
       },
     });
 

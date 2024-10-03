@@ -42,7 +42,7 @@ export class WorkbenchThemeTestPagePO implements MicrofrontendViewPagePO {
         path: 'test-pages/workbench-theme-test-page',
         cssClass: 'e2e-test-workbench-theme',
         title: 'Workbench Theme Test Page',
-        pinToStartPage: true,
+        pinToDesktop: true,
       },
     });
 

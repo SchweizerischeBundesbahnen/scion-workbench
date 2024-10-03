@@ -349,6 +349,6 @@ async function loadPerspectiveLayoutFromStorage(perspectiveId: string): Promise<
 
   return TestBed.inject(ɵWorkbenchLayoutFactory).create({
     workbenchGrid: perspectiveLayout.userLayout.workbenchGrid,
-    viewOutlets: perspectiveLayout.userLayout.viewOutlets,
+    outlets: perspectiveLayout.userLayout.outlets,
   });
 }

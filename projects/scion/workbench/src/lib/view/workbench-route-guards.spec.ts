@@ -18,9 +18,9 @@ import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../t
 import {Component} from '@angular/core';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchComponent} from '../workbench.component';
-import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
+import {canMatchWorkbenchDesktop, canMatchWorkbenchView} from '../routing/workbench-route-guards';
 
-describe('CanMatchWorkbenchView Guard', () => {
+describe('WorkbenchRouteGuards', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toShowCustomMatcher);
@@ -237,12 +237,44 @@ describe('CanMatchWorkbenchView Guard', () => {
     });
   });
 
-  it('should not load the application root route into a view', async () => {
+  it('should error when loading the application root route into the desktop', async () => {
+    @Component({
+      selector: 'spec-desktop',
+      template: 'Desktop',
+      standalone: true,
+    })
+    class DesktopComponent {
+    }
+
+    await jasmine.spyOnGlobalErrorsAsync(async errors => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest(),
+          provideRouter([
+            {path: '', component: WorkbenchComponent}, // do not guard the application root route
+            {path: '', canMatch: [canMatchWorkbenchDesktop('desktop')], loadComponent: () => DesktopComponent},
+          ]),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
+      await waitForInitialWorkbenchLayout();
+
+      // Navigate to the empty path route.
+      const workbenchRouter = TestBed.inject(WorkbenchRouter);
+      await workbenchRouter.navigate(layout => layout.navigateDesktop([], {hint: 'desktop'}));
+      await waitUntilStable();
+
+      expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Circular loading of the workbench component detected in the desktop\. Did you forget to add the CanMatch guard 'canMatchWorkbenchDesktop\(false\)' to the root \(empty-path\) route of the application\?/));
+      expect(fixture).not.toShow(View1Component);
+    });
+  });
+
+  it('should not load the application root route into a view or desktop', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchView(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
+          {path: '', canMatch: [canMatchWorkbenchView(false), canMatchWorkbenchDesktop(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
           {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
         ]),
       ],

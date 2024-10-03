@@ -1,0 +1,61 @@
+<section>
+  <sci-form-field label="URL Segments">
+    <span class="e2e-url-segments">{{desktop.urlSegments() | appJoin:'/'}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Navigation Hint">
+    <span class="e2e-navigation-hint">{{desktop.navigationHint()}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Instantiation ID" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
+  </sci-form-field>
+</section>
+
+@if (route.params | async | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_params">
+      <header>Route Params</header>
+    </ng-template>
+    <ng-template #panel_route_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+<section>
+  <header>Desktop Properties</header>
+
+  <sci-form-field label="CSS Class(es)">
+    <app-css-class [formControl]="form.controls.cssClass"/>
+  </sci-form-field>
+</section>
+
+<section>
+  <header>Route Data</header>
+
+  @if (route.snapshot.params | appNullIfEmpty; as params) {
+    <section>
+      <header>Route Params</header>
+      <sci-key-value [object]="params" class="e2e-route-params"/>
+    </section>
+  }
+
+  @if (route.snapshot.data | appNullIfEmpty; as data) {
+    <section>
+      <header>Route Data</header>
+      <sci-key-value [object]="data" class="e2e-route-data"/>
+    </section>
+  }
+</section>
+
+@if (desktop.navigationData() | appNullIfEmpty; as data) {
+  <sci-accordion class="e2e-navigation-data" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_data">
+      <header>Navigation Data</header>
+    </ng-template>
+    <ng-template #panel_navigation_data>
+      <sci-key-value [object]="data | appAppendParamDataType" class="e2e-navigation-data"/>
+    </ng-template>
+  </sci-accordion>
+}

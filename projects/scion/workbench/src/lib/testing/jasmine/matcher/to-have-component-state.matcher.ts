@@ -13,6 +13,7 @@ import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
 import {WORKBENCH_VIEW_REGISTRY} from '../../../view/workbench-view.registry';
 import {ViewId} from '../../../view/workbench-view.model';
+import {ɵWorkbenchDesktop} from '../../../desktop/ɵworkbench-desktop.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toHaveComponentState}.
@@ -20,11 +21,13 @@ import {ViewId} from '../../../view/workbench-view.model';
 export const toHaveComponentStateCustomMatcher: jasmine.CustomMatcherFactories = {
   toHaveComponentState: (): CustomMatcher => {
     return {
-      compare(viewId: ViewId, expected: string, failOutput: string | undefined): CustomMatcherResult {
-        const componentRef = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(viewId).portal.componentRef;
+      compare(locator: ViewId | 'desktop', expected: string, failOutput: string | undefined): CustomMatcherResult {
+        const componentRef = locator === 'desktop' ?
+          TestBed.inject(ɵWorkbenchDesktop).portal().componentRef :
+          TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(locator).portal.componentRef;
         const actual = componentRef.location.nativeElement.querySelector('input.component-state').value;
         if (actual !== expected) {
-          return fail(`Expected transient state '${actual}' of view '${viewId}' to equal '${expected}'. Maybe, the component was not detached but destroyed during layout change.`);
+          return fail(`Expected transient state '${actual}' of '${locator}' to equal '${expected}'. Maybe, the component was not detached but destroyed during layout change.`);
         }
         return pass();
 

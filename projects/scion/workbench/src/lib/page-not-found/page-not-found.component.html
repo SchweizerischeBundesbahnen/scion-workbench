@@ -6,7 +6,9 @@
   The URL may have changed. Try to open the view again.
 </section>
 
-<button (click)="view.close()">Close</button>
+@if (context.view) {
+  <button (click)="context.view.close()">Close</button>
+}
 
 @if (isDevMode) {
   <section class="developer-hint">

@@ -103,8 +103,49 @@
         grid-column: 1/-1;
       }
     }
-  }
 
+    section.desktop {
+      display: grid;
+
+      > section.desktop-fieldset {
+        display: grid;
+        grid-template-columns:
+        auto // Path
+        auto // CSS Class(es)
+        7em // Show Splash
+        min-content; // Remove Desktop Button
+        gap: 1em;
+
+        > div.path.legend::after {
+          content: 'Path'; // do not include legend mixin to reduce file size
+        }
+
+        > app-css-class.css-class.legend::after {
+          content: 'CSS Class(es)'; // do not include legend mixin to reduce file size
+        }
+
+        > div.show-splash.legend::after {
+          content: 'Show Splash'; // do not include legend mixin to reduce file size
+          left: 1.25em;
+          top: -.25em;
+        }
+
+        > div.show-splash {
+          display: inline-grid;
+          align-self: stretch;
+          place-content: center;
+        }
+
+        > button.remove-desktop {
+          align-self: center;
+        }
+
+        > button.add-desktop {
+          grid-column: 1/-1;
+        }
+      }
+    }
+  }
 
   // include fieldset mixin once to reduce file size
   .fieldset {

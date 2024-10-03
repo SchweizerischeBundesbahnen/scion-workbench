@@ -19,8 +19,7 @@ import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Routing} from './routing.util';
-import {Commands, ViewOutlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
-import {ViewId} from '../view/workbench-view.model';
+import {Commands, Outlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
@@ -90,7 +89,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Perform the navigation.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
       if (!await this._angularRouterMutex.submit(() => this._router.navigate(commands, extras))) {
         return false;
       }
@@ -153,7 +152,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Create the new URL tree.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
       return this._router.createUrlTree(commands, extras);
     });
   }
@@ -316,7 +315,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
  */
 function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentLayout?: ɵWorkbenchLayout | undefined}, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
   const {newLayout, currentLayout} = layouts;
-  const {workbenchGrid, mainAreaGrid} = newLayout.serialize({excludeViewMarkedForRemoval: true});
+  const {workbenchGrid, mainAreaGrid, desktop} = newLayout.serialize({excludeViewMarkedForRemoval: true});
 
   return {
     ...extras,
@@ -332,6 +331,7 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
       perspectiveId: newLayout.perspectiveId ?? currentLayout?.perspectiveId,
       maximized: newLayout.maximized,
       navigationStates: newLayout.navigationStates(),
+      desktop: desktop,
     }),
     // Add the main area as query parameter.
     queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},
@@ -342,31 +342,31 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
 }
 
 /**
- * Computes commands that can be passed to the Angular router to navigate view outlets and to remove view outlets of removed views.
+ * Computes commands that can be passed to the Angular router to navigate view or desktop outlets and to remove view outlets of removed views.
  */
-function computeNavigationCommands(previousViewOutlets: ViewOutlets, nextViewOutlets: ViewOutlets): [{outlets: {[outlet: ViewId]: Commands | null}}] | [] {
-  const previousViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(previousViewOutlets));
-  const nextViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(nextViewOutlets));
+function computeNavigationCommands(previousOutlets: Outlets, nextOutlets: Outlets): [{outlets: {[outlet: string]: Commands | null}}] | [] {
+  const previousOutletMap = new Map<string, UrlSegment[]>(Objects.entries(previousOutlets));
+  const nextOutletMap = new Map<string, UrlSegment[]>(Objects.entries(nextOutlets));
 
-  const commands = new Map<ViewId, Commands | null>();
-  const viewIds = new Set<ViewId>([...previousViewOutletMap.keys(), ...nextViewOutletMap.keys()]);
+  const commands = new Map<string, Commands | null>();
+  const outlets = new Set<string>([...previousOutletMap.keys(), ...nextOutletMap.keys()]);
 
-  viewIds.forEach(viewId => {
+  outlets.forEach(outlet => {
     // Test if the view was added to the layout.
-    if (!previousViewOutletMap.has(viewId)) {
-      commands.set(viewId, Routing.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+    if (!previousOutletMap.has(outlet)) {
+      commands.set(outlet, Routing.segmentsToCommands(nextOutletMap.get(outlet)!));
     }
     // Test if the view was removed from the layout.
-    else if (!nextViewOutletMap.has(viewId)) {
-      commands.set(viewId, null);
+    else if (!nextOutletMap.has(outlet)) {
+      commands.set(outlet, null);
     }
     // Test if the view was updated.
-    else if (!new UrlSegmentMatcher(previousViewOutletMap.get(viewId)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(nextViewOutletMap.get(viewId)!)) {
-      commands.set(viewId, Routing.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+    else if (!new UrlSegmentMatcher(previousOutletMap.get(outlet)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(nextOutletMap.get(outlet)!)) {
+      commands.set(outlet, Routing.segmentsToCommands(nextOutletMap.get(outlet)!));
     }
   });
 
-  // Add view commands to the 'outlets' property to be interpreted by the Angular router.
+  // Add commands to the 'outlets' property to be interpreted by the Angular router.
   return commands.size ? [{outlets: Object.fromEntries(commands)}] : [];
 }
 

@@ -55,6 +55,10 @@ export interface WorkbenchNavigationalState {
    * Provides navigation state of views contained in the workbench layout.
    */
   navigationStates: NavigationStates;
+  /**
+   * Serialized desktop of the layout.
+   */
+  desktop: string;
 }
 
 /**

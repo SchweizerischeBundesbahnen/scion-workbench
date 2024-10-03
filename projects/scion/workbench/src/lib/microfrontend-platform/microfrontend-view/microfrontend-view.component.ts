@@ -25,7 +25,7 @@ import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
+import {MicrofrontendRoutes} from '../routing/microfrontend-routes';
 import {AsyncPipe, NgClass, NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -205,12 +205,12 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
             const currentParams = this._route.snapshot.params;
             const newParams = Dictionaries.coerce(request.body!.params); // coerce params for backward compatibility
             const mergedParams = Objects.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
-            const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
+            const {urlParams, transientParams} = MicrofrontendRoutes.splitParams(mergedParams, viewCapability);
 
             return layout.navigateView(this.view.id, [urlParams], {
               relativeTo: this._route,
               state: Objects.withoutUndefinedEntries({
-                [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
+                [MicrofrontendRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
               }),
             });
           });

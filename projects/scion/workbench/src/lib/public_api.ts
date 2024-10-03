@@ -21,6 +21,7 @@ export * from './layout/public_api';
 export * from './perspective/public_api';
 export * from './part/public_api';
 export * from './view/public_api';
+export * from './desktop/public_api';
 export * from './routing/public_api';
 export * from './message-box/public_api';
 export * from './dialog/public_api';

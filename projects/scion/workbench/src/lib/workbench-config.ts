@@ -33,7 +33,14 @@ export abstract class WorkbenchConfig {
    *
    * This can happen when navigating to a non-existent route or after loading the application, if the routes have changed since the user's last session.
    *
-   * The component can inject {@link WorkbenchView} to get a reference to the view, e.g., to obtain the requested URL.
+   * The component is displayed for navigations in both views and the desktop.
+   *
+   * TODO [DWIE] Desktop is always available for injection.
+   *
+   * The component can read the requested path from {@link WorkbenchView}
+   * and {@link WorkbenchDesktop}, both injected with the `optional` flag set to `true`.
+   *
+   * The component can optional inject {@link WorkbenchView}
    */
   public abstract pageNotFoundComponent?: ComponentType<unknown>;
 

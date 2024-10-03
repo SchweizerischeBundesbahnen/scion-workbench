@@ -25,7 +25,7 @@ import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfronte
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {CanMatchFn, Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
-import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
+import {MicrofrontendRoutes} from './routing/microfrontend-routes';
 import {MicrofrontendViewCapabilityValidator} from './routing/microfrontend-view-capability-validator.interceptor';
 import {StableCapabilityIdAssigner} from './stable-capability-id-assigner.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
@@ -34,7 +34,7 @@ import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/mic
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {Defined} from '@scion/toolkit/util';
-import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
+import {canMatchWorkbenchDesktop, canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 import {Routing} from '../routing/routing.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
@@ -43,6 +43,7 @@ import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-persp
 import {MicrofrontendPerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
 import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 import {ManifestObjectCache} from './manifest-object-cache.service';
+import {MicrofrontendDesktopComponent} from './microfrontend-desktop/microfrontend-desktop.component';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -104,6 +105,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     WorkbenchHostManifestInterceptor,
     provideBuiltInTextMessageBoxCapabilityRoute(),
     provideMicrofrontendViewRoute(),
+    provideMicrofrontendDesktopRoute(),
     provideMicrofrontendPlatformBeans(),
     provideWorkbenchClientBeans(),
   ]);
@@ -159,9 +161,26 @@ function provideMicrofrontendViewRoute(): EnvironmentProviders {
       provide: ROUTES,
       multi: true,
       useFactory: (): Route => ({
-        matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
+        matcher: MicrofrontendRoutes.provideMicrofrontendRouteMatcher(),
         component: MicrofrontendViewComponent,
-        canMatch: [canMatchWorkbenchView(true), MicrofrontendViewRoutes.canMatchViewCapability],
+        canMatch: [canMatchWorkbenchView(true), canMatchWorkbenchDesktop(false), MicrofrontendRoutes.canMatchViewCapability],
+      }),
+    },
+  ]);
+}
+
+/**
+ * Provides the route for integrating microfrontend desktops.
+ */
+function provideMicrofrontendDesktopRoute(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: ROUTES,
+      multi: true,
+      useFactory: (): Route => ({
+        path: '',
+        component: MicrofrontendDesktopComponent,
+        canMatch: [canMatchWorkbenchView(false), canMatchWorkbenchDesktop(MICROFRONTEND_DESKTOP_NAVIGATION_HINT), MicrofrontendRoutes.canMatchPerspectiveCapability],
       }),
     },
   ]);
@@ -193,3 +212,8 @@ function canMatchWorkbenchMessageBox(): CanMatchFn {
     return Routing.isMessageBoxOutlet(outlet);
   };
 }
+
+/**
+ * Navigation hint used for microfrontend desktop navigations to distinguish between empty-path routes and to have an empty URL when no views are open.
+ */
+export const MICROFRONTEND_DESKTOP_NAVIGATION_HINT = '~desktop';

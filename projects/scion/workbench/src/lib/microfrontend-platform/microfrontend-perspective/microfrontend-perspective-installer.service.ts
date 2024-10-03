@@ -17,11 +17,12 @@ import {WorkbenchLayout} from '../../layout/workbench-layout';
 import {WorkbenchLayoutFn} from '../../perspective/workbench-perspective.model';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutFactory} from '../../layout/workbench-layout.factory';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
+import {MicrofrontendRoutes} from '../routing/microfrontend-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {filterArray} from '@scion/toolkit/operators';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchPerspectiveData} from './workbench-perspective-data';
+import {MICROFRONTEND_DESKTOP_NAVIGATION_HINT} from '../workbench-microfrontend-support';
 
 /**
  * Registers perspectives for workbench perspective capabilities.
@@ -86,7 +87,7 @@ export class MicrofrontendPerspectiveInstaller {
             .map(viewCapability => viewCapability.metadata!.id)
             .sort() // Ensure stable view order in case multiple capabilities match the qualifier.
             .forEach(viewCapabilityId => {
-              const commands = MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapabilityId, view.params ?? {});
+              const commands = MicrofrontendRoutes.createMicrofrontendNavigateCommands(viewCapabilityId, view.params ?? {});
               const alternativeViewId = `${part.id}-${viewCapabilityId}-${viewIndex}`;
               layout = layout
                 .addView(alternativeViewId, {partId: part.id, activateView: view.active})
@@ -105,6 +106,10 @@ export class MicrofrontendPerspectiveInstaller {
         }
       }
 
+      // Navigate desktop.
+      if (perspectiveCapability.properties.desktop) {
+        layout = layout.navigateDesktop([], {cssClass: perspectiveCapability.properties.desktop.cssClass, hint: MICROFRONTEND_DESKTOP_NAVIGATION_HINT, data: {capabilityId: perspectiveCapability.metadata!.id}});
+      }
       return layout;
     };
   }

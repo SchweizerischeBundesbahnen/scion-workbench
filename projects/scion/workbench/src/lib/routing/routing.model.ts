@@ -161,14 +161,14 @@ export interface WorkbenchNavigationContext {
 export type Commands = any[];
 
 /**
- * URL segments of views contained in the workbench layout.
+ * URL segments of outlets contained in the workbench layout.
  */
-export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
+export type Outlets = {[name: string]: UrlSegment[]};
 
 /**
- * States associated with view navigations.
+ * States associated with view or desktop navigations.
  */
-export type NavigationStates = {[viewId: ViewId]: NavigationState};
+export type NavigationStates = {[name: string]: NavigationState};
 
 /**
  * State passed to a view navigation.

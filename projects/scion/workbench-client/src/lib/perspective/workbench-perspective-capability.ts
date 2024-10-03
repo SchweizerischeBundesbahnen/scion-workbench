@@ -112,6 +112,33 @@ export interface WorkbenchPerspectiveCapability extends Capability {
      * ```
      */
     layout: [Pick<WorkbenchPerspectivePart, 'id' | 'views'>, ...WorkbenchPerspectivePart[]];
+
+    /**
+     * Defines the desktop of this perspective.
+     *
+     * The desktop is used to display content when all views are closed.
+     */
+    desktop?: {
+      /**
+       * Specifies the path to the microfrontend.
+       *
+       * The path is relative to the base URL specified in the application manifest. If the
+       * application does not declare a base URL, it is relative to the origin of the manifest file.
+       */
+      path: string;
+      /**
+       * Instructs the workbench to show a splash, such as a skeleton or loading indicator, until the desktop microfrontend signals readiness.
+       *
+       * By default, the workbench shows a loading indicator. A custom splash can be configured in the workbench host application.
+       *
+       * @see WorkbenchDesktop.signalReady
+       */
+      showSplash?: boolean;
+      /**
+       * Specifies CSS class(es) to add to the desktop, e.g., to locate the desktop in tests.
+       */
+      cssClass?: string | string[];
+    };
     /**
      * Arbitrary data associated with this perspective.
      */

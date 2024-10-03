@@ -14,6 +14,11 @@
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
   </section>
 
+  <section>
+    <header>Desktop Navigation</header>
+    <app-navigate-desktop [formControl]="form.controls.desktopNavigation"/>
+  </section>
+
   <button (click)="onModify()" [disabled]="form.invalid" class="e2e-modify" sci-primary>Modify</button>
 </form>
 

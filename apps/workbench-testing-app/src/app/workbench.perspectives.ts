@@ -106,7 +106,8 @@ function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
     .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
     .navigateView('sample-view-8', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .activateView('sample-view-8');
+    .activateView('sample-view-8')
+    .navigateDesktop([], {hint: 'start-page'});
 }
 
 function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -136,5 +137,6 @@ function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-8', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
     .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
     .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .activateView('sample-view-6');
+    .activateView('sample-view-6')
+    .navigateDesktop([], {hint: 'start-page'});
 }

@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {coerceArray, commandsToPath, toMatrixNotation} from '../../../helper/testing.util';
-import {PartDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
+import {DesktopNavigationDescriptor, PartDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 
 export const LayoutPages = {
@@ -63,5 +63,19 @@ export const LayoutPages = {
       await locator.locator('input.e2e-state').nth(i).fill(toMatrixNotation(viewNavigation.state));
       await locator.locator('input.e2e-class').nth(i).fill(coerceArray(viewNavigation.cssClass).join(' '));
     }
+  },
+
+  /**
+   * Enters desktop navigation into {@link NavigateDesktopComponent}.
+   */
+  enterDesktopNavigation: async (locator: Locator, desktopNavigation: DesktopNavigationDescriptor | undefined): Promise<void> => {
+    if (!desktopNavigation) {
+      return;
+    }
+    await locator.locator('button.e2e-add').click();
+    await locator.locator('input.e2e-commands').fill(commandsToPath(desktopNavigation.commands));
+    await locator.locator('input.e2e-hint').fill(desktopNavigation.hint ?? '');
+    await locator.locator('input.e2e-data').fill(toMatrixNotation(desktopNavigation.data));
+    await locator.locator('input.e2e-class').fill(coerceArray(desktopNavigation.cssClass).join(' '));
   },
 } as const;

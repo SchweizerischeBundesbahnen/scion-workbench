@@ -15,6 +15,7 @@ import {inject} from '@angular/core';
 import {ViewId} from '../view/workbench-view.model';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
 import {filter, map, startWith, take} from 'rxjs/operators';
+import {DESKTOP_OUTLET} from '../layout/workbench-layout';
 
 /**
  * Provides utility functions for router operations.
@@ -108,6 +109,13 @@ export const Routing = {
   },
 
   /**
+   * Tests if the given outlet matches the format of the desktop outlet.
+   */
+  isDesktopOutlet: (outlet: string | undefined | null): boolean => {
+    return outlet === DESKTOP_OUTLET;
+  },
+
+  /**
    * Tests if the given outlet matches the format of a popup outlet.
    */
   isPopupOutlet: (outlet: string | undefined | null): outlet is `popup.${string}` => {
@@ -129,19 +137,11 @@ export const Routing = {
   },
 
   /**
-   * Reads view outlets from given URL.
+   * Reads outlets from given URL.
    *
-   * A view outlet contains the URL segments of a view contained in the workbench layout.
+   * An outlet contains the URL segments of a view or desktop contained in the workbench layout.
    */
-  parseViewOutlets: (url: UrlTree): Map<ViewId, UrlSegment[]> => {
-    const viewOutlets = new Map<ViewId, UrlSegment[]>();
-    Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
-      if (Routing.isViewOutlet(outlet)) {
-        viewOutlets.set(outlet, segmentGroup.segments);
-      }
-    });
-    return viewOutlets;
-  },
+  parseOutlets: parseOutlets,
 
   /**
    * Tests if given route has an empty path from root.
@@ -246,3 +246,18 @@ export const Routing = {
   },
 } as const;
 
+function parseOutlets(url: UrlTree, filter: {view: true}): Map<ViewId, UrlSegment[]>;
+function parseOutlets(url: UrlTree, filter: {desktop: true}): Map<string, UrlSegment[]>;
+function parseOutlets(url: UrlTree, filter: {view: true; desktop: true}): Map<string, UrlSegment[]>;
+function parseOutlets(url: UrlTree, filter: {view?: true; desktop?: true}): Map<string, UrlSegment[]> {
+  const outlets = new Map<string, UrlSegment[]>();
+  Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
+    if ((filter?.view ?? false) && Routing.isViewOutlet(outlet)) {
+      outlets.set(outlet, segmentGroup.segments);
+    }
+    if ((filter?.desktop ?? false) && Routing.isDesktopOutlet(outlet)) {
+      outlets.set(outlet, segmentGroup.segments);
+    }
+  });
+  return outlets;
+}

@@ -134,7 +134,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
-    this.urlSegments.set(layout.urlSegments({viewId: this.id}));
+    this.urlSegments.set(layout.urlSegments({outlet: this.id}));
 
     this.uid = mView.uid;
     this.alternativeId = mView.alternativeId;
@@ -157,7 +157,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       this.classList.navigation = mView.navigation?.cssClass;
       this.navigationHint.set(mView.navigation?.hint);
       this.navigationData.set(mView.navigation?.data ?? {});
-      this.navigationState.set(layout.navigationState({viewId: this.id}));
+      this.navigationState.set(layout.navigationState({id: this.id}));
     }
 
     // If this view is inactive, Angular does not check it for changes as it is detached from the Angular component tree.

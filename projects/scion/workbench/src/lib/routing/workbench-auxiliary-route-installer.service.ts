@@ -11,7 +11,6 @@
 import {Component, Injectable, InjectionToken} from '@angular/core';
 import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
-import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
 
@@ -47,7 +46,7 @@ export class WorkbenchAuxiliaryRouteInstaller {
         // Register wildcard route to display "Page Not Found".
         {
           path: '**',
-          loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
+          loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? import('../page-not-found/page-not-found.component'),
           data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
           canMatch: config.canMatchNotFoundPage,
         },

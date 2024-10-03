@@ -124,6 +124,9 @@ export class WorkbenchComponent {
     if (Routing.isViewOutlet(outlet)) {
       throw Error(`[WorkbenchError] Circular loading of the workbench component detected in view '${outlet}'. Did you forget to add the CanMatch guard 'canMatchWorkbenchView(false)' to the root (empty-path) route of the application?`);
     }
+    else if (Routing.isDesktopOutlet(outlet)) {
+      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in the desktop. Did you forget to add the CanMatch guard 'canMatchWorkbenchDesktop(false)' to the root (empty-path) route of the application?`);
+    }
     else {
       throw Error(`[WorkbenchError] Circular loading of the workbench component detected in outlet '${outlet}'.`);
     }

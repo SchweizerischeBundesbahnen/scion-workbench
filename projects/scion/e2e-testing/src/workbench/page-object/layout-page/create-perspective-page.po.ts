@@ -31,10 +31,11 @@ export class CreatePerspectivePagePO {
     await this.enterData(definition.data);
 
     // Enter the layout.
-    const {parts, views, viewNavigations} = await definition.layout(new ɵWorkbenchLayoutFactory()) as ɵWorkbenchLayout;
+    const {parts, views, viewNavigations, desktopNavigation} = await definition.layout(new ɵWorkbenchLayoutFactory()) as ɵWorkbenchLayout;
     await LayoutPages.enterParts(this.locator.locator('app-add-parts'), parts);
     await LayoutPages.enterViews(this.locator.locator('app-add-views'), views);
     await LayoutPages.enterViewNavigations(this.locator.locator('app-navigate-views'), viewNavigations);
+    await LayoutPages.enterDesktopNavigation(this.locator.locator('app-navigate-desktop'), desktopNavigation);
 
     // Register the perspective.
     await this.locator.locator('button.e2e-register').click();
