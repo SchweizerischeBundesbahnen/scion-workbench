@@ -36,15 +36,26 @@ This section explains how to submit a pull request.
   <summary><strong>Development</strong></summary>
   <br>
 
-Make sure to use Node.js version 20.14.0 for contributing to SCION. We suggest using [Node Version Manager](https://github.com/nvm-sh/nvm) if you need different Node.js versions for other projects.
+Before you start development, we recommend that you build all projects using the `npm run build` command. Please make sure that path overrides are disabled in `tsconfig.json`.
 
-For development, you can uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json`. This allows running tests or serving applications without having to build dependent modules first.
+**Node Version**
 
-The following is a summary of commands useful for development of `scion-workbench`. See file `package.json` for a complete list of available NPM scripts.
+Make sure to use Node.js version `20.14.0` for contributing to SCION. We recommend using [Node Version Manager](https://github.com/nvm-sh/nvm) if you need different Node.js versions for other projects.
 
-> Before you start development, we recommend that you build all projects using the `npm run build` command. Please make sure that path overrides are disabled in `tsconfig.json`. 
- 
-### Commands for working on the @scion/workbench library
+**Disable Angular Cache**
+
+When working with the workbench testing application, we recommend disabling the Angular cache because we have experienced unexpected caching errors when starting multiple applications at once.
+```console
+ng cache disable
+```
+
+**Enable Hot Code Replacement**
+
+To enable hot code replacement for `@scion/workbench` and `@scion/workbench-client`, uncomment the `PATH-OVERRIDE-FOR-DEVELOPMENT` section in the `tsconfig.json` file.
+
+*Optional*: To debug dependent SCION libraries, such as `@scion/toolkit`, `@scion/components`, or `@scion/microfrontend-platform`, clone [scion-toolkit](https://github.com/SchweizerischeBundesbahnen/scion-toolkit) and [scion-microfrontend-platform](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform) repositories into a directory next to the workbench checkout folder. Then run `npm run scion-src-lib:copy` to copy their sources into the `src-lib` folder. This folder is referenced in the path overrides in `tsconfig.json`.
+
+**Commands for working on the @scion/workbench library**
  
 - `npm run workbench:lint`\
   Lints the workbench source.
@@ -55,7 +66,7 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run workbench:test`\
   Runs unit tests of the workbench.
 
-### Commands for working on the @scion/workbench-client library
+**Commands for working on the @scion/workbench-client library**
  
 - `npm run workbench-client:lint`\
   Lints the workbench-client source.
@@ -65,8 +76,8 @@ The following is a summary of commands useful for development of `scion-workbenc
 
 - `npm run workbench-client:test`\
   Runs unit tests of the workbench-client.
-  
-### Commands for running end-to-end tests
+
+**Commands for running end-to-end tests**
 
 - `npm run e2e:run`\
   Runs end-to-end tests of the workbench and workbench-client. Prior to test execution, starts the testing app `workbench-testing-app` and two instances of the `workbench-client-testing-app`.
@@ -77,9 +88,9 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run e2e:lint`\
   Lints end-to-end tests.
 
-### Commands for working on the testing application
+**Commands for working on the testing application**
 
-- `npm run start`\
+- `npm start`\
   Serves the `workbench-testing-app` and two instances of the `workbench-client-testing-app`. Open the page http://localhost:4200 to load the workbench host app into your browser.\
   Uncomment the section `PATH-OVERRIDE-FOR-DEVELOPMENT` in `tsconfig.json` to have hot module reloading support.
 
@@ -89,7 +100,7 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run workbench-client-testing-app:lint`\
   Lints the `workbench-client-testing-app`.
 
-### Commands for working on the getting started application
+**Commands for working on the getting started application**
 
 - `npm run workbench-getting-started-app:serve`\
   Serves the `workbench-getting-started-app` on http://localhost:4500.\
@@ -98,7 +109,7 @@ The following is a summary of commands useful for development of `scion-workbenc
 - `npm run workbench-getting-started-app:lint`\
   Lints the `workbench-testing-app`.
 
-### Commands for generating the project documentation
+**Commands for generating the project documentation**
 
 We generate separate changelogs for the packages `@scion/workbench` and `@scion/workbench-client` because of their independent release cycles.
 
