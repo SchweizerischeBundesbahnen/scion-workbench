@@ -12,10 +12,8 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {fromRect} from '../helper/testing.util';
-import {PopupPO} from '../popup.po';
+import {POPUP_DIAMOND_ANCHOR_SIZE, PopupPO} from '../popup.po';
 import {ViewPO} from '../view.po';
-
-const POPUP_DIAMOND_ANCHOR_SIZE = 8;
 
 test.describe('Workbench Popup Position', () => {
 

@@ -111,11 +111,11 @@ export function rejectWhenAttached(locator: Locator): Promise<never> {
  *
  * Similar to {@link DOMRect#fromRect} but can be used in e2e-tests executed in NodeJS.
  */
-export function fromRect(other: DOMRectInit | null): DomRect {
-  const width = other?.width ?? 0;
-  const height = other?.height ?? 0;
-  const x = other?.x ?? 0;
-  const y = other?.y ?? 0;
+export function fromRect(rect: DOMRectInit | null): DomRect {
+  const width = rect?.width ?? 0;
+  const height = rect?.height ?? 0;
+  const x = rect?.x ?? 0;
+  const y = rect?.y ?? 0;
   return {
     x,
     y,

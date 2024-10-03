@@ -138,8 +138,12 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
     await accordion.collapse();
   }
 
-  public async open(): Promise<void> {
+  public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
     await this.locator.locator('button.e2e-open').click();
+
+    if (!(options?.waitUntilAttached ?? true)) {
+      return;
+    }
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
