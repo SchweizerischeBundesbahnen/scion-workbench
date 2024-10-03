@@ -123,10 +123,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Method invoked when the workbench layout has changed.
    *
    * This method:
-   * - is called on every layout change, including changes not relevant for this view, e.g., to update the view's part.
-   * - is called after destroyed the previous component (if any), but before constructing the new component.
+   * - is called on every layout change, enabling the update of view properties defined in the layout (navigation hint, navigation data, part, ...).
+   * - is called on route activation (after destroyed the previous component (if any), but before constructing the new component).
    */
-  private onLayoutChange(change: {layout: ɵWorkbenchLayout; previousRoute?: ActivatedRouteSnapshot | null; route?: ActivatedRouteSnapshot}): void {
+  private onLayoutChange(change: {layout: ɵWorkbenchLayout; route?: ActivatedRouteSnapshot; previousRoute?: ActivatedRouteSnapshot | null}): void {
     const {layout, route, previousRoute} = change;
 
     const mPart = layout.part({viewId: this.id});
@@ -134,19 +134,19 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
-    this.urlSegments.set(layout.urlSegments({viewId: this.id}));
+    this.urlSegments.set(layout.urlSegments({outlet: this.id}));
 
     this.uid = mView.uid;
     this.alternativeId = mView.alternativeId;
     this.classList.layout = mView.cssClass;
 
     // Test if a new route has been activated for this view.
-    const routeChanged = route?.routeConfig !== previousRoute?.routeConfig;
+    const routeChanged = route && route.routeConfig !== previousRoute?.routeConfig;
     if (routeChanged) {
-      this.title = Routing.lookupRouteData(route!, WorkbenchRouteData.title) ?? null;
-      this.heading = Routing.lookupRouteData(route!, WorkbenchRouteData.heading) ?? null;
+      this.title = Routing.lookupRouteData(route, WorkbenchRouteData.title) ?? null;
+      this.heading = Routing.lookupRouteData(route, WorkbenchRouteData.heading) ?? null;
       this.dirty = false;
-      this.classList.route = Routing.lookupRouteData(route!, WorkbenchRouteData.cssClass);
+      this.classList.route = Routing.lookupRouteData(route, WorkbenchRouteData.cssClass);
       this.classList.application = [];
     }
 
@@ -157,7 +157,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       this.classList.navigation = mView.navigation?.cssClass;
       this.navigationHint.set(mView.navigation?.hint);
       this.navigationData.set(mView.navigation?.data ?? {});
-      this.navigationState.set(layout.navigationState({viewId: this.id}));
+      this.navigationState.set(layout.navigationState({id: this.id}));
     }
 
     // If this view is inactive, Angular does not check it for changes as it is detached from the Angular component tree.
@@ -401,7 +401,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
         // Revert change in case the navigation fails.
         if (previousLayout?.hasView(this.id)) {
-          navigationContext.registerUndoAction(() => this.onLayoutChange({layout: previousLayout}));
+          navigationContext.registerUndoAction(() => this.onLayoutChange({layout: previousLayout, route: previousRoute!, previousRoute: route}));
         }
       });
   }

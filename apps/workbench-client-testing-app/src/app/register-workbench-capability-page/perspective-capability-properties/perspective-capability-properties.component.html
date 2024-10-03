@@ -53,6 +53,29 @@
       <button class="e2e-add-part add-part" (click)="onAddPart()">Add Part</button>
     </section>
   </sci-form-field>
+
+  <sci-form-field label="Desktop">
+    <section class="desktop e2e-desktop">
+      @if (navigateDesktop()) {
+        <section class="fieldset desktop-fieldset">
+          <!-- Path -->
+          <div class="path legend">
+            <input [formControl]="form.controls.desktop.controls.path" class="e2e-path">
+          </div>
+          <!-- CSS class -->
+          <app-css-class [formControl]="form.controls.desktop.controls.cssClass" class="css-class legend"/>
+          <div class="show-splash legend">
+            <sci-checkbox [formControl]="form.controls.desktop.controls.showSplash" class="e2e-show-splash"/>
+          </div>
+          <!-- Remove desktop navigation button -->
+          <button (click)="onRemoveDesktopNavigation()" class="remove-desktop" title="Remove Desktop" sciMaterialIcon>clear</button>
+        </section>
+      } @else {
+        <!-- Add desktop navigation button -->
+        <button (click)="onAddDesktopNavigation()" class="e2e-add-desktop add-desktop">Add Desktop</button>
+      }
+    </section>
+  </sci-form-field>
 </form>
 
 <datalist [attr.id]="partIdList">

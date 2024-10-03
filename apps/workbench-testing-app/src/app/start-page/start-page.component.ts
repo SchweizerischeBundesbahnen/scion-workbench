@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
- *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
- */
+* Copyright (c) 2018-2024 Swiss Federal Railways
+*
+* This program and the accompanying materials are made
+* available under the terms of the Eclipse Public License 2.0
+* which is available at https://www.eclipse.org/legal/epl-2.0/
+*
+* SPDX-License-Identifier: EPL-2.0
+*/
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
 import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
@@ -69,27 +69,27 @@ export default class StartPageComponent {
               private _cd: ChangeDetectorRef,
               router: Router,
               workbenchConfig: WorkbenchConfig) {
-    // Read workbench views to be pinned to the start page.
+    // Read workbench views to be pinned to the desktop.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(filterArray(route => {
         if ((!route.outlet || route.outlet === PRIMARY_OUTLET)) {
-          return route.data?.['pinToStartPage'] === true;
+          return route.data?.['pinToDesktop'] === true;
         }
         return false;
       }));
 
     if (workbenchConfig.microfrontendPlatform) {
-      // Read microfrontend views to be pinned to the start page.
+      // Read microfrontend views to be pinned to the desktop.
       this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
-          filterArray(viewCapability => 'pinToStartPage' in viewCapability.properties && !!viewCapability.properties['pinToStartPage']),
+          filterArray(viewCapability => 'pinToDesktop' in viewCapability.properties && !!viewCapability.properties['pinToDesktop']),
           filterArray(viewCapability => !isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );
-      // Read test capabilities to be pinned to the start page.
+      // Read test capabilities to be pinned to the desktop.
       this.testCapabilities$ = this._manifestService!.lookupCapabilities$()
         .pipe(
-          filterArray(capability => !!capability.properties && 'pinToStartPage' in capability.properties && !!capability.properties['pinToStartPage']),
+          filterArray(capability => !!capability.properties && 'pinToDesktop' in capability.properties && !!capability.properties['pinToDesktop']),
           filterArray(viewCapability => isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );

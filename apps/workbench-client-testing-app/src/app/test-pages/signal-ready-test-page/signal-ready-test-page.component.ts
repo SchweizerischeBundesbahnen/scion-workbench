@@ -8,14 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Optional} from '@angular/core';
-import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
+import {Component, inject} from '@angular/core';
+import {WorkbenchDesktop, WorkbenchDialog, WorkbenchMessageBox, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
- * Component that signals readiness when a message is published to the topic `signal-ready/${viewId}` (view context) or `signal-ready/${capabilityId}` (popup, dialog or message box context)
+ * Component that signals readiness when a message is published to the following topic depending on the context:
+ * - view: `signal-ready/${viewId}`
+ * - popup, dialog or messagebox: `signal-ready/${capabilityId}`
+ * - desktop: `signal-ready/desktop`
  */
 @Component({
   selector: 'app-signal-ready-test-page',
@@ -24,23 +27,38 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class SignalReadyTestPageComponent {
 
-  constructor(@Optional() view: WorkbenchView,
-              @Optional() popup: WorkbenchPopup,
-              @Optional() dialog: WorkbenchDialog,
-              @Optional() messageBox: WorkbenchMessageBox) {
-    this.installReadySignaler(view ?? popup ?? dialog ?? messageBox);
+  private view = inject(WorkbenchView, {optional: true});
+  private popup = inject(WorkbenchPopup, {optional: true});
+  private dialog = inject(WorkbenchDialog, {optional: true});
+  private messageBox = inject(WorkbenchMessageBox, {optional: true});
+  private desktop = inject(WorkbenchDesktop, {optional: true});
+
+  constructor() {
+    this.installReadySignaler();
   }
 
-  private installReadySignaler(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | undefined): void {
-    if (!handle) {
-      return;
-    }
-    Beans.get(MessageClient).observe$(`signal-ready/${isView(handle) ? handle.id : handle.capability.metadata!.id}`)
+  private installReadySignaler(): void {
+    const handle = this.view ?? this.popup ?? this.dialog ?? this.messageBox ?? this.desktop;
+
+    Beans.get(MessageClient).observe$(this.computeTopic())
       .pipe(takeUntilDestroyed())
-      .subscribe(() => handle.signalReady());
+      .subscribe(() => handle!.signalReady());
+  }
+
+  private computeTopic(): string {
+    if (this.view) {
+      return `signal-ready/${this.view.id}`;
+    }
+    else if (this.popup || this.dialog || this.messageBox) {
+      return `signal-ready/${(this.popup ?? this.dialog ?? this.messageBox)!.capability.metadata!.id}`;
+    }
+    else if (this.desktop) {
+      return 'signal-ready/desktop';
+    }
+    else {
+      throw Error('SignalReadyTestPageComponent not opened in a workbench view, popup, dialog, message box or desktop.');
+    }
   }
 }
 
-function isView(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog): handle is WorkbenchView {
-  return (handle as WorkbenchView).id !== undefined;
-}
+

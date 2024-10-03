@@ -86,11 +86,11 @@ describe('Views', () => {
 /****************************************************************************************************
  * Definition of Feature A                                                                          *
  ****************************************************************************************************/
-@Component({template: 'Feature A - View 1', standalone: true})
+@Component({selector: 'spec-feature-a-view-1', template: 'Feature A - View 1', standalone: true})
 class FeatureA_View1_Component {
 }
 
-@Component({template: 'Feature A - View 1', standalone: true})
+@Component({selector: 'spec-feature-a-view-2', template: 'Feature A - View 2', standalone: true})
 class FeatureA_View2_Component {
 }
 
@@ -102,11 +102,11 @@ const routesFeatureA: Routes = [
 /****************************************************************************************************
  * Definition of Feature B                                                                          *
  ****************************************************************************************************/
-@Component({template: 'Feature B - View 1', standalone: true})
+@Component({selector: 'spec-feature-b-view-1', template: 'Feature B - View 1', standalone: true})
 class FeatureB_View1_Component {
 }
 
-@Component({template: 'Feature B - View 1', standalone: true})
+@Component({selector: 'spec-feature-b-view-2',template: 'Feature B - View 2', standalone: true})
 class FeatureB_View2_Component {
 }
 

@@ -70,10 +70,11 @@ export function withComponentStateInputElement(): EnvironmentProviders {
 }
 
 /**
- * Enters the specified text in the "Component State" input field of the specified view.
+ * Enters the specified text in the "Component State" input field of the specified view or desktop.
  *
  * Use that state to check whether the component has been re-created.
  */
-export function enterComponentState(fixture: ComponentFixture<any>, viewId: ViewId, textualState: string): void {
-  fixture.nativeElement.querySelector(`wb-view[data-viewid="${viewId}"] input.component-state`).value = textualState;
+export function enterComponentState(fixture: ComponentFixture<any>, locator: ViewId | 'desktop', textualState: string): void {
+  const component = locator === 'desktop' ? 'wb-desktop' : `wb-view[data-viewid="${locator}"]`;
+  fixture.nativeElement.querySelector(`${component} input.component-state`).value = textualState;
 }

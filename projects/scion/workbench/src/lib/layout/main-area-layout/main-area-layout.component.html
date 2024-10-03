@@ -13,12 +13,12 @@
                    [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
                    (wbViewDropZoneDrop)="onViewDrop($event)"/>
 } @else {
-  <sci-viewport class="start-page"
-                wbViewDropZone
-                [wbViewDropZoneSize]="1"
-                [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
-                [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
-                (wbViewDropZoneDrop)="onViewDrop($event)">
-    <router-outlet/>
-  </sci-viewport>
+  <div class="desktop"
+       wbViewDropZone
+       [wbViewDropZoneSize]="1"
+       [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
+       [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
+       (wbViewDropZoneDrop)="onViewDrop($event)">
+    <ng-container *wbPortalOutlet="desktop.portal()"/>
+  </div>
 }

@@ -9,8 +9,8 @@
  */
 
 import {inject, Injectable} from '@angular/core';
-import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
-import {ViewOutlets} from '../routing/routing.model';
+import {MDesktop, MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
+import {Outlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
@@ -36,9 +36,9 @@ export class WorkbenchLayoutSerializer {
    * @param grid - Specifies the grid to be serialized.
    * @param flags - Controls which fields not to serialize. By default, all fields are serialized.
    */
-  public serializeGrid(grid: MPartGrid, flags?: GridSerializationFlags): string;
-  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): null | string;
-  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): string | null {
+  public serializeGrid(grid: MPartGrid, flags?: LayoutSerializationFlags): string;
+  public serializeGrid(grid: MPartGrid | undefined | null, flags?: LayoutSerializationFlags): null | string;
+  public serializeGrid(grid: MPartGrid | undefined | null, flags?: LayoutSerializationFlags): string | null {
     if (grid === null || grid === undefined) {
       return null;
     }
@@ -49,7 +49,7 @@ export class WorkbenchLayoutSerializer {
       .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
       .concat(flags?.excludeViewUid ? '**/views/*/uid' : [])
       .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
-      .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : []));
+      .concat(flags?.excludeNavigationId ? '**/views/*/navigation/id' : []));
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
   }
 
@@ -88,8 +88,8 @@ export class WorkbenchLayoutSerializer {
   /**
    * Serializes the given outlets.
    */
-  public serializeViewOutlets(viewOutlets: ViewOutlets): string {
-    return JSON.stringify(Object.fromEntries(Object.entries(viewOutlets)
+  public serializeOutlets(outlets: Outlets): string {
+    return JSON.stringify(Object.fromEntries(Object.entries(outlets)
       .map(([viewId, segments]: [string, UrlSegment[]]): [string, MUrlSegment[]] => {
         return [viewId, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
       })));
@@ -98,13 +98,28 @@ export class WorkbenchLayoutSerializer {
   /**
    * Deserializes the given outlets.
    */
-  public deserializeViewOutlets(serialized: string): ViewOutlets {
-    const viewOutlets: {[viewId: ViewId]: MUrlSegment[]} = JSON.parse(serialized);
+  public deserializeOutlets(serialized: string): Outlets {
+    const outlets: {[viewId: ViewId]: MUrlSegment[]} = JSON.parse(serialized);
 
-    return Object.fromEntries(Object.entries(viewOutlets)
+    return Object.fromEntries(Object.entries(outlets)
       .map(([viewId, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
         return [viewId, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
       }));
+  }
+
+  /**
+   * Serializes the given desktop.
+   */
+  public serializeDesktop(desktop: MDesktop, flags?: LayoutSerializationFlags): string {
+    return stringify(desktop, new Array<string | Exclusion>()
+      .concat(flags?.excludeNavigationId ? 'navigation/id' : []));
+  }
+
+  /**
+   * Deserializes the given desktop.
+   */
+  public deserializeDesktop(serialized: string): MDesktop {
+    return JSON.parse(serialized);
   }
 }
 
@@ -137,9 +152,9 @@ interface MUrlSegment {
 /**
  * Controls which fields not to serialize. By default, all fields are serialized.
  */
-export interface GridSerializationFlags {
+export interface LayoutSerializationFlags {
   excludeTreeNodeId?: true;
   excludeViewUid?: true;
   excludeViewMarkedForRemoval?: true;
-  excludeViewNavigationId?: true;
+  excludeNavigationId?: true;
 }

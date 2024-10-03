@@ -103,3 +103,18 @@ export function segments(commands: Commands): UrlSegment[] {
 export function anything<T>(): T {
   return jasmine.anything() as unknown as T;
 }
+
+/**
+ * Locates the specified desktop.
+ */
+export function getDesktopElement(fixture: ComponentFixture<unknown>, component: string, location?: {mainArea?: boolean}): HTMLElement | null {
+  if (location?.mainArea === undefined) {
+    return fixture.debugElement.query(By.css(`wb-workbench-layout div.desktop > wb-desktop router-outlet + ${component}`))?.nativeElement ?? null;
+  }
+  if (location.mainArea) {
+    return fixture.debugElement.query(By.css(`wb-workbench-layout wb-main-area-layout > div.desktop > wb-desktop router-outlet + ${component}`))?.nativeElement ?? null;
+  }
+  else {
+    return fixture.debugElement.query(By.css(`wb-workbench-layout > div.desktop > wb-desktop router-outlet + ${component}`))?.nativeElement ?? null;
+  }
+}

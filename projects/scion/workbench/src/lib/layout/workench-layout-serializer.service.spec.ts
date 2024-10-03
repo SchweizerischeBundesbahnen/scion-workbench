@@ -49,7 +49,7 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(layout.view({viewId: 'view.1'}).navigation!.id).not.toBeUndefined();
 
     // Serialize layout without "view.navigation.id".
-    const serializedLayout = layout.serialize({excludeViewNavigationId: true});
+    const serializedLayout = layout.serialize({excludeNavigationId: true});
     const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
 
     // Expect navigation id not to be serialized.

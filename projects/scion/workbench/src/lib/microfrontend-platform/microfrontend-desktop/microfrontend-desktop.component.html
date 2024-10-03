@@ -1,0 +1,14 @@
+<wb-content-as-overlay [overlayHost]="iframeHostRef.ref$ | async">
+  <div class="microfrontend-desktop"
+       [class.workbench-drag]="isWorkbenchDrag">
+    <sci-router-outlet #router_outlet
+                       [name]="desktop.outlet()"
+                       [attr.data-capabilityid]="capability?.metadata!.id"
+                       [attr.data-app]="capability?.metadata!.appSymbolicName"
+                       [ngClass]="desktop.classList.asList()"
+                       (focuswithin)="onFocusWithin($event)"
+                       [keystrokes]="keystrokesToBubble()">
+      <ng-container *ngComponentOutlet="splash"/>
+    </sci-router-outlet>
+  </div>
+</wb-content-as-overlay>

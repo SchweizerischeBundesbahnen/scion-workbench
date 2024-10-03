@@ -36,7 +36,7 @@ import {ContentProjectionDirective} from './content-projection.directive';
  *
  * ```scss
  * :host {
- *   display: grid; // fills remaining space vertically and horizontall
+ *   display: grid; // fills remaining space vertically and horizontally
  * }
  *
  * iframe {

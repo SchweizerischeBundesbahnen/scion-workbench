@@ -22,9 +22,9 @@ export const GridDropTargets = {
    *
    * Examples:
    * - Droping a view at the grid's boundaries (north, south, east, west).
-   * - Dropping a view on the grid's start page (center).
+   * - Dropping a view on the grid's desktop (center).
    *
-   * When dropping a view on the grid's start page, the root of the grid can be a part or a node,
+   * When dropping a view on the grid's desktop, the root of the grid can be a part or a node,
    * depending on whether the grid contains structural parts.
    */
   resolve: (target: {grid: MPartGrid; dropRegion: 'west' | 'east' | 'north' | 'south' | 'center'; workbenchId: string}): ViewMoveEventTarget => {

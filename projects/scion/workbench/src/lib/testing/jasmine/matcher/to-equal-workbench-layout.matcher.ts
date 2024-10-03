@@ -14,14 +14,14 @@ import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
 import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
-import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
+import {MDesktop as _MDesktop, MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
 import {By} from '@angular/platform-browser';
-import {NavigationStates, ViewOutlets} from '../../../routing/routing.model';
+import {NavigationStates, Outlets} from '../../../routing/routing.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -83,9 +83,10 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: �
     perspectiveId: actual.perspectiveId,
     mainAreaGrid: actual.mainAreaGrid ?? undefined,
     workbenchGrid: actual.workbenchGrid,
+    desktop: actual.desktop,
     maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
-    viewOutlets: actual.viewOutlets(),
+    outlets: actual.outlets(),
   };
   const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
@@ -273,6 +274,10 @@ export interface ExpectedWorkbenchLayout {
    */
   mainAreaGrid?: MPartGrid;
   /**
+   * Asserts specified desktop, if set.
+   */
+  desktop?: MDesktop;
+  /**
    * Asserts the layout to belong to specified perspective, if set.
    */
   perspectiveId?: string | undefined;
@@ -285,9 +290,9 @@ export interface ExpectedWorkbenchLayout {
    */
   navigationStates?: NavigationStates;
   /**
-   * Asserts specified view outlets, if set.
+   * Asserts specified outlets, if set.
    */
-  viewOutlets?: ViewOutlets;
+  outlets?: Outlets;
 }
 
 /**
@@ -316,6 +321,12 @@ export class MPart extends _MPart {
   constructor(part: Partial<Omit<_MPart, 'type' | 'views'> & {views: Array<Partial<MView>>}>) {
     super(part as _MPart);
   }
+}
+
+/**
+ * `MDesktop` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
+ */
+export interface MDesktop extends _MDesktop {
 }
 
 /**

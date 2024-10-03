@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.component';
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
-import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
+import {NavigateViewsComponent, ViewNavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
 import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchService} from '@scion/workbench';
@@ -22,6 +22,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {Observable} from 'rxjs';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {AsyncPipe} from '@angular/common';
+import {DesktopNavigationDescriptor, NavigateDesktopComponent} from '../tables/navigate-desktop/navigate-desktop.component';
 
 @Component({
   selector: 'app-create-perspective-page',
@@ -37,6 +38,7 @@ import {AsyncPipe} from '@angular/common';
     SciCheckboxComponent,
     SciKeyValueFieldComponent,
     AsyncPipe,
+    NavigateDesktopComponent,
   ],
 })
 export default class CreatePerspectivePageComponent {
@@ -47,7 +49,8 @@ export default class CreatePerspectivePageComponent {
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([], Validators.required),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
-    viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
+    viewNavigations: this._formBuilder.control<ViewNavigationDescriptor[]>([]),
+    desktopNavigation: this._formBuilder.control<DesktopNavigationDescriptor | undefined>(undefined),
   });
 
   protected registerError: string | false | undefined;
@@ -85,6 +88,7 @@ export default class CreatePerspectivePageComponent {
     const [initialPart, ...parts] = this.form.controls.parts.value;
     const views = this.form.controls.views.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
+    const desktopNavigation = this.form.controls.desktopNavigation.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
       // Add initial part.
@@ -119,6 +123,15 @@ export default class CreatePerspectivePageComponent {
           data: viewNavigation.extras?.data,
           state: viewNavigation.extras?.state,
           cssClass: viewNavigation.extras?.cssClass,
+        });
+      }
+
+      // Add desktop navigation.
+      if (desktopNavigation) {
+        layout = layout.navigateDesktop(desktopNavigation.commands, {
+          hint: desktopNavigation.extras?.hint,
+          data: desktopNavigation.extras?.data,
+          cssClass: desktopNavigation.extras?.cssClass,
         });
       }
       return layout;

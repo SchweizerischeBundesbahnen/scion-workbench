@@ -8,21 +8,40 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, isDevMode} from '@angular/core';
+import {Component, computed, inject, isDevMode} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
-import {FormatUrlPipe} from './format-url.pipe';
+import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
+import {UrlSegment} from '@angular/router';
 
 @Component({
   selector: 'wb-page-not-found',
   templateUrl: './page-not-found.component.html',
   styleUrls: ['./page-not-found.component.scss'],
   standalone: true,
-  imports: [
-    FormatUrlPipe,
-  ],
 })
 export default class PageNotFoundComponent {
 
   protected isDevMode = isDevMode();
-  protected view = inject(WorkbenchView);
+
+  /**
+   * Context in which opened this component.
+   */
+  protected context = {
+    view: inject(WorkbenchView, {optional: true}),
+    desktop: inject(WorkbenchDesktop, {optional: true}),
+  };
+
+  protected urlSegments = computed(() => {
+    if (this.context.view) {
+      return formatURL(this.context.view.urlSegments());
+    }
+    if (this.context.desktop) {
+      return formatURL(this.context.desktop.urlSegments());
+    }
+    return [];
+  });
+}
+
+function formatURL(segments: UrlSegment[]): string {
+  return segments.map(segment => `${segment}`).join('/');
 }

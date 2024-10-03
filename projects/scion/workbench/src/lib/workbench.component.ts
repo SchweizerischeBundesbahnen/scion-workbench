@@ -26,6 +26,7 @@ import {Blockable} from './glass-pane/blockable';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-route-installer.service';
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Routing} from './routing/routing.util';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -85,9 +86,7 @@ export class WorkbenchComponent implements OnDestroy {
               private _logger: Logger,
               protected workbenchStartup: WorkbenchStartup) {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
-    if (inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true})) {
-      throw Error(`[WorkbenchError] Workbench must not be loaded into a view. Did you navigate to the empty path route? Make sure that the application's root route is guarded with 'canMatchWorkbenchView(false)'. Example: "{path: '', canMatch: [canMatchWorkbenchView(false), ...]}"`);
-    }
+    this.throwOnCircularLoad();
     this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
     this.splash = inject(WorkbenchConfig).startup?.splash || SplashComponent;
     this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
@@ -140,6 +139,26 @@ export class WorkbenchComponent implements OnDestroy {
           changeDetector.reattach();
         }
       });
+  }
+
+  /**
+   * Throws if loading the workbench recursively.
+   */
+  private throwOnCircularLoad(): void {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+    if (!outlet) {
+      return;
+    }
+
+    if (Routing.isViewOutlet(outlet)) {
+      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in view '${outlet}'. Did you forget to add the CanMatch guard 'canMatchWorkbenchView(false)' to the root (empty-path) route of the application?`);
+    }
+    else if (Routing.isDesktopOutlet(outlet)) {
+      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in the desktop. Did you forget to add the CanMatch guard 'canMatchWorkbenchDesktop(false)' to the root (empty-path) route of the application?`);
+    }
+    else {
+      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in outlet '${outlet}'.`);
+    }
   }
 
   public ngOnDestroy(): void {

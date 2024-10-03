@@ -22,13 +22,18 @@ export class WorkbenchGridMerger {
    * Performs a merge of given local and remote layouts, using the base layout as the common ancestor.
    */
   public merge(grids: {local: ɵWorkbenchLayout; remote: ɵWorkbenchLayout; base: ɵWorkbenchLayout}): ɵWorkbenchLayout {
-    const serializedBaseLayout = grids.base.serialize({excludeTreeNodeId: true, excludeViewUid: true, excludeViewNavigationId: true});
-    const serializedRemoteLayout = grids.remote.serialize({excludeTreeNodeId: true, excludeViewUid: true, excludeViewNavigationId: true});
+    const serializedBaseLayout = grids.base.serialize({excludeTreeNodeId: true, excludeViewUid: true, excludeNavigationId: true});
+    const serializedRemoteLayout = grids.remote.serialize({excludeTreeNodeId: true, excludeViewUid: true, excludeNavigationId: true});
 
     if (serializedBaseLayout.workbenchGrid !== serializedRemoteLayout.workbenchGrid) {
       return grids.remote;
     }
-    if (serializedBaseLayout.workbenchViewOutlets !== serializedRemoteLayout.workbenchViewOutlets) {
+
+    if (serializedBaseLayout.desktop !== serializedRemoteLayout.desktop) {
+      return grids.remote;
+    }
+
+    if (serializedBaseLayout.workbenchOutlets !== serializedRemoteLayout.workbenchOutlets) {
       return grids.remote;
     }
     return grids.local;

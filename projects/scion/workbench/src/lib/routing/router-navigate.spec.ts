@@ -340,6 +340,7 @@ describe('Router', () => {
  * Definition of Feature A                                                                          *
  ****************************************************************************************************/
 @Component({
+  selector: 'spec-feature-a-entry',
   template: `
     <h1>Feature A - Entry</h1>
     <ul>
@@ -365,6 +366,7 @@ class FeatureA_EntryComponent {
 }
 
 @Component({
+  selector: 'spec-feature-a-view-1',
   template: `
     <h1>Feature A - View 1</h1>
     <ul>
@@ -385,6 +387,7 @@ class FeatureA_View1Component {
 }
 
 @Component({
+  selector: 'spec-feature-a-view-2',
   template: `
     <h1>Feature A - View 2</h1>
     <ul>
@@ -410,6 +413,7 @@ const routesFeatureA: Routes = [
  * Definition of Feature B                                                                          *
  ****************************************************************************************************/
 @Component({
+  selector: 'spec-feature-b-entry',
   template: `
     <h1>Feature B - Entry</h1>
     <ul>
@@ -433,6 +437,7 @@ class FeatureB_EntryComponent {
 }
 
 @Component({
+  selector: 'spec-feature-b-view-1',
   template: `
     <h1>Feature B - View 1</h1>
     <ul>
@@ -448,6 +453,7 @@ class FeatureB_View1Component {
 }
 
 @Component({
+  selector: 'spec-feature-b-view-2',
   template: `
     <h1>Feature B - View 2</h1>
     <ul>

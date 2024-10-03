@@ -60,13 +60,4 @@ export const WorkbenchLayouts = {
     }
     return VIEW_ID_PREFIX.concat(`${ids.size + 1}`) as ViewId;
   },
-
-  /**
-   * Tests if the given id matches the format of a view identifier (e.g., `view.1`, `view.2`, etc.).
-   *
-   * @see ViewId
-   */
-  isViewId: (viewId: string | undefined | null): viewId is ViewId => {
-    return viewId?.startsWith(VIEW_ID_PREFIX) ?? false;
-  },
 } as const;

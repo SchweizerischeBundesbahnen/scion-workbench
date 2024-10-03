@@ -12,7 +12,7 @@ import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities, WorkbenchNavigationExtras, WorkbenchViewCapability} from '@scion/workbench-client';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
-import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
+import {MicrofrontendRoutes} from './microfrontend-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
@@ -58,9 +58,9 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
     const extras: WorkbenchNavigationExtras & {blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'} = message.body ?? {};
 
     const intentParams = Objects.withoutUndefinedEntries(Dictionaries.coerce(intent.params));
-    const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
+    const {urlParams, transientParams} = MicrofrontendRoutes.splitParams(intentParams, viewCapability);
     const targets = this.resolveTargets(message, extras);
-    const commands = extras.close ? [] : MicrofrontendViewRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
+    const commands = extras.close ? [] : MicrofrontendRoutes.createMicrofrontendNavigateCommands(viewCapability.metadata!.id, urlParams);
     const partId = extras.close ? undefined : extras.partId;
 
     this._logger.debug(() => `Navigating to: ${viewCapability.properties.path}`, LoggerNames.MICROFRONTEND_ROUTING, commands, viewCapability, transientParams);
@@ -73,7 +73,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
         position: extras.position ?? extras.blankInsertionIndex,
         cssClass: extras.cssClass,
         state: Objects.withoutUndefinedEntries({
-          [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
+          [MicrofrontendRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
         }),
       });
     }));

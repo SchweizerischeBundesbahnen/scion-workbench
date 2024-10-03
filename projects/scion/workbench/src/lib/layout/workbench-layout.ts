@@ -136,6 +136,32 @@ export interface WorkbenchLayout {
    * @return a copy of this layout with the part activated.
    */
   activatePart(id: string): WorkbenchLayout;
+
+  /**
+   * Navigates the desktop based on the provided array of commands and extras.
+   *
+   * A command can be a string or an object literal. A string represents a path segment, an object literal associates matrix parameters with the preceding segment.
+   * Multiple segments can be combined into a single command, separated by a forward slash.
+   *
+   * By default, navigation is absolute. Set `relativeTo` in extras for relative navigation.
+   *
+   * Usage:
+   * ```
+   * layout.navigateDesktop(['path', 'to', 'desktop', {param1: 'value1', param2: 'value2'}]);
+   * ```
+   *
+   * @param commands - Instructs the router which route to navigate to.
+   * @param extras - Controls navigation.
+   * @param extras.hint - Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
+   *                      Like the path, a hint affects desktop resolution. If set, the router will only navigate desktops with an equivalent hint, or if not set, desktops without a hint.
+   * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
+   * @param extras.data - Associates data with a desktop navigation.
+   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the path, allowing data to be passed to empty path navigations.
+   *                      Data must be JSON serializable. Data can be read from {@link WorkbenchDesktop.navigationData}.
+   * @param extras.cssClass - Specifies CSS class(es) to add to the desktop, e.g., to locate the desktop in tests.
+   * @return a copy of this layout with the desktop navigated.
+   */
+  navigateDesktop(commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; cssClass?: string | string[]}): WorkbenchLayout;
 }
 
 /**
@@ -169,3 +195,5 @@ export const MAIN_AREA: MAIN_AREA = 'main-area';
  * Represents the type of the constant {@link MAIN_AREA}.
  */
 export type MAIN_AREA = 'main-area';
+
+export const DESKTOP_OUTLET = 'desktop';

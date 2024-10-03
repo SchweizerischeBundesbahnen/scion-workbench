@@ -7,16 +7,16 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
+import {MDesktop, MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
 import {assertType} from '../common/asserts.util';
 import {UID} from '../common/uid.util';
-import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
-import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
+import {DESKTOP_OUTLET, MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
+import {LayoutSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
-import {Commands, NavigationData, NavigationState, NavigationStates, ViewOutlets} from '../routing/routing.model';
+import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {Arrays} from '@scion/toolkit/util';
@@ -41,8 +41,9 @@ import {Logger} from '../logging';
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
-  private readonly _viewOutlets: Map<ViewId, UrlSegment[]>;
-  private readonly _navigationStates: Map<ViewId, NavigationState>;
+  private readonly _desktop: MDesktop;
+  private readonly _outlets: Map<string, UrlSegment[]>;
+  private readonly _navigationStates: Map<string, NavigationState>;
   private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
@@ -55,17 +56,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public readonly perspectiveId: string | undefined;
 
   /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; perspectiveId?: string; viewOutlets?: string | ViewOutlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; desktop?: string | MDesktop | null; perspectiveId?: string; outlets?: string | Outlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
     this._grids = {
       workbench: coerceMPartGrid(config.workbenchGrid, {default: createDefaultWorkbenchGrid}),
     };
     if (this.hasPart(MAIN_AREA, {grid: 'workbench'})) {
       this._grids.mainArea = coerceMPartGrid(config.mainAreaGrid, {default: createInitialMainAreaGrid});
     }
+    this._desktop = coerceMDesktop(config.desktop);
     this._gridNames = Objects.keys(this._grids);
     this._maximized = config.maximized ?? false;
-    this._viewOutlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceViewOutlets(config.viewOutlets)));
-    this._navigationStates = new Map<ViewId, NavigationState>(Objects.entries(config.navigationStates ?? {}));
+    this._outlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceOutlets(config.outlets)));
+    this._navigationStates = new Map<string, NavigationState>(Objects.entries(config.navigationStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
     this.perspectiveId = config.perspectiveId;
   }
@@ -101,15 +103,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Finds the URL of views based on the specified filter.
+   * Finds the outlets specified by the filter.
    *
    * @param findBy - Defines the search scope.
    * @param findBy.grid - Searches for views contained in the specified grid.
-   * @return outlets of views matching the filter criteria.
+   * @return outlets of views and desktop
    */
-  public viewOutlets(findBy?: {grid?: keyof Grids}): ViewOutlets {
-    const viewOutletEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._viewOutlets.get(view.id) ?? []]);
-    return Object.fromEntries(viewOutletEntries);
+  public outlets(findBy?: {grid?: keyof Grids}): Outlets {
+    const viewOutletEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._outlets.get(view.id) ?? []]);
+    return {
+      ...Object.fromEntries(viewOutletEntries),
+      [DESKTOP_OUTLET]: this._outlets.get(DESKTOP_OUTLET) ?? [],
+    };
   }
 
   /**
@@ -121,21 +126,24 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
     const navigationStateEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._navigationStates.get(view.id) ?? {}]);
-    return Object.fromEntries(navigationStateEntries);
+    return {
+      ...Object.fromEntries(navigationStateEntries),
+      [DESKTOP_OUTLET]: this._navigationStates.get(DESKTOP_OUTLET) ?? {},
+    };
   }
 
   /**
-   * Finds the navigational state of specified view.
+   * Finds the navigational state of specified view or desktop.
    */
-  public navigationState(findBy: {viewId: ViewId}): NavigationState {
-    return this._navigationStates.get(findBy.viewId) ?? {};
+  public navigationState(findBy: {id: string}): NavigationState {
+    return this._navigationStates.get(findBy.id) ?? {};
   }
 
   /**
-   * Finds the URL of specified view.
+   * Finds the URL by the specified outlet.
    */
-  public urlSegments(findBy: {viewId: ViewId}): UrlSegment[] {
-    return this._viewOutlets.get(findBy.viewId) ?? [];
+  public urlSegments(findBy: {outlet: string}): UrlSegment[] {
+    return this._outlets.get(findBy.outlet) ?? [];
   }
 
   /**
@@ -295,7 +303,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         if (findBy?.id !== undefined && !matchViewById(findBy.id)(view)) {
           return false;
         }
-        if (findBy?.segments && !findBy.segments.matches(this.urlSegments({viewId: view.id}))) {
+        if (findBy?.segments && !findBy.segments.matches(this.urlSegments({outlet: view.id}))) {
           return false;
         }
         if (findBy?.navigationHint !== undefined && findBy.navigationHint !== (view.navigation?.hint ?? null)) {
@@ -318,7 +326,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    if (WorkbenchLayouts.isViewId(id)) {
+    if (isViewId(id)) {
       workingCopy.__addView({id, uid: UID.randomUID()}, options);
     }
     else {
@@ -408,6 +416,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Returns the desktop model.
+   */
+  public get desktop(): MDesktop {
+    return this._desktop;
+  }
+
+  /**
    * Sets the split ratio for the two children of a {@link MTreeNode}.
    *
    * @param nodeId - The id of the node to set the split ratio for.
@@ -422,15 +437,25 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * @inheritDoc
+   */
+  public navigateDesktop(commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; cssClass?: string | string[]}): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__navigateDesktop(workingCopy.desktop, commands, extras);
+    return workingCopy;
+  }
+
+  /**
    * Serializes this layout into a URL-safe base64 string.
    */
-  public serialize(flags?: GridSerializationFlags): SerializedWorkbenchLayout {
+  public serialize(flags?: LayoutSerializationFlags): SerializedWorkbenchLayout {
     const isMainAreaEmpty = (this.mainAreaGrid?.root instanceof MPart && this.mainAreaGrid.root.views.length === 0) ?? true;
     return {
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
       mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
-      workbenchViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'workbench'})),
-      mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'mainArea'})),
+      desktop: this._serializer.serializeDesktop(this._desktop, flags),
+      workbenchOutlets: this._serializer.serializeOutlets(this.outlets({grid: 'workbench'})),
+      mainAreaOutlets: this._serializer.serializeOutlets(this.outlets({grid: 'mainArea'})),
     };
   }
 
@@ -514,7 +539,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove outlets and states of views contained in the part.
     part.views.forEach(view => {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
       this._navigationStates.delete(view.id);
     });
 
@@ -564,10 +589,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
     if (urlSegments.length) {
-      this._viewOutlets.set(view.id, urlSegments);
+      this._outlets.set(view.id, urlSegments);
     }
     else {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
     }
 
     if (extras?.state && Objects.keys(extras.state).length) {
@@ -583,6 +608,30 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       data: extras?.data,
       cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
     } satisfies MView['navigation']);
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __navigateDesktop(desktop: MDesktop, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; cssClass?: string | string[]}): void {
+    if (!commands.length && !extras?.hint && !extras?.relativeTo) {
+      throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
+    }
+
+    const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
+    if (urlSegments.length) {
+      this._outlets.set(DESKTOP_OUTLET, urlSegments);
+    }
+    else {
+      this._outlets.delete(DESKTOP_OUTLET);
+    }
+
+    desktop.navigation = Objects.withoutUndefinedEntries({
+      id: UID.randomUID(),
+      hint: extras?.hint,
+      data: extras?.data,
+      cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+    } satisfies MDesktop['navigation']);
   }
 
   /**
@@ -629,7 +678,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove outlet.
     if (options?.removeOutlet ?? true) {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
     }
 
     // Remove state.
@@ -717,9 +766,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const part = this.part({viewId: view.id});
 
-    if (this._viewOutlets.has(view.id)) {
-      this._viewOutlets.set(newViewId, this._viewOutlets.get(view.id)!);
-      this._viewOutlets.delete(view.id);
+    if (this._outlets.has(view.id)) {
+      this._outlets.set(newViewId, this._outlets.get(view.id)!);
+      this._outlets.delete(view.id);
     }
     if (this._navigationStates.has(view.id)) {
       this._navigationStates.set(newViewId, this._navigationStates.get(view.id)!);
@@ -821,8 +870,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
       mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
+      desktop: this._serializer.serializeDesktop(this._desktop),
       perspectiveId: this.perspectiveId,
-      viewOutlets: Object.fromEntries(this._viewOutlets),
+      outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),
       maximized: this._maximized,
     }));
@@ -871,22 +921,43 @@ function coerceMPartGrid(grid: string | MPartGrid | null | undefined, options: {
 }
 
 /**
- * Coerces {@link ViewOutlets}, applying necessary migrations if the serialized outlets are outdated.
+ * Coerces {@link Outlets}, applying necessary migrations if the serialized outlets are outdated.
  */
-function coerceViewOutlets(viewOutlets: string | ViewOutlets | null | undefined): ViewOutlets {
-  if (!viewOutlets) {
+function coerceOutlets(outlets: string | Outlets | null | undefined): Outlets {
+  if (!outlets) {
     return {};
   }
 
-  if (typeof viewOutlets === 'object') {
-    return viewOutlets;
+  if (typeof outlets === 'object') {
+    return outlets;
   }
 
   try {
-    return inject(WorkbenchLayoutSerializer).deserializeViewOutlets(viewOutlets);
+    return inject(WorkbenchLayoutSerializer).deserializeOutlets(outlets);
   }
   catch (error) {
-    inject(Logger).error('[SerializeError] Failed to deserialize view outlets. Please clear your browser storage and reload the application.', error);
+    inject(Logger).error('[SerializeError] Failed to deserialize outlets. Please clear your browser storage and reload the application.', error);
+    return {};
+  }
+}
+
+/**
+ * Coerces {@link MDesktop}.
+ */
+function coerceMDesktop(desktop: string | MDesktop | null | undefined): MDesktop {
+  if (!desktop) {
+    return {};
+  }
+
+  if (typeof desktop === 'object') {
+    return desktop;
+  }
+
+  try {
+    return inject(WorkbenchLayoutSerializer).deserializeDesktop(desktop);
+  }
+  catch (error) {
+    inject(Logger).error('[SerializeError] Failed to deserialize desktop. Please clear your browser storage and reload the application.', error);
     return {};
   }
 }
@@ -1005,7 +1076,7 @@ export class ViewActivationInstantProvider {
  * Creates a predicate to match a view by its primary or alternative id, depending on the type of the passed id.
  */
 function matchViewById(id: string): Predicate<MView> {
-  if (WorkbenchLayouts.isViewId(id)) {
+  if (isViewId(id)) {
     return view => view.id === id;
   }
   else {
@@ -1021,11 +1092,19 @@ function stringifyFilter(filter: {[property: string]: unknown}): string {
 }
 
 /**
+ * Tests if the given id matches the format of a view identifier (e.g., `view.1`, `view.2`, etc.).
+ */
+function isViewId(viewId: string | undefined | null): viewId is ViewId {
+  return Routing.isViewOutlet(viewId);
+}
+
+/**
  * Serialized artifacts of the workbench layout.
  */
 export interface SerializedWorkbenchLayout {
   workbenchGrid: string;
-  workbenchViewOutlets: string;
+  workbenchOutlets: string;
   mainAreaGrid: string | null;
-  mainAreaViewOutlets: string;
+  mainAreaOutlets: string;
+  desktop: string;
 }

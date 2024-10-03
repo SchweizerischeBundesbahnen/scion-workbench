@@ -63,7 +63,7 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
         path: 'test-pages/bulk-navigation-test-page',
         cssClass: 'e2e-test-bulk-navigation',
         title: 'Bulk Navigation Test',
-        pinToStartPage: true,
+        pinToDesktop: true,
       },
     });
 

@@ -75,7 +75,7 @@ test.describe('Workbench Popup', () => {
         properties: {
           path: 'test-popup',
           cssClass: 'testee',
-          pinToStartPage: true,
+          pinToDesktop: true,
           size: {
             width: '350px',
             height: '450px',

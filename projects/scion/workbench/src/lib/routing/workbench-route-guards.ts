@@ -11,8 +11,8 @@
 import {CanMatchFn} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './workbench-auxiliary-route-installer.service';
+import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
+import {Routing} from '../routing/routing.util';
 
 /**
  * Matches the route if target of a workbench view and navigating with the given hint.
@@ -49,11 +49,11 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 
     switch (condition) {
       case true:
-        return WorkbenchLayouts.isViewId(outlet);
+        return Routing.isViewOutlet(outlet);
       case false:
-        return !WorkbenchLayouts.isViewId(outlet);
+        return !Routing.isViewOutlet(outlet);
       default: { // hint
-        if (!WorkbenchLayouts.isViewId(outlet)) {
+        if (!Routing.isViewOutlet(outlet)) {
           return false;
         }
 
@@ -66,29 +66,62 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 }
 
 /**
- * Matches the route based on the active perspective.
+ * Matches the route if, or if not target of a workbench desktop.
  *
- * Can be used to have a different start page per perspective.
+ * Can be used to guard the application's root route from matching an empty path desktop navigation.
  */
-export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
+export function canMatchWorkbenchDesktop(navigationHint: string): CanMatchFn;
+export function canMatchWorkbenchDesktop(canMatch: boolean): CanMatchFn;
+export function canMatchWorkbenchDesktop(condition: string | boolean): CanMatchFn {
   return (): boolean => {
-    return inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout.perspectiveId === id;
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+
+    switch (condition) {
+      case true:
+        return Routing.isDesktopOutlet(outlet);
+      case false:
+        return !Routing.isDesktopOutlet(outlet);
+      default: { // hint
+        if (!Routing.isDesktopOutlet(outlet)) {
+          return false;
+        }
+
+        const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+        return layout.desktop.navigation?.hint === condition;
+      }
+    }
   };
 }
 
 /**
  * Matches if the view has been navigated.
  *
- * Does not match if no navigation information is available, e.g., during initial navigation because the layout is loaded asynchronously, or when closing the view.
+ * Does not match if no navigation information is available for the view, e.g., during initial navigation because the layout is loaded asynchronously, or when closing the view.
  */
-export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
+export const hasViewNavigation: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+  const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
 
-  if (!WorkbenchLayouts.isViewId(outlet)) {
-    throw Error(`[ViewError] CanMatchFn must be installed on a view auxiliary route. [outlet=${outlet}]`);
+  if (Routing.isViewOutlet(outlet)) {
+    const view = layout.view({viewId: outlet}, {orElse: null});
+    return !!view?.navigation;
   }
 
+  throw Error(`[WorkbenchError] Guard can only be installed on view auxiliary route. [outlet=${outlet}]`);
+};
+
+/**
+ * Matches if the desktop has been navigated.
+ *
+ * Does not match if no navigation information is available for the desktop, e.g., during initial navigation because the layout is loaded asynchronously.
+ */
+export const hasDesktopNavigation: CanMatchFn = (): boolean => {
+  const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
   const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
-  const view = layout.view({viewId: outlet}, {orElse: null});
-  return !!view?.navigation;
+
+  if (Routing.isDesktopOutlet(outlet)) {
+    return !!layout.desktop.navigation;
+  }
+
+  throw Error(`[WorkbenchError] Guard can only be installed on view auxiliary route. [outlet=${outlet}]`);
 };

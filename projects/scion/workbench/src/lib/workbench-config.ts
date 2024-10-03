@@ -29,11 +29,18 @@ export abstract class WorkbenchConfig {
   public abstract viewTabComponent?: ComponentType<unknown>;
 
   /**
-   * Specifies the component to display if no route matches the requested URL.
+   * Defines the component to display when no route matches the requested path.
    *
-   * This happens when navigating to a route that does not exist or when loading the application, and the routes have changed since the last use.
+   * This can happen when navigating to a non-existent route or after loading the application, if the routes have changed since the user's last session.
    *
-   * The component can inject {@link WorkbenchView} to get a reference to the view, e.g., to obtain the requested URL.
+   * The component is displayed for navigations in both views and the desktop.
+   *
+   * TODO [DWIE] Desktop is always available for injection.
+   *
+   * The component can read the requested path from {@link WorkbenchView}
+   * and {@link WorkbenchDesktop}, both injected with the `optional` flag set to `true`.
+   *
+   * The component can optional inject {@link WorkbenchView}
    */
   public abstract pageNotFoundComponent?: ComponentType<unknown>;
 

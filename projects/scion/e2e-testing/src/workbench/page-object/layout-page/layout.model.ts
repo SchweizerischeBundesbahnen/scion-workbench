@@ -30,6 +30,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public parts = new Array<PartDescriptor>();
   public views = new Array<ViewDescriptor>();
   public viewNavigations = new Array<ViewNavigationDescriptor>();
+  public desktopNavigation: DesktopNavigationDescriptor | undefined;
 
   public addInitialPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
     this.parts.push({id, activate: options?.activate});
@@ -72,6 +73,20 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       state: extras?.state,
       cssClass: extras?.cssClass,
     });
+    return this;
+  }
+
+  public navigateDesktop(commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout {
+    if (extras?.relativeTo) {
+      throw Error('[PageObjectError] Property `relativeTo` in `WorkbenchLayout.navigateDesktop` is not supported.');
+    }
+
+    this.desktopNavigation = {
+      commands,
+      hint: extras?.hint,
+      data: extras?.data,
+      cssClass: extras?.cssClass,
+    };
     return this;
   }
 
@@ -128,5 +143,15 @@ export interface ViewNavigationDescriptor {
   hint?: string;
   data?: NavigationData;
   state?: NavigationState;
+  cssClass?: string | string[];
+}
+
+/**
+ * Represents a desktop navigation in the layout.
+ */
+export interface DesktopNavigationDescriptor {
+  commands: Commands;
+  hint?: string;
+  data?: NavigationData;
   cssClass?: string | string[];
 }

@@ -120,3 +120,17 @@ export interface MView {
     cssClass?: string[];
   };
 }
+
+/**
+ * Represents the desktop in the layout.
+ *
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
+ */
+export interface MDesktop {
+  navigation?: {
+    id: string;
+    hint?: string;
+    data?: NavigationData;
+    cssClass?: string[];
+  };
+}

@@ -10,10 +10,12 @@
 
 import {Directive, ElementRef, EmbeddedViewRef, Input, OnChanges, OnDestroy, Optional, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {fromDimension$} from '@scion/toolkit/observable';
 import {setStyle} from '../common/dom.util';
-import {animationFrameScheduler, EMPTY, merge, Subject} from 'rxjs';
-import {filter, observeOn, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {ɵWorkbenchDesktop} from '../desktop/ɵworkbench-desktop.model';
+import {fromBoundingClientRect$} from '@scion/toolkit/observable';
 
 /**
  * Renders a given template as overlay. The template will stick to the bounding box of the host element of this directive.
@@ -35,7 +37,10 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
   @Input({alias: 'wbContentProjectionContent', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
   public contentTemplateRef!: TemplateRef<void>;
 
-  constructor(private _host: ElementRef<HTMLElement>, @Optional() private _view: ɵWorkbenchView) {
+  constructor(private _host: ElementRef<HTMLElement>,
+              @Optional() private _view: ɵWorkbenchView,
+              private _desktop: ɵWorkbenchDesktop,
+              public _workbenchLayoutService: WorkbenchLayoutService) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -56,13 +61,9 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
     // Position projected content out of the document flow relative to the page viewport.
     this.styleContent({position: 'fixed'});
 
-    // Align content each time the size of the host element changes, or when the content is attached to the DOM.
-    // For example, moving a view to another part of the same size will not trigger a dimension change event.
-    merge(fromDimension$(this._host.nativeElement), this._view?.portal.attached$.pipe(filter(Boolean)) ?? EMPTY)
-      .pipe(
-        observeOn(animationFrameScheduler), // Align to host boundaries right before the next repaint.
-        takeUntil(dispose$),
-      )
+    // Align content each time when the bounding box of the host element changes.
+    fromBoundingClientRect$(this._host.nativeElement)
+      .pipe(takeUntil(dispose$))
       .subscribe(() => {
         this.alignContentToHostBoundaries();
       });
@@ -73,6 +74,16 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
       .subscribe(attached => {
         this.setVisible(attached);
       });
+
+    // Hide content when contextual view is detached, e.g., if not active, or located in the peripheral area and the main area is maximized.
+    // TODO remove view and desktop handles from this directive
+    if (!this._view) {
+      this._desktop?.portal().attached$
+        .pipe(takeUntil(dispose$))
+        .subscribe(attached => {
+          this.setVisible(attached);
+        });
+    }
   }
 
   /**

@@ -109,17 +109,18 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   toBeRegistered(expected: {partId: string; active: boolean}, expectationFailOutput?: any): boolean;
 
   /**
-   * Expects the component displayed in the view to have the specified component state.
+   * Expects the component displayed in the view or desktop to have the specified component state.
    *
    * Queries state on an input element having the CSS class 'component-state'.
    *
-   * The actual value must be a view id.
+   * The actual value must be a view id or 'desktop'.
    *
    * ---
    * Usage:
    *
    * ```ts
    * expect('view.1').toHaveComponentState('A');
+   * expect('desktop').toHaveComponentState('B');
    * ```
    */
   toHaveComponentState(expected: string, expectationFailOutput?: any): boolean;

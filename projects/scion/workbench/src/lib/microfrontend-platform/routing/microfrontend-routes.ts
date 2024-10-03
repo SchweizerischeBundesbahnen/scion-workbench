@@ -9,19 +9,19 @@
  */
 
 import {CanMatchFn, Params, Route, UrlMatcher, UrlMatchResult, UrlSegment, UrlSegmentGroup} from '@angular/router';
-import {WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchViewCapability, ɵMicrofrontendRouteParams} from '@scion/workbench-client';
 import {inject, Injector} from '@angular/core';
 import {Commands} from '../../routing/routing.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {WorkbenchLayouts} from '../../layout/workbench-layouts.util';
 import {WorkbenchRouteData} from '../../routing/workbench-route-data';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
+import {Routing} from '../../routing/routing.util';
 
 /**
  * Provides functions and constants specific to microfrontend routes.
  */
-export const MicrofrontendViewRoutes = {
+export const MicrofrontendRoutes = {
 
   /**
    * Prefix to identify a microfrontend route.
@@ -44,27 +44,27 @@ export const MicrofrontendViewRoutes = {
    *
    * Example URL: `~/a538d2a;param1=value1;param2=value
    *
-   * @see MicrofrontendViewRoutes.createMicrofrontendNavigateCommands
+   * @see MicrofrontendRoutes.createMicrofrontendNavigateCommands
    */
   provideMicrofrontendRouteMatcher: (): UrlMatcher => {
     const injector = inject(Injector);
 
     return (segments: UrlSegment[], group: UrlSegmentGroup, route: Route): UrlMatchResult | null => {
       // Test if the path matches.
-      const microfrontendRoute = MicrofrontendViewRoutes.parseMicrofrontendRoute(segments);
+      const microfrontendRoute = MicrofrontendRoutes.parseMicrofrontendRoute(segments);
       if (!microfrontendRoute) {
         return null;
       }
 
       // Test if navigating a view.
       const outlet = route.data?.[WorkbenchRouteData.ɵoutlet];
-      if (!WorkbenchLayouts.isViewId(outlet)) {
+      if (!Routing.isViewOutlet(outlet)) {
         return null;
       }
 
       const {layout} = injector.get(ɵWorkbenchRouter).getCurrentNavigationContext();
-      const navigationState = layout.navigationState({viewId: outlet});
-      const transientParams = navigationState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
+      const navigationState = layout.navigationState({id: outlet});
+      const transientParams = navigationState[MicrofrontendRoutes.STATE_TRANSIENT_PARAMS] ?? {};
       const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);
 
       return {
@@ -82,14 +82,14 @@ export const MicrofrontendViewRoutes = {
    *
    * Format: ['~', '<capabilityId>, {params}]
    *
-   * @see MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher
+   * @see MicrofrontendRoutes.provideMicrofrontendRouteMatcher
    */
   createMicrofrontendNavigateCommands: (viewCapabilityId: string, params: Params): Commands => {
     if (Object.keys(params).length) {
-      return [MicrofrontendViewRoutes.ROUTE_PREFIX, viewCapabilityId, params];
+      return [MicrofrontendRoutes.ROUTE_PREFIX, viewCapabilityId, params];
     }
     else {
-      return [MicrofrontendViewRoutes.ROUTE_PREFIX, viewCapabilityId];
+      return [MicrofrontendRoutes.ROUTE_PREFIX, viewCapabilityId];
     }
   },
 
@@ -97,7 +97,7 @@ export const MicrofrontendViewRoutes = {
    * Tests given URL to be a microfrontend route.
    */
   parseMicrofrontendRoute: (segments: UrlSegment[]): {capabilityId: string; params: Params} | null => {
-    if (segments.length === 2 && segments[0].path === MicrofrontendViewRoutes.ROUTE_PREFIX) {
+    if (segments.length === 2 && segments[0].path === MicrofrontendRoutes.ROUTE_PREFIX) {
       return {
         capabilityId: segments[1].path,
         params: segments[1].parameters,
@@ -127,7 +127,7 @@ export const MicrofrontendViewRoutes = {
    * Matches the route if target of a view capability (microfrontend) and the capability exists.
    */
   canMatchViewCapability: ((_route: Route, segments: UrlSegment[]): boolean => {
-    const microfrontendRoute = MicrofrontendViewRoutes.parseMicrofrontendRoute(segments);
+    const microfrontendRoute = MicrofrontendRoutes.parseMicrofrontendRoute(segments);
     if (!microfrontendRoute) {
       return false;
     }
@@ -136,6 +136,30 @@ export const MicrofrontendViewRoutes = {
       return true; // match until started the microfrontend platform to avoid flickering.
     }
 
-    return inject(ManifestObjectCache).hasCapability(microfrontendRoute.capabilityId);
+    return inject(ManifestObjectCache).getCapability(microfrontendRoute.capabilityId, {orElse: null})?.type === WorkbenchCapabilities.View;
+  }) satisfies CanMatchFn,
+
+  /**
+   * Matches the route if target of a perspective capability (microfrontend) and the capability exists.
+   *
+   * @see provideMicrofrontendDesktopRoute
+   */
+  canMatchPerspectiveCapability: ((_route: Route, _segments: UrlSegment[]): boolean => {
+    if (MicrofrontendPlatform.state !== PlatformState.Started) {
+      return true; // match until started the microfrontend platform to avoid flickering.
+    }
+
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+
+    if (!layout.desktop.navigation) {
+      return false;
+    }
+
+    const capabilityId = layout.desktop.navigation.data?.['capabilityId'] as string | undefined;
+    if (!capabilityId) {
+      return false;
+    }
+
+    return inject(ManifestObjectCache).getCapability(capabilityId, {orElse: null})?.type === WorkbenchCapabilities.Perspective;
   }) satisfies CanMatchFn,
 } as const;

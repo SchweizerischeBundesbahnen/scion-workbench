@@ -27,8 +27,8 @@ import {ViewPO} from '../../view.po';
  * For that reason, we re-declare workbench capability interfaces and replace their `type` property (enum) with a string literal.
  */
 export type WorkbenchPerspectiveCapability = Omit<_WorkbenchPerspectiveCapability, 'type'> & {type: 'perspective'};
-export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
-export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToStartPage?: boolean; path: string | '<null>' | '<undefined>'}};
+export type WorkbenchViewCapability = Omit<_WorkbenchViewCapability, 'type'> & {type: 'view'; properties: {pinToDesktop?: boolean; path: string | '<null>' | '<undefined>'}};
+export type WorkbenchPopupCapability = Omit<_WorkbenchPopupCapability, 'type'> & {type: 'popup'; properties: {pinToDesktop?: boolean; path: string | '<null>' | '<undefined>'}};
 export type WorkbenchDialogCapability = Omit<_WorkbenchDialogCapability, 'type'> & {type: 'dialog'; properties: {path: string | '<null>' | '<undefined>'}};
 export type WorkbenchMessageBoxCapability = Omit<_WorkbenchMessageBoxCapability, 'type'> & {type: 'messagebox'; properties: {path: string | '<null>' | '<undefined>'}};
 
@@ -145,6 +145,18 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
         }
       }
     }
+
+    // Enter desktop navigation.
+    const desktop = capability.properties.desktop;
+    if (desktop) {
+      const desktopLocator = this.locator.locator('section.e2e-desktop');
+      await desktopLocator.locator('button.e2e-add-desktop').click();
+      await desktopLocator.locator('input.e2e-path').fill(desktop.path);
+      await desktopLocator.locator('input.e2e-class').fill(coerceArray(desktop.cssClass).join(' '));
+      if (desktop.showSplash !== undefined) {
+        await new SciCheckboxPO(desktopLocator.locator('sci-checkbox.e2e-show-splash')).toggle(desktop.showSplash);
+      }
+    }
   }
 
   private async enterViewCapabilityProperties(capability: WorkbenchViewCapability): Promise<void> {
@@ -166,8 +178,8 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
-    if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+    if (capability.properties.pinToDesktop !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-desktop')).toggle(capability.properties.pinToDesktop);
     }
   }
 
@@ -200,8 +212,8 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     if (capability.properties.showSplash !== undefined) {
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
-    if (capability.properties.pinToStartPage !== undefined) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-startpage')).toggle(capability.properties.pinToStartPage);
+    if (capability.properties.pinToDesktop !== undefined) {
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-desktop')).toggle(capability.properties.pinToDesktop);
     }
   }
 

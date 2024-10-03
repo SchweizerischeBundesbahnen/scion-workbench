@@ -32,7 +32,7 @@ import {Routing} from './routing.util';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
-import {canMatchNotFoundPage} from './workbench-route-guards';
+import {hasViewNavigation} from './workbench-route-guards';
 import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
 import {WorkbenchViewOutletDiffer} from './workbench-view-outlet-differ';
 import {filter} from 'rxjs/operators';
@@ -137,10 +137,11 @@ export class WorkbenchUrlObserver {
         return previousLayout?.mainAreaGrid;
       })(),
       workbenchGrid: workbenchNavigationalState?.workbenchGrid ?? previousLayout?.workbenchGrid,
+      desktop: workbenchNavigationalState?.desktop ?? this._workbenchLayoutService.layout()?.desktop,
       perspectiveId: workbenchNavigationalState?.perspectiveId ?? previousLayout?.perspectiveId,
       maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
       navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
-      viewOutlets: Object.fromEntries(Routing.parseViewOutlets(urlTree)),
+      outlets: Object.fromEntries(Routing.parseOutlets(urlTree, {view: true, desktop: true})),
     });
 
     const undoActions = new Array<() => void>();
@@ -179,7 +180,7 @@ export class WorkbenchUrlObserver {
     // Register view auxiliary routes.
     const addedViewOutlets = navigationContext.viewOutletDiff.addedViewOutlets;
     if (addedViewOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {canMatchNotFoundPage: [canMatchNotFoundPage]});
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {canMatchNotFoundPage: [hasViewNavigation]});
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 

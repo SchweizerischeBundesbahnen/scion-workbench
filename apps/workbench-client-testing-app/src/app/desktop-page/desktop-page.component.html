@@ -1,0 +1,42 @@
+<section>
+  <sci-form-field label="App Instance" title="Unique identifier of this app instance">
+    <span class="e2e-app-instance-id">{{appInstanceId}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Component Instance" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
+  </sci-form-field>
+
+  <sci-form-field label="Path">
+    <span class="e2e-path">{{location.path()}}</span>
+  </sci-form-field>
+</section>
+
+@if (route.params | async | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_params">
+      <header>Route Params</header>
+    </ng-template>
+    <ng-template #panel_route_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+<section>
+  <header>Route Data</header>
+
+  @if (route.snapshot.params | appNullIfEmpty; as params) {
+    <section>
+      <header>Route Params</header>
+      <sci-key-value [object]="params" class="e2e-route-params"/>
+    </section>
+  }
+
+  @if (route.snapshot.data | appNullIfEmpty; as data) {
+    <section>
+      <header>Route Data</header>
+      <sci-key-value [object]="data" class="e2e-route-data"/>
+    </section>
+  }
+</section>

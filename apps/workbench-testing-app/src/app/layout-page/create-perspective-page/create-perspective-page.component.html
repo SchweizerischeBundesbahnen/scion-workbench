@@ -26,6 +26,11 @@
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals$ | async"/>
   </section>
 
+  <section>
+    <header>Desktop Navigation</header>
+    <app-navigate-desktop [formControl]="form.controls.desktopNavigation"/>
+  </section>
+
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>Register</button>
 </form>
 

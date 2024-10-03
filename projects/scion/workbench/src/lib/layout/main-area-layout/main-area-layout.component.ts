@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Inject} from '@angular/core';
+import {Component, HostBinding, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MPartGrid} from '../workbench-layout.model';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -21,6 +21,8 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
+import {WorkbenchPortalOutletDirective} from '../../portal/workbench-portal-outlet.directive';
+import {ɵWorkbenchDesktop} from '../../desktop/ɵworkbench-desktop.model';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -57,19 +59,21 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
     RouterOutlet,
     SciViewportComponent,
     GridElementIfVisiblePipe,
+    WorkbenchPortalOutletDirective,
   ],
 })
 export class MainAreaLayoutComponent {
 
+  private _workbenchId = inject(WORKBENCH_ID);
+  private _part = inject(ɵWorkbenchPart);
+  private _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private _viewDragService = inject(ViewDragService);
+
+  protected desktop = inject(ɵWorkbenchDesktop);
+
   @HostBinding('attr.data-partid')
   protected get partId(): string {
     return this._part.id;
-  }
-
-  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _part: ɵWorkbenchPart,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _viewDragService: ViewDragService) {
   }
 
   protected get mainAreaGrid(): MPartGrid {

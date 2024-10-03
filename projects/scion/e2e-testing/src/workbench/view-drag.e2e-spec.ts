@@ -598,9 +598,9 @@ test.describe('View Drag', () => {
     });
   });
 
-  test.describe('drag to start page', () => {
+  test.describe('drag to desktop', () => {
 
-    test('should drop view on start page of the main area (grid root is MPart)', async ({appPO, workbenchNavigator}) => {
+    test('should drop view on desktop of the main area (grid root is MPart)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
@@ -610,7 +610,7 @@ test.describe('View Drag', () => {
         .navigateView('testee', ['test-view']),
       );
 
-      // Drop view on the start page of the main area.
+      // Drop view on the desktop of the main area.
       const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
       await testeeViewPage.view.tab.dragTo({grid: 'mainArea', region: 'center'});
 
@@ -619,7 +619,7 @@ test.describe('View Drag', () => {
       await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
     });
 
-    test('should drop view on start page of the main area (grid root is MTreeNode)', async ({appPO, workbenchNavigator}) => {
+    test('should drop view on desktop of the main area (grid root is MTreeNode)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
@@ -635,7 +635,7 @@ test.describe('View Drag', () => {
         .addPart('main-right', {relativeTo: activePartId, align: 'right'}),
       );
 
-      // Drop view on the start page of the main area.
+      // Drop view on the desktop of the main area.
       const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
       await testeeViewPage.view.tab.dragTo({grid: 'mainArea', region: 'center'});
 

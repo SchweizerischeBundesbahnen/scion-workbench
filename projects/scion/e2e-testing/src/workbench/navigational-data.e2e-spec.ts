@@ -12,6 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {DesktopPagePO} from './page-object/desktop-page.po';
 
 test.describe('Navigational Data', () => {
 
@@ -39,6 +40,17 @@ test.describe('Navigational Data', () => {
 
     const viewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
     await expect.poll(() => viewPage.getNavigationData()).toEqual({some: 'data'});
+  });
+
+  test('should pass data (WorkbenchLayout.navigateDesktop)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.modifyLayout(layout => layout
+      .navigateDesktop(['test-desktop'], {data: {some: 'data'}, cssClass: 'testee'}),
+    );
+
+    const desktopPage = new DesktopPagePO(appPO, {cssClass: 'testee'});
+    await expect.poll(() => desktopPage.getNavigationData()).toEqual({some: 'data'});
   });
 
   test('should preserve data type of data', async ({appPO, workbenchNavigator}) => {

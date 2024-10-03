@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef} from '@angular/core';
+import {Component, forwardRef, signal} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {noop, Observable} from 'rxjs';
@@ -52,12 +52,18 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
   protected form = this._formBuilder.group({
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.array<FormGroup<PartFormGroup>>([]),
+    desktop: this._formBuilder.group({
+      path: this._formBuilder.control<string | undefined>(undefined),
+      cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
+      showSplash: this._formBuilder.control<boolean | undefined>(undefined),
+    }),
   });
 
   protected MAIN_AREA = MAIN_AREA;
   protected relativeToList = `relative-to-list-${UUID.randomUUID()}`;
   protected partIdList = `partid-list-${UUID.randomUUID()}`;
   protected partProposals$: Observable<string[]>;
+  protected navigateDesktop = signal(false);
 
   constructor(private _formBuilder: NonNullableFormBuilder) {
     this.form.valueChanges
@@ -79,6 +85,11 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
         this._cvaChangeFn({
           layout: parts as WorkbenchPerspectiveCapabilityLayout,
           data: SciKeyValueFieldComponent.toDictionary(this.form.controls.data) ?? undefined,
+          desktop: this.navigateDesktop() ? {
+            path: this.form.controls.desktop.controls.path.value!,
+            cssClass: this.form.controls.desktop.controls.cssClass.value,
+            showSplash: this.form.controls.desktop.controls.showSplash.value,
+          } : undefined,
         });
         this._cvaTouchedFn();
       });
@@ -199,6 +210,14 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
    */
   public validate(control: AbstractControl): ValidationErrors | null {
     return this.form.valid ? null : {valid: false};
+  }
+
+  public onAddDesktopNavigation(): void {
+    this.navigateDesktop.set(true);
+  }
+
+  public onRemoveDesktopNavigation(): void {
+    this.navigateDesktop.set(false);
   }
 }
 

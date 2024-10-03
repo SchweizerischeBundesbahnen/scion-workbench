@@ -1,0 +1,21 @@
+<form [formGroup]="form">
+  <span>Path</span>
+  <span>Hint</span>
+  <span>Data</span>
+  <span>CSS Class(es)</span>
+  @if (navigateDesktop()) {
+    <!-- Remove button -->
+    <button class="e2e-remove" (click)="onRemoveNavigation()" title="Remove navigation" sciMaterialIcon>remove</button>
+    <!-- Commands -->
+    <app-router-commands [formControl]="form.controls.commands"/>
+    <!-- Hint -->
+    <input [formControl]="form.controls.extras.controls.hint" class="e2e-hint">
+    <!-- Data -->
+    <app-record [formControl]="form.controls.extras.controls.data" class="e2e-data"/>
+    <!-- CSS class -->
+    <app-css-class [formControl]="form.controls.extras.controls.cssClass"/>
+  } @else {
+    <!-- Add button -->
+    <button (click)="onAddNavigation()" class="e2e-add" title="Add navigation" sciMaterialIcon>add</button>
+  }
+</form>
