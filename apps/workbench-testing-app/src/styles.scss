@@ -6,16 +6,13 @@
 
 html {
   font-size: 14px; // defines 1rem as 14px
-  width: 100vw;
-  height: 100vh;
 }
 
 body {
   font-family: Roboto, Arial, sans-serif;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-primary);
-  width: 100vw;
-  height: 100vh;
+  height: 100%;
   margin: 0;
 }
 

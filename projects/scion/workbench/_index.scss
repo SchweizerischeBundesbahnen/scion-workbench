@@ -144,6 +144,7 @@
 @use '@angular/cdk';
 @use './design/workbench-light-theme-design-tokens';
 @use './design/workbench-dark-theme-design-tokens';
+@use './design/workbench-global-styles' as workbench;
 @use './design/workbench-icon-font' as workbench-icons;
 @use './design/workbench-popup-global-styles' as workbench-popup;
 @use './design/workbench-view-drag-image-global-styles' as workbench-view-drag-image;
@@ -163,6 +164,7 @@ $icon-font: null !default;
 @include workbench-icons.install-icon-font($icon-font);
 
 // Install global workbench styles
+@include workbench.install-global-styles();
 @include workbench-popup.install-global-styles();
 @include workbench-view-drag-image.install-global-styles();
 @include workbench-dialog.install-global-styles();
