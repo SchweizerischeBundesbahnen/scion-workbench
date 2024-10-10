@@ -10,10 +10,12 @@
 
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchComponent} from './workbench.component';
-import {WorkbenchLauncher} from './startup/workbench-launcher.service';
+import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
 import {waitForInitialWorkbenchLayout} from './testing/testing.util';
 import {Arrays} from '@scion/toolkit/util';
+import {provideWorkbench} from './workbench.provider';
+import {Router} from '@angular/router';
 
 describe('Workbench', () => {
 
@@ -28,13 +30,22 @@ describe('Workbench', () => {
   });
 
   it(`should not error if calling 'provideWorkbench()' before adding workbench component`, async () => {
-    TestBed.configureTestingModule({providers: [provideWorkbenchForTest()]});
+    TestBed.configureTestingModule({
+      providers: [provideWorkbench()],
+    });
+    TestBed.inject(Router).initialNavigation();
+
     expect(() => TestBed.createComponent(WorkbenchComponent)).not.toThrowError();
+    await expectAsync(TestBed.inject(WorkbenchStartup).whenStarted).toBeResolved();
   });
 
   it(`should not error if calling 'provideWorkbench()' before starting the workbench`, async () => {
-    TestBed.configureTestingModule({providers: [provideWorkbenchForTest()]});
-    expect(() => TestBed.inject(WorkbenchLauncher).launch()).not.toThrowError();
+    TestBed.configureTestingModule({
+      providers: [provideWorkbench()],
+    });
+    TestBed.inject(Router).initialNavigation();
+
+    await expectAsync(TestBed.inject(WorkbenchLauncher).launch()).toBeResolved();
   });
 
   /**
