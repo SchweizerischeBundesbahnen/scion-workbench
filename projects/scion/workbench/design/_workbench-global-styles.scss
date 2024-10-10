@@ -1,0 +1,18 @@
+/**
+ * Adds styles required by the workbench to the document root (`<html>`) element.
+ */
+@mixin install-global-styles() {
+  // Ensure the CSS layer of @scion/workbench to have higher precedence than the CSS layer of @scion/toolkit.
+  @layer sci-toolkit, sci-workbench;
+
+  // Declare styles for the document root element (`<html>`) in a CSS layer.
+  // CSS layers have lower priority than "regular" CSS declarations, and the layer name indicates the styles are from @scion/workbench.
+  @layer sci-workbench {
+    :root {
+      // Ensure the document root element is positioned to support `@scion/toolkit/observable/fromBoundingClientRect$` for observing element bounding boxes.
+      position: absolute;
+      // Align the document root with the page viewport so the top-level positioning context fills the page viewport (as expected by applications).
+      inset: 0;
+    }
+  }
+}
