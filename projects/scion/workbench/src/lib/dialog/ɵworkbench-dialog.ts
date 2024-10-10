@@ -20,7 +20,7 @@ import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {setStyle} from '../common/dom.util';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {fromResize$} from '@scion/toolkit/observable';
 import {subscribeInside} from '@scion/toolkit/operators';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {WORKBENCH_ELEMENT_REF} from '../content-projection/view-container.reference';
@@ -92,7 +92,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   public async open(): Promise<R | undefined> {
     // Wait for the overlay to be initially positioned to have a smooth slide-in animation.
     if (this.animate) {
-      await firstValueFrom(fromDimension$(this._overlayRef.hostElement));
+      await firstValueFrom(fromResize$(this._overlayRef.hostElement));
     }
 
     // Attach the dialog portal to the overlay.
@@ -352,8 +352,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
       hostElement$
         .pipe(
-          switchMap(hostElement => hostElement ? fromDimension$(hostElement) : EMPTY),
-          map(({element: hostElement}) => hostElement.getBoundingClientRect()),
+          switchMap(hostElement => hostElement ? fromResize$(hostElement).pipe(map(() => hostElement.getBoundingClientRect())) : EMPTY),
           subscribeInside(fn => this._zone.runOutsideAngular(fn)),
           takeUntilDestroyed(),
         )

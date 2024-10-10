@@ -10,7 +10,7 @@
 
 import {Directive, ElementRef, EmbeddedViewRef, Input, OnChanges, OnDestroy, Optional, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {fromResize$} from '@scion/toolkit/observable';
 import {setStyle} from '../common/dom.util';
 import {animationFrameScheduler, EMPTY, merge, Subject} from 'rxjs';
 import {filter, observeOn, takeUntil} from 'rxjs/operators';
@@ -58,7 +58,7 @@ export class ContentProjectionDirective implements OnChanges, OnDestroy {
 
     // Align content each time the size of the host element changes, or when the content is attached to the DOM.
     // For example, moving a view to another part of the same size will not trigger a dimension change event.
-    merge(fromDimension$(this._host.nativeElement), this._view?.portal.attached$.pipe(filter(Boolean)) ?? EMPTY)
+    merge(fromResize$(this._host.nativeElement), this._view?.portal.attached$.pipe(filter(Boolean)) ?? EMPTY)
       .pipe(
         observeOn(animationFrameScheduler), // Align to host boundaries right before the next repaint.
         takeUntil(dispose$),

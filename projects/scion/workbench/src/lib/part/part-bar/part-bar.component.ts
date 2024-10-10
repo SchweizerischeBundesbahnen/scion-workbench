@@ -8,24 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, HostListener, Inject, NgZone, OnInit, untracked, viewChild, viewChildren} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, HostListener, Inject, Injector, NgZone, OnInit, runInInjectionContext, untracked, viewChild, viewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {filter, map, mergeMap, take, takeUntil} from 'rxjs/operators';
-import {animationFrameScheduler, combineLatest, firstValueFrom, from, interval, Observable, Subject} from 'rxjs';
+import {animationFrameScheduler, firstValueFrom, from, interval, Observable, Subject} from 'rxjs';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
-import {filterArray, mapArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {filterArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {SciDimensionModule} from '@scion/components/dimension';
+import {fromDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {AsyncPipe} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {fromResize$} from '@scion/toolkit/observable';
 import {WORKBENCH_ID} from '../../workbench-id';
 
 /**
@@ -59,7 +59,7 @@ import {WORKBENCH_ID} from '../../workbench-id';
   imports: [
     AsyncPipe,
     SciViewportComponent,
-    SciDimensionModule,
+    SciDimensionDirective,
     ViewTabComponent,
     PartActionBarComponent,
     ViewListButtonComponent,
@@ -128,7 +128,8 @@ export class PartBarComponent implements OnInit {
               private _viewTabDragImageRenderer: ViewTabDragImageRenderer,
               private _viewDragService: ViewDragService,
               private _destroyRef: DestroyRef,
-              private _zone: NgZone) {
+              private _zone: NgZone,
+              private _injector: Injector) {
     this._host = host.nativeElement;
     this.dragover$ = this._viewDragService.tabbarDragOver$.pipe(map(partId => partId === this.part.id));
     this.installActiveViewScroller();
@@ -137,8 +138,8 @@ export class PartBarComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.installTabbarIndentSizeDetector();
-    this.installViewportClientSizeDetector();
+    runInInjectionContext(this._injector, () => this.installTabbarIndentSizeDetector());
+    runInInjectionContext(this._injector, () => this.installViewportClientSizeDetector());
   }
 
   @HostListener('dblclick', ['$event'])
@@ -470,10 +471,10 @@ export class PartBarComponent implements OnInit {
   }
 
   private installViewportClientSizeDetector(): void {
-    fromDimension$(this._viewportComponent().viewportClientElement)
+    fromResize$(this._viewportComponent().viewportClientElement)
       .pipe(
         subscribeInside(fn => this._zone.run(fn)),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         NgZone.assertInAngularZone();
@@ -482,17 +483,14 @@ export class PartBarComponent implements OnInit {
   }
 
   private installTabbarIndentSizeDetector(): void {
-    combineLatest([fromDimension$(this._tabCornerRadiusElement().nativeElement), fromDimension$(this._paddingInlineElement().nativeElement)])
-      .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        mapArray(dimension => dimension.clientWidth),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(([tabCornerRadius, paddingInline]) => {
-        NgZone.assertNotInAngularZone();
-        this._tabbarIndent = {left: tabCornerRadius + paddingInline, right: tabCornerRadius + paddingInline};
-        setCssVariable(this._host, {'--ɵpart-bar-indent-left': `${this._tabbarIndent.left}px`});
-        setCssVariable(this._host, {'--ɵpart-bar-indent-right': `${this._tabbarIndent.right}px`});
-      });
+    const tabCornerRadiusDimension = fromDimension(this._tabCornerRadiusElement());
+    const paddingInlineDimension = fromDimension(this._paddingInlineElement());
+
+    effect(() => {
+      const indent = tabCornerRadiusDimension().clientWidth + paddingInlineDimension().clientWidth;
+      this._tabbarIndent = {left: indent, right: indent};
+      setCssVariable(this._host, {'--ɵpart-bar-indent-left': `${this._tabbarIndent.left}px`});
+      setCssVariable(this._host, {'--ɵpart-bar-indent-right': `${this._tabbarIndent.right}px`});
+    });
   }
 }
