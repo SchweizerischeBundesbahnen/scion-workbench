@@ -12,6 +12,9 @@ import {TestBed} from '@angular/core/testing';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideWorkbench} from './workbench.provider';
+import {provideWorkbenchForTest} from './testing/workbench.provider';
+import {waitForInitialWorkbenchLayout} from './testing/testing.util';
+import {Arrays} from '@scion/toolkit/util';
 
 describe('Workbench', () => {
 
@@ -37,5 +40,68 @@ describe('Workbench', () => {
       providers: [provideWorkbench()],
     });
     expect(() => TestBed.inject(WorkbenchLauncher)).not.toThrowError();
+  });
+
+  /**
+   * This test:
+   * - Asserts the document root element to be positioned to support `@scion/toolkit/observable/fromBoundingClientRect$` for observing element bounding boxes.
+   * - Asserts the document root to be aligned with the page viewport so the top-level positioning context fills the page viewport (as expected by applications).
+   */
+  it('should position document root element (html) and fill page viewport', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+    const fixture = TestBed.createComponent(WorkbenchComponent);
+    await waitForInitialWorkbenchLayout();
+
+    // Expect document root to be positioned and to fill the page viewport.
+    expect(getComputedStyle(document.documentElement)).toEqual(jasmine.objectContaining({
+      position: 'absolute',
+      inset: '0px',
+    }));
+
+    // Align workbench element with page viewport.
+    fixture.debugElement.nativeElement.style.position = 'absolute';
+    fixture.debugElement.nativeElement.style.inset = '0';
+
+    // Expect workbench element to fill page viewport.
+    expect(getComputedStyle(fixture.debugElement.nativeElement)).toEqual(jasmine.objectContaining({
+      width: `${document.documentElement.clientWidth}px`,
+      height: `${document.documentElement.clientHeight}px`,
+    }));
+  });
+
+  it('should allow overriding positioning of document root element (html)', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+    const fixture = TestBed.createComponent(WorkbenchComponent);
+    await waitForInitialWorkbenchLayout();
+
+    // Override positioning of root element.
+    const styleSheet = new CSSStyleSheet();
+    styleSheet.insertRule(`
+    html {
+      position: relative;
+      height: 100%;
+    }`);
+    document.adoptedStyleSheets.push(styleSheet);
+
+    // Expect overrides to be applied.
+    expect(getComputedStyle(document.documentElement)).toEqual(jasmine.objectContaining({
+      position: 'relative',
+    }));
+
+    // Align workbench element with page viewport.
+    fixture.debugElement.nativeElement.style.position = 'absolute';
+    fixture.debugElement.nativeElement.style.inset = '0';
+
+    // Expect workbench element to fill page viewport.
+    expect(getComputedStyle(fixture.debugElement.nativeElement)).toEqual(jasmine.objectContaining({
+      width: `${document.documentElement.clientWidth}px`,
+      height: `${document.documentElement.clientHeight}px`,
+    }));
+
+    fixture.componentRef.onDestroy(() => Arrays.remove(document.adoptedStyleSheets, styleSheet));
   });
 });
