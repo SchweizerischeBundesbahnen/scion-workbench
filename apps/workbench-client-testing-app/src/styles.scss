@@ -7,16 +7,13 @@
 
 html {
   font-size: 14px; // defines 1rem as 14px
-  width: 100vw;
-  height: 100vh;
 }
 
 body {
   font-family: Roboto, Arial, sans-serif;
   color: var(--sci-color-text);
   background-color: unset; // Do not set the background color in microfrontends to inherit it from the embedding context of the workbench, such as view or dialog.
-  width: 100vw;
-  height: 100vh;
+  height: 100%;
   margin: 0;
 }
 
