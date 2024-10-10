@@ -32,17 +32,20 @@
       ]
     }
     /*
-     * +================================================================================================+
-     * | ## PATH-OVERRIDE-FOR-DEVELOPMENT                                                               |
-     * | ## DO NOT ACTIVATE FOR PRODUCTION!                                                             |
-     * |                                                                                                |
-     * | To debug dependent modules, please uncomment lines accordingly.                                |
-     * | The most specific paths win, or the latter with equal specificity.                             |
-     * |                                                                                                |
-     * | To debug external SCION dependencies:                                                          |
-     * | - clone repositories into a directory next to the workbench checkout folder.                   |
-     * | - execute `npm run scion-src-lib:copy`.                                                        |
-     * +================================================================================================+
+     * +============================================================================================================================+
+     * | ## PATH-OVERRIDE-FOR-DEVELOPMENT                                                                                           |
+     * | ## DO NOT ACTIVATE FOR PRODUCTION!                                                                                         |
+     * |                                                                                                                            |
+     * | To debug dependent modules, please uncomment lines accordingly.                                                            |
+     * | The most specific paths win, or the latter with equal specificity.                                                         |
+     * |                                                                                                                            |
+     * | ## To debug dependent SCION libraries:                                                                                     |
+     * | 1. Clone repositories into a directory at the same level as the workbench checkout folder:                                 |
+     * |    ├── scion-workbench                                                                                                     |
+     * |    ├── scion-toolkit (git clone git@github.com:SchweizerischeBundesbahnen/scion-toolkit.git)                               |
+     * |    ├── scion-microfrontend-platform (git clone git@github.com:SchweizerischeBundesbahnen/scion-microfrontend-platform.git) |
+     * | 2. Run `npm run copy-src` to copy their source into the `src-lib` folder.                                                  |
+     * +============================================================================================================================+
      */
     //    "paths": {
     //      "@scion/workbench": [

@@ -53,7 +53,14 @@ ng cache disable
 
 To enable hot code replacement for `@scion/workbench` and `@scion/workbench-client`, uncomment the `PATH-OVERRIDE-FOR-DEVELOPMENT` section in the `tsconfig.json` file.
 
-*Optional*: To debug dependent SCION libraries, such as `@scion/toolkit`, `@scion/components`, or `@scion/microfrontend-platform`, clone [scion-toolkit](https://github.com/SchweizerischeBundesbahnen/scion-toolkit) and [scion-microfrontend-platform](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform) repositories into a directory next to the workbench checkout folder. Then run `npm run scion-src-lib:copy` to copy their sources into the `src-lib` folder. This folder is referenced in the path overrides in `tsconfig.json`.
+*Optional*: To debug dependent SCION libraries:
+1. Clone repositories into a directory at the same level as the workbench checkout folder:
+   ``` 
+   ├── scion-workbench
+   ├── scion-toolkit (git clone git@github.com:SchweizerischeBundesbahnen/scion-toolkit.git)
+   ├── scion-microfrontend-platform (git clone git@github.com:SchweizerischeBundesbahnen/scion-microfrontend-platform.git)
+   ```
+2. Run `npm run copy-src` to copy their source into the `src-lib` folder. This folder is referenced in the path overrides in `tsconfig.json`.
 
 **Commands for working on the @scion/workbench library**
  
