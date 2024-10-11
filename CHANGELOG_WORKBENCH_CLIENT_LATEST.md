@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* **workbench-client:** position document root as required by @scion/toolkit ([007e9c3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/007e9c396dff4c2dde11c62d810b5997c034eca2))
+* **workbench-client:** position document root as required by `@scion/toolkit` ([007e9c3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/007e9c396dff4c2dde11c62d810b5997c034eca2))
 
 
 
