@@ -1,7 +1,7 @@
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, Type} from '@angular/core';
+import {booleanAttribute, Component, DestroyRef, effect, EnvironmentInjector, inject, InjectionToken, Injector, input, Type} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchDialogService} from './workbench-dialog.service';
@@ -351,6 +351,99 @@ describe('Dialog', () => {
 
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should allow updating dialog properties in an effect (without enabling `allowSignalWrites`)', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideWorkbenchForTest()],
+    });
+
+    @Component({
+      selector: 'spec-dialog',
+      template: 'dialog',
+      standalone: true,
+    })
+    class SpecDialogComponent {
+
+      public title = input<string>();
+      public padding = input(undefined, {transform: booleanAttribute});
+      public closable = input(undefined, {transform: booleanAttribute});
+      public resizable = input(undefined, {transform: booleanAttribute});
+      public cssClass = input<string>();
+      public minWidth = input<string>();
+      public width = input<string>();
+      public maxWidth = input<string>();
+      public minHeight = input<string>();
+      public height = input<string>();
+      public maxHeight = input<string>();
+
+      constructor(dialog: WorkbenchDialog) {
+        effect(() => {
+          dialog.title = this.title();
+          dialog.padding = this.padding() ?? true;
+          dialog.closable = this.closable() ?? true;
+          dialog.resizable = this.resizable() ?? true;
+          dialog.cssClass = this.cssClass() ?? [];
+          dialog.size.minWidth = this.minWidth();
+          dialog.size.width = this.width();
+          dialog.size.maxWidth = this.maxWidth();
+          dialog.size.minHeight = this.minHeight();
+          dialog.size.height = this.height();
+          dialog.size.maxHeight = this.maxHeight();
+        });
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    const workbenchDialogService = TestBed.inject(WorkbenchDialogService);
+
+    // Set title.
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {title: 'TITLE'}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).title()).toEqual('TITLE');
+    getDialog({cssClass: 'testee'}).close();
+
+    // Set padding.
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {padding: false}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).padding()).toBeFalse();
+    getDialog({cssClass: 'testee'}).close();
+
+    // Set closable.
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {closable: false}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).closable()).toBeFalse();
+    getDialog({cssClass: 'testee'}).close();
+
+    // Set resizable.
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {resizable: false}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).resizable()).toBeFalse();
+    getDialog({cssClass: 'testee'}).close();
+
+    // Set CSS class.
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {cssClass: 'cssclass'}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).cssClass()).toContain('cssclass');
+    getDialog({cssClass: 'testee'}).close();
+
+    // Set size (width).
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {minWidth: '100px', width: '200px', maxWidth: '300px'}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).size.minWidth()).toEqual('100px');
+    expect(getDialog({cssClass: 'testee'}).size.width()).toEqual('200px');
+    expect(getDialog({cssClass: 'testee'}).size.maxWidth()).toEqual('300px');
+    getDialog({cssClass: 'testee'}).close();
+
+    // Set size (height).
+    workbenchDialogService.open(SpecDialogComponent, {cssClass: 'testee', inputs: {minHeight: '100px', height: '200px', maxHeight: '300px'}}).then();
+    await waitUntilStable();
+    expect(getDialog({cssClass: 'testee'}).size.minHeight()).toEqual('100px');
+    expect(getDialog({cssClass: 'testee'}).size.height()).toEqual('200px');
+    expect(getDialog({cssClass: 'testee'}).size.maxHeight()).toEqual('300px');
+    getDialog({cssClass: 'testee'}).close();
   });
 });
 
