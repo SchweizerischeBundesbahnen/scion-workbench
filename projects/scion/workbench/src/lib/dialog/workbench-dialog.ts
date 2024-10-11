@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {signal, Signal} from '@angular/core';
+import {signal, Signal, untracked} from '@angular/core';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -131,7 +131,7 @@ export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
 
   /** @inheritDoc */
   public set minHeight(minHeight: string | undefined) {
-    this._minHeight.set(minHeight);
+    untracked(() => this._minHeight.set(minHeight));
   }
 
   /** @inheritDoc */
@@ -141,7 +141,7 @@ export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
 
   /** @inheritDoc */
   public set height(height: string | undefined) {
-    this._height.set(height);
+    untracked(() => this._height.set(height));
   }
 
   /** @inheritDoc */
@@ -151,7 +151,7 @@ export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
 
   /** @inheritDoc */
   public set maxHeight(maxHeight: string | undefined) {
-    this._maxHeight.set(maxHeight);
+    untracked(() => this._maxHeight.set(maxHeight));
   }
 
   /** @inheritDoc */
@@ -161,7 +161,7 @@ export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
 
   /** @inheritDoc */
   public set minWidth(minWidth: string | undefined) {
-    this._minWidth.set(minWidth);
+    untracked(() => this._minWidth.set(minWidth));
   }
 
   /** @inheritDoc */
@@ -171,7 +171,7 @@ export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
 
   /** @inheritDoc */
   public set width(width: string | undefined) {
-    this._width.set(width);
+    untracked(() => this._width.set(width));
   }
 
   /** @inheritDoc */
@@ -181,6 +181,6 @@ export class ɵWorkbenchDialogSize implements WorkbenchDialogSize {
 
   /** @inheritDoc */
   public set maxWidth(maxWidth: string | undefined) {
-    this._maxWidth.set(maxWidth);
+    untracked(() => this._maxWidth.set(maxWidth));
   }
 }

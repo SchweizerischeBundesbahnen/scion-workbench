@@ -9,7 +9,7 @@
  */
 
 import {BehaviorSubject, combineLatest, concatWith, delay, EMPTY, firstValueFrom, map, merge, Observable, of, Subject, switchMap} from 'rxjs';
-import {ApplicationRef, ComponentRef, EnvironmentInjector, inject, Injector, NgZone, Signal, signal} from '@angular/core';
+import {ApplicationRef, ComponentRef, EnvironmentInjector, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
@@ -182,7 +182,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public set title(title: string | undefined) {
-    this._title.set(title);
+    untracked(() => this._title.set(title));
   }
 
   /** @inheritDoc */
@@ -192,7 +192,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public set closable(closable: boolean) {
-    this._closable.set(closable);
+    untracked(() => this._closable.set(closable));
   }
 
   /** @inheritDoc */
@@ -202,7 +202,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public set resizable(resizable: boolean) {
-    this._resizable.set(resizable);
+    untracked(() => this._resizable.set(resizable));
   }
 
   /** @inheritDoc */
@@ -212,7 +212,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public set padding(padding: boolean) {
-    this._padding.set(padding);
+    untracked(() => this._padding.set(padding));
   }
 
   /** @inheritDoc */
@@ -222,7 +222,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public set cssClass(cssClass: string | string[]) {
-    this._cssClass.set(new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass));
+    untracked(() => this._cssClass.set(new Array<string>().concat(this._options.cssClass ?? []).concat(cssClass)));
   }
 
   /**
