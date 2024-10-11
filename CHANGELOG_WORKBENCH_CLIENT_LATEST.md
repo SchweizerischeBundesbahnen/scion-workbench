@@ -1,30 +1,9 @@
-# [1.0.0-beta.26](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.25...workbench-client-1.0.0-beta.26) (2024-09-11)
+# [1.0.0-beta.27](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/workbench-client-1.0.0-beta.26...workbench-client-1.0.0-beta.27) (2024-10-11)
 
 
-### Features
+### Bug Fixes
 
-* **workbench-client/popup:** support returning result on focus loss ([ce5089e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ce5089e57ba48f53f17fede4ffe4fa72cf74a01b))
-
-
-### BREAKING CHANGES
-
-* **workbench-client/popup:** The method `closeWithError` has been removed from the `WorkbenchPopup` handle. Instead, pass an `Error` object to the `close` method.
-
-**Before migration:**
-```ts
-import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchPopup} from '@scion/workbench-client';
-
-Beans.get(WorkbenchPopup).closeWithError('some error');
-```
-
-**After migration:**
-```ts
-import {Beans} from '@scion/toolkit/bean-manager';
-import {WorkbenchPopup} from '@scion/workbench-client';
-
-Beans.get(WorkbenchPopup).close(new Error('some error'));
-```
+* **workbench-client:** position document root as required by @scion/toolkit ([007e9c3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/007e9c396dff4c2dde11c62d810b5997c034eca2))
 
 
 
