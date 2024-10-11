@@ -9,8 +9,8 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
-import {ActivatedRoute, provideRouter} from '@angular/router';
+import {booleanAttribute, Component, DestroyRef, Directive, effect, inject, Injector, input, OnDestroy, OnInit, Type} from '@angular/core';
+import {ActivatedRoute, provideRouter, withComponentInputBinding} from '@angular/router';
 import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ViewId, WorkbenchView} from './workbench-view.model';
@@ -2937,6 +2937,72 @@ describe('View', () => {
       expect(view2.part().id).toEqual('left');
       expect(viewportView2.scrollTop).toBe(scrollTop);
     });
+  });
+
+  it('should allow updating view properties in an effect (without enabling `allowSignalWrites`)', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+        provideRouter([
+          {path: 'path/to/view', loadComponent: () => TestViewComponent},
+        ], withComponentInputBinding()),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-view',
+      template: 'view',
+      standalone: true,
+    })
+    class TestViewComponent {
+
+      public title = input<string>();
+      public heading = input<string>();
+      public dirty = input(undefined, {transform: booleanAttribute});
+      public closable = input(undefined, {transform: booleanAttribute});
+      public cssClass = input<string>();
+
+      constructor(view: WorkbenchView) {
+        effect(() => {
+          view.title = this.title() ?? null;
+          view.heading = this.heading() ?? null;
+          view.dirty = this.dirty() ?? false;
+          view.closable = this.closable() ?? true;
+          view.cssClass = this.cssClass() ?? [];
+        });
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    const workbenchRouter = TestBed.inject(WorkbenchRouter);
+    const workbenchService = TestBed.inject(WorkbenchService);
+
+    // Set title.
+    await workbenchRouter.navigate(['path/to/view', {title: 'TITLE'}], {target: 'view.101'});
+    await waitUntilStable();
+    expect(workbenchService.getView('view.101')!.title()).toEqual('TITLE');
+
+    // Set heading.
+    await workbenchRouter.navigate(['path/to/view', {heading: 'HEADING'}], {target: 'view.102'});
+    await waitUntilStable();
+    expect(workbenchService.getView('view.102')!.heading()).toEqual('HEADING');
+
+    // Mark view dirty.
+    await workbenchRouter.navigate(['path/to/view', {dirty: true}], {target: 'view.103'});
+    await waitUntilStable();
+    expect(workbenchService.getView('view.103')!.dirty()).toBeTrue();
+
+    // Make view non-closable.
+    await workbenchRouter.navigate(['path/to/view', {closable: false}], {target: 'view.104'});
+    await waitUntilStable();
+    expect(workbenchService.getView('view.104')!.closable()).toBeFalse();
+
+    // Set CSS class.
+    await workbenchRouter.navigate(['path/to/view', {cssClass: 'cssclass'}], {target: 'view.105'});
+    await waitUntilStable();
+    expect(workbenchService.getView('view.105')!.cssClass()).toEqual(['cssclass']);
   });
 });
 
