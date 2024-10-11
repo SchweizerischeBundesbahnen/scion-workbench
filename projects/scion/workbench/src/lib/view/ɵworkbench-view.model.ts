@@ -21,7 +21,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, Type} from '@angular/core';
+import {AbstractType, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
@@ -191,7 +191,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public set title(title: string | null) {
-    this._title.set(title);
+    untracked(() => this._title.set(title));
   }
 
   /** @inheritDoc */
@@ -201,7 +201,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public set heading(heading: string | null) {
-    this._heading.set(heading);
+    untracked(() => this._heading.set(heading));
   }
 
   /** @inheritDoc */
@@ -211,7 +211,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public set dirty(dirty: boolean) {
-    this._dirty.set(dirty);
+    untracked(() => this._dirty.set(dirty));
   }
 
   /** @inheritDoc */
@@ -225,7 +225,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public set cssClass(cssClass: string | string[]) {
-    this.classList.application = cssClass;
+    untracked(() => this.classList.application = cssClass);
   }
 
   /** @inheritDoc */
@@ -235,7 +235,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public set closable(closable: boolean) {
-    this._closable.set(closable);
+    untracked(() => this._closable.set(closable));
   }
 
   /** @inheritDoc */
