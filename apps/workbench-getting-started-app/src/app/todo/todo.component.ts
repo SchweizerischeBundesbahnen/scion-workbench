@@ -8,39 +8,33 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Inject, LOCALE_ID} from '@angular/core';
+import {Component, computed, effect, inject, input, LOCALE_ID} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
-import {Todo, TodoService} from '../todo.service';
-import {ActivatedRoute} from '@angular/router';
-import {map, Observable, tap} from 'rxjs';
-import {AsyncPipe, DatePipe, formatDate} from '@angular/common';
+import {TodoService} from '../todo.service';
+import {DatePipe, formatDate} from '@angular/common';
 
 @Component({
   selector: 'app-todo',
   templateUrl: './todo.component.html',
-  styleUrls: ['./todo.component.scss'],
+  styleUrl: './todo.component.scss',
   standalone: true,
   imports: [
-    AsyncPipe,
     DatePipe,
   ],
 })
 export default class TodoComponent {
 
-  public todo$: Observable<Todo>;
+  private todoService = inject(TodoService);
+  private locale = inject(LOCALE_ID);
 
-  constructor(route: ActivatedRoute,
-              todoService: TodoService,
-              view: WorkbenchView,
-              @Inject(LOCALE_ID) locale: string) {
-    this.todo$ = route.params
-      .pipe(
-        map(params => params['id']),
-        map(id => todoService.getTodo(id)),
-        tap(todo => {
-          view.title = todo.task;
-          view.heading = `Due by ${formatDate(todo.dueDate, 'short', locale)}`;
-        }),
-      );
+  public id = input.required<string>();
+
+  protected todo = computed(() => this.todoService.getTodo(this.id()));
+
+  constructor(view: WorkbenchView) {
+    effect(() => {
+      view.title = this.todo().task;
+      view.heading = `Due by ${formatDate(this.todo().dueDate, 'short', this.locale)}`;
+    });
   }
 }

@@ -1,5 +1,3 @@
-@if (todo$ | async; as todo) {
-  <span>Task:</span>{{todo.task}}
-  <span>Due Date:</span>{{todo.dueDate | date:'short'}}
-  <span>Notes:</span>{{todo.notes}}
-}
+<span>Task:</span>{{todo().task}}
+<span>Due Date:</span>{{todo().dueDate | date:'short'}}
+<span>Notes:</span>{{todo().notes}}

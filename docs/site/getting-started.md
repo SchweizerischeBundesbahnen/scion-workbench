@@ -47,17 +47,20 @@ Open `app.config.ts` and register SCION Workbench providers. Added lines are mar
 ```ts
     import {ApplicationConfig} from '@angular/core';
 [+] import {provideWorkbench} from '@scion/workbench';
-[+] import {provideRouter} from '@angular/router';
+[+] import {provideRouter, withComponentInputBinding} from '@angular/router';
 [+] import {provideAnimations} from '@angular/platform-browser/animations';
     
     export const appConfig: ApplicationConfig = {
       providers: [
 [+]     provideWorkbench(),
-[+]     provideRouter([]), // required by the SCION Workbench
+[+]     provideRouter([], withComponentInputBinding()),
 [+]     provideAnimations(), // required by the SCION Workbench
       ],
     };
 ```
+
+We configure the router with `componentInputBinding` to read parameters directly from component inputs. SCION Workbench does not require this feature, but it simplifies this tutorial.
+
 </details>
 
 <details>
@@ -116,7 +119,7 @@ In this step, we will create a component that displays a welcome message when no
         @Component({
           selector: 'app-welcome',
           templateUrl: './welcome.component.html',
-          styleUrls: ['./welcome.component.scss'],
+          styleUrl: './welcome.component.scss',
           standalone: true,
         })
     [+] export default class WelcomeComponent {
@@ -136,7 +139,7 @@ In this step, we will create a component that displays a welcome message when no
     ```ts
         import {ApplicationConfig} from '@angular/core';
         import {provideWorkbench} from '@scion/workbench';
-        import {provideRouter} from '@angular/router';
+        import {provideRouter, withComponentInputBinding} from '@angular/router';
         import {provideAnimations} from '@angular/platform-browser/animations';
     
         export const appConfig: ApplicationConfig = {
@@ -144,7 +147,7 @@ In this step, we will create a component that displays a welcome message when no
             provideWorkbench(),
             provideRouter([
     [+]       {path: '', loadComponent: () => import('./welcome/welcome.component')},
-            ]),
+            ], withComponentInputBinding()),
             provideAnimations(),
           ],
        };
@@ -181,7 +184,7 @@ In this step, we will create the TODO list and place it to the left of the main 
         })
     [+] export default class TodosComponent {
     
-    [+]   constructor(view: WorkbenchView, public todoService: TodoService) {
+    [+]   constructor(view: WorkbenchView, protected todoService: TodoService) {
     [+]     view.title = 'Todos';
     [+]     view.heading = 'What to do today?';
     [+]     view.closable = false;
@@ -212,7 +215,7 @@ In this step, we will create the TODO list and place it to the left of the main 
     ```ts
         import {ApplicationConfig} from '@angular/core';
         import {provideWorkbench} from '@scion/workbench';
-        import {provideRouter} from '@angular/router';
+        import {provideRouter, withComponentInputBinding} from '@angular/router';
         import {provideAnimations} from '@angular/platform-browser/animations';
     
         export const appConfig: ApplicationConfig = {
@@ -221,7 +224,7 @@ In this step, we will create the TODO list and place it to the left of the main 
             provideRouter([
               {path: '', loadComponent: () => import('./welcome/welcome.component')},
     [+]       {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
-            ]),
+            ], withComponentInputBinding()),
             provideAnimations(),
           ],
        };
@@ -234,7 +237,7 @@ In this step, we will create the TODO list and place it to the left of the main 
    ```ts
        import {ApplicationConfig} from '@angular/core';
        import {provideWorkbench} from '@scion/workbench';
-       import {provideRouter} from '@angular/router';
+       import {provideRouter, withComponentInputBinding} from '@angular/router';
        import {provideAnimations} from '@angular/platform-browser/animations';
    [+] import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
@@ -250,7 +253,7 @@ In this step, we will create the TODO list and place it to the left of the main 
            provideRouter([
              {path: '', loadComponent: () => import('./welcome/welcome.component')},
              {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
-           ]),
+           ], withComponentInputBinding()),
            provideAnimations(),
          ],
       };
@@ -267,7 +270,7 @@ In this step, we will create the TODO list and place it to the left of the main 
     <summary><strong>Create Todo Component</strong></summary>
     <br>
 
-In this step, we will create a component to open a TODO in a view.
+In this step, we will create a component to open a TODO in a view in the main area.
 
 1. Create a new component using the Angular CLI.
     ```console
@@ -276,60 +279,52 @@ In this step, we will create a component to open a TODO in a view.
 2. Open `todo.component.ts` and change it as follows.
 
     ```ts
-    [+] import {Component, Inject, LOCALE_ID} from '@angular/core';
+    [+] import {Component, computed, effect, inject, input, LOCALE_ID} from '@angular/core';
     [+] import {WorkbenchView} from '@scion/workbench';
-    [+] import {Todo, TodoService} from '../todo.service';
-    [+] import {ActivatedRoute} from '@angular/router';
-    [+] import {map, Observable, tap} from 'rxjs';
-    [+] import {AsyncPipe, DatePipe, formatDate} from '@angular/common';
+    [+] import {TodoService} from '../todo.service';
+    [+] import {DatePipe, formatDate} from '@angular/common';
 
         @Component({
           selector: 'app-todo',
           templateUrl: './todo.component.html',
-          styleUrls: ['./todo.component.scss'],
+          styleUrl: './todo.component.scss',
           standalone: true,
           imports: [
-    [+]     AsyncPipe, DatePipe,
+    [+]     DatePipe,
           ],
         })
     [+] export default class TodoComponent {
         
-    [+]   public todo$: Observable<Todo>;
-        
-    [+]   constructor(route: ActivatedRoute, todoService: TodoService, view: WorkbenchView, @Inject(LOCALE_ID) locale: string) {
-    [+]     this.todo$ = route.params
-    [+]       .pipe(
-    [+]         map(params => params['id']),
-    [+]         map(id => todoService.getTodo(id)),
-    [+]         tap(todo => {
-    [+]           view.title = todo.task;
-    [+]           view.heading = `Due by ${formatDate(todo.dueDate, 'short', locale)}`;
-    [+]         }),
-    [+]       );
-    [+]   }
+    [+]   private todoService = inject(TodoService);
+    [+]   private locale = inject(LOCALE_ID);
+   
+    [+]   public id = input.required<string>();
+   
+    [+]   protected todo = computed(() => this.todoService.getTodo(this.id()));
+
+    [+]   constructor(view: WorkbenchView) {
+    [+]     effect(() => {
+    [+]       view.title = this.todo().task;
+    [+]       view.heading = `Due by ${formatDate(this.todo().dueDate, 'short', this.locale)}`;
+    [+]     });
+    [+]   }   
         }
     ```
+   In this step, we define an input property to read the id of the TODO. Using the `computed` function, we fetch the TODO based on the provided id. In the constructor, we inject `WorkbenchView` and use an effect to set the view's title and heading.
 
-   As with the TODO list component, we change the component to be exported by default, making it easier to register the route for the component.
+   We also change the component to be exported by default, making it easier to register the route for the component.
 
-   In the constructor, we inject the `ActivatedRoute` to read the id of the TODO that we want to display in the view. We also inject the `TodoService` to look up the TODO. As a side effect, after looking up the TODO, we set the title and heading of the view.
-
-   In the next step, we will subscribe to the observable in the template.
+   In the next step, we will render the TODO in the template.
 
 3. Open `todo.component.html` and change it as follows.
 
     ```html
-    @if (todo$ | async; as todo) {
-      <span>Task:</span>{{todo.task}}
-      <span>Due Date:</span>{{todo.dueDate | date:'short'}}
-      <span>Notes:</span>{{todo.notes}}
-    }
+    <span>Task:</span>{{todo().task}}
+    <span>Due Date:</span>{{todo().dueDate | date:'short'}}
+    <span>Notes:</span>{{todo().notes}}
     ```
-    Using Angular's `async` pipe, we subscribe to the `todo$` observable and assign its emitted value to the template variable `todo`. Then, we render the TODO.
 
 4. Open `todo.component.scss` and add the following styles.
-
-   Next, we add some CSS to get a tabular presentation of the TODO.
 
     ```css
     :host {
@@ -340,6 +335,7 @@ In this step, we will create a component to open a TODO in a view.
       place-content: start;
     }
     ```
+   We add some CSS to get a tabular presentation of the TODO.
 
 5. Register a route in `app.config.ts` for the component.
 
@@ -348,7 +344,7 @@ In this step, we will create a component to open a TODO in a view.
    ```ts
        import {ApplicationConfig} from '@angular/core';
        import {provideWorkbench} from '@scion/workbench';
-       import {provideRouter} from '@angular/router';
+       import {provideRouter, withComponentInputBinding} from '@angular/router';
        import {provideAnimations} from '@angular/platform-browser/animations';
        import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
@@ -365,7 +361,7 @@ In this step, we will create a component to open a TODO in a view.
            {path: '', loadComponent: () => import('./welcome/welcome.component')},
            {path: 'todos', loadComponent: () => import('./todos/todos.component')},
    [+]     {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},  
-         ]),
+         ], withComponentInputBinding()),
          provideAnimations(),
         ],
        };
