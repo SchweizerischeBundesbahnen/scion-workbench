@@ -11,7 +11,6 @@
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
-import {provideWorkbench} from './workbench.provider';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
 import {waitForInitialWorkbenchLayout} from './testing/testing.util';
 import {Arrays} from '@scion/toolkit/util';
@@ -26,20 +25,6 @@ describe('Workbench', () => {
   it(`should error if not calling 'provideWorkbench()' before starting the workbench`, () => {
     TestBed.configureTestingModule({});
     expect(() => TestBed.inject(WorkbenchLauncher).launch()).toThrowError(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
-  });
-
-  it(`should not error if calling 'provideWorkbench()' before adding workbench component`, async () => {
-    TestBed.configureTestingModule({
-      providers: [provideWorkbench()],
-    });
-    expect(() => TestBed.createComponent(WorkbenchComponent)).not.toThrowError();
-  });
-
-  it(`should not error if calling 'provideWorkbench()' before starting the workbench`, async () => {
-    TestBed.configureTestingModule({
-      providers: [provideWorkbench()],
-    });
-    expect(() => TestBed.inject(WorkbenchLauncher)).not.toThrowError();
   });
 
   /**

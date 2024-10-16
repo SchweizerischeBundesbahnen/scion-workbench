@@ -9,7 +9,7 @@
  */
 
 import {BehaviorSubject, combineLatest, concatWith, delay, EMPTY, firstValueFrom, map, merge, Observable, of, Subject, switchMap} from 'rxjs';
-import {ApplicationRef, ComponentRef, EnvironmentInjector, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
+import {ApplicationRef, assertNotInReactiveContext, ComponentRef, EnvironmentInjector, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
@@ -115,6 +115,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
 
   /** @inheritDoc */
   public close(result?: R | Error): void {
+    assertNotInReactiveContext(this.close, 'Call WorkbenchDialog.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     this._result = result;
     this.destroy();
   }

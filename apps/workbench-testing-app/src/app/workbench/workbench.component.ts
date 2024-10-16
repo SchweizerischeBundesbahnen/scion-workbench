@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, OnDestroy} from '@angular/core';
+import {Component, effect, OnDestroy, untracked} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {distinct, map} from 'rxjs/operators';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
@@ -72,7 +72,7 @@ export class WorkbenchComponent implements OnDestroy {
     const stickyStartViewTab = toSignal(this._route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get('stickyStartViewTab'))), distinct()), {requireSync: true});
     effect(() => {
       if (stickyStartViewTab() && !this.workbenchService.views().length) {
-        this._wbRouter.navigate(['/start-page']).then();
+        untracked(() => this._wbRouter.navigate(['/start-page'])).then();
       }
     });
   }

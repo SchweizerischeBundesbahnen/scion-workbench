@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {createEnvironmentInjector, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {assertNotInReactiveContext, createEnvironmentInjector, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {combineLatestWith, firstValueFrom, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/operators';
@@ -78,6 +78,8 @@ export class PopupService {
    *          - resolves to `undefined` if closed without a result
    */
   public async open<R>(config: PopupConfig): Promise<R | undefined> {
+    assertNotInReactiveContext(this.open, 'Call WorkbenchPopupService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
     // Ensure to run in Angular zone to display the popup even when called from outside of the Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(config));
@@ -237,7 +239,7 @@ export class PopupService {
     if (contextualView) {
       effect(() => {
         if (!this._viewRegistry.objects().some(view => view.id === contextualView.id)) {
-          popup.close();
+          untracked(() => popup.close());
         }
       }, {injector: popup.injector});
     }
