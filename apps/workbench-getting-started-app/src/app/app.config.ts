@@ -10,7 +10,7 @@
 
 import {ApplicationConfig} from '@angular/core';
 import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
-import {provideRouter, withHashLocation} from '@angular/router';
+import {provideRouter, withComponentInputBinding, withHashLocation} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 
 /**
@@ -29,7 +29,7 @@ export const appConfig: ApplicationConfig = {
       {path: '', loadComponent: () => import('./welcome/welcome.component')},
       {path: 'todos', loadComponent: () => import('./todos/todos.component')},
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
-    ], withHashLocation()),
+    ], withComponentInputBinding(), withHashLocation()),
     provideAnimations(),
   ],
 };

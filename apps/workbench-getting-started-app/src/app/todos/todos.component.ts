@@ -22,7 +22,7 @@ import {TodoService} from '../todo.service';
 })
 export default class TodosComponent {
 
-  constructor(view: WorkbenchView, public todoService: TodoService) {
+  constructor(view: WorkbenchView, protected todoService: TodoService) {
     view.title = 'Todos';
     view.heading = 'What to do today?';
     view.closable = false;
