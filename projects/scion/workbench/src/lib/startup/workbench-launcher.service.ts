@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {APP_INITIALIZER, ApplicationInitStatus, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
+import {APP_INITIALIZER, ApplicationInitStatus, assertNotInReactiveContext, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 
@@ -94,6 +94,8 @@ export class WorkbenchLauncher {
    * @return A Promise that resolves when the workbench has completed the startup or that rejects if the startup failed.
    */
   public async launch(): Promise<true> {
+    assertNotInReactiveContext(this.launch, 'Call WorkbenchLauncher.launch() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
     // Ensure to run in the Angular zone to check the workbench for changes even if called from outside the Angular zone, e.g. in unit tests.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.launch());

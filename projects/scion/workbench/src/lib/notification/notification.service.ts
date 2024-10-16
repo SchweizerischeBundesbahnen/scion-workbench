@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Inject, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, Inject, Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
 import {ɵNotification} from './ɵnotification';
 import {NotificationConfig} from './notification.config';
@@ -55,6 +55,8 @@ export class NotificationService {
    * @param  notification - Configures the content and appearance of the notification.
    */
   public notify(notification: string | NotificationConfig): void {
+    assertNotInReactiveContext(this.notify, 'Call NotificationService.notify() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
     // Ensure to run in Angular zone to display the notification even when called from outside of the Angular zone, e.g. from an error handler.
     if (!NgZone.isInAngularZone()) {
       this._zone.run(() => this.notify(notification));

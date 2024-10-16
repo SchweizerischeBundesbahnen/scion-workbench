@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, EnvironmentInjector, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, ElementRef, EnvironmentInjector, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
@@ -264,6 +264,7 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
 
   /** @inheritDoc */
   public close(result?: R | Error): void {
+    assertNotInReactiveContext(this.close, 'Call WorkbenchPopup.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     this.result = result;
     this.destroy();
   }
