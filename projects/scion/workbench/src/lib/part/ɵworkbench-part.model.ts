@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal} from '@angular/core';
+import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
 import {WorkbenchPart} from './workbench-part.model';
@@ -84,6 +84,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public async activate(): Promise<boolean> {
+    assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     if (this.active()) {
       return true;
     }

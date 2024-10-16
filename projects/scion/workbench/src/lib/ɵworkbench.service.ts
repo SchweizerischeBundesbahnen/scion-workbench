@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, inject, Injectable, Signal} from '@angular/core';
+import {assertNotInReactiveContext, computed, inject, Injectable, Signal} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {Disposable} from './common/disposable';
@@ -75,26 +75,31 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   /** @inheritDoc */
   public registerPerspective(perspective: WorkbenchPerspectiveDefinition): Promise<void> {
+    assertNotInReactiveContext(this.registerPerspective, 'Call WorkbenchService.registerPerspective() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     return this._perspectiveService.registerPerspective(perspective);
   }
 
   /** @inheritDoc */
   public switchPerspective(id: string): Promise<boolean> {
+    assertNotInReactiveContext(this.switchPerspective, 'Call WorkbenchService.switchPerspective() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     return this._perspectiveService.switchPerspective(id);
   }
 
   /** @inheritDoc */
   public async resetPerspective(): Promise<void> {
+    assertNotInReactiveContext(this.resetPerspective, 'Call WorkbenchService.resetPerspective() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     await this._perspectiveService.resetPerspective();
   }
 
   /** @inheritDoc */
   public async closeViews(...viewIds: ViewId[]): Promise<boolean> {
+    assertNotInReactiveContext(this.closeViews, 'Call WorkbenchService.closeViews() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     return this._workbenchRouter.navigate(layout => viewIds.reduce((layout, viewId) => layout.removeView(viewId), layout));
   }
 
   /** @inheritDoc */
   public registerPartAction(action: WorkbenchPartAction): Disposable {
+    assertNotInReactiveContext(this.registerPartAction, 'Call WorkbenchService.registerPartAction() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     this._partActionRegistry.register(action);
     return {
       dispose: () => this._partActionRegistry.unregister(action),
@@ -103,6 +108,7 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   /** @inheritDoc */
   public registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable {
+    assertNotInReactiveContext(this.registerViewMenuItem, 'Call WorkbenchService.registerViewMenuItem() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     this.viewMenuItemProviders$.next(this.viewMenuItemProviders$.value.concat(factoryFn));
     return {
       dispose: (): void => {
@@ -113,6 +119,7 @@ export class ɵWorkbenchService implements WorkbenchService {
 
   /** @inheritDoc */
   public switchTheme(theme: string): Promise<void> {
+    assertNotInReactiveContext(this.switchTheme, 'Call WorkbenchService.switchTheme() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     return this._workbenchThemeSwitcher.switchTheme(theme);
   }
 }

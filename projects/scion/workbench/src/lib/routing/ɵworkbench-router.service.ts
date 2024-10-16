@@ -11,7 +11,7 @@
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {Defined, Observables} from '@scion/toolkit/util';
-import {inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
 import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
@@ -59,6 +59,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   public navigate(navigateFn: ɵNavigateFn, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean>;
   public navigate(commandsOrNavigateFn: Commands | ɵNavigateFn, extras?: WorkbenchNavigationExtras | Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean>;
   public navigate(commandsOrNavigateFn: Commands | ɵNavigateFn, extras?: WorkbenchNavigationExtras | Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean> {
+    assertNotInReactiveContext(this.navigate, 'Call WorkbenchRouter.navigate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
     // Ensure to run in Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.navigate(commandsOrNavigateFn, extras));
@@ -122,6 +124,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
    * @see NavigateFn
    */
   public async createUrlTree(onNavigate: (layout: ɵWorkbenchLayout) => Promise<ɵWorkbenchLayout | null> | ɵWorkbenchLayout | null, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<UrlTree | null> {
+    assertNotInReactiveContext(this.createUrlTree, 'Call WorkbenchRouter.createUrlTree() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+
     // Ensure to run in Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.createUrlTree(onNavigate, extras));

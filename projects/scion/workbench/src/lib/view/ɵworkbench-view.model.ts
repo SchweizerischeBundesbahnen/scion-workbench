@@ -21,7 +21,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, Type, untracked} from '@angular/core';
+import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
@@ -245,6 +245,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
+    assertNotInReactiveContext(this.activate, 'Call WorkbenchView.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     if (this.active() && this.part().active()) {
       return true;
     }
@@ -262,6 +263,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
+    assertNotInReactiveContext(this.close, 'Call WorkbenchView.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     switch (target || 'self') {
       case 'self': {
         return this._workbenchService.closeViews(this.id);
@@ -290,6 +292,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public move(target: 'new-window'): void;
   public move(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void;
   public move(target: 'new-window' | string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void {
+    assertNotInReactiveContext(this.move, 'Call WorkbenchView.move() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     const source: ViewMoveEventSource = {
       workbenchId: this._workbenchId,
       partId: this.part().id,
@@ -318,6 +321,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
+    assertNotInReactiveContext(this.registerMenuItem, 'Call WorkbenchView.registerMenuItem() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     const factoryFn = (): WorkbenchMenuItem => menuItem;
     this._menuItemProviders$.next(this._menuItemProviders$.value.concat(factoryFn));
     return {
