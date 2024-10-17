@@ -180,8 +180,12 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('input.e2e-contextual-view-id').fill(viewId);
   }
 
-  public async open(): Promise<void> {
+  public async open(options?: {waitUntilAttached?: boolean}): Promise<void> {
     await this.locator.locator('button.e2e-open').click();
+
+    if (!(options?.waitUntilAttached ?? true)) {
+      return;
+    }
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([

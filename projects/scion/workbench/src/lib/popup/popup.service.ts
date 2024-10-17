@@ -265,6 +265,8 @@ export class PopupService {
    * The Observable emits the anchor's initial position, and each time when its position changes.
    */
   private observePopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
+    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
+
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       const anchorBounds = boundingClientRect(coerceElement<any>(config.anchor), {injector});
       return computed(() => {
@@ -273,11 +275,11 @@ export class PopupService {
         if (contextualView && !contextualView.portal.attached()) {
           return undefined;
         }
-        return anchorBounds();  // IMPORTANT: Track anchor bounds only if attached to prevent flickering.
+        // IMPORTANT: Track anchor and host bounds only if attached to prevent flickering.
+        return constrainClientRect(anchorBounds(), hostBounds());
       }, {equal: isEqualDomRect});
     }
     else {
-      const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
       const anchorBounds = toSignal(Observables.coerce(config.anchor), {injector});
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when re-attached to the host
@@ -285,7 +287,9 @@ export class PopupService {
         if (contextualView && !contextualView.portal.attached()) {
           return undefined;
         }
-        if (!anchorBounds()) { // IMPORTANT: Track anchor bounds only if attached to prevent flickering.
+
+        // IMPORTANT: Track anchor and host bounds only if attached to prevent flickering.
+        if (!anchorBounds()) {
           return undefined;
         }
 
@@ -354,4 +358,18 @@ function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
 
 function isEqualDomRect(a: DOMRect | undefined, b: DOMRect | undefined): boolean {
   return a?.top === b?.top && a?.right === b?.right && a?.bottom === b?.bottom && a?.left === b?.left;
+}
+
+function constrainClientRect(clientRect: DOMRect, constraints: DOMRect): DOMRect {
+  const top = minmax(clientRect.top, {min: constraints.top, max: constraints.bottom});
+  const right = minmax(clientRect.right, {min: constraints.left, max: constraints.right});
+  const bottom = minmax(clientRect.bottom, {min: constraints.top, max: constraints.bottom});
+  const left = minmax(clientRect.left, {min: constraints.left, max: constraints.right});
+  const width = right - left;
+  const height = bottom - top;
+  return new DOMRect(left, top, width, height);
+}
+
+function minmax(value: number, minmax: {min: number; max: number}): number {
+  return Math.max(minmax.min, Math.min(value, minmax.max));
 }

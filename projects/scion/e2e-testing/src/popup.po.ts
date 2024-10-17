@@ -11,6 +11,8 @@
 import {Locator} from '@playwright/test';
 import {DomRect, fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
 
+export const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+
 /**
  * Handle for interacting with a workbench popup.
  */
@@ -66,5 +68,34 @@ export class PopupPO {
 
   public hasHorizontalOverflow(): Promise<boolean> {
     return hasCssClass(this.locator.locator('sci-viewport.e2e-popup-viewport > sci-scrollbar.horizontal'), 'overflow');
+  }
+
+  public async getAnchorPosition(): Promise<{x: number; y: number}> {
+    const boundingBox = await this.getBoundingBox({box: 'border-box'});
+    const align = await this.getAlign();
+    switch (align) {
+      case 'south':
+        return {
+          x: boundingBox.hcenter,
+          y: boundingBox.y - POPUP_DIAMOND_ANCHOR_SIZE,
+        };
+      case 'north':
+        return {
+          x: boundingBox.hcenter,
+          y: boundingBox.bottom + POPUP_DIAMOND_ANCHOR_SIZE,
+        };
+      case 'east':
+        return {
+          x: boundingBox.x - POPUP_DIAMOND_ANCHOR_SIZE,
+          y: boundingBox.vcenter,
+        };
+      case 'west':
+        return {
+          x: boundingBox.right + POPUP_DIAMOND_ANCHOR_SIZE,
+          y: boundingBox.vcenter,
+        };
+      default:
+        throw Error('[PageObjectError] Illegal position; must be north, south, west or east');
+    }
   }
 }

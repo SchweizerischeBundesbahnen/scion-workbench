@@ -1,0 +1,24 @@
+<section class="properties">
+  <sci-form-field label="margin-top">
+    <input [(ngModel)]="margin.top" type="number" class="e2e-margin-top">
+  </sci-form-field>
+  <sci-form-field label="margin-right">
+    <input [(ngModel)]="margin.right" type="number" class="e2e-margin-right">
+  </sci-form-field>
+  <sci-form-field label="margin-bottom">
+    <input [(ngModel)]="margin.bottom" type="number" class="e2e-margin-bottom">
+  </sci-form-field>
+  <sci-form-field label="margin-left">
+    <input [(ngModel)]="margin.left" type="number" class="e2e-margin-left">
+  </sci-form-field>
+</section>
+
+<button (click)="onOpen()"
+        class="open e2e-open"
+        [style.margin-top.px]="margin.top()"
+        [style.margin-right.px]="margin.right()"
+        [style.margin-bottom.px]="margin.bottom()"
+        [style.margin-left.px]="margin.left()"
+        #open_button>
+  Open Popup
+</button>
