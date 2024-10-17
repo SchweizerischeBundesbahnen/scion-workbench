@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, untracked, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, untracked, viewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
 import {combineLatest, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
 import {first, map, takeUntil} from 'rxjs/operators';
@@ -18,7 +18,7 @@ import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_K
 import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanClose} from '../../workbench.model';
-import {IFRAME_HOST, ViewContainerReference} from '../../content-projection/view-container.reference';
+import {IFRAME_OVERLAY_HOST} from '../../content-projection/workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
@@ -27,10 +27,9 @@ import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
 import {AsyncPipe, NgClass, NgComponentOutlet} from '@angular/common';
-import {ContentAsOverlayComponent} from '../../content-projection/content-as-overlay.component';
+import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../../glass-pane/glass-pane.directive';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
@@ -60,57 +59,51 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 })
 export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
 
+  private _host = inject(ElementRef<HTMLElement>);
+  private _route = inject(ActivatedRoute);
+  private _outletRouter = inject(OutletRouter);
+  private _manifestService = inject(ManifestService);
+  private _manifestObjectCache = inject(ManifestObjectCache);
+  private _messageClient = inject(MessageClient);
+  private _logger = inject(Logger);
+  private _viewContextMenuService = inject(ViewMenuService);
+  private _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private _workbenchRouter = inject(WorkbenchRouter);
+  private _injector = inject(Injector);
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private _destroyRef = inject(DestroyRef);
+
+  private _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
   private _unsubscribeParamsUpdater$ = new Subject<void>();
   private _universalKeystrokes = [
     'keydown.escape', // allows closing notifications
   ];
 
+  protected view = inject(ɵWorkbenchView);
   protected capability: WorkbenchViewCapability | null = null;
+  /** Splash to display until the microfrontend signals readiness. */
+  protected splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+  /** Keystrokes which to bubble across iframe boundaries from embedded content. */
+  protected keystrokesToBubble$: Observable<string[]>;
+  /** Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash. */
+  protected isWorkbenchDrag = false;
+  /** Configures iframe projection. */
+  protected overlayConfig: ContentAsOverlayConfig = {
+    location: inject(IFRAME_OVERLAY_HOST),
+    visible: this.view.portal.attached,
+  };
 
-  /**
-   * Splash to display until the microfrontend signals readiness.
-   */
-  protected splash: ComponentType<unknown>;
-
-  @ViewChild('router_outlet', {static: true})
-  public routerOutletElement!: ElementRef<SciRouterOutletElement>;
-
-  /**
-   * Keystrokes which to bubble across iframe boundaries of embedded content.
-   */
-  public keystrokesToBubble$: Observable<string[]>;
-
-  /**
-   * Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash.
-   */
-  public isWorkbenchDrag = false;
-
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _route: ActivatedRoute,
-              private _outletRouter: OutletRouter,
-              private _manifestService: ManifestService,
-              private _manifestObjectCache: ManifestObjectCache,
-              private _messageClient: MessageClient,
-              private _destroyRef: DestroyRef,
-              private _logger: Logger,
-              private _viewContextMenuService: ViewMenuService,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _workbenchRouter: WorkbenchRouter,
-              private _injector: Injector,
-              private _cd: ChangeDetectorRef,
-              public view: ɵWorkbenchView,
-              @Inject(IFRAME_HOST) protected iframeHostRef: ViewContainerReference) {
+  constructor() {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
       .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
     this.installWorkbenchDragDetector();
     this.installViewActivePublisher();
     this.installPartIdPublisher();
-    this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   }
 
   public ngOnInit(): void {
-    this.routerOutletElement.nativeElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id);
+    this._routerOutletElement().nativeElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id);
     this.propagateWorkbenchTheme();
     this.installMenuItemAccelerators$();
     this.installNavigator();
@@ -173,7 +166,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     // Inactive views are not checked for changes since detached from the Angular component tree.
     // So, we manually trigger change detection to update attributes on the `sci-router-outlet`.
     if (!this.view.active()) {
-      this._cd.detectChanges();
+      this._changeDetectorRef.detectChanges();
     }
   }
 
@@ -185,7 +178,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
     // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
     // menu of this view do not work, so we install the accelerators on the router outlet as well.
-    this._viewContextMenuService.installMenuItemAccelerators$(this.routerOutletElement.nativeElement, this.view)
+    this._viewContextMenuService.installMenuItemAccelerators$(this._routerOutletElement().nativeElement, this.view)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe();
   }
@@ -287,7 +280,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     return firstValueFrom(this._messageClient.request$<boolean>(hasCanCloseGuard ? canCloseTopic : legacyCanCloseTopic).pipe(mapToBody()), {defaultValue: true});
   }
 
-  public onFocusWithin(event: Event): void {
+  protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
     if (focusWithin) {
       this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
@@ -332,7 +325,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
   }
 
   private propagateWorkbenchTheme(): void {
-    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
+    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this._routerOutletElement().nativeElement));
   }
 
   private unload(): void {

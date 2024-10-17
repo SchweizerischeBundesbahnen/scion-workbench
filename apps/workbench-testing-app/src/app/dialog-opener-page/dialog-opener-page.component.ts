@@ -23,6 +23,7 @@ import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-pag
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
 import {CssClassComponent} from '../css-class/css-class.component';
+import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -101,6 +102,8 @@ export default class DialogOpenerPageComponent {
         return FocusTestPageComponent;
       case 'input-field-test-page':
         return InputFieldTestPageComponent;
+      case 'size-test-page':
+        return SizeTestPageComponent;
       default:
         throw Error(`[IllegalDialogComponent] Dialog component not supported: ${this.form.controls.component.value}`);
     }

@@ -1,4 +1,4 @@
-<wb-content-as-overlay [overlayHost]="iframeHostRef.ref$ | async">
+<wb-content-as-overlay [config]="overlayConfig">
   <div class="microfrontend-view"
        [class.workbench-drag]="isWorkbenchDrag"
        [attr.data-viewid]="view.id"

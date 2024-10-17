@@ -23,7 +23,7 @@
   /**
    * Anchor to attach the visual placeholder when dragging a view over a valid drop zone.
    */
-  > div.view-drop-placeholder-host {
+  > div.view-drop-zone-overlay-host {
     position: absolute; // out of the document flow
   }
 

@@ -19,6 +19,8 @@ import {InputFieldTestPagePO as WorkbenchInputFieldTestPagePO} from '../workbenc
 import {ViewPagePO} from './page-object/view-page.po';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Workbench Popup', () => {
 
@@ -408,6 +410,36 @@ test.describe('Workbench Popup', () => {
 
       // expect the component not to be constructed anew
       await expect.poll(() => popupPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should maintain popup bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling)', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Open view 1 with popup.
+      const popupPage = await SizeTestPagePO.openInPopup(appPO);
+      const viewPage1 = new PopupOpenerPagePO(appPO, {viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()});
+
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Open view 2.
+      const viewPage2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      await expectPopup(popupPage).toBeHidden();
+      await expectView(viewPage1).toBeInactive();
+      await expectView(viewPage2).toBeActive();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Activate view 1.
+      await viewPage1.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+      await expectView(viewPage1).toBeActive();
+      await expectView(viewPage2).toBeInactive();
+
+      // Expect popup not to be resized (no flickering).
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
     });
 
     test('should bind the popup to the current view, if opened in the context of a view', async ({appPO, microfrontendNavigator}) => {
