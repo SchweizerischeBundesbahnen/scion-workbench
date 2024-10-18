@@ -57,6 +57,22 @@ export const Perspectives = {
           [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
         },
       },
+      {
+        id: 'perspective-3',
+        layout: providePerspective3Layout,
+        data: {
+          [PerspectiveData.label]: 'Perspective 3',
+          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+        },
+      },
+      {
+        id: 'perspective-4',
+        layout: providePerspective4Layout,
+        data: {
+          [PerspectiveData.label]: 'Perspective 4',
+          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+        },
+      },
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
       ...WorkbenchStartupQueryParams.perspectives().map(perspective => ({
         id: perspective,
@@ -137,4 +153,39 @@ function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
     .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
     .activateView('sample-view-6');
+}
+
+function providePerspective3Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+    .addPart('left', {align: 'left', ratio: 0.01})
+    .addPart('left1', {align: 'left', ratio: 0.01})
+    .addPart('left2', {align: 'left', ratio: 0.01})
+    .addPart('left3', {align: 'left', ratio: 0.01})
+    .addPart('left4', {align: 'left', ratio: 0.01})
+    .addPart('left5', {align: 'left', ratio: 0.01})
+    .addPart('left6', {align: 'left', ratio: 0.01})
+    .addPart('left7', {align: 'left', ratio: 0.01})
+    .addPart('left8', {align: 'left', ratio: 0.01})
+    .addPart('left9', {align: 'left', ratio: 0.01})
+    .addPart('left10', {align: 'left', ratio: 0.01})
+    .addView('sample-view-1', {partId: 'left'})
+    .addView('sample-view-2', {partId: 'left1'})
+    .addView('sample-view-3', {partId: 'left2'})
+    .addView('sample-view-4', {partId: 'left3'})
+    .addView('sample-view-5', {partId: 'left4'})
+    .addView('sample-view-6', {partId: 'left5'})
+    .addView('sample-view-7', {partId: 'left6'})
+    .addView('sample-view-8', {partId: 'left7'})
+    .addView('sample-view-9', {partId: 'left8'})
+    .addView('sample-view-10', {partId: 'left9'})
+    .addView('sample-view-11', {partId: 'left10'});
+}
+
+function providePerspective4Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+    .addPart('left', {align: 'left', ratio: 0.01})
+    .addView('sample-view-1', {partId: 'left'})
+    .navigateView('sample-view-1', [], {hint: 'sample-view'});
 }

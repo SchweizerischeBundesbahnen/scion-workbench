@@ -17,7 +17,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "useDefineForClassFields": false,
     "lib": [
       "ES2022",
@@ -50,19 +50,19 @@
     //      ],
     //      "@scion/workbench-client": [
     //        "./projects/scion/workbench-client/src/public-api"
-    //      ],
-    //      //      "@scion/toolkit/*": [
-    //      //        "./src-lib/@scion/toolkit/*/src/public_api"
-    //      //      ],
-    //      //      "@scion/components/*": [
-    //      //        "./src-lib/@scion/components/*/src/public_api"
-    //      //      ],
-    //      //      "@scion/components.internal/*": [
-    //      //        "./src-lib/@scion/components.internal/*/src/public_api"
-    //      //      ],
-    //      //      "@scion/microfrontend-platform": [
-    //      //        "./src-lib/@scion/microfrontend-platform/src/public-api"
-    //      //      ]
+    //      ]
+    //      //      //      "@scion/toolkit/*": [
+    //      //      //        "./src-lib/@scion/toolkit/*/src/public_api"
+    //      //      //      ],
+    //      //      //      "@scion/components/*": [
+    //      //      //        "./src-lib/@scion/components/*/src/public_api"
+    //      //      //      ],
+    //      //      //      "@scion/components.internal/*": [
+    //      //      //        "./src-lib/@scion/components.internal/*/src/public_api"
+    //      //      //      ],
+    //      //      //      "@scion/microfrontend-platform": [
+    //      //      //        "./src-lib/@scion/microfrontend-platform/src/public-api"
+    //      //      //      ]
     //    }
   },
   "angularCompilerOptions": {

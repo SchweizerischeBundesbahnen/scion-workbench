@@ -1,0 +1,17 @@
+:host {
+  div.draggable {
+    width: 100px;
+    background-color: purple;
+  }
+
+  div.dropzone {
+    height: 250px;
+    background-color: yellow;
+  }
+
+  div.viewport {
+    height: 50px;
+    background-color: blue;
+    width: var(--drag-image-width);
+  }
+}

@@ -25,8 +25,8 @@ import {AsyncPipe} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {fromDimension$} from '@scion/toolkit/observable';
 import {WORKBENCH_ID} from '../../workbench-id';
+import {fromDimension$} from '@scion/toolkit/observable';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -264,13 +264,18 @@ export class PartBarComponent implements OnInit {
    * Method invoked while the user is dragging a tab over this tabbar.
    */
   private onTabbarDragOver(event: DragEvent): void {
+    NgZone.assertNotInAngularZone();
     event.preventDefault(); // allow view drop
 
     // Locate the tab over which the user is dragging the tab, but only after pending transitions have ended to prevent tabs from sliding back and forth.
     if (this.isDragAnimationStable()) {
       this.dropTargetViewTab = this.computeDropTarget(event);
       // Synchronize the width of the drag source placeholder with the drag pointer position to move actions along with the pointer.
-      setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${this.calculateDragImagePlaceholderWidth(event)}px`});
+
+      const width = this.calculateDragImagePlaceholderWidth(event);
+      requestAnimationFrame(() => {
+        setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${width}px`});
+      });
     }
   }
 
@@ -349,6 +354,7 @@ export class PartBarComponent implements OnInit {
 
     // Disable animations during calculation and force the viewport to overflow.
     setCssClass(this._host, 'calculating-max-viewport-width');
+
     setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${this._host.clientWidth}px`});
     try {
       return this._viewportElement().nativeElement.getBoundingClientRect().width;
@@ -411,8 +417,10 @@ export class PartBarComponent implements OnInit {
     this._viewTabDragImageRenderer.unsetConstrainDragImageRectFn(this._constrainFn!);
     this._constrainFn = null;
 
-    unsetCssClass(this._host, 'drag-over');
-    unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-image-placeholder-width');
+    requestAnimationFrame(() => {
+      unsetCssClass(this._host, 'drag-over');
+      unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-image-placeholder-width');
+    });
     this._viewDragService.unsetTabbarDragover(this.part.id);
   }
 
@@ -450,7 +458,10 @@ export class PartBarComponent implements OnInit {
 
   private installViewDragListener(): void {
     this._viewDragService.viewDrag$(this._host)
-      .pipe(takeUntilDestroyed())
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntilDestroyed(),
+      )
       .subscribe((event: DragEvent) => {
         switch (event.type) {
           case 'dragenter':
