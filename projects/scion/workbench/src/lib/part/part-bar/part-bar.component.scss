@@ -23,6 +23,7 @@
   }
 
   > sci-viewport.tabbar {
+    background-color: red;
     // Use 'flex: initial' instead of 'flex: auto' to not grow to absorb any extra free space in the partbar,
     // so that left-aligned actions will directly follow the viewtabs.
     flex: initial;

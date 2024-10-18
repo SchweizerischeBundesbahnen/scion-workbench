@@ -1,21 +1,21 @@
 <!-- MPart (leaf) -->
-@if (element | wbInstanceof:MPart; as part) {
+@if (element() | wbInstanceof:MPart; as part) {
   <ng-container [cdkPortalOutlet]="part.id | wbPartPortal"/>
 }
 
 <!-- MTreeNode -->
-@if (element | wbInstanceof:MTreeNode; as treeNode) {
-  @if (children.length === 1) {
+@if (element() | wbInstanceof:MTreeNode; as treeNode) {
+  @if (children().length === 1) {
     <!-- Node with a single visible child. -->
-    <wb-grid-element [element]="children[0].element"/>
+    <wb-grid-element [element]="children()[0].element"/>
   }
-  @if (children.length > 1) {
+  @if (children().length > 1) {
     <!-- Node with multiple visible children. -->
     <sci-sashbox [direction]="treeNode.direction"
                  [attr.data-nodeid]="treeNode.id"
                  (sashStart)="onSashStart()"
                  (sashEnd)="onSashEnd(treeNode, $event)">
-      @for (child of children; track child.element.id) {
+      @for (child of children(); track child.element.id) {
         <ng-template sciSash [size]="child.size">
           <wb-grid-element [element]="child.element" [class]="'sash-' + ($index + 1)"/>
         </ng-template>

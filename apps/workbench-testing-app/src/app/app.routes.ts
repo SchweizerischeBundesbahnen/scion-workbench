@@ -100,6 +100,14 @@ export const routes: Routes = [
     },
   },
   {
+    path: 'drag-page',
+    loadComponent: () => import('./drag-page/drag-page.component'),
+    data: {
+      [WorkbenchRouteData.title]: 'Drag Page',
+      pinToStartPage: true,
+    },
+  },
+  {
     path: 'test-layout',
     loadComponent: () => import('./layout-page/layout-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToStartPage: true},

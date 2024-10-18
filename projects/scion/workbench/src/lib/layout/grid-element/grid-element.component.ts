@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, computed, effect, HostBinding, input, Signal} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -43,12 +43,12 @@ import {WorkbenchLayouts} from '../workbench-layouts.util';
     SciSashDirective,
   ],
 })
-export class GridElementComponent implements OnChanges {
+export class GridElementComponent {
 
   public MTreeNode = MTreeNode;
   public MPart = MPart;
 
-  public children = new Array<ChildElement>();
+  public children: Signal<Array<ChildElement>>;
 
   @HostBinding('attr.data-parentnodeid')
   public parentNodeId: string | undefined;
@@ -59,18 +59,32 @@ export class GridElementComponent implements OnChanges {
   @HostBinding('attr.data-partid')
   public partId: string | undefined;
 
-  @Input({required: true})
-  public element!: MTreeNode | MPart;
+  public element = input.required<MTreeNode | MPart>();
 
   constructor(private _workbenchRouter: ɵWorkbenchRouter, private _workbenchLayoutService: WorkbenchLayoutService) {
+    this.children = computed(() => {
+      if (this.element() instanceof MTreeNode) {
+        return this.computeChildren(this.element() as MTreeNode);
+      }
+      else {
+        return [];
+      }
+    });
+    effect(() => {
+      console.log('>>> effect element');
+      const element = this.element();
+      this.parentNodeId = element.parent?.id;
+      this.nodeId = element instanceof MTreeNode ? element.id : undefined;
+      this.partId = element instanceof MPart ? element.id : undefined;
+    });
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
-    this.parentNodeId = this.element.parent?.id;
-    this.nodeId = this.element instanceof MTreeNode ? this.element.id : undefined;
-    this.partId = this.element instanceof MPart ? this.element.id : undefined;
-  }
+  // public ngOnChanges(changes: SimpleChanges): void {
+  //   this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
+  //   this.parentNodeId = this.element.parent?.id;
+  //   this.nodeId = this.element instanceof MTreeNode ? this.element.id : undefined;
+  //   this.partId = this.element instanceof MPart ? this.element.id : undefined;
+  // }
 
   public onSashStart(): void {
     this._workbenchLayoutService.notifyDragStarting();

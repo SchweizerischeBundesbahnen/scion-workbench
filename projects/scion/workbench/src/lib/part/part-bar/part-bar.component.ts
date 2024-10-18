@@ -25,8 +25,8 @@ import {AsyncPipe} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {fromDimension$} from '@scion/toolkit/observable';
 import {WORKBENCH_ID} from '../../workbench-id';
+import {fromDimension$} from '@scion/toolkit/observable';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -79,6 +79,7 @@ export class PartBarComponent implements OnInit {
   private readonly _viewportComponent = viewChild.required(SciViewportComponent);
   private readonly _tabCornerRadiusElement = viewChild.required('tab_corner_radius', {read: ElementRef<HTMLElement>});
   private readonly _paddingInlineElement = viewChild.required('padding_inline', {read: ElementRef<HTMLElement>});
+  private readonly _dragImagePlaceholderElement = viewChild.required('drag_image_placeholder', {read: ElementRef<HTMLElement>});
 
   /**
    * Reference to the tab before which to insert the drag source on drop, or `end` if dropping it after the last tab.
@@ -244,6 +245,7 @@ export class PartBarComponent implements OnInit {
    * Method invoked when the user drags a tab out of this tabbar.
    */
   private onTabbarDragLeave(): void {
+    console.log('>>> onTabbarDragLeave');
     this._dragleave$.next();
 
     // Set the CSS class 'drag-leave' to indicate leaving the tabbar.
@@ -270,7 +272,12 @@ export class PartBarComponent implements OnInit {
     if (this.isDragAnimationStable()) {
       this.dropTargetViewTab = this.computeDropTarget(event);
       // Synchronize the width of the drag source placeholder with the drag pointer position to move actions along with the pointer.
-      setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${this.calculateDragImagePlaceholderWidth(event)}px`});
+
+      const width = this.calculateDragImagePlaceholderWidth(event);
+      NgZone.assertNotInAngularZone();
+      requestAnimationFrame(() => {
+        setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${width}px`});
+      });
     }
   }
 
@@ -450,7 +457,13 @@ export class PartBarComponent implements OnInit {
 
   private installViewDragListener(): void {
     this._viewDragService.viewDrag$(this._host)
-      .pipe(takeUntilDestroyed())
+      // .pipe(
+      //   takeUntilDestroyed(),
+      // )
+      .pipe(
+        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        takeUntilDestroyed(),
+      )
       .subscribe((event: DragEvent) => {
         switch (event.type) {
           case 'dragenter':

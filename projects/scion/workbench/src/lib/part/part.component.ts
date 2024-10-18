@@ -35,7 +35,7 @@ import {WORKBENCH_ID} from '../workbench-id';
     ViewPortalPipe,
   ],
 })
-export class PartComponent implements OnInit, OnDestroy {
+export class PartComponent {
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
