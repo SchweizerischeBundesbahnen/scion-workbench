@@ -13,7 +13,7 @@ import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayCo
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent, ViewListComponentInputs} from '../view-list/view-list.component';
 import {WorkbenchPart} from '../workbench-part.model';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {observeIn} from '@scion/toolkit/operators';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
@@ -72,9 +72,9 @@ export class ViewListButtonComponent implements OnDestroy {
   private updatePositionInputOnPositionChange(componentRef: ComponentRef<ViewListComponent>, positionStrategy: FlexibleConnectedPositionStrategy): void {
     positionStrategy.positionChanges
       .pipe(
-        // Run inside Angular as Angular CDK emits position changes outside the Angular zone.
+        // Ensure running inside Angular as Angular CDK emits position changes outside the Angular zone.
         // Otherwise, Angular would not invoke the `ngOnChanges` lifecycle hook when updating component input.
-        subscribeInside(fn => this._zone.run(fn)),
+        observeIn(fn => this._zone.run(fn)),
         takeUntilDestroyed(componentRef.injector.get(DestroyRef)),
       )
       .subscribe(positionChange => {

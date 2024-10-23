@@ -14,8 +14,8 @@ import {filter, map, take} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {observeIn, subscribeIn} from '@scion/toolkit/operators';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {ViewId} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 import {NavigationData} from '../routing/routing.model';
@@ -66,6 +66,14 @@ export class ViewDragService implements OnDestroy {
    * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
    */
   public readonly tabbarDragOver$: Observable<string | null> = this._tabbarDragOver$;
+
+  /**
+   * Indicates if a drag operation is in progress.
+   */
+  public readonly dragging = toSignal(merge(
+    this.viewDragStart$.pipe(map(() => true)),
+    this.viewDragEnd$.pipe(map(() => false)),
+  ), {initialValue: false});
 
   constructor(private _zone: NgZone) {
     this.viewDragStart$
@@ -148,8 +156,8 @@ export class ViewDragService implements OnDestroy {
         shouldSubscribe('dragenter') || shouldSubscribe('dragleave') || shouldSubscribe('drop') ? dragenterOrDragleaveOrDrop$() : EMPTY,
       )
         .pipe(
-          subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-          observeInside(fn => insideAngular ? this._zone.run(fn) : this._zone.runOutsideAngular(fn)),
+          subscribeIn(fn => this._zone.runOutsideAngular(fn)),
+          observeIn(fn => insideAngular ? this._zone.run(fn) : this._zone.runOutsideAngular(fn)),
         )
         .subscribe(observer);
 

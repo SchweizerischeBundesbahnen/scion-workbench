@@ -1,14 +1,12 @@
 @if (workbenchStartup.isStarted()) {
   <div class="stacking-context-barrier" wbGlassPane>
-    @if (whenViewContainersInjected | async) {
-      <wb-workbench-layout/>
-    }
+    <wb-workbench-layout/>
     <!-- Achor to attach iframes of embedded microfrontends -->
-    <ng-container #iframe_host/>
+    <ng-container #iframe_overlay_host/>
   </div>
 
   <!-- Anchor to attach the visual placeholder when dragging a view over a valid drop zone -->
-  <div #view_drop_placeholder_host class="view-drop-placeholder-host"></div>
+  <div #view_drop_zone_overlay_host class="view-drop-zone-overlay-host"></div>
 
   <!-- Notifications -->
   <wb-notification-list/>

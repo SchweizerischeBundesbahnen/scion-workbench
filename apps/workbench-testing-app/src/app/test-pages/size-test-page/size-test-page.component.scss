@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > sci-viewport {
+    flex: 1 1 0;
+
+    &::part(content) {
+      display: flex;
+      flex-direction: column;
+      gap: .25em;
+      padding: 1em;
+    }
+  }
+
+  > button {
+    position: absolute;
+    top: .25em;
+    right: .25em;
+  }
+}

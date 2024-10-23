@@ -11,7 +11,7 @@
 import {Directive, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDropPlaceholderRenderer} from './view-drop-placeholder-renderer.service';
 import {Subject} from 'rxjs';
@@ -84,7 +84,7 @@ export class ViewDropZoneDirective implements OnInit {
     // Create drop zones when entering the host element.
     this._viewDragService.viewDrag$(this._host, {eventType: 'dragenter'})
       .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntilDestroyed(),
       )
       .subscribe(() => {
@@ -138,7 +138,7 @@ export class ViewDropZoneDirective implements OnInit {
     // Install drag listener to render the drop placeholder and handle drop.
     this._viewDragService.viewDrag$(dropZoneElement, {eventType: ['dragenter', 'dragover', 'drop']})
       .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntil(dispose$),
       )
       .subscribe((event: DragEvent) => {
@@ -161,7 +161,7 @@ export class ViewDropZoneDirective implements OnInit {
     // Disable the drop zone when dragging over the tab bar, allowing the user to change the tab order even for tabs covered by the drop zone.
     this._viewDragService.tabbarDragOver$
       .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntil(dispose$),
       )
       .subscribe(dragOverTabbar => {

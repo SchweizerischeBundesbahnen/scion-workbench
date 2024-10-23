@@ -21,7 +21,7 @@ import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.comp
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {NgClass} from '@angular/common';
@@ -178,8 +178,8 @@ export class ViewTabComponent {
     const zone = inject(NgZone);
     const enabled$ = merge(fromEvent<Event>(this.host, 'mouseenter'), fromEvent<Event>(this.host, 'mousemove'), fromEvent<Event>(this.host, 'mouseleave'))
       .pipe(
+        subscribeIn(fn => zone.runOutsideAngular(fn)),
         map(event => event.type === 'mousemove'), // the 'mousemove' event arms the listener
-        subscribeInside(continueFn => zone.runOutsideAngular(continueFn)),
       );
 
     fromEvent<Event>(this.host, 'dblclick')

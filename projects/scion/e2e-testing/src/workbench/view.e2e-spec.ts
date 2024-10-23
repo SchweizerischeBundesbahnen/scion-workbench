@@ -18,6 +18,7 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../workbench.model';
 import {WorkbenchNavigator} from './workbench-navigator';
 import {StartPagePO} from '../start-page.po';
+import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -805,5 +806,31 @@ test.describe('Workbench View', () => {
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expect.poll(() => viewPage.view.tab.getCssClasses()).toContain('testee');
     await expect(viewPage.view.tab.title).toHaveText('View Title');
+  });
+
+  test('should have no position and size when inactive', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view 1.
+    const viewPage1 = await SizeTestPagePO.openInNewTab(appPO);
+    await expectView(viewPage1).toBeActive();
+    const size = await viewPage1.getBoundingBox();
+
+    // Open view 2.
+    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await expectView(viewPage1).toBeInactive();
+    await expectView(viewPage2).toBeActive();
+
+    // Activate view 1.
+    await viewPage1.view.tab.click();
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).toBeInactive();
+
+    // Expect view to have zero position and size when inactive.
+    await expect.poll(() => viewPage1.getRecordedSizeChanges()).toEqual([
+      `x=${size.x}, y=${size.y}, width=${size.width}, height=${size.height}`,
+      'x=0, y=0, width=0, height=0',
+      `x=${size.x}, y=${size.y}, width=${size.width}, height=${size.height}`,
+    ]);
   });
 });

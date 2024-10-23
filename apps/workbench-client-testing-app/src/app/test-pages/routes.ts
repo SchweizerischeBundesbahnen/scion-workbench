@@ -107,6 +107,10 @@ const routes: Routes = [
     path: 'legacy-message-box-opener-page',
     loadComponent: () => import('./legacy-message-box-opener-page/legacy-message-box-opener-page.component'),
   },
+  {
+    path: 'size-test-page',
+    loadComponent: () => import('./size-test-page/size-test-page.component'),
+  },
 ];
 
 export default routes;

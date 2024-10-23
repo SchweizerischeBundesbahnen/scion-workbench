@@ -42,7 +42,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterCssClass('testee');
       await popupOpenerPage.enterContextualViewId(startPageViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({waitUntilAttached: false});
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);

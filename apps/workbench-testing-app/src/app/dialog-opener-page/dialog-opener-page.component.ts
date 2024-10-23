@@ -18,11 +18,12 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {DialogPageComponent} from '../dialog-page/dialog-page.component';
+import {CssClassComponent} from '../css-class/css-class.component';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
 import InputFieldTestPageComponent from '../test-pages/input-field-test-page/input-field-test-page.component';
-import {CssClassComponent} from '../css-class/css-class.component';
+import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -101,6 +102,8 @@ export default class DialogOpenerPageComponent {
         return FocusTestPageComponent;
       case 'input-field-test-page':
         return InputFieldTestPageComponent;
+      case 'size-test-page':
+        return SizeTestPageComponent;
       default:
         throw Error(`[IllegalDialogComponent] Dialog component not supported: ${this.form.controls.component.value}`);
     }

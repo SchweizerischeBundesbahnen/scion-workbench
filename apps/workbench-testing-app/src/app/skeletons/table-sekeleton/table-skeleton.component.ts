@@ -12,8 +12,7 @@ import {Component, computed, ElementRef, HostBinding, inject, Signal} from '@ang
 import {ArrayPipe} from '../array.pipe';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ListSkeletonComponent} from '../list-sekeleton/list-skeleton.component';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {dimension} from '@scion/components/dimension';
 
 /**
  * Represents a skeleton for a table.
@@ -40,9 +39,8 @@ export class TableSkeletonComponent {
   }
 
   constructor() {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
-    const dimension = toSignal(fromDimension$(host), {initialValue: null});
+    const hostSize = dimension(inject(ElementRef<HTMLElement>));
     // Compute number of columns based on table width.
-    this.columns = computed(() => Math.ceil((dimension()?.offsetWidth ?? host.offsetWidth) / 150));
+    this.columns = computed(() => Math.ceil((hostSize().offsetWidth) / 150));
   }
 }

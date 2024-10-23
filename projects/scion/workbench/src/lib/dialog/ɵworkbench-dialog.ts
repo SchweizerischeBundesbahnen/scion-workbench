@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, concatWith, delay, EMPTY, firstValueFrom, map, merge, Observable, of, Subject, switchMap} from 'rxjs';
-import {ApplicationRef, assertNotInReactiveContext, ComponentRef, EnvironmentInjector, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
+import {BehaviorSubject, concatWith, delay, firstValueFrom, map, of, Subject, switchMap} from 'rxjs';
+import {ApplicationRef, assertNotInReactiveContext, ComponentRef, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, untracked} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogSize, ɵWorkbenchDialogSize} from './workbench-dialog';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
@@ -20,10 +20,9 @@ import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {setStyle} from '../common/dom.util';
-import {fromDimension$} from '@scion/toolkit/observable';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {fromResize$} from '@scion/toolkit/observable';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WORKBENCH_ELEMENT_REF} from '../content-projection/view-container.reference';
+import {WORKBENCH_ELEMENT_REF} from '../content-projection/workbench-element-references';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchConfig} from '../workbench-config';
 import {distinctUntilChanged, filter} from 'rxjs/operators';
@@ -34,6 +33,7 @@ import {Disposable} from '../common/disposable';
 import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
 import {provideViewContext} from '../view/view-context-provider';
+import {boundingClientRect} from '@scion/components/dimension';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
@@ -43,11 +43,10 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _overlayRef: OverlayRef;
   private readonly _portal: ComponentPortal<WorkbenchDialogComponent>;
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
-  private readonly _zone = inject(NgZone);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _destroyRef = new ɵDestroyRef();
-  private readonly _attached$: Observable<boolean>;
   private readonly _blink$ = new Subject<void>();
+  private readonly _attached: Signal<boolean>;
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _closable = signal(true);
   private readonly _resizable = signal(true);
@@ -79,9 +78,8 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     this._overlayRef = this.createOverlay();
     this._portal = this.createPortal();
     this._cssClass.set(Arrays.coerce(this._options.cssClass));
-    this._attached$ = this.monitorHostElementAttached$();
+    this._attached = this.monitorHostElementAttached();
 
-    this.hideOnHostElementDetachOrViewDrag();
     this.stickToHostElement();
     this.blockWhenNotOnTop();
     this.restoreFocusOnAttach();
@@ -92,7 +90,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   public async open(): Promise<R | undefined> {
     // Wait for the overlay to be initially positioned to have a smooth slide-in animation.
     if (this.animate) {
-      await firstValueFrom(fromDimension$(this._overlayRef.hostElement));
+      await firstValueFrom(fromResize$(this._overlayRef.hostElement));
     }
 
     // Attach the dialog portal to the overlay.
@@ -278,14 +276,10 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    * Restores focus when re-attaching this dialog.
    */
   private restoreFocusOnAttach(): void {
-    this._attached$
-      .pipe(
-        filter(Boolean),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this.focus();
-      });
+    effect(() => {
+      const attached = this._attached();
+      untracked(() => attached && this.focus());
+    });
   }
 
   /**
@@ -305,38 +299,15 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   /**
    * Monitors attachment of the host element.
    */
-  private monitorHostElementAttached$(): Observable<boolean> {
+  private monitorHostElementAttached(): Signal<boolean> {
     if (this.context.view) {
-      return this.context.view.portal.attached$;
+      return this.context.view.portal.attached;
     }
     if (this._workbenchConfig.dialog?.modalityScope === 'viewport') {
-      return of(true);
+      return computed(() => true);
     }
-    return inject(WORKBENCH_ELEMENT_REF).ref$.pipe(map(ref => !!ref));
-  }
-
-  /**
-   * Hides this dialog when either its host element is detached or during view drag and drop operation.
-   */
-  private hideOnHostElementDetachOrViewDrag(): void {
-    const viewDragService = inject(ViewDragService);
-    const viewDrag$ = merge(
-      viewDragService.viewDragStart$.pipe(map(() => true)),
-      viewDragService.viewDragEnd$.pipe(map(() => false)),
-      of(false), // to initialize `combineLatest`
-    );
-
-    combineLatest([this._attached$, viewDrag$])
-      .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        takeUntilDestroyed(),
-      )
-      .subscribe(([attached, dragging]) => {
-        const hideDialog = !attached || dragging;
-
-        // Hide via `visibility: hidden` instead of `display: none` in order to preserve the dimension of the dialog.
-        setStyle(this._overlayRef.overlayElement, {visibility: hideDialog ? 'hidden' : null});
-      });
+    const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
+    return computed(() => !!workbenchElementRef());
   }
 
   /**
@@ -347,25 +318,30 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
       setStyle(this._overlayRef.hostElement, {inset: '0'});
     }
     else {
-      const workbenchViewElement$ = (view: ɵWorkbenchView): Observable<HTMLElement> => of(view.portal.componentRef.location.nativeElement);
-      const workbenchRootElement$ = (): Observable<HTMLElement> => inject(WORKBENCH_ELEMENT_REF).ref$.pipe(map(ref => ref?.element.nativeElement));
-      const hostElement$ = this.context.view ? workbenchViewElement$(this.context.view) : workbenchRootElement$();
+      const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
+      const hostElement = computed(() => this.context.view ? this.context.view.portal.componentRef.location.nativeElement : workbenchElementRef()?.element.nativeElement);
+      const hostBounds = boundingClientRect(hostElement);
+      const viewDragService = inject(ViewDragService);
 
-      hostElement$
-        .pipe(
-          switchMap(hostElement => hostElement ? fromDimension$(hostElement) : EMPTY),
-          map(({element: hostElement}) => hostElement.getBoundingClientRect()),
-          subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-          takeUntilDestroyed(),
-        )
-        .subscribe(({top, left, width, height}) => {
-          setStyle(this._overlayRef.hostElement, {
-            top: `${top}px`,
-            left: `${left}px`,
-            width: `${width}px`,
-            height: `${height}px`,
-          });
+      effect(() => {
+        const visible = this._attached() && !viewDragService.dragging();
+
+        // Maintain position and size when hidden to prevent flickering when visible again and to support for virtual scrolling in dialog content.
+        if (!visible) {
+          setStyle(this._overlayRef.overlayElement, {visibility: 'hidden'}); // Hide via `visibility` instead of `display` property to retain the size.
+          return;
+        }
+
+        // IMPORTANT: Track host bounds only if visible to prevent flickering.
+        const {left, top, width, height} = hostBounds();
+        setStyle(this._overlayRef.overlayElement, {visibility: null});
+        setStyle(this._overlayRef.hostElement, {
+          top: `${top}px`,
+          left: `${left}px`,
+          width: `${width}px`,
+          height: `${height}px`,
         });
+      });
     }
   }
 

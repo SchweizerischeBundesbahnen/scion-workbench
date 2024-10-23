@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,8 @@ import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 
 const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
+import {expectView} from '../matcher/view-matcher';
 
 test.describe('Workbench Popup', () => {
 
@@ -497,6 +499,66 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).toBeVisible();
     });
 
+    test('should maintain popup bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling) [element anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open view 1 with popup.
+      const popupPage = await SizeTestPagePO.openInPopup(appPO, {position: 'element'});
+      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()}));
+
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Open view 2.
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      await expectPopup(popupPage).toBeHidden();
+      await expectView(viewPage1).toBeInactive();
+      await expectView(viewPage2).toBeActive();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Activate view 1.
+      await viewPage1.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+      await expectView(viewPage1).toBeActive();
+      await expectView(viewPage2).toBeInactive();
+
+      // Expect popup not to be resized
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+
+    test('should maintain popup bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling) [coordinate anchor]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open view 1 with popup.
+      const popupPage = await SizeTestPagePO.openInPopup(appPO, {position: 'coordinate'});
+      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()}));
+
+      await expectPopup(popupPage).toBeVisible();
+      const popupSize = await popupPage.getBoundingBox();
+      const sizeChanges = await popupPage.getRecordedSizeChanges();
+
+      // Open view 2.
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      await expectPopup(popupPage).toBeHidden();
+      await expectView(viewPage1).toBeInactive();
+      await expectView(viewPage2).toBeActive();
+
+      // Expect popup bounding box not to have changed.
+      await expect.poll(() => popupPage.getBoundingBox()).toEqual(popupSize);
+
+      // Activate view 1.
+      await viewPage1.view.tab.click();
+      await expectPopup(popupPage).toBeVisible();
+      await expectView(viewPage1).toBeActive();
+      await expectView(viewPage2).toBeInactive();
+
+      // Expect popup not to be resized (no flickering).
+      await expect.poll(() => popupPage.getRecordedSizeChanges()).toEqual(sizeChanges);
+    });
+
     test('should not destroy the popup when its contextual view (if any) is deactivated', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -536,12 +598,12 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterContextualViewId(await startPage.view.getViewId());
       await popupOpenerPage.enterPosition({left: appPO.viewportBoundingBox().hcenter, top: appPO.viewportBoundingBox().vcenter});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({waitUntilAttached: false});
 
       const popup = appPO.popup({cssClass: 'testee'});
       const popupPage = new PopupPagePO(popup);
 
-      await expectPopup(popupPage).toBeHidden();
+      await expectPopup(popupPage).not.toBeAttached();
 
       // activate the view to which the popup is bound to
       await startPage.view.tab.click();
@@ -629,12 +691,12 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterContextualViewId(await popupTargetViewPage.view.getViewId());
       await popupOpenerPage.enterPosition({left: 300, top: 300});
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({waitUntilAttached: false});
 
       const popup1 = appPO.popup({cssClass: 'testee-1'});
       const popupPopupOpenerPage1 = new PopupOpenerPagePO(popup1);
 
-      await expectPopup(popupPopupOpenerPage1).toBeHidden();
+      await expectPopup(popupPopupOpenerPage1).not.toBeAttached();
 
       // Activate target view.
       await popupTargetViewPage.view.tab.click();

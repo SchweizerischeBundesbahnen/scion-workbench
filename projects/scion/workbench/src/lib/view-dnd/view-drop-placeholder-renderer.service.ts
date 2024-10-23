@@ -12,8 +12,8 @@ import {inject, Injectable, NgZone} from '@angular/core';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragService} from './view-drag.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {subscribeInside} from '@scion/toolkit/operators';
-import {VIEW_DROP_PLACEHOLDER_HOST, ViewContainerReference} from '../content-projection/view-container.reference';
+import {subscribeIn} from '@scion/toolkit/operators';
+import {VIEW_DROP_ZONE_OVERLAY_HOST} from '../content-projection/workbench-element-references';
 import {filter} from 'rxjs/operators';
 import {merge} from 'rxjs';
 
@@ -26,7 +26,7 @@ import {merge} from 'rxjs';
 @Injectable({providedIn: 'root'})
 export class ViewDropPlaceholderRenderer {
 
-  private _dropPlaceholderHost = inject<ViewContainerReference>(VIEW_DROP_PLACEHOLDER_HOST);
+  private _dropPlaceholderOverlayHost = inject(VIEW_DROP_ZONE_OVERLAY_HOST);
   private _dropPlaceholder: HTMLElement | null = null;
 
   constructor(private _viewDragService: ViewDragService, private _zone: NgZone) {
@@ -53,7 +53,7 @@ export class ViewDropPlaceholderRenderer {
 
   private createDropPlaceholder(): HTMLElement {
     return createElement('div', {
-      parent: this._dropPlaceholderHost.ref().element.nativeElement,
+      parent: this._dropPlaceholderOverlayHost()!.element.nativeElement,
       style: {
         'position': 'fixed',
         'background-color': 'var(--sci-workbench-part-dropzone-background-color)',
@@ -81,7 +81,7 @@ export class ViewDropPlaceholderRenderer {
 
     merge(tabbarDragOver$, nonDropTargetDragOver$, dragEnd$)
       .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntilDestroyed(),
       )
       .subscribe(() => {

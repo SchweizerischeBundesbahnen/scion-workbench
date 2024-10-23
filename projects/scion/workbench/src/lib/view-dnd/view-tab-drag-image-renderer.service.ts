@@ -13,7 +13,7 @@ import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ComponentPortal, DomPortalOutlet} from '@angular/cdk/portal';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-drag-image.component';
 import {UrlSegment} from '@angular/router';
@@ -165,7 +165,7 @@ export class ViewTabDragImageRenderer {
   private installWindowViewDragListener(): void {
     this._viewDragService.viewDrag$(window)
       .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntilDestroyed(),
       )
       .subscribe((event: DragEvent) => {
