@@ -15,6 +15,8 @@ import {DialogPagePO} from '../page-object/dialog-page.po';
 import {expectDialog} from '../../matcher/dialog-matcher';
 import {ViewPagePO} from '../page-object/view-page.po';
 import {DialogPropertiesTestPagePO} from '../page-object/test-pages/dialog-properties-test-page.po';
+import {SizeTestPagePO} from '../page-object/test-pages/size-test-page.po';
+import {expectView} from '../../matcher/view-matcher';
 
 test.describe('Workbench Dialog', () => {
 
@@ -85,6 +87,36 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
       // Expect the component not to be constructed anew.
       await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should maintain dialog bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling)', async ({appPO, microfrontendNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: true});
+
+      // Open view 1 with dialog.
+      const dialogPage = await SizeTestPagePO.openInDialog(appPO);
+      const viewPage1 = new DialogOpenerPagePO(appPO, {viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()});
+
+      await expectDialog(dialogPage).toBeVisible();
+      const dialogSize = await dialogPage.getBoundingBox();
+      const sizeChanges = await dialogPage.getRecordedSizeChanges();
+
+      // Open view 2.
+      const viewPage2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+      await expectDialog(dialogPage).toBeHidden();
+      await expectView(viewPage1).toBeInactive();
+      await expectView(viewPage2).toBeActive();
+
+      // Expect dialog bounding box not to have changed.
+      await expect.poll(() => dialogPage.getBoundingBox()).toEqual(dialogSize);
+
+      // Activate view 1.
+      await viewPage1.view.tab.click();
+      await expectDialog(dialogPage).toBeVisible();
+      await expectView(viewPage1).toBeActive();
+      await expectView(viewPage2).toBeInactive();
+
+      // Expect dialog not to be resized (no flickering).
+      await expect.poll(() => dialogPage.getRecordedSizeChanges()).toEqual(sizeChanges);
     });
 
     test('should open dialog in any view', async ({appPO, microfrontendNavigator}) => {

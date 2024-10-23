@@ -16,7 +16,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {MovableDirective, WbMoveEvent} from './movable.directive';
 import {ResizableDirective, WbResizeEvent} from './resizable.directive';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
@@ -164,12 +164,12 @@ export class WorkbenchDialogComponent implements OnInit {
   private trackFocus(): void {
     fromEvent<FocusEvent>(this._dialogElement.nativeElement, 'focusin')
       .pipe(
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         map(event => event.target instanceof HTMLElement ? event.target : undefined),
         // The dialog is focused if it has no focusable element, so the dialog can be closed via Escape.
         // However, in order not to cancel the autofocus, the dialog element must not be memoized as the
         // active element. Otherwise, delayed content would not be focused.
         filter(element => element !== this._dialogElement.nativeElement),
-        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
         takeUntilDestroyed(this._destroyRef),
       )
       .subscribe(activeElement => {

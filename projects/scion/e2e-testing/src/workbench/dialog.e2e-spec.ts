@@ -18,6 +18,8 @@ import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {expectDialog} from '../matcher/dialog-matcher';
+import {expectView} from '../matcher/view-matcher';
+import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -75,6 +77,36 @@ test.describe('Workbench Dialog', () => {
 
       // Expect the component not to be constructed anew.
       await expect.poll(() => dialogPage.getComponentInstanceId()).toEqual(componentInstanceId);
+    });
+
+    test('should maintain dialog bounds if view is not active (to not flicker on reactivation; to support for virtual scrolling)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Open view 1 with dialog.
+      const dialogPage = await SizeTestPagePO.openInDialog(appPO);
+      const viewPage1 = new DialogOpenerPagePO(appPO.view({viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()}));
+
+      await expectDialog(dialogPage).toBeVisible();
+      const dialogSize = await dialogPage.getBoundingBox();
+      const sizeChanges = await dialogPage.getRecordedSizeChanges();
+
+      // Open view 2.
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+      await expectDialog(dialogPage).toBeHidden();
+      await expectView(viewPage1).toBeInactive();
+      await expectView(viewPage2).toBeActive();
+
+      // Expect dialog bounding box not to have changed.
+      await expect.poll(() => dialogPage.getBoundingBox()).toEqual(dialogSize);
+
+      // Activate view 1.
+      await viewPage1.view.tab.click();
+      await expectDialog(dialogPage).toBeVisible();
+      await expectView(viewPage1).toBeActive();
+      await expectView(viewPage2).toBeInactive();
+
+      // Expect dialog not to be resized (no flickering).
+      await expect.poll(() => dialogPage.getRecordedSizeChanges()).toEqual(sizeChanges);
     });
 
     test('should detach the dialog if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {

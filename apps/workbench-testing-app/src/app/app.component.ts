@@ -17,7 +17,7 @@ import {DOCUMENT} from '@angular/common';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
-import {subscribeInside} from '@scion/toolkit/operators';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {SettingsService} from './settings.service';
 
 @Component({
@@ -90,7 +90,7 @@ export class AppComponent implements DoCheck {
   private installPropagatedKeyboardEventLogger(): void {
     fromEvent<KeyboardEvent>(inject(DOCUMENT), 'keydown')
       .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntilDestroyed(),
       )
       .subscribe((event: KeyboardEvent) => {

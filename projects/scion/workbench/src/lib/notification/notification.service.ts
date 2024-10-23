@@ -14,7 +14,7 @@ import {ɵNotification} from './ɵnotification';
 import {NotificationConfig} from './notification.config';
 import {DOCUMENT} from '@angular/common';
 import {filter, map} from 'rxjs/operators';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
@@ -133,11 +133,11 @@ export class NotificationService {
   private installEscapeHandler(): void {
     fromEvent<KeyboardEvent>(this._document, 'keydown')
       .pipe(
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         filter((event: KeyboardEvent) => event.key === 'Escape'),
         map(() => Arrays.last(this.notifications)),
         filter((notification): notification is ɵNotification => !!notification),
-        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-        observeInside(continueFn => this._zone.run(continueFn)),
+        observeIn(fn => this._zone.run(fn)),
         takeUntilDestroyed(),
       )
       .subscribe(lastNotification => {

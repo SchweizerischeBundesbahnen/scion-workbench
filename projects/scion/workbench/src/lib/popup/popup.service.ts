@@ -8,30 +8,30 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, createEnvironmentInjector, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
-import {ConnectedOverlayPositionChange, ConnectedPosition, FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
-import {combineLatestWith, firstValueFrom, fromEvent, identity, MonoTypeOperatorFunction, Observable} from 'rxjs';
-import {distinctUntilChanged, filter, map, shareReplay, startWith} from 'rxjs/operators';
+import {assertNotInReactiveContext, computed, createEnvironmentInjector, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
+import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import {firstValueFrom, fromEvent} from 'rxjs';
+import {filter} from 'rxjs/operators';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {Popup, PopupConfig, ɵPopup} from './popup.config';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
-import {Objects, Observables} from '@scion/toolkit/util';
+import {Observables} from '@scion/toolkit/util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {fromBoundingClientRect$, fromDimension$} from '@scion/toolkit/observable';
+import {fromResize$} from '@scion/toolkit/observable';
 import {PopupComponent} from './popup.component';
 import {DOCUMENT} from '@angular/common';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
-import {coerceElement} from '@angular/cdk/coercion';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {provideViewContext} from '../view/view-context-provider';
 import {UUID} from '@scion/toolkit/uuid';
+import {boundingClientRect} from '@scion/components/dimension';
 
-const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom'};
-const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top'};
-const WEST: ConnectedPosition = {originX: 'start', originY: 'center', overlayX: 'end', overlayY: 'center'};
-const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center'};
+const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
+const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
+const WEST: ConnectedPosition = {originX: 'start', originY: 'center', overlayX: 'end', overlayY: 'center', panelClass: 'wb-west'};
+const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center', panelClass: 'wb-east'};
 
 /**
  * Allows displaying a component in a workbench popup.
@@ -87,11 +87,15 @@ export class PopupService {
 
     const align = config.align || 'north';
     const contextualView = this.resolveContextualView(config);
+    const popup = this.createPopup(config, {view: contextualView});
+    const popupDestroyRef = popup.injector.get(DestroyRef);
+    const popupOrigin = this.trackPopupOrigin(config, contextualView, popup.injector);
 
-    // Set up the popup positioning strategy.
-    const popupOrigin$ = this.observePopupOrigin$(config, contextualView).pipe(shareReplay({bufferSize: 1, refCount: false}));
+    // Wait for the initial position.
+    const initialPosition = await firstValueFrom(toObservable(popupOrigin, {injector: popup.injector}).pipe(filter(Boolean)));
+
     const overlayPositionStrategy = this._overlay.position()
-      .flexibleConnectedTo(await firstValueFrom(popupOrigin$))
+      .flexibleConnectedTo(initialPosition)
       .withFlexibleDimensions(false)
       .withLockedPosition(false) // If locked, the popup won't attempt to reposition itself if not enough space available.
       .withPositions(((): ConnectedPosition[] => {
@@ -111,10 +115,7 @@ export class PopupService {
 
     // Configure the popup overlay.
     const overlayConfig = new OverlayConfig({
-      panelClass: [
-        'wb-popup',
-        `wb-${align}`,
-      ],
+      panelClass: 'wb-popup',
       hasBackdrop: false,
       positionStrategy: overlayPositionStrategy,
       scrollStrategy: this._overlay.scrollStrategies.noop(),
@@ -123,7 +124,6 @@ export class PopupService {
 
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
-    const popup = this.createPopup(config, {view: contextualView});
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
       parent: config.componentConstructOptions?.injector || this._environmentInjector,
       providers: [
@@ -133,7 +133,6 @@ export class PopupService {
         ...[config.componentConstructOptions?.providers || []],
       ],
     }));
-    const popupDestroyRef = popup.injector.get(DestroyRef);
     const componentRef = overlayRef.attach(popupPortal);
     const popupElement: HTMLElement = componentRef.location.nativeElement;
 
@@ -141,23 +140,26 @@ export class PopupService {
     popupElement.setAttribute('tabindex', '-1');
     this._focusManager.focusVia(popupElement, 'program'); // To not close the popup immediately when it opens, if using the 'onFocusLost' strategy.
 
-    // Synchronize the CSS class that indicates where the popup docks to the anchor; is one of 'wb-north', 'wb-south', 'wb-east', or 'wb-west'.
-    overlayPositionStrategy.positionChanges
-      .pipe(takeUntilDestroyed(popupDestroyRef))
-      .subscribe(change => this.setPopupAlignCssClass(overlayRef, change));
+    // Reposition popup when the anchor is moved.
+    effect(() => {
+      const origin = popupOrigin();
+      untracked(() => {
+        if (origin) {
+          overlayPositionStrategy.setOrigin(origin);
+          overlayRef.updatePosition();
+        }
+      });
+    }, {injector: popup.injector});
 
-    // Re-position the popup when the origin moves.
-    popupOrigin$
-      .pipe(takeUntilDestroyed(popupDestroyRef))
-      .subscribe((origin: FlexibleConnectedPositionStrategyOrigin) => {
-        overlayPositionStrategy.setOrigin(origin);
+    // Reposition popup when resized.
+    fromResize$(overlayRef.overlayElement)
+      .pipe(
+        observeIn(fn => this._zone.run(fn)),
+        takeUntilDestroyed(popupDestroyRef),
+      )
+      .subscribe(() => {
         overlayRef.updatePosition();
       });
-
-    // Reposition the popup when its size changes (if necessary).
-    fromDimension$(overlayRef.overlayElement)
-      .pipe(takeUntilDestroyed(popupDestroyRef))
-      .subscribe(() => overlayRef.updatePosition());
 
     // Close the popup depending on the passed config.
     this.installPopupCloser(config, popupElement, popup, contextualView);
@@ -189,24 +191,6 @@ export class PopupService {
     return runInInjectionContext(popupEnvironmentInjector, () => new ɵPopup<R>(popupId, config));
   }
 
-  private setPopupAlignCssClass(overlayRef: OverlayRef, positionChange: ConnectedOverlayPositionChange): void {
-    overlayRef.overlayElement.classList.remove('wb-north', 'wb-south', 'wb-east', 'wb-west');
-    switch (positionChange.connectionPair) {
-      case NORTH:
-        overlayRef.overlayElement.classList.add('wb-north');
-        break;
-      case SOUTH:
-        overlayRef.overlayElement.classList.add('wb-south');
-        break;
-      case EAST:
-        overlayRef.overlayElement.classList.add('wb-east');
-        break;
-      case WEST:
-        overlayRef.overlayElement.classList.add('wb-west');
-        break;
-    }
-  }
-
   /**
    * Closes the popup depending on the configured popup closing strategy.
    */
@@ -217,9 +201,9 @@ export class PopupService {
     if (config.closeStrategy?.onEscape ?? true) {
       fromEvent<KeyboardEvent>(popupElement, 'keydown')
         .pipe(
+          subscribeIn(fn => this._zone.runOutsideAngular(fn)),
           filter((event: KeyboardEvent) => event.key === 'Escape'),
-          subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
-          observeInside(continueFn => this._zone.run(continueFn)),
+          observeIn(fn => this._zone.run(fn)),
           takeUntilDestroyed(popupDestroyRef),
         )
         .subscribe(() => popup.close());
@@ -255,9 +239,9 @@ export class PopupService {
     const popupDestroyRef = popup.injector.get(DestroyRef);
     let activeElement: HTMLElement | undefined;
 
-    contextualView.portal.attached$
-      .pipe(takeUntilDestroyed(popupDestroyRef))
-      .subscribe(attached => {
+    effect(() => {
+      const attached = contextualView.portal.attached();
+      untracked(() => {
         if (attached) {
           overlayRef.overlayElement.classList.add('wb-view-attached');
           activeElement?.focus();
@@ -266,11 +250,12 @@ export class PopupService {
           overlayRef.overlayElement.classList.remove('wb-view-attached');
         }
       });
+    }, {injector: popup.injector});
 
     // Track the focus in the popup to restore it when attaching the popup.
     fromEvent(overlayRef.overlayElement, 'focusin')
       .pipe(
-        subscribeInside(continueFn => this._zone.runOutsideAngular(continueFn)),
+        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntilDestroyed(popupDestroyRef),
       )
       .subscribe(() => {
@@ -279,50 +264,35 @@ export class PopupService {
   }
 
   /**
-   * Observes the position of the popup anchor.
-   *
-   * The Observable emits the anchor's initial position, and each time when its position changes.
+   * Creates a signal that tracks the position of the popup anchor.
    */
-  private observePopupOrigin$(config: PopupConfig, contextualView: ɵWorkbenchView | null): Observable<FlexibleConnectedPositionStrategyOrigin> {
+  private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
-      return fromBoundingClientRect$(coerceElement<HTMLElement>(config.anchor as HTMLElement))
-        .pipe(
-          filter(clientRect => !isNullClientRect(clientRect)), // Omit changes without dimension, for example, emitted when the view is deactivated.
-          map(clientRect => ({x: clientRect.x, y: clientRect.y, width: clientRect.width, height: clientRect.height})),
-        );
+      const anchorBounds = boundingClientRect(config.anchor as HTMLElement | ElementRef<HTMLElement>, {injector});
+      return computed(() => {
+        // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
+        if (contextualView && !contextualView.portal.attached()) {
+          return undefined;
+        }
+        return anchorBounds();  // IMPORTANT: Track anchor bounds only if attached to prevent flickering.
+      }, {equal: isEqualDomRect});
     }
     else {
-      return Observables.coerce(config.anchor)
-        .pipe(
-          combineLatestWith(this.viewportBounds$(contextualView)),
-          map(([popupOrigin, viewportBounds]) => {
-            const {x, y} = this.mapPopupOriginToPageCoordinate(popupOrigin, viewportBounds);
-            return {x, y, width: popupOrigin.width, height: popupOrigin.height};
-          }),
-          distinctUntilChanged(Objects.isEqual),
-        );
-    }
-  }
+      const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
+      const anchorBounds = toSignal(Observables.coerce(config.anchor), {injector});
+      return computed(() => {
+        // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
+        if (contextualView && !contextualView.portal.attached()) {
+          return undefined;
+        }
+        if (!anchorBounds()) { // IMPORTANT: Track anchor bounds only if attached to prevent flickering.
+          return undefined;
+        }
 
-  /**
-   * Observes the bounds of the viewport (view or page) in which the popup has been opened.
-   */
-  private viewportBounds$(view: ɵWorkbenchView | null): Observable<ViewportBounds> {
-    if (view) {
-      return fromDimension$(view.portal.componentRef.location.nativeElement)
-        .pipe(
-          map(dimension => dimension.element.getBoundingClientRect()),
-          filter(clientRect => !isNullClientRect(clientRect)), // Omit changes without dimension, for example, emitted when the view is deactivated.
-          map(clientRect => ({x: clientRect.left, y: clientRect.top, width: clientRect.width, height: clientRect.height})),
-          startWithNullBoundsIf(() => !view.active()), // Ensure initial bounds to be emitted even if the view is inactive. Otherwise, the popup would not be attached to the DOM until the view is activated.
-        );
-    }
-    else {
-      return fromEvent(window, 'resize')
-        .pipe(
-          startWith(undefined as void),
-          map(() => ({x: 0, y: 0, width: window.innerWidth, height: window.innerHeight})),
-        );
+        const {x, y} = mapToPageCoordinates(anchorBounds()!, hostBounds());
+        const {width, height} = anchorBounds()!;
+        return new DOMRect(x, y, width, height);
+      }, {equal: isEqualDomRect});
     }
   }
 
@@ -338,61 +308,50 @@ export class PopupService {
     }
     return null;
   }
+}
 
-  /**
-   * Maps the passed popup origin, which is relative to the given viewport, to a page coordinate.
-   */
-  private mapPopupOriginToPageCoordinate(origin: PopupOrigin, viewportBounds: ViewportBounds): Point {
-    const xy = origin as Point;
-    if (xy.x !== undefined && xy.y !== undefined) {
-      return {
-        x: viewportBounds.x + xy.x,
-        y: viewportBounds.y + xy.y,
-      };
-    }
-    const topLeft = origin as TopLeftPoint;
-    if (topLeft.top !== undefined && topLeft.left !== undefined) {
-      return {
-        x: viewportBounds.x + topLeft.left,
-        y: viewportBounds.y + topLeft.top,
-      };
-    }
-    const topRight = origin as TopRightPoint;
-    if (topRight.top !== undefined && topRight.right !== undefined) {
-      return {
-        x: viewportBounds.x + (viewportBounds.width - topRight.right),
-        y: viewportBounds.y + topRight.top,
-      };
-    }
-    const bottomLeft = origin as BottomLeftPoint;
-    if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
-      return {
-        x: viewportBounds.x + bottomLeft.left,
-        y: viewportBounds.y + (viewportBounds.height - bottomLeft.bottom),
-      };
-    }
-    const bottomRight = origin as BottomRightPoint;
-    if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
-      return {
-        x: viewportBounds.x + (viewportBounds.width - bottomRight.right),
-        y: viewportBounds.y + (viewportBounds.height - bottomRight.bottom),
-      };
-    }
-    throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
+/**
+ * Maps given view coordinates to absolute page coordinates.
+ */
+function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
+  const xy = origin as Point;
+  if (xy.x !== undefined && xy.y !== undefined) {
+    return {
+      x: relativeTo.x + xy.x,
+      y: relativeTo.y + xy.y,
+    };
   }
+  const topLeft = origin as TopLeftPoint;
+  if (topLeft.top !== undefined && topLeft.left !== undefined) {
+    return {
+      x: relativeTo.x + topLeft.left,
+      y: relativeTo.y + topLeft.top,
+    };
+  }
+  const topRight = origin as TopRightPoint;
+  if (topRight.top !== undefined && topRight.right !== undefined) {
+    return {
+      x: relativeTo.x + (relativeTo.width - topRight.right),
+      y: relativeTo.y + topRight.top,
+    };
+  }
+  const bottomLeft = origin as BottomLeftPoint;
+  if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
+    return {
+      x: relativeTo.x + bottomLeft.left,
+      y: relativeTo.y + (relativeTo.height - bottomLeft.bottom),
+    };
+  }
+  const bottomRight = origin as BottomRightPoint;
+  if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
+    return {
+      x: relativeTo.x + (relativeTo.width - bottomRight.right),
+      y: relativeTo.y + (relativeTo.height - bottomRight.bottom),
+    };
+  }
+  throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
 }
 
-function isNullClientRect(clientRect: DOMRect): boolean {
-  return clientRect.top === 0 && clientRect.right === 0 && clientRect.bottom === 0 && clientRect.left === 0;
-}
-
-function startWithNullBoundsIf(condition: () => boolean): MonoTypeOperatorFunction<ViewportBounds> {
-  return condition() ? startWith({x: 0, y: 0, width: 0, height: 0}) : identity;
-}
-
-interface ViewportBounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+function isEqualDomRect(a: DOMRect | undefined, b: DOMRect | undefined): boolean {
+  return a?.top === b?.top && a?.right === b?.right && a?.bottom === b?.bottom && a?.left === b?.left;
 }

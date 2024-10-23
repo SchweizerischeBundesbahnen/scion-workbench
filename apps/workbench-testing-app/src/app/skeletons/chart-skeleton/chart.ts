@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {computed, ElementRef, inject, signal, Signal} from '@angular/core';
-import {toSignal} from '@angular/core/rxjs-interop';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {dimension} from '@scion/components/dimension';
 
 /**
  * Generates a responsive chart based on the provided data series.
@@ -56,11 +55,10 @@ export class Chart {
    * Computes the chart points from the data series.
    */
   private computePoints(): Signal<Point[]> {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
-    const dimension = toSignal(fromDimension$(host), {initialValue: null});
+    const hostSize = dimension(inject(ElementRef<HTMLElement>));
 
     return computed(() => {
-      const width = dimension()?.offsetWidth ?? host.offsetWidth;
+      const width = hostSize().offsetWidth;
       if (!width) {
         return [];
       }

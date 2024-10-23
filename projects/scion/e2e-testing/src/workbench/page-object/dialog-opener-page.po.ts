@@ -63,7 +63,7 @@ export class DialogOpenerPagePO implements WorkbenchViewPagePO {
     }
   }
 
-  public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
+  public async open(component: 'dialog-page' | 'dialog-opener-page' | 'popup-opener-page' | 'focus-test-page' | 'input-field-test-page' | 'size-test-page', options?: WorkbenchDialogOptions & DialogOpenerPageOptions): Promise<void> {
     if (options?.injector) {
       throw Error('[PageObjectError] PageObject does not support the option `injector`.');
     }

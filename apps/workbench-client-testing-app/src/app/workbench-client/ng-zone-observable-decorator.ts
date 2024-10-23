@@ -10,7 +10,7 @@
 
 import {Observable} from 'rxjs';
 import {NgZone} from '@angular/core';
-import {observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {ObservableDecorator} from '@scion/microfrontend-platform';
 
 /**
@@ -26,8 +26,8 @@ export class NgZoneObservableDecorator implements ObservableDecorator {
       const insideAngular = NgZone.isInAngularZone();
       const subscription = source$
         .pipe(
-          subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-          observeInside(fn => insideAngular ? this._zone.run(fn) : this._zone.runOutsideAngular(fn)),
+          subscribeIn(fn => this._zone.runOutsideAngular(fn)),
+          observeIn(fn => insideAngular ? this._zone.run(fn) : this._zone.runOutsideAngular(fn)),
         )
         .subscribe(observer);
       return () => subscription.unsubscribe();

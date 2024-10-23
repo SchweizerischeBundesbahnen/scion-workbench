@@ -20,7 +20,7 @@ import {coerceElement} from '@angular/cdk/coercion';
 import {TEXT, TextComponent} from '../view-context-menu/text.component';
 import {MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
 import {WorkbenchService} from '../../workbench.service';
-import {filterArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {filterArray, observeIn} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {provideViewContext} from '../../view/view-context-provider';
@@ -103,6 +103,7 @@ export class ViewMenuService {
 
       view.menuItems$
         .pipe(
+          observeIn(fn => this._zone.runOutsideAngular(fn)),
           // Skip menu items which have no accelerator configured.
           filterArray((menuItem: WorkbenchMenuItem) => !!menuItem.accelerator?.length),
           filter(menuItems => menuItems.length > 0),
@@ -131,8 +132,7 @@ export class ViewMenuService {
               }),
           })),
           filter(({menuItems}) => menuItems.length > 0),
-          subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-          observeInside(fn => this._zone.run(fn)),
+          observeIn(fn => this._zone.run(fn)),
           takeUntil(unsubscribe$),
         )
         .subscribe(({event, menuItems}) => {
