@@ -48,7 +48,7 @@ export class WorkbenchPerspectiveSerializer {
 /**
  * Represents the current version of the workbench perspective layout.
  *
- * Increment this version and write a migrator when introducting a breaking change.
+ * Increment this version and write a migrator when introducing a breaking change.
  *
  * @see WorkbenchMigrator
  */

@@ -17,8 +17,7 @@ import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {InputFieldTestPagePO as WorkbenchInputFieldTestPagePO} from '../workbench/page-object/test-pages/input-field-test-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-
-const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectView} from '../matcher/view-matcher';
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Inject} from '@angular/core';
+import {Component, HostBinding, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MPartGrid} from '../workbench-layout.model';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -61,15 +61,14 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 })
 export class MainAreaLayoutComponent {
 
+  private _workbenchId = inject(WORKBENCH_ID);
+  private _part = inject(ɵWorkbenchPart);
+  private _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private _viewDragService = inject(ViewDragService);
+
   @HostBinding('attr.data-partid')
   protected get partId(): string {
     return this._part.id;
-  }
-
-  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _part: ɵWorkbenchPart,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _viewDragService: ViewDragService) {
   }
 
   protected get mainAreaGrid(): MPartGrid {

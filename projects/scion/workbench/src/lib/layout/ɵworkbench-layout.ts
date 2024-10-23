@@ -318,7 +318,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    if (WorkbenchLayouts.isViewId(id)) {
+    if (isViewId(id)) {
       workingCopy.__addView({id, uid: UID.randomUID()}, options);
     }
     else {
@@ -1005,7 +1005,7 @@ export class ViewActivationInstantProvider {
  * Creates a predicate to match a view by its primary or alternative id, depending on the type of the passed id.
  */
 function matchViewById(id: string): Predicate<MView> {
-  if (WorkbenchLayouts.isViewId(id)) {
+  if (isViewId(id)) {
     return view => view.id === id;
   }
   else {
@@ -1018,6 +1018,13 @@ function matchViewById(id: string): Predicate<MView> {
  */
 function stringifyFilter(filter: {[property: string]: unknown}): string {
   return Object.entries(filter).map(([key, value]) => `${key}=${value}`).join(', ');
+}
+
+/**
+ * Tests if the given id matches the format of a view identifier (e.g., `view.1`, `view.2`, etc.).
+ */
+function isViewId(viewId: string | undefined | null): viewId is ViewId {
+  return Routing.isViewOutlet(viewId);
 }
 
 /**

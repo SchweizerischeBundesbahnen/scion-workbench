@@ -55,6 +55,11 @@ export default [
     data: {[WorkbenchRouteData.title]: 'Angular Router Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-angular-router-test-page'},
   },
   {
+    path: 'popup-position-test-page',
+    loadComponent: () => import('./popup-position-test-page/popup-position-test-page.component'),
+    data: {[WorkbenchRouteData.title]: 'Popup Position Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-popup-position-test-page'},
+  },
+  {
     path: 'size-test-page',
     loadComponent: () => import('./size-test-page/size-test-page.component'),
   },

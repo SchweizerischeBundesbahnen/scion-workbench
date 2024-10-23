@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Inject} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {GridElementComponent} from './grid-element/grid-element.component';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {MPartGrid} from './workbench-layout.model';
 import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
@@ -66,15 +65,16 @@ export class WorkbenchLayoutComponent {
   public layout: ɵWorkbenchLayout | undefined;
   protected grid: MPartGrid | undefined;
 
-  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _viewDragService: ViewDragService,
-              workbenchLayoutService: WorkbenchLayoutService) {
-    workbenchLayoutService.layout$
-      .pipe(takeUntilDestroyed())
-      .subscribe(layout => {
-        this.layout = layout;
-        this.grid = layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid : layout.workbenchGrid;
-      });
+  private _workbenchId = inject(WORKBENCH_ID);
+  private _viewDragService = inject(ViewDragService);
+  private _workbenchLayoutService = inject(WorkbenchLayoutService);
+
+  constructor() {
+    effect(() => {
+      const layout = this._workbenchLayoutService.layout();
+      this.layout = layout ?? undefined;
+      this.grid = layout?.maximized && layout?.mainAreaGrid ? layout?.mainAreaGrid : layout?.workbenchGrid;
+    });
   }
 
   protected onViewDrop(event: WbViewDropEvent): void {

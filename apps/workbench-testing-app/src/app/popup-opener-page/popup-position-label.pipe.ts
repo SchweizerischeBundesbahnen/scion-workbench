@@ -28,7 +28,7 @@ export class PopupPositionLabelPipe implements PipeTransform {
       case 'point':
         return axis === 'vertical' ? 'y' : 'x';
       default:
-        throw Error(`[UnsupportedPositionError] Expected one of [point|top-left|top-right|bottom-left|bottom-righ], but was [${position}]`);
+        throw Error(`[UnsupportedPositionError] Expected one of [point|top-left|top-right|bottom-left|bottom-right], but was [${position}]`);
     }
   }
 }

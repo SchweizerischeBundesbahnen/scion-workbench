@@ -27,6 +27,7 @@ import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-int
 import {provideViewContext} from '../view/view-context-provider';
 import {UUID} from '@scion/toolkit/uuid';
 import {boundingClientRect} from '@scion/components/dimension';
+import {coerceElement} from '@angular/cdk/coercion';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
@@ -267,31 +268,43 @@ export class PopupService {
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
+    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
+
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
-      const anchorBounds = boundingClientRect(config.anchor as HTMLElement | ElementRef<HTMLElement>, {injector});
+      const anchor = coerceElement(config.anchor) as HTMLElement;
+      const anchorBounds = boundingClientRect(anchor, {injector});
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
         if (contextualView && !contextualView.portal.attached()) {
           return undefined;
         }
-        return anchorBounds();  // IMPORTANT: Track anchor bounds only if attached to prevent flickering.
+
+        // IMPORTANT: Track anchor and host bounds only if attached to prevent flickering.
+
+        // The `boundingClientRect` signal does not detect position changes when the element is scrolled out of view.
+        // Consequently, if the popup anchor is scrolled out of view and the view is enlarged, the popup may not align
+        // with the view boundaries. Therefore, we read the anchor's bounding box directly from the DOM.
+        anchorBounds();
+
+        return constrainClientRect(anchor.getBoundingClientRect(), hostBounds());
       }, {equal: isEqualDomRect});
     }
     else {
-      const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
       const anchorBounds = toSignal(Observables.coerce(config.anchor), {injector});
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
         if (contextualView && !contextualView.portal.attached()) {
           return undefined;
         }
-        if (!anchorBounds()) { // IMPORTANT: Track anchor bounds only if attached to prevent flickering.
+
+        // IMPORTANT: Track anchor and host bounds only if attached to prevent flickering.
+        if (!anchorBounds()) {
           return undefined;
         }
 
         const {x, y} = mapToPageCoordinates(anchorBounds()!, hostBounds());
         const {width, height} = anchorBounds()!;
-        return new DOMRect(x, y, width, height);
+        return constrainClientRect(new DOMRect(x, y, width, height), hostBounds());
       }, {equal: isEqualDomRect});
     }
   }
@@ -350,6 +363,20 @@ function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
     };
   }
   throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
+}
+
+function constrainClientRect(clientRect: DOMRect, constraints: DOMRect): DOMRect {
+  const top = minmax(clientRect.top, {min: constraints.top, max: constraints.bottom});
+  const right = minmax(clientRect.right, {min: constraints.left, max: constraints.right});
+  const bottom = minmax(clientRect.bottom, {min: constraints.top, max: constraints.bottom});
+  const left = minmax(clientRect.left, {min: constraints.left, max: constraints.right});
+  const width = right - left;
+  const height = bottom - top;
+  return new DOMRect(left, top, width, height);
+}
+
+function minmax(value: number, minmax: {min: number; max: number}): number {
+  return Math.max(minmax.min, Math.min(value, minmax.max));
 }
 
 function isEqualDomRect(a: DOMRect | undefined, b: DOMRect | undefined): boolean {

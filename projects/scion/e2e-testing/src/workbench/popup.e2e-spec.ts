@@ -17,8 +17,8 @@ import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-pa
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
-
-const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+import {PopupPositionTestPagePO} from './page-object/test-pages/popup-position-test-page.po';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectView} from '../matcher/view-matcher';
 
@@ -935,6 +935,445 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.view.tab.click();
       await expect(focusTestPage.locator).toBeVisible();
       await expect(focusTestPage.middleField).toBeFocused();
+    });
+  });
+
+  test.describe('stick popup to view bounds', () => {
+
+    test('should stick popup anchor to bottom view bounds when scrolling up', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('bottom', {align: 'bottom'})
+        .addView('testee', {partId: 'middle'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginTop('2000');
+
+      // Open popup
+      const popup = await testPage.open();
+
+      // Capture view bounds
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      while (await testPage.view.getScrollPosition('vertical') > 0) {
+        // Move scrollbar up
+        await testPage.view.scrollbars.vertical.scroll(-25);
+
+        // Expect popup anchor not to exceed bottom view bounds
+        const {y} = await popup.getAnchorPosition();
+        expect(y).toBeLessThanOrEqual(viewBoundingBox.bottom + 1);
+      }
+
+      // Except popup anchor to stick to bottom view bounds
+      const {y} = await popup.getAnchorPosition();
+      expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+    });
+
+    test('should stick popup anchor to top view bounds when scrolling down', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('bottom', {align: 'bottom'})
+        .addView('testee', {partId: 'middle'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginBottom('2000');
+
+      // Capture view bounds
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while (await testPage.view.getScrollPosition('vertical') < 1) {
+        // Move scrollbar down
+        await testPage.view.scrollbars.vertical.scroll(25);
+
+        // Expect popup anchor not to exceed top view bounds
+        const {y} = await popup.getAnchorPosition();
+        expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
+      }
+
+      // Except popup anchor to stick to top view bounds
+      const {y} = await popup.getAnchorPosition();
+      expect(y).toBeCloseTo(viewBoundingBox.top, 0);
+    });
+
+    test('should stick popup anchor to right view bounds when scrolling left', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
+        .addView('testee', {partId: 'middle'})
+        .addView('left', {partId: 'left'})
+        .addView('right', {partId: 'right'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginLeft('2000');
+
+      // Capture view bounds
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while (await testPage.view.getScrollPosition('horizontal') > 0) {
+        // Move scrollbar left
+        await testPage.view.scrollbars.horizontal.scroll(-25);
+
+        // Expect popup anchor not to exceed right view bounds
+        const {x} = await popup.getAnchorPosition();
+        expect(x).toBeLessThanOrEqual(viewBoundingBox.right + 1);
+      }
+
+      // Except popup anchor to stick to right view bounds
+      const {x} = await popup.getAnchorPosition();
+      expect(x).toBeCloseTo(viewBoundingBox.right, 0);
+    });
+
+    test('should stick popup anchor to left view bounds when scrolling right', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
+        .addView('testee', {partId: 'middle'})
+        .addView('left', {partId: 'left'})
+        .addView('right', {partId: 'right'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginRight('2000');
+
+      // Capture view bounds
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while (await testPage.view.getScrollPosition('horizontal') < 1) {
+        // Move scrollbar right
+        await testPage.view.scrollbars.horizontal.scroll(25);
+
+        // Expect popup anchor not to exceed left view bounds
+        const {x} = await popup.getAnchorPosition();
+        expect(x).toBeGreaterThanOrEqual(viewBoundingBox.left - 1);
+      }
+
+      // Except popup anchor to stick to left view bounds
+      const {x} = await popup.getAnchorPosition();
+      expect(x).toBeCloseTo(viewBoundingBox.left, 0);
+    });
+
+    test('should stick popup anchor to bottom view bounds when moving bottom sash up', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
+        .addPart('bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'middle'})
+        .addView('right', {partId: 'right'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while ((await testPage.view.getBoundingBox()).height > 0) {
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+
+        // Move bottom sash up
+        await testPage.view.part.sash.drag('bottom', -Math.min(50, viewBoundingBox.height));
+
+        const {y} = await popup.getAnchorPosition();
+
+        // Expect popup anchor not to exceed bottom view bounds
+        expect(y).toBeLessThanOrEqual(viewBoundingBox.bottom + 1);
+
+        // Expect popup anchor not to exceed top view bounds
+        expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
+      }
+
+      const {y} = await popup.getAnchorPosition();
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Except popup anchor to stick to top view bounds
+      expect(y).toBeCloseTo(viewBoundingBox.top, 0);
+
+      // Except popup anchor to stick to bottom view bounds
+      expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+    });
+
+    test('should stick popup anchor to bottom view bounds when moving top sash down', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
+        .addPart('top', {align: 'top', ratio: .1})
+        .addPart('bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'middle'})
+        .addView('right', {partId: 'right'})
+        .addView('top', {partId: 'top'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while ((await testPage.view.getBoundingBox()).height > 0) {
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+
+        // Drag top sash down
+        await testPage.view.part.sash.drag('top', Math.min(50, viewBoundingBox.height));
+
+        const {y} = await popup.getAnchorPosition();
+
+        // Expect popup anchor not to exceed top view bounds
+        expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
+
+        // Expect popup anchor not to exceed bottom view bounds
+        expect(y).toBeLessThanOrEqual(viewBoundingBox.bottom + 1);
+      }
+
+      const {y} = await popup.getAnchorPosition();
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Except popup anchor to stick to top view bounds
+      expect(y).toBeCloseTo(viewBoundingBox.top, 0);
+
+      // Except popup anchor to stick to bottom view bounds
+      expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+    });
+
+    test('should stick popup anchor to right view bounds when moving right sash to the left', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'middle'})
+        .addView('left', {partId: 'left'})
+        .addView('right', {partId: 'right'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginLeft('400');
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while ((await testPage.view.getBoundingBox()).width > 0) {
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+
+        // Move right sash to the left
+        await testPage.view.part.sash.drag('right', -Math.min(50, viewBoundingBox.width));
+
+        const {x} = await popup.getAnchorPosition();
+
+        // Expect popup anchor not to exceed right view bounds
+        expect(x).toBeLessThanOrEqual(viewBoundingBox.right + 1);
+
+        // Expect popup anchor not to exceed left view bounds
+        expect(x).toBeGreaterThanOrEqual(viewBoundingBox.left - 1);
+      }
+
+      const {x} = await popup.getAnchorPosition();
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Except popup anchor to stick to right view bounds
+      expect(x).toBeCloseTo(viewBoundingBox.right, 0);
+
+      // Except popup anchor to stick to left view bounds
+      expect(x).toBeCloseTo(viewBoundingBox.left, 0);
+    });
+
+    test('should stick popup anchor to right view bounds when moving left sash to the right', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('right', {align: 'right', ratio: .3})
+        .addPart('bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'middle'})
+        .addView('left', {partId: 'left'})
+        .addView('right', {partId: 'right'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginLeft('400');
+
+      // Open popup
+      const popup = await testPage.open();
+
+      while ((await testPage.view.getBoundingBox()).width > 0) {
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+
+        // Move left sash to the right
+        await testPage.view.part.sash.drag('left', Math.min(50, viewBoundingBox.width));
+
+        const {x} = await popup.getAnchorPosition();
+
+        // Expect popup anchor not to exceed right view bounds
+        expect(x).toBeLessThanOrEqual(viewBoundingBox.right + 1);
+
+        // Expect popup anchor not to exceed left view bounds
+        expect(x).toBeGreaterThanOrEqual(viewBoundingBox.left - 1);
+      }
+
+      const {x} = await popup.getAnchorPosition();
+      const viewBoundingBox = await testPage.view.getBoundingBox();
+
+      // Except popup anchor to stick to right view bounds
+      expect(x).toBeCloseTo(viewBoundingBox.right, 0);
+
+      // Except popup anchor to stick to left view bounds
+      expect(x).toBeCloseTo(viewBoundingBox.left, 0);
+    });
+
+    test('should stick popup anchor to right view bounds if anchor scrolled out of viewport and moving right sash to the right', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('right', {align: 'right', ratio: .3})
+        .addView('testee', {partId: 'middle'})
+        .addView('left', {partId: 'left'})
+        .addView('right', {partId: 'right'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginLeft('2000');
+
+      // Open popup
+      const popup = await testPage.open();
+
+      await test.step('move right sash to the left', async () => {
+        // Move right sash to the left
+        await testPage.view.part.sash.drag('right', -500);
+
+        // Except popup anchor to stick to right view bounds
+        const {x} = await popup.getAnchorPosition();
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+        expect(x).toBeCloseTo(viewBoundingBox.right, 0);
+      });
+
+      await test.step('scroll left', async () => {
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+
+        while (await testPage.view.getScrollPosition('horizontal') > 0) {
+          // Move scrollbar left
+          await testPage.view.scrollbars.horizontal.scroll(-50);
+
+          // Except popup anchor to stick to right view bounds
+          const {x} = await popup.getAnchorPosition();
+          expect(x).toBeCloseTo(viewBoundingBox.right, 0);
+        }
+      });
+
+      await test.step('move right sash to the right', async () => {
+        // Move right sash to the right
+        await testPage.view.part.sash.drag('right', 500);
+
+        // Except popup anchor to stick to right view bounds
+        const {x} = await popup.getAnchorPosition();
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+        expect(x).toBeCloseTo(viewBoundingBox.right, 0);
+      });
+    });
+
+    test('should stick popup anchor to bottom view bounds if anchor scrolled out of viewport and moving bottom sash down', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('middle')
+        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
+        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
+        .addPart('bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'middle'})
+        .addView('right', {partId: 'right'})
+        .addView('bottom', {partId: 'bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      await testPage.enterMarginTop('2000');
+
+      // Open popup.
+      const popup = await testPage.open();
+
+      await test.step('move bottom sash up', async () => {
+        // Move bottom sash up
+        await testPage.view.part.sash.drag('bottom', -500);
+
+        // Except popup anchor to stick to bottom view bounds
+        const {y} = await popup.getAnchorPosition();
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+        expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+      });
+
+      await test.step('scroll up', async () => {
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+
+        while (await testPage.view.getScrollPosition('vertical') > 0) {
+          // Move scrollbar up
+          await testPage.view.scrollbars.vertical.scroll(-50);
+
+          // Except popup anchor to stick to bottom view bounds
+          const {y} = await popup.getAnchorPosition();
+          expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+        }
+      });
+
+      await test.step('move bottom sash down', async () => {
+        // Move top sash up
+        await testPage.view.part.sash.drag('bottom', 500);
+
+        // Except popup anchor to stick to bottom view bounds
+        const {y} = await popup.getAnchorPosition();
+        const viewBoundingBox = await testPage.view.getBoundingBox();
+        expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+      });
     });
   });
 });
