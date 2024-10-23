@@ -24,34 +24,35 @@ export class PartSashPO {
    */
   public async drag(handle: 'top' | 'right' | 'bottom' | 'left', distance: number): Promise<void> {
     const mouse = this._locator.page().mouse;
+    const steps = Math.ceil(Math.abs(distance) / 5);
 
     const sashBounds = fromRect(await this._locator.boundingBox());
     switch (handle) {
       case 'top': {
         await mouse.move(sashBounds.hcenter, sashBounds.top);
         await mouse.down();
-        await mouse.move(sashBounds.hcenter, sashBounds.top + distance);
+        await mouse.move(sashBounds.hcenter, sashBounds.top + distance, {steps});
         await mouse.up();
         break;
       }
       case 'bottom': {
         await mouse.move(sashBounds.hcenter, sashBounds.bottom);
         await mouse.down();
-        await mouse.move(sashBounds.hcenter, sashBounds.bottom + distance);
+        await mouse.move(sashBounds.hcenter, sashBounds.bottom + distance, {steps});
         await mouse.up();
         break;
       }
       case 'left': {
         await mouse.move(sashBounds.left, sashBounds.vcenter);
         await mouse.down();
-        await mouse.move(sashBounds.left + distance, sashBounds.vcenter);
+        await mouse.move(sashBounds.left + distance, sashBounds.vcenter, {steps});
         await mouse.up();
         break;
       }
       case 'right': {
         await mouse.move(sashBounds.right, sashBounds.vcenter);
         await mouse.down();
-        await mouse.move(sashBounds.right + distance, sashBounds.vcenter);
+        await mouse.move(sashBounds.right + distance, sashBounds.vcenter, {steps});
         await mouse.up();
         break;
       }

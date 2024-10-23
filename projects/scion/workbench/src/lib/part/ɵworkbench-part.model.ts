@@ -66,8 +66,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   /**
    * Method invoked when the workbench layout has changed.
    *
-   * This method:
-   * - is called on every layout change, including changes not relevant for this part.
+   * This method is called on every layout change.
    */
   private onLayoutChange(layout: ɵWorkbenchLayout): void {
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});

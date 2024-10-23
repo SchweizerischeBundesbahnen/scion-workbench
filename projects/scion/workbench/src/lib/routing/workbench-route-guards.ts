@@ -11,7 +11,7 @@
 import {CanMatchFn} from '@angular/router';
 import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
+import {Routing} from './routing.util';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './workbench-auxiliary-route-installer.service';
 
 /**
@@ -49,11 +49,11 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 
     switch (condition) {
       case true:
-        return WorkbenchLayouts.isViewId(outlet);
+        return Routing.isViewOutlet(outlet);
       case false:
-        return !WorkbenchLayouts.isViewId(outlet);
+        return !Routing.isViewOutlet(outlet);
       default: { // hint
-        if (!WorkbenchLayouts.isViewId(outlet)) {
+        if (!Routing.isViewOutlet(outlet)) {
           return false;
         }
 
@@ -84,8 +84,8 @@ export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
 export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
 
-  if (!WorkbenchLayouts.isViewId(outlet)) {
-    throw Error(`[ViewError] CanMatchFn must be installed on a view auxiliary route. [outlet=${outlet}]`);
+  if (!Routing.isViewOutlet(outlet)) {
+    throw Error(`[WorkbenchError] Guard can only be installed on view auxiliary route. [outlet=${outlet}]`);
   }
 
   const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;

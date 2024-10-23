@@ -10,10 +10,9 @@
 
 import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
-import {DIALOG_ID_PREFIX, MESSAGE_BOX_ID_PREFIX, POPUP_ID_PREFIX} from '../workbench.constants';
+import {DIALOG_ID_PREFIX, MESSAGE_BOX_ID_PREFIX, POPUP_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
 import {inject} from '@angular/core';
 import {ViewId} from '../view/workbench-view.model';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
 import {filter, map, startWith, take} from 'rxjs/operators';
 
@@ -102,6 +101,13 @@ export const Routing = {
   },
 
   /**
+   * Tests if the given outlet matches the format of the view outlet.
+   */
+  isViewOutlet: (outlet: string | undefined | null): outlet is ViewId => {
+    return outlet?.startsWith(VIEW_ID_PREFIX) ?? false;
+  },
+
+  /**
    * Tests if the given outlet matches the format of a popup outlet.
    */
   isPopupOutlet: (outlet: string | undefined | null): outlet is `popup.${string}` => {
@@ -130,7 +136,7 @@ export const Routing = {
   parseViewOutlets: (url: UrlTree): Map<ViewId, UrlSegment[]> => {
     const viewOutlets = new Map<ViewId, UrlSegment[]>();
     Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
-      if (WorkbenchLayouts.isViewId(outlet)) {
+      if (Routing.isViewOutlet(outlet)) {
         viewOutlets.set(outlet, segmentGroup.segments);
       }
     });

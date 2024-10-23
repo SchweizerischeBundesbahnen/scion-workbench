@@ -111,7 +111,7 @@ export class WorkbenchLayoutSerializer {
 /**
  * Represents the current version of the workbench layout model.
  *
- * Increment this version and write a migrator when introducting a breaking layout model change.
+ * Increment this version and write a migrator when introducing a breaking layout model change.
  *
  * @see WorkbenchMigrator
  */
