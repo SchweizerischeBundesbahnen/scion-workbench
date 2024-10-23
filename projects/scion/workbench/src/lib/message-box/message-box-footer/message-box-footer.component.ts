@@ -11,7 +11,7 @@ import {Component, ElementRef, EventEmitter, HostBinding, inject, Input, Output,
 import {KeyValuePipe} from '@angular/common';
 import {observeOn} from 'rxjs/operators';
 import {animationFrameScheduler, firstValueFrom} from 'rxjs';
-import {fromDimension$} from '@scion/toolkit/observable';
+import {fromResize$} from '@scion/toolkit/observable';
 
 @Component({
   selector: 'wb-message-box-footer',
@@ -61,8 +61,9 @@ export class MessageBoxFooterComponent {
     const host = inject(ElementRef<HTMLElement>).nativeElement;
     host.classList.add('calculating-min-width');
     try {
-      const initialSize = await firstValueFrom(fromDimension$(host).pipe(observeOn(animationFrameScheduler)));
-      this.preferredSizeChange.emit(initialSize.offsetWidth);
+      // Wait for the CSS class to take effect, then wait an animation frame to avoid the error: "ResizeObserver loop completed with undelivered notifications".
+      await firstValueFrom(fromResize$(host).pipe(observeOn(animationFrameScheduler)));
+      this.preferredSizeChange.emit(host.offsetWidth);
     }
     finally {
       host.classList.remove('calculating-min-width');

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,24 +8,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, HostListener, Inject, NgZone, OnInit, untracked, viewChild, viewChildren} from '@angular/core';
+import {Component, computed, DestroyRef, effect, ElementRef, HostListener, Inject, NgZone, untracked, viewChild, viewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {filter, map, mergeMap, take, takeUntil} from 'rxjs/operators';
-import {animationFrameScheduler, combineLatest, firstValueFrom, from, interval, Observable, Subject} from 'rxjs';
+import {animationFrameScheduler, firstValueFrom, from, interval, Observable, Subject} from 'rxjs';
 import {ConstrainFn, ViewDragImageRect, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
-import {filterArray, mapArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
+import {filterArray, observeInside, subscribeInside} from '@scion/toolkit/operators';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {SciDimensionModule} from '@scion/components/dimension';
+import {dimension} from '@scion/components/dimension';
 import {AsyncPipe} from '@angular/common';
 import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {fromDimension$} from '@scion/toolkit/observable';
 import {WORKBENCH_ID} from '../../workbench-id';
 
 /**
@@ -59,13 +58,12 @@ import {WORKBENCH_ID} from '../../workbench-id';
   imports: [
     AsyncPipe,
     SciViewportComponent,
-    SciDimensionModule,
     ViewTabComponent,
     PartActionBarComponent,
     ViewListButtonComponent,
   ],
 })
-export class PartBarComponent implements OnInit {
+export class PartBarComponent {
 
   private readonly _host: HTMLElement;
   private readonly _viewportChange$ = new Subject<void>();
@@ -75,7 +73,6 @@ export class PartBarComponent implements OnInit {
   private readonly _dragend$ = new Subject<void>();
   public readonly dragover$: Observable<boolean>;
 
-  private readonly _viewportElement = viewChild.required(SciViewportComponent, {read: ElementRef<HTMLElement>});
   private readonly _viewportComponent = viewChild.required(SciViewportComponent);
   private readonly _tabCornerRadiusElement = viewChild.required('tab_corner_radius', {read: ElementRef<HTMLElement>});
   private readonly _paddingInlineElement = viewChild.required('padding_inline', {read: ElementRef<HTMLElement>});
@@ -134,11 +131,8 @@ export class PartBarComponent implements OnInit {
     this.installActiveViewScroller();
     this.installScrolledIntoViewUpdater();
     this.installViewDragListener();
-  }
-
-  public ngOnInit(): void {
-    this.installTabbarIndentSizeDetector();
-    this.installViewportClientSizeDetector();
+    this.installTabbarIndentSizeTracker();
+    this.installViewportSizeTracker();
   }
 
   @HostListener('dblclick', ['$event'])
@@ -147,10 +141,6 @@ export class PartBarComponent implements OnInit {
       this._router.navigate(layout => layout.toggleMaximized()).then();
     }
     event.stopPropagation();
-  }
-
-  public onTabbarViewportDimensionChange(): void {
-    this._viewportChange$.next();
   }
 
   public onScroll(): void {
@@ -328,7 +318,7 @@ export class PartBarComponent implements OnInit {
     const hostLeft = this._host.getBoundingClientRect().left;
     const maxViewportWidth = this.calculateMaxViewportWidth();
     return (rect: ViewDragImageRect): ViewDragImageRect => {
-      const viewportBoundingBox = this._viewportElement().nativeElement.getBoundingClientRect();
+      const viewportBoundingBox = this._viewportComponent().host.nativeElement.getBoundingClientRect();
       return new ViewDragImageRect({
         x: Math.min(Math.max(hostLeft + this._tabbarIndent.left, rect.x), hostLeft + maxViewportWidth - rect.width - this._tabbarIndent.right),
         y: viewportBoundingBox.top,
@@ -351,7 +341,7 @@ export class PartBarComponent implements OnInit {
     setCssClass(this._host, 'calculating-max-viewport-width');
     setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': `${this._host.clientWidth}px`});
     try {
-      return this._viewportElement().nativeElement.getBoundingClientRect().width;
+      return this._viewportComponent().host.nativeElement.getBoundingClientRect().width;
     }
     finally {
       setCssVariable(this._host, {'--ɵpart-bar-drag-image-placeholder-width': currentWidth || null});
@@ -469,30 +459,30 @@ export class PartBarComponent implements OnInit {
       });
   }
 
-  private installViewportClientSizeDetector(): void {
-    fromDimension$(this._viewportComponent().viewportClientElement)
-      .pipe(
-        subscribeInside(fn => this._zone.run(fn)),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(() => {
-        NgZone.assertInAngularZone();
-        this._viewportChange$.next();
-      });
+  private installViewportSizeTracker(): void {
+    const viewportSize = dimension(computed(() => this._viewportComponent().host));
+    const viewportClientSize = dimension(computed(() => this._viewportComponent().viewportClientElement));
+
+    effect(() => {
+      // Track viewport and viewport client sizes.
+      viewportSize();
+      viewportClientSize();
+
+      untracked(() => this._viewportChange$.next());
+    });
   }
 
-  private installTabbarIndentSizeDetector(): void {
-    combineLatest([fromDimension$(this._tabCornerRadiusElement().nativeElement), fromDimension$(this._paddingInlineElement().nativeElement)])
-      .pipe(
-        subscribeInside(fn => this._zone.runOutsideAngular(fn)),
-        mapArray(dimension => dimension.clientWidth),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(([tabCornerRadius, paddingInline]) => {
-        NgZone.assertNotInAngularZone();
-        this._tabbarIndent = {left: tabCornerRadius + paddingInline, right: tabCornerRadius + paddingInline};
-        setCssVariable(this._host, {'--ɵpart-bar-indent-left': `${this._tabbarIndent.left}px`});
-        setCssVariable(this._host, {'--ɵpart-bar-indent-right': `${this._tabbarIndent.right}px`});
+  private installTabbarIndentSizeTracker(): void {
+    const tabCornerRadiusDimension = dimension(this._tabCornerRadiusElement);
+    const paddingInlineDimension = dimension(this._paddingInlineElement);
+
+    effect(() => {
+      const indent = tabCornerRadiusDimension().clientWidth + paddingInlineDimension().clientWidth;
+      this._tabbarIndent = {left: indent, right: indent};
+      setCssVariable(this._host, {
+        '--ɵpart-bar-indent-left': `${this._tabbarIndent.left}px`,
+        '--ɵpart-bar-indent-right': `${this._tabbarIndent.right}px`,
       });
+    });
   }
 }

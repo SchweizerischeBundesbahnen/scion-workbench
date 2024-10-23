@@ -8,18 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, Provider, ViewChild, ViewContainerRef} from '@angular/core';
-import {IFRAME_HOST, VIEW_DROP_PLACEHOLDER_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/view-container.reference';
+import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Provider, viewChild, ViewContainerRef} from '@angular/core';
+import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/workbench-element-references';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchConfig} from './workbench-config';
-import {ComponentType} from '@angular/cdk/portal';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
 import {AsyncPipe, DOCUMENT, NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
-import {combineLatest, lastValueFrom} from 'rxjs';
-import {first, map} from 'rxjs/operators';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {Blockable} from './glass-pane/blockable';
@@ -46,53 +43,26 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     configureWorkbenchGlassPane(),
   ],
 })
-export class WorkbenchComponent implements OnDestroy {
+export class WorkbenchComponent {
 
-  /**
-   * View containers required for the workbench to attach elements.
-   */
-  private viewContainerReferences = {
-    workbenchElement: inject(WORKBENCH_ELEMENT_REF),
-    iframeHost: inject(IFRAME_HOST),
-    viewDropPlaceholderHost: inject(VIEW_DROP_PLACEHOLDER_HOST),
-  };
+  private _workbenchLauncher = inject(WorkbenchLauncher);
+  private _logger = inject(Logger);
 
-  /**
-   * Splash to display during workbench startup.
-   */
-  protected splash: ComponentType<unknown>;
+  private _iframeOverlayHost = viewChild('iframe_overlay_host', {read: ViewContainerRef});
+  private _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
 
-  /**
-   * Promise that resolves once all the required view containers for the workbench to attach elements have been injected from the template.
-   *
-   * To avoid an `ExpressionChangedAfterItHasBeenCheckedError`, make sure not to add the {@link WorkbenchLayoutComponent} before the relevant
-   * view containers have been injected. Otherwise, when loading an existing workbench layout (e.g., from URL) into the workbench, Angular
-   * will throw this error because views are rendered before view containers are available.
-   */
-  protected whenViewContainersInjected: Promise<true>;
+  /** Splash to display during workbench startup. */
+  protected splash = inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
+  protected workbenchStartup = inject(WorkbenchStartup);
 
-  @ViewChild('iframe_host', {read: ViewContainerRef})
-  protected set injectIframeHost(vcr: ViewContainerRef) {
-    vcr && this.viewContainerReferences.iframeHost.set(vcr);
-  }
-
-  @ViewChild('view_drop_placeholder_host', {read: ViewContainerRef})
-  protected set injectViewDropPlaceholderHost(vcr: ViewContainerRef) {
-    vcr && this.viewContainerReferences.viewDropPlaceholderHost.set(vcr);
-  }
-
-  constructor(private _workbenchLauncher: WorkbenchLauncher,
-              private _logger: Logger,
-              protected workbenchStartup: WorkbenchStartup) {
+  constructor() {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
     if (inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true})) {
       throw Error(`[WorkbenchError] Workbench must not be loaded into a view. Did you navigate to the empty path route? Make sure that the application's root route is guarded with 'canMatchWorkbenchView(false)'. Example: "{path: '', canMatch: [canMatchWorkbenchView(false), ...]}"`);
     }
-    this.viewContainerReferences.workbenchElement.set(inject(ViewContainerRef));
-    this.splash = inject(WorkbenchConfig).startup?.splash || SplashComponent;
-    this.whenViewContainersInjected = this.createHostViewContainersInjectedPromise();
     this.startWorkbench();
     this.disableChangeDetectionDuringNavigation();
+    this.provideWorkbenchElementReferences();
   }
 
   /**
@@ -102,25 +72,6 @@ export class WorkbenchComponent implements OnDestroy {
     if (!this.workbenchStartup.isStarted()) {
       this._workbenchLauncher.launch().catch(error => this._logger.error('Failed to start SCION Workbench', error));
     }
-  }
-
-  /**
-   * Creates a Promise that resolves once all the required view containers for the workbench to attach elements have been injected from the template.
-   */
-  private createHostViewContainersInjectedPromise(): Promise<true> {
-    const references = Object.values(this.viewContainerReferences);
-    return lastValueFrom(combineLatest(references.map(reference => reference.ref$))
-      .pipe(
-        first(vcrs => vcrs.every(Boolean)),
-        map(() => true),
-      ));
-  }
-
-  /**
-   * Unsets view container references when this component is destroyed.
-   */
-  private unsetViewContainerReferences(): void {
-    Object.values(this.viewContainerReferences).forEach(ref => ref.unset());
   }
 
   /**
@@ -142,8 +93,24 @@ export class WorkbenchComponent implements OnDestroy {
       });
   }
 
-  public ngOnDestroy(): void {
-    this.unsetViewContainerReferences();
+  /**
+   * Initializes tokens to inject references to workbench elements.
+   */
+  private provideWorkbenchElementReferences(): void {
+    // Provide reference to the workbench element.
+    const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
+    workbenchElementRef.set(inject(ViewContainerRef));
+    inject(DestroyRef).onDestroy(() => workbenchElementRef.set(undefined));
+
+    // Provide reference to the iframe overlay host.
+    const iframeOverlayHost = inject(IFRAME_OVERLAY_HOST);
+    effect(() => iframeOverlayHost.set(this._iframeOverlayHost()), {allowSignalWrites: true});
+    inject(DestroyRef).onDestroy(() => iframeOverlayHost.set(undefined));
+
+    // Provide reference to the view drop zone overlay host.
+    const viewDropZoneOverlayHost = inject(VIEW_DROP_ZONE_OVERLAY_HOST);
+    effect(() => viewDropZoneOverlayHost.set(this._viewDropZoneOverlayHost()), {allowSignalWrites: true});
+    inject(DestroyRef).onDestroy(() => viewDropZoneOverlayHost.set(undefined));
   }
 }
 

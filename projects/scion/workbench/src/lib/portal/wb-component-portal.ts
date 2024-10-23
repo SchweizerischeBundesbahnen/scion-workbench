@@ -9,9 +9,8 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {ComponentRef, createComponent, EnvironmentInjector, inject, Injector, Provider, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, createComponent, EnvironmentInjector, inject, Injector, Provider, Signal, signal, ViewContainerRef} from '@angular/core';
 import {Logger, LoggerNames} from '../logging';
-import {BehaviorSubject, Observable} from 'rxjs';
 
 /**
  * Like the Angular CDK 'ComponentPortal' but does not destroy the component on detach.
@@ -28,7 +27,7 @@ export class WbComponentPortal<T = any> {
   private _viewContainerRef: ViewContainerRef | null | undefined;
   private _componentRef: ComponentRef<T> | null | undefined;
   private _logger = inject(Logger);
-  private _attached$ = new BehaviorSubject<boolean>(false);
+  private _attached = signal(false);
 
   constructor(private _componentType: ComponentType<T>, private _options?: PortalOptions) {
     // Do not construct the component here but the time attaching it to the Angular component tree. See the comment above.
@@ -70,10 +69,11 @@ export class WbComponentPortal<T = any> {
    * - If already attached to a different view container, detaches it first.
    */
   public attach(viewContainerRef: ViewContainerRef): void {
+    assertNotInReactiveContext(this.attach);
     if (this.isAttachedTo(viewContainerRef)) {
       return;
     }
-    if (this.isAttached) {
+    if (this.attached()) {
       this.detach();
     }
 
@@ -83,7 +83,7 @@ export class WbComponentPortal<T = any> {
 
     this._componentRef.changeDetectorRef.reattach();
     this._viewContainerRef.insert(this._componentRef.hostView);
-    this._attached$.next(true);
+    this._attached.set(true);
     (this._componentRef.instance as OnAttach)?.onAttach();
   }
 
@@ -94,7 +94,8 @@ export class WbComponentPortal<T = any> {
    * so it will not be checked for changes until it is reattached.
    */
   public detach(): void {
-    if (!this.isAttached) {
+    assertNotInReactiveContext(this.detach);
+    if (!this.attached()) {
       return;
     }
 
@@ -103,19 +104,15 @@ export class WbComponentPortal<T = any> {
     const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
     this._viewContainerRef!.detach(index);
     this._componentRef!.changeDetectorRef.detach();
-    this._attached$.next(false);
+    this._attached.set(false);
   }
 
   public get isConstructed(): boolean {
     return !!this._componentRef;
   }
 
-  private get isAttached(): boolean {
-    return this._attached$.value;
-  }
-
   public isAttachedTo(viewContainerRef: ViewContainerRef): boolean {
-    return this._viewContainerRef === viewContainerRef && this.isAttached;
+    return this._viewContainerRef === viewContainerRef && this.attached();
   }
 
   public get isDestroyed(): boolean {
@@ -132,15 +129,14 @@ export class WbComponentPortal<T = any> {
     return this._componentRef;
   }
 
-  public get attached$(): Observable<boolean> {
-    return this._attached$;
+  public get attached(): Signal<boolean> {
+    return this._attached;
   }
 
   private onDestroy(): void {
     this._componentRef = null;
     this._viewContainerRef = null;
-    this._attached$.next(false);
-    this._attached$.complete();
+    this._attached.set(false);
   }
 
   /**

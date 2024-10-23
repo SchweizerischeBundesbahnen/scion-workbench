@@ -54,6 +54,10 @@ export default [
     loadComponent: () => import('./angular-router-test-page/angular-router-test-page.component'),
     data: {[WorkbenchRouteData.title]: 'Angular Router Test Page', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-angular-router-test-page'},
   },
+  {
+    path: 'size-test-page',
+    loadComponent: () => import('./size-test-page/size-test-page.component'),
+  },
 ] satisfies Routes;
 
 /**
