@@ -18,6 +18,7 @@ import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 import {ViewInfo} from '../workbench/page-object/view-info-dialog.po';
 import {TextMessagePO} from './page-object/text-message.po';
+import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -339,22 +340,30 @@ test.describe('Workbench View', () => {
     await expectView(viewPage2).toBeInactive();
   });
 
-  test('should preserve the size of inactive views', async ({appPO, microfrontendNavigator}) => {
+  test('should maintain view size if not active (to not flicker on reactivation; to support for virtual scrolling)', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // open test view 1
-    const viewPage1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const activeViewSize = await viewPage1.getBoundingBox();
+    // Open view 1.
+    const viewPage1 = await SizeTestPagePO.openInNewTab(appPO);
     await expectView(viewPage1).toBeActive();
+    const viewSize = await viewPage1.getBoundingBox();
+    const sizeChanges = await viewPage1.getRecordedSizeChanges();
 
-    // open test view 2
+    // Open view 2.
     const viewPage2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const inactiveViewSize = await viewPage1.getBoundingBox();
     await expectView(viewPage1).toBeInactive();
     await expectView(viewPage2).toBeActive();
 
-    // expect view size of inactive view not to have changed
-    expect(activeViewSize).toEqual(inactiveViewSize);
+    // Expect view bounding box not to have changed.
+    await expect.poll(() => viewPage1.getBoundingBox()).toEqual(viewSize);
+
+    // Activate view 1.
+    await viewPage1.view.tab.click();
+    await expectView(viewPage1).toBeActive();
+    await expectView(viewPage2).toBeInactive();
+
+    // Expect view not to be resized (no flickering).
+    await expect.poll(() => viewPage1.getRecordedSizeChanges()).toEqual(sizeChanges);
   });
 
   test('should not invoke `CanClose` guard when switching between viewtabs', async ({appPO, microfrontendNavigator}) => {

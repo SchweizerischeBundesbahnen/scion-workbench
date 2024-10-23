@@ -28,6 +28,7 @@ import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.
 import {Dictionaries} from '@scion/toolkit/util';
 import {parseTypedString} from '../common/parse-typed-value.util';
 import {CssClassComponent} from '../css-class/css-class.component';
+import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -125,6 +126,8 @@ export default class PopupOpenerPageComponent {
         return BlankTestPageComponent;
       case 'input-field-test-page':
         return InputFieldTestPageComponent;
+      case 'size-test-page':
+        return SizeTestPageComponent;
       case 'dialog-opener-page':
         return DialogOpenerPageComponent;
       case 'popup-opener-page':

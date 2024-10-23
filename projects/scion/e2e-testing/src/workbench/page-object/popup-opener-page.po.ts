@@ -63,7 +63,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     }
   }
 
-  public async selectPopupComponent(component: 'popup-page' | 'focus-test-page' | 'input-field-test-page' | 'blank-test-page' | 'popup-opener-page' | 'dialog-opener-page'): Promise<void> {
+  public async selectPopupComponent(component: 'popup-page' | 'focus-test-page' | 'input-field-test-page' | 'blank-test-page' | 'size-test-page' | 'popup-opener-page' | 'dialog-opener-page'): Promise<void> {
     await this.locator.locator('select.e2e-popup-component').selectOption(component);
   }
 
