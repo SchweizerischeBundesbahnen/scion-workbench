@@ -62,7 +62,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterContextualViewId(startPageViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({waitUntilAttached: false});
 
       await startPage.view.tab.click();
 
@@ -91,7 +91,7 @@ test.describe('Workbench Popup', () => {
       await popupOpenerPage.enterContextualViewId(microfrontendViewId);
       await popupOpenerPage.enterCloseStrategy({closeOnFocusLost: false});
       await popupOpenerPage.enterCssClass('testee');
-      await popupOpenerPage.open();
+      await popupOpenerPage.open({waitUntilAttached: false});
 
       await microfrontendPage.view.tab.click();
 

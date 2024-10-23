@@ -1,0 +1,19 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+
+  > section.properties {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    border: 1px solid var(--sci-color-border);
+    border-radius: var(--sci-corner);
+    padding: 1em;
+  }
+
+  > button.open {
+    text-wrap: nowrap;
+  }
+}

@@ -11,6 +11,7 @@
 import {expect} from '@playwright/test';
 import {toEqualIgnoreOrder} from './to-equal-ignore-order.matcher';
 import {ExpectedWorkbenchLayout, toEqualWorkbenchLayout} from './to-equal-workbench-layout.matcher';
+import {toBeBetween} from './to-be-between.matcher';
 
 /**
  * Extends the Playwright expect API with project specific custom matchers.
@@ -22,6 +23,11 @@ declare global {
        * Tests the array to contain exactly the expected elements in any order.
        */
       toEqualIgnoreOrder(expected: Array<any>): R;
+
+      /**
+       * Tests the number to be between the expected numbers (inclusive).
+       */
+      toBeBetween(expectedFrom: number, expectedTo: number): R;
 
       /**
        * Expects the workbench to have expected layout.
@@ -63,6 +69,7 @@ export namespace CustomMatchers {
     expect.extend({
       toEqualIgnoreOrder,
       toEqualWorkbenchLayout,
+      toBeBetween,
     });
   }
 }
