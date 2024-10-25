@@ -19,28 +19,28 @@ export default {
   fullyParallel: true,
   webServer: runInCI ? [
     {
-      command: 'npm run workbench-testing-app:http-server',
+      command: 'npm run workbench-testing-app:dist-serve',
       port: 4200,
       reuseExistingServer: false,
     },
     {
-      command: 'npm run workbench-client-testing-app:4201:http-server',
+      command: 'npm run workbench-client-testing-app:4201:dist-serve',
       port: 4201,
       reuseExistingServer: false,
     },
     {
-      command: 'npm run workbench-client-testing-app:4202:http-server',
+      command: 'npm run workbench-client-testing-app:4202:dist-serve',
       port: 4202,
       reuseExistingServer: false,
     },
     {
-      command: 'npm run workbench-testing-app:basehref:http-server',
+      command: 'npm run workbench-testing-app:basehref:dist-serve',
       port: 4300,
       reuseExistingServer: false,
     },
     // TODO [Angular 19] remove when `@angular-devkit/build-angular:browser` builder is deprecated
     {
-      command: 'npm run workbench-testing-app:basehref-webpack:http-server',
+      command: 'npm run workbench-testing-app:basehref-webpack:dist-serve',
       port: 4400,
       reuseExistingServer: false,
     },
