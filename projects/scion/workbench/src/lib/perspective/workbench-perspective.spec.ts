@@ -530,11 +530,11 @@ describe('Workbench Perspective', () => {
           provide: WORKBENCH_STARTUP,
           multi: true,
           useValue: async () => {
-            const workbenchServie = inject(WorkbenchService);
+            const workbenchService = inject(WorkbenchService);
             // Wait some time to simulate late perspective registration.
             await firstValueFrom(timer(500));
 
-            await workbenchServie.registerPerspective({
+            await workbenchService.registerPerspective({
               id: 'perspective',
               layout: factory => factory
                 .addPart('left')
