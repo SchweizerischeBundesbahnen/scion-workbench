@@ -19,6 +19,9 @@ import {expectMessageBox} from '../matcher/message-box-matcher';
 import {ViewInfo} from '../workbench/page-object/view-info-dialog.po';
 import {TextMessagePO} from './page-object/text-message.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
+import {MAIN_AREA} from '../workbench.model';
+import {SciRouterOutletPO} from './page-object/sci-router-outlet.po';
+import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -1107,5 +1110,121 @@ test.describe('Workbench View', () => {
       const viewBounds = await viewPage.view.getBoundingBox();
       expect(outletBounds).toEqual(viewBounds);
     }).toPass();
+  });
+
+  test('should preserve component state when changing layout', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Register input field test page.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'input-test-page'},
+      properties: {
+        path: 'test-pages/input-field-test-page',
+        title: 'Input Test Page',
+      },
+    });
+
+    // Register view 1.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'view-1'},
+      properties: {
+        path: 'test-view',
+        title: 'Microfrontend View 1',
+      },
+    });
+
+    // Register view 2.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {view: 'view-2'},
+      properties: {
+        path: 'test-view',
+        title: 'Microfrontend View 2',
+      },
+    });
+
+    // Register perspective.
+    const perspective = await microfrontendNavigator.registerCapability('app1', {
+      type: 'perspective',
+      qualifier: {perspective: 'app-1'},
+      properties: {
+        layout: [
+          {
+            id: MAIN_AREA,
+          },
+          {
+            id: 'left',
+            align: 'left',
+            views: [
+              {qualifier: {view: 'input-test-page'}, cssClass: 'testee'},
+            ],
+          },
+          {
+            id: 'bottom',
+            align: 'bottom',
+            views: [
+              {qualifier: {view: 'view-1'}, cssClass: 'testee-1'},
+            ],
+          },
+          {
+            id: 'right',
+            align: 'right',
+            views: [
+              {qualifier: {view: 'view-2'}, cssClass: 'testee-2'},
+            ],
+          },
+
+        ],
+      },
+    });
+
+    // Switch perspective.
+    await appPO.switchPerspective(perspective.metadata!.id);
+
+    // Enter component state in view.
+    const view = appPO.view({cssClass: 'testee'});
+    const outlet = new SciRouterOutletPO(appPO, {cssClass: 'testee'});
+    const testeeViewPage = new InputFieldTestPagePO(outlet, view);
+    await testeeViewPage.enterText('A');
+    await expect(testeeViewPage.input).toHaveValue('A');
+
+    await test.step('move view to bottom part', async () => {
+      // Move view to bottom part.
+      await testeeViewPage.view.tab.moveTo('bottom');
+
+      // Expect component state to be preserved.
+      await expect(testeeViewPage.input).toHaveValue('A');
+    });
+
+    await test.step('activate another view in same part', async () => {
+      // Activate another view in same part.
+      const viewPage1 = new ViewPagePO(appPO, {cssClass: 'testee-1'});
+      await viewPage1.view.tab.click();
+
+      // Activate testee view.
+      await testeeViewPage.view.tab.click();
+
+      // Expect component state to be preserved.
+      await expect(testeeViewPage.input).toHaveValue('A');
+    });
+
+    await test.step('split view to the east', async () => {
+      // Split view to the east.
+      await testeeViewPage.view.tab.moveTo('bottom', {region: 'east'});
+
+      // Expect component state to be preserved.
+      await expect(testeeViewPage.input).toHaveValue('A');
+    });
+
+    await test.step('close another view', async () => {
+      // Activate another view in same part.
+      const viewPage2 = new ViewPagePO(appPO, {cssClass: 'testee-2'});
+      await viewPage2.view.tab.close();
+
+      // Expect component state to be preserved.
+      await expect(testeeViewPage.input).toHaveValue('A');
+    });
   });
 });

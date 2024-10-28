@@ -27,6 +27,10 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
     this.input = this.locator.locator('input.e2e-input');
   }
 
+  public async enterText(text: string): Promise<void> {
+    await this.input.fill(text);
+  }
+
   public get view(): ViewPO {
     if (this._locateBy instanceof ViewPO) {
       return this._locateBy;
