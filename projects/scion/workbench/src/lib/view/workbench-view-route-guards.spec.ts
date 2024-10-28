@@ -232,7 +232,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       await workbenchRouter.navigate([], {hint: 'view-1'});
       await waitUntilStable();
 
-      expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Workbench must not be loaded into a view\. Did you navigate to the empty path route\? Make sure that the application's root route is guarded with 'canMatchWorkbenchView\(false\)'\./));
+      expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Circular loading of the workbench component detected in view 'view\.1'\. Did you forget to add the CanMatch guard 'canMatchWorkbenchView\(false\)' to the root \(empty-path\) route of the application\?/));
       expect(fixture).not.toShow(View1Component);
     });
   });

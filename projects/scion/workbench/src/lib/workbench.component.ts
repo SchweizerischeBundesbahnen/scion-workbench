@@ -23,6 +23,7 @@ import {Blockable} from './glass-pane/blockable';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-route-installer.service';
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Routing} from './routing/routing.util';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -57,9 +58,7 @@ export class WorkbenchComponent {
 
   constructor() {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
-    if (inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true})) {
-      throw Error(`[WorkbenchError] Workbench must not be loaded into a view. Did you navigate to the empty path route? Make sure that the application's root route is guarded with 'canMatchWorkbenchView(false)'. Example: "{path: '', canMatch: [canMatchWorkbenchView(false), ...]}"`);
-    }
+    this.throwOnCircularLoad();
     this.startWorkbench();
     this.disableChangeDetectionDuringNavigation();
     this.provideWorkbenchElementReferences();
@@ -111,6 +110,23 @@ export class WorkbenchComponent {
     const viewDropZoneOverlayHost = inject(VIEW_DROP_ZONE_OVERLAY_HOST);
     effect(() => viewDropZoneOverlayHost.set(this._viewDropZoneOverlayHost()), {allowSignalWrites: true});
     inject(DestroyRef).onDestroy(() => viewDropZoneOverlayHost.set(undefined));
+  }
+
+  /**
+   * Throws if loading the workbench recursively.
+   */
+  private throwOnCircularLoad(): void {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+    if (!outlet) {
+      return;
+    }
+
+    if (Routing.isViewOutlet(outlet)) {
+      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in view '${outlet}'. Did you forget to add the CanMatch guard 'canMatchWorkbenchView(false)' to the root (empty-path) route of the application?`);
+    }
+    else {
+      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in outlet '${outlet}'.`);
+    }
   }
 }
 
