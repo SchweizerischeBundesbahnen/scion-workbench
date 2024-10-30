@@ -69,31 +69,31 @@ import {StyleSheetInstaller} from './style-sheet-installer';
  * uses iframes to embed microfrontends; thus, any web page can be integrated as a microfrontend. A micro application can communicate with other micro applications safely
  * using the platform's cross-origin messaging API. A micro application has to provide an application manifest which to register in the host application.
  *
- * For more information, see the chapter [Core Concepts](https://scion-microfrontend-platform-developer-guide.vercel.app/#_core_concepts)
+ * For more information, see the chapter [Core Concepts](https://microfrontend-platform-developer-guide.scion.vercel.app/#_core_concepts)
  * of the SCION Microfrontend Platform Developer's Guide.
  *
  * #### Embedding of Microfrontends
  * You can embed microfrontends using the `<sci-router-outlet>` web component. Web content displayed in the web component is controlled via the `OutletRouter`.
  *
- * For more information, see the chapter [Embedding Microfrontends](https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:embedding-microfrontends)
+ * For more information, see the chapter [Embedding Microfrontends](https://microfrontend-platform-developer-guide.scion.vercel.app/#chapter:embedding-microfrontends)
  * of the SCION Microfrontend Platform Developer's Guide.
  *
  * #### Cross-Application Communication
  * You can interact with other micro applications via messaging or through so-called intents. Intents are a mechanism known from Android development,
  * enabling controlled collaboration across application boundaries.
  *
- * For more information, see the chapters [Cross-Application Communication](https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:cross-application-communication)
- * and [Intention API](https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:intention-api) of the SCION Microfrontend Platform Developer's Guide.
+ * For more information, see the chapters [Cross-Application Communication](https://microfrontend-platform-developer-guide.scion.vercel.app/#chapter:cross-application-communication)
+ * and [Intention API](https://microfrontend-platform-developer-guide.scion.vercel.app/#chapter:intention-api) of the SCION Microfrontend Platform Developer's Guide.
  *
  * #### Activation
  * You can provide an activator to connect to the platform when the user loads the host app into his browser, allowing to initialize and install message listeners for interacting
  * with other micro applications. Starting an activator may take some time. In order not to miss any messages, you can instruct the platform host to wait until you signal
  * readiness.
  *
- * For more information, see the chapter [Activator](https://scion-microfrontend-platform-developer-guide.vercel.app/#chapter:activator) of the SCION Microfrontend
+ * For more information, see the chapter [Activator](https://microfrontend-platform-developer-guide.scion.vercel.app/#chapter:activator) of the SCION Microfrontend
  * Platform Developer's Guide.
  *
- * See our [Developer's Guide](https://scion-microfrontend-platform-developer-guide.vercel.app) for the full documentation about the
+ * See our [Developer's Guide](https://microfrontend-platform-developer-guide.scion.vercel.app) for the full documentation about the
  * [SCION Microfrontend Platform](https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform).
  */
 export class WorkbenchClient {
