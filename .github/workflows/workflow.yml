@@ -344,8 +344,8 @@ jobs:
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_API_PROJECT_ID }}
           version: ${{ needs.build-libs.outputs.workbench-client-version }}
           aliases: |
-            scion-workbench-client-api.vercel.app,
-            scion-workbench-client-api-v%v.vercel.app
+            workbench-client-api.scion.vercel.app,
+            workbench-client-api-v%v.scion.vercel.app
       - name: 'Publishing @scion/workbench-client to NPM'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/npm-publish@master
         with:
