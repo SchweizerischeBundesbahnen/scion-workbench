@@ -324,7 +324,7 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
    - Publishes `@scion/workbench` package to NPM (https://www.npmjs.com/package/@scion/workbench)
    - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
    - Deploys following apps to Vercel:
-     - https://scion-workbench-getting-started.vercel.app
+     - https://workbench-getting-started.scion.vercel.app
      - https://workbench-testing-app.scion.vercel.app
      - https://workbench-client-testing-app1.scion.vercel.app (contributes microfrontends)
      - https://workbench-client-testing-app2.scion.vercel.app (contributes microfrontends)
@@ -346,7 +346,7 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
     - Publishes `@scion/workbench-client` package to NPM (https://www.npmjs.com/package/@scion/workbench-client)
     - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
     - Deploys following apps to Vercel:
-        - https://scion-workbench-getting-started.vercel.app
+        - https://workbench-getting-started.scion.vercel.app
         - https://workbench-testing-app.scion.vercel.app
         - https://workbench-client-testing-app1.scion.vercel.app (contributes microfrontends)
         - https://workbench-client-testing-app2.scion.vercel.app (contributes microfrontends)

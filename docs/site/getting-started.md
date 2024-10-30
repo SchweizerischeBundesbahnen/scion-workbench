@@ -10,7 +10,7 @@ We will create a simple TODO app to introduce you to the SCION Workbench. This s
 The application lists TODOs on the left side. When the user clicks a TODO, a new view opens displaying the TODO. Different TODOs open a different view. To open a TODO multiple times, the Ctrl key can be pressed. The user can size and arrange views by drag and drop.
 
 ***
-- After you complete this guide, the application will look like this: https://scion-workbench-getting-started.vercel.app.
+- After you complete this guide, the application will look like this: https://workbench-getting-started.scion.vercel.app.
 - The source code of the application can be found <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/workbench-getting-started-app/src">here</a>.
 ***
 
