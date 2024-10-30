@@ -325,9 +325,9 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
    - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
    - Deploys following apps to Vercel:
      - https://scion-workbench-getting-started.vercel.app
-     - https://scion-workbench-testing-app.vercel.app
-     - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
-     - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
+     - https://workbench-testing-app.scion.vercel.app
+     - https://workbench-client-testing-app1.scion.vercel.app (contributes microfrontends)
+     - https://workbench-client-testing-app2.scion.vercel.app (contributes microfrontends)
 
 </details>
 
@@ -347,9 +347,9 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
     - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
     - Deploys following apps to Vercel:
         - https://scion-workbench-getting-started.vercel.app
-        - https://scion-workbench-testing-app.vercel.app
-        - https://scion-workbench-client-testing-app1.vercel.app (contributes microfrontends)
-        - https://scion-workbench-client-testing-app2.vercel.app (contributes microfrontends)
+        - https://workbench-testing-app.scion.vercel.app
+        - https://workbench-client-testing-app1.scion.vercel.app (contributes microfrontends)
+        - https://workbench-client-testing-app2.scion.vercel.app (contributes microfrontends)
     - Publishes API documentation (TypeDoc) to Vercel:
         - https://scion-workbench-client-api.vercel.app
         - https://scion-workbench-client-api-vX-X-X.vercel.app 
