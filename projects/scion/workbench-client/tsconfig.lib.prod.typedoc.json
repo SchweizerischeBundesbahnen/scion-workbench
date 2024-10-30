@@ -19,9 +19,9 @@
     },
     "externalSymbolLinkMappings": {
       "@scion/microfrontend-platform": {
-        "MicrofrontendPlatform": "https://scion-microfrontend-platform-api.vercel.app/classes/MicrofrontendPlatform.html",
-        "MicrofrontendPlatformClient.connect": "https://scion-microfrontend-platform-api.vercel.app/classes/MicrofrontendPlatformClient.html#connect",
-        "PreferredSizeService": "https://scion-microfrontend-platform-api.vercel.app/classes/PreferredSizeService.html"
+        "MicrofrontendPlatform": "https://microfrontend-platform-api.scion.vercel.app/classes/MicrofrontendPlatform.html",
+        "MicrofrontendPlatformClient.connect": "https://microfrontend-platform-api.scion.vercel.app/classes/MicrofrontendPlatformClient.html#connect",
+        "PreferredSizeService": "https://microfrontend-platform-api.scion.vercel.app/classes/PreferredSizeService.html"
       }
     }
   }
