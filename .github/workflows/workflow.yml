@@ -290,7 +290,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_GETTING_STARTED_APP_PROJECT_ID }}
-          aliases: scion-workbench-getting-started.vercel.app
+          aliases: workbench-getting-started.scion.vercel.app
   release-workbench:
     name: 'Releasing @scion/workbench'
     if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' }}
