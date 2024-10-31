@@ -272,7 +272,10 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
-          aliases: workbench-testing-app.scion.vercel.app
+          version: ${{ needs.build-libs.outputs.workbench-version }}
+          aliases: |
+            workbench-testing-app.scion.vercel.app,
+            workbench-testing-app-v%v.scion.vercel.app,
       - name: 'Deploying workbench-client-testing-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
@@ -280,9 +283,10 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
+          version: ${{ needs.build-libs.outputs.workbench-version }}
           aliases: |
-            workbench-client-testing-app1.scion.vercel.app,
-            workbench-client-testing-app2.scion.vercel.app,
+            workbench-client-testing-app1-v%v.scion.vercel.app,
+            workbench-client-testing-app2-v%v.scion.vercel.app,
       - name: 'Deploying workbench-getting-started-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:

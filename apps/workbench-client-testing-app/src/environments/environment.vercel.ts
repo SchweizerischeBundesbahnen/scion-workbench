@@ -8,6 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import packageJson from '../../../../projects/scion/workbench/package.json';
+
+const version = packageJson.version.replace(/\./g, '-');
+
 /**
  * Environment used when packaging the app for Vercel.
  */
@@ -16,11 +20,11 @@ export const environment = {
   apps: {
     app1: {
       symbolicName: 'workbench-client-testing-app1',
-      url: 'https://workbench-client-testing-app1.scion.vercel.app',
+      url: `https://workbench-client-testing-app1-v${version}.scion.vercel.app`,
     },
     app2: {
       symbolicName: 'workbench-client-testing-app2',
-      url: 'https://workbench-client-testing-app2.scion.vercel.app',
+      url: `https://workbench-client-testing-app2-v${version}.scion.vercel.app`,
     },
   },
 };
