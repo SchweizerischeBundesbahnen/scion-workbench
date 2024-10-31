@@ -335,7 +335,7 @@ jobs:
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
-      - name: 'Publishing API Documentation (TypeDoc) to Vercel'
+      - name: 'Publishing TypeDoc for @scion/workbench-client to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
           dist-folder: dist/workbench-client-api
