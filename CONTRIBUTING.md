@@ -270,11 +270,27 @@ function someMethod(): void {
   
 We deploy our documentations and applications to [Vercel](https://vercel.com/docs). Vercel is a cloud platform for static sites and serverless functions. Applications are deployed using the SCION collaborator account (scion.collaborator@gmail.com) under the [SCION organization](https://vercel.com/scion).
 
-We have the following workbench related projects:
+**Vercel Deployment Projects:**
 - https://vercel.com/scion/scion-workbench-client-api
 - https://vercel.com/scion/scion-workbench-testing-app
 - https://vercel.com/scion/scion-workbench-client-testing-app
 - https://vercel.com/scion/scion-workbench-getting-started-app
+
+**Applications**
+- https://workbench-testing-app.scion.vercel.app (latest)
+- https://workbench-testing-app-vX-X-X.scion.vercel.app (versioned)
+  <p>
+- https://workbench-client-testing-app1.scion.vercel.app (latest)
+- https://workbench-client-testing-app1-vX-X-X.scion.vercel.app (versioned)
+  <p>
+- https://workbench-client-testing-app2.scion.vercel.app (latest)
+- https://workbench-client-testing-app2-vX-X-X.scion.vercel.app (versioned)
+  <p>
+- https://workbench-getting-started.scion.vercel.app
+
+**Documentation Sites**
+- https://workbench-client-api.scion.vercel.app (latest)
+- https://workbench-client-api-vX-X-X.scion.vercel.app (versioned)
 
 </details>
 
@@ -323,11 +339,7 @@ This chapter describes the tasks to publish a new release for `@scion/workbench`
    - Creates a Git release tag
    - Publishes `@scion/workbench` package to NPM (https://www.npmjs.com/package/@scion/workbench)
    - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
-   - Deploys following apps to Vercel:
-     - https://workbench-getting-started.scion.vercel.app
-     - https://workbench-testing-app.scion.vercel.app
-     - https://workbench-client-testing-app1.scion.vercel.app (contributes microfrontends)
-     - https://workbench-client-testing-app2.scion.vercel.app (contributes microfrontends)
+   - Deploys Getting Started App and Testing App to Vercel
 
 </details>
 
@@ -345,14 +357,9 @@ This chapter describes the tasks to publish a new release for `@scion/workbench-
     - Creates a Git release tag (prefixed with workbench-client-)
     - Publishes `@scion/workbench-client` package to NPM (https://www.npmjs.com/package/@scion/workbench-client)
     - Creates a release on GitHub (https://github.com/SchweizerischeBundesbahnen/scion-workbench/releases)
-    - Deploys following apps to Vercel:
-        - https://workbench-getting-started.scion.vercel.app
-        - https://workbench-testing-app.scion.vercel.app
-        - https://workbench-client-testing-app1.scion.vercel.app (contributes microfrontends)
-        - https://workbench-client-testing-app2.scion.vercel.app (contributes microfrontends)
-    - Publishes API documentation (TypeDoc) to Vercel:
-        - https://workbench-client-api.scion.vercel.app
-        - https://workbench-client-api-vX-X-X.scion.vercel.app 
+    - Deploys Getting Started App and Testing App to Vercel
+    - Publishes TypeDoc of `@scion/workbench-client` to Vercel
+
 </details>
 
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
