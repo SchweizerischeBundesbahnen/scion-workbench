@@ -4,6 +4,15 @@
       "source": "**",
       "headers": [
         {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; connect-src 'self' blob: localhost:*; frame-src 'self' localhost:*; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com 'nonce-STATIC_NONCE'; script-src 'self' 'nonce-STATIC_NONCE'; frame-ancestors localhost:4200"
+        }
+      ]
+    },
+    {
+      "source": "**",
+      "headers": [
+        {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
         }
