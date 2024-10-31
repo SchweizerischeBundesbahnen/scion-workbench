@@ -95,12 +95,16 @@ jobs:
             cmd: npm run workbench-testing-app:basehref:build
           - name: workbench-testing-app-basehref-webpack
             cmd: npm run workbench-testing-app:basehref-webpack:build
-          - name: workbench-testing-app-vercel
-            cmd: npm run workbench-testing-app:vercel:build
+          - name: workbench-testing-app-vercel-latest
+            cmd: npm run workbench-testing-app:vercel-latest:build
+          - name: workbench-testing-app-vercel-release
+            cmd: npm run workbench-testing-app:vercel-release:build
+          - name: workbench-client-testing-app-vercel-latest
+            cmd: npm run workbench-client-testing-app:vercel-latest:build
+          - name: workbench-client-testing-app-vercel-release
+            cmd: npm run workbench-client-testing-app:vercel-release:build
           - name: workbench-client-testing-app-ci
             cmd: npm run workbench-client-testing-app:ci:build
-          - name: workbench-client-testing-app-vercel
-            cmd: npm run workbench-client-testing-app:vercel:build
           - name: workbench-getting-started-app
             cmd: npm run workbench-getting-started-app:build
     steps:
@@ -246,43 +250,78 @@ jobs:
   deploy-apps:
     name: 'Deploying Applications'
     if: github.ref == 'refs/heads/master'
-    needs: [ workbench-release-guard, workbench-client-release-guard ]
+    needs:
+      - workbench-release-guard
+      - workbench-client-release-guard
+      - build-libs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 'Downloading app: workbench-testing-app-vercel (dist)'
+      - name: 'Downloading app: workbench-testing-app-vercel-latest (dist)'
         uses: actions/download-artifact@v4
         with:
-          name: workbench-testing-app-vercel
-          path: dist/workbench-testing-app-vercel
-      - name: 'Downloading app: workbench-client-testing-app-vercel (dist)'
+          name: workbench-testing-app-vercel-latest
+          path: dist/workbench-testing-app-vercel-latest
+      - name: 'Downloading app: workbench-client-testing-app-vercel-latest (dist)'
         uses: actions/download-artifact@v4
         with:
-          name: workbench-client-testing-app-vercel
-          path: dist/workbench-client-testing-app-vercel
+          name: workbench-client-testing-app-vercel-latest
+          path: dist/workbench-client-testing-app-vercel-latest
+      - name: 'Downloading app: workbench-testing-app-vercel-release (dist)'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-testing-app-vercel-release
+          path: dist/workbench-testing-app-vercel-release
+      - name: 'Downloading app: workbench-client-testing-app-vercel-release (dist)'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-client-testing-app-vercel-release
+          path: dist/workbench-client-testing-app-vercel-release
       - name: 'Downloading app: workbench-getting-started-app (dist)'
         uses: actions/download-artifact@v4
         with:
           name: workbench-getting-started-app
           path: dist/workbench-getting-started-app
-      - name: 'Deploying workbench-testing-app to Vercel'
+      - name: 'Deploying workbench-testing-app to Vercel (latest)'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
-          dist-folder: dist/workbench-testing-app-vercel/browser
+          dist-folder: dist/workbench-testing-app-vercel-latest/browser
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
           aliases: workbench-testing-app.scion.vercel.app
-      - name: 'Deploying workbench-client-testing-app to Vercel'
+      - name: 'Deploying workbench-client-testing-app to Vercel (latest)'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:
-          dist-folder: dist/workbench-client-testing-app-vercel/browser
+          dist-folder: dist/workbench-client-testing-app-vercel-latest/browser
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           org-id: ${{ secrets.VERCEL_ORG_ID }}
           project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
           aliases: |
             workbench-client-testing-app1.scion.vercel.app,
-            workbench-client-testing-app2.scion.vercel.app,
+            workbench-client-testing-app2.scion.vercel.app
+      - name: 'Deploying workbench-testing-app to Vercel (release)'
+        if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' || needs.workbench-client-release-guard.outputs.should-release == 'true' }}
+        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
+        with:
+          dist-folder: dist/workbench-testing-app-vercel-release/browser
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_WORKBENCH_TESTING_APP_PROJECT_ID }}
+          version: ${{ needs.build-libs.outputs.workbench-version }}
+          aliases: workbench-testing-app-v%v.scion.vercel.app
+      - name: 'Deploying workbench-client-testing-app to Vercel (release)'
+        if: ${{ needs.workbench-release-guard.outputs.should-release == 'true' || needs.workbench-client-release-guard.outputs.should-release == 'true' }}
+        uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
+        with:
+          dist-folder: dist/workbench-client-testing-app-vercel-release/browser
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          org-id: ${{ secrets.VERCEL_ORG_ID }}
+          project-id: ${{ secrets.VERCEL_WORKBENCH_CLIENT_TESTING_APP_PROJECT_ID }}
+          version: ${{ needs.build-libs.outputs.workbench-version }}
+          aliases: |
+            workbench-client-testing-app1-v%v.scion.vercel.app,
+            workbench-client-testing-app2-v%v.scion.vercel.app
       - name: 'Deploying workbench-getting-started-app to Vercel'
         uses: SchweizerischeBundesbahnen/scion-toolkit/.github/actions/vercel-deploy@master
         with:

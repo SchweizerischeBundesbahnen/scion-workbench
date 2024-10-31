@@ -46,7 +46,8 @@
     "workbench-getting-started-app:serve": "ng serve workbench-getting-started-app --port 4500",
 
     "workbench-testing-app:build": "ng build workbench-testing-app --configuration=development",
-    "workbench-testing-app:vercel:build": "ng build workbench-testing-app --configuration=production-vercel",
+    "workbench-testing-app:vercel-latest:build": "ng build workbench-testing-app --configuration=production-vercel-latest",
+    "workbench-testing-app:vercel-release:build": "ng build workbench-testing-app --configuration=production-vercel-release",
     "workbench-testing-app:ci:build": "ng build workbench-testing-app --configuration=production-ci",
     "workbench-testing-app:basehref:build": "ng build workbench-testing-app --configuration=production-basehref",
     "workbench-testing-app:basehref-webpack:build": "ng run workbench-testing-app:build-basehref-webpack:production",
@@ -59,7 +60,8 @@
     "workbench-testing-app:basehref-webpack:http-server": "cd dist/workbench-testing-app-basehref-webpack && http-server --silent --port 4400",
 
     "workbench-client-testing-app:build": "ng build workbench-client-testing-app --configuration=development",
-    "workbench-client-testing-app:vercel:build": "ng build workbench-client-testing-app --configuration=production-vercel",
+    "workbench-client-testing-app:vercel-latest:build": "ng build workbench-client-testing-app --configuration=production-vercel-latest",
+    "workbench-client-testing-app:vercel-release:build": "ng build workbench-client-testing-app --configuration=production-vercel-release",
     "workbench-client-testing-app:ci:build": "ng build workbench-client-testing-app --configuration=production-ci",
     "workbench-client-testing-app:lint": "ng lint workbench-client-testing-app",
     "workbench-client-testing-app:4201:serve": "ng serve workbench-client-testing-app --port 4201",

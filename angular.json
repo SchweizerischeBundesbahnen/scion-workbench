@@ -251,7 +251,7 @@
             "scripts": []
           },
           "configurations": {
-            "production-vercel": {
+            "production-vercel-latest": {
               "budgets": [
                 {
                   "type": "initial",
@@ -267,11 +267,33 @@
               "fileReplacements": [
                 {
                   "replace": "apps/workbench-testing-app/src/environments/environment.ts",
-                  "with": "apps/workbench-testing-app/src/environments/environment.vercel.ts"
+                  "with": "apps/workbench-testing-app/src/environments/environment.vercel.latest.ts"
                 }
               ],
               "outputHashing": "all",
-              "outputPath": "dist/workbench-testing-app-vercel"
+              "outputPath": "dist/workbench-testing-app-vercel-latest"
+            },
+            "production-vercel-release": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "5kB"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-testing-app/src/environments/environment.vercel.release.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "outputPath": "dist/workbench-testing-app-vercel-release"
             },
             "production-ci": {
               "budgets": [
@@ -481,7 +503,7 @@
             "scripts": []
           },
           "configurations": {
-            "production-vercel": {
+            "production-vercel-latest": {
               "budgets": [
                 {
                   "type": "initial",
@@ -497,11 +519,33 @@
               "fileReplacements": [
                 {
                   "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
-                  "with": "apps/workbench-client-testing-app/src/environments/environment.vercel.ts"
+                  "with": "apps/workbench-client-testing-app/src/environments/environment.vercel.latest.ts"
                 }
               ],
               "outputHashing": "all",
-              "outputPath": "dist/workbench-client-testing-app-vercel"
+              "outputPath": "dist/workbench-client-testing-app-vercel-latest"
+            },
+            "production-vercel-release": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "5kB"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/workbench-client-testing-app/src/environments/environment.ts",
+                  "with": "apps/workbench-client-testing-app/src/environments/environment.vercel.release.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "outputPath": "dist/workbench-client-testing-app-vercel-release"
             },
             "production-ci": {
               "budgets": [
