@@ -51,8 +51,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
 })
 export default class ViewPageComponent {
 
-  private _messageBoxService = inject(WorkbenchMessageBoxService);
-
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
   public canClose: CanCloseFn | undefined;
@@ -85,7 +83,7 @@ export default class ViewPageComponent {
   }
 
   private async askToClose(): Promise<boolean> {
-    const action = await this._messageBoxService.open('Do you want to close this view?', {
+    const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
       actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
     });

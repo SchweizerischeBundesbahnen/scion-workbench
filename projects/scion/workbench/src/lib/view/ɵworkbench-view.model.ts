@@ -9,7 +9,7 @@
  */
 
 import {BehaviorSubject, combineLatest, firstValueFrom, Observable} from 'rxjs';
-import {ActivatedRouteSnapshot, ChildrenOutletContexts, OutletContext, UrlSegment} from '@angular/router';
+import {ActivatedRouteSnapshot, ChildrenOutletContexts, UrlSegment} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
@@ -177,15 +177,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Returns the component of this view. Returns `null` if not navigated the view, or before it was activated for the first time.
    */
   public getComponent<T = unknown>(): T | null {
-    const outlet = this.getOutletContext()?.outlet;
+    const outlet = Routing.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id))?.outlet;
     return outlet?.isActivated ? outlet.component as T : null;
-  }
-
-  /**
-   * Returns the injector of the component. Returns `null` if not navigated the view, or before it was activated for the first time.
-   */
-  public getComponentInjector(): Injector | null {
-    return this.getOutletContext()?.injector ?? null;
   }
 
   /** @inheritDoc */
@@ -379,13 +372,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /**
-   * Returns the outlet context of the currently activated route.
-   */
-  private getOutletContext(): OutletContext | null {
-    return Routing.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id));
-  }
-
-  /**
    * Updates the activation instant when this view is activated.
    */
   private touchOnActivate(): void {
@@ -402,7 +388,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private constructCanCloseGuard(): () => Promise<boolean> {
     return async () => {
       try {
-        const close = runInInjectionContext(this.getComponentInjector()!, () => this.getComponent<CanClose>()!.canClose());
+        const close = runInInjectionContext(this.portal.componentRef.injector, () => this.getComponent<CanClose>()!.canClose());
         return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
       }
       catch (error) {
