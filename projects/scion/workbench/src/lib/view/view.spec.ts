@@ -984,8 +984,10 @@ describe('View', () => {
     await view.close();
     await fixture.whenStable();
 
-    // Expect `CanClose` guard to be invoked in the component's injection context.
-    expect(component.canCloseInjector).toBe(view.getComponentInjector());
+    // Expect `CanClose` guard to be invoked in the view's injection context.
+    expect(component.canCloseInjector!.get(WorkbenchView)).toBe(view);
+    expect(component.canCloseInjector!.get(WorkbenchMessageBoxService)).toBe(component.injector.get(WorkbenchMessageBoxService));
+    expect(component.canCloseInjector!.get(WorkbenchMessageBoxService)).not.toBe(TestBed.inject(WorkbenchMessageBoxService));
   });
 
   it('should remove view without a view handle', async () => {
@@ -3037,6 +3039,7 @@ class SpecViewComponent implements OnDestroy, CanClose {
   public checkedForChanges = false;
   public preventClosing = false;
   public view = inject(WorkbenchView);
+  public injector = inject(Injector);
   public canCloseInjector: Injector | undefined;
 
   constructor() {
