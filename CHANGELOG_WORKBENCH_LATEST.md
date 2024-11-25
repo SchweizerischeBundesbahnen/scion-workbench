@@ -1,64 +1,50 @@
-# [18.0.0-beta.8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.7...18.0.0-beta.8) (2024-10-28)
+# [18.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.8...18.0.0-beta.9) (2024-11-25)
 
 
 ### Bug Fixes
 
-* **workbench/popup:** ensure the popup anchor not leaving view boundaries ([c629f49](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c629f49f3ba520c2cd700a008e4ed0af1c86e01f))
-* **workbench/view:** ensure view overlays align with view boundaries when view position changes ([2998295](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/29982951bf8290108d3b09104ebc456f3acb9f6c))
+* **workbench/view:** invoke `CanClose` guard in view injection context ([07ba936](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/07ba93604ec6862936a11badf6957d8582a0b687)), closes [#578](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/578)
+* **workbench/view:** prevent `CanClose` guard from blocking workbench navigation ([12e9e91](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/12e9e9140cf8db11c8fc188f463503ccaaf35195)), closes [#558](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/558)
+* **workbench/view:** prevent closing views with a pending `CanClose` guard ([4326a63](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4326a63665ac8a40bfb040250f9a66c582aed7c6))
 
 
 ### Features
 
-* **workbench:** prevent tracking unwanted dependencies in effects ([7a7eaf8](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/7a7eaf847f3ed54dcc7eeab300cbde53700b8e46))
+* **workbench/view:** add functional `CanClose` guard, deprecate class-based guard ([c2ee531](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c2ee531d483dbdbff72d468592908bb346002278))
 
 
-### BREAKING CHANGES
+### Deprecations
 
-* **workbench:** SCION Workbench requires `@scion/toolkit` version `1.6.0` or later.
-* **workbench:** SCION Workbench requires `@scion/components` version `18.1.1` or later.
-* **workbench:** Calling following workbench methods in a reactive (tracking) context (e.g., `effect`) now throws an error. Migrate by using Angular's `untracked()` function.
-  - `WorkbenchRouter.navigate`
-  - `WorkbenchService.registerPerspective`
-  - `WorkbenchService.switchPerspective`
-  - `WorkbenchService.resetPerspective`
-  - `WorkbenchService.closeViews`
-  - `WorkbenchService.switchTheme`
-  - `WorkbenchService.registerPartAction`
-  - `WorkbenchService.registerViewMenuItem`
-  - `WorkbenchLauncher.launch`
-  - `WorkbenchDialogService.open`
-  - `WorkbenchMessageBoxService.open`
-  - `NotificationService.notify`
-  - `PopupService.open`
-  - `WorkbenchPart.activate`
-  - `WorkbenchView.activate`
-  - `WorkbenchView.close`
-  - `WorkbenchView.move`
-  - `WorkbenchView.registerMenuItem`
-  - `WorkbenchDialog.close`
-  - `Popup.close`
-  
-  **Migration Example**
+* **workbench/view:** The class-based `CanClose` guard has been deprecated in favor of a functional guard that can be registered on `WorkbenchView.canClose`.
+
+  Migrate by registering a callback on `WorkbenchView.canClose` instead of implementing the `CanClose` interface.
+
+  **Before migration:**
   ```ts
-  import {effect, inject, untracked} from '@angular/core';
-  import {WorkbenchRouter} from '@scion/workbench';
+  import {CanClose} from '@scion/workbench';
+  import {Component} from '@angular/core';
   
-  const workbenchRouter = inject(WorkbenchRouter);
+  @Component({})
+  export class ViewComponent implements CanClose {
   
-  // Before
-  effect(() => {
-    if (someSignal()) {
-      workbenchRouter.navigate(['path/to/view']);
+    public canClose(): boolean {
+      return true;
     }
-  });
-  
-  // After
-  effect(() => {
-    if (someSignal()) {
-      untracked(() => workbenchRouter.navigate(['path/to/view']));
-    }
-  });
+  }
   ```
 
-
-
+  **After migration:**
+  ```ts
+  import {Component, inject} from '@angular/core';
+  import {WorkbenchView} from '@scion/workbench';
+  
+  @Component({})
+  export class ViewComponent {
+  
+    constructor() {
+      inject(WorkbenchView).canClose(() => {
+        return true;
+      });
+    }
+  }
+  ```
