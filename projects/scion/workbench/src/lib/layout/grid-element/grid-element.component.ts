@@ -73,12 +73,12 @@ export class GridElementComponent implements OnChanges {
   }
 
   public onSashStart(): void {
-    this._workbenchLayoutService.notifyDragStarting();
+    this._workbenchLayoutService.signalResizing(true);
   }
 
   public onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
-    this._workbenchLayoutService.notifyDragEnding();
+    this._workbenchLayoutService.signalResizing(false);
     this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio)).then();
   }
 

@@ -13,7 +13,7 @@ import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {ViewPO} from '../../../view.po';
 import {Commands, ViewId} from '@scion/workbench';
-import {commandsToPath, rejectWhenAttached, waitForCondition} from '../../../helper/testing.util';
+import {commandsToPath, rejectWhenAttached} from '../../../helper/testing.util';
 
 export class AngularRouterTestPagePO implements WorkbenchViewPagePO {
 
@@ -34,7 +34,7 @@ export class AngularRouterTestPagePO implements WorkbenchViewPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
+      this._appPO.waitForLayoutChange({navigationId}),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }

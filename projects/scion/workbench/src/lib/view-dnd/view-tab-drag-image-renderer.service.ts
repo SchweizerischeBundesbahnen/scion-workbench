@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ComponentFactoryResolver, computed, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
+import {ApplicationRef, ComponentFactoryResolver, computed, inject, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
 import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
@@ -25,7 +25,7 @@ import {Disposable} from '../common/disposable';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {throwError} from '../common/throw-error.util';
 
-export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
+export type ConstrainFn = (rect: DOMRect) => DOMRect;
 
 /**
  * Renders a drag image during a view drag operation.
@@ -36,29 +36,31 @@ export type ConstrainFn = (rect: ViewDragImageRect) => ViewDragImageRect;
 @Injectable({providedIn: 'root'})
 export class ViewTabDragImageRenderer {
 
-  private _viewDragImagePortalOutlet: DomPortalOutlet | null = null;
-  private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
+  private readonly _viewDragService = inject(ViewDragService);
+  // TODO [Angular 19][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
+  private readonly _componentFactoryResolver = inject(ComponentFactoryResolver);
+  private readonly _applicationRef = inject(ApplicationRef);
+  private readonly _injector = inject(Injector);
+  private readonly _zone = inject(NgZone);
 
-  constructor(private _viewDragService: ViewDragService,
-              // TODO [Angular 19][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
-              private _componentFactoryResolver: ComponentFactoryResolver,
-              private _applicationRef: ApplicationRef,
-              private _injector: Injector,
-              private _zone: NgZone) {
+  private _viewDragImagePortalOutlet: DomPortalOutlet | null = null;
+  private _constrainDragImageRectFn: ConstrainFn | null = null;
+
+  constructor() {
     this.installWindowViewDragListener();
   }
 
   /**
    * Allows to constrain the position and dimension of the drag image during a view drag operation.
    */
-  public setConstrainDragImageRectFn(fn: (rect: ViewDragImageRect) => ViewDragImageRect): void {
+  public setConstrainDragImageRectFn(fn: ConstrainFn): void {
     this._constrainDragImageRectFn = fn;
   }
 
   /**
    * Unsets the drag image constrain function, if registered.
    */
-  public unsetConstrainDragImageRectFn(fn: (rect: ViewDragImageRect) => ViewDragImageRect): void {
+  public unsetConstrainDragImageRectFn(fn: ConstrainFn): void {
     if (fn === this._constrainDragImageRectFn) {
       this._constrainDragImageRectFn = null;
     }
@@ -66,6 +68,10 @@ export class ViewTabDragImageRenderer {
 
   private onWindowDragStart(event: DragEvent): void {
     this.createDragImage(event);
+  }
+
+  private onWindowDragEnd(): void {
+    this.disposeDragImage();
   }
 
   /**
@@ -82,7 +88,7 @@ export class ViewTabDragImageRenderer {
    * Method invoked while dragging a view over the current window. It is invoked outside the Angular zone.
    */
   private onWindowDragOver(event: DragEvent): void {
-    const dragPosition = this.calculateDragImageRect(this._viewDragService.viewDragData!, event);
+    const dragPosition = this.calculateDragImageRect(this._viewDragService.viewDragData()!, event);
 
     // update the drag image position
     setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
@@ -118,7 +124,7 @@ export class ViewTabDragImageRenderer {
       return;
     }
 
-    const dragData = this._viewDragService.viewDragData!;
+    const dragData = this._viewDragService.viewDragData()!;
     const dragPosition = this.calculateDragImageRect(dragData, event);
 
     // create the drag image
@@ -145,20 +151,20 @@ export class ViewTabDragImageRenderer {
   }
 
   private disposeDragImage(): void {
-    this._viewDragImagePortalOutlet!.dispose();
+    this._viewDragImagePortalOutlet?.dispose();
     this._viewDragImagePortalOutlet = null;
   }
 
   /**
    * Calculates client position and dimension for the drag image, accounting for any constraints.
    */
-  public calculateDragImageRect(dragData: ViewDragData, event: DragEvent): ViewDragImageRect {
-    const rect = new ViewDragImageRect({
-      x: event.clientX - dragData.viewTabPointerOffsetX,
-      y: event.clientY - dragData.viewTabPointerOffsetY,
-      height: dragData.viewTabHeight,
-      width: dragData.viewTabWidth,
-    });
+  public calculateDragImageRect(dragData: ViewDragData, event: DragEvent): DOMRect {
+    const rect = new DOMRect(
+      event.clientX - dragData.viewTabPointerOffsetX,
+      event.clientY - dragData.viewTabPointerOffsetY,
+      dragData.viewTabWidth,
+      dragData.viewTabHeight,
+    );
     return this._constrainDragImageRectFn ? this._constrainDragImageRectFn(rect) : rect;
   }
 
@@ -185,43 +191,11 @@ export class ViewTabDragImageRenderer {
           case 'drop':
             this.onWindowDrop();
             break;
+          case 'dragend':
+            this.onWindowDragEnd();
+            break;
         }
       });
-  }
-}
-
-/**
- * Represents the position and dimension of the drag image.
- */
-export class ViewDragImageRect {
-
-  /**
-   * Coordinate of the top left corner of the drag image in the "client" coordinate system.
-   */
-  public readonly x!: number;
-  /**
-   * Coordinate of the top left corner of the drag image in the "client" coordinate system.
-   */
-  public readonly y!: number;
-  /**
-   * Height of the drag image.
-   */
-  public readonly height!: number;
-  /**
-   * Width of the drag image.
-   */
-  public readonly width!: number;
-
-  constructor(rect: Omit<ViewDragImageRect, 'left' | 'right'>) {
-    Object.assign(this, rect);
-  }
-
-  public get left(): number {
-    return this.x;
-  }
-
-  public get right(): number {
-    return this.x + this.width;
   }
 }
 

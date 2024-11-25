@@ -24,7 +24,9 @@ test.describe('Workbench Part', () => {
     // Open test view "right".
     const rightTestPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
     // Move test view to the right
-    await rightTestPage.view.tab.dragTo({partId: await appPO.activePart({inMainArea: true}).getPartId(), region: 'east'});
+    const dragHandle = await rightTestPage.view.tab.startDrag();
+    await dragHandle.dragToPart(await appPO.activePart({inMainArea: true}).getPartId(), {region: 'east'});
+    await dragHandle.drop();
 
     // Capture part and view identities.
     const leftPartId = await leftTestPage.view.part.getPartId();
@@ -85,7 +87,7 @@ test.describe('Workbench Part', () => {
     const testPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
     // Open view list menu.
-    const viewListMenu = await testPage.view.part.openViewListMenu();
+    const viewListMenu = await testPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the view.
@@ -106,7 +108,7 @@ test.describe('Workbench Part', () => {
     const testPage = await MicrofrontendInputFieldTestPagePO.openInPopup(appPO, microfrontendNavigator, {closeOnFocusLost: false});
 
     // Open view list menu.
-    const viewListMenu = await viewPage.view.part.openViewListMenu();
+    const viewListMenu = await viewPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the popup.

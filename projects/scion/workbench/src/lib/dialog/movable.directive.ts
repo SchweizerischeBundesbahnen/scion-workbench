@@ -52,7 +52,7 @@ export class MovableDirective implements OnInit {
    * Method invoked when start moving the handle.
    */
   private onMoveStart(event: MouseEvent | Touch): void {
-    this._workbenchLayoutService.notifyDragStarting();
+    this._workbenchLayoutService.signalMoving(true);
     this._x = event.clientX;
     this._y = event.clientY;
   }
@@ -78,7 +78,7 @@ export class MovableDirective implements OnInit {
    * Method invoked when end moving the handle.
    */
   private onMoveEnd(): void {
-    this._workbenchLayoutService.notifyDragEnding();
+    this._workbenchLayoutService.signalMoving(false);
   }
 
   private makeHandleMovable(): void {

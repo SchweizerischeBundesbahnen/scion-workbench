@@ -15,7 +15,6 @@ import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outlet.po';
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
 import {ViewId} from '@scion/workbench';
-import {waitForCondition} from './helper/testing.util';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -66,7 +65,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
     await this._tabbarLocator.locator(`.e2e-workbench-view-tiles a.${cssClass}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
     // Wait until completed navigation.
-    await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
+    await this._appPO.waitForLayoutChange({navigationId});
   }
 
   /**
@@ -82,7 +81,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
     const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;
     await frameLocator.locator('app-root').waitFor({state: 'visible'});
     // Wait until completed navigation.
-    await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
+    await this._appPO.waitForLayoutChange({navigationId});
   }
 
   /**

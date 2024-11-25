@@ -322,11 +322,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
    * such as when dragging a view or moving a sash.
    */
   private installWorkbenchDragDetector(): void {
-    this._workbenchLayoutService.dragging$
-      .pipe(takeUntilDestroyed())
-      .subscribe(event => {
-        this.isWorkbenchDrag = (event === 'start');
-      });
+    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging());
   }
 
   private propagateWorkbenchTheme(): void {
