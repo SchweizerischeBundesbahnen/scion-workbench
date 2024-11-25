@@ -1,4 +1,4 @@
-<sci-viewport class="tabbar" scrollbarStyle="hidden" [class.dragover]="dragover$ | async">
+<sci-viewport class="tabbar e2e-tabbar" scrollbarStyle="hidden" [class.dragover]="dragover$ | async">
   @for (viewId of part.viewIds(); track viewId) {
     @if (viewtab === dropTargetViewTab) {
       <div class="divider"></div>

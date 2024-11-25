@@ -76,6 +76,28 @@ export class ViewTabPO {
     return hasCssClass(this.locator, 'e2e-dirty');
   }
 
+  public isActive(): Promise<boolean> {
+    return hasCssClass(this.locator, 'active');
+  }
+
+  /**
+   * Tests if this tab is fully scrolled into view.
+   */
+  public async isScrolledIntoView(): Promise<boolean> {
+    const partId = await this.part.getPartId();
+
+    return this.locator.evaluate((viewTabElement: HTMLElement, partId: string) => {
+      const tabbarViewport = document.querySelector(`wb-part[data-partid="${partId}"] wb-part-bar sci-viewport.e2e-tabbar`);
+      return new Promise<boolean>(resolve => {
+        const intersectionObserver = new IntersectionObserver(([entry]) => {
+          intersectionObserver.disconnect();
+          resolve(entry.isIntersecting);
+        }, {root: tabbarViewport, threshold: 1});
+        intersectionObserver.observe(viewTabElement);
+      });
+    }, partId);
+  }
+
   public getCssClasses(): Promise<string[]> {
     return getCssClasses(this.locator);
   }
