@@ -9,7 +9,7 @@
  */
 
 import {Component, effect, inject} from '@angular/core';
-import {CanClose, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {CanCloseFn, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
@@ -49,10 +49,13 @@ import {CssClassComponent} from '../css-class/css-class.component';
     WorkbenchPartActionDirective,
   ],
 })
-export default class ViewPageComponent implements CanClose {
+export default class ViewPageComponent {
+
+  private _messageBoxService = inject(WorkbenchMessageBoxService);
 
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
+  public canClose: CanCloseFn | undefined;
 
   public formControls = {
     partActions: this._formBuilder.control(''),
@@ -78,17 +81,13 @@ export default class ViewPageComponent implements CanClose {
 
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
+    this.installCanCloseGuard();
   }
 
-  public async canClose(): Promise<boolean> {
-    if (!this.formControls.confirmClosing.value) {
-      return true;
-    }
-
-    const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
+  private async askToClose(): Promise<boolean> {
+    const action = await this._messageBoxService.open('Do you want to close this view?', {
       actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
-      modality: 'application',
     });
 
     if (action === 'error') {
@@ -126,6 +125,25 @@ export default class ViewPageComponent implements CanClose {
       .pipe(takeUntilDestroyed())
       .subscribe(cssClasses => {
         this.view.cssClass = cssClasses;
+      });
+  }
+
+  /**
+   * Installs {@link CanClose} guard only if checked confirm closing.
+   */
+  private installCanCloseGuard(): void {
+    this.formControls.confirmClosing.valueChanges
+      .pipe(
+        startWith(this.formControls.confirmClosing.value),
+        takeUntilDestroyed(),
+      )
+      .subscribe(confirmClosing => {
+        if (confirmClosing) {
+          this.canClose = this.askToClose;
+        }
+        else {
+          delete this.canClose;
+        }
       });
   }
 }

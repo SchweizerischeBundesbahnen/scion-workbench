@@ -1594,8 +1594,7 @@ describe('WorkbenchLayout', () => {
     workbenchLayout = workbenchLayout.removeView('view.3'); // marked for removal
     expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
 
-    workbenchLayout = workbenchLayout.removeView('view.3'); // marked for removal
-    workbenchLayout = await workbenchLayout.removeViewsMarkedForRemoval();
+    workbenchLayout = workbenchLayout.removeView('view.3', {force: true});
     expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
 
     workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
@@ -1641,20 +1640,22 @@ describe('WorkbenchLayout', () => {
     const view2 = workbenchLayout.view({viewId: 'view.2'});
     const view3 = workbenchLayout.view({viewId: 'view.3'});
 
+    expect(workbenchLayout.views({markedForRemoval: true}).map(view => view.id)).toEqual(['view.1', 'view.2']);
     expect(view1.markedForRemoval).toBeTrue();
     expect(view2.markedForRemoval).toBeTrue();
     expect(view3.markedForRemoval).toBeUndefined();
 
-    // Remove views marked for removal if guard returns true.
-    workbenchLayout = await workbenchLayout.removeViewsMarkedForRemoval(viewUid => view2.uid === viewUid);
+    // Remove view 2.
+    workbenchLayout = workbenchLayout.removeView('view.2', {force: true});
 
     // Expect views to be removed.
+    expect(workbenchLayout.views({markedForRemoval: true}).map(view => view.id)).toEqual(['view.1']);
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toEqual(view1);
     expect(workbenchLayout.view({viewId: 'view.2'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.view({viewId: 'view.3'}, {orElse: null})).toEqual(view3);
 
     // Remove views marked for removal.
-    workbenchLayout = await workbenchLayout.removeViewsMarkedForRemoval();
+    workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
 
     // Expect views to be removed.
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();

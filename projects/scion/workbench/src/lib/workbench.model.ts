@@ -37,8 +37,15 @@ export interface CanClose {
    *
    * This function can call `inject` to get any required dependencies.
    */
-  canClose(): Observable<boolean> | Promise<boolean> | boolean;
+  canClose: CanCloseFn;
 }
+
+/**
+ * The signature of a function to confirm closing a view., e.g., if dirty.
+ *
+ * The function can call `inject` to get dependencies.
+ */
+export type CanCloseFn = () => Observable<boolean> | Promise<boolean> | boolean;
 
 /**
  * Describes an action contributed to a part.

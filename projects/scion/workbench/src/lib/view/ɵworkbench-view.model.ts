@@ -8,20 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, firstValueFrom, Observable} from 'rxjs';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts, OutletContext, UrlSegment} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Disposable} from '../common/disposable';
 import {throwError} from '../common/throw-error.util';
-import {WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
+import {CanClose, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
 import {ViewId, WorkbenchView} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, Signal, signal, Type, untracked} from '@angular/core';
+import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
@@ -38,6 +38,8 @@ import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {Observables} from '@scion/toolkit/util';
+import {Logger} from '../logging/logger';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -51,6 +53,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _logger = inject(Logger);
 
   private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
@@ -62,6 +65,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _closableComputed = computed(() => this._closable() && !this._blockedBy());
   private readonly _blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
   private readonly _scrolledIntoView = signal(true);
+  private readonly _canCloseGuard = this.constructCanCloseGuard();
 
   private _activationInstant: number | undefined;
 
@@ -319,6 +323,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     }
   }
 
+  /**
+   * Reference to the `CanClose` guard registered on this view, if any.
+   */
+  public get canCloseGuard(): (() => Promise<boolean>) | undefined {
+    return typeof this.getComponent<CanClose>()?.canClose === 'function' ? this._canCloseGuard : undefined;
+  }
+
   /** @inheritDoc */
   public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
     assertNotInReactiveContext(this.registerMenuItem, 'Call WorkbenchView.registerMenuItem() in a non-reactive (non-tracking) context, such as within the untracked() function.');
@@ -383,6 +394,22 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         this._activationInstant = this._activationInstantProvider.now();
       }
     });
+  }
+
+  /**
+   * Creates the guard to confirm closing this view.
+   */
+  private constructCanCloseGuard(): () => Promise<boolean> {
+    return async () => {
+      try {
+        const close = runInInjectionContext(this.getComponentInjector()!, () => this.getComponent<CanClose>()!.canClose());
+        return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
+      }
+      catch (error) {
+        this._logger.error(`Unhandled error while invoking 'CanClose' guard of view '${this.id}'.`, error);
+        return true;
+      }
+    };
   }
 
   /**

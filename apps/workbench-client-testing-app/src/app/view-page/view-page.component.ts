@@ -75,7 +75,7 @@ export default class ViewPageComponent implements CanClose, OnDestroy {
     this.view.markDirty(NEVER.pipe(this.logCompletion('DirtyObservableComplete')));
     this.view.setClosable(this.form.controls.closable.valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
 
-    this.installClosingListener();
+    this.installCanCloseGuard();
     this.installViewActiveStateLogger();
     this.installObservableCompletionLogger();
     this.setInitialTitleFromParams();
@@ -100,7 +100,6 @@ export default class ViewPageComponent implements CanClose, OnDestroy {
       title: 'Confirm Close',
       actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
-      modality: 'application',
     });
 
     if (action === 'error') {
@@ -133,7 +132,7 @@ export default class ViewPageComponent implements CanClose, OnDestroy {
     }
   }
 
-  private installClosingListener(): void {
+  private installCanCloseGuard(): void {
     this.form.controls.confirmClosing.valueChanges
       .pipe(
         startWith(this.form.controls.confirmClosing.value),

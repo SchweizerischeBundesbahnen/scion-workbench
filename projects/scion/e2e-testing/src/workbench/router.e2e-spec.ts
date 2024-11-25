@@ -1339,11 +1339,14 @@ test.describe('Workbench Router', () => {
 
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('right', {relativeTo: MAIN_AREA, align: 'right'})
-      .addView('view.101', {partId: 'right', activateView: true})
-      .navigateView('view.101', [], {hint: 'test-router'}),
+      .addView('view.101', {partId: 'right'})
+      .addView('view.102', {partId: 'right', activateView: true})
+      .navigateView('view.101', [], {hint: 'test-router'})
+      .navigateView('view.102', [], {hint: 'test-view'}),
     );
 
-    const testView1 = new RouterPagePO(appPO, {viewId: 'view.101'});
+    const view101 = new RouterPagePO(appPO, {viewId: 'view.101'});
+    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
 
     // Close views navigated to empty-path route with hint 'test-view'.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -1353,7 +1356,9 @@ test.describe('Workbench Router', () => {
     });
 
     // Expect view.101 not to be closed.
-    await expectView(testView1).toBeActive();
+    await expectView(view101).toBeActive();
+    // Expect view.102 to be closed.
+    await expectView(view102).not.toBeAttached();
   });
 
   test('should close views in the specified part', async ({appPO, workbenchNavigator}) => {
