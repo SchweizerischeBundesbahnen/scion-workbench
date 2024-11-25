@@ -198,11 +198,18 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       .map(async view => {
         // Capture current navigation id to not proceed closing if navigated in the meantime.
         const navigationId = view.navigationId;
-        const close = await view.canCloseGuard!();
-        if (close && view.navigationId === navigationId) {
-          return this.navigate(layout => layout.removeView(view.id, {force: true}));
+        // Make view non-closable to prevent closing the view again while awaiting closing confirmation.
+        view.closable = false;
+        try {
+          const close = await view.canCloseGuard!();
+          if (close && view.navigationId === navigationId) {
+            return this.navigate(layout => layout.removeView(view.id, {force: true}));
+          }
+          return true;
         }
-        return true;
+        finally {
+          view.closable = true;
+        }
       });
 
     // Wait for all `CanClose` guards to resolve and subsequent navigations to complete.

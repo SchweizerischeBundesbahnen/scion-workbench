@@ -830,6 +830,38 @@ test.describe('Workbench View', () => {
     await expectView(testViewPage).not.toBeAttached();
   });
 
+  test('should not invoke `CanClose` guard while blocking', async ({appPO, workbenchNavigator, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-pages/blocking-can-close-test-page'], {target: 'view.100'});
+    const testView = appPO.view({viewId: 'view.100'});
+
+    // Close view.
+    await testView.tab.close();
+
+    // Expect `CanClose` guard to be invoked.
+    await expect.poll(() => consoleLogs.get()).toContain('[BlockingCanCloseTestPageComponent] BLOCKING');
+
+    // Clear log.
+    consoleLogs.clear();
+
+    // Expect view not to be closable until `CanClose` guard is released.
+    await expect(testView.tab.closeButton).not.toBeVisible();
+
+    // Close all views.
+    await routerPage.view.tab.click();
+    const contextMenu = await routerPage.view.tab.openContextMenu();
+    await contextMenu.menuItems.closeAll.click();
+
+    // Expect `CanClose` guard not to be invoked again.
+    await expect.poll(() => consoleLogs.get()).not.toContain('[BlockingCanCloseTestPageComponent] BLOCKING');
+
+    // Expect view not to be closable until `CanClose` guard is released.
+    await expect(testView.tab.closeButton).not.toBeVisible();
+  });
+
   test(`should disable context menu 'Close tab' for 'non-closable' view`, async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
