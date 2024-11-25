@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, HostBinding, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, HostBinding, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
 import {ManifestService, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext} from '@scion/workbench-client';
 import {NgClass, NgComponentOutlet} from '@angular/common';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
@@ -121,11 +120,7 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
    * such as when dragging a view or moving a sash.
    */
   private installWorkbenchDragDetector(): void {
-    this._workbenchLayoutService.dragging$
-      .pipe(takeUntilDestroyed())
-      .subscribe(event => {
-        this.isWorkbenchDrag = (event === 'start');
-      });
+    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging());
   }
 
   public ngOnDestroy(): void {

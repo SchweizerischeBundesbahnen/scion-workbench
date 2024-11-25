@@ -119,7 +119,9 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
 
       // Drag dialog opener view into peripheral area.
-      await dialogOpenerPage.view.tab.dragTo({grid: 'workbench', region: 'east'});
+      const dragHandle = await dialogOpenerPage.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.drop();
 
       // Open dialog.
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});
@@ -2113,7 +2115,9 @@ test.describe('Workbench Dialog', () => {
       // Open two dialog opener views side by side.
       const dialogOpenerViewPage1 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
       const dialogOpenerViewPage2 = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerViewPage2.view.tab.dragTo({partId: await dialogOpenerViewPage2.view.part.getPartId(), region: 'east'});
+      const dragHandle = await dialogOpenerViewPage2.view.tab.startDrag();
+      await dragHandle.dragToPart(await dialogOpenerViewPage2.view.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Open dialog 1.
       await dialogOpenerViewPage1.open('focus-test-page', {cssClass: 'testee-1'});
@@ -2161,7 +2165,9 @@ test.describe('Workbench Dialog', () => {
       // Open router view and dialog opener view side by side.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.view.tab.dragTo({partId: await dialogOpenerPage.view.part.getPartId(), region: 'east'});
+      const dragHandle = await dialogOpenerPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await dialogOpenerPage.view.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Navigate to FocusTestPageComponent
       await routerPage.navigate(['/test-pages/focus-test-page'], {
@@ -2197,7 +2203,9 @@ test.describe('Workbench Dialog', () => {
       // Open router view and dialog opener view side by side.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-      await dialogOpenerPage.view.tab.dragTo({partId: await dialogOpenerPage.view.part.getPartId(), region: 'east'});
+      const dragHandle = await dialogOpenerPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await dialogOpenerPage.view.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Navigate to FocusTestPageComponent
       await routerPage.navigate(['/test-pages/focus-test-page'], {

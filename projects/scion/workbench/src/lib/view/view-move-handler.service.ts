@@ -1,4 +1,14 @@
-import {Inject, Injectable} from '@angular/core';
+/*
+ * Copyright (c) 2018-2024 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
+import {inject, Injectable} from '@angular/core';
 import {ViewDragService, ViewMoveEvent} from '../view-dnd/view-drag.service';
 import {Router} from '@angular/router';
 import {LocationStrategy} from '@angular/common';
@@ -11,52 +21,48 @@ import {generatePerspectiveWindowName} from '../perspective/workbench-perspectiv
 import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {WORKBENCH_ID} from '../workbench-id';
 import {UID} from '../common/uid.util';
+import {filter} from 'rxjs/operators';
 
 /**
- * Updates the workbench layout when the user moves a view.
+ * Updates the workbench layout when receiving a {@link ViewMoveEvent} event relevant for this application.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class ViewMoveHandler {
 
-  constructor(@Inject(WORKBENCH_ID) private _workbenchId: string,
-              private _workbenchRouter: ɵWorkbenchRouter,
-              private _workbenchLayoutFactory: ɵWorkbenchLayoutFactory,
-              private _viewDragService: ViewDragService,
-              private _router: Router,
-              private _locationStrategy: LocationStrategy) {
-    this.installViewMoveListener();
+  private readonly _workbenchId = inject(WORKBENCH_ID);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
+  private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
+  private readonly _router = inject(Router);
+  private readonly _locationStrategy = inject(LocationStrategy);
+
+  constructor() {
+    this.installViewMoveHandler();
   }
 
-  private installViewMoveListener(): void {
-    this._viewDragService.viewMove$
-      .pipe(takeUntilDestroyed())
-      .subscribe(async (event: ViewMoveEvent) => { // eslint-disable-line rxjs/no-async-subscribe
-        // Check if this workbench instance takes part in the view drag operation. If not, do nothing.
-        if (event.source.workbenchId !== this._workbenchId && event.target.workbenchId !== this._workbenchId) {
-          return;
-        }
+  /**
+   * Updates the workbench layout when receiving a {@link ViewMoveEvent} event relevant for this application.
+   */
+  private async onViewMove(event: ViewMoveEvent): Promise<void> {
+    const crossWorkbenchViewDrag = (event.source.workbenchId !== event.target.workbenchId);
 
-        const crossWorkbenchViewDrag = (event.source.workbenchId !== event.target.workbenchId);
-
-        // Check if to remove the view from this workbench instance if being moved to another workbench instance.
-        if (crossWorkbenchViewDrag && event.source.workbenchId === this._workbenchId) {
-          // Check if to add the view to a new browser window.
-          if (event.target.workbenchId === 'new-window') {
-            await this.moveViewToNewWindow(event);
-          }
-          else {
-            await this.removeView(event);
-          }
-        }
-        // Check if to add the view to this workbench instance if being moved from another workbench instance to this workbench instance.
-        else if (crossWorkbenchViewDrag && event.target.workbenchId === this._workbenchId) {
-          await this.addView(event);
-        }
-        // Move the view within the same workbench instance.
-        else {
-          await this.moveView(event);
-        }
-      });
+    // Check if to remove the view from this workbench instance if being moved to another workbench instance.
+    if (crossWorkbenchViewDrag && event.source.workbenchId === this._workbenchId) {
+      // Check if to add the view to a new browser window.
+      if (event.target.workbenchId === 'new-window') {
+        await this.moveViewToNewWindow(event);
+      }
+      else {
+        await this.removeView(event);
+      }
+    }
+    // Check if to add the view to this workbench instance if being moved from another workbench instance to this workbench instance.
+    else if (crossWorkbenchViewDrag && event.target.workbenchId === this._workbenchId) {
+      await this.addView(event);
+    }
+    // Move the view within the same workbench instance.
+    else {
+      await this.moveView(event);
+    }
   }
 
   private async addView(event: ViewMoveEvent): Promise<void> {
@@ -128,6 +134,24 @@ export class ViewMoveHandler {
         activatePart: true,
       }));
     }
+  }
+
+  /**
+   * Subscribes to {@link ViewMoveEvent} events relevant for this app instance,
+   * invoking {@link onViewMove} for each event and signaling completion once the view has been moved.
+   */
+  private installViewMoveHandler(): void {
+    const viewDragService = inject(ViewDragService);
+
+    viewDragService.viewMove$
+      .pipe(
+        // Skip events not relevant for this app instance.
+        filter(event => event.source.workbenchId === this._workbenchId || event.target.workbenchId === this._workbenchId),
+        takeUntilDestroyed(),
+      )
+      .subscribe(event => {
+        this.onViewMove(event).finally(() => viewDragService.signalViewMoved(event));
+      });
   }
 }
 

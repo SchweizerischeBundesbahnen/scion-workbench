@@ -36,7 +36,9 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       // Move test view to the west of the workbench grid.
-      await testView.view.tab.dragTo({grid: 'workbench', region: 'west'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'west'});
+      await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
       // Expect test view to be moved to the west of the workbench grid.
@@ -88,7 +90,9 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       // Move test view to the west of the workbench grid.
-      await testView.view.tab.dragTo({grid: 'workbench', region: 'west'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'west'});
+      await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
       // Expect test view to be moved to the west of the workbench grid.
@@ -151,7 +155,9 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       // Move test view to the east of the workbench grid.
-      await testView.view.tab.dragTo({grid: 'workbench', region: 'east'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
       // Expect test view to be moved to the east of the workbench grid.
@@ -203,7 +209,9 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       // Move test view to the east of the workbench grid.
-      await testView.view.tab.dragTo({grid: 'workbench', region: 'east'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
       // Expect test view to be moved to the east of the workbench grid.
@@ -269,7 +277,9 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       // Move test view to the south of the workbench grid.
-      await testView.view.tab.dragTo({grid: 'workbench', region: 'south'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'south'});
+      await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
       // Expect test view to be moved to the south of the workbench grid.
@@ -324,7 +334,9 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       // Move test view to the south of the workbench grid.
-      await testView.view.tab.dragTo({grid: 'workbench', region: 'south'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'south'});
+      await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
       // Expect test view to be moved to the south of the workbench grid.
@@ -390,7 +402,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.102', {partId: 'right', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
@@ -419,7 +432,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.102', {partId: 'bottom', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
@@ -450,7 +464,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.103', {partId: 'right', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
@@ -481,7 +496,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.103', {partId: 'left', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
@@ -517,7 +533,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.104', {partId: 'bottom', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
@@ -555,7 +572,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.105', {partId: 'right', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
@@ -586,7 +604,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.102', {partId: 'bottom-middle', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(false);
@@ -618,7 +637,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.102', {partId: 'right-bottom', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
@@ -648,7 +668,8 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.102', {partId: 'right', activateView: true}),
       );
 
-      await testView.view.tab.activateDropZones({grid: 'workbench'});
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'center'});
 
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'north'})).toBe(false);
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'south'})).toBe(true);
@@ -679,16 +700,14 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Get bounding box of the tabbar of the 'bottom' part.
       const bottomPart = appPO.part({partId: 'bottom'});
-      const bottomTabbarBounds = fromRect(await bottomPart.getPartBarBoundingBox());
+      const bottomTabbarBounds = fromRect(await bottomPart.bar.getBoundingBox());
 
-      // Press mouse button on the view tab.
-      await testView.view.tab.mousedown();
+      // Drag tab to the center of the tabbar of the 'bottom' part.
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragTo({x: bottomTabbarBounds.hcenter, y: bottomTabbarBounds.vcenter});
 
-      // Move tab to the center of the tabbar of the 'bottom' part.
-      await page.mouse.move(bottomTabbarBounds.hcenter, bottomTabbarBounds.vcenter, {steps: 100});
-
-      // Move tab to the beginning of the tabbar.
-      await page.mouse.move(0, bottomTabbarBounds.vcenter, {steps: 100});
+      // Drag tab to the beginning of the tabbar.
+      await dragHandle.dragTo({x: 0, y: bottomTabbarBounds.vcenter});
 
       // Expect the drop zone to be inactive.
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(false);
@@ -717,16 +736,14 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Get bounding box of the tabbar of the 'bottom' part.
       const bottomPart = appPO.part({partId: 'bottom'});
-      const bottomTabbarBounds = fromRect(await bottomPart.getPartBarBoundingBox());
+      const bottomTabbarBounds = fromRect(await bottomPart.bar.getBoundingBox());
 
-      // Press mouse button on the view tab.
-      await testView.view.tab.mousedown();
+      // Drag tab into drop zone.
+      const dragHandle = await testView.view.tab.startDrag();
+      await dragHandle.dragTo({x: 0, y: 0});
 
-      // Move tab into drop zone.
-      await page.mouse.move(0, 0, {steps: 1});
-
-      // Move tab along the drop zone into the tabbar of the 'bottom' part.
-      await page.mouse.move(0, bottomTabbarBounds.vcenter, {steps: 100});
+      // Drag tab along the drop zone into the tabbar of the 'bottom' part.
+      await dragHandle.dragTo({x: 0, y: bottomTabbarBounds.vcenter});
 
       // Expect the drop zone to be active.
       await expect.poll(() => appPO.isDropZoneActive({grid: 'workbench', region: 'west'})).toBe(true);

@@ -477,7 +477,9 @@ test.describe('Workbench Popup', () => {
       const popupOpenerView = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
 
       // Drag popup opener view into peripheral area.
-      await popupOpenerView.view.tab.dragTo({grid: 'workbench', region: 'east'});
+      const dragHandle = await popupOpenerView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.drop();
 
       // Open popup.
       await popupOpenerView.selectPopupComponent('popup-page');
@@ -813,7 +815,9 @@ test.describe('Workbench Popup', () => {
       // Open test page
       const inputFieldPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
       // Move test page to the right
-      await inputFieldPage.view.tab.dragTo({partId: await inputFieldPage.view.part.getPartId(), region: 'east'});
+      const dragHandle = await inputFieldPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await inputFieldPage.view.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Open popup
       await popupOpenerPage.selectPopupComponent('focus-test-page');

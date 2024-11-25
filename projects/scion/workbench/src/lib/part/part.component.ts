@@ -103,6 +103,7 @@ export class PartComponent implements OnInit, OnDestroy {
         elementId: this.part.id,
         region: event.dropRegion === 'center' ? undefined : event.dropRegion,
       },
+      dragData: event.dragData,
     });
   }
 

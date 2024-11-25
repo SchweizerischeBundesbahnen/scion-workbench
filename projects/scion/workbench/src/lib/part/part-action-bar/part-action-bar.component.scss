@@ -1,28 +1,9 @@
 :host {
   display: flex;
   gap: .5em;
+  align-items: center;
 
-  > ul {
-    all: unset;
-    list-style: none;
-    flex: auto;
-    display: flex;
-    gap: .5em;
-    align-items: center;
-
-    &.start {
-      padding-left: var(--sci-workbench-part-bar-actions-padding-inline);
-      place-content: flex-start;
-    }
-
-    &.end {
-      padding-right: var(--sci-workbench-part-bar-actions-padding-inline);
-      place-content: flex-end;
-    }
-
-    > li {
-      all: unset;
-      flex: none;
-    }
+  > div.action {
+    flex: none;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,116 +8,106 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, NgZone, OnDestroy} from '@angular/core';
-import {BehaviorSubject, EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
-import {filter, map, take} from 'rxjs/operators';
+import {computed, effect, inject, Injectable, Injector, NgZone, OnDestroy, untracked} from '@angular/core';
+import {BehaviorSubject, EMPTY, fromEvent, merge, mergeMap, mergeWith, MonoTypeOperatorFunction, Observable, Observer, Subject, switchMap, TeardownLogic} from 'rxjs';
+import {filter, map} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
-import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {ViewId} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 import {NavigationData} from '../routing/routing.model';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 /**
- * Events fired during view drag and drop operation.
- */
-export type ViewDragEventType = 'dragstart' | 'dragend' | 'dragenter' | 'dragover' | 'dragleave' | 'drop';
-/**
- * Transfer type for dragging a view.
- */
-export const VIEW_DRAG_TRANSFER_TYPE = 'workbench/view';
-
-/**
- * Manages the drag & drop behavior when the user drags a view.
+ * Coordinates cross application drag and drop of views.
+ *
+ * Views can only be moved across applications of the same origin.
  */
 @Injectable({providedIn: 'root'})
 export class ViewDragService implements OnDestroy {
 
-  /**
-   * Reference to the view drag data of the ongoing view drag operation, if any, or `null` otherwise.
-   */
-  private _viewDragData: ViewDragData | null = null;
-  private _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
-  private _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
-  private _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
-  private _tabbarDragOver$ = new BehaviorSubject<string /* partId */ | null>(null);
+  private readonly _injector = inject(Injector);
+  private readonly _zone = inject(NgZone);
+  private readonly _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
+  private readonly _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
+  private readonly _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
+  private readonly _tabbarDragOver$ = new BehaviorSubject<string /* partId */ | false>(false);
+  private readonly _viewMoved$ = new Subject<ViewMoveEvent>();
 
   /**
-   * Emits when the user starts dragging a viewtab. The event is received across app instances of the same origin.
-   */
-  public readonly viewDragStart$: Observable<ViewDragData> = this._viewDragStartBroadcastChannel.observe$;
-
-  /**
-   * Emits when the user ends dragging a viewtab. The event is received across app instances of the same origin.
-   */
-  public readonly viewDragEnd$: Observable<void> = this._viewDragEndBroadcastChannel.observe$;
-
-  /**
-   * Emits when the user moves a view. The event is received across app instances of the same origin.
+   * Notifies when to move a view. The event is broadcasted to all application instances of the same origin.
    */
   public readonly viewMove$: Observable<ViewMoveEvent> = this._viewMoveBroadcastChannel.observe$;
 
   /**
-   * Emits the identity of the part when the user is dragging a view over its tabbar, or `null` if not dragging over a tabbar.
-   * The event is NOT received across app instances.
+   * Notifies when the layout of this application has been updated after a view move event.
+   */
+  public readonly viewMoved$: Observable<ViewMoveEvent> = this._viewMoved$;
+
+  /**
+   * Notifies when dragging a tab over a tabbar. The event is the id of the part being dragged over, or `false` if not dragging over a tabbar.
    *
-   * Upon subscription, emits the current state, and then each time the state changes. The observable never completes.
+   * Upon subscription, emits the current dragover state, and then each time the state changes. The observable never completes.
    */
-  public readonly tabbarDragOver$: Observable<string | null> = this._tabbarDragOver$;
+  public readonly tabbarDragOver$: Observable<string | false> = this._tabbarDragOver$;
 
   /**
-   * Indicates if a drag operation is in progress.
+   * Provides the drag data of the current drag operation. Is `null` if no drag operation is in progress.
    */
-  public readonly dragging = toSignal(merge(
-    this.viewDragStart$.pipe(map(() => true)),
-    this.viewDragEnd$.pipe(map(() => false)),
-  ), {initialValue: false});
-
-  constructor(private _zone: NgZone) {
-    this.viewDragStart$
-      .pipe(takeUntilDestroyed())
-      .subscribe(viewDragData => {
-        this._viewDragData = viewDragData;
-      });
-    this.viewDragEnd$
-      .pipe(takeUntilDestroyed())
-      .subscribe(() => {
-        this._viewDragData = null;
-      });
-  }
+  public readonly viewDragData = toSignal<ViewDragData | null>(
+    merge(
+      this._viewDragStartBroadcastChannel.observe$,
+      this._viewDragEndBroadcastChannel.observe$.pipe(map(() => null)),
+    ),
+    {initialValue: null},
+  );
 
   /**
-   * Set when dragging a view over specified tabbar.
+   * Indicates if a drag operation is active across application instances of the same origin.
    */
-  public setTabbarDragover(partId: string): void {
+  public readonly dragging = computed<boolean>(() => this.viewDragData() !== null);
+
+  /**
+   * Signals start dragging a tab over specified tabbar (dragenter).
+   */
+  public signalTabbarDragEnter(partId: string): void {
     this._tabbarDragOver$.next(partId);
   }
 
   /**
-   * Unset when not dragging a view over specified tabbar anymore.
+   * Signals end dragging a tab over specified tabbar (dragleave).
    */
-  public unsetTabbarDragover(partId: string): void {
+  public signalTabbarDragLeave(partId: string): void {
     if (this._tabbarDragOver$.value === partId) {
-      this._tabbarDragOver$.next(null);
+      this._tabbarDragOver$.next(false);
     }
   }
 
   /**
-   * Indicates if dragging a view tab over a tabbar.
-   *
-   * Returns the identity of the part if the user is dragging a view over its tabbar, or `null` if not dragging over a tabbar.
+   * Signals successful move of a view in the layout of this app instance.
    */
-  public get isDragOverTabbar(): string | null {
+  public signalViewMoved(event: ViewMoveEvent): void {
+    this._viewMoved$.next(event);
+  }
+
+  /**
+   * Indicates if dragging a tab over a tabbar, returning the id of the part being dragged over, or `false` if not dragging over a tabbar.
+   */
+  public get isDragOverTabbar(): string | false {
     return this._tabbarDragOver$.value;
   }
 
   /**
-   * Checks if the given event is a view drag event with the same origin.
+   * Tests given event to be a view drag event of an app of this origin.
    */
   public isViewDragEvent(event: DragEvent): boolean {
-    return !!event.dataTransfer && event.dataTransfer.types.includes(VIEW_DRAG_TRANSFER_TYPE) && this.viewDragData !== null;
+    if (!event.dataTransfer?.types.includes(VIEW_DRAG_TRANSFER_TYPE)) {
+      return false;
+    }
+    // Test the event to originate from an app of this origin.
+    return this.dragging();
   }
 
   /**
@@ -170,13 +160,14 @@ export class ViewDragService implements OnDestroy {
     }
 
     function dragend$(): Observable<DragEvent> {
-      // The `dragend` event does not contain a drag transfer type. To still filter view-related `dragend` events,
-      // we combine `dragstart` and `dragend` events, i.e., when a view-related `dragstart` event occurs, we expect
-      // the next `dragend` event to be view-related.
-      return zip(
-        fromEvent<DragEvent>(target, 'dragstart', options ?? {}).pipe(filter(event => isViewDragEvent(event))),
-        fromEvent<DragEvent>(target, 'dragend', options ?? {}),
-      ).pipe(map(([_, dragendEvent]) => dragendEvent));
+      // The `dragend` event does not contain a drag transfer type.
+      // To filter view-related `dragend` events, we subscribe to view-related `dragstart` events in the first place.
+      // When receiving a `dragstart` event we subscribe for the next `dragend` event, expecting it to be view-related.
+      return fromEvent<DragEvent>(target, 'dragstart', options ?? {})
+        .pipe(
+          filter(event => isViewDragEvent(event)),
+          switchMap(() => fromEvent<DragEvent>(target, 'dragend', {...options, once: true})),
+        );
     }
 
     function dragover$(): Observable<DragEvent> {
@@ -208,8 +199,21 @@ export class ViewDragService implements OnDestroy {
                 return true;
             }
           }),
+          resetOnDragEnd(),
           filter(event => shouldSubscribe(event.type)),
         );
+
+      /**
+       * Resets `dragEnterCount` on `dragend` to prevent inconsistent state if `dragend` should not be triggered.
+       */
+      function resetOnDragEnd<T>(): MonoTypeOperatorFunction<T> {
+        return mergeWith(fromEvent<DragEvent>(target, 'dragend')
+          .pipe(mergeMap(() => {
+            dragEnterCount = 0;
+            return EMPTY;
+          })),
+        );
+      }
     }
 
     function shouldSubscribe(eventType: string): boolean {
@@ -218,20 +222,16 @@ export class ViewDragService implements OnDestroy {
   }
 
   /**
-   * Dispatches the given view move event to app instances of the same origin.
+   * Dispatches the given view move event, broadcasting it to all application instances of the same origin.
    */
   public dispatchViewMoveEvent(event: ViewMoveEvent): void {
-    // Wait to dispatch the event until the drag operation finished, if any, because if the drag source element
-    // is destroyed during the drag operation, e.g. if moved to another part, the drag operation would not
-    // ordinarily complete, meaning 'dragend' or 'dragleave' would not be called.
-    const isDragging = this.viewDragData !== null;
-    (isDragging ? this.viewDragEnd$ : of(undefined))
-      .pipe(take(1))
-      .subscribe(() => this._viewMoveBroadcastChannel.postMessage(event));
+    // Dispatch the event after the current drag operation, if any, has ended, preventing destruction of the drag source
+    // during the drag operation which would break the drag operation, i.e., `dragend` and `dragleave` events would not be fired.
+    this.onDragEnd(() => this._viewMoveBroadcastChannel.postMessage(event), {once: true, injector: this._injector});
   }
 
   /**
-   * Makes the given view drag data available to app instances of the same origin.
+   * Sets given drag data, broadcasting it to all application instances of the same origin.
    *
    * Invoke this method inside 'dragstart' event handler of the element where the drag operation started.
    */
@@ -240,7 +240,7 @@ export class ViewDragService implements OnDestroy {
   }
 
   /**
-   * Removes the view drag data.
+   * Unsets the current drag data.
    *
    * Invoke this method inside 'dragend' event handler of the element where the drag operation started.
    */
@@ -249,10 +249,18 @@ export class ViewDragService implements OnDestroy {
   }
 
   /**
-   * Returns the view drag data of the ongoing view drag operation or `null` if no drag operation is in progress.
+   * Registers a callback to be executed when a drag operation ends, executing it immediately if no drag operation is in progress at the time of registration.
+   *
+   * Automatically unregisters the function when the current injection context or the provided injector is destroyed.
+   * Setting `once` unregisters the function after the first execution.
    */
-  public get viewDragData(): ViewDragData | null {
-    return this._viewDragData;
+  public onDragEnd(onDragEnd: () => void, options?: {injector?: Injector; once?: true}): void {
+    const effectRef = effect(() => {
+      if (!this.dragging()) {
+        untracked(() => onDragEnd());
+        options?.once && effectRef.destroy();
+      }
+    }, {injector: options?.injector});
   }
 
   public ngOnDestroy(): void {
@@ -266,6 +274,10 @@ export class ViewDragService implements OnDestroy {
  * Represents data of a view drag operation.
  */
 export interface ViewDragData {
+  /**
+   * Unique id of the drag operation.
+   */
+  uid: string;
   /**
    * X-coordinate of the mouse pointer, relative to the view tab drag image.
    */
@@ -291,15 +303,25 @@ export interface ViewDragData {
 }
 
 /**
- * Event emitted when moving a view.
+ * Event for moving a view in the workbench layout.
  */
 export interface ViewMoveEvent {
+  /**
+   * Describes which view to move.
+   */
   source: ViewMoveEventSource;
+  /**
+   * Describes where to move the view.
+   */
   target: ViewMoveEventTarget;
+  /**
+   * Drag data associated with this operation. Is only set if moving a view via drag and drop.
+   */
+  dragData?: ViewDragData;
 }
 
 /**
- * Describes a view to be moved to another location.
+ * Describes which view to move.
  */
 export interface ViewMoveEventSource {
   viewId: ViewId;
@@ -313,7 +335,7 @@ export interface ViewMoveEventSource {
 }
 
 /**
- * Describes the target location for moving a view.
+ * Describes where to move a view.
  */
 export interface ViewMoveEventTarget {
   /**
@@ -362,9 +384,22 @@ export interface ViewMoveEventTarget {
   };
 }
 
+/**
+ * Controls how to subscribe to drag events.
+ */
 export interface ViewDragEventListenerOptions extends EventListenerOptions {
   /**
-   * Allows filtering for given drag event types.
+   * Controls which event(s) to subscribe.
    */
   eventType?: ViewDragEventType | ViewDragEventType[];
 }
+
+/**
+ * Represents the type of drag event.
+ */
+export type ViewDragEventType = 'dragstart' | 'dragend' | 'dragenter' | 'dragover' | 'dragleave' | 'drop';
+
+/**
+ * Transfer type for dragging a view.
+ */
+export const VIEW_DRAG_TRANSFER_TYPE = 'workbench/view';

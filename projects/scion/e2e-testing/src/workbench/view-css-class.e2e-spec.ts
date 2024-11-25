@@ -234,7 +234,9 @@ test.describe('Workbench View CSS Class', () => {
     });
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
-    await viewPage.view.tab.dragTo({partId: await viewPage.view.part.getPartId(), region: 'east'});
+    const dragHandle = await viewPage.view.tab.startDrag();
+    await dragHandle.dragToPart(await viewPage.view.part.getPartId(), {region: 'east'});
+    await dragHandle.drop();
 
     // Expect CSS classes of the navigation to be retained.
     await expect.poll(() => viewPage.view.getCssClasses()).toContain('testee-navigation');

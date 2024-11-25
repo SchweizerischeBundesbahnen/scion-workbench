@@ -495,7 +495,9 @@ test.describe('Workbench Popup', () => {
       const popupOpenerView = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
 
       // Drag popup opener view into peripheral area.
-      await popupOpenerView.view.tab.dragTo({grid: 'workbench', region: 'east'});
+      const dragHandle = await popupOpenerView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.drop();
 
       // Open popup.
       await popupOpenerView.enterCssClass('testee');
@@ -665,7 +667,9 @@ test.describe('Workbench Popup', () => {
       // Open test view
       const inputFieldPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
       // Move test page to the right
-      await inputFieldPage.view.tab.dragTo({partId: await inputFieldPage.view.part.getPartId(), region: 'east'});
+      const dragHandle = await inputFieldPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await inputFieldPage.view.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Open popup
       await popupOpenerPage.enterQualifier({component: 'testee'});
@@ -705,7 +709,9 @@ test.describe('Workbench Popup', () => {
       // Open test view
       const inputFieldPage = await WorkbenchInputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
       // Move test page to the right
-      await inputFieldPage.view.tab.dragTo({partId: await inputFieldPage.view.part.getPartId(), region: 'east'});
+      const dragHandle = await inputFieldPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await inputFieldPage.view.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Open popup
       await popupOpenerPage.enterQualifier({component: 'testee'});

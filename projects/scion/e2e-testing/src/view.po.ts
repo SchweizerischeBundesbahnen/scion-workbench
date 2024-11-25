@@ -13,8 +13,7 @@ import {Locator} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabPO} from './view-tab.po';
 import {ViewId} from '@scion/workbench';
-import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
-import {AppPO} from './app.po';
+import {ViewInfo} from './workbench/page-object/view-info-dialog.po';
 import {ScrollbarPO} from './scrollbar.po';
 
 /**
@@ -40,23 +39,12 @@ export class ViewPO {
     };
   }
 
-  public async getViewId(): Promise<ViewId> {
+  public getViewId(): Promise<ViewId> {
     return this.tab.getViewId();
   }
 
-  public async getInfo(): Promise<ViewInfo> {
-    const contextMenu = await this.tab.openContextMenu();
-    await contextMenu.menuItems.showViewInfo.click();
-
-    const dialog = new AppPO(this.locator.page()).dialog({cssClass: 'e2e-view-info'});
-    const dialogPage = new ViewInfoDialogPO(dialog);
-
-    try {
-      return await dialogPage.getInfo();
-    }
-    finally {
-      await dialog.close();
-    }
+  public getInfo(): Promise<ViewInfo> {
+    return this.tab.getInfo();
   }
 
   /**

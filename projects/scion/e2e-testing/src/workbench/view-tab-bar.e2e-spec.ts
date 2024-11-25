@@ -15,6 +15,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {waitForCondition} from '../helper/testing.util';
 
 test.describe('View Tabbar', () => {
 
@@ -186,7 +187,9 @@ test.describe('View Tabbar', () => {
 
     // Move view.5 to the left part
     const view5 = appPO.view({viewId: 'view.5'});
-    await view5.tab.dragTo({partId: 'left', region: 'center'});
+    const dragHandle = await view5.tab.startDrag();
+    await dragHandle.dragToPart('left', {region: 'center'});
+    await dragHandle.drop();
 
     // Expect view.5 to be opened to the right of the active view.
     await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -223,7 +226,8 @@ test.describe('View Tabbar', () => {
 
     // Drag view.3 out of the tabbar.
     const view3 = appPO.view({viewId: 'view.3'});
-    await view3.tab.dragTo({partId: 'part', region: 'center'}, {steps: 100, performDrop: false});
+    const dragHandle = await view3.tab.startDrag();
+    await dragHandle.dragToPart('part', {region: 'center'});
 
     // Expect view.2 to be activated.
     await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -251,7 +255,9 @@ test.describe('View Tabbar', () => {
 
     // Drag view.3 to its own part.
     const view3 = appPO.view({viewId: 'view.3'});
-    await view3.tab.dragTo({partId: 'part', region: 'center'}, {steps: 100});
+    const dragHandle = await view3.tab.startDrag();
+    await dragHandle.dragToPart('part', {region: 'center'});
+    await dragHandle.drop();
 
     // Expect tab order not to be changed.
     await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -279,7 +285,8 @@ test.describe('View Tabbar', () => {
 
     // Drag view.3 out of the tabbar.
     const view3 = appPO.view({viewId: 'view.3'});
-    await view3.tab.dragTo({partId: 'part', region: 'center'}, {steps: 100, performDrop: false});
+    const dragHandle = await view3.tab.startDrag();
+    await dragHandle.dragToPart('part', {region: 'center'});
 
     // Cancel drag operation.
     await appPO.workbench.press('Escape');
@@ -311,7 +318,7 @@ test.describe('View Tabbar', () => {
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
     await routerPage.view.tab.click();
@@ -325,7 +332,7 @@ test.describe('View Tabbar', () => {
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2', 'view.3']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2', 'view.3']);
 
     // open view.4
     await routerPage.view.tab.click();
@@ -340,7 +347,7 @@ test.describe('View Tabbar', () => {
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeInactive();
     await expectView(testee4ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
   });
 
   test('should allow opening view at the start', async ({appPO, workbenchNavigator}) => {
@@ -357,7 +364,7 @@ test.describe('View Tabbar', () => {
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.2', 'view.1']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.2', 'view.1']);
 
     // open view.3
     await routerPage.view.tab.click();
@@ -371,7 +378,7 @@ test.describe('View Tabbar', () => {
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.3', 'view.2', 'view.1']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.3', 'view.2', 'view.1']);
 
     // open view.4
     await routerPage.view.tab.click();
@@ -386,7 +393,7 @@ test.describe('View Tabbar', () => {
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeInactive();
     await expectView(testee4ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
   });
 
   test('should allow opening view at a specific position', async ({appPO, workbenchNavigator}) => {
@@ -403,7 +410,7 @@ test.describe('View Tabbar', () => {
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
     await routerPage.view.tab.click();
@@ -417,7 +424,7 @@ test.describe('View Tabbar', () => {
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
 
     // open view.4
     await routerPage.view.tab.click();
@@ -432,7 +439,7 @@ test.describe('View Tabbar', () => {
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeInactive();
     await expectView(testee4ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
   });
 
   test('should allow to have a sticky view tab', async ({appPO}) => {
@@ -453,6 +460,103 @@ test.describe('View Tabbar', () => {
 
   test.describe('Auto Scrolling of Active Tab', () => {
 
+    test('should scroll the active tab into view when dragging it to the end of the viewport', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective('testee', layout => layout
+        .addPart('left')
+        .addPart('right', {align: 'right'})
+        .addView('view.101', {partId: 'left', activateView: true})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left'})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.201', {partId: 'right'}),
+      );
+      const tab1 = appPO.view({viewId: 'view.101'}).tab;
+      await tab1.setTitle('view.101');
+      await tab1.setWidth('300px');
+
+      const tab2 = appPO.view({viewId: 'view.102'}).tab;
+      await tab2.setTitle('view.102');
+      await tab2.setWidth('300px');
+
+      const tab3 = appPO.view({viewId: 'view.103'}).tab;
+      await tab3.setTitle('view.103');
+      await tab3.setWidth('300px');
+
+      const tab4 = appPO.view({viewId: 'view.104'}).tab;
+      await tab4.setTitle('view.104');
+      await tab4.setWidth('300px');
+
+      const tab5 = appPO.view({viewId: 'view.105'}).tab;
+      await tab5.setTitle('view.105');
+      await tab5.setWidth('300px');
+
+      const tab6 = appPO.view({viewId: 'view.106'}).tab;
+      await tab6.setTitle('view.106');
+      await tab6.setWidth('300px');
+
+      const tab7 = appPO.view({viewId: 'view.107'}).tab;
+      await tab7.setTitle('view.107');
+      await tab7.setWidth('300px');
+
+      const tab8 = appPO.view({viewId: 'view.108'}).tab;
+      await tab8.setTitle('view.108');
+      await tab8.setWidth('300px');
+
+      const tab9 = appPO.view({viewId: 'view.109'}).tab;
+      await tab9.setTitle('view.109');
+      await tab9.setWidth('300px');
+
+      const tabbar = appPO.part({partId: 'left'}).bar;
+      const tabbarBoundingBox = await tabbar.getTabViewportBoundingBox();
+
+      // Scroll tabbar to the start.
+      await tabbar.setTabViewportScrollLeft(0);
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => tabbar.getHiddenTabCount()).toBe(6);
+
+      // Expect first tab to be active and scrolled into view.
+      await expect.poll(() => tab1.isActive()).toBe(true);
+      await expect.poll(() => tab1.isScrolledIntoView()).toBe(true);
+
+      // Drag tab to the end, scrolling the viewport.
+      const dragHandle = await tab1.startDrag();
+
+      // Keep scrolling until scrolled the last tab into view.
+      // Since Playwright only triggers a single `dragover` event, we keep dragging to the same position with step count 1.
+      await waitForCondition(async () => {
+        await dragHandle.dragTo({x: tabbarBoundingBox.right - 1, y: tabbarBoundingBox.vcenter}, {steps: 1});
+        return tab9.isScrolledIntoView();
+      });
+
+      // Perform drop.
+      await dragHandle.drop();
+
+      // Expect tab to be dropped at the end.
+      await expect.poll(() => tabbar.getViewIds({visible: true})).toEqual([
+        'view.102',
+        'view.103',
+        'view.104',
+        'view.105',
+        'view.106',
+        'view.107',
+        'view.108',
+        'view.109',
+        'view.101',
+      ]);
+
+      // Expect tab to be fully scrolled into view.
+      await expect.poll(() => tab1.isActive()).toBe(true);
+      await expect.poll(() => tab1.isScrolledIntoView()).toBe(true);
+    });
+
     test('should scroll the active tab into view when opening a new tab', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -472,7 +576,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Expect first tab to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
@@ -506,7 +610,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Open new tab at the end.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -536,7 +640,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Expect last tab to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
@@ -569,7 +673,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Expect "view.103" to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
@@ -607,10 +711,10 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Scroll tabbar to the end.
-      await appPO.part({partId: 'left'}).scrollLeft(Number.MAX_SAFE_INTEGER);
+      await appPO.part({partId: 'left'}).bar.setTabViewportScrollLeft(Number.MAX_SAFE_INTEGER);
 
       // Expect "view.103" to be active and scrolled out of view.
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
@@ -644,7 +748,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Expect last tab to be active and scrolled into view.
       await appPO.view({viewId: 'view.110'}).tab.click();
@@ -652,7 +756,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
 
       // Scroll tabbar to the start.
-      await appPO.part({partId: 'left'}).scrollLeft(0);
+      await appPO.part({partId: 'left'}).bar.setTabViewportScrollLeft(0);
 
       // Expect active tab (last tab) to be scrolled out of view.
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(false);
@@ -684,14 +788,14 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Expect first tab to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(true);
 
       // Scroll tabbar to the end.
-      await appPO.part({partId: 'left'}).scrollLeft(Number.MAX_SAFE_INTEGER);
+      await appPO.part({partId: 'left'}).bar.setTabViewportScrollLeft(Number.MAX_SAFE_INTEGER);
 
       // Open new tab at the end.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);

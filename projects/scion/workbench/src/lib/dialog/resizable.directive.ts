@@ -180,7 +180,7 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
     if (this.maxHeight !== undefined && this.minHeight !== undefined && this.minHeight > this.maxHeight) {
       this.maxHeight = this.minHeight; // prefer min-height over max-height (as in CSS)
     }
-    this._workbenchLayoutService.notifyDragStarting();
+    this._workbenchLayoutService.signalResizing(true);
   }
 
   /**
@@ -191,7 +191,7 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
     this.maxHeight = undefined;
     this.minWidth = undefined;
     this.maxWidth = undefined;
-    this._workbenchLayoutService.notifyDragEnding();
+    this._workbenchLayoutService.signalResizing(false);
   }
 
   /**
