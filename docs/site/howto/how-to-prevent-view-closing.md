@@ -7,39 +7,38 @@
 
 ### How to prevent a view from closing
 
-A view can implement the `CanClose` interface to intercept or prevent the closing.
+A view can register a `CanClose` guard to intercept or prevent the closing.
 
-The `canClose` method is called when the view is about to close. Return `true` to close the view or `false` to prevent closing. Instead of a `boolean`, the method can return a `Promise` or an `Observable` to perform an asynchronous operation, such as displaying a message box.
+The passed callback function is called when the view is about to close. Return `true` to close the view or `false` to prevent closing. Instead of a `boolean`, the method can return a `Promise` or an `Observable` to perform an asynchronous operation, such as displaying a message box.
 
 The following snippet asks the user whether to save changes.
 
 ```ts 
-import {Component, inject} from '@angular/core';
-import {CanClose, WorkbenchMessageBoxService} from '@scion/workbench';
+import {inject} from '@angular/core';
+import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench';
 
-@Component({...})
-class ViewComponent implements CanClose {
-
-  public async canClose(): Promise<boolean> {
-    const action = await inject(WorkbenchMessageBoxService).open('Do you want to save changes?', {
-      actions: {
-        yes: 'Yes',
-        no: 'No',
-        cancel: 'Cancel',
-      },
-    });
-
-    switch (action) {
-      case 'yes':
-        // Store changes ...
-        return true;
-      case 'no':
-        return true;
-      default:
-        return false;
-    }
+inject(WorkbenchView).canClose(async () => {
+  if (!inject(WorkbenchView).dirty()) {
+    return true;
   }
-}
+  const action = await inject(WorkbenchMessageBoxService).open('Do you want to save changes?', {
+    actions: {
+      yes: 'Yes',
+      no: 'No',
+      cancel: 'Cancel'
+    }
+  });
+
+  switch (action) {
+    case 'yes':
+      // Store changes ...
+      return true;
+    case 'no':
+      return true;
+    default:
+      return false;
+  }
+});
 ```
 
 [menu-how-to]: /docs/site/howto/how-to.md

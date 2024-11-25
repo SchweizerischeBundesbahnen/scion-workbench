@@ -29,6 +29,7 @@ import {WorkbenchPart} from './part/workbench-part.model';
  *   }
  * }
  * ```
+ * @deprecated since version 18.0.0-beta.9. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
  */
 export interface CanClose {
 
@@ -36,8 +37,10 @@ export interface CanClose {
    * Decides whether this view can be closed.
    *
    * This function can call `inject` to get any required dependencies.
+   *
+   * @deprecated since version 18.0.0-beta.9. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
    */
-  canClose: CanCloseFn;
+  canClose(): Observable<boolean> | Promise<boolean> | boolean;
 }
 
 /**
@@ -46,6 +49,19 @@ export interface CanClose {
  * The function can call `inject` to get dependencies.
  */
 export type CanCloseFn = () => Observable<boolean> | Promise<boolean> | boolean;
+
+/**
+ * Reference to a `CanClose` guard registered on a view.
+ */
+export interface CanCloseRef {
+
+  /**
+   * Removes the `CanClose` guard from the view.
+   *
+   * Has no effect if another guard was registered in the meantime.
+   */
+  dispose(): void;
+}
 
 /**
  * Describes an action contributed to a part.

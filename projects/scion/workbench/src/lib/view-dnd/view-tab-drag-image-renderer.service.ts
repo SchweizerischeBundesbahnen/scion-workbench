@@ -17,7 +17,7 @@ import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-drag-image.component';
 import {UrlSegment} from '@angular/router';
-import {WorkbenchMenuItem} from '../workbench.model';
+import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {ViewId, WorkbenchView} from '../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
@@ -274,6 +274,10 @@ class DragImageWorkbenchView implements WorkbenchView {
   }
 
   public activate(): Promise<boolean> {
+    throw Error('[UnsupportedOperationError]');
+  }
+
+  public canClose(canClose: CanCloseFn): CanCloseRef {
     throw Error('[UnsupportedOperationError]');
   }
 }

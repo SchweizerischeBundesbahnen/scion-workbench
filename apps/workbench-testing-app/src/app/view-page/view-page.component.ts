@@ -9,8 +9,8 @@
  */
 
 import {Component, effect, inject} from '@angular/core';
-import {CanCloseFn, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
-import {Observable} from 'rxjs';
+import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {mergeWith, Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -26,6 +26,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {CssClassComponent} from '../css-class/css-class.component';
+import {CanClose} from '@scion/workbench-client';
 
 @Component({
   selector: 'app-view-page',
@@ -53,13 +54,14 @@ export default class ViewPageComponent {
 
   public uuid = UUID.randomUUID();
   public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
-  public canClose: CanCloseFn | undefined;
 
-  public formControls = {
+  public form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
     confirmClosing: this._formBuilder.control(false),
-  };
+    /** @deprecated since version 18.0.0-beta.9. No longer needed with the removal of class-based {@link CanClose} guard. */
+    useClassBasedCanCloseGuard: this._formBuilder.control(false),
+  });
 
   public WorkbenchRouteData = WorkbenchRouteData;
 
@@ -71,7 +73,7 @@ export default class ViewPageComponent {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
-    this.partActions$ = this.formControls.partActions.valueChanges
+    this.partActions$ = this.form.controls.partActions.valueChanges
       .pipe(
         map(() => this.parsePartActions()),
         startWith(this.parsePartActions()),
@@ -80,9 +82,10 @@ export default class ViewPageComponent {
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
     this.installCanCloseGuard();
+    this.installClassBasedCanCloseGuard();
   }
 
-  private async askToClose(): Promise<boolean> {
+  private async confirmClosing(): Promise<boolean> {
     const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
       actions: {yes: 'Yes', no: 'No', error: 'Throw Error'},
       cssClass: ['e2e-close-view', this.view.id],
@@ -95,12 +98,12 @@ export default class ViewPageComponent {
   }
 
   private parsePartActions(): WorkbenchPartActionDescriptor[] {
-    if (!this.formControls.partActions.value) {
+    if (!this.form.controls.partActions.value) {
       return [];
     }
 
     try {
-      return Arrays.coerce(JSON.parse(this.formControls.partActions.value));
+      return Arrays.coerce(JSON.parse(this.form.controls.partActions.value));
     }
     catch {
       return [];
@@ -119,7 +122,7 @@ export default class ViewPageComponent {
   }
 
   private installCssClassUpdater(): void {
-    this.formControls.cssClass.valueChanges
+    this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(cssClasses => {
         this.view.cssClass = cssClasses;
@@ -127,20 +130,45 @@ export default class ViewPageComponent {
   }
 
   /**
-   * Installs {@link CanClose} guard only if checked confirm closing.
+   * Installs a {@link CanClose} guard depending on the current settings.
    */
   private installCanCloseGuard(): void {
-    this.formControls.confirmClosing.valueChanges
+    let canCloseRef: CanCloseRef | undefined;
+
+    this.form.controls.confirmClosing.valueChanges
       .pipe(
-        startWith(this.formControls.confirmClosing.value),
+        mergeWith(this.form.controls.useClassBasedCanCloseGuard.valueChanges.pipe(map(() => this.form.controls.confirmClosing.value))),
+        startWith(this.form.controls.confirmClosing.value),
         takeUntilDestroyed(),
       )
       .subscribe(confirmClosing => {
-        if (confirmClosing) {
-          this.canClose = this.askToClose;
+        if (confirmClosing && !this.form.controls.useClassBasedCanCloseGuard.value) {
+          canCloseRef = this.view.canClose(() => this.confirmClosing());
         }
         else {
-          delete this.canClose;
+          canCloseRef?.dispose();
+        }
+      });
+  }
+
+  /**
+   * Installs a class-based {@link CanClose} guard depending on the current settings.
+   *
+   * @deprecated since version 18.0.0-beta.9. No longer needed with the removal of class-based {@link CanClose} guard.
+   */
+  private installClassBasedCanCloseGuard(): void {
+    this.form.controls.confirmClosing.valueChanges
+      .pipe(
+        mergeWith(this.form.controls.useClassBasedCanCloseGuard.valueChanges.pipe(map(() => this.form.controls.confirmClosing.value))),
+        startWith(this.form.controls.confirmClosing.value),
+        takeUntilDestroyed(),
+      )
+      .subscribe(confirmClosing => {
+        if (confirmClosing && this.form.controls.useClassBasedCanCloseGuard.value) {
+          (this as unknown as CanClose).canClose = () => this.confirmClosing();
+        }
+        else {
+          (this as unknown as CanClose).canClose = undefined!;
         }
       });
   }
