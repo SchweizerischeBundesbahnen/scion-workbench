@@ -110,7 +110,6 @@ export class MPart {
 export interface MView {
   id: ViewId;
   alternativeId?: string;
-  uid: string;
   cssClass?: string[];
   markedForRemoval?: true;
   navigation?: {

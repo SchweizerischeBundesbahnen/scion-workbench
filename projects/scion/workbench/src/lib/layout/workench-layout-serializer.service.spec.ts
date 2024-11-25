@@ -56,22 +56,6 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.view({viewId: 'view.1'}).navigation!.id).toBeUndefined();
   });
 
-  it('should not serialize "view.uid" field', () => {
-    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('left')
-      .addView('view.1', {partId: 'left'});
-
-    // Expect view uid to be set.
-    expect(layout.view({viewId: 'view.1'}).uid).not.toBeUndefined();
-
-    // Serialize layout without "view.uid".
-    const serializedLayout = layout.serialize({excludeViewUid: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
-
-    // Expect uid not to be serialized.
-    expect(deserializedLayout.view({viewId: 'view.1'}).uid).toBeUndefined();
-  });
-
   it('should not serialize "TreeNode.id" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('left')
@@ -155,7 +139,7 @@ describe('WorkbenchLayoutSerializer', () => {
           ratio: .25,
           child1: new MPart({
             id: 'left',
-            views: [{id: 'view.2'}, {id: 'view.3', uid: ANYTHING, navigation: {id: ANYTHING, hint: 'test-view'}}],
+            views: [{id: 'view.2'}, {id: 'view.3', navigation: {id: ANYTHING, hint: 'test-view'}}],
             activeViewId: 'view.2',
           }),
           child2: new MTreeNode({
@@ -167,7 +151,7 @@ describe('WorkbenchLayoutSerializer', () => {
             }),
             child2: new MPart({
               id: 'right',
-              views: [{id: 'view.4', uid: ANYTHING, navigation: {id: ANYTHING}}],
+              views: [{id: 'view.4', navigation: {id: ANYTHING}}],
               activeViewId: 'view.4',
             }),
           }),
@@ -181,12 +165,12 @@ describe('WorkbenchLayoutSerializer', () => {
           ratio: .5,
           child1: new MPart({
             id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7',
-            views: [{id: 'view.1', uid: ANYTHING, navigation: {id: ANYTHING}}],
+            views: [{id: 'view.1', navigation: {id: ANYTHING}}],
             activeViewId: 'view.1',
           }),
           child2: new MPart({
             id: '1d94dcb6-76b6-47eb-b300-39448993d36b',
-            views: [{id: 'view.5', uid: ANYTHING, navigation: {id: ANYTHING}}],
+            views: [{id: 'view.5', navigation: {id: ANYTHING}}],
             activeViewId: 'view.5',
           }),
         }),

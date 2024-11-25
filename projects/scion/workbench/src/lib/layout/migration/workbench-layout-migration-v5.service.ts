@@ -39,7 +39,7 @@ export class WorkbenchLayoutMigrationV5 implements WorkbenchMigration {
         case 'MPart':
           return migratePart(elementV4);
         default:
-          throw Error(`[WorkbenchLayoutError] Unable to migrate to the latest version. Expected element to be of type 'MPart' or 'MTreeNode'. [version=3, element=${JSON.stringify(elementV4)}]`);
+          throw Error(`[WorkbenchLayoutError] Unable to migrate to the latest version. Expected element to be of type 'MPart' or 'MTreeNode'. [version=4, element=${JSON.stringify(elementV4)}]`);
       }
     }
 
