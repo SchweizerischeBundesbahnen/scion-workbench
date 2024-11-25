@@ -81,11 +81,17 @@
   </sci-form-field>
 
   <sci-form-field label="Confirm Closing">
-    <sci-checkbox [formControl]="formControls.confirmClosing" class="e2e-confirm-closing"/>
+    <sci-checkbox [formControl]="form.controls.confirmClosing" class="e2e-confirm-closing"/>
   </sci-form-field>
 
+  @if (form.controls.confirmClosing.value) {
+    <sci-form-field label="Use Legacy Guard" title="Check to use the deprecated class-based CanClose guard.">
+      <sci-checkbox [formControl]="form.controls.useClassBasedCanCloseGuard" class="e2e-class-based-can-close-guard"/>
+    </sci-form-field>
+  }
+
   <sci-form-field label="CSS Class(es)">
-    <app-css-class [formControl]="formControls.cssClass"/>
+    <app-css-class [formControl]="form.controls.cssClass"/>
   </sci-form-field>
 </section>
 
@@ -104,7 +110,7 @@
   </ng-template>
   <ng-template #panel_part_actions>
     <input class="e2e-part-actions"
-           [formControl]="formControls.partActions"
+           [formControl]="form.controls.partActions"
            placeholder='Enter action(s) as JSON array: [{"content":"...","align":"end","cssClass":"e2e-open-in-new"}]'>
   </ng-template>
 </sci-accordion>

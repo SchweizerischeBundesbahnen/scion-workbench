@@ -14,8 +14,7 @@ import {ActivatedRoute, provideRouter, withComponentInputBinding} from '@angular
 import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ViewId, WorkbenchView} from './workbench-view.model';
-import {CanClose} from '../workbench.model';
-import {firstValueFrom, Observable, ReplaySubject, Subject} from 'rxjs';
+import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
@@ -3033,7 +3032,7 @@ describe('View', () => {
   template: '{{onCheckForChanges()}}',
   standalone: true,
 })
-class SpecViewComponent implements OnDestroy, CanClose {
+class SpecViewComponent implements OnDestroy {
 
   public destroyed = false;
   public checkedForChanges = false;
@@ -3056,12 +3055,11 @@ class SpecViewComponent implements OnDestroy, CanClose {
     if (params.has('cssClass')) {
       this.view.cssClass = params.get('cssClass')!;
     }
-  }
-
-  public canClose(): Observable<boolean> | Promise<boolean> | boolean {
-    console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.urlSegments().join('/')}]`);
-    this.canCloseInjector = inject(Injector);
-    return !this.preventClosing;
+    this.view.canClose(() => {
+      console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.urlSegments().join('/')}]`);
+      this.canCloseInjector = inject(Injector);
+      return !this.preventClosing;
+    });
   }
 
   public ngOnDestroy(): void {

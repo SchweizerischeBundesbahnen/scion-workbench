@@ -1,6 +1,6 @@
 import {UrlSegment} from '@angular/router';
 import {Disposable} from '../common/disposable';
-import {WorkbenchMenuItem} from '../workbench.model';
+import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
@@ -164,6 +164,45 @@ export abstract class WorkbenchView {
    * The target workbench ID is available via {@link WORKBENCH_ID} DI token in the target application.
    */
   public abstract move(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): void;
+
+  /**
+   * Registers a guard to confirm closing the view, replacing any previous guard.
+   *
+   * The callback can call `inject` to get dependencies.
+   *
+   * Example:
+   * ```ts
+   * import {inject} from '@angular/core';
+   * import {WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench';
+   *
+   * inject(WorkbenchView).canClose(async () => {
+   *   if (!inject(WorkbenchView).dirty()) {
+   *     return true;
+   *   }
+   *   const action = await inject(WorkbenchMessageBoxService).open('Do you want to save changes?', {
+   *     actions: {
+   *       yes: 'Yes',
+   *       no: 'No',
+   *       cancel: 'Cancel'
+   *     }
+   *   });
+   *
+   *   switch (action) {
+   *     case 'yes':
+   *       // Store changes ...
+   *       return true;
+   *     case 'no':
+   *       return true;
+   *     default:
+   *       return false;
+   *   }
+   * });
+   * ```
+   *
+   * @param canClose - Callback to confirm closing the view.
+   * @returns Reference to the `CanClose` guard, which can be used to unregister the guard.
+   */
+  public abstract canClose(canClose: CanCloseFn): CanCloseRef;
 
   /**
    * Contributes a menu item to this view's context menu.

@@ -312,7 +312,7 @@ test.describe('Workbench View', () => {
     await expectView(viewPage).not.toBeAttached();
   });
 
-  test('should prevent closing a view', async ({appPO, page, workbenchNavigator}) => {
+  test('should prevent closing a view (via view tab, view handle, keystroke, router)', async ({appPO, page, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -372,6 +372,126 @@ test.describe('Workbench View', () => {
     // Close view.
     await testeeViewPage.view.tab.close();
     await canCloseMessageBox.clickActionButton('yes');
+    await expectView(testeeViewPage).not.toBeAttached();
+  });
+
+  test('should prevent closing a view using a `CanClose` guard', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view.
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testeeViewPage.checkConfirmClosing(true);
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectView(testeeViewPage).toBeActive();
+
+    // Cancel closing.
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectView(testeeViewPage).toBeActive();
+
+    // Confirm closing.
+    await canCloseMessageBox.clickActionButton('yes');
+    await expectView(testeeViewPage).not.toBeAttached();
+  });
+
+  /** @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard. */
+  test('should prevent closing a view using the deprecated class-based `CanClose` guard', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view.
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testeeViewPage.checkConfirmClosing(true);
+    await testeeViewPage.checkUseClassBasedCanCloseGuard(true);
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectView(testeeViewPage).toBeActive();
+
+    // Cancel closing.
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectView(testeeViewPage).toBeActive();
+
+    // Confirm closing.
+    await canCloseMessageBox.clickActionButton('yes');
+    await expectView(testeeViewPage).not.toBeAttached();
+  });
+
+  test('should unregister `CanClose` guard', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view.
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testeeViewPage.checkConfirmClosing(true);
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectView(testeeViewPage).toBeActive();
+
+    // Cancel closing.
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Unregister `CanClose` guard.
+    await testeeViewPage.checkConfirmClosing(false);
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+    await expectView(testeeViewPage).not.toBeAttached();
+  });
+
+  /** @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard. */
+  test('should unregister deprecated class-based `CanClose` guard', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view.
+    const testeeViewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+    await testeeViewPage.checkConfirmClosing(true);
+    await testeeViewPage.checkUseClassBasedCanCloseGuard(true);
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
+    await expectView(testeeViewPage).toBeActive();
+
+    // Cancel closing.
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Unregister `CanClose` guard.
+    await testeeViewPage.checkConfirmClosing(false);
+
+    // Close view.
+    await testeeViewPage.view.tab.close();
     await expectView(testeeViewPage).not.toBeAttached();
   });
 
@@ -541,6 +661,99 @@ test.describe('Workbench View', () => {
     await expectView(testeeViewPage3).not.toBeAttached();
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox1)).not.toBeAttached();
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).not.toBeAttached();
+  });
+
+  test('should unregister `CanClose` guard when navigating to a different page (different route)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view via router.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view', {navigation: '1'}], {
+      target: 'view.101',
+    });
+
+    // Expect view to be opened.
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expectView(testeeViewPage).toBeActive();
+    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '1'});
+
+    // Prevent view from closing.
+    await testeeViewPage.checkConfirmClosing(true);
+
+    // Test that closing the view must be confirmed.
+    await testeeViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Navigate view to the same page.
+    await routerPage.view.tab.click();
+    await routerPage.navigate(['test-view', {navigation: '2'}], {
+      target: 'view.101',
+    });
+
+    // Expect view to be navigated.
+    await expectView(testeeViewPage).toBeActive();
+    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '2'});
+
+    // Navigate view to different page (RouterPage)
+    await routerPage.view.tab.click();
+    await routerPage.navigate(['test-router'], {
+      target: 'view.101',
+    });
+
+    // Expect view to be navigated.
+    const differentPage = new RouterPagePO(appPO, {viewId: 'view.101'});
+    await expectView(differentPage).toBeActive();
+    await expect(appPO.views()).toHaveCount(2);
+
+    // Close view.
+    await differentPage.view.tab.close();
+
+    // Expect view to be closed without confirmation.
+    await expectView(differentPage).not.toBeAttached();
+    await expectView(routerPage).toBeActive();
+    await expect(appPO.views()).toHaveCount(1);
+  });
+
+  test('should not unregister `CanClose` guard when navigating to the same page (same route)', async ({appPO, page, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Open view via router.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view', {navigation: '1'}], {
+      target: 'view.101',
+    });
+
+    // Expect view to be opened.
+    const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expectView(testeeViewPage).toBeActive();
+    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '1'});
+
+    // Prevent view from closing.
+    await testeeViewPage.checkConfirmClosing(true);
+
+    // Test that closing the view must be confirmed.
+    await testeeViewPage.view.tab.close();
+    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+
+    // Navigate view to the same page.
+    await routerPage.view.tab.click();
+    await routerPage.navigate(['test-view', {navigation: '2'}], {
+      target: 'view.101',
+    });
+
+    // Expect view to be navigated.
+    await expectView(testeeViewPage).toBeActive();
+    await expect.poll(() => testeeViewPage.getParams()).toEqual({navigation: '2'});
+
+    // Test that closing the view must be confirmed.
+    await testeeViewPage.view.tab.close();
+    await canCloseMessageBox.clickActionButton('no');
+    await expectView(testeeViewPage).toBeActive();
+    await expect(appPO.views()).toHaveCount(2);
   });
 
   test('should skip navigation if the layout has not changed, such as when only closing views with a `CanClose` guard', async ({appPO, workbenchNavigator}) => {

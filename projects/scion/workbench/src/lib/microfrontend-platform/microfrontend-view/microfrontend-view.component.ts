@@ -17,7 +17,7 @@ import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
-import {CanClose} from '../../workbench.model';
+import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../content-projection/workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
@@ -57,7 +57,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
-export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
+export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
   private _host = inject(ElementRef<HTMLElement>);
   private _route = inject(ActivatedRoute);
@@ -100,6 +100,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     this.installWorkbenchDragDetector();
     this.installViewActivePublisher();
     this.installPartIdPublisher();
+    this.installCanCloseGuard(ɵWorkbenchCommands.canCloseTopic(this.view.id));
+    this.installCanCloseGuard(ɵWorkbenchCommands.viewClosingTopic(this.view.id));
   }
 
   public ngOnInit(): void {
@@ -266,18 +268,21 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy, CanClose {
     await firstValueFrom(viewParams$);
   }
 
-  /** @inheritDoc */
-  public async canClose(): Promise<boolean> {
-    const canCloseTopic = ɵWorkbenchCommands.canCloseTopic(this.view.id);
-    const legacyCanCloseTopic = ɵWorkbenchCommands.viewClosingTopic(this.view.id);
-
-    // Initiate a request-response communication only if the embedded microfrontend implements `CanClose` guard.
-    const hasCanCloseGuard = await firstValueFrom(this._messageClient.subscriberCount$(canCloseTopic)) > 0;
-    const hasLegacyCanCloseGuard = await firstValueFrom(this._messageClient.subscriberCount$(legacyCanCloseTopic)) > 0;
-    if (!hasCanCloseGuard && !hasLegacyCanCloseGuard) {
-      return true;
-    }
-    return firstValueFrom(this._messageClient.request$<boolean>(hasCanCloseGuard ? canCloseTopic : legacyCanCloseTopic).pipe(mapToBody()), {defaultValue: true});
+  private installCanCloseGuard(canCloseTopic: string): void {
+    let canCloseRef: CanCloseRef | undefined;
+    this._messageClient.subscriberCount$(canCloseTopic)
+      .pipe(
+        map(count => count > 0),
+        takeUntilDestroyed(),
+      )
+      .subscribe(confirmClosing => {
+        if (confirmClosing) {
+          canCloseRef = this.view.canClose(() => this._messageClient.request$<boolean>(canCloseTopic).pipe(mapToBody()));
+        }
+        else {
+          canCloseRef?.dispose();
+        }
+      });
   }
 
   protected onFocusWithin(event: Event): void {
