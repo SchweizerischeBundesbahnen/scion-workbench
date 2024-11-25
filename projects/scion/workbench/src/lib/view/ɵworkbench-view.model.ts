@@ -79,7 +79,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    */
   public uid!: string;
   public alternativeId: string | undefined;
-  public navigationId: string | undefined;
+  public navigationId = signal<string | undefined>(undefined);
   public navigationHint = signal<string | undefined>(undefined);
   public navigationData = signal<NavigationData>({});
   public navigationState = signal<NavigationState>({});
@@ -157,13 +157,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     }
 
     // Test if this view was navigated. Navigation does not necessarily cause the route to change.
-    const navigationChanged = mView.navigation?.id !== this.navigationId;
+    const navigationChanged = mView.navigation?.id !== this.navigationId();
     if (navigationChanged) {
-      this.navigationId = mView.navigation?.id;
-      this.classList.navigation = mView.navigation?.cssClass;
+      this.navigationId.set(mView.navigation?.id);
       this.navigationHint.set(mView.navigation?.hint);
       this.navigationData.set(mView.navigation?.data ?? {});
       this.navigationState.set(layout.navigationState({viewId: this.id}));
+      this.classList.navigation = mView.navigation?.cssClass;
     }
 
     // If this view is inactive, Angular does not check it for changes as it is detached from the Angular component tree.

@@ -417,6 +417,9 @@ export class PartBarComponent {
         return;
       }
 
+      // Track navigation of the active view, scrolling its tab into view if necessary.
+      activeViewTab.view().navigationId();
+
       // Scroll the tab into view if scrolled out of view.
       untracked(() => requestAnimationFrame(() => {
         if (!this._viewportComponent().isElementInView(activeViewTab.host, 'full')) {
