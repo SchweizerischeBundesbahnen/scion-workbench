@@ -487,6 +487,36 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.view({viewId: 'view.999'}).tab.isScrolledIntoView()).toBe(true);
     });
 
+    test('should fully scroll active tab into view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left'})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left'})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left', activateView: true}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Open new tab at the end.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-pages/navigation-test-page', {title: 'Workbench Navigation Test Page (long title)'}], {target: 'view.110'});
+
+      // Expect tab to be fully scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
+    });
+
     test('should scroll the active tab into view when opening/reloading the application', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
@@ -554,6 +584,43 @@ test.describe('View Tabbar', () => {
       await appPO.view({viewId: 'view.110'}).tab.close();
 
       // Expect "view.103" to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
+    });
+
+    test('should scroll the active tab into view when navigating the active view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left'})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left', activateView: true})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left'}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Scroll tabbar to the end.
+      await appPO.part({partId: 'left'}).scrollLeft(Number.MAX_SAFE_INTEGER);
+
+      // Expect "view.103" to be active and scrolled out of view.
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(false);
+
+      // Navigate the active tab (view.103).
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-view', {navigated: true}], {target: 'view.103'});
+
+      // Expect active tab to be scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
     });

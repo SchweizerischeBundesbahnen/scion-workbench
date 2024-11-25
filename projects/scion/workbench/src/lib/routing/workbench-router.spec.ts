@@ -238,7 +238,7 @@ describe('WorkbenchRouter', () => {
       },
     });
     const view102 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
-    const navigationId = view102.navigationId;
+    const navigationId = view102.navigationId();
 
     // Navigate multiple views:
     // - Navigate view.102 [canActivate=true]
@@ -256,7 +256,7 @@ describe('WorkbenchRouter', () => {
       },
     });
     // Expect view.102 not to be navigated.
-    expect(view102.navigationId).toEqual(navigationId);
+    expect(view102.navigationId()).toEqual(navigationId);
     expect(view102.navigationData()).toEqual({});
     expect(view102.navigationState()).toEqual({});
 
@@ -275,7 +275,7 @@ describe('WorkbenchRouter', () => {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
       },
     });
-    expect(view102.navigationId).not.toEqual(navigationId);
+    expect(view102.navigationId()).not.toEqual(navigationId);
     expect(view102.navigationData()).toEqual({some: 'data'});
     expect(view102.navigationState()).toEqual({some: 'state'});
   });
@@ -337,7 +337,7 @@ describe('WorkbenchRouter', () => {
       },
     });
     const view102 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
-    const navigationId = view102.navigationId;
+    const navigationId = view102.navigationId();
 
     // Navigate multiple views:
     // - Navigate view.102 [canActivate=true]
@@ -356,7 +356,7 @@ describe('WorkbenchRouter', () => {
       },
     });
     // Expect view.102 not to be navigated.
-    expect(view102.navigationId).toEqual(navigationId);
+    expect(view102.navigationId()).toEqual(navigationId);
     expect(view102.navigationData()).toEqual({});
     expect(view102.navigationState()).toEqual({});
 
@@ -375,7 +375,7 @@ describe('WorkbenchRouter', () => {
         root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
       },
     });
-    expect(view102.navigationId).not.toEqual(navigationId);
+    expect(view102.navigationId()).not.toEqual(navigationId);
     expect(view102.navigationData()).toEqual({some: 'data'});
     expect(view102.navigationState()).toEqual({some: 'state'});
   });
