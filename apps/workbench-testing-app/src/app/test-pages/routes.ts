@@ -63,6 +63,10 @@ export default [
     path: 'size-test-page',
     loadComponent: () => import('./size-test-page/size-test-page.component'),
   },
+  {
+    path: 'blocking-can-close-test-page',
+    loadComponent: () => import('./blocking-can-close-test-page/blocking-can-close-test-page.component'),
+  },
 ] satisfies Routes;
 
 /**
