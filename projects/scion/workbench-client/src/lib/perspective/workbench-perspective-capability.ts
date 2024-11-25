@@ -179,6 +179,13 @@ export interface WorkbenchPerspectiveView {
 }
 
 /**
+ * Identifies the part that represents the main area.
+ *
+ * Refer to this part to align parts relative to the main area.
+ */
+export const MAIN_AREA: MAIN_AREA = 'main-area';
+
+/**
  * Identifies the main area.
  */
 export type MAIN_AREA = 'main-area';
