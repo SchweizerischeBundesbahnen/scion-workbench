@@ -10,7 +10,7 @@
 
 import {NavigationExtras, Router, UrlSegment, UrlTree} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
-import {Defined, Observables} from '@scion/toolkit/util';
+import {Defined} from '@scion/toolkit/util';
 import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
@@ -24,8 +24,7 @@ import {ViewId} from '../view/workbench-view.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {Logger} from '../logging';
-import {CanClose} from '../workbench.model';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -35,7 +34,6 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchViewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _injector = inject(Injector);
-  private readonly _logger = inject(Logger);
   private readonly _zone = inject(NgZone);
   /** Mutex to serialize Workbench Router navigation requests, preventing race conditions when modifying the active workbench layout to operate on the most-recent layout. */
   private readonly _workbenchRouterMutex = new SingleTaskExecutor();
@@ -58,7 +56,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   public navigate(commands: Commands, extras?: WorkbenchNavigationExtras): Promise<boolean>;
   public navigate(navigateFn: ɵNavigateFn, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean>;
   public navigate(commandsOrNavigateFn: Commands | ɵNavigateFn, extras?: WorkbenchNavigationExtras | Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean>;
-  public navigate(commandsOrNavigateFn: Commands | ɵNavigateFn, extras?: WorkbenchNavigationExtras | Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean> {
+  public async navigate(commandsOrNavigateFn: Commands | ɵNavigateFn, extras?: WorkbenchNavigationExtras | Omit<NavigationExtras, 'relativeTo' | 'state'>): Promise<boolean> {
     assertNotInReactiveContext(this.navigate, 'Call WorkbenchRouter.navigate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone.
@@ -69,7 +67,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
     const navigateFn = typeof commandsOrNavigateFn === 'function' ? commandsOrNavigateFn : createNavigationFromCommands(commandsOrNavigateFn, extras ?? {});
 
     // Serialize navigation requests to avoid race conditions when modifying the active workbench layout, ensuring layout operations are performed on the most-recent layout.
-    return this._workbenchRouterMutex.submit(async () => {
+    const newLayout = await this._workbenchRouterMutex.submit(async () => {
       // Wait until the initial layout is available, i.e., after completion of Angular's initial navigation.
       // Otherwise, this navigation would override the initial layout as given in the URL.
       if (!this._workbenchLayoutService.layout()) {
@@ -80,11 +78,17 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       const currentLayout = this._workbenchLayoutService.layout()!;
       let newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => navigateFn(currentLayout)) as ɵWorkbenchLayout;
       if (!newLayout) {
-        return true;
+        return null;
       }
 
-      // Remove views marked for removal, invoking `CanClose` guard if implemented.
-      newLayout = await newLayout.removeViewsMarkedForRemoval(viewUid => this.canCloseView(viewUid));
+      // Remove views marked for removal that have no `CanClose` guard.
+      // Views with a `CanClose` guard are removed later, outside the navigation mutex, to avoid blocking the workbench router.
+      newLayout = this.removeViewsWithoutGuard(newLayout);
+
+      // Skip navigation if the layout has not changed, such as when only closing views with a `CanClose` guard.
+      if (newLayout.equals(currentLayout, {excludeViewMarkedForRemoval: true})) {
+        return newLayout;
+      }
 
       // Create extras with workbench navigation instructions.
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
@@ -92,13 +96,20 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       // Perform the navigation.
       const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
       if (!await this._angularRouterMutex.submit(() => this._router.navigate(commands, extras))) {
-        return false;
+        return null;
       }
 
       // Block subsequent navigation(s) until Angular has flushed the changed layout to the DOM.
       await firstValueFrom(this._zone.onStable);
-      return true;
+      return newLayout;
     });
+
+    if (!newLayout) {
+      return false;
+    }
+
+    // Remove views marked for removal, confirming closing by calling each view's `CanClose` guard.
+    return this.scheduleViewRemoval(newLayout);
   }
 
   /**
@@ -147,7 +158,9 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       }
 
       // Remove views marked for removal.
-      newLayout = await newLayout.removeViewsMarkedForRemoval();
+      newLayout.views({markedForRemoval: true}).forEach(view => {
+        newLayout = newLayout!.removeView(view.id, {force: true});
+      });
 
       // Create extras with workbench navigation instructions.
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
@@ -159,32 +172,41 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   }
 
   /**
-   * Decides if given view can be closed, invoking `CanClose` guard if implemented.
+   * Remove views marked for removal that have no `CanClose` guard.
    */
-  private async canCloseView(viewUid: string): Promise<boolean> {
-    const view = this._workbenchViewRegistry.objects().find(view => view.uid === viewUid);
-    if (!view) {
-      return true;
-    }
-    if (!view.closable()) {
-      return false;
-    }
+  private removeViewsWithoutGuard(layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+    return layout.views({markedForRemoval: true}).reduce((layout, mView) => {
+      const view = this._workbenchViewRegistry.get(mView.id, {orElse: null});
+      if (!view || (view.closable() && !view.canCloseGuard)) {
+        return layout.removeView(mView.id, {force: true});
+      }
+      return layout;
+    }, layout);
+  }
 
-    // Test if the view implements `CanClose` guard.
-    const component = view.getComponent() as CanClose | null;
-    if (typeof component?.canClose !== 'function') {
-      return true;
-    }
+  /**
+   * Removes views marked for removal, confirming closing by calling each view's `CanClose` guard.
+   *
+   * Guards are executed in parallel, and views are removed in separate navigations.
+   *
+   * @return a Promise that resolves to `true` when all marked views were successfully closed or declined closing.
+   */
+  private async scheduleViewRemoval(layout: ɵWorkbenchLayout): Promise<boolean> {
+    const navigations = layout.views({markedForRemoval: true})
+      .map(mView => this._workbenchViewRegistry.get(mView.id, {orElse: null}))
+      .filter((view): view is ɵWorkbenchView => !!view && view.closable())
+      .map(async view => {
+        // Capture current navigation id to not proceed closing if navigated in the meantime.
+        const navigationId = view.navigationId;
+        const close = await view.canCloseGuard!();
+        if (close && view.navigationId === navigationId) {
+          return this.navigate(layout => layout.removeView(view.id, {force: true}));
+        }
+        return true;
+      });
 
-    // Invoke `CanClose` guard to decide if to close the view.
-    try {
-      const canClose = runInInjectionContext(view.getComponentInjector()!, () => component.canClose());
-      return await firstValueFrom(Observables.coerce(canClose), {defaultValue: true});
-    }
-    catch (error) {
-      this._logger.error(`Unhandled error while invoking 'CanClose' guard of view '${view.id}'.`, error);
-      return true;
-    }
+    // Wait for all `CanClose` guards to resolve and subsequent navigations to complete.
+    return (await Promise.all(navigations)).every(Boolean);
   }
 
   /**
@@ -317,6 +339,8 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
 function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentLayout?: ɵWorkbenchLayout | undefined}, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
   const {newLayout, currentLayout} = layouts;
   const {workbenchGrid, mainAreaGrid} = newLayout.serialize({excludeViewMarkedForRemoval: true});
+
+  // IMPORTANT: Update `ɵWorkbenchLayout.equals` function when adding new state properties.
 
   return {
     ...extras,

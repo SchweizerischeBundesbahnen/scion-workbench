@@ -126,7 +126,7 @@ test.describe('Workbench Page Not Found', () => {
     // Drag view to right part.
     await viewPage.view.tab.dragTo({partId: 'right', region: 'center'});
 
-    // Except view to be moved to right part.
+    // Expect view to be moved to right part.
     await expectView(viewPage).toBeActive();
     await expect.poll(() => viewPage.view.part.getPartId()).toEqual('right');
 

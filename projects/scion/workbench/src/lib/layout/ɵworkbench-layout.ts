@@ -350,19 +350,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Removes views marked for removal, optionally invoking the passed `CanClose` function to decide whether to remove a view.
-   */
-  public async removeViewsMarkedForRemoval(canCloseFn?: (viewUid: string) => Promise<boolean> | boolean): Promise<ɵWorkbenchLayout> {
-    const workingCopy = this.workingCopy();
-    for (const view of workingCopy.views({markedForRemoval: true})) {
-      if (!canCloseFn || await canCloseFn(view.uid)) {
-        workingCopy.__removeView(view, {force: true});
-      }
-    }
-    return workingCopy;
-  }
-
-  /**
    * @inheritDoc
    */
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
@@ -432,6 +419,28 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workbenchViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'workbench'})),
       mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'mainArea'})),
     };
+  }
+
+  /**
+   * Tests if the current layout is equal to another layout based on provided flags.
+   */
+  public equals(other: ɵWorkbenchLayout, flags?: GridSerializationFlags): boolean {
+    if (this === other) {
+      return true;
+    }
+
+    const layout1 = this.serialize(flags);
+    const layout2 = other.serialize(flags);
+
+    return (
+      layout1.workbenchGrid === layout2.workbenchGrid &&
+      layout1.mainAreaGrid === layout2.mainAreaGrid &&
+      layout1.mainAreaViewOutlets === layout2.mainAreaViewOutlets &&
+      layout1.workbenchViewOutlets === layout2.workbenchViewOutlets &&
+      this.perspectiveId === other.perspectiveId &&
+      this.maximized === other.maximized
+      // Navigational state is not tested for equality as it is set through view navigation, resulting in a new navigation id when modified.
+    );
   }
 
   /**

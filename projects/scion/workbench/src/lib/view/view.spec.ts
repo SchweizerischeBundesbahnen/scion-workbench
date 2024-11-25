@@ -984,8 +984,28 @@ describe('View', () => {
     await view.close();
     await fixture.whenStable();
 
-    // Except `CanClose` guard to be invoked in the component's injection context.
+    // Expect `CanClose` guard to be invoked in the component's injection context.
     expect(component.canCloseInjector).toBe(view.getComponentInjector());
+  });
+
+  it('should remove view without a view handle', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest(),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    // Navigate to "path/to/view".
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part', {align: 'right'})
+      .addView('view.100', {partId: 'part'}) // add view
+      .removeView('view.100') // remove view in same navigation
+    );
+    await fixture.whenStable();
+
+    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).has('view.100')).toBeFalse();
   });
 
   it('should provide navigated component', async () => {
