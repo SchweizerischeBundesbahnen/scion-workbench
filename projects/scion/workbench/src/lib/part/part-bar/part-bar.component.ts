@@ -402,14 +402,27 @@ export class PartBarComponent {
    */
   private installActiveViewScroller(): void {
     effect(() => {
-      const viewportComponent = this._viewportComponent();
+      // Track the active view.
       const activeViewId = this.part.activeViewId();
-
-      // There may be no active view in the tabbar, e.g., when dragging the last view out of the tabbar.
-      const activeViewTab = this._viewTabs().find(viewTab => viewTab.viewId === activeViewId);
-      if (activeViewTab && !viewportComponent.isElementInView(activeViewTab.host, 'full')) {
-        untracked(() => viewportComponent.scrollIntoView(activeViewTab.host));
+      // There may be no active view, e.g., if no view has been activated, or when dragging the last view out of the tabbar.
+      if (!activeViewId) {
+        return;
       }
+
+      // Get a reference to the currently rendered active tab, waiting if necessary by tracking the rendered tabs.
+      // Do not track rendered tabs in general to prevent unwanted scrolling when opening or closing inactive tabs.
+      const activeViewTab = untracked(() => this._viewTabs()).find(viewTab => viewTab.viewId === activeViewId);
+      if (!activeViewTab) {
+        this._viewTabs(); // Track rendered tabs to re-execute once rendered.
+        return;
+      }
+
+      // Scroll the tab into view if scrolled out of view.
+      untracked(() => requestAnimationFrame(() => {
+        if (!this._viewportComponent().isElementInView(activeViewTab.host, 'full')) {
+          this._viewportComponent().scrollIntoView(activeViewTab.host);
+        }
+      }));
     });
   }
 

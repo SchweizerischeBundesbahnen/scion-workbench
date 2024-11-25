@@ -450,4 +450,189 @@ test.describe('View Tabbar', () => {
     await expect(appPO.views()).toHaveCount(1);
     await expectView(stickyViewPage).toBeActive();
   });
+
+  test.describe('Auto Scrolling of Active Tab', () => {
+
+    test('should scroll the active tab into view when opening a new tab', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left', activateView: true})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left'})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left'}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Expect first tab to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(true);
+
+      // Open new tab at the end.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-view'], {partId: 'left', target: 'view.999', position: 'end'});
+
+      // Expect new tab to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.999'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.999'}).tab.isScrolledIntoView()).toBe(true);
+    });
+
+    test('should scroll the active tab into view when opening/reloading the application', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left'})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left'})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left', activateView: true}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Expect last tab to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
+
+      // Reload the application.
+      await appPO.reload();
+
+      // Expect last tab to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
+    });
+
+    test('should scroll the active tab into view when closing the active tab', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left'})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left', activateView: true})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left'}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Expect "view.103" to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
+
+      // Activate the last tab (view.110).
+      await appPO.view({viewId: 'view.110'}).tab.click();
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
+
+      // Close the active tab (view.110).
+      await appPO.view({viewId: 'view.110'}).tab.close();
+
+      // Expect "view.103" to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isScrolledIntoView()).toBe(true);
+    });
+
+    test('should not scroll the active tab into view when closing an inactive tab', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left'})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left'})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left', activateView: true}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Expect last tab to be active and scrolled into view.
+      await appPO.view({viewId: 'view.110'}).tab.click();
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
+
+      // Scroll tabbar to the start.
+      await appPO.part({partId: 'left'}).scrollLeft(0);
+
+      // Expect active tab (last tab) to be scrolled out of view.
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(false);
+
+      // Close "view.103" (not active tab).
+      await appPO.view({viewId: 'view.103'}).tab.close();
+
+      // Expect active tab (last tab) to be active but not scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(false);
+    });
+
+    test('should not scroll the active tab into view when opening an inactive tab', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      // Add part with 10 views left to the main area.
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('left', {align: 'left', ratio: .25})
+        .addView('view.101', {partId: 'left', activateView: true})
+        .addView('view.102', {partId: 'left'})
+        .addView('view.103', {partId: 'left'})
+        .addView('view.104', {partId: 'left'})
+        .addView('view.105', {partId: 'left'})
+        .addView('view.106', {partId: 'left'})
+        .addView('view.107', {partId: 'left'})
+        .addView('view.108', {partId: 'left'})
+        .addView('view.109', {partId: 'left'})
+        .addView('view.110', {partId: 'left'}),
+      );
+
+      // Expect tabbar to overflow (prerequisite).
+      await expect.poll(() => appPO.part({partId: 'left'}).getHiddenTabCount()).toBe(6);
+
+      // Expect first tab to be active and scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(true);
+
+      // Scroll tabbar to the end.
+      await appPO.part({partId: 'left'}).scrollLeft(Number.MAX_SAFE_INTEGER);
+
+      // Open new tab at the end.
+      const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+      await routerPage.navigate(['test-view'], {partId: 'left', target: 'view.999', position: 'end', activate: false});
+
+      // Expect first tab to be active but not scrolled into view.
+      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
+      await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(false);
+    });
+  });
 });

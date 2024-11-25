@@ -92,4 +92,25 @@ export class PartPO {
   public async closeViewTabs(): Promise<void> {
     await this._partBarLocator.locator('wb-view-tab').first().press('Control+Alt+Shift+K');
   }
+
+  /**
+   * Gets the number of currently hidden tabs.
+   */
+  public async getHiddenTabCount(): Promise<number> {
+    const hiddenTabCount = this._partBarLocator.locator('wb-view-list-button').locator('span.e2e-hidden-tab-count');
+    if (await hiddenTabCount.count()) {
+      return Number.parseInt(await hiddenTabCount.innerText());
+    }
+    return 0;
+  }
+
+  /**
+   * Sets the horizontal scroll position of the tabbar viewport.
+   */
+  public async scrollLeft(scrollLeft: number): Promise<void> {
+    const tabbarViewport = this._partBarLocator.locator('sci-viewport.e2e-tabbar div.viewport');
+    await tabbarViewport.evaluate((tabbarViewportElement: HTMLElement, scrollLeft: number) => {
+      tabbarViewportElement.scrollLeft = scrollLeft;
+    }, scrollLeft);
+  }
 }
