@@ -12,11 +12,12 @@ import {inject, Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
 import {ViewOutlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
-import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
 import {ViewId} from '../view/workbench-view.model';
+import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
 import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
+import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {Exclusion, stringify} from './stringifier';
 
 /**
@@ -28,7 +29,8 @@ export class WorkbenchLayoutSerializer {
   private _workbenchLayoutMigrator = new WorkbenchMigrator()
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
     .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
-    .registerMigration(4, inject(WorkbenchLayoutMigrationV5));
+    .registerMigration(4, inject(WorkbenchLayoutMigrationV5))
+    .registerMigration(5, inject(WorkbenchLayoutMigrationV6));
 
   /**
    * Serializes the given grid into a URL-safe base64 string.
@@ -47,7 +49,6 @@ export class WorkbenchLayoutSerializer {
       .concat('**/parent')
       .concat('migrated')
       .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
-      .concat(flags?.excludeViewUid ? '**/views/*/uid' : [])
       .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
       .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : []));
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
@@ -115,7 +116,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 5;
+export const WORKBENCH_LAYOUT_VERSION = 6;
 
 /**
  * Separates the serialized JSON model and its version in the base64-encoded string.
@@ -139,7 +140,6 @@ interface MUrlSegment {
  */
 export interface GridSerializationFlags {
   excludeTreeNodeId?: true;
-  excludeViewUid?: true;
   excludeViewMarkedForRemoval?: true;
   excludeViewNavigationId?: true;
 }

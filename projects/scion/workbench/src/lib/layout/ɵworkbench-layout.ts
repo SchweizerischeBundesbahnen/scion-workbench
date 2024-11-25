@@ -319,10 +319,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     if (isViewId(id)) {
-      workingCopy.__addView({id, uid: UID.randomUID()}, options);
+      workingCopy.__addView({id}, options);
     }
     else {
-      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id, uid: UID.randomUID()}, options);
+      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id}, options);
     }
     return workingCopy;
   }

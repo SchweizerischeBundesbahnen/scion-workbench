@@ -70,14 +70,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private _activationInstant: number | undefined;
   private _canCloseFn: (() => Promise<boolean>) | undefined;
 
-  /**
-   * Identifies the {@link MView}.
-   *
-   * A view handle represents a view with a particular view id. Different {@link MView}s of the same view id may share the handle.
-   * For example, when changing the layout, view handles for views with the same view id will be reused, regardless of
-   * whether they have the same {@link MView}.
-   */
-  public uid!: string;
   public alternativeId: string | undefined;
   public navigationId = signal<string | undefined>(undefined);
   public navigationHint = signal<string | undefined>(undefined);
@@ -141,7 +133,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.active.set(mPart.activeViewId === this.id);
     this.urlSegments.set(layout.urlSegments({viewId: this.id}));
 
-    this.uid = mView.uid;
     this.alternativeId = mView.alternativeId;
     this.classList.layout = mView.cssClass;
 
