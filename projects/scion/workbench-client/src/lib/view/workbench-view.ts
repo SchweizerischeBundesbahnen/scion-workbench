@@ -111,15 +111,48 @@ export abstract class WorkbenchView {
   public abstract close(): void;
 
   /**
+   * Registers a guard to confirm closing the view, replacing any previous guard.
+   *
+   * Example:
+   * ```ts
+   * Beans.get(WorkbenchView).canClose(async () => {
+   *   const action = await Beans.get(WorkbenchMessageBoxService).open('Do you want to save changes?', {
+   *     actions: {
+   *       yes: 'Yes',
+   *       no: 'No',
+   *       cancel: 'Cancel'
+   *     }
+   *   });
+   *
+   *   switch (action) {
+   *     case 'yes':
+   *       // Store changes ...
+   *       return true;
+   *     case 'no':
+   *       return true;
+   *     default:
+   *       return false;
+   *   }
+   * });
+   * ```
+   *
+   * @param canClose - Callback to confirm closing the view.
+   * @returns Reference to the `CanClose` guard, which can be used to unregister the guard.
+   */
+  public abstract canClose(canClose: CanCloseFn): CanCloseRef;
+
+  /**
    * Registers a guard to decide whether this view can be closed or not.
    * The guard will be removed when navigating to another microfrontend.
    *
-   * @see CanClose
+   * @deprecated since version 1.0.0-beta.28. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
    */
   public abstract addCanClose(canClose: CanClose): void;
 
   /**
    * Unregisters the given guard.
+   *
+   * @deprecated since version 1.0.0-beta.28. Unregister the callback using the {@link CanCloseRef} returned by {@link WorkbenchView.canClose}. This API will be removed in a future release.
    */
   public abstract removeCanClose(canClose: CanClose): void;
 }
@@ -144,13 +177,34 @@ export abstract class WorkbenchView {
  *   }
  * }
  * ```
+ * @deprecated since version 1.0.0-beta.28. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
  */
 export interface CanClose {
 
   /**
    * Decides whether this view can be closed.
+   *
+   * @deprecated since version 1.0.0-beta.28. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
    */
   canClose(): Observable<boolean> | Promise<boolean> | boolean;
+}
+
+/**
+ * The signature of a function to confirm closing a view., e.g., if dirty.
+ */
+export type CanCloseFn = () => Observable<boolean> | Promise<boolean> | boolean;
+
+/**
+ * Reference to the `CanClose` guard registered on a view.
+ */
+export interface CanCloseRef {
+
+  /**
+   * Removes the `CanClose` guard from the view.
+   *
+   * Has no effect if another guard was registered in the meantime.
+   */
+  dispose(): void;
 }
 
 /**

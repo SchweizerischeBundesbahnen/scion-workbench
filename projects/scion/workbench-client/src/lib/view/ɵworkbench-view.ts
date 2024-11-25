@@ -16,7 +16,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
-import {CanClose, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {CanClose, CanCloseFn, CanCloseRef, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
@@ -32,7 +32,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
    * Observable that emits before navigating to a different microfrontend of the same app.
    */
   private _beforeInAppNavigation$ = new Subject<void>();
-  private _canCloseGuards = new Set<CanClose>();
+  private _canCloseFn: CanCloseFn | CanClose | undefined;
   private _canCloseSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
@@ -96,14 +96,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       )
       .subscribe(() => {
         this._beforeInAppNavigation$.next();
-        this._canCloseGuards.clear();
-        this._canCloseSubscription?.unsubscribe();
-      });
-
-    // Detect navigation to a different view capability of another app.
-    this._beforeUnload$
-      .pipe(takeUntil(this._destroy$))
-      .subscribe(() => {
+        this._canCloseFn = undefined;
         this._canCloseSubscription?.unsubscribe();
       });
 
@@ -111,16 +104,12 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
     this.whenProperties = firstValueFrom(combineLatest([this.partId$, this.params$])).then();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public signalReady(): void {
     MicrofrontendPlatformClient.signalReady();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public setTitle(title: string | Observable<string>): void {
     this._propertyChange$.next('title');
 
@@ -132,9 +121,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .subscribe();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public setHeading(heading: string | Observable<string>): void {
     this._propertyChange$.next('heading');
 
@@ -146,9 +133,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .subscribe();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public markDirty(dirty: undefined | boolean | Observable<boolean>): void {
     this._propertyChange$.next('dirty');
 
@@ -160,9 +145,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .subscribe();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public setClosable(closable: boolean | Observable<boolean>): void {
     this._propertyChange$.next('closable');
 
@@ -174,44 +157,43 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .subscribe();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public close(): void {
     Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.id)).then();
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public addCanClose(canClose: CanClose): void {
-    // Subscribe to `CanClose` requests lazily when registering the first guard.
-    // The workbench will only invoke this guard if a guard is installed.
-    if (!this._canCloseGuards.has(canClose) && this._canCloseGuards.add(canClose).size === 1) {
-      this._canCloseSubscription = Beans.get(MessageClient).onMessage(ɵWorkbenchCommands.canCloseTopic(this.id), () => this.canClose());
-    }
+    this.canClose(canClose);
   }
 
-  /**
-   * @inheritDoc
-   */
+  /** @inheritDoc */
   public removeCanClose(canClose: CanClose): void {
-    if (this._canCloseGuards.delete(canClose) && this._canCloseGuards.size === 0) {
-      this._canCloseSubscription?.unsubscribe();
+    if (canClose === this._canCloseFn) {
+      this._canCloseSubscription!.unsubscribe();
       this._canCloseSubscription = undefined;
+      this._canCloseFn = undefined;
     }
   }
 
-  /**
-   * Decides whether this view can be closed.
-   */
-  private async canClose(): Promise<boolean> {
-    for (const guard of this._canCloseGuards) {
-      if (!await firstValueFrom(Observables.coerce(guard.canClose()), {defaultValue: true})) {
-        return false;
+  /** @inheritDoc */
+  public canClose(canClose: CanCloseFn | CanClose): CanCloseRef {
+    this._canCloseFn = canClose;
+    this._canCloseSubscription ??= Beans.get(MessageClient).onMessage(ɵWorkbenchCommands.canCloseTopic(this.id), () => {
+      if (typeof this._canCloseFn === 'object') {
+        return this._canCloseFn.canClose();
       }
-    }
-    return true;
+      return this._canCloseFn?.() ?? true;
+    });
+    return {
+      dispose: () => {
+        if (canClose === this._canCloseFn) {
+          this._canCloseSubscription!.unsubscribe();
+          this._canCloseSubscription = undefined;
+          this._canCloseFn = undefined;
+        }
+      },
+    };
   }
 
   public preDestroy(): void {

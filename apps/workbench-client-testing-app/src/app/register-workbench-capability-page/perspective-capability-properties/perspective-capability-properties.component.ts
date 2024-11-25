@@ -13,10 +13,9 @@ import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {noop, Observable} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {MAIN_AREA} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
-import {WorkbenchPerspectiveCapability, WorkbenchPerspectivePart, WorkbenchPerspectiveView} from '@scion/workbench-client';
+import {MAIN_AREA, WorkbenchPerspectiveCapability, WorkbenchPerspectivePart, WorkbenchPerspectiveView} from '@scion/workbench-client';
 import {RecordComponent} from '../../record/record.component';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {AsyncPipe} from '@angular/common';

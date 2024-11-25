@@ -139,6 +139,11 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-confirm-closing')).toggle(check);
   }
 
+  /** @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard. */
+  public async checkUseClassBasedCanCloseGuard(check: boolean): Promise<void> {
+    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-class-based-can-close-guard')).toggle(check);
+  }
+
   public async clickClose(): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
     await accordion.expand();
