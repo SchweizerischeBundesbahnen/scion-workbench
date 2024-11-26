@@ -15,7 +15,6 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {RouterOutlet} from '@angular/router';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
@@ -28,7 +27,6 @@ import {WORKBENCH_ID} from '../workbench-id';
   styleUrls: ['./part.component.scss'],
   standalone: true,
   imports: [
-    RouterOutlet,
     PartBarComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,

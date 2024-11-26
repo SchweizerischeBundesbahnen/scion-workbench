@@ -40,7 +40,7 @@ Before you start development, we recommend that you build all projects using the
 
 **Node Version**
 
-Make sure to use Node.js version `20.14.0` for contributing to SCION. We recommend using [Node Version Manager](https://github.com/nvm-sh/nvm) if you need different Node.js versions for other projects.
+Make sure to use Node.js version `22.11.0` for contributing to SCION. We recommend using [Node Version Manager](https://github.com/nvm-sh/nvm) if you need different Node.js versions for other projects.
 
 **Disable Angular Cache**
 

@@ -13,7 +13,6 @@ import {noop} from 'rxjs';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {CssClassComponent} from '../../../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
@@ -26,7 +25,6 @@ import {UUID} from '@scion/toolkit/uuid';
   imports: [
     ReactiveFormsModule,
     SciCheckboxComponent,
-    SciFormFieldComponent,
     SciMaterialIconDirective,
     CssClassComponent,
   ],

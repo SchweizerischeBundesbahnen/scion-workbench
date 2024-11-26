@@ -1,4 +1,4 @@
-// TODO [Angular 19] remove this file and build targets `workbench-testing-app:build-basehref-webpack` and `workbench-testing-app:serve:development-basehref-webpack` when `@angular-devkit/build-angular:browser` builder is deprecated
+// TODO [Angular 20] remove this file and build targets `workbench-testing-app:build-basehref-webpack` and `workbench-testing-app:serve:development-basehref-webpack` when `@angular-devkit/build-angular:browser` builder is deprecated
 @use '@scion/workbench' with (
   $icon-font: (
     directory: '^fonts'

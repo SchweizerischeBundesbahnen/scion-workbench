@@ -15,7 +15,7 @@ import {WorkbenchView} from '@scion/workbench';
   selector: 'app-non-standalone-view-test-page',
   templateUrl: './non-standalone-view-test-page.component.html',
   styleUrls: ['./non-standalone-view-test-page.component.scss'],
-  standalone: false, // DO NOT CHANGE because used to test non-standalone components
+  standalone: false, // eslint-disable-line @angular-eslint/prefer-standalone
 })
 export class NonStandaloneViewTestPageComponent {
 

@@ -37,4 +37,19 @@ test.describe('WorkbenchClient', () => {
     await appPO.changeColorScheme('dark');
     await expect(testPage.colorScheme).toHaveText('dark');
   });
+
+  test('should propagate theme to inactive view', async ({appPO, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, microfrontendNavigator);
+
+    // Open new tab to deactivate testPage.
+    await appPO.openNewViewTab();
+
+    await appPO.changeColorScheme('light');
+    await expect(testPage.theme).toHaveText('scion-light');
+
+    await appPO.changeColorScheme('dark');
+    await expect(testPage.theme).toHaveText('scion-dark');
+  });
 });
