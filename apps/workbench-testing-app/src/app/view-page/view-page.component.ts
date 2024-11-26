@@ -16,7 +16,7 @@ import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {Arrays} from '@scion/toolkit/util';
-import {AsyncPipe, NgClass} from '@angular/common';
+import {AsyncPipe} from '@angular/common';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JoinPipe} from '../common/join.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -34,7 +34,6 @@ import {CanClose} from '@scion/workbench-client';
   styleUrls: ['./view-page.component.scss'],
   standalone: true,
   imports: [
-    NgClass,
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,
@@ -118,7 +117,7 @@ export default class ViewPageComponent {
       else {
         console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
       }
-    });
+    }, {forceRoot: true});
   }
 
   private installCssClassUpdater(): void {

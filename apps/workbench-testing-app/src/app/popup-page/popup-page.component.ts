@@ -13,8 +13,6 @@ import {Popup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
-import {JsonPipe} from '@angular/common';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -25,9 +23,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   styleUrls: ['./popup-page.component.scss'],
   standalone: true,
   imports: [
-    JsonPipe,
     FormsModule,
-    NullIfEmptyPipe,
     SciViewportComponent,
     SciFormFieldComponent,
     SciAccordionComponent,

@@ -121,7 +121,7 @@ export class ContentAsOverlayComponent {
         height: `${height}px`,
         visibility: null,
       });
-    });
+    }, {forceRoot: true});
   }
 }
 

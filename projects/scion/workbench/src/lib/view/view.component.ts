@@ -107,7 +107,7 @@ export class ViewComponent implements OnDestroy, OnAttach, OnDetach {
 
   private addHostCssClasses(): void {
     const ngClass = inject(NgClass);
-    effect(() => ngClass.ngClass = this._view.classList.asList());
+    effect(() => ngClass.ngClass = this._view.classList.asList(), {forceRoot: true});
   }
 
   public ngOnDestroy(): void {

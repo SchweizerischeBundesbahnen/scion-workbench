@@ -1,7 +1,7 @@
 name: Continuous Integration and Delivery
 on: [push, pull_request, workflow_dispatch]
 env:
-  NODE_VERSION: 20.14.0
+  NODE_VERSION: 22.11.0
 jobs:
   install:
     name: 'Installing NPM modules'

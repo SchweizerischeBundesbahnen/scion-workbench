@@ -10,7 +10,6 @@
 
 import {Component, forwardRef, Input} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
-import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -25,7 +24,6 @@ import {UUID} from '@scion/toolkit/uuid';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    SciFormFieldComponent,
     SciCheckboxComponent,
     SciMaterialIconDirective,
   ],
