@@ -12,14 +12,14 @@
   }
 
   > span.count {
+    flex: none;
+    font-size: var(--sci-workbench-part-hidden-tab-count-size);
+
     // @formatter:off - Disable formatting because IntelliJ does not support style container queries.
     // Display tab count only if font size is not 0 (style container query)
     @container style(--sci-workbench-part-hidden-tab-count-size: 0) {
       display: none;
     }
     // @formatter:on
-
-    flex: none;
-    font-size: var(--sci-workbench-part-hidden-tab-count-size);
   }
 }

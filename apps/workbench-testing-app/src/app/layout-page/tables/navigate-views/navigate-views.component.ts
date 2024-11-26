@@ -12,8 +12,6 @@ import {Component, forwardRef, Input} from '@angular/core';
 import {noop} from 'rxjs';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Commands, NavigationData, NavigationState} from '@scion/workbench';
 import {RouterCommandsComponent} from '../../../router-commands/router-commands.component';
@@ -28,8 +26,6 @@ import {RecordComponent} from '../../../record/record.component';
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    SciCheckboxComponent,
-    SciFormFieldComponent,
     SciMaterialIconDirective,
     RouterCommandsComponent,
     RecordComponent,

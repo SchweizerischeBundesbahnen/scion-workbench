@@ -56,7 +56,7 @@ export class ViewTabComponent {
   private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef<HTMLElement>).nativeElement;
-  public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))});
+  public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))}); // eslint-disable-line @angular-eslint/no-input-rename
   public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
@@ -198,7 +198,7 @@ export class ViewTabComponent {
 
   private addHostCssClasses(): void {
     const ngClass = inject(NgClass);
-    effect(() => ngClass.ngClass = this.view().classList.asList());
+    effect(() => ngClass.ngClass = this.view().classList.asList(), {forceRoot: true});
   }
 
   private installViewMenuItemAccelerators(): void {

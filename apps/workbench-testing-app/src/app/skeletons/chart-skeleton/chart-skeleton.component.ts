@@ -12,7 +12,6 @@ import {Component, HostListener, inject, signal, WritableSignal} from '@angular/
 import {Skeletons} from '../skeletons.util';
 import {NgClass} from '@angular/common';
 import {WorkbenchView} from '@scion/workbench';
-import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {Chart} from './chart';
 
 /**
@@ -27,7 +26,6 @@ import {Chart} from './chart';
   standalone: true,
   imports: [
     NgClass,
-    SciMaterialIconDirective,
   ],
 })
 export class ChartSkeletonComponent {
