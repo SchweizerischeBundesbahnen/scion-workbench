@@ -37,7 +37,7 @@ export const Microfrontends = {
         sciRouterOutletElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
         sciRouterOutletElement.removeContextValue('color-scheme');
       }
-    });
+    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   },
   /**
    * Creates a stable identifier for given capability.

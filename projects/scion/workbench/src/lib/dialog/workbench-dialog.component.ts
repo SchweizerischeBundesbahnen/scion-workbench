@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
+import {Component, DestroyRef, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
 import {BehaviorSubject, fromEvent} from 'rxjs';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
-import {AsyncPipe, NgClass, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
+import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -25,6 +25,7 @@ import {DialogFooterComponent} from './dialog-footer/dialog-footer.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
+import {synchronizeCssClasses} from '../common/css-class.util';
 
 /**
  * Renders the workbench dialog.
@@ -52,9 +53,6 @@ import {fromMutation$} from '@scion/toolkit/observable';
   ],
   animations: [
     trigger('enter', provideEnterAnimation()),
-  ],
-  hostDirectives: [
-    NgClass,
   ],
   viewProviders: [
     configureDialogGlassPane(),
@@ -139,8 +137,8 @@ export class WorkbenchDialogComponent implements OnInit {
   }
 
   private addHostCssClasses(): void {
-    const ngClass = inject(NgClass);
-    effect(() => ngClass.ngClass = this.dialog.cssClass());
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    synchronizeCssClasses(host, this.dialog.cssClass);
   }
 
   /**

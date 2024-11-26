@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
+import {Component, computed, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
 import {fromEvent, merge, withLatestFrom} from 'rxjs';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {map, switchMap} from 'rxjs/operators';
@@ -24,9 +24,9 @@ import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
-import {NgClass} from '@angular/common';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
+import {synchronizeCssClasses} from '../../common/css-class.util';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -41,9 +41,6 @@ import {UUID} from '@scion/toolkit/uuid';
   imports: [
     PortalModule,
   ],
-  hostDirectives: [
-    NgClass,
-  ],
 })
 export class ViewTabComponent {
 
@@ -56,7 +53,7 @@ export class ViewTabComponent {
   private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef<HTMLElement>).nativeElement;
-  public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))});
+  public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))}); // eslint-disable-line @angular-eslint/no-input-rename
   public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
@@ -197,8 +194,8 @@ export class ViewTabComponent {
   }
 
   private addHostCssClasses(): void {
-    const ngClass = inject(NgClass);
-    effect(() => ngClass.ngClass = this.view().classList.asList());
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    synchronizeCssClasses(host, computed(() => this.view().classList.asList()));
   }
 
   private installViewMenuItemAccelerators(): void {

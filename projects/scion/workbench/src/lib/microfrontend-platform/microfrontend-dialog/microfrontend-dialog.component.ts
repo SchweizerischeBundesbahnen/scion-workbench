@@ -12,7 +12,7 @@ import {Component, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, HostBinding, inje
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
-import {NgClass, NgComponentOutlet} from '@angular/common';
+import {NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ComponentType} from '@angular/cdk/portal';
@@ -31,7 +31,6 @@ import {Microfrontends} from '../common/microfrontend.util';
   templateUrl: './microfrontend-dialog.component.html',
   standalone: true,
   imports: [
-    NgClass,
     NgComponentOutlet,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element

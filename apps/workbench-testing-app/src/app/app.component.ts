@@ -14,7 +14,7 @@ import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} 
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DOCUMENT} from '@angular/common';
-import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup, WorkbenchViewMenuItemDirective} from '@scion/workbench';
+import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -28,7 +28,6 @@ import {SettingsService} from './settings.service';
   imports: [
     RouterOutlet,
     HeaderComponent,
-    WorkbenchViewMenuItemDirective,
   ],
 })
 export class AppComponent implements DoCheck {

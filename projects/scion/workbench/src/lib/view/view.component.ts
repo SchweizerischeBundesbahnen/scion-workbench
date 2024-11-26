@@ -19,8 +19,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {WorkbenchView} from './workbench-view.model';
-import {NgClass} from '@angular/common';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
+import {synchronizeCssClasses} from '../common/css-class.util';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -37,7 +37,6 @@ import {OnAttach, OnDetach} from '../portal/wb-component-portal';
   ],
   hostDirectives: [
     GlassPaneDirective,
-    NgClass,
   ],
   providers: [
     configureViewGlassPane(),
@@ -106,8 +105,8 @@ export class ViewComponent implements OnDestroy, OnAttach, OnDetach {
   }
 
   private addHostCssClasses(): void {
-    const ngClass = inject(NgClass);
-    effect(() => ngClass.ngClass = this._view.classList.asList());
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    synchronizeCssClasses(host, this._view.classList.asList);
   }
 
   public ngOnDestroy(): void {

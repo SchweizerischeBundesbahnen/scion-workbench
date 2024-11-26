@@ -243,7 +243,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
         this._messageClient.publish(commandTopic, active, {retain: true}).then();
       });
-    });
+    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
 
   private installPartIdPublisher(): void {
@@ -253,7 +253,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
         const commandTopic = ɵWorkbenchCommands.viewPartIdTopic(this.view.id);
         this._messageClient.publish(commandTopic, part.id, {retain: true}).then();
       });
-    });
+    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
 
   /**
@@ -322,7 +322,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
    * such as when dragging a view or moving a sash.
    */
   private installWorkbenchDragDetector(): void {
-    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging());
+    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging()); // Running as root effect is not necessary because the view is only target of a drag operation if active.
   }
 
   private propagateWorkbenchTheme(): void {

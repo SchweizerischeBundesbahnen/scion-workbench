@@ -12,7 +12,7 @@ import {Component, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, HostBinding, inje
 import {ManifestService, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext} from '@scion/workbench-client';
-import {NgClass, NgComponentOutlet} from '@angular/common';
+import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
@@ -31,7 +31,6 @@ import {Microfrontends} from '../common/microfrontend.util';
   templateUrl: './microfrontend-message-box.component.html',
   standalone: true,
   imports: [
-    NgClass,
     NgComponentOutlet,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element

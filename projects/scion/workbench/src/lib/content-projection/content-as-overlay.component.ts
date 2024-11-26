@@ -90,7 +90,7 @@ export class ContentAsOverlayComponent {
           this._overlay.set(undefined);
         }));
       });
-    });
+    }); // Do not run as root effect for component inputs to be available in the effect.
   }
 
   /**
@@ -121,7 +121,7 @@ export class ContentAsOverlayComponent {
         height: `${height}px`,
         visibility: null,
       });
-    });
+    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
 }
 
