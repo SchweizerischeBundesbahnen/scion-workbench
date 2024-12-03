@@ -18,20 +18,6 @@ import {Router} from '@angular/router';
  * - disables animations
  * - performs the initial navigation
  *
- * ### Usage
- *
- * ```
- * beforeEach(() => {
- *   TestBed.configureTestingModule({
- *      imports: [
- *        WorkbenchTestingModule.forTest(),
- *        RouterTestingModule.withRoutes([
- *          {path: 'test-view', component: TestComponent},
- *        ]),
- *      ],
- *    });
- * });
- * ```
  */
 export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInitialPartId?: string}): EnvironmentProviders {
   return makeEnvironmentProviders([
