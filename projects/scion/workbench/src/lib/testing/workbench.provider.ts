@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2018-2024 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
 import {WorkbenchConfig} from '../workbench-config';
 import {ENVIRONMENT_INITIALIZER, EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {provideWorkbench} from '../workbench.provider';
@@ -8,7 +18,7 @@ import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Router} from '@angular/router';
 
 /**
- * Returns the set of dependency-injection providers to enable and configure the SCION Workbench in tests.
+ * Enables and configures the SCION Workbench in tests., returning a set of dependency-injection providers to be registered in Angular.
  *
  * Does the following:
  * - provides the workbench with given config
@@ -18,18 +28,15 @@ import {Router} from '@angular/router';
  * - disables animations
  * - performs the initial navigation
  *
- * ### Usage
+ * ---
+ * Usage:
  *
- * ```
- * beforeEach(() => {
- *   TestBed.configureTestingModule({
- *      imports: [
- *        WorkbenchTestingModule.forTest(),
- *        RouterTestingModule.withRoutes([
- *          {path: 'test-view', component: TestComponent},
- *        ]),
- *      ],
- *    });
+ * ```ts
+ * TestBed.configureTestingModule({
+ *   providers: [
+ *     provideWorkbenchForTest(),
+ *     provideRouter([])
+ *   ],
  * });
  * ```
  */
