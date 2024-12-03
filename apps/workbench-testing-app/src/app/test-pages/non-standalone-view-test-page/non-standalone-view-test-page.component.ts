@@ -11,7 +11,7 @@
 import {Component} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 
-@Component({
+@Component({ // eslint-disable-line  @angular-eslint/prefer-standalone
   selector: 'app-non-standalone-view-test-page',
   templateUrl: './non-standalone-view-test-page.component.html',
   styleUrls: ['./non-standalone-view-test-page.component.scss'],

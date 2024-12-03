@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, ComponentFactoryResolver, computed, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
+import {ApplicationRef, computed, Injectable, Injector, NgZone, signal, Signal} from '@angular/core';
 import {take} from 'rxjs/operators';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
@@ -40,8 +40,6 @@ export class ViewTabDragImageRenderer {
   private _constrainDragImageRectFn: ((rect: ViewDragImageRect) => ViewDragImageRect) | null = null;
 
   constructor(private _viewDragService: ViewDragService,
-              // TODO [Angular 19][https://github.com/angular/components/issues/24334] Alternative constructor (ComponentFactoryResolver is deprecated)
-              private _componentFactoryResolver: ComponentFactoryResolver,
               private _applicationRef: ApplicationRef,
               private _injector: Injector,
               private _zone: NgZone) {
@@ -132,7 +130,7 @@ export class ViewTabDragImageRenderer {
         height: `${dragPosition.height}px`,
       },
     });
-    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
+    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, null, this._applicationRef, this._injector);
     const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
       parent: this._injector,
       providers: [

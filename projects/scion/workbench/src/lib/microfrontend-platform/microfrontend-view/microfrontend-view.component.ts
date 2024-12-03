@@ -243,7 +243,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
         this._messageClient.publish(commandTopic, active, {retain: true}).then();
       });
-    });
+    }, {forceRoot: true});
   }
 
   private installPartIdPublisher(): void {
