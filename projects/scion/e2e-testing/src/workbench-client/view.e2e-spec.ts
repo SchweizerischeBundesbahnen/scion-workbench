@@ -1082,7 +1082,9 @@ test.describe('Workbench View', () => {
     const view2ComponentId = await viewPage2.getComponentInstanceId();
 
     // Drag view 2 into peripheral area.
-    await viewPage2.view.tab.dragTo({grid: 'workbench', region: 'east'});
+    const dragHandle = await viewPage2.view.tab.startDrag();
+    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.drop();
 
     await expectView(viewPage1).toBeActive();
     await expectView(viewPage2).toBeActive();

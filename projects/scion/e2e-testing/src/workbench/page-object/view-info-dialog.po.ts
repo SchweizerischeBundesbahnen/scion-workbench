@@ -46,6 +46,14 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
       navigationState: await navigationState.isVisible() ? await new SciKeyValuePO(navigationState).readEntries() : {},
     };
   }
+
+  public async enterTitle(title: string): Promise<void> {
+    await this.locator.locator('input.e2e-title').fill(title);
+  }
+
+  public close(): Promise<void> {
+    return this.dialog.close();
+  }
 }
 
 export interface ViewInfo {

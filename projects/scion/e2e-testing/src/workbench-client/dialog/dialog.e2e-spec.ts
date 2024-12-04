@@ -202,7 +202,9 @@ test.describe('Workbench Dialog', () => {
       const dialogOpenerView = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
 
       // Drag dialog opener view into peripheral area.
-      await dialogOpenerView.view.tab.dragTo({grid: 'workbench', region: 'east'});
+      const dragHandle = await dialogOpenerView.view.tab.startDrag();
+      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.drop();
 
       // Open the dialog.
       await dialogOpenerView.open({component: 'testee'}, {cssClass: 'testee'});

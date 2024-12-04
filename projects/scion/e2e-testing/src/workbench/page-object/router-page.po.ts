@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceArray, commandsToPath, rejectWhenAttached, waitForCondition} from '../../helper/testing.util';
+import {coerceArray, commandsToPath, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
@@ -46,7 +46,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
+      this._appPO.waitForLayoutChange({navigationId}),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }
@@ -62,7 +62,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('a.e2e-router-link-navigate').click({modifiers: extras?.modifiers});
 
     // Wait until navigation completed.
-    await waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId);
+    await this._appPO.waitForLayoutChange({navigationId});
   }
 
   private async enterCommands(commands: Commands): Promise<void> {

@@ -15,7 +15,7 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {expectView} from '../matcher/view-matcher';
 import {MAIN_AREA} from '../workbench.model';
 
-test.describe('View Drag', () => {
+test.describe('View Drag & Drop', () => {
 
   test.describe('view (de-)activation on drag', () => {
     test('should deactivate view when moving it quickly to the center', async ({appPO, workbenchNavigator}) => {
@@ -29,7 +29,8 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the center quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.view.tab.dragTo({partId, region: 'center'}, {steps: 1, performDrop: false});
+      const dragHandle = await viewPage2.view.tab.startDrag();
+      await dragHandle.dragToPart(partId, {region: 'center', steps: 1});
 
       // Expect view 1 to be activated
       await expectView(viewPage1).toBeActive();
@@ -52,7 +53,8 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the north quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.view.tab.dragTo({partId, region: 'north'}, {steps: 1, performDrop: false});
+      const dragHandle = await viewPage2.view.tab.startDrag();
+      await dragHandle.dragToPart(partId, {region: 'north', steps: 1});
 
       // Expect view 1 to be activated
       await expectView(viewPage1).toBeActive();
@@ -75,7 +77,8 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the east quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.view.tab.dragTo({partId, region: 'east'}, {steps: 1, performDrop: false});
+      const dragHandle = await viewPage2.view.tab.startDrag();
+      await dragHandle.dragToPart(partId, {region: 'east', steps: 1});
 
       // Expect view 1 to be activated
       await expectView(viewPage1).toBeActive();
@@ -98,7 +101,8 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the south quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.view.tab.dragTo({partId, region: 'south'}, {steps: 1, performDrop: false});
+      const dragHandle = await viewPage2.view.tab.startDrag();
+      await dragHandle.dragToPart(partId, {region: 'south', steps: 1});
 
       // Expect view 1 to be activated
       await expectView(viewPage1).toBeActive();
@@ -121,7 +125,8 @@ test.describe('View Drag', () => {
 
       // Drag view 2 to the west quickly
       const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      await viewPage2.view.tab.dragTo({partId, region: 'west'}, {steps: 1, performDrop: false});
+      const dragHandle = await viewPage2.view.tab.startDrag();
+      await dragHandle.dragToPart(partId, {region: 'west', steps: 1});
 
       // Expect view 1 to be activated
       await expectView(viewPage1).toBeActive();
@@ -150,7 +155,9 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to the center.
-      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'center'});
+      const dragHandle = await view2.tab.startDrag();
+      await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'center'});
+      await dragHandle.drop();
 
       // Expect view 2 not to be moved.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -179,7 +186,9 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the west.
-      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'west'});
+      const dragHandle = await view2.tab.startDrag();
+      await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'west'});
+      await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -217,7 +226,9 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the east.
-      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'east'});
+      const dragHandle = await view2.tab.startDrag();
+      await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'east'});
+      await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -258,7 +269,9 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the north.
-      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'north'});
+      const dragHandle = await view2.tab.startDrag();
+      await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'north'});
+      await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -299,7 +312,9 @@ test.describe('View Drag', () => {
       const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
 
       // Move view 2 to a new part in the south.
-      await view2.tab.dragTo({partId: await view2.part.getPartId(), region: 'south'});
+      const dragHandle = await view2.tab.startDrag();
+      await dragHandle.dragToPart(await view2.part.getPartId(), {region: 'south'});
+      await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -347,7 +362,9 @@ test.describe('View Drag', () => {
 
       // Move view to the center of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
-      await testView.tab.dragTo({partId: initialPartId, region: 'center'});
+      const dragHandle = await testView.tab.startDrag();
+      await dragHandle.dragToPart(initialPartId, {region: 'center'});
+      await dragHandle.drop();
 
       // Expect view to be moved to the initial part.
       await expect(appPO.workbench).toEqualWorkbenchLayout({
@@ -392,7 +409,9 @@ test.describe('View Drag', () => {
 
       // Move view to a new part in the west of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
-      await testView.tab.dragTo({partId: initialPartId, region: 'west'});
+      const dragHandle = await testView.tab.startDrag();
+      await dragHandle.dragToPart(initialPartId, {region: 'west'});
+      await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the west of the initial part.
@@ -447,7 +466,9 @@ test.describe('View Drag', () => {
 
       // Move view to a new part in the east of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
-      await testView.tab.dragTo({partId: initialPartId, region: 'east'});
+      const dragHandle = await testView.tab.startDrag();
+      await dragHandle.dragToPart(initialPartId, {region: 'east'});
+      await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the east of the initial part.
@@ -505,7 +526,9 @@ test.describe('View Drag', () => {
 
       // Move view to a new part in the north of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
-      await testView.tab.dragTo({partId: initialPartId, region: 'north'});
+      const dragHandle = await testView.tab.startDrag();
+      await dragHandle.dragToPart(initialPartId, {region: 'north'});
+      await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the north of the initial part.
@@ -563,7 +586,9 @@ test.describe('View Drag', () => {
 
       // Move view to a new part in the south of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
-      await testView.tab.dragTo({partId: initialPartId, region: 'south'});
+      const dragHandle = await testView.tab.startDrag();
+      await dragHandle.dragToPart(initialPartId, {region: 'south'});
+      await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the south of the initial part.
@@ -612,7 +637,9 @@ test.describe('View Drag', () => {
 
       // Drop view on the start page of the main area.
       const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-      await testeeViewPage.view.tab.dragTo({grid: 'mainArea', region: 'center'});
+      const dragHandle = await testeeViewPage.view.tab.startDrag();
+      await dragHandle.dragToGrid('mainArea', {region: 'center'});
+      await dragHandle.drop();
 
       // Expect view to be moved to the main area.
       await expectView(testeeViewPage).toBeActive();
@@ -637,7 +664,9 @@ test.describe('View Drag', () => {
 
       // Drop view on the start page of the main area.
       const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
-      await testeeViewPage.view.tab.dragTo({grid: 'mainArea', region: 'center'});
+      const dragHandle = await testeeViewPage.view.tab.startDrag();
+      await dragHandle.dragToGrid('mainArea', {region: 'center'});
+      await dragHandle.drop();
 
       // Expect view to be moved to the main area.
       await expectView(testeeViewPage).toBeActive();
@@ -654,7 +683,8 @@ test.describe('View Drag', () => {
       await viewPage.enterTitle('Title');
 
       // Start dragging the view.
-      await viewPage.view.tab.dragTo({partId: await viewPage.view.part.getPartId(), region: 'center'}, {performDrop: false});
+      const dragHandle = await viewPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await viewPage.view.part.getPartId(), {region: 'center'});
 
       // Expect drag image to have title.
       await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');
@@ -670,7 +700,8 @@ test.describe('View Drag', () => {
       await viewPage.enterHeading('Heading');
 
       // Start dragging the view.
-      await viewPage.view.tab.dragTo({partId: await viewPage.view.part.getPartId(), region: 'center'}, {performDrop: false});
+      const dragHandle = await viewPage.view.tab.startDrag();
+      await dragHandle.dragToPart(await viewPage.view.part.getPartId(), {region: 'center'});
 
       // Expect drag image to have title and heading.
       await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');
@@ -684,11 +715,11 @@ test.describe('View Drag', () => {
       await viewPage.enterTitle('Title');
 
       // Move view tab out of the window.
-      await viewPage.view.tab.mousedown();
-      await page.mouse.move(-500, appPO.viewportBoundingBox().vcenter, {steps: 100});
+      const dragHandle = await viewPage.view.tab.startDrag();
+      await dragHandle.dragTo({deltaX: -500, deltaY: 0});
 
       // Move view tab quickly into the window.
-      await page.mouse.move(appPO.viewportBoundingBox().hcenter, appPO.viewportBoundingBox().vcenter, {steps: 1});
+      await dragHandle.dragTo({deltaX: 500, deltaY: 0}, {steps: 1});
 
       // Expect view tab to render content.
       await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');

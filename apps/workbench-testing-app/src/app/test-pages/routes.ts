@@ -67,6 +67,10 @@ export default [
     path: 'blocking-can-close-test-page',
     loadComponent: () => import('./blocking-can-close-test-page/blocking-can-close-test-page.component'),
   },
+  {
+    path: 'lifecycle-logger-test-page',
+    loadComponent: () => import('./lifecycle-logger-test-page/lifecycle-logger-test-page.component'),
+  },
 ] satisfies Routes;
 
 /**

@@ -1,19 +1,5 @@
-@if (startActions().length) {
-  <ul class="start">
-    @for (startAction of startActions(); track startAction) {
-      <li class="e2e-part-action" [ngClass]="startAction.cssClass">
-        <ng-container *cdkPortalOutlet="startAction.portal"/>
-      </li>
-    }
-  </ul>
-}
-
-@if (endActions().length) {
-  <ul class="end">
-    @for (endAction of endActions(); track endAction) {
-      <li class="e2e-part-action" [ngClass]="endAction.cssClass">
-        <ng-container *cdkPortalOutlet="endAction.portal"/>
-      </li>
-    }
-  </ul>
+@for (action of actions(); track action) {
+  <div class="action e2e-part-action" [ngClass]="action.cssClass">
+    <ng-container *cdkPortalOutlet="action.portal"/>
+  </div>
 }

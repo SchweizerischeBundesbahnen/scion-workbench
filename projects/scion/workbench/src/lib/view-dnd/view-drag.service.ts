@@ -9,7 +9,7 @@
  */
 
 import {Injectable, NgZone, OnDestroy} from '@angular/core';
-import {BehaviorSubject, EMPTY, fromEvent, merge, Observable, Observer, of, TeardownLogic, zip} from 'rxjs';
+import {BehaviorSubject, EMPTY, fromEvent, merge, mergeMap, mergeWith, MonoTypeOperatorFunction, Observable, Observer, of, switchMap, TeardownLogic} from 'rxjs';
 import {filter, map, take} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegment} from '@angular/router';
@@ -117,7 +117,7 @@ export class ViewDragService implements OnDestroy {
    * Checks if the given event is a view drag event with the same origin.
    */
   public isViewDragEvent(event: DragEvent): boolean {
-    return !!event.dataTransfer && event.dataTransfer.types.includes(VIEW_DRAG_TRANSFER_TYPE) && this.viewDragData !== null;
+    return !!event.dataTransfer?.types.includes(VIEW_DRAG_TRANSFER_TYPE) && !!this.viewDragData;
   }
 
   /**
@@ -170,13 +170,14 @@ export class ViewDragService implements OnDestroy {
     }
 
     function dragend$(): Observable<DragEvent> {
-      // The `dragend` event does not contain a drag transfer type. To still filter view-related `dragend` events,
-      // we combine `dragstart` and `dragend` events, i.e., when a view-related `dragstart` event occurs, we expect
-      // the next `dragend` event to be view-related.
-      return zip(
-        fromEvent<DragEvent>(target, 'dragstart', options ?? {}).pipe(filter(event => isViewDragEvent(event))),
-        fromEvent<DragEvent>(target, 'dragend', options ?? {}),
-      ).pipe(map(([_, dragendEvent]) => dragendEvent));
+      // The `dragend` event does not contain a drag transfer type.
+      // To filter view-related `dragend` events, we subscribe to view-related `dragstart` events in the first place.
+      // When receiving a `dragstart` event we subscribe for the next `dragend` event, expecting it to be view-related.
+      return fromEvent<DragEvent>(target, 'dragstart', options ?? {})
+        .pipe(
+          filter(event => isViewDragEvent(event)),
+          switchMap(() => fromEvent<DragEvent>(target, 'dragend', {...options, once: true})),
+        );
     }
 
     function dragover$(): Observable<DragEvent> {
@@ -208,8 +209,21 @@ export class ViewDragService implements OnDestroy {
                 return true;
             }
           }),
+          resetOnDragEnd(),
           filter(event => shouldSubscribe(event.type)),
         );
+
+      /**
+       * Resets `dragEnterCount` on `dragend` to prevent inconsistent state if `dragend` should not be triggered.
+       */
+      function resetOnDragEnd<T>(): MonoTypeOperatorFunction<T> {
+        return mergeWith(fromEvent<DragEvent>(target, 'dragend')
+          .pipe(mergeMap(() => {
+            dragEnterCount = 0;
+            return EMPTY;
+          })),
+        );
+      }
     }
 
     function shouldSubscribe(eventType: string): boolean {

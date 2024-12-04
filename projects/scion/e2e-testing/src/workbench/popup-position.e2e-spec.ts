@@ -46,10 +46,25 @@ test.describe('Workbench Popup Position', () => {
     // +--------+------------+--------+
     // |             SOUTH            |
     // +------------------------------+
-    await northView.tab.dragTo({partId: await northView.part.getPartId(), region: 'north'});
-    await southView.tab.dragTo({partId: await southView.part.getPartId(), region: 'south'});
-    await westView.tab.dragTo({partId: await westView.part.getPartId(), region: 'west'});
-    await eastView.tab.dragTo({partId: await eastView.part.getPartId(), region: 'east'});
+    // Drag view to the north.
+    const dragHandle1 = await northView.tab.startDrag();
+    await dragHandle1.dragToPart(await northView.part.getPartId(), {region: 'north'});
+    await dragHandle1.drop();
+
+    // Drag view to the south.
+    const dragHandle2 = await southView.tab.startDrag();
+    await dragHandle2.dragToPart(await southView.part.getPartId(), {region: 'south'});
+    await dragHandle2.drop();
+
+    // Drag view to the west.
+    const dragHandle3 = await westView.tab.startDrag();
+    await dragHandle3.dragToPart(await westView.part.getPartId(), {region: 'west'});
+    await dragHandle3.drop();
+
+    // Drag view to the east.
+    const dragHandle4 = await eastView.tab.startDrag();
+    await dragHandle4.dragToPart(await eastView.part.getPartId(), {region: 'east'});
+    await dragHandle4.drop();
 
     // Enlarge center part size
     const {width, height} = appPO.page.viewportSize()!;

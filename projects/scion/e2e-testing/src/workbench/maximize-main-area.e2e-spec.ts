@@ -45,7 +45,9 @@ test.describe('Workbench', () => {
     // Move view 2 to the right of view 1.
     const view1 = appPO.view({cssClass: 'view-1'});
     const view2 = appPO.view({cssClass: 'view-2'});
-    await view2.tab.dragTo({partId: await view1.part.getPartId(), region: 'east'});
+    const dragHandle = await view2.tab.startDrag();
+    await dragHandle.dragToPart(await view1.part.getPartId(), {region: 'east'});
+    await dragHandle.drop();
 
     const viewId1 = await view1.getViewId();
     const viewId2 = await view2.getViewId();

@@ -286,6 +286,14 @@ export class AppPO {
   }
 
   /**
+   * Waits for the layout to change.
+   */
+  public async waitForLayoutChange(options?: {navigationId?: string}): Promise<void> {
+    const navigationId = options?.navigationId ?? await this.getCurrentNavigationId();
+    await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
+  }
+
+  /**
    * Returns a unique id set after a navigation has been performed.
    *
    * This identifier should be used to detect when the current navigation has completed.

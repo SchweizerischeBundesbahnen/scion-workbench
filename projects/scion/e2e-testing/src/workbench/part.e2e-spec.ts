@@ -22,7 +22,7 @@ test.describe('Workbench Part', () => {
     const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
 
     // Open view list menu.
-    const viewListMenu = await testPage.view.part.openViewListMenu();
+    const viewListMenu = await testPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the view.
@@ -43,7 +43,7 @@ test.describe('Workbench Part', () => {
     const testPage = await InputFieldTestPagePO.openInPopup(appPO, workbenchNavigator, {closeOnFocusLost: false});
 
     // Open view list menu.
-    const viewListMenu = await viewPage.view.part.openViewListMenu();
+    const viewListMenu = await viewPage.view.part.bar.openViewListMenu();
     await expect(viewListMenu.locator).toBeAttached();
 
     // When focusing the popup.

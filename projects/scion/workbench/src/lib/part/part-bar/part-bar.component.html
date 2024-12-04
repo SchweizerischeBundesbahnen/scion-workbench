@@ -1,19 +1,29 @@
-<sci-viewport class="tabbar e2e-tabbar" scrollbarStyle="hidden" [class.dragover]="dragover$ | async">
+<sci-viewport class="tabbar e2e-tabbar" scrollbarStyle="hidden">
   @for (viewId of part.viewIds(); track viewId) {
-    @if (viewtab === dropTargetViewTab) {
+    @if (viewtab === dropTargetViewTab()) {
       <div class="divider"></div>
     }
     <wb-view-tab #viewtab
                  [viewId]="viewId"
-                 [class.drag-source]="viewtab === dragSourceViewTab"
-                 [class.drop-target]="viewtab === dropTargetViewTab"/>
+                 [class.drag-source]="viewtab === dragSourceViewTab()"
+                 [class.drop-target]="viewtab === dropTargetViewTab()"/>
     <div class="divider"></div>
   }
 
-  <!-- Placeholder element to grow the viewport to fit the drag image. -->
-  <div class="drag-image-placeholder"></div>
+  <!-- Placeholder for expanding the viewport when dragging a tab to the right, moving part actions along with the dragover event. -->
+  <div class="drag-placeholder"></div>
 </sci-viewport>
-<wb-part-action-bar/>
+
+<!-- Actions -->
+@if (startActions().length) {
+  <wb-part-action-bar [actions]="startActions()" class="start"/>
+}
+<div class="filler" #filler></div>
+@if (endActions().length) {
+  <wb-part-action-bar [actions]="endActions()" class="end"/>
+}
+
+<!-- View List Dropdown -->
 <wb-view-list-button/>
 
 <!-- Element for injecting the corner radius into the component. -->

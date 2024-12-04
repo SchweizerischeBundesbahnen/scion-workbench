@@ -14,7 +14,7 @@ import {Qualifier} from '@scion/microfrontend-platform';
 import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-field.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
-import {coerceArray, rejectWhenAttached, waitForCondition} from '../../helper/testing.util';
+import {coerceArray, rejectWhenAttached} from '../../helper/testing.util';
 import {SciRouterOutletPO} from './sci-router-outlet.po';
 import {MicrofrontendViewPagePO} from '../../workbench/page-object/workbench-view-page.po';
 import {ViewId, WorkbenchNavigationExtras} from '@scion/workbench-client';
@@ -47,7 +47,7 @@ export class RouterPagePO implements MicrofrontendViewPagePO {
 
     // Evaluate the response: resolve the promise on success, or reject it on error.
     await Promise.race([
-      waitForCondition(async () => (await this._appPO.getCurrentNavigationId()) !== navigationId),
+      this._appPO.waitForLayoutChange({navigationId}),
       rejectWhenAttached(this.locator.locator('output.e2e-navigate-error')),
     ]);
   }
