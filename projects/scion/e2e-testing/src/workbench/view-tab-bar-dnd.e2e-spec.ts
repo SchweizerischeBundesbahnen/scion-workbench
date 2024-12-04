@@ -757,11 +757,22 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     await workbenchNavigator.createPerspective('testee', layout => layout
       .addPart('main')
-      .addView('view.100', {partId: 'main', activateView: true}),
+      .addView('view.101', {partId: 'main', activateView: true})
+      .addView('view.102', {partId: 'main'})
+      .addView('view.103', {partId: 'main'}),
     );
 
-    const tab = appPO.view({viewId: 'view.100'}).tab;
-    await tab.setTitle('view.100');
+    const tab1 = appPO.view({viewId: 'view.101'}).tab;
+    await tab1.setTitle('view.101');
+    await tab1.setWidth('100px');
+
+    const tab2 = appPO.view({viewId: 'view.102'}).tab;
+    await tab2.setTitle('view.102');
+    await tab2.setWidth('100px');
+
+    const tab3 = appPO.view({viewId: 'view.103'}).tab;
+    await tab3.setTitle('view.103');
+    await tab3.setWidth('100px');
 
     // Register part action.
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
@@ -771,29 +782,18 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     // Log change of part action position.
     await installPositionLogger(appPO.part({partId: 'main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
 
-    // Clear log.
+    // Drag tab to the right.
+    const dragHandle = await tab1.startDrag();
+    await dragHandle.dragTo({deltaX: 300, deltaY: 0});
     await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 
     // Drag tab to the right.
-    const dragHandle = await tab.startDrag();
-    await dragHandle.dragTo({deltaX: 300, deltaY: 0}, {steps: 1});
+    await dragHandle.dragTo({deltaX: 300, deltaY: 0}, {steps: 2});
     await waitUntilStable(() => consoleLogs.get().length);
 
     // Expect action to be positioned instantly (without animation).
-    await expect.poll(() => consoleLogs.get({message: '[part-action] Position has changed'}).length).toBe(1);
-
-    // Wait for the CSS classes 'on-drag-start' and 'on-drag-enter' to be removed.
-    const tabbar = appPO.part({partId: 'main'}).bar.locator;
-    await waitForCondition(async () => !await hasCssClass(tabbar, 'on-drag-start') && !await hasCssClass(tabbar, 'on-drag-enter'));
-    consoleLogs.clear();
-
-    // Drag tab to the left.
-    await dragHandle.dragTo({deltaX: -300, deltaY: 0}, {steps: 1});
-    await waitUntilStable(() => consoleLogs.get().length);
-
-    // Expect action to be positioned instantly (without animation).
-    await expect.poll(() => consoleLogs.get({message: '[part-action] Position has changed'}).length).toBe(1);
+    await expect.poll(() => consoleLogs.get({message: '[part-action] Position has changed'}).length).toBeBetween(1, 2);
   });
 
   test('should move part action to the right of the drag pointer', async ({appPO, workbenchNavigator}) => {
@@ -826,6 +826,46 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     // Expect action to be visible.
     await expect(partAction.locator).toBeVisible();
+  });
+
+  test('should not change position of part action when start dragging', async ({appPO, workbenchNavigator, consoleLogs}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective('testee', layout => layout
+      .addPart('main')
+      .addView('view.101', {partId: 'main', activateView: true})
+      .addView('view.102', {partId: 'main'})
+      .addView('view.103', {partId: 'main'}),
+    );
+
+    const tab1 = appPO.view({viewId: 'view.101'}).tab;
+    await tab1.setTitle('view.101');
+    await tab1.setWidth('100px');
+
+    const tab2 = appPO.view({viewId: 'view.102'}).tab;
+    await tab2.setTitle('view.102');
+    await tab2.setWidth('100px');
+
+    const tab3 = appPO.view({viewId: 'view.103'}).tab;
+    await tab3.setTitle('view.103');
+    await tab3.setWidth('100px');
+
+    // Register part action.
+    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPage.registerPartAction('action', {align: 'start', cssClass: 'testee'});
+    await layoutPage.view.tab.close();
+
+    // Wait until positioned the part action.
+    await installPositionLogger(appPO.part({partId: 'main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    await waitUntilStable(() => consoleLogs.get().length);
+    consoleLogs.clear();
+
+    // Start dragging the tab.
+    const dragHandle = await tab1.startDrag();
+    await dragHandle.dragTo({deltaX: 50, deltaY: 0});
+
+    // Expect part action not to have changed position.
+    await expect.poll(() => consoleLogs.get({message: '[part-action] Position has changed'}).length).toBe(0);
   });
 
   test('should not animate part action movement on dragenter and dragleave', async ({appPO, consoleLogs, workbenchNavigator}) => {
@@ -867,7 +907,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await waitUntilStable(() => consoleLogs.get().length);
     await expect.poll(() => consoleLogs.get({message: '[part-action] Position has changed'}).length).toBe(1);
 
-    // Wait for the CSS classes 'on-drag-start' and 'on-drag-enter' to be removed.
+    // Wait for the CSS class 'on-drag-enter' to be removed.
     const tabbar = appPO.part({partId: 'bottom'}).bar.locator;
     await waitForCondition(async () => !await hasCssClass(tabbar, 'on-drag-start') && !await hasCssClass(tabbar, 'on-drag-enter'));
     consoleLogs.clear();

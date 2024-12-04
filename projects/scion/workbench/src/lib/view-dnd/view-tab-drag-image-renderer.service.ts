@@ -89,13 +89,7 @@ export class ViewTabDragImageRenderer {
    */
   private onWindowDragOver(event: DragEvent): void {
     const dragPosition = this.calculateDragImageRect(this._viewDragService.viewDragData!, event);
-
-    // update the drag image position
-    setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
-      left: `${dragPosition.x}px`,
-      top: `${dragPosition.y}px`,
-      height: `${dragPosition.height}px`,
-    });
+    this.updateDragImagePosition(dragPosition);
   }
 
   /**
@@ -120,34 +114,43 @@ export class ViewTabDragImageRenderer {
   }
 
   private createDragImage(event: DragEvent): void {
-    if (this._viewDragImagePortalOutlet) {
-      return;
-    }
-
     const dragData = this._viewDragService.viewDragData!;
     const dragPosition = this.calculateDragImageRect(dragData, event);
 
-    // create the drag image
-    const outletElement = createElement('div', {
-      parent: document.body,
-      cssClass: 'wb-view-tab-drag-image',
-      style: {
-        left: `${dragPosition.x}px`,
-        top: `${dragPosition.y}px`,
-        width: `${dragPosition.width}px`,
-        height: `${dragPosition.height}px`,
-      },
+    if (this._viewDragImagePortalOutlet) {
+      this.updateDragImagePosition(dragPosition);
+    }
+    else {
+      // create the drag image
+      const outletElement = createElement('div', {
+        parent: document.body,
+        cssClass: 'wb-view-tab-drag-image',
+        style: {
+          left: `${dragPosition.x}px`,
+          top: `${dragPosition.y}px`,
+          width: `${dragPosition.width}px`,
+          height: `${dragPosition.height}px`,
+        },
+      });
+      this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
+      const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
+        parent: this._injector,
+        providers: [
+          {provide: WorkbenchView, useValue: new DragImageWorkbenchView(dragData)},
+          {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'drag-image' satisfies ViewTabRenderingContext},
+        ],
+      })));
+      // Detect for changes because constructed outside of Angular.
+      componentRef.changeDetectorRef.detectChanges();
+    }
+  }
+
+  private updateDragImagePosition(position: DOMRect): void {
+    setStyle(this._viewDragImagePortalOutlet!.outletElement as HTMLElement, {
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+      height: `${position.height}px`,
     });
-    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._componentFactoryResolver, this._applicationRef, this._injector);
-    const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
-      parent: this._injector,
-      providers: [
-        {provide: WorkbenchView, useValue: new DragImageWorkbenchView(dragData)},
-        {provide: VIEW_TAB_RENDERING_CONTEXT, useValue: 'drag-image' satisfies ViewTabRenderingContext},
-      ],
-    })));
-    // Detect for changes because constructed outside of Angular.
-    componentRef.changeDetectorRef.detectChanges();
   }
 
   private disposeDragImage(): void {

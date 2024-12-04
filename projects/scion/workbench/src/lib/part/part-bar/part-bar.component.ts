@@ -193,8 +193,9 @@ export class PartBarComponent {
 
     // Set drag source, but only if started the drag operation in this part.
     // We do not set the drag source in `dragstart` to not break the drag operation (in Chrome and Edge, but not Firefox).
-    if (dragData.partId === this.part.id && dragData.workbenchId === this._workbenchId) {
+    if (this._host.classList.contains('on-drag-start')) {
       this.dragSourceViewTab.set(this._viewTabs().find(viewTab => viewTab.viewId === dragData.viewId) ?? null);
+      setCssVariable(this._host, {'--ɵpart-bar-drag-placeholder-width': `${dragData.viewTabWidth}px`});
     }
 
     // Locate the tab the user is dragging over.
@@ -438,8 +439,7 @@ export class PartBarComponent {
     this._viewTabDragImageRenderer.unsetConstrainDragImageRectFn(this._constrainFn!);
     this._constrainFn = null;
 
-    unsetCssClass(this._host, 'drag-over');
-    unsetCssClass(this._host, 'pointer-events-disabled');
+    unsetCssClass(this._host, 'drag-over', 'pointer-events-disabled');
     unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-placeholder-width');
     this._viewDragService.unsetTabbarDragover(this.part.id);
   }
