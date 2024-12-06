@@ -10,8 +10,8 @@
 
 import {Component, computed, effect, ElementRef, HostListener, inject, NgZone, OnDestroy, Signal, signal, untracked, viewChild, viewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
-import {map, mergeMap, startWith, takeUntil} from 'rxjs/operators';
-import {from, fromEvent, merge, OperatorFunction, pairwise, pipe, Subject, timer} from 'rxjs';
+import {map, mergeMap, takeUntil} from 'rxjs/operators';
+import {from, fromEvent, merge, Observable, OperatorFunction, Subject, timer} from 'rxjs';
 import {ConstrainFn, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService, ViewMoveEvent} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
@@ -111,6 +111,11 @@ export class PartBarComponent implements OnDestroy {
   private _constrainFn: ConstrainFn | null = null;
 
   /**
+   * Signals when unsetting drag state.
+   */
+  private _onUnsetDragState = signal<void>(undefined, {equal: () => false});
+
+  /**
    * Tabbar indents where to display the rounded bottom corners of the first and last view tab.
    */
   private _tabbarIndent = {
@@ -125,6 +130,7 @@ export class PartBarComponent implements OnDestroy {
     this.installViewDragListener();
     this.installTabbarIndentSizeTracker();
     this.installViewportChangeTracker();
+    console.log('>>> finally done 1');
   }
 
   @HostListener('dblclick', ['$event'])
@@ -254,7 +260,7 @@ export class PartBarComponent implements OnDestroy {
   /**
    * Method invoked when the user is dragging a tab over this tabbar.
    */
-  private onTabbarDragOver(event: DragEvent, dragDistance: DragDistance): void {
+  private onTabbarDragOver(event: DragEvent, dragDistance: number, scrollDistance: number): void {
     NgZone.assertNotInAngularZone();
     event.preventDefault(); // allow view drop
 
@@ -272,9 +278,14 @@ export class PartBarComponent implements OnDestroy {
         this.dropTargetViewTab.set(this.computeDropTarget(event, 0));
       }
       // Compute drop target only if moving the drag pointer to prevent tabs from sliding back and forth (while animation is in progress)
-      else if (dragDistance.x) {
-        this.dropTargetViewTab.set(this.computeDropTarget(event, dragDistance.x));
+      else if (dragDistance) {
+        this.dropTargetViewTab.set(this.computeDropTarget(event, dragDistance));
       }
+      // Compute drop target when scrolling the viewport, i.e., not moving the drag pointer but scrolling the viewport because placed the drag pointer at the viewport edges.
+      else if (scrollDistance) {
+        this.dropTargetViewTab.set(this.computeDropTarget(event, scrollDistance));
+      }
+
       // Set CSS class to animate dragging over the tabbar.
       setCssClass(this._host, 'drag-over');
 
@@ -407,17 +418,19 @@ export class PartBarComponent implements OnDestroy {
    * Cleans up the drag state, unsetting the drag source based on provided options.
    */
   private unsetDragState(options?: {unsetDragSource?: false}): void {
-    if (options?.unsetDragSource ?? true) {
-      this.dragSourceViewTab.set(null);
-      this._dragData = null;
-    }
     this.dropTargetViewTab.set(null);
+    this._onUnsetDragState.set();
     this._viewTabDragImageRenderer.unsetConstrainDragImageRectFn(this._constrainFn!);
+    this._viewDragService.signalTabbarDragLeave(this.part.id);
     this._constrainFn = null;
 
     unsetCssClass(this._host, 'drag-over', 'pointer-events-disabled');
     unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-placeholder-width');
-    this._viewDragService.signalTabbarDragLeave(this.part.id);
+
+    if (options?.unsetDragSource ?? true) {
+      this.dragSourceViewTab.set(null);
+      this._dragData = null;
+    }
   }
 
   /**
@@ -443,9 +456,11 @@ export class PartBarComponent implements OnDestroy {
         return;
       }
 
-      // Get a reference to the currently rendered active tab, waiting if necessary by tracking the rendered tabs.
       // Do not track rendered tabs in general to prevent unwanted scrolling when opening or closing inactive tabs.
-      const activeViewTab = untracked(() => this._viewTabs()).find(viewTab => viewTab.viewId === activeViewId);
+      const viewTabs = untracked(() => this._viewTabs());
+
+      // Get a reference to the currently rendered active tab, waiting if necessary by tracking the rendered tabs.
+      const activeViewTab = viewTabs.find(viewTab => viewTab.viewId === activeViewId);
       if (!activeViewTab) {
         this._viewTabs(); // Track rendered tabs to re-execute once rendered.
         return;
@@ -453,6 +468,9 @@ export class PartBarComponent implements OnDestroy {
 
       // Track navigation of the active view, scrolling its tab into view if necessary.
       activeViewTab.view().navigationId();
+
+      // Track unsetting drag state to ensure the active view is scrolled into view after drop or cancel.
+      this._onUnsetDragState();
 
       // Scroll the tab into view if scrolled out of view.
       untracked(() => requestAnimationFrame(() => {
@@ -489,10 +507,10 @@ export class PartBarComponent implements OnDestroy {
     this._viewDragService.viewDrag$(this._host)
       .pipe(
         subscribeIn(fn => zone.runOutsideAngular(fn)),
-        calculateDragDistance(),
+        calculateDistance(() => this._viewportComponent()), // view child not available yet
         takeUntilDestroyed(),
       )
-      .subscribe(([event, dragDistance]) => {
+      .subscribe(({event, dragDistance, scrollDistance}) => {
         switch (event.type) {
           case 'dragstart':
             this.onTabDragStart();
@@ -504,7 +522,7 @@ export class PartBarComponent implements OnDestroy {
             this.onTabbarDragEnter(event);
             break;
           case 'dragover':
-            this.onTabbarDragOver(event, dragDistance);
+            this.onTabbarDragOver(event, dragDistance, scrollDistance);
             break;
           case 'dragleave':
             this.onTabbarDragLeave(event);
@@ -524,21 +542,24 @@ export class PartBarComponent implements OnDestroy {
       .subscribe(event => this.onTabMoved(event));
 
     /**
-     * Calculates the distance the drag pointer has moved since the last drag event.
+     * Calculates the distance the drag pointer and viewport have moved since the last drag event.
      */
-    function calculateDragDistance(): OperatorFunction<DragEvent, [DragEvent, DragDistance]> {
-      return pipe(
-        startWith(undefined), // initialize pairwise operator
-        pairwise(),
-        map(([previousDragEvent, currentDragEvent]): [DragEvent, DragDistance] => {
-          const {screenX, screenY} = currentDragEvent!;
-          const distance = {
-            x: screenX - (previousDragEvent?.screenX ?? screenX),
-            y: screenY - (previousDragEvent?.screenY ?? screenY),
-          };
-          return [currentDragEvent!, distance];
-        }),
-      );
+    function calculateDistance(viewport: () => SciViewportComponent): OperatorFunction<DragEvent, DragEventPlusDistance> {
+      return source$ => new Observable<DragEventPlusDistance>(observer => {
+        let previousScreenX: number | undefined;
+        let previousScrollLeft: number | undefined;
+
+        const subscription = source$.subscribe(event => {
+          observer.next({
+            event,
+            dragDistance: event.screenX - (previousScreenX ?? event.screenX),
+            scrollDistance: viewport().scrollLeft - (previousScrollLeft ?? viewport().scrollLeft),
+          });
+          previousScreenX = event.screenX;
+          previousScrollLeft = viewport().scrollLeft;
+        });
+        return () => subscription.unsubscribe();
+      });
     }
   }
 
@@ -593,9 +614,19 @@ export class PartBarComponent implements OnDestroy {
 }
 
 /**
- * Distance the drag pointer has moved since the last drag event.
+ * Contains the event plus drag and scroll distance.
  */
-interface DragDistance {
-  x: number;
-  y: number;
+interface DragEventPlusDistance {
+  /**
+   * Reference to the drag event.
+   */
+  event: DragEvent;
+  /**
+   * Distance the drag pointer has moved since the last drag event.
+   */
+  dragDistance: number;
+  /**
+   * Distance the viewport has scrolled since the last drag event.
+   */
+  scrollDistance: number;
 }
