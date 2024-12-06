@@ -840,15 +840,15 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
-    await tab1.setWidth('100px');
+    await tab1.setWidth('200px');
 
     const tab2 = appPO.view({viewId: 'view.102'}).tab;
     await tab2.setTitle('view.102');
-    await tab2.setWidth('100px');
+    await tab2.setWidth('200px');
 
     const tab3 = appPO.view({viewId: 'view.103'}).tab;
     await tab3.setTitle('view.103');
-    await tab3.setWidth('100px');
+    await tab3.setWidth('200px');
 
     // Register part action.
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);

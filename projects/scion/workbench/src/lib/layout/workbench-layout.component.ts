@@ -94,6 +94,7 @@ export class WorkbenchLayoutComponent {
         workbenchId: this._workbenchId,
         dropRegion: event.dropRegion,
       }),
+      dragData: event.dragData,
     });
   }
 }

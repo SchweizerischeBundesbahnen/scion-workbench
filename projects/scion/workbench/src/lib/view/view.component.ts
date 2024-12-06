@@ -56,7 +56,7 @@ export class ViewComponent implements OnDestroy, OnAttach, OnDetach {
 
   @HostBinding('class.view-drag')
   public get isViewDragActive(): boolean {
-    return this._viewDragService.viewDragData !== null;
+    return this._viewDragService.viewDragData() !== null;
   }
 
   constructor(private _view: ɵWorkbenchView,

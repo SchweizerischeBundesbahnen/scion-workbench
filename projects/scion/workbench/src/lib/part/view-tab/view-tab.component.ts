@@ -26,6 +26,7 @@ import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {NgClass} from '@angular/common';
 import {boundingClientRect} from '@scion/components/dimension';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -139,6 +140,7 @@ export class ViewTabComponent {
     event.dataTransfer.setDragImage(createElement('div', {style: {display: 'none'}}), 0, 0);
 
     this._viewDragService.setViewDragData({
+      uid: UUID.randomUUID(),
       viewId: view.id,
       viewTitle: view.title(),
       viewHeading: view.heading(),
@@ -162,12 +164,8 @@ export class ViewTabComponent {
     }
   }
 
-  @HostListener('dragend', ['$event'])
-  public onDragEnd(event: DragEvent): void {
-    // Ensure this view stays activated if the user cancels the drag operation. But, do not push the navigation into browsing history stack.
-    if (event.dataTransfer?.dropEffect === 'none') {
-      this.view().activate({skipLocationChange: true}).then();
-    }
+  @HostListener('dragend')
+  public onDragEnd(): void {
     this._viewDragService.unsetViewDragData();
   }
 

@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, HostListener, inject, NgZone, Signal, signal, untracked, viewChild, viewChildren} from '@angular/core';
+import {Component, computed, effect, ElementRef, HostListener, inject, NgZone, OnDestroy, Signal, signal, untracked, viewChild, viewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {map, mergeMap, startWith, takeUntil} from 'rxjs/operators';
-import {firstValueFrom, from, fromEvent, merge, OperatorFunction, pairwise, pipe, Subject, timer} from 'rxjs';
+import {from, fromEvent, merge, OperatorFunction, pairwise, pipe, Subject, timer} from 'rxjs';
 import {ConstrainFn, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
-import {ViewDragData, ViewDragService} from '../../view-dnd/view-drag.service';
+import {ViewDragData, ViewDragService, ViewMoveEvent} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {filterArray, subscribeIn} from '@scion/toolkit/operators';
@@ -25,7 +25,6 @@ import {ViewListButtonComponent} from '../view-list-button/view-list-button.comp
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {clamp} from '../../common/math.util';
-import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 
 /**
  * Renders view tabs and actions of a {@link WorkbenchPart}.
@@ -33,15 +32,19 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
  * Tabs are added to a viewport, which the user can scroll if not enough space. The viewport grows with its tabs,
  * allowing actions to be placed directly after the last tab or on the right side.
  *
- * ## Drag Events
+ * ## Drag and Drop
+ * This component subscribes to drag events to visualize tabs during a drag operation. The drag operation is initiated in {@link ViewTabComponent}.
+ *
  * We use native drag and drop to support dragging views to other windows.
  *
- * By listening to drag events, the tabbar visualizes tabs during a drag operation. The drag operation is initiated in {@link ViewTabComponent}.
- * - `dragstart` and `dragend` events are fired in the tabbar where the drag operation was initiated.
- * - `dragenter` event is fired when a tab enters the tabbar.
- * - `dragover` events are fired when dragging a tab over the tabbar.
- * - `dragleave` event is fired when a tab leaves the tabbar.
- * - `drop` event is fired when the user drops a tab in the tabbar.
+ * The following events are fired:
+ * - dragstart: when start dragging a tab (only received in the tabbar where the drag operation was started)
+ * - dragend:   when end dragging a tab, either via drop or cancel (only received in the tabbar where the drag operation was started)
+ * - dragenter: when a tab enters the tabbar
+ * - dragover:  when dragging a tab over the tabbar, every few hundred milliseconds
+ * - dragleave: when a tab leaves the tabbar
+ * - drop:      when the user drops a tab in the tabbar
+ *
  * - Note that `dragleave` event is not fired on drop action. Therefore, always handle both events, `dragleave` and `drop` events, respectively.
  *
  * ## Terminology
@@ -62,12 +65,11 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     ViewListButtonComponent,
   ],
 })
-export class PartBarComponent {
+export class PartBarComponent implements OnDestroy {
 
   private readonly _host = inject(ElementRef<HTMLElement>).nativeElement;
   private readonly _viewportChange$ = new Subject<void>();
   private readonly _workbenchId = inject(WORKBENCH_ID);
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _router = inject(ɵWorkbenchRouter);
   private readonly _viewTabDragImageRenderer = inject(ViewTabDragImageRenderer);
   private readonly _viewDragService = inject(ViewDragService);
@@ -135,18 +137,15 @@ export class PartBarComponent {
 
   /**
    * Method invoked when the user starts dragging a tab of this tabbar.
+   *
+   * This method is only called in the tabbar where the drag started.
    */
-  @HostListener('dragstart', ['$event'])
-  protected onViewDragStart(event: DragEvent): void {
-    if (!this._viewDragService.isViewDragEvent(event)) {
-      return;
-    }
-
+  private onTabDragStart(): void {
     // Memoize drag data.
-    this._dragData = this._viewDragService.viewDragData!;
+    this._dragData = this._viewDragService.viewDragData()!;
 
     // Indicate dragging over this tabbar.
-    this._viewDragService.setTabbarDragover(this.part.id);
+    this._viewDragService.signalTabbarDragEnter(this.part.id);
 
     // Snap drag image to tabbar when dragging near it.
     this._constrainFn = this.createDragImageConstrainFn();
@@ -170,11 +169,28 @@ export class PartBarComponent {
   }
 
   /**
-   * Method invoked when the user ends dragging a tab of this tabbar.
+   * Method invoked when the user ends dragging a tab of this tabbar, either by drop or cancel.
+   *
+   * This method is only called in the tabbar where the drag started.
    */
-  @HostListener('dragend')
-  public onViewDragEnd(): void {
-    this.unsetDragState();
+  private onTabDragEnd(event: DragEvent): void {
+    // Unset drag state only on cancel, not on drop, to prevent tabs from temporarily reverting to their pre-drag state. Drag state is reset in `onTabMoved` after a drop.
+    if (event.dataTransfer!.dropEffect === 'none') {
+      // Reactivate the drag source view on cancel.
+      this.dragSourceViewTab()?.view().activate({skipLocationChange: true}).then();
+      // Unset drag state.
+      this.unsetDragState();
+    }
+  }
+
+  /**
+   * Method invoked when the layout has changed after a drop. The drop may not be related to a tab of this tabbar.
+   */
+  private onTabMoved(event: ViewMoveEvent): void {
+    // Unset drag state only if this tabbar is involved in the drag and no new drag has started.
+    if (this._dragData && event.dragData?.uid === this._dragData?.uid) {
+      this.unsetDragState();
+    }
   }
 
   /**
@@ -182,10 +198,10 @@ export class PartBarComponent {
    */
   private onTabbarDragEnter(event: DragEvent): void {
     // Memoize drag data.
-    const dragData = this._dragData = this._viewDragService.viewDragData!;
+    const dragData = this._dragData = this._viewDragService.viewDragData()!;
 
     // Indicate dragging over this tabbar.
-    this._viewDragService.setTabbarDragover(this.part.id);
+    this._viewDragService.signalTabbarDragEnter(this.part.id);
 
     // Snap drag image to tabbar when dragging near it.
     this._constrainFn = this.createDragImageConstrainFn();
@@ -276,13 +292,6 @@ export class PartBarComponent {
     const dropTargetViewTab = this.dropTargetViewTab()!;
     const dropPosition = dropTargetViewTab === 'end' ? 'end' : this._viewTabs().indexOf(dropTargetViewTab);
 
-    // Perform the drop only if the layout will change, i.e., not when dropping the tab at the same position.
-    if (!this.isChangingTabbar(dragData, dropPosition)) {
-      this.unsetDragState();
-      return;
-    }
-
-    // Perform the drop.
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: dragData.workbenchId,
@@ -299,41 +308,8 @@ export class PartBarComponent {
         position: dropPosition,
         elementId: this.part.id,
       },
+      dragData: dragData,
     });
-
-    // Wait to reset the drag state until the layout change is applied,
-    // preventing tabs from temporarily reverting to the state before the drag operation.
-    await firstValueFrom(this._workbenchLayoutService.onLayoutChange$);
-
-    // Unset the drag state only if a new drag operation has not started in the meantime.
-    if (this._dragData === dragData) {
-      this.unsetDragState();
-    }
-  }
-
-  /**
-   * Checks if dragging will change the tabs of the tabbar.
-   */
-  private isChangingTabbar(dragData: ViewDragData, dropPosition: number | 'end'): boolean {
-    // Test if dragging tab to a different part.
-    if (dragData.partId !== this.part.id) {
-      return true;
-    }
-
-    // Test if the tab order has changed.
-    const layout = this._workbenchLayoutService.layout()!;
-    const viewId = dragData.viewId;
-    const viewIndex = this.part.viewIds().indexOf(viewId);
-    const newViewIndex = layout
-      .moveView(viewId, this.part.id, {position: dropPosition})
-      .views({partId: this.part.id})
-      .findIndex(view => view.id === viewId);
-    if (newViewIndex !== viewIndex) {
-      return true;
-    }
-
-    // Test if the active tab has changed.
-    return layout.part({viewId}).activeViewId !== viewId;
   }
 
   /**
@@ -430,18 +406,18 @@ export class PartBarComponent {
   /**
    * Cleans up the drag state, unsetting the drag source based on provided options.
    */
-  private unsetDragState(options?: {unsetDragSource?: boolean}): void {
+  private unsetDragState(options?: {unsetDragSource?: false}): void {
     if (options?.unsetDragSource ?? true) {
       this.dragSourceViewTab.set(null);
+      this._dragData = null;
     }
     this.dropTargetViewTab.set(null);
-    this._dragData = null;
     this._viewTabDragImageRenderer.unsetConstrainDragImageRectFn(this._constrainFn!);
     this._constrainFn = null;
 
     unsetCssClass(this._host, 'drag-over', 'pointer-events-disabled');
     unsetCssVariable(this._host, '--ɵpart-bar-drag-source-width', '--ɵpart-bar-drag-placeholder-width');
-    this._viewDragService.unsetTabbarDragover(this.part.id);
+    this._viewDragService.signalTabbarDragLeave(this.part.id);
   }
 
   /**
@@ -504,11 +480,12 @@ export class PartBarComponent {
   }
 
   /**
-   * Subscribes to native drag events.
+   * Subscribes to drag events.
    */
   private installViewDragListener(): void {
     const zone = inject(NgZone);
 
+    // Subscribe to drag events relevant for this tabbar.
     this._viewDragService.viewDrag$(this._host)
       .pipe(
         subscribeIn(fn => zone.runOutsideAngular(fn)),
@@ -517,6 +494,12 @@ export class PartBarComponent {
       )
       .subscribe(([event, dragDistance]) => {
         switch (event.type) {
+          case 'dragstart':
+            this.onTabDragStart();
+            break;
+          case 'dragend':
+            this.onTabDragEnd(event);
+            break;
           case 'dragenter':
             this.onTabbarDragEnter(event);
             break;
@@ -532,6 +515,14 @@ export class PartBarComponent {
         }
       });
 
+    // Get notified when a view has moved in the layout.
+    this._viewDragService.viewMoved$
+      .pipe(
+        subscribeIn(fn => zone.runOutsideAngular(fn)),
+        takeUntilDestroyed(),
+      )
+      .subscribe(event => this.onTabMoved(event));
+
     /**
      * Calculates the distance the drag pointer has moved since the last drag event.
      */
@@ -539,13 +530,13 @@ export class PartBarComponent {
       return pipe(
         startWith(undefined), // initialize pairwise operator
         pairwise(),
-        map(([previousDragEvent, currrentDragEvent]): [DragEvent, DragDistance] => {
-          const {screenX, screenY} = currrentDragEvent!;
+        map(([previousDragEvent, currentDragEvent]): [DragEvent, DragDistance] => {
+          const {screenX, screenY} = currentDragEvent!;
           const distance = {
             x: screenX - (previousDragEvent?.screenX ?? screenX),
             y: screenY - (previousDragEvent?.screenY ?? screenY),
           };
-          return [currrentDragEvent!, distance];
+          return [currentDragEvent!, distance];
         }),
       );
     }
@@ -594,6 +585,10 @@ export class PartBarComponent {
         '--ɵpart-bar-indent-right': `${this._tabbarIndent.right}px`,
       });
     });
+  }
+
+  public ngOnDestroy(): void {
+    this.unsetDragState();
   }
 }
 

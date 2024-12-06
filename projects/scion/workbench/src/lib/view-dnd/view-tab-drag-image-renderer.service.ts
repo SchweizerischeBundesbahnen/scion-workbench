@@ -88,7 +88,7 @@ export class ViewTabDragImageRenderer {
    * Method invoked while dragging a view over the current window. It is invoked outside the Angular zone.
    */
   private onWindowDragOver(event: DragEvent): void {
-    const dragPosition = this.calculateDragImageRect(this._viewDragService.viewDragData!, event);
+    const dragPosition = this.calculateDragImageRect(this._viewDragService.viewDragData()!, event);
     this.updateDragImagePosition(dragPosition);
   }
 
@@ -114,7 +114,7 @@ export class ViewTabDragImageRenderer {
   }
 
   private createDragImage(event: DragEvent): void {
-    const dragData = this._viewDragService.viewDragData!;
+    const dragData = this._viewDragService.viewDragData()!;
     const dragPosition = this.calculateDragImageRect(dragData, event);
 
     if (this._viewDragImagePortalOutlet) {

@@ -152,7 +152,7 @@ export class ViewDropZoneDirective implements OnInit {
           case 'drop':
             this._zone.run(() => this.viewDrop.emit({
               dropRegion: region,
-              dragData: this._viewDragService.viewDragData!,
+              dragData: this._viewDragService.viewDragData()!,
             }));
             break;
         }
