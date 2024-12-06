@@ -77,9 +77,9 @@ export class ViewTabDragImageComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(partId => {
         // Compute if dragging this view tab over a tabbar.
-        this.isDragOverTabbar = partId !== null;
+        this.isDragOverTabbar = !!partId;
         // Compute if dragging this view tab over a tabbar located in the peripheral area.
-        this.isDragOverPeripheralTabbar = partId !== null && documentRoot.querySelector(`wb-workbench:has(wb-main-area-layout) wb-part[data-partid="${partId}"]:not(.main-area)`) !== null;
+        this.isDragOverPeripheralTabbar = !!partId && documentRoot.querySelector(`wb-workbench:has(wb-main-area-layout) wb-part[data-partid="${partId}"]:not(.main-area)`) !== null;
       });
   }
 }

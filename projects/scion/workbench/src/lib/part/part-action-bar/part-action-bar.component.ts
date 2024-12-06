@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, Signal} from '@angular/core';
-import {WorkbenchPart} from '../workbench-part.model';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {NgClass} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
 import {WorkbenchPartAction} from '../../workbench.model';
@@ -27,11 +26,5 @@ import {WorkbenchPartAction} from '../../workbench.model';
 })
 export class PartActionBarComponent {
 
-  protected startActions: Signal<WorkbenchPartAction[]>;
-  protected endActions: Signal<WorkbenchPartAction[]>;
-
-  constructor(part: WorkbenchPart) {
-    this.startActions = computed(() => part.actions().filter(action => action.align !== 'end'));
-    this.endActions = computed(() => part.actions().filter(action => action.align === 'end'));
-  }
+  public actions = input.required<WorkbenchPartAction[]>();
 }

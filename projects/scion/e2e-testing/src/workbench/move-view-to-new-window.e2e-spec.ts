@@ -339,7 +339,9 @@ test.describe('Workbench View', () => {
     // Move peripheral view to workbench grid.
     const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
     const peripheralViewId = await peripheralViewPage.getViewId();
-    await peripheralViewPage.tab.dragTo({grid: 'workbench', region: 'east'});
+    const dragHandle = await peripheralViewPage.tab.startDrag();
+    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.drop();
 
     // Expect peripheral view to be dragged to the workbench grid.
     await expect(newWindow.appPO.workbench).toEqualWorkbenchLayout({
@@ -435,7 +437,9 @@ test.describe('Workbench View', () => {
     // Move peripheral view to workbench grid.
     const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
     const peripheralViewId = await peripheralViewPage.getViewId();
-    await peripheralViewPage.tab.dragTo({grid: 'workbench', region: 'east'});
+    const dragHandle = await peripheralViewPage.tab.startDrag();
+    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.drop();
 
     // Expect peripheral view to be dragged to the workbench grid.
     await expect(newWindow.appPO.workbench).toEqualWorkbenchLayout({

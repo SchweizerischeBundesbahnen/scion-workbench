@@ -131,7 +131,7 @@ test.describe('Workbench Router', () => {
     await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // close all view tabs
-    await appPO.activePart({inMainArea: true}).closeViewTabs();
+    await appPO.activePart({inMainArea: true}).bar.closeTabs();
 
     await expect(appPO.views()).toHaveCount(0);
 
@@ -1386,10 +1386,10 @@ test.describe('Workbench Router', () => {
     });
 
     // Expect views in the left part to be closed.
-    await expect.poll(() => appPO.part({partId: 'left'}).getViewIds()).toEqual(['view.103']);
+    await expect.poll(() => appPO.part({partId: 'left'}).bar.getViewIds()).toEqual(['view.103']);
 
     // Expect view in the right part not to be closed.
-    await expect.poll(() => appPO.part({partId: 'right'}).getViewIds()).toEqual(['view.104']);
+    await expect.poll(() => appPO.part({partId: 'right'}).bar.getViewIds()).toEqual(['view.104']);
   });
 
   test('should support app URL to contain view outlets of views in the workbench grid', async ({appPO, workbenchNavigator}) => {

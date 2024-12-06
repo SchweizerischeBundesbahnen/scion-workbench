@@ -26,18 +26,18 @@ test.describe('Workbench Part Action Directive', () => {
     await viewPage2.addViewAction({content: 'launch', cssClass: 'view-2-launch-action'});
 
     await view1.tab.click();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-1-search-action'}).locator).toBeVisible();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-1-search-action'}).locator).toBeVisible();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
 
     await view2.tab.click();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-settings-action'}).locator).toBeVisible();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-launch-action'}).locator).toBeVisible();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-settings-action'}).locator).toBeVisible();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-launch-action'}).locator).toBeVisible();
 
-    await appPO.activePart({inMainArea: true}).closeViewTabs();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
-    await expect(appPO.activePart({inMainArea: true}).action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
+    await appPO.activePart({inMainArea: true}).bar.closeTabs();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
+    await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();
   });
 });

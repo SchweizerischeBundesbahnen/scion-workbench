@@ -124,14 +124,18 @@ test.describe('Workbench Page Not Found', () => {
     const viewPage = new PageNotFoundPagePO(appPO, {viewId: 'view.101'});
 
     // Drag view to right part.
-    await viewPage.view.tab.dragTo({partId: 'right', region: 'center'});
+    const dragHandle1 = await viewPage.view.tab.startDrag();
+    await dragHandle1.dragToPart('right', {region: 'center'});
+    await dragHandle1.drop();
 
     // Expect view to be moved to right part.
     await expectView(viewPage).toBeActive();
     await expect.poll(() => viewPage.view.part.getPartId()).toEqual('right');
 
     // Drag view to main area part
-    await viewPage.view.tab.dragTo({partId: initialPartId, region: 'center'});
+    const dragHandle2 = await viewPage.view.tab.startDrag();
+    await dragHandle2.dragToPart(initialPartId, {region: 'center'});
+    await dragHandle2.drop();
     await expectView(viewPage).toBeActive();
     await expect.poll(() => viewPage.view.part.getPartId()).toEqual(initialPartId);
 

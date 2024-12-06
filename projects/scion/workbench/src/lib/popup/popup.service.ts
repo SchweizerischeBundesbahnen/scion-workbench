@@ -28,6 +28,7 @@ import {provideViewContext} from '../view/view-context-provider';
 import {UUID} from '@scion/toolkit/uuid';
 import {boundingClientRect} from '@scion/components/dimension';
 import {coerceElement} from '@angular/cdk/coercion';
+import {clamp} from '../common/math.util';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
@@ -366,17 +367,13 @@ function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
 }
 
 function constrainClientRect(clientRect: DOMRect, constraints: DOMRect): DOMRect {
-  const top = minmax(clientRect.top, {min: constraints.top, max: constraints.bottom});
-  const right = minmax(clientRect.right, {min: constraints.left, max: constraints.right});
-  const bottom = minmax(clientRect.bottom, {min: constraints.top, max: constraints.bottom});
-  const left = minmax(clientRect.left, {min: constraints.left, max: constraints.right});
+  const top = clamp(clientRect.top, {min: constraints.top, max: constraints.bottom});
+  const right = clamp(clientRect.right, {min: constraints.left, max: constraints.right});
+  const bottom = clamp(clientRect.bottom, {min: constraints.top, max: constraints.bottom});
+  const left = clamp(clientRect.left, {min: constraints.left, max: constraints.right});
   const width = right - left;
   const height = bottom - top;
   return new DOMRect(left, top, width, height);
-}
-
-function minmax(value: number, minmax: {min: number; max: number}): number {
-  return Math.max(minmax.min, Math.min(value, minmax.max));
 }
 
 function isEqualDomRect(a: DOMRect | undefined, b: DOMRect | undefined): boolean {

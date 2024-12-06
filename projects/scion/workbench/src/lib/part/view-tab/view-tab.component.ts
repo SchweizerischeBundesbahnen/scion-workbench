@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,8 @@ import {subscribeIn} from '@scion/toolkit/operators';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {NgClass} from '@angular/common';
+import {boundingClientRect} from '@scion/components/dimension';
+import {UUID} from '@scion/toolkit/uuid';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -56,6 +58,7 @@ export class ViewTabComponent {
   public readonly host = inject(ElementRef<HTMLElement>).nativeElement;
   public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))});
   public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
+  public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
   @HostBinding('attr.draggable')
   public draggable = true;
@@ -126,45 +129,43 @@ export class ViewTabComponent {
 
   @HostListener('dragstart', ['$event'])
   public onDragStart(event: DragEvent): void {
+    if (!event.dataTransfer) {
+      return;
+    }
+
     const view = this.view();
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData(VIEW_DRAG_TRANSFER_TYPE, view.id);
+    // Use an invisible <div> as the native drag image because the workbench renders the drag image in {@link ViewTabDragImageRenderer}.
+    event.dataTransfer.setDragImage(createElement('div', {style: {display: 'none'}}), 0, 0);
 
-    view.activate().then(() => {
-      if (!event.dataTransfer) {
-        return;
-      }
-
-      event.dataTransfer.effectAllowed = 'move';
-      event.dataTransfer.setData(VIEW_DRAG_TRANSFER_TYPE, view.id);
-      // Use an invisible <div> as the native drag image because the effective drag image is rendered by {ViewTabDragImageRenderer}.
-      event.dataTransfer.setDragImage(createElement('div', {style: {display: 'none'}}), 0, 0);
-
-      this._viewDragService.setViewDragData({
-        viewId: view.id,
-        viewTitle: view.title(),
-        viewHeading: view.heading(),
-        viewDirty: view.dirty(),
-        viewClosable: view.closable(),
-        viewUrlSegments: view.urlSegments(),
-        alternativeViewId: view.alternativeId,
-        navigationHint: view.navigationHint(),
-        navigationData: view.navigationData(),
-        partId: view.part().id,
-        viewTabPointerOffsetX: event.offsetX,
-        viewTabPointerOffsetY: event.offsetY,
-        viewTabWidth: this.host.getBoundingClientRect().width,
-        viewTabHeight: this.host.getBoundingClientRect().height,
-        workbenchId: this._workbenchId,
-        classList: view.classList.asMap(),
-      });
+    this._viewDragService.setViewDragData({
+      uid: UUID.randomUUID(),
+      viewId: view.id,
+      viewTitle: view.title(),
+      viewHeading: view.heading(),
+      viewDirty: view.dirty(),
+      viewClosable: view.closable(),
+      viewUrlSegments: view.urlSegments(),
+      alternativeViewId: view.alternativeId,
+      navigationHint: view.navigationHint(),
+      navigationData: view.navigationData(),
+      partId: view.part().id,
+      viewTabPointerOffsetX: event.offsetX,
+      viewTabPointerOffsetY: event.offsetY,
+      viewTabWidth: this.host.getBoundingClientRect().width,
+      viewTabHeight: this.host.getBoundingClientRect().height,
+      workbenchId: this._workbenchId,
+      classList: view.classList.asMap(),
     });
+
+    if (!view.active()) {
+      view.activate().then();
+    }
   }
 
-  @HostListener('dragend', ['$event'])
-  public onDragEnd(event: DragEvent): void {
-    // Ensure this view stays activated if the user cancels the drag operation. But, do not push the navigation into browsing history stack.
-    if (event.dataTransfer?.dropEffect === 'none') {
-      this.view().activate({skipLocationChange: true}).then();
-    }
+  @HostListener('dragend')
+  public onDragEnd(): void {
     this._viewDragService.unsetViewDragData();
   }
 

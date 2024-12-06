@@ -952,7 +952,9 @@ test.describe('Workbench View', () => {
     await expectView(testee2ViewPage).toBeActive();
 
     // Drag view in the layout.
-    await testee2ViewPage.view.tab.dragTo({partId: await testee2ViewPage.view.part.getPartId(), region: 'east'});
+    const dragHandle = await testee2ViewPage.view.tab.startDrag();
+    await dragHandle.dragToPart(await testee2ViewPage.view.part.getPartId(), {region: 'east'});
+    await dragHandle.drop();
 
     // Expect `CanClose` guard not to be invoked.
     await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
@@ -998,7 +1000,9 @@ test.describe('Workbench View', () => {
     await expectView(testee2ViewPage).toBeActive();
 
     // Drag view in the layout.
-    await testee2ViewPage.view.tab.dragTo({grid: 'workbench', region: 'east'});
+    const dragHandle = await testee2ViewPage.view.tab.startDrag();
+    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.drop();
 
     // Expect `CanClose` guard not to be invoked.
     await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
@@ -1167,7 +1171,9 @@ test.describe('Workbench View', () => {
     const view2ComponentId = await viewPage2.getComponentInstanceId();
 
     // Drag view 2 into peripheral area.
-    await viewPage2.view.tab.dragTo({grid: 'workbench', region: 'east'});
+    const dragHandle = await viewPage2.view.tab.startDrag();
+    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.drop();
 
     await expectView(viewPage1).toBeActive();
     await expectView(viewPage2).toBeActive();

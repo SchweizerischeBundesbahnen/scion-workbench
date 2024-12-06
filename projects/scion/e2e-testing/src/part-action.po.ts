@@ -9,6 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
+import {DomRect, fromRect} from './helper/testing.util';
 
 /**
  * Handle for interacting with a part action.
@@ -16,5 +17,9 @@ import {Locator} from '@playwright/test';
 export class PartActionPO {
 
   constructor(public readonly locator: Locator) {
+  }
+
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
   }
 }

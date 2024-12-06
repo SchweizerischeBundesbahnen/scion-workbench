@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fromRect, getCssClasses, getPerspectiveId, hasCssClass} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses, getPerspectiveId, hasCssClass} from './helper/testing.util';
 import {Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
 import {AppPO} from './app.po';
 import {ViewId} from '@scion/workbench';
+import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
+import {ViewDrageHandlePO} from './view-drag-handle.po';
 
 /**
  * Handle for interacting with a workbench view tab.
@@ -55,16 +57,6 @@ export class ViewTabPO {
 
   public async dblclick(): Promise<void> {
     await this.locator.dblclick();
-  }
-
-  /**
-   * Performs a mouse down on this view tab.
-   */
-  public async mousedown(): Promise<void> {
-    const bounds = fromRect(await this.locator.boundingBox());
-    const mouse = this.locator.page().mouse;
-    await mouse.move(bounds.hcenter, bounds.vcenter);
-    await mouse.down();
   }
 
   public async close(): Promise<void> {
@@ -112,31 +104,6 @@ export class ViewTabPO {
   }
 
   /**
-   * Activates drop zones on the specified target by moving the tab over the specified target.
-   */
-  public async activateDropZones(target: {partId: string}, options?: {steps?: number}): Promise<void>;
-  public async activateDropZones(target: {grid: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void>;
-  public async activateDropZones(target: {partId?: string; grid?: 'workbench' | 'mainArea'}, options?: {steps?: number}): Promise<void> {
-    // 1. Perform a "mousedown" on the view tab.
-    const mouse = this.locator.page().mouse;
-    await this.mousedown();
-
-    // 2. Locate the target.
-    const targetLocator = (() => {
-      if (target.partId) {
-        return this.locator.page().locator(`wb-part[data-partid="${target.partId}"]`).locator('div.e2e-active-view');
-      }
-      else {
-        return this.locator.page().locator(target.grid === 'mainArea' ? 'wb-main-area-layout' : 'wb-workbench-layout');
-      }
-    })();
-
-    // 3. Move the mouse pointer over the target.
-    const targetElementBounds = fromRect(await targetLocator.boundingBox());
-    await mouse.move(targetElementBounds.hcenter, targetElementBounds.vcenter, {steps: options?.steps ?? 1});
-  }
-
-  /**
    * Moves this view to a new browser window.
    */
   public async moveToNewWindow(): Promise<AppPO> {
@@ -158,7 +125,7 @@ export class ViewTabPO {
   /**
    * Moves this view to a different or new part in the specified region.
    *
-   * Unlike the {@link dragTo} method, this operation does not perform a drag and drop operation but
+   * Unlike the {@link startDrag} method, this operation does not perform a native drag and drop operation but
    * moves the view programmatically. Use this method to move a view to another window as not supported
    * by Playwright.
    */
@@ -178,69 +145,67 @@ export class ViewTabPO {
   }
 
   /**
-   * Drags this view tab to the specified region of specified part or grid.
+   * Starts dragging this tab.
    *
-   * @param target - Specifies the part or grid where to drop this view tab.
-   * @param target.partId - Specifies the part where to drag this tab.
-   * @param target.grid - Specifies the grid where to drag this tab.
-   * @param target.region - Specifies the region where to drop this tab in the specified target.
-   * @param options - Controls the drag operation.
-   * @param options.steps - Sets the number of intermediate events to be emitted while dragging; defaults to `2`.
-   * @param options.performDrop - Controls whether to perform the drop; defaults to `true`.
+   * Use the returned drag handle to control the drag operation.
    */
-  public async dragTo(target: {partId: string; region: 'north' | 'east' | 'south' | 'west' | 'center'}, options?: {steps?: number; performDrop?: boolean}): Promise<void>;
-  public async dragTo(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}, options?: {steps?: number; performDrop?: boolean}): Promise<void>;
-  public async dragTo(target: {partId?: string; grid?: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}, options?: {steps?: number; performDrop?: boolean}): Promise<void> {
-    // We cannot use {@link Locator#dragTo} because the workbench dynamically inserts drop zones when dragging over the target part.
-    // For this reason, we first perform a "mousedown" on the view tab, move the mouse to the specified region of the target element, and then perform a "mouseup".
-    // 1. Activate drop zones by moving the mouse over the specified target.
-    if (target.partId) {
-      await this.activateDropZones({partId: target.partId}, {steps: options?.steps});
-    }
-    else {
-      await this.activateDropZones({grid: target.grid!}, {steps: options?.steps});
-    }
+  public async startDrag(): Promise<ViewDrageHandlePO> {
+    const {hcenter, vcenter} = await this.getBoundingBox();
+    const page = this.locator.page();
 
-    // 2. Locate the drop zone.
-    const dropZoneLocator = (() => {
-      if (target.partId) {
-        return this.locator.page().locator(`wb-part[data-partid="${target.partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${target.region}.e2e-part`);
-      }
-      else {
-        const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
-        return this.locator.page().locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
-      }
-    })();
+    await page.mouse.move(hcenter, vcenter, {steps: 1});
+    await page.mouse.down();
 
-    // 3. Move the view tab over the drop zone.
-    const dropZoneBounds = fromRect(await dropZoneLocator.boundingBox());
-    const mouse = this.locator.page().mouse;
-    switch (target.region) {
-      case 'north':
-        // Moves the mouse to the bottom edge, just one pixel inside the drop zone
-        await mouse.move(dropZoneBounds.hcenter, dropZoneBounds.bottom - 1, {steps: 1});
-        break;
-      case 'south':
-        // Moves the mouse to the top edge, just one pixel inside the drop zone
-        await mouse.move(dropZoneBounds.hcenter, dropZoneBounds.top + 1, {steps: 1});
-        break;
-      case 'west':
-        // Moves the mouse to the right edge, just one pixel inside the drop zone
-        await mouse.move(dropZoneBounds.right - 1, dropZoneBounds.vcenter, {steps: 1});
-        break;
-      case 'east':
-        // Moves the mouse to the left edge, just one pixel inside the drop zone
-        await mouse.move(dropZoneBounds.left + 1, dropZoneBounds.vcenter, {steps: 1});
-        break;
-      case 'center':
-        // Moves the mouse to the center of the drop zone.
-        await mouse.move(dropZoneBounds.hcenter, dropZoneBounds.vcenter, {steps: 1});
-        break;
-    }
+    return new ViewDrageHandlePO(page.locator('wb-view-tab-drag-image'), {x: hcenter, y: vcenter});
+  }
 
-    // 4. Perform a "mouseup".
-    if (options?.performDrop ?? true) {
-      await this.locator.page().mouse.up();
+  /**
+   * Opens a dialog with information about the view.
+   */
+  public async openInfoDialog(): Promise<ViewInfoDialogPO> {
+    const contextMenu = await this.openContextMenu();
+    await contextMenu.menuItems.showViewInfo.click();
+
+    const dialog = new AppPO(this.locator.page()).dialog({cssClass: 'e2e-view-info'});
+    return new ViewInfoDialogPO(dialog);
+  }
+
+  /**
+   * Gets information about the view.
+   */
+  public async getInfo(): Promise<ViewInfo> {
+    const infoDialog = await this.openInfoDialog();
+
+    try {
+      return await infoDialog.getInfo();
     }
+    finally {
+      await infoDialog.close();
+    }
+  }
+
+  /**
+   * Enters the title of the view.
+   */
+  public async setTitle(title: string): Promise<void> {
+    const infoDialog = await this.openInfoDialog();
+    await infoDialog.enterTitle(title);
+    await infoDialog.close();
+  }
+
+  /**
+   * Sets the width of a tab.
+   */
+  public async setWidth(width: string): Promise<void> {
+    await this.locator.evaluate((viewTabElement: HTMLElement, width: string) => {
+      viewTabElement.style.setProperty('width', width);
+    }, width);
+  }
+
+  /**
+   * Gets the boundings box of the tab.
+   */
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
   }
 }
