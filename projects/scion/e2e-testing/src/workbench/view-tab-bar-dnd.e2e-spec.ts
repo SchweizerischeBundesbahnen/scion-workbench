@@ -17,6 +17,7 @@ import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {PartActionPO} from '../part-action.po';
 import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
+import {ConsoleLogs} from '../helper/console-logs';
 
 test.describe('View Drag & Drop (Tabbar)', () => {
 
@@ -530,7 +531,6 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await installPositionLogger(tab3.locator, {label: 'view.103'});
 
     // Clear log.
-    await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 
     // Start dragging.
@@ -573,13 +573,13 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
 
-    // Start Dragging.
-    const dragHandle = await tab.startDrag();
-
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
     await installPositionLogger(tab2.locator, {label: 'view.102'});
     await installPositionLogger(tab3.locator, {label: 'view.103'});
+
+    // Start Dragging.
+    const dragHandle = await tab.startDrag();
 
     // Clear log.
     await waitUntilStable(() => consoleLogs.get().length);
@@ -621,13 +621,13 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab4.setTitle('view.104');
     await tab4.setWidth('100px');
 
-    // Start dragging.
-    const dragHandle = await tab2.startDrag();
-
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
     await installPositionLogger(tab4.locator, {label: 'view.103'});
     await installPositionLogger(tab4.locator, {label: 'view.104'});
+
+    // Start dragging.
+    const dragHandle = await tab2.startDrag();
 
     // Clear log.
     await waitUntilStable(() => consoleLogs.get().length);
@@ -672,15 +672,15 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
 
-    // Start dragging.
-    const dragHandle = await tab1.startDrag();
-    await dragHandle.dragTo({x: await getHCenter(tab1), y: bottomTabbarBounds.vcenter});
-
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
     await installPositionLogger(tab2.locator, {label: 'view.102'});
     await installPositionLogger(tab3.locator, {label: 'view.201'});
     await installPositionLogger(tab4.locator, {label: 'view.202'});
+
+    // Start dragging.
+    const dragHandle = await tab1.startDrag();
+    await dragHandle.dragTo({x: await getHCenter(tab1), y: bottomTabbarBounds.vcenter});
 
     // Clear log.
     await waitUntilStable(() => consoleLogs.get().length);
@@ -728,15 +728,15 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
 
-    // Start dragging.
-    const dragHandle = await tab1.startDrag();
-    await dragHandle.dragTo({x: await getHCenter(tab1), y: bottomTabbarBounds.vcenter});
-
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
     await installPositionLogger(tab2.locator, {label: 'view.102'});
     await installPositionLogger(tab3.locator, {label: 'view.201'});
     await installPositionLogger(tab4.locator, {label: 'view.202'});
+
+    // Start dragging.
+    const dragHandle = await tab1.startDrag();
+    await dragHandle.dragTo({x: await getHCenter(tab1), y: bottomTabbarBounds.vcenter});
 
     // Clear log.
     await waitUntilStable(() => consoleLogs.get().length);
@@ -857,7 +857,6 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     // Wait until positioned the part action.
     await installPositionLogger(appPO.part({partId: 'main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
-    await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 
     // Start dragging the tab.
@@ -895,7 +894,6 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
 
     // Clear log.
-    await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 
     // Start dragging.
@@ -1019,9 +1017,10 @@ async function getWidth(tab: ViewTabPO | ViewDrageHandlePO | PartActionPO): Prom
 }
 
 async function installPositionLogger(locator: Locator, options: {label: string}): Promise<void> {
+  const consoleLogs = new ConsoleLogs(locator.page());
   await locator.evaluate((target: HTMLElement, label: string) => {
-    let x = 0;
-    let y = 0;
+    let x: number | undefined;
+    let y: number | undefined;
 
     logPosition();
 
@@ -1035,4 +1034,7 @@ async function installPositionLogger(locator: Locator, options: {label: string})
       requestAnimationFrame(logPosition);
     }
   }, options.label);
+
+  // Wait until installed the logger.
+  await expect.poll(() => consoleLogs.get({message: `[${options.label}] Position has changed`}).length).toBe(1);
 }
