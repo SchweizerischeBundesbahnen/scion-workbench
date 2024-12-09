@@ -1,50 +1,15 @@
-# [18.0.0-beta.9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.8...18.0.0-beta.9) (2024-11-25)
+# [18.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.9...18.0.0-beta.10) (2024-12-09)
 
 
 ### Bug Fixes
 
-* **workbench/view:** invoke `CanClose` guard in view injection context ([07ba936](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/07ba93604ec6862936a11badf6957d8582a0b687)), closes [#578](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/578)
-* **workbench/view:** prevent `CanClose` guard from blocking workbench navigation ([12e9e91](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/12e9e9140cf8db11c8fc188f463503ccaaf35195)), closes [#558](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/558)
-* **workbench/view:** prevent closing views with a pending `CanClose` guard ([4326a63](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/4326a63665ac8a40bfb040250f9a66c582aed7c6))
+* **workbench/view:** do not scroll the active tab into view when opening or closing an inactive tab ([a5d4d7e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a5d4d7e8e2b7e62382ee8140c683acb7476cc4e3))
+* **workbench/view:** scroll the active tab into view when navigating the active tab ([d10d25b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d10d25b8852d8bf5b8f891c2d00e3ffd245e7f86))
 
 
-### Features
+### Performance Improvements
 
-* **workbench/view:** add functional `CanClose` guard, deprecate class-based guard ([c2ee531](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c2ee531d483dbdbff72d468592908bb346002278))
+* **workbench:** improve drag experience when dragging tabs in the tabbar ([0ae78eb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0ae78ebd89068857e1869a118e8e3eee95d018a0))
 
 
-### Deprecations
 
-* **workbench/view:** The class-based `CanClose` guard has been deprecated in favor of a functional guard that can be registered on `WorkbenchView.canClose`.
-
-  Migrate by registering a callback on `WorkbenchView.canClose` instead of implementing the `CanClose` interface.
-
-  **Before migration:**
-  ```ts
-  import {CanClose} from '@scion/workbench';
-  import {Component} from '@angular/core';
-  
-  @Component({})
-  export class ViewComponent implements CanClose {
-  
-    public canClose(): boolean {
-      return true;
-    }
-  }
-  ```
-
-  **After migration:**
-  ```ts
-  import {Component, inject} from '@angular/core';
-  import {WorkbenchView} from '@scion/workbench';
-  
-  @Component({})
-  export class ViewComponent {
-  
-    constructor() {
-      inject(WorkbenchView).canClose(() => {
-        return true;
-      });
-    }
-  }
-  ```
