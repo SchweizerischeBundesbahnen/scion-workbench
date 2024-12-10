@@ -14,7 +14,7 @@ import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.
 import {WorkbenchConfig} from './workbench-config';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
-import {AsyncPipe, DOCUMENT, NgComponentOutlet} from '@angular/common';
+import {DOCUMENT, NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
@@ -34,7 +34,6 @@ import {Routing} from './routing/routing.util';
   styleUrls: ['./workbench.component.scss'],
   standalone: true,
   imports: [
-    AsyncPipe,
     NgComponentOutlet,
     WorkbenchLayoutComponent,
     NotificationListComponent,
@@ -103,12 +102,12 @@ export class WorkbenchComponent {
 
     // Provide reference to the iframe overlay host.
     const iframeOverlayHost = inject(IFRAME_OVERLAY_HOST);
-    effect(() => iframeOverlayHost.set(this._iframeOverlayHost()), {allowSignalWrites: true});
+    effect(() => iframeOverlayHost.set(this._iframeOverlayHost()));
     inject(DestroyRef).onDestroy(() => iframeOverlayHost.set(undefined));
 
     // Provide reference to the view drop zone overlay host.
     const viewDropZoneOverlayHost = inject(VIEW_DROP_ZONE_OVERLAY_HOST);
-    effect(() => viewDropZoneOverlayHost.set(this._viewDropZoneOverlayHost()), {allowSignalWrites: true});
+    effect(() => viewDropZoneOverlayHost.set(this._viewDropZoneOverlayHost()));
     inject(DestroyRef).onDestroy(() => viewDropZoneOverlayHost.set(undefined));
   }
 
