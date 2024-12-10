@@ -63,7 +63,7 @@ export const MicrofrontendViewRoutes = {
       }
 
       const {layout} = injector.get(ɵWorkbenchRouter).getCurrentNavigationContext();
-      const navigationState = layout.navigationState({viewId: outlet});
+      const navigationState = layout.navigationState({outlet});
       const transientParams = navigationState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
       const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);
 

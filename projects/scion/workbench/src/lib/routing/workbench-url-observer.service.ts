@@ -34,7 +34,7 @@ import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
 import {canMatchNotFoundPage} from './workbench-route-guards';
 import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
-import {WorkbenchViewOutletDiffer} from './workbench-view-outlet-differ';
+import {WorkbenchOutletDiffer} from './workbench-outlet-differ';
 import {filter} from 'rxjs/operators';
 
 /**
@@ -58,7 +58,7 @@ export class WorkbenchUrlObserver {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
   private readonly _workbenchLayoutDiffer = inject(WorkbenchLayoutDiffer);
-  private readonly _workbenchViewOutletDiffer = inject(WorkbenchViewOutletDiffer);
+  private readonly _workbenchOutletDiffer = inject(WorkbenchOutletDiffer);
   private readonly _workbenchPopupDiffer = inject(WorkbenchPopupDiffer);
   private readonly _workbenchDialogDiffer = inject(WorkbenchDialogDiffer);
   private readonly _workbenchMessageBoxDiffer = inject(WorkbenchMessageBoxDiffer);
@@ -140,7 +140,7 @@ export class WorkbenchUrlObserver {
       perspectiveId: workbenchNavigationalState?.perspectiveId ?? previousLayout?.perspectiveId,
       maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
       navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
-      viewOutlets: Object.fromEntries(Routing.parseViewOutlets(urlTree)),
+      outlets: Object.fromEntries(Routing.parseOutlets(urlTree, {part: true, view: true})),
     });
 
     const undoActions = new Array<() => void>();
@@ -150,14 +150,14 @@ export class WorkbenchUrlObserver {
       layout: newLayout,
       previousLayout,
       layoutDiff: this._workbenchLayoutDiffer.diff(newLayout),
-      viewOutletDiff: this._workbenchViewOutletDiffer.diff(newLayout, urlTree),
+      outletDiff: this._workbenchOutletDiffer.diff(newLayout, urlTree),
       popupDiff: this._workbenchPopupDiffer.diff(urlTree),
       dialogDiff: this._workbenchDialogDiffer.diff(urlTree),
       messageBoxDiff: this._workbenchMessageBoxDiffer.diff(urlTree),
       undoChanges: () => {
         // Revert differs to the state before the navigation.
         this._workbenchLayoutDiffer.diff(previousLayout);
-        this._workbenchViewOutletDiffer.diff(previousLayout, previousUrl);
+        this._workbenchOutletDiffer.diff(previousLayout, previousUrl);
         this._workbenchPopupDiffer.diff(previousUrl);
         this._workbenchDialogDiffer.diff(previousUrl);
         this._workbenchMessageBoxDiffer.diff(previousUrl);
@@ -177,7 +177,7 @@ export class WorkbenchUrlObserver {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
 
     // Register view auxiliary routes.
-    const addedViewOutlets = navigationContext.viewOutletDiff.addedViewOutlets;
+    const addedViewOutlets = navigationContext.outletDiff.addedViewOutlets;
     if (addedViewOutlets.length) {
       const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {canMatchNotFoundPage: [canMatchNotFoundPage]});
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
@@ -217,7 +217,7 @@ export class WorkbenchUrlObserver {
   private unregisterRemovedOutletAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const removedOutlets: string[] = [
-      ...navigationContext.viewOutletDiff.removedViewOutlets,
+      ...navigationContext.outletDiff.removedViewOutlets,
       ...navigationContext.popupDiff.removedPopupOutlets,
       ...navigationContext.dialogDiff.removedDialogOutlets,
       ...navigationContext.messageBoxDiff.removedMessageBoxOutlets,

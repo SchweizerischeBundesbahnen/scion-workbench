@@ -10,7 +10,7 @@
 
 import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
-import {DIALOG_ID_PREFIX, MESSAGE_BOX_ID_PREFIX, POPUP_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
+import {DIALOG_ID_PREFIX, MESSAGE_BOX_ID_PREFIX, PART_ID_PREFIX, POPUP_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
 import {inject} from '@angular/core';
 import {ViewId} from '../view/workbench-view.model';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
@@ -101,6 +101,13 @@ export const Routing = {
   },
 
   /**
+   * Tests if the given outlet matches the format of the part outlet.
+   */
+  isPartOutlet: (outlet: string | undefined | null): outlet is `part.${string}` => {
+    return outlet?.startsWith(PART_ID_PREFIX) ?? false;
+  },
+
+  /**
    * Tests if the given outlet matches the format of the view outlet.
    */
   isViewOutlet: (outlet: string | undefined | null): outlet is ViewId => {
@@ -129,19 +136,11 @@ export const Routing = {
   },
 
   /**
-   * Reads view outlets from given URL.
+   * Reads outlets from given URL.
    *
-   * A view outlet contains the URL segments of a view contained in the workbench layout.
+   * An outlet contains the URL segments of a part or view contained in the workbench layout.
    */
-  parseViewOutlets: (url: UrlTree): Map<ViewId, UrlSegment[]> => {
-    const viewOutlets = new Map<ViewId, UrlSegment[]>();
-    Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
-      if (Routing.isViewOutlet(outlet)) {
-        viewOutlets.set(outlet, segmentGroup.segments);
-      }
-    });
-    return viewOutlets;
-  },
+  parseOutlets: parseOutlets,
 
   /**
    * Tests if given route has an empty path from root.
@@ -246,3 +245,18 @@ export const Routing = {
   },
 } as const;
 
+function parseOutlets(url: UrlTree, filter: {view: true}): Map<ViewId, UrlSegment[]>;
+function parseOutlets(url: UrlTree, filter: {part: true}): Map<string, UrlSegment[]>;
+function parseOutlets(url: UrlTree, filter: {view: true; part: true}): Map<string, UrlSegment[]>;
+function parseOutlets(url: UrlTree, filter: {view?: true; part?: true}): Map<string, UrlSegment[]> {
+  const outlets = new Map<string, UrlSegment[]>();
+  Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
+    if (filter?.view && Routing.isViewOutlet(outlet)) {
+      outlets.set(outlet, segmentGroup.segments);
+    }
+    if (filter?.part && Routing.isPartOutlet(outlet)) {
+      outlets.set(outlet, segmentGroup.segments);
+    }
+  });
+  return outlets;
+}

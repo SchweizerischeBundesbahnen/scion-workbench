@@ -11,6 +11,13 @@
 import {InjectionToken} from '@angular/core';
 
 /**
+ * Represents the id prefix of parts.
+ *
+ * @see PartId
+ */
+export const PART_ID_PREFIX = 'part.';
+
+/**
  * Represents the id prefix of views.
  *
  * @see ViewId

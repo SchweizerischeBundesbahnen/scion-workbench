@@ -28,7 +28,7 @@ export class WorkbenchGridMerger {
     if (serializedBaseLayout.workbenchGrid !== serializedRemoteLayout.workbenchGrid) {
       return grids.remote;
     }
-    if (serializedBaseLayout.workbenchViewOutlets !== serializedRemoteLayout.workbenchViewOutlets) {
+    if (serializedBaseLayout.workbenchOutlets !== serializedRemoteLayout.workbenchOutlets) {
       return grids.remote;
     }
     return grids.local;
