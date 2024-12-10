@@ -10,10 +10,9 @@
 
 import {inject, Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
-import {ViewOutlets} from '../routing/routing.model';
+import {Outlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
-import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
 import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
@@ -89,22 +88,22 @@ export class WorkbenchLayoutSerializer {
   /**
    * Serializes the given outlets.
    */
-  public serializeViewOutlets(viewOutlets: ViewOutlets): string {
-    return JSON.stringify(Object.fromEntries(Object.entries(viewOutlets)
-      .map(([viewId, segments]: [string, UrlSegment[]]): [string, MUrlSegment[]] => {
-        return [viewId, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
+  public serializeOutlets(outlets: Outlets): string {
+    return JSON.stringify(Object.fromEntries(Object.entries(outlets)
+      .map(([outlet, segments]: [string, UrlSegment[]]): [string, MUrlSegment[]] => {
+        return [outlet, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
       })));
   }
 
   /**
    * Deserializes the given outlets.
    */
-  public deserializeViewOutlets(serialized: string): ViewOutlets {
-    const viewOutlets: {[viewId: ViewId]: MUrlSegment[]} = JSON.parse(serialized);
+  public deserializeOutlets(serialized: string): Outlets {
+    const outlets: {[outlet: string]: MUrlSegment[]} = JSON.parse(serialized);
 
-    return Object.fromEntries(Object.entries(viewOutlets)
-      .map(([viewId, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
-        return [viewId, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
+    return Object.fromEntries(Object.entries(outlets)
+      .map(([outlet, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
+        return [outlet, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
       }));
   }
 }

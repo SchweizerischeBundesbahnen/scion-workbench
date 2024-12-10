@@ -16,7 +16,7 @@ import {WorkbenchPopupDiff} from './workbench-popup-differ';
 import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchMessageBoxDiff} from './workbench-message-box-differ';
-import {WorkbenchViewOutletDiff} from './workbench-view-outlet-differ';
+import {WorkbenchOutletDiff} from './workbench-outlet-differ';
 
 /**
  * Options to control the navigation.
@@ -107,9 +107,9 @@ export interface WorkbenchNavigationContext {
    */
   layoutDiff: WorkbenchLayoutDiff;
   /**
-   * View auxiliary routes to register or unregister by the current navigation.
+   * Auxiliary routes to register or unregister by the current navigation.
    */
-  viewOutletDiff: WorkbenchViewOutletDiff;
+  outletDiff: WorkbenchOutletDiff;
   /**
    * Popups added or removed by the current navigation.
    */
@@ -161,19 +161,20 @@ export interface WorkbenchNavigationContext {
 export type Commands = any[];
 
 /**
- * URL segments of views contained in the workbench layout.
+ * URL segments of workbench elements contained in the workbench layout.
  */
-export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
+export type Outlets = {[outlet: ViewId]: UrlSegment[]};
 
 /**
- * States associated with view navigations.
+ * States associated with navigations.
  */
-export type NavigationStates = {[viewId: ViewId]: NavigationState};
+export type NavigationStates = {[outlet: string]: NavigationState};
 
 /**
- * State passed to a view navigation.
+ * State passed to a navigation.
  *
  * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
+ * TODO [activity] Change description to also fit part
  * State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
  */
 export type NavigationState = {[key: string]: unknown};
@@ -182,6 +183,7 @@ export type NavigationState = {[key: string]: unknown};
  * Data associated with a view navigation.
  *
  * Data can be read from {@link WorkbenchView.navigationData}. Data must be JSON serializable.
+ * TODO [activity] Change description to also fit part
  */
 export type NavigationData = {[key: string]: unknown};
 

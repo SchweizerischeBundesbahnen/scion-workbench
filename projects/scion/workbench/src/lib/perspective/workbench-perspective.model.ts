@@ -203,10 +203,10 @@ export interface MPerspectiveLayout {
      */
     workbenchGrid: string;
     /**
-     * @see WorkbenchLayoutSerializer.serializeViewOutlets
-     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
      */
-    viewOutlets: string;
+    outlets: string;
   };
   /**
    * Layout personalized by the user.
@@ -218,9 +218,9 @@ export interface MPerspectiveLayout {
      */
     workbenchGrid: string;
     /**
-     * @see WorkbenchLayoutSerializer.serializeViewOutlets
-     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
      */
-    viewOutlets: string;
+    outlets: string;
   };
 }

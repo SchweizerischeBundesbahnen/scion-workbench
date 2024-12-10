@@ -16,7 +16,7 @@ import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
-import {Commands, NavigationData, NavigationState, NavigationStates, ViewOutlets} from '../routing/routing.model';
+import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {Arrays} from '@scion/toolkit/util';
@@ -24,6 +24,7 @@ import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
+import {PART_ID_PREFIX} from '../workbench.constants';
 
 /**
  * @inheritDoc
@@ -41,8 +42,8 @@ import {Logger} from '../logging';
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
-  private readonly _viewOutlets: Map<ViewId, UrlSegment[]>;
-  private readonly _navigationStates: Map<ViewId, NavigationState>;
+  private readonly _outlets: Map<string, UrlSegment[]>;
+  private readonly _navigationStates: Map<string, NavigationState>;
   private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
@@ -55,7 +56,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public readonly perspectiveId: string | undefined;
 
   /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; perspectiveId?: string; viewOutlets?: string | ViewOutlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
+  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; perspectiveId?: string; outlets?: string | Outlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
     this._grids = {
       workbench: coerceMPartGrid(config.workbenchGrid, {default: createDefaultWorkbenchGrid}),
     };
@@ -64,8 +65,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
     this._gridNames = Objects.keys(this._grids);
     this._maximized = config.maximized ?? false;
-    this._viewOutlets = new Map<ViewId, UrlSegment[]>(Objects.entries(coerceViewOutlets(config.viewOutlets)));
-    this._navigationStates = new Map<ViewId, NavigationState>(Objects.entries(config.navigationStates ?? {}));
+    this._outlets = new Map<string, UrlSegment[]>(Objects.entries(coerceOutlets(config.outlets)));
+    this._navigationStates = new Map<string, NavigationState>(Objects.entries(config.navigationStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
     this.perspectiveId = config.perspectiveId;
   }
@@ -101,41 +102,43 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Finds the URL of views based on the specified filter.
+   * Finds the URL of outlets based on the specified filter.
    *
    * @param findBy - Defines the search scope.
-   * @param findBy.grid - Searches for views contained in the specified grid.
-   * @return outlets of views matching the filter criteria.
+   * @param findBy.grid - Searches outlets in the specified grid.
+   * @return outlets matching the filter criteria.
    */
-  public viewOutlets(findBy?: {grid?: keyof Grids}): ViewOutlets {
-    const viewOutletEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._viewOutlets.get(view.id) ?? []]);
-    return Object.fromEntries(viewOutletEntries);
+  public outlets(findBy?: {grid?: keyof Grids}): Outlets {
+    const partOutlets = this.parts({grid: findBy?.grid}).map(part => [part.id, this._outlets.get(part.id) ?? []]);
+    const viewOutlets = this.views({grid: findBy?.grid}).map(view => [view.id, this._outlets.get(view.id) ?? []]);
+    return Object.fromEntries([...partOutlets, ...viewOutlets]);
   }
 
   /**
-   * Finds navigational state for views based on the specified filter.
+   * Finds navigational state based on the specified filter.
    *
    * @param findBy - Defines the search scope.
-   * @param findBy.grid - Searches for views contained in the specified grid.
-   * @return navigation state of views matching the filter criteria.
+   * @param findBy.grid - Searches outlets in the specified grid.
+   * @return state matching the filter criteria.
    */
   public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
-    const navigationStateEntries = this.views({grid: findBy?.grid}).map(view => [view.id, this._navigationStates.get(view.id) ?? {}]);
-    return Object.fromEntries(navigationStateEntries);
+    const partStates = this.parts({grid: findBy?.grid}).map(part => [part.id, this._navigationStates.get(part.id) ?? []]);
+    const viewStates = this.views({grid: findBy?.grid}).map(view => [view.id, this._navigationStates.get(view.id) ?? {}]);
+    return Object.fromEntries([...partStates, ...viewStates]);
   }
 
   /**
-   * Finds the navigational state of specified view.
+   * Finds the navigational state of specified outlet.
    */
-  public navigationState(findBy: {viewId: ViewId}): NavigationState {
-    return this._navigationStates.get(findBy.viewId) ?? {};
+  public navigationState(findBy: {outlet: string}): NavigationState {
+    return this._navigationStates.get(findBy.outlet) ?? {};
   }
 
   /**
-   * Finds the URL of specified view.
+   * Finds the URL of specified outlet.
    */
-  public urlSegments(findBy: {viewId: ViewId}): UrlSegment[] {
-    return this._viewOutlets.get(findBy.viewId) ?? [];
+  public urlSegments(findBy: {outlet: string}): UrlSegment[] {
+    return this._outlets.get(findBy.outlet) ?? [];
   }
 
   /**
@@ -228,6 +231,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * @inheritDoc
+   */
+  public navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__navigatePart(id, commands, extras);
+    return workingCopy;
+  }
+
+  /**
    * Returns the active part of the specified grid, or `null` if specified grid is not present.
    */
   public activePart(find: {grid: 'workbench'}): Readonly<MPart>;
@@ -295,7 +307,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         if (findBy?.id !== undefined && !matchViewById(findBy.id)(view)) {
           return false;
         }
-        if (findBy?.segments && !findBy.segments.matches(this.urlSegments({viewId: view.id}))) {
+        if (findBy?.segments && !findBy.segments.matches(this.urlSegments({outlet: view.id}))) {
           return false;
         }
         if (findBy?.navigationHint !== undefined && findBy.navigationHint !== (view.navigation?.hint ?? null)) {
@@ -416,8 +428,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return {
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
       mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
-      workbenchViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'workbench'})),
-      mainAreaViewOutlets: this._serializer.serializeViewOutlets(this.viewOutlets({grid: 'mainArea'})),
+      workbenchOutlets: this._serializer.serializeOutlets(this.outlets({grid: 'workbench'})),
+      mainAreaOutlets: this._serializer.serializeOutlets(this.outlets({grid: 'mainArea'})),
     };
   }
 
@@ -435,8 +447,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return (
       layout1.workbenchGrid === layout2.workbenchGrid &&
       layout1.mainAreaGrid === layout2.mainAreaGrid &&
-      layout1.mainAreaViewOutlets === layout2.mainAreaViewOutlets &&
-      layout1.workbenchViewOutlets === layout2.workbenchViewOutlets &&
+      layout1.mainAreaOutlets === layout2.mainAreaOutlets &&
+      layout1.workbenchOutlets === layout2.workbenchOutlets &&
       this.perspectiveId === other.perspectiveId &&
       this.maximized === other.maximized
       // Navigational state is not tested for equality as it is set through view navigation, resulting in a new navigation id when modified.
@@ -523,7 +535,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove outlets and states of views contained in the part.
     part.views.forEach(view => {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
       this._navigationStates.delete(view.id);
     });
 
@@ -538,6 +550,39 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         })[0];
       grid.activePartId = activePart!.id;
     }
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): void {
+    const part = this.part({partId: id});
+
+    if (!commands.length && !extras?.hint && !extras?.relativeTo) {
+      throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
+    }
+
+    const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
+    if (urlSegments.length) {
+      this._outlets.set(PART_ID_PREFIX.concat(part.id), urlSegments); // TODO [activity] Consider changing to PartId
+    }
+    else {
+      this._outlets.delete(PART_ID_PREFIX.concat(part.id));
+    }
+
+    if (extras?.state && Objects.keys(extras.state).length) {
+      this._navigationStates.set(part.id, extras.state);
+    }
+    else {
+      this._navigationStates.delete(part.id);
+    }
+
+    part.navigation = Objects.withoutUndefinedEntries({
+      id: UID.randomUID(),
+      hint: extras?.hint,
+      data: extras?.data,
+      cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+    } satisfies MPart['navigation']);
   }
 
   /**
@@ -573,10 +618,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
     if (urlSegments.length) {
-      this._viewOutlets.set(view.id, urlSegments);
+      this._outlets.set(view.id, urlSegments);
     }
     else {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
     }
 
     if (extras?.state && Objects.keys(extras.state).length) {
@@ -638,7 +683,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove outlet.
     if (options?.removeOutlet ?? true) {
-      this._viewOutlets.delete(view.id);
+      this._outlets.delete(view.id);
     }
 
     // Remove state.
@@ -726,9 +771,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const part = this.part({viewId: view.id});
 
-    if (this._viewOutlets.has(view.id)) {
-      this._viewOutlets.set(newViewId, this._viewOutlets.get(view.id)!);
-      this._viewOutlets.delete(view.id);
+    if (this._outlets.has(view.id)) {
+      this._outlets.set(newViewId, this._outlets.get(view.id)!);
+      this._outlets.delete(view.id);
     }
     if (this._navigationStates.has(view.id)) {
       this._navigationStates.set(newViewId, this._navigationStates.get(view.id)!);
@@ -831,7 +876,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
       mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
       perspectiveId: this.perspectiveId,
-      viewOutlets: Object.fromEntries(this._viewOutlets),
+      outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),
       maximized: this._maximized,
     }));
@@ -880,22 +925,22 @@ function coerceMPartGrid(grid: string | MPartGrid | null | undefined, options: {
 }
 
 /**
- * Coerces {@link ViewOutlets}, applying necessary migrations if the serialized outlets are outdated.
+ * Coerces {@link Outlets}, applying necessary migrations if the serialized outlets are outdated.
  */
-function coerceViewOutlets(viewOutlets: string | ViewOutlets | null | undefined): ViewOutlets {
-  if (!viewOutlets) {
+function coerceOutlets(outlets: string | Outlets | null | undefined): Outlets {
+  if (!outlets) {
     return {};
   }
 
-  if (typeof viewOutlets === 'object') {
-    return viewOutlets;
+  if (typeof outlets === 'object') {
+    return outlets;
   }
 
   try {
-    return inject(WorkbenchLayoutSerializer).deserializeViewOutlets(viewOutlets);
+    return inject(WorkbenchLayoutSerializer).deserializeOutlets(outlets);
   }
   catch (error) {
-    inject(Logger).error('[SerializeError] Failed to deserialize view outlets. Please clear your browser storage and reload the application.', error);
+    inject(Logger).error('[SerializeError] Failed to deserialize outlets. Please clear your browser storage and reload the application.', error);
     return {};
   }
 }
@@ -1041,7 +1086,7 @@ function isViewId(viewId: string | undefined | null): viewId is ViewId {
  */
 export interface SerializedWorkbenchLayout {
   workbenchGrid: string;
-  workbenchViewOutlets: string;
+  workbenchOutlets: string;
   mainAreaGrid: string | null;
-  mainAreaViewOutlets: string;
+  mainAreaOutlets: string;
 }

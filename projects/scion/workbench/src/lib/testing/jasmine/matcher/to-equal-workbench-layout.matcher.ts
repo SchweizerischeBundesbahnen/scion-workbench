@@ -21,7 +21,7 @@ import {MAIN_AREA} from '../../../layout/workbench-layout';
 import {ComponentFixture} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
 import {By} from '@angular/platform-browser';
-import {NavigationStates, ViewOutlets} from '../../../routing/routing.model';
+import {NavigationStates, Outlets} from '../../../routing/routing.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -85,7 +85,7 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
     workbenchGrid: actual.workbenchGrid,
     maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
-    viewOutlets: actual.viewOutlets(),
+    viewOutlets: actual.outlets(),
   };
   const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
@@ -287,7 +287,7 @@ export interface ExpectedWorkbenchLayout {
   /**
    * Asserts specified view outlets, if set.
    */
-  viewOutlets?: ViewOutlets;
+  viewOutlets?: Outlets;
 }
 
 /**

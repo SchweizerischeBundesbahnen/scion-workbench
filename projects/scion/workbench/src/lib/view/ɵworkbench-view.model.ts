@@ -131,7 +131,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
-    this.urlSegments.set(layout.urlSegments({viewId: this.id}));
+    this.urlSegments.set(layout.urlSegments({outlet: this.id}));
 
     this.alternativeId = mView.alternativeId;
     this.classList.layout = mView.cssClass;
@@ -153,7 +153,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       this.navigationId.set(mView.navigation?.id);
       this.navigationHint.set(mView.navigation?.hint);
       this.navigationData.set(mView.navigation?.data ?? {});
-      this.navigationState.set(layout.navigationState({viewId: this.id}));
+      this.navigationState.set(layout.navigationState({outlet: this.id}));
       this.classList.navigation = mView.navigation?.cssClass;
     }
 

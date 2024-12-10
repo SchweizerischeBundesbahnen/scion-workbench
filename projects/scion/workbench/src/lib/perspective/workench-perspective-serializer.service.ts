@@ -12,6 +12,7 @@ import {inject, Injectable} from '@angular/core';
 import {MPerspectiveLayout} from '../perspective/workbench-perspective.model';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
 import {WorkbenchPerspectiveMigrationV2} from './migration/workbench-perspective-migration-v2.service';
+import {WorkbenchPerspectiveMigrationV3} from './migration/workbench-perspective-migration-v3.service';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPerspectiveLayout}.
@@ -20,7 +21,8 @@ import {WorkbenchPerspectiveMigrationV2} from './migration/workbench-perspective
 export class WorkbenchPerspectiveSerializer {
 
   private _workbenchPerspectiveMigrator = new WorkbenchMigrator()
-    .registerMigration(1, inject(WorkbenchPerspectiveMigrationV2));
+    .registerMigration(1, inject(WorkbenchPerspectiveMigrationV2))
+    .registerMigration(2, inject(WorkbenchPerspectiveMigrationV3));
 
   /**
    * Serializes the given perspective layout into a URL-safe base64 string.
@@ -52,7 +54,7 @@ export class WorkbenchPerspectiveSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_PERSPECTIVE_LAYOUT_VERSION = 2;
+export const WORKBENCH_PERSPECTIVE_LAYOUT_VERSION = 3;
 
 /**
  * Separates the serialized JSON model and its version in the base64-encoded string.

@@ -75,6 +75,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this;
   }
 
+  public navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout {
+    throw Error('[PageObjectError] Operation `WorkbenchLayout.navigatePart` is not supported.');
+  }
+
   public removeView(id: string): WorkbenchLayout {
     throw Error('[PageObjectError] Operation `WorkbenchLayout.removeView` is not supported.');
   }

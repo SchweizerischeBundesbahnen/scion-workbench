@@ -39,6 +39,8 @@ export interface WorkbenchLayout {
    */
   addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
 
+  navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout;
+
   /**
    * Adds a view to the specified part.
    *

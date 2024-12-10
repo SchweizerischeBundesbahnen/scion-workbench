@@ -87,6 +87,12 @@ export class MPart {
   public views!: MView[];
   public activeViewId?: ViewId;
   public structural!: boolean;
+  public navigation?: {
+    id: string;
+    hint?: string;
+    data?: NavigationData;
+    cssClass?: string[];
+  };
 
   constructor(part: Omit<MPart, 'type'>) {
     Defined.orElseThrow(part.id, () => Error('MPart requires an id'));
