@@ -4,6 +4,7 @@ import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
+import {ViewOutlet} from '../workbench.constants';
 
 /**
  * Handle to interact with a view opened via {@link WorkbenchRouter}.
@@ -232,4 +233,4 @@ export abstract class WorkbenchView {
  * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
  * be identified either by its unique or alternative id.
  */
-export type ViewId = `view.${number}`;
+export type ViewId = ViewOutlet;
