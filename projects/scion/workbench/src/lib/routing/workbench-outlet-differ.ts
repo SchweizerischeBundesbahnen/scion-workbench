@@ -22,11 +22,11 @@ import {DialogOutlet, MessageBoxOutlet, PartOutlet, PopupOutlet, toPartOutlet, V
 @Injectable({providedIn: 'root'})
 export class WorkbenchOutletDiffer {
 
-  private _viewsDiffer = inject(IterableDiffers).find([]).create<ViewOutlet>()
-  private _partsDiffer = inject(IterableDiffers).find([]).create<PartOutlet>()
-  private _popupsDiffer = inject(IterableDiffers).find([]).create<PopupOutlet>()
-  private _dialogsDiffer = inject(IterableDiffers).find([]).create<DialogOutlet>()
-  private _messageBoxDiffer = inject(IterableDiffers).find([]).create<MessageBoxOutlet>()
+  private _viewsDiffer = inject(IterableDiffers).find([]).create<ViewOutlet>();
+  private _partsDiffer = inject(IterableDiffers).find([]).create<PartOutlet>();
+  private _popupsDiffer = inject(IterableDiffers).find([]).create<PopupOutlet>();
+  private _dialogsDiffer = inject(IterableDiffers).find([]).create<DialogOutlet>();
+  private _messageBoxDiffer = inject(IterableDiffers).find([]).create<MessageBoxOutlet>();
 
   /**
    * Computes differences since last time {@link WorkbenchOutletDiffer#diff} was invoked.
@@ -121,5 +121,5 @@ interface WorkbenchOutletChanges {
   parts: IterableChanges<PartOutlet> | null;
   popups: IterableChanges<PopupOutlet> | null;
   dialogs: IterableChanges<DialogOutlet> | null;
-  messageBoxes: IterableChanges<MessageBoxOutlet> | null
+  messageBoxes: IterableChanges<MessageBoxOutlet> | null;
 }
