@@ -50,4 +50,12 @@ export abstract class WorkbenchPart {
    * Actions matching this part and its active view.
    */
   public abstract readonly actions: Signal<WorkbenchPartAction[]>;
+
+  /**
+   * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.
+   *
+   * TODO [activity] Do we need css class on part?
+   */
+  public abstract get cssClass(): Signal<string[]>;
+  public abstract set cssClass(cssClass: string | string[]);
 }

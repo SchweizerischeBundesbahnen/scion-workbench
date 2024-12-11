@@ -18,6 +18,7 @@ import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration
 import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {Exclusion, stringify} from './stringifier';
+import {WorkbenchOutlet} from '../workbench.constants';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -99,7 +100,7 @@ export class WorkbenchLayoutSerializer {
    * Deserializes the given outlets.
    */
   public deserializeOutlets(serialized: string): Outlets {
-    const outlets: {[outlet: string]: MUrlSegment[]} = JSON.parse(serialized);
+    const outlets: {[outlet: WorkbenchOutlet]: MUrlSegment[]} = JSON.parse(serialized);
 
     return Object.fromEntries(Object.entries(outlets)
       .map(([outlet, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {

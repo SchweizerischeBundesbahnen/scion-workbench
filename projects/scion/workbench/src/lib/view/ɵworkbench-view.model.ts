@@ -14,7 +14,6 @@ import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.servic
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Disposable} from '../common/disposable';
-import {throwError} from '../common/throw-error.util';
 import {CanClose, CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
 import {ViewId, WorkbenchView} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
@@ -110,8 +109,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         // Therefore, we instruct the outlet to act as a top-level outlet to be the target of the registered top-level view routes.
         {provide: ChildrenOutletContexts, useValue: this._childrenOutletContexts},
         // Prevent injecting this part into the view because the view may be dragged to a different part.
-        {provide: WorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchPart'`)},
-        {provide: ɵWorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'ɵWorkbenchPart'`)},
+        {provide: WorkbenchPart, useFactory: () => undefined},
+        {provide: ɵWorkbenchPart, useFactory: () => undefined},
       ],
     });
   }

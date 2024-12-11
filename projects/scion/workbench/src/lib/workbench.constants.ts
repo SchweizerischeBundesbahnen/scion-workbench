@@ -40,6 +40,36 @@ export const DIALOG_ID_PREFIX = 'dialog.';
 export const MESSAGE_BOX_ID_PREFIX = 'messagebox.';
 
 /**
+ * Format of a part outlet name.
+ */
+export type PartOutlet = `${typeof PART_ID_PREFIX}${string}`;
+
+/**
+ * Format of a view outlet name.
+ */
+export type ViewOutlet = `${typeof VIEW_ID_PREFIX}${number}`;
+
+/**
+ * Format of a popup outlet name.
+ */
+export type PopupOutlet = `${typeof POPUP_ID_PREFIX}${string}`;
+
+/**
+ * Format of a dialog outlet name.
+ */
+export type DialogOutlet = `${typeof DIALOG_ID_PREFIX}${string}`;
+
+/**
+ * Format of a messagebox outlet name.
+ */
+export type MessageBoxOutlet = `${typeof MESSAGE_BOX_ID_PREFIX}${string}`;
+
+/**
+ * Union of workbench outlets.
+ */
+export type WorkbenchOutlet = PartOutlet | ViewOutlet | PopupOutlet | DialogOutlet | MessageBoxOutlet;
+
+/**
  * Name of the query parameter that contains the layout of the main area.
  */
 export const MAIN_AREA_LAYOUT_QUERY_PARAM = 'main_area';
@@ -62,3 +92,8 @@ export const VIEW_TAB_RENDERING_CONTEXT = new InjectionToken<ViewTabRenderingCon
  * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.
  */
 export const ANONYMOUS_PERSPECTIVE_ID_PREFIX = 'anonymous.';
+
+// TODO [activity] Remove when changing to formatted PartId
+export function toPartOutlet(partId: string): PartOutlet {
+  return `${PART_ID_PREFIX}${partId}` satisfies PartOutlet;
+}
