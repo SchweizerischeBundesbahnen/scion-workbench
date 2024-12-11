@@ -48,7 +48,7 @@ export class PartPO {
    * Indicates if this part is contained in the main area.
    */
   public async isInMainArea(): Promise<boolean> {
-    const count = await this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}).count();
+    const count = await this._locator.page().locator('wb-main-area-part', {has: this._locator}).count();
     return count > 0;
   }
 }

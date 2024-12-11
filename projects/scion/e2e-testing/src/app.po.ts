@@ -364,7 +364,7 @@ export class AppPO {
    * Tests if the layout has a main area.
    */
   public hasMainArea(): Promise<boolean> {
-    return this.workbench.locator('wb-main-area-layout').isVisible();
+    return this.workbench.locator('wb-main-area-part').isVisible();
   }
 
   /**

@@ -21,7 +21,7 @@ import {ViewComponent} from '../view/view.component';
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {Logger, LoggerNames} from '../logging';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
-import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
+import {MainAreaPartComponent} from '../layout/main-area-part/main-area-part.component';
 import {PartComponent} from '../part/part.component';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -280,7 +280,7 @@ export class WorkbenchUrlObserver {
     // Construct the handle in an injection context that shares the part's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const partEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Part ${partId}`);
     return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, {
-      component: partId === MAIN_AREA ? MainAreaLayoutComponent : PartComponent,
+      component: partId === MAIN_AREA ? MainAreaPartComponent : PartComponent,
     }));
   }
 

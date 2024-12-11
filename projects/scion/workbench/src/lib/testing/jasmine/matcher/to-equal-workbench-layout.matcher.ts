@@ -18,10 +18,11 @@ import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
-import {ComponentFixture} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {Arrays} from '@scion/toolkit/util';
 import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
+import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -54,7 +55,7 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
           }
 
           // Assert model.
-          assertWorkbenchLayoutModel(expected, debugElement.componentInstance.layout!, util);
+          assertWorkbenchLayoutModel(expected, TestBed.inject(WorkbenchLayoutService).layout()!, util);
           // Assert DOM.
           assertWorkbenchLayoutDOM(expected, debugElement.nativeElement);
           return pass();
@@ -105,7 +106,7 @@ function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualEleme
   }
   // Assert only the main area grid, but not the workbench grid since not expected.
   else if (expected.mainAreaGrid) {
-    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector(`wb-main-area-layout[data-partid="${MAIN_AREA}"] > wb-grid-element`), expected);
+    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector(`wb-main-area-part > wb-grid-element`), expected);
   }
 }
 
@@ -187,9 +188,9 @@ function assertMPartDOM(expectedPart: MPart, actualElement: Element, expectedWor
   }
 
   if (partId === MAIN_AREA) {
-    const actualPartElement = actualElement.querySelector(`wb-main-area-layout[data-partid="${partId}"]`);
+    const actualPartElement = actualElement.querySelector('wb-main-area-part');
     if (!actualPartElement) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-main-area-layout[data-partid="${partId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-main-area-part' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
     if (expectedWorkbenchLayout.mainAreaGrid) {
       assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);

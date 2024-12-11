@@ -11,7 +11,7 @@
 import {inject, Injector, Pipe, PipeTransform} from '@angular/core';
 import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import type {PartComponent} from './part.component';
-import type {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
+import type {MainAreaPartComponent} from '../layout/main-area-part/main-area-part.component';
 import {ComponentPortal} from '@angular/cdk/portal';
 
 /**
@@ -24,7 +24,7 @@ export class PartPortalPipe implements PipeTransform {
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _injector = inject(Injector);
 
-  public transform(partId: string | null): ComponentPortal<PartComponent | MainAreaLayoutComponent> | null {
+  public transform(partId: string | null): ComponentPortal<PartComponent | MainAreaPartComponent> | null {
     if (!partId) {
       return null;
     }

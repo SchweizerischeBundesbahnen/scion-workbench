@@ -8,12 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {WorkbenchLayoutService} from './workbench-layout.service';
-import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {GridElementComponent} from './grid-element/grid-element.component';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {MPartGrid} from './workbench-layout.model';
 import {RequiresDropZonePipe} from '../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {RouterOutlet} from '@angular/router';
@@ -21,6 +19,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../workbench-id';
 import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
+import {MPartGrid} from './workbench-layout.model';
 
 /**
  * Renders the layout of the workbench.
@@ -43,8 +42,6 @@ import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
  *                                   |             |                 +--------+-----------------------+
  *                                 MPart         MPart
  *                                (left)        (right)
- *
- * @see MainAreaLayoutComponent
  */
 @Component({
   selector: 'wb-workbench-layout',
@@ -62,20 +59,14 @@ import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
 })
 export class WorkbenchLayoutComponent {
 
-  public layout: ɵWorkbenchLayout | undefined;
-  protected grid: MPartGrid | undefined;
-
   private _workbenchId = inject(WORKBENCH_ID);
   private _viewDragService = inject(ViewDragService);
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
 
-  constructor() {
-    effect(() => {
-      const layout = this._workbenchLayoutService.layout();
-      this.layout = layout ?? undefined;
-      this.grid = layout?.maximized && layout?.mainAreaGrid ? layout?.mainAreaGrid : layout?.workbenchGrid;
-    });
-  }
+  protected grid = computed((): MPartGrid | undefined => {
+    const layout = this._workbenchLayoutService.layout();
+    return layout && layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid : layout?.workbenchGrid;
+  });
 
   protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
@@ -90,7 +81,7 @@ export class WorkbenchLayoutComponent {
         classList: event.dragData.classList,
       },
       target: GridDropTargets.resolve({
-        grid: this.grid!,
+        grid: this.grid()!,
         workbenchId: this._workbenchId,
         dropRegion: event.dropRegion,
       }),

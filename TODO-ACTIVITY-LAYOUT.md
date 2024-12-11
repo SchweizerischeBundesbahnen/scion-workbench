@@ -6,7 +6,7 @@
 [] Duplicate part ids, already a problem today when switching perspective, having a part with the same name in the main area and the perspective
 [] Conflict Resolver for part ids
 [] Should also be possible to navigate MAIN_AREA, like any other part
-   -> do we still need MainAreaLayoutComponent or integrate the special handling with sub grid in PartComponent?
+   -> do we still need MainAreaPartComponent or integrate the special handling with sub grid in PartComponent?
    -> for the moment, we still require the primary router outlet in main area component to not be breaking
 
 ## TO CONSIDER:
