@@ -37,7 +37,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
-  private readonly _partComponent: ComponentType<PartComponent | MainAreaLayoutComponent>;
+  private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>;
 
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
@@ -51,7 +51,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   public navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
 
-  constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaLayoutComponent>}) {
+  constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) {
     this._partComponent = options.component;
     this.actions = this.selectPartActions();
     this.touchOnActivate();
@@ -62,7 +62,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   /**
    * Constructs the portal using the given injection context.
    */
-  public createPortalFromInjectionContext(injectionContext: Injector): ComponentPortal<PartComponent | MainAreaLayoutComponent> {
+  public createPortalFromInjectionContext(injectionContext: Injector): ComponentPortal<PartComponent | MainAreaPartComponent> {
     const injector = Injector.create({
       parent: injectionContext,
       providers: [
@@ -71,7 +71,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
         // For each part, the workbench registers auxiliary routes of all top-level routes, enabling routing on a per-part basis.
         // But, if the workbench component itself is displayed in a router outlet, part outlets are not top-level outlets.
         // Therefore, we instruct the outlet to act as a top-level outlet to be the target of the registered top-level part routes.
-        // TODO [activity] Try to remove by get rid of MainAreaLayoutComponent
+        // TODO [activity] Try to remove by get rid of MainAreaPartComponent
         this.id !== MAIN_AREA ? {provide: ChildrenOutletContexts, useValue: this._childrenOutletContexts} : [],
       ],
     });
@@ -227,9 +227,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 type PartComponent = any;
 
 /**
- * Represents a pseudo-type for the actual {@link MainAreaLayoutComponent} which must not be referenced in order to avoid import cycles.
+ * Represents a pseudo-type for the actual {@link MainAreaPartComponent} which must not be referenced in order to avoid import cycles.
  */
-type MainAreaLayoutComponent = any;
+type MainAreaPartComponent = any;
 
 /**
  * Represents the navigation for a workbench part.

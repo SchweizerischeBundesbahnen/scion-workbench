@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject} from '@angular/core';
+import {Component, computed, HostBinding, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
 import {MPartGrid} from '../workbench-layout.model';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -42,13 +42,11 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
  *     |             |        renders   +------+-------+
  *   MPart         MPart
  *  (left)        (right)
- *
- * @see WorkbenchLayoutComponent
  */
 @Component({
-  selector: 'wb-main-area-layout',
-  templateUrl: './main-area-layout.component.html',
-  styleUrls: ['./main-area-layout.component.scss'],
+  selector: 'wb-main-area-part',
+  templateUrl: './main-area-part.component.html',
+  styleUrls: ['./main-area-part.component.scss'],
   standalone: true,
   imports: [
     GridElementComponent,
@@ -59,22 +57,20 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
     GridElementIfVisiblePipe,
   ],
 })
-export class MainAreaLayoutComponent {
+export class MainAreaPartComponent {
 
   private _workbenchId = inject(WORKBENCH_ID);
   private _part = inject(ɵWorkbenchPart);
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
   private _viewDragService = inject(ViewDragService);
 
+  protected mainAreaGrid = computed((): MPartGrid => {
+    return this._workbenchLayoutService.layout()!.mainAreaGrid!;
+  });
+
   @HostBinding('attr.data-partid')
   protected get partId(): string {
     return this._part.id;
-  }
-
-  protected get mainAreaGrid(): MPartGrid {
-    // It is critical that both `WorkbenchLayoutComponent` and `MainAreaLayoutComponent` operate on the same layout,
-    // so we do not subscribe to the layout but reference it directly.
-    return this._workbenchLayoutService.layout()!.mainAreaGrid!;
   }
 
   protected onViewDrop(event: WbViewDropEvent): void {
@@ -90,7 +86,7 @@ export class MainAreaLayoutComponent {
         classList: event.dragData.classList,
       },
       target: GridDropTargets.resolve({
-        grid: this.mainAreaGrid,
+        grid: this.mainAreaGrid(),
         workbenchId: this._workbenchId,
         dropRegion: event.dropRegion,
       }),

@@ -1,4 +1,4 @@
-@if (grid?.root | wbGridElementIfVisible; as root) {
+@if (grid()?.root | wbGridElementIfVisible; as root) {
   <wb-grid-element [element]="root"
                    wbViewDropZone
                    [wbViewDropZoneSize]="50"

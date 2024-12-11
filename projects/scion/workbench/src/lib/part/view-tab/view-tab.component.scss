@@ -28,7 +28,7 @@
     border-top-color: var(--sci-workbench-tab-border-color);
     background-color: var(--sci-workbench-view-background-color);
 
-    wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+    wb-workbench:has(wb-main-area-part) wb-part:not(.main-area) & {
       background-color: var(--sci-workbench-view-peripheral-background-color);
     }
 
@@ -94,7 +94,7 @@
       box-shadow: inset 0 0 0 1px var(--sci-workbench-tab-border-color);
       box-sizing: content-box;
 
-      wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+      wb-workbench:has(wb-main-area-part) wb-part:not(.main-area) & {
         border-color: var(--sci-workbench-view-peripheral-background-color);
       }
     }

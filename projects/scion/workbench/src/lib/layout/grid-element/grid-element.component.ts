@@ -26,9 +26,7 @@ import {WorkbenchLayouts} from '../workbench-layouts.util';
  * a split layout in which the two children are arranged vertically or horizontally.
  *
  * Nodes are rendered as {@link SciSashboxComponent} and parts as {@link PartComponent} or
- * {@link MainAreaLayoutComponent}.
- *
- * @see WorkbenchLayoutComponent
+ * {@link MainAreaPartComponent}.
  */
 @Component({
   selector: 'wb-grid-element',

@@ -45,7 +45,7 @@ describe('Start Page', () => {
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect start page to display
-      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+      expect(fixture.debugElement.query(By.css('wb-main-area-part > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
       expect(fixture.debugElement.query(By.css('wb-part'))).toBeNull();
 
       // Open view
@@ -53,7 +53,7 @@ describe('Start Page', () => {
       await waitUntilStable();
 
       // Expect start page not to display
-      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport > router-outlet'))).toBeNull();
+      expect(fixture.debugElement.query(By.css('wb-main-area-part > sci-viewport > router-outlet'))).toBeNull();
       expect(fixture.debugElement.query(By.css('wb-part'))).not.toBeNull();
 
       // Close view
@@ -61,7 +61,7 @@ describe('Start Page', () => {
       await waitUntilStable();
 
       // Expect start page to display
-      expect(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+      expect(fixture.debugElement.query(By.css('wb-main-area-part > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
       expect(fixture.debugElement.query(By.css('wb-part'))).toBeNull();
     });
 
@@ -86,7 +86,7 @@ describe('Start Page', () => {
       fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
 
       // Expect start page not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-main-area-layout > sci-viewport')).nativeElement).height).toEqual('500px');
+      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-main-area-part > sci-viewport')).nativeElement).height).toEqual('500px');
     });
   });
 
