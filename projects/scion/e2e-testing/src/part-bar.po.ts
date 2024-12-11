@@ -19,11 +19,11 @@ import {PartPO} from './part.po';
  */
 export class PartBarPO {
 
-  public readonly tabViewport: Locator;
+  public readonly tabBar: Locator;
   public readonly viewListButton: Locator;
 
   constructor(public locator: Locator, public part: PartPO) {
-    this.tabViewport = this.locator.locator('sci-viewport.e2e-tabbar');
+    this.tabBar = this.locator.locator('wb-view-tab-bar');
     this.viewListButton = this.locator.locator('wb-view-list-button');
   }
 
@@ -68,15 +68,15 @@ export class PartBarPO {
    * Gets the bounding box of the tab viewport.
    */
   public async getTabViewportBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.tabViewport.boundingBox());
+    return fromRect(await this.tabBar.boundingBox());
   }
 
   /**
    * Gets the specified CSS property of the tab viewport client.
    */
   public getTabViewportClientCssProperty(property: string): Promise<string> {
-    return this.tabViewport.locator('div[part="content"]').evaluate((tabbar: HTMLElement, property: string) => {
-      return getComputedStyle(tabbar).getPropertyValue(property);
+    return this.tabBar.locator('sci-viewport.e2e-tab-viewport div[part="content"]').evaluate((viewportClient: HTMLElement, property: string) => {
+      return getComputedStyle(viewportClient).getPropertyValue(property);
     }, property);
   }
 
@@ -84,9 +84,9 @@ export class PartBarPO {
    * Sets the horizontal scroll position of the tab viewport.
    */
   public async setTabViewportScrollLeft(scrollLeft: number): Promise<void> {
-    const tabbarViewport = this.tabViewport.locator('div.viewport');
-    await tabbarViewport.evaluate((tabbarViewportElement: HTMLElement, scrollLeft: number) => {
-      tabbarViewportElement.scrollLeft = scrollLeft;
+    const tabbarViewport = this.tabBar.locator('sci-viewport.e2e-tab-viewport div.viewport');
+    await tabbarViewport.evaluate((viewport: HTMLElement, scrollLeft: number) => {
+      viewport.scrollLeft = scrollLeft;
     }, scrollLeft);
   }
 
@@ -94,7 +94,7 @@ export class PartBarPO {
    * Closes all tabs.
    */
   public async closeTabs(): Promise<void> {
-    await this.tabViewport.locator('wb-view-tab').first().press('Control+Alt+Shift+K');
+    await this.tabBar.locator('wb-view-tab').first().press('Control+Alt+Shift+K');
   }
 
   /**
