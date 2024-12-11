@@ -77,18 +77,22 @@ export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
 }
 
 /**
- * Matches if the view has been navigated.
+ * Matches if the view or part has been navigated.
  *
  * Does not match if no navigation information is available, e.g., during initial navigation because the layout is loaded asynchronously, or when closing the view.
  */
 export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
 
-  if (!Routing.isViewOutlet(outlet)) {
-    throw Error(`[WorkbenchError] Guard can only be installed on view auxiliary route. [outlet=${outlet}]`);
+  if (Routing.isViewOutlet(outlet)) {
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const view = layout.view({viewId: outlet}, {orElse: null});
+    return !!view?.navigation;
   }
-
-  const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
-  const view = layout.view({viewId: outlet}, {orElse: null});
-  return !!view?.navigation;
+  if (Routing.isPartOutlet(outlet)) {
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const part = layout.part({partId: outlet}, {orElse: null});
+    return !!part?.navigation;
+  }
+  throw Error(`[WorkbenchError] Guard can only be installed on view or part auxiliary route. [outlet=${outlet}]`);
 };

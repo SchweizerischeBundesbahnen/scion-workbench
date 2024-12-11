@@ -26,9 +26,9 @@ export const WorkbenchRouteData = {
   heading: 'ɵworkbenchViewHeading',
 
   /**
-   * Property to associate CSS class(es) with a view in {@link Route.data}, e.g., to locate the view in tests.
+   * Property to associate CSS class(es) with a workbench element in {@link Route.data}, e.g., to locate it in tests.
    */
-  cssClass: 'ɵworkbenchViewCssClass',
+  cssClass: 'ɵworkbenchCssClass',
 
   /**
    * @internal

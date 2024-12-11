@@ -24,7 +24,7 @@ import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {PART_ID_PREFIX} from '../workbench.constants';
+import {toPartOutlet, WorkbenchOutlet} from '../workbench.constants';
 
 /**
  * @inheritDoc
@@ -42,8 +42,8 @@ import {PART_ID_PREFIX} from '../workbench.constants';
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   private readonly _grids: Grids;
-  private readonly _outlets: Map<string, UrlSegment[]>;
-  private readonly _navigationStates: Map<string, NavigationState>;
+  private readonly _outlets: Map<WorkbenchOutlet, UrlSegment[]>;
+  private readonly _navigationStates: Map<WorkbenchOutlet, NavigationState>;
   private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
@@ -65,8 +65,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
     this._gridNames = Objects.keys(this._grids);
     this._maximized = config.maximized ?? false;
-    this._outlets = new Map<string, UrlSegment[]>(Objects.entries(coerceOutlets(config.outlets)));
-    this._navigationStates = new Map<string, NavigationState>(Objects.entries(config.navigationStates ?? {}));
+    this._outlets = new Map(Objects.entries(coerceOutlets(config.outlets)));
+    this._navigationStates = new Map(Objects.entries(config.navigationStates ?? {}));
     this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
     this.perspectiveId = config.perspectiveId;
   }
@@ -109,7 +109,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return outlets matching the filter criteria.
    */
   public outlets(findBy?: {grid?: keyof Grids}): Outlets {
-    const partOutlets = this.parts({grid: findBy?.grid}).map(part => [part.id, this._outlets.get(part.id) ?? []]);
+    const partOutlets = this.parts({grid: findBy?.grid}).map(part => [toPartOutlet(part.id), this._outlets.get(toPartOutlet(part.id)) ?? []]);
     const viewOutlets = this.views({grid: findBy?.grid}).map(view => [view.id, this._outlets.get(view.id) ?? []]);
     return Object.fromEntries([...partOutlets, ...viewOutlets]);
   }
@@ -122,7 +122,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return state matching the filter criteria.
    */
   public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
-    const partStates = this.parts({grid: findBy?.grid}).map(part => [part.id, this._navigationStates.get(part.id) ?? []]);
+    const partStates = this.parts({grid: findBy?.grid}).map(part => [toPartOutlet(part.id), this._navigationStates.get(toPartOutlet(part.id)) ?? []]);
     const viewStates = this.views({grid: findBy?.grid}).map(view => [view.id, this._navigationStates.get(view.id) ?? {}]);
     return Object.fromEntries([...partStates, ...viewStates]);
   }
@@ -130,14 +130,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Finds the navigational state of specified outlet.
    */
-  public navigationState(findBy: {outlet: string}): NavigationState {
+  public navigationState(findBy: {outlet: WorkbenchOutlet}): NavigationState {
     return this._navigationStates.get(findBy.outlet) ?? {};
   }
 
   /**
    * Finds the URL of specified outlet.
    */
-  public urlSegments(findBy: {outlet: string}): UrlSegment[] {
+  public urlSegments(findBy: {outlet: WorkbenchOutlet}): UrlSegment[] {
     return this._outlets.get(findBy.outlet) ?? [];
   }
 
@@ -564,17 +564,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
     if (urlSegments.length) {
-      this._outlets.set(PART_ID_PREFIX.concat(part.id), urlSegments); // TODO [activity] Consider changing to PartId
+      this._outlets.set(toPartOutlet(part.id), urlSegments);
     }
     else {
-      this._outlets.delete(PART_ID_PREFIX.concat(part.id));
+      this._outlets.delete(toPartOutlet(part.id));
     }
 
     if (extras?.state && Objects.keys(extras.state).length) {
-      this._navigationStates.set(part.id, extras.state);
+      this._navigationStates.set(toPartOutlet(part.id), extras.state);
     }
     else {
-      this._navigationStates.delete(part.id);
+      this._navigationStates.delete(toPartOutlet(part.id));
     }
 
     part.navigation = Objects.withoutUndefinedEntries({

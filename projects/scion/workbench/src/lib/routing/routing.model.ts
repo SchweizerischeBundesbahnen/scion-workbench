@@ -12,11 +12,9 @@ import {NavigationExtras, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
-import {WorkbenchPopupDiff} from './workbench-popup-differ';
-import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
-import {WorkbenchMessageBoxDiff} from './workbench-message-box-differ';
 import {WorkbenchOutletDiff} from './workbench-outlet-differ';
+import {WorkbenchOutlet} from '../workbench.constants';
 
 /**
  * Options to control the navigation.
@@ -110,18 +108,6 @@ export interface WorkbenchNavigationContext {
    * Auxiliary routes to register or unregister by the current navigation.
    */
   outletDiff: WorkbenchOutletDiff;
-  /**
-   * Popups added or removed by the current navigation.
-   */
-  popupDiff: WorkbenchPopupDiff;
-  /**
-   * Dialogs added or removed by the current navigation.
-   */
-  dialogDiff: WorkbenchDialogDiff;
-  /**
-   * Message boxes added or removed by the current navigation.
-   */
-  messageBoxDiff: WorkbenchMessageBoxDiff;
 
   /**
    * Reverts changes made during the navigation if it fails or is cancelled.
@@ -163,12 +149,12 @@ export type Commands = any[];
 /**
  * URL segments of workbench elements contained in the workbench layout.
  */
-export type Outlets = {[outlet: ViewId]: UrlSegment[]};
+export type Outlets = {[outlet: WorkbenchOutlet]: UrlSegment[]};
 
 /**
  * States associated with navigations.
  */
-export type NavigationStates = {[outlet: string]: NavigationState};
+export type NavigationStates = {[outlet: WorkbenchOutlet]: NavigationState};
 
 /**
  * State passed to a navigation.

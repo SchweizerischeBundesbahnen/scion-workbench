@@ -100,6 +100,15 @@ export const routes: Routes = [
     },
   },
   {
+    path: 'test-part',
+    loadComponent: () => import('./part-page/part-page.component'),
+    data: {
+      [WorkbenchRouteData.cssClass]: 'e2e-test-part',
+      path: 'test-part',
+      navigationHint: '',
+    },
+  },
+  {
     path: 'test-layout',
     loadComponent: () => import('./layout-page/layout-page.component'),
     data: {[WorkbenchRouteData.title]: 'Workbench Layout', [WorkbenchRouteData.heading]: 'Workbench E2E Testpage', [WorkbenchRouteData.cssClass]: 'e2e-test-layout', pinToStartPage: true},

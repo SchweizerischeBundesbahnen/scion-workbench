@@ -40,7 +40,7 @@ export const WorkbenchLayouts = {
    */
   isGridElementVisible: (element: MTreeNode | MPart): boolean => {
     if (element instanceof MPart) {
-      return element.id === MAIN_AREA || element.views.length > 0;
+      return element.id === MAIN_AREA || element.views.length > 0 || !!element.navigation;
     }
     return WorkbenchLayouts.isGridElementVisible(element.child1) || WorkbenchLayouts.isGridElementVisible(element.child2);
   },

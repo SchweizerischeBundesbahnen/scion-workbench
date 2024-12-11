@@ -82,7 +82,7 @@ export class MPart {
    * Discriminator to unmarshall {@link MPart} to its class type.
    */
   public readonly type = 'MPart';
-  public readonly id!: string;
+  public readonly id!: string; // TODO [activity] Consider changing to formatted PartId
   public parent?: MTreeNode;
   public views!: MView[];
   public activeViewId?: ViewId;

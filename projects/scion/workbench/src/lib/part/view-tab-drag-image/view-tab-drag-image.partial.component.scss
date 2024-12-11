@@ -11,4 +11,13 @@
       display: none;
     }
   }
+
+  &:not(.drag-over-tabbar):not(.drag-over-dropzone) {
+    border-color: var(--sci-color-negative);
+    color: var(--sci-color-negative);
+
+    > div.content {
+      color: var(--sci-color-negative);
+    }
+  }
 }

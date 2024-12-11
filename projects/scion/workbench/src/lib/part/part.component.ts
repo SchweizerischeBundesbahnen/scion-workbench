@@ -21,6 +21,9 @@ import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.
 import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
+import {SciViewportComponent} from '@scion/components/viewport';
+import {PART_ID_PREFIX} from '../workbench.constants';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'wb-part',
@@ -33,9 +36,15 @@ import {WORKBENCH_ID} from '../workbench-id';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
     ViewPortalPipe,
+    SciViewportComponent,
+  ],
+  hostDirectives: [
+    NgClass,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {
+
+  protected readonly PART_ID_PREFIX = PART_ID_PREFIX;
 
   @HostBinding('attr.tabindex')
   public tabIndex = -1;
@@ -73,6 +82,7 @@ export class PartComponent implements OnInit, OnDestroy {
     this._logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
     this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
+    this.addHostCssClasses();
   }
 
   public ngOnInit(): void {
@@ -136,6 +146,11 @@ export class PartComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.part.activate().then();
       });
+  }
+
+  private addHostCssClasses(): void {
+    const ngClass = inject(NgClass);
+    effect(() => ngClass.ngClass = this.part.classList.asList());
   }
 
   public ngOnDestroy(): void {

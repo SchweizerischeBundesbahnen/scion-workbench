@@ -10,6 +10,12 @@
   > div.active-view {
     flex: auto;
     display: grid;
-    position: relative; // positioning context for view and drop zone
+    position: relative; // positioning context for content and drop zone
+  }
+
+  > sci-viewport.page {
+    flex: 1 1 0;
+    display: grid;
+    position: relative; // positioning context for content
   }
 }

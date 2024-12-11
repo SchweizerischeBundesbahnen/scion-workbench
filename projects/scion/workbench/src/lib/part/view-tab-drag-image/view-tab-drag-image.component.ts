@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Injector, signal, Signal} from '@angular/core';
+import {Component, HostBinding, inject, Injector, NgZone, signal, Signal} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
@@ -16,6 +16,8 @@ import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.comp
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DOCUMENT} from '@angular/common';
 import {WorkbenchView} from '../../view/workbench-view.model';
+import {observeIn, subscribeIn} from '@scion/toolkit/operators';
+import {distinctUntilChanged, map} from 'rxjs/operators';
 
 /**
  * @see ViewTabComponent
@@ -50,6 +52,12 @@ export class ViewTabDragImageComponent {
   public isDragOverTabbar = false;
 
   /**
+   * Indicates if dragging this view tab over a dropzone.
+   */
+  @HostBinding('class.drag-over-dropzone')
+  public isDragOverDropZone = false;
+
+  /**
    * Indicates if dragging this view tab over a tabbar located in the peripheral area.
    */
   @HostBinding('class.drag-over-peripheral-tabbar')
@@ -59,6 +67,7 @@ export class ViewTabDragImageComponent {
               private _viewDragService: ViewDragService,
               private _injector: Injector) {
     this.installDragOverTabbarDetector();
+    this.installDragOverDropZoneDetector();
     this.viewTabContentPortal = signal(this.createViewTabContentPortal());
   }
 
@@ -72,7 +81,7 @@ export class ViewTabDragImageComponent {
   }
 
   private installDragOverTabbarDetector(): void {
-    const documentRoot = inject<Document>(DOCUMENT).documentElement;
+    const documentRoot = inject(DOCUMENT).documentElement;
     this._viewDragService.tabbarDragOver$
       .pipe(takeUntilDestroyed())
       .subscribe(partId => {
@@ -80,6 +89,22 @@ export class ViewTabDragImageComponent {
         this.isDragOverTabbar = !!partId;
         // Compute if dragging this view tab over a tabbar located in the peripheral area.
         this.isDragOverPeripheralTabbar = !!partId && documentRoot.querySelector(`wb-workbench:has(wb-main-area-layout) wb-part[data-partid="${partId}"]:not(.main-area)`) !== null;
+      });
+  }
+
+  private installDragOverDropZoneDetector(): void {
+    const documentRoot = inject(DOCUMENT).documentElement;
+    const zone = inject(NgZone);
+    this._viewDragService.viewDrag$(documentRoot, {eventType: 'dragover'})
+      .pipe(
+        subscribeIn(fn => zone.runOutsideAngular(fn)),
+        map(event => event.defaultPrevented),
+        distinctUntilChanged(),
+        observeIn(fn => zone.run(fn)),
+        takeUntilDestroyed(),
+      )
+      .subscribe(isDragOverDropZone => {
+        this.isDragOverDropZone = isDragOverDropZone;
       });
   }
 }
