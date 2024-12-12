@@ -79,7 +79,7 @@ export class ViewTabPO {
     const partId = await this.part.getPartId();
 
     return this.locator.evaluate((viewTabElement: HTMLElement, partId: string) => {
-      const tabbarViewport = document.querySelector(`wb-part[data-partid="${partId}"] wb-part-bar sci-viewport.e2e-tabbar`);
+      const tabbarViewport = document.querySelector(`wb-part[data-partid="${partId}"] wb-view-tab-bar sci-viewport.e2e-tab-viewport`);
       return new Promise<boolean>(resolve => {
         const intersectionObserver = new IntersectionObserver(([entry]) => {
           intersectionObserver.disconnect();

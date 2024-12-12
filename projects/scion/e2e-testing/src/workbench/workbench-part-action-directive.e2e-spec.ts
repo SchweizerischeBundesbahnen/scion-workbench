@@ -35,7 +35,7 @@ test.describe('Workbench Part Action Directive', () => {
     await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-settings-action'}).locator).toBeVisible();
     await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-launch-action'}).locator).toBeVisible();
 
-    await appPO.activePart({inMainArea: true}).bar.closeTabs();
+    await appPO.activePart({inMainArea: true}).bar.viewTabBar.closeTabs();
     await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-1-search-action'}).locator).not.toBeAttached();
     await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-settings-action'}).locator).not.toBeAttached();
     await expect(appPO.activePart({inMainArea: true}).bar.action({cssClass: 'view-2-launch-action'}).locator).not.toBeAttached();

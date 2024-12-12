@@ -46,7 +46,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle2.dragTo({deltaX: 50, deltaY: 0});
 
     // Expect drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'right'}).bar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'right'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
   });
 
   test('should activate tab when dragging it out of the tabbar and into the tabbar again, retaining position', async ({appPO, workbenchNavigator}) => {
@@ -75,7 +75,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await expect.poll(() => tab2.isActive()).toBe(true);
 
     // Expect same tab order
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
 
     // Expect view to display correct content.
     await expectView(new ViewPagePO(appPO, {viewId: 'view.102'})).toBeActive();
@@ -99,13 +99,13 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     const dragHandle1 = await tab1.startDrag();
     await dragHandle1.dragTo({deltaX: await getWidth(tab1), deltaY: 0});
     await dragHandle1.drop();
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds()).toEqual(['view.102', 'view.101']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.102', 'view.101']);
 
     // Swap tabs.
     const dragHandle2 = await tab1.startDrag();
     await dragHandle2.dragTo({deltaX: -await getWidth(tab2), deltaY: 0});
     await dragHandle2.drop();
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should not display the drag source when dragging it over its tabbar', async ({appPO, workbenchNavigator}) => {
@@ -127,10 +127,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: 0});
 
     // Expect the drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
 
     // Expect the drag source to be in the DOM.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should not display the drag source when dragging it out of its tabbar', async ({appPO, workbenchNavigator}) => {
@@ -152,10 +152,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: 300});
 
     // Expect the drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
 
     // Expect the drag source to be in the DOM.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should not display the drag source when dragging it back into its tabbar', async ({appPO, workbenchNavigator}) => {
@@ -178,10 +178,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: -300});
 
     // Expect the drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
 
     // Expect the drag source to be in the DOM.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should snap the drag image to the tabbar when dragging near it', async ({appPO, workbenchNavigator}) => {
@@ -199,7 +199,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     const tab2 = appPO.view({viewId: 'view.102'}).tab;
     await tab2.setTitle('view.102');
 
-    const tabbarBounds = await appPO.part({partId: 'main'}).bar.getTabViewportBoundingBox();
+    const tabbarBounds = await appPO.part({partId: 'main'}).bar.viewTabBar.getBoundingBox();
 
     // Start dragging.
     const dragHandle = await tab1.startDrag();
@@ -315,7 +315,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab3.setWidth('200px');
     const tab3Bounds = await tab3.getBoundingBox();
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Start dragging.
     const dragHandle = await tab.startDrag();
@@ -451,7 +451,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     // Start dragging.
     const dragHandle = await tab1.startDrag();
     await dragHandle.dragTo({deltaX: 10, deltaY: 0});
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getTabViewportClientCssProperty('pointer-events')).toEqual('none');
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewportClientCssProperty('pointer-events')).toEqual('none');
   });
 
   test('should animate shifting tabs when dragging over a tabbar', async ({appPO, consoleLogs, workbenchNavigator}) => {
@@ -571,7 +571,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab3.setTitle('view.103');
     await tab3.setWidth('100px');
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
@@ -670,7 +670,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab4.setTitle('view.202');
     await tab4.setWidth('100px');
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
@@ -726,7 +726,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab4.setTitle('view.202');
     await tab4.setWidth('100px');
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
@@ -890,8 +890,8 @@ test.describe('View Drag & Drop (Tabbar)', () => {
 
     // Log change of part action position.
     await installPositionLogger(appPO.part({partId: 'bottom'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
-    const topTabbarBounds = await appPO.part({partId: 'top'}).bar.getTabViewportBoundingBox();
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.getTabViewportBoundingBox();
+    const topTabbarBounds = await appPO.part({partId: 'top'}).bar.viewTabBar.getBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Clear log.
     consoleLogs.clear();
@@ -971,7 +971,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: -1000, deltaY: 0});
 
     // Expect adjacent tab to be activated.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds({visible: true})).toEqual(['view.101']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
     await expect.poll(() => tab1.isActive()).toBe(true);
   });
 
@@ -995,7 +995,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 0, deltaY: 300});
 
     // Expect adjacent tab to be activated.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.getViewIds({visible: true})).toEqual(['view.101']);
+    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
     await expect.poll(() => tab1.isActive()).toBe(true);
   });
 });

@@ -318,7 +318,7 @@ test.describe('View Tabbar', () => {
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
     await routerPage.view.tab.click();
@@ -332,7 +332,7 @@ test.describe('View Tabbar', () => {
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2', 'view.3']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.1', 'view.2', 'view.3']);
 
     // open view.4
     await routerPage.view.tab.click();
@@ -347,7 +347,7 @@ test.describe('View Tabbar', () => {
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeInactive();
     await expectView(testee4ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
   });
 
   test('should allow opening view at the start', async ({appPO, workbenchNavigator}) => {
@@ -364,7 +364,7 @@ test.describe('View Tabbar', () => {
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.2', 'view.1']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.2', 'view.1']);
 
     // open view.3
     await routerPage.view.tab.click();
@@ -378,7 +378,7 @@ test.describe('View Tabbar', () => {
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.3', 'view.2', 'view.1']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.3', 'view.2', 'view.1']);
 
     // open view.4
     await routerPage.view.tab.click();
@@ -393,7 +393,7 @@ test.describe('View Tabbar', () => {
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeInactive();
     await expectView(testee4ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.4', 'view.3', 'view.2', 'view.1']);
   });
 
   test('should allow opening view at a specific position', async ({appPO, workbenchNavigator}) => {
@@ -410,7 +410,7 @@ test.describe('View Tabbar', () => {
 
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.1', 'view.2']);
 
     // open view.3
     await routerPage.view.tab.click();
@@ -424,7 +424,7 @@ test.describe('View Tabbar', () => {
     await expectView(routerPage).toBeInactive();
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.1', 'view.3', 'view.2']);
 
     // open view.4
     await routerPage.view.tab.click();
@@ -439,7 +439,7 @@ test.describe('View Tabbar', () => {
     await expectView(testee2ViewPage).toBeInactive();
     await expectView(testee3ViewPage).toBeInactive();
     await expectView(testee4ViewPage).toBeActive();
-    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
+    await expect.poll(() => appPO.activePart({inMainArea: true}).bar.viewTabBar.getViewIds()).toEqual(['view.1', 'view.4', 'view.3', 'view.2']);
   });
 
   test('should allow to have a sticky view tab', async ({appPO}) => {
@@ -514,10 +514,10 @@ test.describe('View Tabbar', () => {
       await tab9.setWidth('300px');
 
       const tabbar = appPO.part({partId: 'left'}).bar;
-      const tabbarBoundingBox = await tabbar.getTabViewportBoundingBox();
+      const tabbarBoundingBox = await tabbar.viewTabBar.getBoundingBox();
 
       // Scroll tabbar to the start.
-      await tabbar.setTabViewportScrollLeft(0);
+      await tabbar.viewTabBar.setViewportScrollLeft(0);
 
       // Expect tabbar to overflow (prerequisite).
       await expect.poll(() => tabbar.getHiddenTabCount()).toBe(6);
@@ -540,7 +540,7 @@ test.describe('View Tabbar', () => {
       await dragHandle.drop();
 
       // Expect tab to be dropped at the end.
-      await expect.poll(() => tabbar.getViewIds({visible: true})).toEqual([
+      await expect.poll(() => tabbar.viewTabBar.getViewIds({visible: true})).toEqual([
         'view.102',
         'view.103',
         'view.104',
@@ -714,7 +714,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.part({partId: 'left'}).bar.getHiddenTabCount()).toBe(6);
 
       // Scroll tabbar to the end.
-      await appPO.part({partId: 'left'}).bar.setTabViewportScrollLeft(Number.MAX_SAFE_INTEGER);
+      await appPO.part({partId: 'left'}).bar.viewTabBar.setViewportScrollLeft(Number.MAX_SAFE_INTEGER);
 
       // Expect "view.103" to be active and scrolled out of view.
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
@@ -756,7 +756,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(true);
 
       // Scroll tabbar to the start.
-      await appPO.part({partId: 'left'}).bar.setTabViewportScrollLeft(0);
+      await appPO.part({partId: 'left'}).bar.viewTabBar.setViewportScrollLeft(0);
 
       // Expect active tab (last tab) to be scrolled out of view.
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isScrolledIntoView()).toBe(false);
@@ -795,7 +795,7 @@ test.describe('View Tabbar', () => {
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isScrolledIntoView()).toBe(true);
 
       // Scroll tabbar to the end.
-      await appPO.part({partId: 'left'}).bar.setTabViewportScrollLeft(Number.MAX_SAFE_INTEGER);
+      await appPO.part({partId: 'left'}).bar.viewTabBar.setViewportScrollLeft(Number.MAX_SAFE_INTEGER);
 
       // Open new tab at the end.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
