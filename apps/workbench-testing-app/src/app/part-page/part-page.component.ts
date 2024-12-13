@@ -9,7 +9,5 @@ import {WorkbenchPart} from '@scion/workbench';
 })
 export default class PartPageComponent {
 
-  constructor() {
-    inject(WorkbenchPart).cssClass = 'marc';
-  }
+  protected part = inject(WorkbenchPart);
 }

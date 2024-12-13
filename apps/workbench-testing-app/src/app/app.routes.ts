@@ -11,13 +11,13 @@
 import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {topLevelTestPageRoutes} from './test-pages/routes';
-import {canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
+import {canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
 
 export const routes: Routes = [
   {
     path: '',
     component: WorkbenchComponent,
-    canMatch: [canMatchWorkbenchView(false)],
+    canMatch: [canMatchWorkbenchView(false), canMatchWorkbenchPart(false)],
     children: [
       {
         path: '',

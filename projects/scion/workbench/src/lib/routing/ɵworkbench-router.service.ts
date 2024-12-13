@@ -13,7 +13,7 @@ import {WorkbenchRouter} from './workbench-router.service';
 import {Defined} from '@scion/toolkit/util';
 import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
+import {MAIN_AREA_LAYOUT_QUERY_PARAM, WorkbenchOutlet} from '../workbench.constants';
 import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
@@ -374,25 +374,25 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
 /**
  * Computes commands that can be passed to the Angular router to navigate views and parts.
  */
-function computeNavigationCommands(previousOutlets: Outlets, nextOutlets: Outlets): [{outlets: {[outlet: string]: Commands | null}}] | [] {
-  const previousOutletMap = new Map<string, UrlSegment[]>(Objects.entries(previousOutlets));
-  const nextOutletMap = new Map<string, UrlSegment[]>(Objects.entries(nextOutlets));
+function computeNavigationCommands(currentOutlets: Outlets, newOutlets: Outlets): [{outlets: {[outlet: WorkbenchOutlet]: Commands | null}}] | [] {
+  const currentOutletMap = new Map<WorkbenchOutlet, UrlSegment[]>(Objects.entries(currentOutlets));
+  const newOutletMap = new Map<WorkbenchOutlet, UrlSegment[]>(Objects.entries(newOutlets));
 
-  const commands = new Map<string, Commands | null>();
-  const outlets = new Set<string>([...previousOutletMap.keys(), ...nextOutletMap.keys()]);
+  const commands = new Map<WorkbenchOutlet, Commands | null>();
+  const outlets = new Set<WorkbenchOutlet>([...currentOutletMap.keys(), ...newOutletMap.keys()]);
 
   outlets.forEach(outlet => {
     // Test if the outlet was added to the layout.
-    if (!previousOutletMap.has(outlet)) {
-      commands.set(outlet, Routing.segmentsToCommands(nextOutletMap.get(outlet)!));
+    if (!currentOutletMap.has(outlet)) {
+      commands.set(outlet, Routing.segmentsToCommands(newOutletMap.get(outlet)!));
     }
     // Test if the outlet was removed from the layout.
-    else if (!nextOutletMap.has(outlet)) {
+    else if (!newOutletMap.has(outlet)) {
       commands.set(outlet, null);
     }
     // Test if the outlet was changed.
-    else if (!new UrlSegmentMatcher(previousOutletMap.get(outlet)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(nextOutletMap.get(outlet)!)) {
-      commands.set(outlet, Routing.segmentsToCommands(nextOutletMap.get(outlet)!));
+    else if (!new UrlSegmentMatcher(currentOutletMap.get(outlet)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(newOutletMap.get(outlet)!)) {
+      commands.set(outlet, Routing.segmentsToCommands(newOutletMap.get(outlet)!));
     }
   });
 

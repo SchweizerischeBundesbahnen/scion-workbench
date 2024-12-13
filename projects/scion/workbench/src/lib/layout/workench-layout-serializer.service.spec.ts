@@ -56,6 +56,22 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.view({viewId: 'view.1'}).navigation!.id).toBeUndefined();
   });
 
+  it('should not serialize "part.navigation.id" field', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.1')
+      .navigatePart('part.1', ['path/to/part']);
+
+    // Expect navigation id to be set.
+    expect(layout.part({partId: 'part.1'}).navigation!.id).not.toBeUndefined();
+
+    // Serialize layout without "part.navigation.id".
+    const serializedLayout = layout.serialize({excludePartNavigationId: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+
+    // Expect navigation id not to be serialized.
+    expect(deserializedLayout.part({partId: 'part.1'}).navigation!.id).toBeUndefined();
+  });
+
   it('should not serialize "TreeNode.id" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('left')

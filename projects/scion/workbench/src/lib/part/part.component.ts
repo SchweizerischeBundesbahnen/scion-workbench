@@ -23,6 +23,7 @@ import {WORKBENCH_ID} from '../workbench-id';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {PART_ID_PREFIX} from '../workbench.constants';
 import {NgClass} from '@angular/common';
+import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive';
 
 @Component({
   selector: 'wb-part',
@@ -33,6 +34,7 @@ import {NgClass} from '@angular/common';
     PartBarComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
+    RootRouterOutletDirective,
     ViewPortalPipe,
     SciViewportComponent,
   ],

@@ -13,9 +13,13 @@
     position: relative; // positioning context for content and drop zone
   }
 
-  > sci-viewport.page {
+  > sci-viewport.content {
     flex: 1 1 0;
     display: grid;
     position: relative; // positioning context for content
+
+    > router-outlet {
+      position: absolute; // take router outlet out of the document flow
+    }
   }
 }

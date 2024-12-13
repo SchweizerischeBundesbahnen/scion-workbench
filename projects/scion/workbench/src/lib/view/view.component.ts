@@ -21,6 +21,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
+import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -34,6 +35,7 @@ import {synchronizeCssClasses} from '../common/css-class.util';
     RouterOutlet,
     A11yModule,
     SciViewportComponent,
+    RootRouterOutletDirective,
   ],
   hostDirectives: [
     GlassPaneDirective,

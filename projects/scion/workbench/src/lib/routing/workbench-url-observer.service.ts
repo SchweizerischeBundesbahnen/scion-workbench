@@ -21,7 +21,7 @@ import {ViewComponent} from '../view/view.component';
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
 import {Logger, LoggerNames} from '../logging';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
-import {MainAreaPartComponent} from '../layout/main-area-part/main-area-part.component';
+import {MainAreaPartComponent} from '../part/main-area-part/main-area-part.component';
 import {PartComponent} from '../part/part.component';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';

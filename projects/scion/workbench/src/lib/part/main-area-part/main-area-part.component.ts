@@ -9,10 +9,9 @@
  */
 
 import {Component, computed, HostBinding, inject} from '@angular/core';
-import {ɵWorkbenchPart} from '../../part/ɵworkbench-part.model';
-import {MPartGrid} from '../workbench-layout.model';
-import {WorkbenchLayoutService} from '../workbench-layout.service';
-import {GridElementComponent} from '../grid-element/grid-element.component';
+import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {GridElementComponent} from '../../layout/grid-element/grid-element.component';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
@@ -21,6 +20,9 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
+import {PART_ID_PREFIX} from '../../workbench.constants';
+import {RootRouterOutletDirective} from '../../routing/root-router-outlet.directive';
+import {Logger} from '../../logging';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -55,23 +57,23 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
     RouterOutlet,
     SciViewportComponent,
     GridElementIfVisiblePipe,
+    RootRouterOutletDirective,
   ],
 })
 export class MainAreaPartComponent {
 
   private _workbenchId = inject(WORKBENCH_ID);
-  private _part = inject(ɵWorkbenchPart);
   private _workbenchLayoutService = inject(WorkbenchLayoutService);
   private _viewDragService = inject(ViewDragService);
+  private readonly _logger = inject(Logger);
 
-  protected mainAreaGrid = computed((): MPartGrid => {
-    return this._workbenchLayoutService.layout()!.mainAreaGrid!;
-  });
+  protected part = inject(ɵWorkbenchPart);
+  protected mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.mainAreaGrid!);
 
   @HostBinding('attr.data-partid')
-  protected get partId(): string {
-    return this._part.id;
-  }
+  protected partId = this.part.id;
+
+  protected readonly PART_ID_PREFIX = PART_ID_PREFIX;
 
   protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
@@ -92,5 +94,10 @@ export class MainAreaPartComponent {
       }),
       dragData: event.dragData,
     });
+  }
+
+  protected onStartPageActivate(): void {
+    // TODO [activity] Print better warning
+    this._logger.warn('[Workbench][Deprecation] Displaying a start page in the main area is deprecated. Instead, navigate the main area part in the workbench layout. This API will be removed in Angular 20.');
   }
 }

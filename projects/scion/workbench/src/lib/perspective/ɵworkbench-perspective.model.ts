@@ -92,9 +92,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   /**
    * Creates the perspective layout using the main area of the current layout.
    *
-   * When switching perspective, id clashes between the views contained in the perspective and the
-   * views contained in the main area are possible. The activation detects and resolves conflicts,
-   * changing the layout of this perspective if necessary.
+   * When switching perspective, id clashes between parts and views contained in the perspective and the main area are possible.
+   * The activation detects and resolves conflicts, changing the layout of this perspective if necessary.
    */
   private createLayoutForActivation(currentLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     if (!this._perspectiveLayout) {
@@ -112,16 +111,16 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       this._perspectiveLayout = this._perspectiveViewConflictResolver.resolve(currentLayout, this._perspectiveLayout);
     }
 
-    // Add view outlets of views contained in the main area.
+    // Add outlets of parts and views contained in the main area.
     if (currentLayout.hasPart(MAIN_AREA, {grid: 'workbench'}) && this._perspectiveLayout.hasPart(MAIN_AREA, {grid: 'workbench'})) {
-      Object.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([viewId, segments]) => {
-        outlets.set(viewId, segments);
+      Object.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([outlet, segments]) => {
+        outlets.set(outlet, segments);
       });
     }
 
-    // Add view outlets of views contained in this perspective.
-    Object.entries(this._perspectiveLayout.outlets()).forEach(([viewId, segments]) => {
-      outlets.set(viewId, segments);
+    // Add outlets of parts and views contained in this perspective.
+    Object.entries(this._perspectiveLayout.outlets()).forEach(([outlet, segments]) => {
+      outlets.set(outlet, segments);
     });
 
     // Create the layout for this perspective.
@@ -130,7 +129,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       mainAreaGrid: currentLayout.mainAreaGrid,
       perspectiveId: this.id,
       outlets: Object.fromEntries(outlets),
-      navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of views in the main area; navigation state of other views cannot be restored since not persisted
+      navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of parts and views in the main area; navigation state of other views cannot be restored since not persisted
       maximized: undefined, // Do not preserve maximized state when switching between perspectives.
     });
   }

@@ -79,7 +79,7 @@ export interface Exclusion {
    * Tests if to exclude the resolved field, enabling extended checks if the field cannot be uniquely identified via the path.
    *
    * @param objectPath - path to the field in the object tree.
-   * @param key - key under with the field is associated in the parent object.
+   * @param key - key under which the field is associated in the parent object.
    * @param value - value of the field.
    */
   predicate: (objectPath: unknown[], key: string, value: unknown) => boolean;

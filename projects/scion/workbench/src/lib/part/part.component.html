@@ -1,5 +1,8 @@
-@if (part.hasViews()) {
+@if (part.viewIds().length || part.actions().length) {
   <wb-part-bar/>
+}
+
+@if (part.viewIds().length) {
   <div wbViewDropZone
        [wbViewDropZoneSize]=".3"
        [wbViewDropZonePlaceholderSize]=".5"
@@ -9,9 +12,9 @@
     <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
   </div>
 } @else if (part.navigation()) {
-  <sci-viewport class="page">
+  <sci-viewport class="content">
     <!-- TODO [activity] Consider using a portal similar to view (like desktop) to not lose data when moving the part  -->
     <!-- TODO [activity] Do we need drop zones? Maybe configurable; not in activities  -->
-    <router-outlet [name]="PART_ID_PREFIX + part.id"/>
+    <router-outlet [name]="PART_ID_PREFIX + part.id" wbRoot/>
   </sci-viewport>
 }

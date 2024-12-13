@@ -17,7 +17,7 @@ import {ActivationInstantProvider} from '../activation-instant.provider';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewId} from '../view/workbench-view.model';
-import {ActivatedRouteSnapshot, ChildrenOutletContexts, UrlSegment} from '@angular/router';
+import {ActivatedRouteSnapshot, UrlSegment} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
@@ -26,13 +26,11 @@ import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {NavigationData, NavigationState} from '../routing/routing.model';
-import {MAIN_AREA} from '../layout/workbench-layout';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
   private readonly _partEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
-  private readonly _childrenOutletContexts = inject(ChildrenOutletContexts);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
@@ -43,7 +41,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId = signal<ViewId | null>(null);
   public readonly actions: Signal<WorkbenchPartAction[]>;
-  public readonly hasViews = computed(() => this.viewIds().length);
   public readonly classList = new ClassList();
 
   private _isInMainArea: boolean | undefined;
@@ -68,11 +65,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
-        // For each part, the workbench registers auxiliary routes of all top-level routes, enabling routing on a per-part basis.
-        // But, if the workbench component itself is displayed in a router outlet, part outlets are not top-level outlets.
-        // Therefore, we instruct the outlet to act as a top-level outlet to be the target of the registered top-level part routes.
-        // TODO [activity] Try to remove by get rid of MainAreaPartComponent
-        this.id !== MAIN_AREA ? {provide: ChildrenOutletContexts, useValue: this._childrenOutletContexts} : [],
       ],
     });
     return new ComponentPortal(this._partComponent, null, injector, null, null);

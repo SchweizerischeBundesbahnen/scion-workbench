@@ -97,7 +97,7 @@ function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .addView('sample-view-6', {partId: 'bottom'})
     .addView('sample-view-7', {partId: 'bottom'})
     .addView('sample-view-8', {partId: 'bottom'})
-    .navigatePart('top-right', ['test-part'], {cssClass: 'dani'})
+    .navigatePart('top-right', ['test-part'])
     .navigatePart('bottom-right', ['test-part'])
     .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
     .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})

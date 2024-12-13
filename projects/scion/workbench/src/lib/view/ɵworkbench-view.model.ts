@@ -47,7 +47,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
-  private readonly _childrenOutletContexts = inject(ChildrenOutletContexts);
+  private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
@@ -104,10 +104,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     return new WbComponentPortal(viewComponent, {
       providers: [
         provideViewContext(this),
-        // For each view, the workbench registers auxiliary routes of all top-level routes, enabling routing on a per-view basis.
-        // But, if the workbench component itself is displayed in a router outlet, view outlets are not top-level outlets.
-        // Therefore, we instruct the outlet to act as a top-level outlet to be the target of the registered top-level view routes.
-        {provide: ChildrenOutletContexts, useValue: this._childrenOutletContexts},
         // Prevent injecting this part into the view because the view may be dragged to a different part.
         {provide: WorkbenchPart, useFactory: () => undefined},
         {provide: ɵWorkbenchPart, useFactory: () => undefined},
@@ -169,7 +165,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Returns the component of this view. Returns `null` if not navigated the view, or before it was activated for the first time.
    */
   public getComponent<T = unknown>(): T | null {
-    const outlet = Routing.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id))?.outlet;
+    const outlet = Routing.resolveEffectiveOutletContext(this._rootOutletContexts.getContext(this.id))?.outlet;
     return outlet?.isActivated ? outlet.component as T : null;
   }
 

@@ -424,7 +424,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Serializes this layout into a URL-safe base64 string.
    */
   public serialize(flags?: GridSerializationFlags): SerializedWorkbenchLayout {
-    const isMainAreaEmpty = (this.mainAreaGrid?.root instanceof MPart && this.mainAreaGrid.root.views.length === 0) ?? true;
+    const root = this.mainAreaGrid?.root;
+    const isMainAreaEmpty = root instanceof MPart && !root.views.length && !root.navigation && !root.structural;
+
     return {
       workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
       mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
@@ -702,8 +704,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         }).at(0);
     }
 
-    // Remove the part if this is the last view of the part and not a structural part.
-    if (part.views.length === 0 && !part.structural) {
+    // Remove the part when removing its last view, but only if the part has no navigation and is not a structural part.
+    if (!part.views.length && !part.navigation && !part.structural) {
       this.__removePart(part.id);
     }
   }

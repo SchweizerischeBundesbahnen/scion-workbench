@@ -1,3 +1,5 @@
+<input placeholder="Part ID" #part_id>
+<button (click)="onNavigatePart(part_id.value)">Navigate Part</button>
 <form autocomplete="off" [formGroup]="form">
   <section>
     <header>Routing Command</header>

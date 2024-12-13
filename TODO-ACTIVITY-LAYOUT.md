@@ -15,3 +15,14 @@
 
 ## IDEAS:
 [] Activity icon in form of a component (instead ligature, SVG, or SVG Symbol) => full flexiblity
+[] Log warning if using start page in main area
+
+
+## TESTS:
+- should not remove navigated part if removing last view (ɵworkbench-layout.ts:709) //__removeView
+- should not null main area if part is navigated (ɵworkbench-layout.ts:430) // serialize
+    1. Open two parts in main area with one view each
+    2. Navigate right part and close view of right part
+    3. Close view in left part
+    4 expect right part to be displayed (not start page)
+    

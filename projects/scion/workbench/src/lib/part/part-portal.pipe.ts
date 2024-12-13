@@ -11,7 +11,7 @@
 import {inject, Injector, Pipe, PipeTransform} from '@angular/core';
 import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import type {PartComponent} from './part.component';
-import type {MainAreaPartComponent} from '../layout/main-area-part/main-area-part.component';
+import type {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {ComponentPortal} from '@angular/cdk/portal';
 
 /**

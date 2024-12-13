@@ -97,3 +97,8 @@ export const ANONYMOUS_PERSPECTIVE_ID_PREFIX = 'anonymous.';
 export function toPartOutlet(partId: string): PartOutlet {
   return `${PART_ID_PREFIX}${partId}` satisfies PartOutlet;
 }
+
+// TODO [activity] Remove when changing to formatted PartId
+export function toPartId(outlet: PartOutlet): string {
+  return outlet.substring(PART_ID_PREFIX.length);
+}
