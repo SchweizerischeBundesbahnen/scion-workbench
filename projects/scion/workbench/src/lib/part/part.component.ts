@@ -22,8 +22,9 @@ import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {PART_ID_PREFIX} from '../workbench.constants';
-import {NgClass} from '@angular/common';
 import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive';
+import {synchronizeCssClasses} from '../common/css-class.util';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'wb-part',
@@ -34,12 +35,10 @@ import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive
     PartBarComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
+    RouterOutlet,
     RootRouterOutletDirective,
     ViewPortalPipe,
     SciViewportComponent,
-  ],
-  hostDirectives: [
-    NgClass,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {
@@ -149,8 +148,8 @@ export class PartComponent implements OnInit, OnDestroy {
   }
 
   private addHostCssClasses(): void {
-    const ngClass = inject(NgClass);
-    effect(() => ngClass.ngClass = this.part.classList.asList());
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    synchronizeCssClasses(host, this.part.classList.asList);
   }
 
   public ngOnDestroy(): void {

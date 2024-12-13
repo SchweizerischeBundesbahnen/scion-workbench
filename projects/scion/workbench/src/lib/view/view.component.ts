@@ -33,9 +33,9 @@ import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive
   standalone: true,
   imports: [
     RouterOutlet,
+    RootRouterOutletDirective,
     A11yModule,
     SciViewportComponent,
-    RootRouterOutletDirective,
   ],
   hostDirectives: [
     GlassPaneDirective,

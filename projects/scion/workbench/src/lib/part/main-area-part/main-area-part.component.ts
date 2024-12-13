@@ -55,9 +55,9 @@ import {Logger} from '../../logging';
     ViewDropZoneDirective,
     RequiresDropZonePipe,
     RouterOutlet,
+    RootRouterOutletDirective,
     SciViewportComponent,
     GridElementIfVisiblePipe,
-    RootRouterOutletDirective,
   ],
 })
 export class MainAreaPartComponent {
