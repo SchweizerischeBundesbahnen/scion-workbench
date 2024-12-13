@@ -1,15 +1,29 @@
-# [18.0.0-beta.10](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.9...18.0.0-beta.10) (2024-12-09)
+# [19.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/18.0.0-beta.10...19.0.0-beta.1) (2024-12-13)
 
 
-### Bug Fixes
+### Dependencies
 
-* **workbench/view:** do not scroll the active tab into view when opening or closing an inactive tab ([a5d4d7e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/a5d4d7e8e2b7e62382ee8140c683acb7476cc4e3))
-* **workbench/view:** scroll the active tab into view when navigating the active tab ([d10d25b](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d10d25b8852d8bf5b8f891c2d00e3ffd245e7f86))
+* **workbench:** update @scion/workbench to Angular 19 ([e3f358f](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/e3f358fe328a61ff43f37fc368a184067b16f8b4))
 
 
-### Performance Improvements
+### Chore
 
-* **workbench:** improve drag experience when dragging tabs in the tabbar ([0ae78eb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/0ae78ebd89068857e1869a118e8e3eee95d018a0))
+* **workbench:** remove deprecated workbench modules ([df3eb4e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/df3eb4e72cd90c921b8b1385b960a63f7c9c2ac4))
+
+
+### BREAKING CHANGES
+
+* **workbench:** Updating `@scion/workbench` to Angular 19 introduced a breaking change.
+
+  To migrate:
+    - Update your application to Angular 19; for detailed migration instructions, refer to https://v19.angular.dev/update-guide;
+* **workbench:** Removing deprecated workbench modules introduced the following breaking changes.
+
+  The following APIs have been removed:
+    - `WorkbenchModule.forRoot` => register SCION Workbench providers using `provideWorkbench` function and import standalone components and directives instead;
+    - `WorkbenchModule.forChild` => no replacement; import standalone workbench components and directives instead;
+    - `WorkbenchTestingModule.forTest` => no replacement; use `provideWorkbench` instead;
+    - `provideWorkbenchForTest` => no replacement; use `provideWorkbench` instead;
 
 
 
