@@ -86,7 +86,6 @@ describe('WorkbenchGridMerger', () => {
 
     expect(mergedLayout.outlets()).toEqual({
       'view.1': segments(['PATH/TO/VIEW/1']),
-      'view.3': [],
       'view.100': segments(['path/to/view/100']),
     });
   });
@@ -153,7 +152,6 @@ describe('WorkbenchGridMerger', () => {
 
     expect(mergedLayout.outlets()).toEqual({
       'view.2': segments(['path/to/view/2']),
-      'view.3': [],
       'view.100': segments(['PATH/TO/VIEW/100']),
     });
   });
@@ -265,7 +263,6 @@ describe('WorkbenchGridMerger', () => {
 
     expect(mergedLayout.outlets()).toEqual({
       'view.1': segments(['path/to/view/1']),
-      'view.2': [],
     });
   });
 });

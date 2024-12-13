@@ -86,7 +86,7 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
     workbenchGrid: actual.workbenchGrid,
     maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
-    viewOutlets: actual.outlets(),
+    outlets: actual.outlets(),
   };
   const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
@@ -288,7 +288,7 @@ export interface ExpectedWorkbenchLayout {
   /**
    * Asserts specified view outlets, if set.
    */
-  viewOutlets?: Outlets;
+  outlets?: Outlets;
 }
 
 /**

@@ -24,7 +24,7 @@ import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {toPartOutlet, WorkbenchOutlet} from '../workbench.constants';
+import {PartOutlet, toPartOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
 
 /**
  * @inheritDoc
@@ -109,9 +109,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return outlets matching the filter criteria.
    */
   public outlets(findBy?: {grid?: keyof Grids}): Outlets {
-    const partOutlets = this.parts({grid: findBy?.grid}).map(part => [toPartOutlet(part.id), this._outlets.get(toPartOutlet(part.id)) ?? []]);
-    const viewOutlets = this.views({grid: findBy?.grid}).map(view => [view.id, this._outlets.get(view.id) ?? []]);
-    return Object.fromEntries([...partOutlets, ...viewOutlets]);
+    const partOutlets: PartOutlet[] = this.parts({grid: findBy?.grid}).map(part => toPartOutlet(part.id));
+    const viewOutlets: ViewOutlet[] = this.views({grid: findBy?.grid}).map(view => view.id);
+
+    const outlets = [...partOutlets, ...viewOutlets]
+      .filter(outlet => this._outlets.has(outlet))
+      .map(outlet => ({outlet, urlSegments: this._outlets.get(outlet)!}))
+      .reduce((outlets, {outlet, urlSegments}) => outlets.set(outlet, urlSegments), new Map<WorkbenchOutlet, UrlSegment[]>());
+
+    return Object.fromEntries(outlets);
   }
 
   /**

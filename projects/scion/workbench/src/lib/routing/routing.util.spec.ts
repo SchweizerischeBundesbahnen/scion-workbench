@@ -244,7 +244,7 @@ describe('Routing.pathToCommands', () => {
   });
 });
 
-describe('Routing.parseViewOutlets', () => {
+describe('Routing.parseOutlets', () => {
 
   it('should parse view outlets from URL', async () => {
     TestBed.configureTestingModule({

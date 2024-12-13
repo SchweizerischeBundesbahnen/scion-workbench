@@ -201,7 +201,7 @@ export class WorkbenchUrlObserver {
 
     // Revert registration if the navigation fails.
     navigationContext.registerUndoAction(() => {
-      const addedOutlets = [...addedViewOutlets, ...addedPopupOutlets, ...addedDialogOutlets, ...addedMessageBoxOutlets];
+      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets, ...addedMessageBoxOutlets];
       this._auxiliaryRouteInstaller.unregisterAuxiliaryRoutes(addedOutlets);
     });
   }

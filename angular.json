@@ -620,10 +620,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "cache": {
-      "enabled": false
-    }
   }
 }

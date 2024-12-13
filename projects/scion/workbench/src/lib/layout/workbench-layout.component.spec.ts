@@ -3083,9 +3083,9 @@ describe('WorkbenchLayout', () => {
     await firstValueFrom(onCanActivate$);
     await waitUntilStable();
 
-    // Expect part handle to already be updated.
-    expect(TestBed.inject(WorkbenchService).getPart('main')!.activeViewId()).toEqual('view.102');
-    expect(TestBed.inject(WorkbenchService).getPart('main')!.viewIds()).toEqual(['view.101', 'view.102']);
+    // Expect part handle to still have previous state.
+    expect(TestBed.inject(WorkbenchService).getPart('main')!.activeViewId()).toEqual('view.101');
+    expect(TestBed.inject(WorkbenchService).getPart('main')!.viewIds()).toEqual(['view.101']);
 
     // Expect view handle to be partially updated.
     expect(TestBed.inject(WorkbenchService).getView('view.101')!.active()).toBeTrue();
