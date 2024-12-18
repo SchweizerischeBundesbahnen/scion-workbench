@@ -349,7 +349,7 @@ export class AppPO {
    * Tests if specified drop zone is active, i.e., present in the DOM and armed for pointed events.
    */
   public async isDropZoneActive(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<boolean> {
-    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
+    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-drop-zone' : 'e2e-workbench-drop-zone';
     const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
     return await dropZoneLocator.count() > 0 && await dropZoneLocator.evaluate((element: HTMLElement) => getComputedStyle(element).pointerEvents) !== 'none';
   }
@@ -358,7 +358,7 @@ export class AppPO {
    * Returns the bounding box of the specified drop zone.
    */
   public async getDropZoneBoundingBox(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DomRect> {
-    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
+    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-drop-zone' : 'e2e-workbench-drop-zone';
     const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
     return fromRect(await dropZoneLocator.boundingBox());
   }

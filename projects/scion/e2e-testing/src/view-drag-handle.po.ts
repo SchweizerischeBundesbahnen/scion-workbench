@@ -59,7 +59,7 @@ export class ViewDrageHandlePO {
 
     // 2. Move the drag handle over the specified region.
     if (options.region !== 'center') {
-      const dropZoneLocator = this._page.locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${options.region}.e2e-part`);
+      const dropZoneLocator = this._page.locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${options.region}.e2e-part-drop-zone`);
       await this.moveMouseToRegion(dropZoneLocator, options.region, {steps});
     }
   }
@@ -76,7 +76,7 @@ export class ViewDrageHandlePO {
 
     // 2. Move the drag handle over the specified region.
     if (options.region !== 'center') {
-      const dropZoneCssClass = grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
+      const dropZoneCssClass = grid === 'mainArea' ? 'e2e-main-area-drop-zone' : 'e2e-workbench-drop-zone';
       const dropZoneLocator = this._page.locator(`div.e2e-view-drop-zone.e2e-${options.region}.${dropZoneCssClass}`);
       await this.moveMouseToRegion(dropZoneLocator, options.region, {steps});
     }

@@ -6,15 +6,34 @@
   <div wbViewDropZone
        [wbViewDropZoneSize]=".3"
        [wbViewDropZonePlaceholderSize]=".5"
-       [wbViewDropZoneCssClass]="'e2e-part'"
+       [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="active-view e2e-active-view">
     <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
   </div>
 } @else if (part.navigation()) {
-  <sci-viewport class="part-page">
+  <sci-viewport class="part-page"
+                wbViewDropZone
+                [wbViewDropZoneSize]="1"
+                [wbViewDropZoneContext]="'part.' + partId"
+                [wbViewDropZonePlaceholderSize]=".5"
+                [wbViewDropZoneRegions]="{center: false, north: false, south: true, west: true, east: true}"
+                [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
+                (wbViewDropZoneDrop)="onViewDrop($event)">
     <!-- TODO [activity] Consider using a portal similar to view (like desktop) to not lose data when moving the part  -->
     <!-- TODO [activity] Do we need drop zones? Maybe configurable; not in activities  -->
     <router-outlet [name]="part.id" wbRouterOutletRootContext/>
   </sci-viewport>
+<!--  <sci-viewport class="part-page"-->
+<!--                wbViewDropZone-->
+<!--                [wbViewDropZoneSize]="1"-->
+<!--                [wbViewDropZoneContext]="'part.' + partId"-->
+<!--                [wbViewDropZonePlaceholderSize]=".5"-->
+<!--                [wbViewDropZoneRegions]="{center: false, north: true, south: true, west: true, east: true}"-->
+<!--                [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"-->
+<!--                (wbViewDropZoneDrop)="onViewDrop($event)">-->
+<!--    &lt;!&ndash; TODO [activity] Consider using a portal similar to view (like desktop) to not lose data when moving the part  &ndash;&gt;-->
+<!--    &lt;!&ndash; TODO [activity] Do we need drop zones? Maybe configurable; not in activities  &ndash;&gt;-->
+<!--    <router-outlet [name]="part.id" wbRouterOutletRootContext/>-->
+<!--  </sci-viewport>-->
 }

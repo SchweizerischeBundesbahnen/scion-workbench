@@ -10,14 +10,14 @@
                      east: root | wbRequiresDropZone:'east',
                      center: false,
                    }"
-                   [wbViewDropZoneCssClass]="'e2e-workbench-grid'"
+                   [wbViewDropZoneCssClass]="'e2e-workbench-drop-zone'"
                    (wbViewDropZoneDrop)="onViewDrop($event)"/>
 } @else {
   <sci-viewport class="start-page"
                 wbViewDropZone
                 [wbViewDropZoneSize]="1"
                 [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
-                [wbViewDropZoneCssClass]="'e2e-workbench-grid'"
+                [wbViewDropZoneCssClass]="'e2e-workbench-drop-zone'"
                 (wbViewDropZoneDrop)="onViewDrop($event)">
     <router-outlet/>
   </sci-viewport>

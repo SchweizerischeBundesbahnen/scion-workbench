@@ -10,7 +10,7 @@
                      east: root | wbRequiresDropZone:'east',
                      center: false,
                    }"
-                   [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
+                   [wbViewDropZoneCssClass]="'e2e-main-area-drop-zone'"
                    (wbViewDropZoneDrop)="onViewDrop($event)"/>
 } @else if (part.navigation()) {
   <sci-viewport class="content">
@@ -24,7 +24,7 @@
                 wbViewDropZone
                 [wbViewDropZoneSize]="1"
                 [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
-                [wbViewDropZoneCssClass]="'e2e-main-area-grid'"
+                [wbViewDropZoneCssClass]="'e2e-main-area-drop-zone'"
                 (wbViewDropZoneDrop)="onViewDrop($event)">
     <router-outlet (activate)="onStartPageActivate()"/>
   </sci-viewport>

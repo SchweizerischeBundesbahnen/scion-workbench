@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
+import {Directive, ElementRef, EventEmitter, inject, Injector, Input, NgZone, OnInit, Output, runInInjectionContext} from '@angular/core';
 import {createElement, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {subscribeIn} from '@scion/toolkit/operators';
@@ -28,6 +28,10 @@ import {Arrays} from '@scion/toolkit/util';
 export class ViewDropZoneDirective implements OnInit {
 
   private readonly _host: HTMLElement;
+  private readonly _injector = inject(Injector);
+
+  @Input('wbViewDropZoneContext') // eslint-disable-line @angular-eslint/no-input-rename
+  public context?: string;
 
   /**
    * Specifies the regions where a drop zone should be installed. If not set, installs a drop zone in every region.
@@ -65,11 +69,12 @@ export class ViewDropZoneDirective implements OnInit {
               private _viewDropPlaceholderRenderer: ViewDropPlaceholderRenderer,
               private _zone: NgZone) {
     this._host = host.nativeElement;
-    this.installDropZones();
+    // this.installDropZones();
   }
 
   public ngOnInit(): void {
     this.ensureHostElementPositioned();
+    runInInjectionContext(this._injector, () => this.installDropZones());
   }
 
   /**
@@ -81,13 +86,58 @@ export class ViewDropZoneDirective implements OnInit {
   private installDropZones(): void {
     const disposables = new Array<DisposeFn>();
 
+    if (this.context === 'part.bottom-right' || 1 + 1 === 2) {
+      console.log('>>> here we go');
+      this._viewDragService.viewDrag$(this._host, {eventType: ['dragenter', 'dragover', 'dragleave', 'drop'], capture: true})
+        .pipe(
+          subscribeIn(fn => this._zone.runOutsideAngular(fn)),
+          takeUntilDestroyed(),
+        )
+        .subscribe((event: DragEvent) => {
+          // Disable the drop zone when dragging over the tab bar, allowing the user to change the tab order even for tabs covered by the drop zone.
+          if (this._viewDragService.isDragOverTabbar) {
+            return;
+          }
+
+          const region = this.computeDropZone(event, this.regions ?? {north: true, east: true, south: true, west: true, center: true}, this.dropZoneSize);
+          if (region === null) {
+            return;
+          }
+
+          event.stopPropagation();
+          console.log('>>> region', region);
+
+          const dropPlaceholderInset = this.calculateInset(region, this.dropPlaceholderSize ?? this.dropZoneSize);
+
+          switch (event.type) {
+            case 'dragenter':
+              this._viewDropPlaceholderRenderer.updatePosition(this._host, dropPlaceholderInset);
+              break;
+            case 'dragover':
+              this._viewDropPlaceholderRenderer.updatePosition(this._host, dropPlaceholderInset);
+              event.preventDefault(); // allow view drop
+              break;
+            case 'dragleave':
+              break;
+            case 'drop':
+              this._zone.run(() => this.viewDrop.emit({
+                dropRegion: region,
+                dragData: this._viewDragService.viewDragData()!,
+              }));
+              break;
+          }
+
+        });
+      return;
+    }
+
     // Create drop zones when entering the host element.
     this._viewDragService.viewDrag$(this._host, {eventType: 'dragenter'})
       .pipe(
         subscribeIn(fn => this._zone.runOutsideAngular(fn)),
         takeUntilDestroyed(),
       )
-      .subscribe(() => {
+      .subscribe(event => {
         if (!this.regions || this.regions.center) {
           disposables.push(...this.createDropZone('center'));
         }
@@ -112,6 +162,132 @@ export class ViewDropZoneDirective implements OnInit {
         disposables.forEach(disposeFn => disposeFn());
         disposables.length = 0;
       });
+  }
+
+  private computeDropZone(event: MouseEvent, regions: DropZoneRegion, size: number): 'north' | 'east' | 'south' | 'west' | 'center' | null {
+    const boundingClientRect = this._host.getBoundingClientRect();
+    const hCenter = boundingClientRect.width / 2;
+    const vCenter = boundingClientRect.height / 2;
+
+    const pointerOffsetTop = event.clientY - boundingClientRect.y;
+    const pointerOffsetRight = boundingClientRect.right - event.clientX;
+    const pointerOffsetBottom = boundingClientRect.bottom - event.clientY;
+    const pointerOffsetLeft = event.clientX - boundingClientRect.x;
+
+    const maxHeight = coercePixelValue(size, {containerSize: boundingClientRect.height});
+    const maxWidth = coercePixelValue(size, {containerSize: boundingClientRect.width});
+
+    // Quadrant left-top
+    if (pointerOffsetLeft < hCenter && pointerOffsetTop < vCenter) {
+      if (pointerOffsetLeft > maxWidth && pointerOffsetTop > maxHeight) {
+
+        return regions.center ? 'center' : null;
+      }
+      else if (regions.west && regions.north) {
+        if (pointerOffsetLeft < pointerOffsetTop) {
+          return 'west'
+        }
+        else {
+          return 'north'
+        }
+      }
+      else if (regions.west) {
+        return 'west';
+      }
+      else if (regions.north) {
+        return 'north';
+      }
+      else if (regions.center) {
+        return 'center';
+      }
+      else {
+        return null;
+      }
+    }
+
+    // Quadrant right-top
+    if (pointerOffsetLeft > hCenter && pointerOffsetTop < vCenter) {
+      console.log('>>> quadrant right-top');
+      if (pointerOffsetRight > maxWidth && pointerOffsetTop > maxHeight) {
+        return regions.center ? 'center' : null;
+      }
+      else if (regions.east && regions.north) {
+        if (pointerOffsetRight < pointerOffsetTop) {
+          return 'east'
+        }
+        else {
+          return 'north'
+        }
+      }
+      else if (regions.east) {
+        return 'east';
+      }
+      else if (regions.north) {
+        return 'north';
+      }
+      else if (regions.center) {
+        return 'center';
+      }
+      else {
+        return null;
+      }
+    }
+    // Quadrant left-bottom
+    if (pointerOffsetLeft < hCenter && pointerOffsetTop > vCenter) {
+      console.log('>>> quadrant left-bottom');
+      if (pointerOffsetLeft > maxWidth && pointerOffsetBottom > maxHeight) {
+        return regions.center ? 'center' : null;
+      }
+      else if (regions.west && regions.south) {
+        if (pointerOffsetLeft < pointerOffsetBottom) {
+          return 'west'
+        }
+        else {
+          return 'south'
+        }
+      }
+      else if (regions.west) {
+        return 'west';
+      }
+      else if (regions.south) {
+        return 'south';
+      }
+      else if (regions.center) {
+        return 'center';
+      }
+      else {
+        return null;
+      }
+    }
+
+    // Quadrant right-bottom
+    if (pointerOffsetLeft > hCenter && pointerOffsetTop > vCenter) {
+      console.log('>>> quadrant right-bottom');
+      if (pointerOffsetRight > maxWidth && pointerOffsetBottom > maxHeight) {
+        return regions.center ? 'center' : null;
+      }
+      else if (regions.east && regions.south) {
+        if (pointerOffsetRight < pointerOffsetBottom) {
+          return 'east'
+        }
+        else {
+          return 'south'
+        }
+      }
+      else if (regions.east) {
+        return 'east';
+      }
+      else if (regions.south) {
+        return 'south';
+      }
+      else if (regions.center) {
+        return 'center';
+      }
+      else {
+        return null;
+      }
+    }
+    return null;
   }
 
   /**
