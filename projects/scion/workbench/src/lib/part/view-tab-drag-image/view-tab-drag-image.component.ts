@@ -18,6 +18,8 @@ import {DOCUMENT} from '@angular/common';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
+import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
+import {MAIN_AREA} from '../../layout/workbench-layout';
 
 /**
  * @see ViewTabComponent
@@ -81,14 +83,14 @@ export class ViewTabDragImageComponent {
   }
 
   private installDragOverTabbarDetector(): void {
-    const documentRoot = inject(DOCUMENT).documentElement;
+    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
     this._viewDragService.tabbarDragOver$
       .pipe(takeUntilDestroyed())
       .subscribe(partId => {
         // Compute if dragging this view tab over a tabbar.
         this.isDragOverTabbar = !!partId;
         // Compute if dragging this view tab over a tabbar located in the peripheral area.
-        this.isDragOverPeripheralTabbar = !!partId && documentRoot.querySelector(`wb-workbench:has(wb-main-area-part) wb-part[data-partid="${partId}"]:not(.main-area)`) !== null;
+        this.isDragOverPeripheralTabbar = !!partId && partRegistry.has(MAIN_AREA) && !partRegistry.get(partId).isInMainArea;
       });
   }
 

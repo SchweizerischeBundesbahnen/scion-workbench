@@ -76,7 +76,7 @@
   }
 
   // Hide reload button if in the main area and the tabbar is showing.
-  &.main-area {
+  wb-part[data-partid="main-area"] & {
     @container view (min-width: 450px) {
       > button.reload {
         display: none;

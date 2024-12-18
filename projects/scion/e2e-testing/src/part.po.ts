@@ -13,6 +13,7 @@ import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
+import {MAIN_AREA} from './workbench.model';
 
 /**
  * Handle for interacting with a workbench part.
@@ -48,7 +49,6 @@ export class PartPO {
    * Indicates if this part is contained in the main area.
    */
   public async isInMainArea(): Promise<boolean> {
-    const count = await this._locator.page().locator('wb-main-area-part', {has: this._locator}).count();
-    return count > 0;
+    return (await this._locator.getAttribute('data-context')) === MAIN_AREA;
   }
 }

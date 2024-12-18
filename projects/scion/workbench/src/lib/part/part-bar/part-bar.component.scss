@@ -1,3 +1,5 @@
+@use '../../common/workbench-mixins';
+
 :host {
   display: flex;
   color: var(--sci-workbench-tab-text-color);
@@ -10,7 +12,7 @@
   container-type: size;
   position: relative; // Positioning context for the bottom border pseudo element.
 
-  wb-workbench:has(wb-main-area-part) wb-part:not(.main-area) & {
+  @include workbench-mixins.peripheral-workbench-parts-selector {
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
   }
 

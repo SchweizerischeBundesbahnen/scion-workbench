@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, HostBinding, inject, signal, untracked} from '@angular/core';
+import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {TableSkeletonComponent} from '../skeletons/table-sekeleton/table-skeleton.component';
 import {InputFieldSkeletonComponent} from '../skeletons/input-field-sekeleton/input-field-skeleton.component';
 import {TabbarSkeletonComponent} from '../skeletons/tabbar-sekeleton/tabbar-skeleton.component';
@@ -52,11 +52,6 @@ export default class SampleViewComponent {
   protected tabs: SkeletonStyle[] = ['table', 'form', 'list'];
   protected selectedTab = signal(Skeletons.random(0, this.tabs.length - 1));
   protected view = inject(WorkbenchView);
-
-  @HostBinding('class.main-area')
-  protected get isInMainArea(): boolean {
-    return this.view.part().isInMainArea;
-  }
 
   constructor() {
     effect(() => {

@@ -25,6 +25,7 @@ import {PART_ID_PREFIX} from '../workbench.constants';
 import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
+import {MAIN_AREA} from '../layout/workbench-layout';
 
 @Component({
   selector: 'wb-part',
@@ -46,25 +47,23 @@ export class PartComponent implements OnInit, OnDestroy {
   protected readonly PART_ID_PREFIX = PART_ID_PREFIX;
 
   @HostBinding('attr.tabindex')
-  public tabIndex = -1;
+  protected tabIndex = -1;
 
   @HostBinding('attr.data-partid')
-  public get partId(): string {
+  protected get partId(): string {
     return this.part.id;
   }
 
-  @HostBinding('class.e2e-main-area')
-  public get isInMainArea(): boolean {
-    return this.part.isInMainArea;
-  }
-
-  @HostBinding('class.main-area')
-  public get isMainArea(): boolean {
-    return this.part.isInMainArea;
+  /**
+   * Gets the context in which this part is used.
+   */
+  @HostBinding('attr.data-context')
+  protected get context(): MAIN_AREA | null {
+    return this.part.isInMainArea ? MAIN_AREA : null;
   }
 
   @HostBinding('class.active')
-  public get isActive(): boolean {
+  protected get isActive(): boolean {
     return this.part.active();
   }
 
@@ -95,7 +94,7 @@ export class PartComponent implements OnInit, OnDestroy {
   /**
    * Method invoked to move a view into this part.
    */
-  public onViewDrop(event: WbViewDropEvent): void {
+  protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,

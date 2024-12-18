@@ -70,7 +70,7 @@ export class ViewDrageHandlePO {
     const steps = options.steps ?? 100;
 
     // 1. Activate drop zones by dragging the drag handle over the grid.
-    const targetBounds = fromRect(await this._page.locator(grid === 'mainArea' ? 'wb-main-area-part' : 'wb-workbench-layout').boundingBox());
+    const targetBounds = fromRect(await this._page.locator(grid === 'mainArea' ? 'wb-part[data-partid="main-area"]' : 'wb-workbench-layout').boundingBox());
     await this._mouse.move(targetBounds.hcenter, targetBounds.vcenter, {steps});
 
     // 2. Move the drag handle over the specified region.

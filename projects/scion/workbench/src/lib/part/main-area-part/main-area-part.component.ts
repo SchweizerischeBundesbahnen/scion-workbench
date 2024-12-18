@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, HostBinding, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {GridElementComponent} from '../../layout/grid-element/grid-element.component';
@@ -23,6 +23,7 @@ import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 import {PART_ID_PREFIX} from '../../workbench.constants';
 import {RootRouterOutletDirective} from '../../routing/root-router-outlet.directive';
 import {Logger} from '../../logging';
+import {MAIN_AREA} from '../../layout/workbench-layout';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -46,7 +47,7 @@ import {Logger} from '../../logging';
  *  (left)        (right)
  */
 @Component({
-  selector: 'wb-main-area-part',
+  selector: `wb-part[data-partid="${MAIN_AREA}"]`, // eslint-disable-line @angular-eslint/component-selector
   templateUrl: './main-area-part.component.html',
   styleUrls: ['./main-area-part.component.scss'],
   standalone: true,
@@ -69,9 +70,6 @@ export class MainAreaPartComponent {
 
   protected part = inject(ɵWorkbenchPart);
   protected mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.mainAreaGrid!);
-
-  @HostBinding('attr.data-partid')
-  protected partId = this.part.id;
 
   protected readonly PART_ID_PREFIX = PART_ID_PREFIX;
 
