@@ -365,10 +365,10 @@ test.describe('Workbench View CSS Class', () => {
   });
 
   test('should add CSS classes to inactive view (WorkbenchLayout.navigateView)', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
 
-    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-      .addView('view.100', {partId: activePartId, activateView: false})
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.100', {partId: 'main', activateView: false})
       .navigateView('view.100', ['test-view'], {cssClass: 'testee'}),
     );
 

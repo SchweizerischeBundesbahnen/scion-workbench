@@ -1015,6 +1015,8 @@ export interface ReferenceElement extends ReferencePart {
  * ```
  * TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'})
  * ```
+ *
+ * @docs-private Not public API, intended for internal use only.
  */
 export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<string>('MAIN_AREA_INITIAL_PART_ID', {
   providedIn: 'root',

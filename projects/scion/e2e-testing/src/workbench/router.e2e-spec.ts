@@ -1502,11 +1502,11 @@ test.describe('Workbench Router', () => {
   });
 
   test('should navigate from path-based route to path-based route', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
 
     // Open router page as path-based route.
-    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-      .addView('view.100', {partId: activePartId})
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.100', {partId: 'main'})
       .navigateView('view.100', ['test-router']),
     );
 
@@ -1529,11 +1529,11 @@ test.describe('Workbench Router', () => {
   });
 
   test('should navigate from path-based route to empty-path route', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
 
     // Open router page as path-based route.
-    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-      .addView('view.100', {partId: activePartId})
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.100', {partId: 'main'})
       .navigateView('view.100', ['test-router']),
     );
 
@@ -1557,11 +1557,11 @@ test.describe('Workbench Router', () => {
   });
 
   test('should navigate from empty-path route to empty-path route', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
 
     // Open router page as empty-path route.
-    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-      .addView('view.100', {partId: activePartId})
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.100', {partId: 'main'})
       .navigateView('view.100', [], {hint: 'test-router'}),
     );
 
@@ -1585,11 +1585,11 @@ test.describe('Workbench Router', () => {
   });
 
   test('should navigate from empty-path route to path-based route', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
 
     // Open router page as empty-path route.
-    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-      .addView('view.100', {partId: activePartId})
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.100', {partId: 'main'})
       .navigateView('view.100', [], {hint: 'test-router'}),
     );
 

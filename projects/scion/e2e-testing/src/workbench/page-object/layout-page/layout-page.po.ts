@@ -52,11 +52,11 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
    *
    * @see WorkbenchRouter.navigate
    */
-  public async modifyLayout(fn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
+  public async modifyLayout(fn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
     await this.view.tab.click();
     await this._tabbar.selectTab('e2e-modify-layout');
 
-    const modifyLayoutPage = new ModifyLayoutPagePO(this.view, this.locator.locator('app-modify-layout-page'));
+    const modifyLayoutPage = new ModifyLayoutPagePO(this.locator.locator('app-modify-layout-page'));
     return modifyLayoutPage.modify(fn);
   }
 

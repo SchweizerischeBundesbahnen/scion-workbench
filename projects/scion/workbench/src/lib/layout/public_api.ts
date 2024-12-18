@@ -9,4 +9,5 @@
  */
 
 export {WorkbenchLayout, ReferencePart, MAIN_AREA} from './workbench-layout';
+export {MAIN_AREA_INITIAL_PART_ID} from './ɵworkbench-layout';
 export {WorkbenchLayoutFactory} from './workbench-layout.factory';

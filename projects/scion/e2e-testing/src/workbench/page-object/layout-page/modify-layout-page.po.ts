@@ -13,7 +13,6 @@ import {Locator} from '@playwright/test';
 import {WorkbenchLayout} from '@scion/workbench';
 import {LayoutPages} from './layout-pages.po';
 import {AppPO} from '../../../app.po';
-import {ViewPO} from '../../../view.po';
 import {ɵWorkbenchLayout} from './layout.model';
 
 /**
@@ -21,12 +20,11 @@ import {ɵWorkbenchLayout} from './layout.model';
  */
 export class ModifyLayoutPagePO {
 
-  constructor(public view: ViewPO, public locator: Locator) {
+  constructor(public locator: Locator) {
   }
 
-  public async modify(fn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
-    const activePartId = await this.view.part.getPartId();
-    const {parts, views, viewNavigations} = fn(new ɵWorkbenchLayout(), activePartId) as ɵWorkbenchLayout;
+  public async modify(fn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
+    const {parts, views, viewNavigations} = fn(new ɵWorkbenchLayout()) as ɵWorkbenchLayout;
 
     // Enter the layout.
     await LayoutPages.enterParts(this.locator.locator('app-add-parts'), parts);

@@ -49,6 +49,14 @@ export const WorkbenchStartupQueryParams = {
   DIALOG_MODALITY_SCOPE: 'dialogModalityScope',
 
   /**
+   * Query param to control the identity of the initial part in the main area.
+   *
+   * The initial part is automatically created by the workbench if the main area has no part, but it has no
+   * special meaning to the workbench and can be removed by the user. If not set, a UUID is assigned.
+   */
+  MAIN_AREA_INITIAL_PART_ID: 'mainAreaInitialPartId',
+
+  /**
    * Reads the query param to set the workbench launching strategy.
    */
   launcher: (): 'APP_INITIALIZER' | 'LAZY' | undefined => {
@@ -88,5 +96,12 @@ export const WorkbenchStartupQueryParams = {
    */
   simulateSlowCapabilityLookup: (): boolean => {
     return coerceBooleanProperty(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP));
+  },
+
+  /**
+   * Reads the query param to control the identity of the initial part in the main area.
+   */
+  mainAreaInitialPartId: (): string | undefined => {
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID) ?? undefined;
   },
 } as const;

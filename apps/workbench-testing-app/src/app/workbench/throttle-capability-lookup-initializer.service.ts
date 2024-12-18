@@ -52,9 +52,6 @@ class CapabilityLookupMessageInterceptor implements MessageInterceptor {
  * Returns an empty provider array if the query parameter {@link WorkbenchStartupQueryParams#SIMULATE_SLOW_CAPABILITY_LOOKUP} is not set.
  */
 export function provideThrottleCapabilityLookupInterceptor(): EnvironmentProviders | [] {
-  if (WorkbenchStartupQueryParams.standalone()) {
-    return [];
-  }
   if (WorkbenchStartupQueryParams.simulateSlowCapabilityLookup()) {
     return makeEnvironmentProviders([
       {

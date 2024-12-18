@@ -63,16 +63,31 @@ export class AppPO {
     }
 
     this._workbenchStartupQueryParams = new URLSearchParams();
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options?.launcher ?? 'LAZY');
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(options?.microfrontendSupport ?? true) === false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${options?.confirmStartup ?? false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${options?.simulateSlowCapabilityLookup ?? false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${(options?.perspectives ?? []).join(';')}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options?.dialogModalityScope ?? 'workbench');
+    if (options?.launcher) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options.launcher);
+    }
+    if (!(options?.microfrontendSupport ?? true)) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${true}`);
+    }
+    if (options?.confirmStartup) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${true}`);
+    }
+    if (options?.simulateSlowCapabilityLookup) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${true}`);
+    }
+    if (options?.perspectives?.length) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${options.perspectives.join(';')}`);
+    }
+    if (options?.dialogModalityScope) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options?.dialogModalityScope);
+    }
+    if (options?.mainAreaInitialPartId) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
+    }
 
     const featureQueryParams = new URLSearchParams();
-    if (options?.stickyStartViewTab !== undefined) {
-      featureQueryParams.append('stickyStartViewTab', `${options.stickyStartViewTab}`);
+    if (options?.stickyStartViewTab) {
+      featureQueryParams.append('stickyStartViewTab', `${true}`);
     }
 
     // Perform navigation.
@@ -434,6 +449,10 @@ export interface Options {
    */
   dialogModalityScope?: 'workbench' | 'viewport';
   /**
+   * Controls the identity of the initial part in the main area. If not set, a UUID is assigned.
+   */
+  mainAreaInitialPartId?: string;
+  /**
    * Specifies data to be in local storage.
    */
   localStorage?: {[key: string]: string};
@@ -472,4 +491,9 @@ export enum WorkenchStartupQueryParams {
    * Query param to set the scope for application-modal dialogs.
    */
   DIALOG_MODALITY_SCOPE = 'dialogModalityScope',
+
+  /**
+   * Query param to control the identity of the initial part in the main area.
+   */
+  MAIN_AREA_INITIAL_PART_ID = 'mainAreaInitialPartId',
 }

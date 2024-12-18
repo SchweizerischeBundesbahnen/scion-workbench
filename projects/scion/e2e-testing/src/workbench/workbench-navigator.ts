@@ -122,7 +122,7 @@ export class WorkbenchNavigator {
    *
    * @see WorkbenchRouter.navigate
    */
-  public async modifyLayout(layoutFn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
+  public async modifyLayout(layoutFn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
     const layoutPage = await this.openInNewTab(LayoutPagePO);
     await layoutPage.modifyLayout(layoutFn);
     await layoutPage.view.tab.close();
