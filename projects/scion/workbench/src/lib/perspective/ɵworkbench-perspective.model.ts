@@ -100,8 +100,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       throw Error(`[PerspectiveActivateError] Perspective '${this.id}' not constructed.`);
     }
 
-    // TODO [activity] Conflicts with part outlets
-
     // Outlets of the new layout.
     const outlets = new Map<string, UrlSegment[]>();
 

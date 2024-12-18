@@ -39,8 +39,8 @@ test.describe('Workbench RouterLink', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left'}),
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left'}),
     );
 
     // Add state via separate navigation as not supported when adding views to the perspective.
@@ -68,7 +68,7 @@ test.describe('Workbench RouterLink', () => {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
@@ -418,10 +418,10 @@ test.describe('Workbench RouterLink', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
-      .addPart('left')
-      .addPart('right', {align: 'right'})
-      .addView('view.101', {partId: 'left'})
-      .addView('view.102', {partId: 'right'}),
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'}),
     );
     await workbenchNavigator.modifyLayout(layout => layout
       .navigateView('view.101', ['test-router'], {state: {navigated: 'false'}})
@@ -458,8 +458,8 @@ test.describe('Workbench RouterLink', () => {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
         }),
       },
     });
@@ -470,8 +470,8 @@ test.describe('Workbench RouterLink', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left'}),
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left'}),
     );
 
     // Add state via separate navigation as not supported when adding views to the perspective.
@@ -511,7 +511,7 @@ test.describe('Workbench RouterLink', () => {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
@@ -529,8 +529,8 @@ test.describe('Workbench RouterLink', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left'}),
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left'}),
     );
 
     // Add state via separate navigation as not supported when adding views to the perspective.
@@ -570,7 +570,7 @@ test.describe('Workbench RouterLink', () => {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },

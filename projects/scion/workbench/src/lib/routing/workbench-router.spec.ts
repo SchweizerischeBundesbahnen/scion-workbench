@@ -32,7 +32,7 @@ describe('WorkbenchRouter', () => {
   it('should not automatically activate part when opening view through `WorkbenchLayout.addView`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
         provideRouter([]),
       ],
     });
@@ -41,33 +41,33 @@ describe('WorkbenchRouter', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add part to the right of the main part.
-    await workbenchRouter.navigate(layout => layout.addPart('right', {relativeTo: 'main', align: 'right'}));
+    await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.main', align: 'right'}));
     await waitUntilStable();
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view.101 to main part.
-    await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'main', activateView: true}));
+    await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.main', activateView: true}));
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view.102 to the right part without activating the part.
-    await workbenchRouter.navigate(layout => layout.addView('view.102', {partId: 'right', activateView: true}));
+    await workbenchRouter.navigate(layout => layout.addView('view.102', {partId: 'part.right', activateView: true}));
     await waitUntilStable();
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view.103 to the right part without activating the part.
-    await workbenchRouter.navigate(layout => layout.addView('view.103', {partId: 'right', activateView: true}));
+    await workbenchRouter.navigate(layout => layout.addView('view.103', {partId: 'part.right', activateView: true}));
     await waitUntilStable();
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view.104 to the right part and activate the part.
-    await workbenchRouter.navigate(layout => layout.addView('view.104', {partId: 'right', activateView: true, activatePart: true}));
+    await workbenchRouter.navigate(layout => layout.addView('view.104', {partId: 'part.right', activateView: true, activatePart: true}));
     await waitUntilStable();
     // Expect right part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('right');
+    expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
       return TestBed.inject(WorkbenchService).parts().find(part => part.isInMainArea && part.active())!;
@@ -77,7 +77,7 @@ describe('WorkbenchRouter', () => {
   it('should automatically activate part when opening view through `WorkbenchRouter.navigate([path/to/view])`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
         provideRouter([]),
       ],
     });
@@ -86,40 +86,40 @@ describe('WorkbenchRouter', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add part to the right of the main part.
-    await workbenchRouter.navigate(layout => layout.addPart('right', {relativeTo: 'main', align: 'right'}));
+    await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.main', align: 'right'}));
     await waitUntilStable();
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view to the right part.
-    await workbenchRouter.navigate(['path/to/view'], {partId: 'right'});
+    await workbenchRouter.navigate(['path/to/view'], {partId: 'part.right'});
     await waitUntilStable();
     // Expect right part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('right');
+    expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     // Activate main part.
-    await workbenchRouter.navigate(layout => layout.activatePart('main'));
+    await workbenchRouter.navigate(layout => layout.activatePart('part.main'));
     await waitUntilStable();
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view to the right part (view already in the layout).
-    await workbenchRouter.navigate(['path/to/view'], {partId: 'right'});
+    await workbenchRouter.navigate(['path/to/view'], {partId: 'part.right'});
     await waitUntilStable();
     // Expect right part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('right');
+    expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     // Activate main part.
-    await workbenchRouter.navigate(layout => layout.activatePart('main'));
+    await workbenchRouter.navigate(layout => layout.activatePart('part.main'));
     await waitUntilStable();
     // Expect main part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('main');
+    expect(findActiveMainAreaPart().id).toEqual('part.main');
 
     // Add view to the right part.
-    await workbenchRouter.navigate(['path/to/other/view'], {partId: 'right'});
+    await workbenchRouter.navigate(['path/to/other/view'], {partId: 'part.right'});
     await waitUntilStable();
     // Expect right part to be active.
-    expect(findActiveMainAreaPart().id).toEqual('right');
+    expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
       return TestBed.inject(WorkbenchService).parts().find(part => part.isInMainArea && part.active())!;
@@ -194,7 +194,7 @@ describe('WorkbenchRouter', () => {
     let canActivate3: boolean;
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
         provideRouter([
           {path: 'path/to/view/1', component: SpecViewComponent},
           {path: 'path/to/view/2', component: SpecViewComponent, canActivate: [() => canActivate2]},
@@ -212,7 +212,7 @@ describe('WorkbenchRouter', () => {
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
     });
 
@@ -222,7 +222,7 @@ describe('WorkbenchRouter', () => {
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
     });
     expect(TestBed.inject(WorkbenchService).getView('view.102')).toBeNull();
@@ -234,7 +234,7 @@ describe('WorkbenchRouter', () => {
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
     });
     const view102 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
@@ -246,13 +246,13 @@ describe('WorkbenchRouter', () => {
     canActivate3 = false;
     await workbenchRouter.navigate(layout => layout
       .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addView('view.103', {partId: 'main'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
     });
     // Expect view.102 not to be navigated.
@@ -266,13 +266,13 @@ describe('WorkbenchRouter', () => {
     canActivate3 = true;
     await workbenchRouter.navigate(layout => layout
       .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addView('view.103', {partId: 'main'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
       },
     });
     expect(view102.navigationId()).not.toEqual(navigationId);
@@ -292,7 +292,7 @@ describe('WorkbenchRouter', () => {
     let canActivate3: () => boolean;
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
         provideRouter([
           {path: 'path/to/view/1', component: SpecViewComponent},
           {path: 'path/to/view/2', component: SpecViewComponent, canActivate: [() => canActivate2()]},
@@ -310,7 +310,7 @@ describe('WorkbenchRouter', () => {
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
     });
 
@@ -321,7 +321,7 @@ describe('WorkbenchRouter', () => {
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
     });
     expect(TestBed.inject(WorkbenchService).getView('view.102')).toBeNull();
@@ -333,7 +333,7 @@ describe('WorkbenchRouter', () => {
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
     });
     const view102 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
@@ -345,14 +345,14 @@ describe('WorkbenchRouter', () => {
     canActivate3 = () => throwError('navigation error');
     const navigation3 = workbenchRouter.navigate(layout => layout
       .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addView('view.103', {partId: 'main'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
     await expectAsync(navigation3).toBeRejectedWithError('navigation error');
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
     });
     // Expect view.102 not to be navigated.
@@ -366,13 +366,13 @@ describe('WorkbenchRouter', () => {
     canActivate3 = () => true;
     await workbenchRouter.navigate(layout => layout
       .navigateView('view.102', ['path/to/view/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addView('view.103', {partId: 'main'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.103', ['path/to/view/3']),
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
       },
     });
     expect(view102.navigationId()).not.toEqual(navigationId);

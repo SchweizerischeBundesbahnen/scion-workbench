@@ -14,7 +14,7 @@ import {PartPO} from './part.po';
 import {ViewTabContextMenuPO} from './view-tab-context-menu.po';
 import {ViewMoveDialogTestPagePO} from './workbench/page-object/test-pages/view-move-dialog-test-page.po';
 import {AppPO} from './app.po';
-import {ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
 import {ViewInfo, ViewInfoDialogPO} from './workbench/page-object/view-info-dialog.po';
 import {ViewDrageHandlePO} from './view-drag-handle.po';
 
@@ -48,7 +48,7 @@ export class ViewTabPO {
   }
 
   public async getViewId(): Promise<ViewId> {
-    return (await this.locator.getAttribute('data-viewid'))! as ViewId;
+    return (await this.locator.getAttribute('data-viewid')) as ViewId;
   }
 
   public async click(): Promise<void> {
@@ -78,7 +78,7 @@ export class ViewTabPO {
   public async isScrolledIntoView(): Promise<boolean> {
     const partId = await this.part.getPartId();
 
-    return this.locator.evaluate((viewTabElement: HTMLElement, partId: string) => {
+    return this.locator.evaluate((viewTabElement: HTMLElement, partId: PartId) => {
       const tabbarViewport = document.querySelector(`wb-part[data-partid="${partId}"] wb-view-tab-bar sci-viewport.e2e-tab-viewport`);
       return new Promise<boolean>(resolve => {
         const intersectionObserver = new IntersectionObserver(([entry]) => {
@@ -129,7 +129,7 @@ export class ViewTabPO {
    * moves the view programmatically. Use this method to move a view to another window as not supported
    * by Playwright.
    */
-  public async moveTo(partId: string, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): Promise<void> {
+  public async moveTo(partId: PartId, options?: {region?: 'north' | 'south' | 'west' | 'east'; workbenchId?: string}): Promise<void> {
     await this.click();
 
     const contextMenu = await this.openContextMenu();

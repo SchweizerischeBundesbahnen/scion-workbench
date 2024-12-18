@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, NavigationState, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {Commands, NavigationData, NavigationState, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -129,7 +129,7 @@ export interface PartDescriptor {
  */
 export interface ViewDescriptor {
   id: string;
-  partId: string;
+  partId: PartId | string;
   position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   activateView?: boolean;
   activatePart?: boolean;

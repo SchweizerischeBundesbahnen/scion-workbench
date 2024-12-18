@@ -86,7 +86,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
-  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>}) {
+  constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout, options: {component: ComponentType<ViewComponent>}) {
+    this.alternativeId = layout.view({viewId: this.id}).alternativeId;
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
@@ -97,7 +98,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.portal = this.createPortal(options.component);
     this.touchOnActivate();
     this.installModelUpdater();
-    this.onLayoutChange({layout: this._workbenchRouter.getCurrentNavigationContext().layout});
+    this.onLayoutChange({layout});
   }
 
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
@@ -128,6 +129,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.active.set(mPart.activeViewId === this.id);
     this.urlSegments.set(layout.urlSegments({outlet: this.id}));
 
+    // TODO [#626]: Remove assignment and change `alternativeId` to read only when resolved the issue #626
     this.alternativeId = mView.alternativeId;
     this.classList.layout = mView.cssClass;
 

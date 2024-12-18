@@ -70,8 +70,8 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addView('view.100', {partId: 'right', activateView: true, cssClass: 'testee-layout'}),
+      .addPart('part.right', {align: 'right'})
+      .addView('view.100', {partId: 'part.right', activateView: true, cssClass: 'testee-layout'}),
     );
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
@@ -157,8 +157,8 @@ test.describe('Workbench View CSS Class', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addView('view.100', {partId: 'right', activateView: true, cssClass: 'testee-layout'}),
+      .addPart('part.right', {align: 'right'})
+      .addView('view.100', {partId: 'part.right', activateView: true, cssClass: 'testee-layout'}),
     );
 
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});

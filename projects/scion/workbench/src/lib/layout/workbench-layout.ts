@@ -31,7 +31,7 @@ export interface WorkbenchLayout {
   /**
    * Adds a part with the given id to this layout. Position and size are expressed relative to a reference part.
    *
-   * @param id - Unique id of the part. Use {@link MAIN_AREA} to add the main area.
+   * @param id - The id of the part to add.  Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
    * @param options - Controls how to add the part to the layout.
    * @param options.activate - Controls whether to activate the part. Default is `false`.
@@ -165,9 +165,9 @@ export interface ReferencePart {
  *
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA: MAIN_AREA = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
  * Represents the type of the constant {@link MAIN_AREA}.
  */
-export type MAIN_AREA = 'main-area';
+export type MAIN_AREA = 'part.main-area';

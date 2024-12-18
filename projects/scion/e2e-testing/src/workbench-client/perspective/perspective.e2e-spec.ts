@@ -50,7 +50,7 @@ test.describe('Workbench Perspective', () => {
         layout: [
           {id: MAIN_AREA},
           {
-            id: 'left',
+            id: 'part.left',
             relativeTo: MAIN_AREA,
             align: 'left',
             ratio: .25,
@@ -60,7 +60,7 @@ test.describe('Workbench Perspective', () => {
             ],
           },
           {
-            id: 'right',
+            id: 'part.right',
             relativeTo: MAIN_AREA,
             align: 'right',
             ratio: .2,
@@ -88,7 +88,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .25,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await viewPage1.view.tab.getViewId()},
               {id: await viewPage2.view.tab.getViewId()},
@@ -102,7 +102,7 @@ test.describe('Workbench Perspective', () => {
               id: MAIN_AREA,
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [
                 {id: await viewPage3.view.tab.getViewId()},
                 {id: await viewPage4.view.tab.getViewId()},
@@ -172,13 +172,13 @@ test.describe('Workbench Perspective', () => {
       properties: {
         layout: [
           {
-            id: 'left',
+            id: 'part.left',
             views: [
               {qualifier: {view: 'testee-1'}, cssClass: 'testee-1'},
             ],
           },
           {
-            id: 'right-top',
+            id: 'part.right-top',
             align: 'right',
             ratio: .2,
             views: [
@@ -186,8 +186,8 @@ test.describe('Workbench Perspective', () => {
             ],
           },
           {
-            id: 'right-bottom',
-            relativeTo: 'right-top',
+            id: 'part.right-bottom',
+            relativeTo: 'part.right-top',
             align: 'bottom',
             ratio: .5,
             views: [
@@ -212,7 +212,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .8,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await viewPage1.view.tab.getViewId()},
             ],
@@ -222,14 +222,14 @@ test.describe('Workbench Perspective', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: 'right-top',
+              id: 'part.right-top',
               views: [
                 {id: await viewPage2.view.tab.getViewId()},
               ],
               activeViewId: await viewPage2.view.tab.getViewId(),
             }),
             child2: new MPart({
-              id: 'right-bottom',
+              id: 'part.right-bottom',
               views: [
                 {id: await viewPage3.view.tab.getViewId()},
               ],
@@ -274,7 +274,7 @@ test.describe('Workbench Perspective', () => {
       properties: {
         layout: [
           {
-            id: 'part',
+            id: 'part.part',
             views: [
               {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
               {qualifier: {view: 'testee'}, cssClass: 'testee-2'},
@@ -316,7 +316,7 @@ test.describe('Workbench Perspective', () => {
       properties: {
         layout: [
           {
-            id: 'part',
+            id: 'part.part',
             views: [
               {qualifier: {view: 'testee'}, cssClass: 'testee-1'},
               {qualifier: {view: 'testee'}, cssClass: 'testee-2', active: true},
@@ -373,7 +373,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'left',
+            id: 'part.left',
             align: 'left',
             views: [
               {qualifier: {view: '1'}, cssClass: 'testee-1'},
@@ -394,7 +394,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'right',
+            id: 'part.right',
             align: 'right',
             views: [
               {qualifier: {view: '2'}, cssClass: 'testee-2'},
@@ -425,7 +425,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await viewPage1.view.tab.getViewId()},
             ],
@@ -453,7 +453,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           }),
           child2: new MPart({
-            id: 'right',
+            id: 'part.right',
             views: [
               {id: await viewPage2.view.tab.getViewId()},
             ],
@@ -480,7 +480,7 @@ test.describe('Workbench Perspective', () => {
                 id: MAIN_AREA,
               },
               {
-                id: 'left',
+                id: 'part.left',
                 align: 'left',
                 views: [
                   {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
@@ -548,7 +548,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await testViewPage1.view.tab.getViewId()},
               {id: await notFoundPage.view.tab.getViewId()},
@@ -592,7 +592,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await testViewPage1.view.tab.getViewId()},
               {id: await testViewPage2.view.tab.getViewId()},
@@ -626,7 +626,7 @@ test.describe('Workbench Perspective', () => {
                   id: MAIN_AREA,
                 },
                 {
-                  id: 'left',
+                  id: 'part.left',
                   align: 'left',
                   views: [
                     {qualifier: {view: 'testee'}, cssClass: 'testee'},
@@ -664,7 +664,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await notFoundPage.view.tab.getViewId()},
             ],
@@ -698,7 +698,7 @@ test.describe('Workbench Perspective', () => {
                   id: MAIN_AREA,
                 },
                 {
-                  id: 'left',
+                  id: 'part.left',
                   align: 'left',
                   views: [
                     {qualifier: {view: 'testee'}, cssClass: 'testee'},
@@ -737,7 +737,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await testViewPage.view.tab.getViewId()},
             ],
@@ -787,7 +787,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'left',
+            id: 'part.left',
             align: 'left',
             views: [
               {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
@@ -818,7 +818,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await testViewPage1.view.tab.getViewId()},
               {id: await notFoundPage2.view.tab.getViewId()},
@@ -871,7 +871,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'left',
+            id: 'part.left',
             align: 'left',
             views: [
               {qualifier: {view: 'app-1'}, cssClass: 'testee-1'},
@@ -900,7 +900,7 @@ test.describe('Workbench Perspective', () => {
           direction: 'row',
           ratio: .5,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [
               {id: await testViewPage.view.tab.getViewId()},
               {id: await notFoundPage.view.tab.getViewId()},
@@ -950,9 +950,9 @@ test.describe('Workbench Perspective', () => {
     // Register perspective 1.
     const perspective1 = await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left'})
-      .addView('view.102', {partId: 'left'})
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.left'})
       .navigateView('view.101', ['test-router'])
       .navigateView('view.102', ['test-view']),
     );
@@ -960,9 +960,9 @@ test.describe('Workbench Perspective', () => {
     // Register perspective 2.
     const perspective2 = await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left'})
-      .addView('view.102', {partId: 'left'}),
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.left'}),
     );
 
     // Replace views with microfrontend views.
@@ -1026,9 +1026,9 @@ test.describe('Workbench Perspective', () => {
     // Register perspective 1.
     const perspective1 = await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true})
-      .addView('view.102', {partId: 'left'})
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left', activateView: true})
+      .addView('view.102', {partId: 'part.left'})
       .navigateView('view.101', ['test-router'])
       .navigateView('view.102', ['test-view']),
     );
@@ -1036,9 +1036,9 @@ test.describe('Workbench Perspective', () => {
     // Register perspective 2.
     const perspective2 = await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('right', {align: 'right'})
-      .addView('view.101', {partId: 'right'})
-      .addView('view.102', {partId: 'right', activateView: true}),
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.right'})
+      .addView('view.102', {partId: 'part.right', activateView: true}),
     );
 
     // Replace views with microfrontend views.
@@ -1109,7 +1109,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'left',
+            id: 'part.left',
             align: 'left',
             views: [
               {qualifier: {view: 'app-1'}, cssClass: 'app-1'},
@@ -1129,7 +1129,7 @@ test.describe('Workbench Perspective', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'right',
+            id: 'part.right',
             align: 'right',
             views: [
               {qualifier: {view: 'app-2'}, cssClass: 'app-2'},

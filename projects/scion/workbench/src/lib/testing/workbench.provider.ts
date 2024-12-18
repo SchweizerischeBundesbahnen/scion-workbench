@@ -45,7 +45,7 @@ export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInit
     provideWorkbench(config),
     provideNoopAnimations(),
     {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
-    {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config?.mainAreaInitialPartId ?? 'main'},
+    {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config?.mainAreaInitialPartId ?? 'part.main'},
     {provide: ComponentFixtureAutoDetect, useValue: true},
     {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
     {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},

@@ -20,8 +20,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
-import {PART_ID_PREFIX} from '../../workbench.constants';
-import {RootRouterOutletDirective} from '../../routing/root-router-outlet.directive';
+import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
 import {Logger} from '../../logging';
 import {MAIN_AREA} from '../../layout/workbench-layout';
 
@@ -56,7 +55,7 @@ import {MAIN_AREA} from '../../layout/workbench-layout';
     ViewDropZoneDirective,
     RequiresDropZonePipe,
     RouterOutlet,
-    RootRouterOutletDirective,
+    RouterOutletRootContextDirective,
     SciViewportComponent,
     GridElementIfVisiblePipe,
   ],
@@ -70,8 +69,6 @@ export class MainAreaPartComponent {
 
   protected part = inject(ɵWorkbenchPart);
   protected mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.mainAreaGrid!);
-
-  protected readonly PART_ID_PREFIX = PART_ID_PREFIX;
 
   protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({

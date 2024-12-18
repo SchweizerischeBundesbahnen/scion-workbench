@@ -43,6 +43,7 @@ import {NavigationData, NavigationState} from '../routing/routing.model';
 import {BlankComponent} from '../routing/workbench-auxiliary-route-installer.service';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {PartId} from '../part/workbench-part.model';
 
 describe('View', () => {
 
@@ -895,15 +896,15 @@ describe('View', () => {
               {
                 id: 'A',
                 layout: factory => factory
-                  .addPart('left')
-                  .addView('view.100', {partId: 'left'})
+                  .addPart('part.left')
+                  .addView('view.100', {partId: 'part.left'})
                   .navigateView('view.100', ['path/to/view/1']),
               },
               {
                 id: 'B',
                 layout: factory => factory
-                  .addPart('left')
-                  .addView('view.100', {partId: 'left'}) // Add view with same id as in perspective A.
+                  .addPart('part.left')
+                  .addView('view.100', {partId: 'part.left'}) // Add view with same id as in perspective A.
                   .navigateView('view.100', ['path/to/view/2'])
                   .removeView('view.100'), // Remove view to test that `CanClose` of view.100 in perspective A is not invoked.
               },
@@ -1000,8 +1001,8 @@ describe('View', () => {
 
     // Navigate to "path/to/view".
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addPart('part', {align: 'right'})
-      .addView('view.100', {partId: 'part'}) // add view
+      .addPart('part.part', {align: 'right'})
+      .addView('view.100', {partId: 'part.part'}) // add view
       .removeView('view.100'), // remove view in same navigation
     );
     await fixture.whenStable();
@@ -1359,7 +1360,7 @@ describe('View', () => {
   it('should have alternative id from MView', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
       ],
     });
 
@@ -1367,13 +1368,13 @@ describe('View', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add layout with view "view.1" and alternative view id "testee-1"
-    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'main'}));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'part.main'}));
     const view1 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-1')!;
 
     // Replace layout with view "view.1" and alternative view id "testee-2"
     await TestBed.inject(ɵWorkbenchRouter).navigate(() => inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addView('testee-2', {partId: 'main'}),
+      .addView('testee-2', {partId: 'part.main'}),
     );
 
     // Expect the view handle to be the same.
@@ -1383,7 +1384,7 @@ describe('View', () => {
     // Replace layout with view "view.1" and alternative view id "testee-2"
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
       .removeView('testee-2', {force: true})
-      .addView('testee-3', {partId: 'main'}),
+      .addView('testee-3', {partId: 'part.main'}),
     );
 
     // Expect the view handle to be the same.
@@ -2099,8 +2100,8 @@ describe('View', () => {
 
         private _view = inject(ɵWorkbenchView);
 
-        public partReadInConstructor: string | null = null;
-        public partReadInDestroy: string | null = null;
+        public partReadInConstructor: PartId | null = null;
+        public partReadInDestroy: PartId | null = null;
 
         constructor() {
           this.partReadInConstructor = this._view.part().id;
@@ -2153,8 +2154,8 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-a/view-1" in the left part.
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addPart('left', {align: 'left'})
-        .addView('view.100', {partId: 'left'})
+        .addPart('part.left', {align: 'left'})
+        .addView('view.100', {partId: 'part.left'})
         .navigateView('view.100', ['path/to/module-a/view-1'])
         .activateView('view.100'),
       );
@@ -2162,13 +2163,13 @@ describe('View', () => {
       // Expect properties to be set in constructor.
       const componentInstanceView1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
-      expect(componentInstanceView1.partReadInConstructor).toEqual('left');
+      expect(componentInstanceView1.partReadInConstructor).toEqual('part.left');
 
       // Navigate "view.100" to "path/to/module-b/view-2" in the right part.
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addPart('right', {align: 'right'})
-        .addView('view.100', {partId: 'right'})
+        .addPart('part.right', {align: 'right'})
+        .addView('view.100', {partId: 'part.right'})
         .navigateView('view.100', ['path/to/module-b/view-2'])
         .activateView('view.100'),
       );
@@ -2176,15 +2177,15 @@ describe('View', () => {
       // Expect properties to be set in constructor.
       const componentInstanceView2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
-      expect(componentInstanceView2.partReadInConstructor).toEqual('right');
+      expect(componentInstanceView2.partReadInConstructor).toEqual('part.right');
       // Expect properties not to be changed until destroyed previous component.
-      expect(componentInstanceView1.partReadInDestroy).toEqual('left');
+      expect(componentInstanceView1.partReadInDestroy).toEqual('part.left');
 
       // Close view
       await workbenchRouter.navigate([], {target: 'view.100', close: true});
       await waitUntilStable();
       // Expect properties not to be changed until destroyed previous component.
-      expect(componentInstanceView2.partReadInDestroy).toEqual('right');
+      expect(componentInstanceView2.partReadInDestroy).toEqual('part.right');
     });
 
     /**
@@ -2221,7 +2222,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {
               path: 'path/to/module-a',
@@ -2253,7 +2254,7 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-a/view-1".
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.main'})
         .navigateView('view.100', ['path/to/module-a/view-1'])
         .activateView('view.100'),
       );
@@ -2266,7 +2267,7 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-b/view-2".
       await workbenchRouter.navigate(layout => layout
         .navigateView('view.100', ['path/to/module-b/view-2'])
-        .addView('view.101', {partId: 'main'})
+        .addView('view.101', {partId: 'part.main'})
         .activateView('view.101'),
       );
       await waitUntilStable();
@@ -2317,7 +2318,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {
               path: 'path/to/module-a',
@@ -2349,7 +2350,7 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-a/view-1".
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.main'})
         .navigateView('view.100', ['path/to/module-a/view-1'])
         .activateView('view.100'),
       );
@@ -2392,7 +2393,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {path: 'path/to/view', component: SpecViewComponent},
           ]),
@@ -2404,7 +2405,7 @@ describe('View', () => {
 
       // Navigate view with data.
       await workbenchRouter.navigate(layout => layout
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.main'})
         .navigateView('view.100', ['path/to/view'], {data: {data: 'a'}})
         .activateView('view.100'),
       );
@@ -2439,7 +2440,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {path: 'path/to/view', component: SpecViewComponent},
           ]),
@@ -2451,7 +2452,7 @@ describe('View', () => {
 
       // Navigate view with state.
       await workbenchRouter.navigate(layout => layout
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.main'})
         .navigateView('view.100', ['path/to/view'], {state: {state: 'a'}})
         .activateView('view.100'),
       );
@@ -2506,7 +2507,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {path: 'path/to/view/1', component: SpecViewComponent1},
             {path: 'path/to/view/2', component: SpecViewComponent2},
@@ -2518,7 +2519,7 @@ describe('View', () => {
       await waitForInitialWorkbenchLayout();
 
       // Open view 1.
-      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'main', activateView: true}));
+      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.main', activateView: true}));
 
       // Open view 2 and navigate it to "path/to/view/1".
       await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.102', activate: false});
@@ -2565,7 +2566,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {path: '', canMatch: [canMatchWorkbenchView('view-101')], component: SpecViewComponent1},
             {path: '', canMatch: [canMatchWorkbenchView('view-102')], component: SpecViewComponent2},
@@ -2577,7 +2578,7 @@ describe('View', () => {
       await waitForInitialWorkbenchLayout();
 
       // Open view 1.
-      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'main', activateView: true}));
+      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.main', activateView: true}));
 
       // Open view 2 and navigate it to "" passing hint "view-101".
       await workbenchRouter.navigate([], {target: 'view.102', hint: 'view-101', activate: false});
@@ -2773,7 +2774,7 @@ describe('View', () => {
     it('should retain view scroll position when moving view', async () => {
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {path: 'path/to/view', loadComponent: () => TestViewComponent},
           ]),
@@ -2808,11 +2809,11 @@ describe('View', () => {
       expect(scrollTop).toBeGreaterThan(0);
 
       // Add right part.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('right', {relativeTo: 'main', align: 'right'}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('part.right', {relativeTo: 'part.main', align: 'right'}));
       await waitUntilStable();
 
       // Move view to the right part.
-      view2.move('right');
+      view2.move('part.right');
       await waitUntilStable();
 
       // Expect scroll position to be restored.
@@ -2825,8 +2826,8 @@ describe('View', () => {
         },
         mainAreaGrid: {
           root: new MTreeNode({
-            child1: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-            child2: new MPart({id: 'right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+            child1: new MPart({id: 'part.main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
           }),
         },
       });
@@ -2835,7 +2836,7 @@ describe('View', () => {
     it('should retain view scroll position when changing the layout', async () => {
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
           provideRouter([
             {path: 'path/to/view', loadComponent: () => TestViewComponent},
           ]),
@@ -2871,14 +2872,14 @@ describe('View', () => {
 
       // Change layout.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-        .addPart('left', {relativeTo: 'main', align: 'left'})
-        .addPart('right', {relativeTo: 'main', align: 'right'})
-        .addPart('top', {relativeTo: 'main', align: 'top'})
-        .addPart('bottom', {relativeTo: 'main', align: 'bottom'})
-        .addView('view.103', {partId: 'left', activateView: true})
-        .addView('view.104', {partId: 'right', activateView: true})
-        .addView('view.105', {partId: 'top', activateView: true})
-        .addView('view.106', {partId: 'bottom', activateView: true}),
+        .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+        .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+        .addPart('part.top', {relativeTo: 'part.main', align: 'top'})
+        .addPart('part.bottom', {relativeTo: 'part.main', align: 'bottom'})
+        .addView('view.103', {partId: 'part.left', activateView: true})
+        .addView('view.104', {partId: 'part.right', activateView: true})
+        .addView('view.105', {partId: 'part.top', activateView: true})
+        .addView('view.106', {partId: 'part.bottom', activateView: true}),
       );
       await waitUntilStable();
 
@@ -2886,31 +2887,31 @@ describe('View', () => {
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // Move view to part 'top'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'top', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.top', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('top');
+      expect(view2.part().id).toEqual('part.top');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // // Move view to part 'bottom'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'bottom', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.bottom', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('bottom');
+      expect(view2.part().id).toEqual('part.bottom');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // // Move view to part 'right'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'right', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.right', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('right');
+      expect(view2.part().id).toEqual('part.right');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // // Move view to part 'left'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'left', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.left', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('left');
+      expect(view2.part().id).toEqual('part.left');
       expect(viewportView2.scrollTop).toBe(scrollTop);
     });
   });

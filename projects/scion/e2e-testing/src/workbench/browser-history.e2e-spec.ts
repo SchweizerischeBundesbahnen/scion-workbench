@@ -22,13 +22,13 @@ test.describe('Browser History', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add part to the workbench grid
-    await workbenchNavigator.modifyLayout(layout => layout.addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25}));
+    await workbenchNavigator.modifyLayout(layout => layout.addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25}));
 
     // Add view-1 to the left part
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
       target: 'view.101',
-      partId: 'left',
+      partId: 'part.left',
       cssClass: 'testee',
     });
 
@@ -39,7 +39,7 @@ test.describe('Browser History', () => {
     // Add view-2 to the left part
     await routerPage.navigate(['test-view'], {
       target: 'view.102',
-      partId: 'left',
+      partId: 'part.left',
       cssClass: 'testee',
     });
 

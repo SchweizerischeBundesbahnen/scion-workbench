@@ -12,7 +12,7 @@ import {Locator} from '@playwright/test';
 import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
-import {ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -331,7 +331,7 @@ interface BoundingBox {
  */
 export interface MPartGrid {
   root: MTreeNode | MPart;
-  activePartId?: string;
+  activePartId?: PartId;
 }
 
 /**
@@ -356,7 +356,8 @@ export class MTreeNode {
 export class MPart {
 
   public readonly type = 'MPart';
-  public readonly id?: string;
+  public readonly id?: PartId;
+  public readonly alternativeId?: string;
   public views?: MView[];
   public activeViewId?: ViewId;
 

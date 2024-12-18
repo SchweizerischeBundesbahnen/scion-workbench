@@ -35,9 +35,9 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom', activateView: true}),
       );
 
       // Move test view to the west of the main area.
@@ -71,7 +71,7 @@ test.describe('View Drag Main Area', () => {
                 activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: 'bottom',
+                id: 'part.bottom',
                 views: [{id: 'view.102'}],
                 activeViewId: 'view.102',
               }),
@@ -98,9 +98,9 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom', activateView: true}),
       );
 
       // Move test view to the east of the main area.
@@ -129,7 +129,7 @@ test.describe('View Drag Main Area', () => {
                 activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: 'bottom',
+                id: 'part.bottom',
                 views: [{id: 'view.102'}],
                 activeViewId: 'view.102',
               }),
@@ -161,9 +161,9 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .25})
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right', ratio: .25})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'right', activateView: true}),
+        .addView('view.102', {partId: 'part.right', activateView: true}),
       );
 
       // Move test view to the south of the main area.
@@ -192,7 +192,7 @@ test.describe('View Drag Main Area', () => {
                 activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: 'right',
+                id: 'part.right',
                 views: [{id: 'view.102'}],
                 activeViewId: 'view.102',
               }),
@@ -223,9 +223,9 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right'})
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'right', activateView: true}),
+        .addView('view.102', {partId: 'part.right', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -253,9 +253,9 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -283,11 +283,11 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right'})
-        .addPart('bottom-left', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right'})
+        .addPart('part.bottom-left', {relativeTo: initialPartId, align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom-left', activateView: true})
-        .addView('view.103', {partId: 'right', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom-left', activateView: true})
+        .addView('view.103', {partId: 'part.right', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -315,11 +315,11 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('left', {relativeTo: initialPartId, align: 'left'})
-        .addPart('bottom-right', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.left', {relativeTo: initialPartId, align: 'left'})
+        .addPart('part.bottom-right', {relativeTo: initialPartId, align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom-right', activateView: true})
-        .addView('view.103', {partId: 'left', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom-right', activateView: true})
+        .addView('view.103', {partId: 'part.left', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -350,13 +350,13 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom'})
-        .addPart('left', {relativeTo: initialPartId, align: 'left'})
-        .addPart('bottom-right', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.left', {relativeTo: initialPartId, align: 'left'})
+        .addPart('part.bottom-right', {relativeTo: initialPartId, align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom-right', activateView: true})
-        .addView('view.103', {partId: 'left', activateView: true})
-        .addView('view.104', {partId: 'bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom-right', activateView: true})
+        .addView('view.103', {partId: 'part.left', activateView: true})
+        .addView('view.104', {partId: 'part.bottom', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -387,15 +387,15 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right'})
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom'})
-        .addPart('left', {relativeTo: initialPartId, align: 'left'})
-        .addPart('middle', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right'})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.left', {relativeTo: initialPartId, align: 'left'})
+        .addPart('part.middle', {relativeTo: initialPartId, align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'middle', activateView: true})
-        .addView('view.103', {partId: 'left', activateView: true})
-        .addView('view.104', {partId: 'bottom', activateView: true})
-        .addView('view.105', {partId: 'right', activateView: true}),
+        .addView('view.102', {partId: 'part.middle', activateView: true})
+        .addView('view.103', {partId: 'part.left', activateView: true})
+        .addView('view.104', {partId: 'part.bottom', activateView: true})
+        .addView('view.105', {partId: 'part.right', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -423,11 +423,11 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('left', {relativeTo: initialPartId, align: 'left'})
-        .addPart('right', {relativeTo: initialPartId, align: 'right'})
-        .addPart('bottom-middle', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.left', {relativeTo: initialPartId, align: 'left'})
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right'})
+        .addPart('part.bottom-middle', {relativeTo: initialPartId, align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom-middle', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom-middle', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -455,12 +455,12 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('left-top', {relativeTo: initialPartId, align: 'left'})
-        .addPart('right-top', {relativeTo: initialPartId, align: 'right'})
-        .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'})
-        .addPart('right-bottom', {relativeTo: 'right-top', align: 'bottom'})
+        .addPart('part.left-top', {relativeTo: initialPartId, align: 'left'})
+        .addPart('part.right-top', {relativeTo: initialPartId, align: 'right'})
+        .addPart('part.left-bottom', {relativeTo: 'part.left-top', align: 'bottom'})
+        .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'right-bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.right-bottom', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -479,9 +479,9 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom'})
-        .addPart('right', {relativeTo: initialPartId, align: 'right'})
-        .addView('view.101', {partId: 'right', activateView: true}),
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom'})
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right'})
+        .addView('view.101', {partId: 'part.right', activateView: true}),
       );
 
       const dragHandle = await testView.view.tab.startDrag();
@@ -509,15 +509,15 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom', activateView: true}),
       );
       const workbenchGridDropZoneSize = 50;
       const mainAreaGridDropZoneSize = 100;
 
       // Get bounding box of the tabbar of the 'bottom' part.
-      const bottomTabbarBounds = fromRect(await appPO.part({partId: 'bottom'}).bar.getBoundingBox());
+      const bottomTabbarBounds = fromRect(await appPO.part({partId: 'part.bottom'}).bar.getBoundingBox());
 
       // Open view in the initial part.
       const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -549,13 +549,13 @@ test.describe('View Drag Main Area', () => {
       const initialPartId = await testView.view.part.getPartId();
 
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
+        .addPart('part.bottom', {relativeTo: initialPartId, align: 'bottom', ratio: .25})
         .addView('view.101', {partId: initialPartId})
-        .addView('view.102', {partId: 'bottom', activateView: true}),
+        .addView('view.102', {partId: 'part.bottom', activateView: true}),
       );
 
       // Get bounding box of the tabbar of the 'bottom' part.
-      const bottomTabbarBounds = fromRect(await appPO.part({partId: 'bottom'}).bar.getBoundingBox());
+      const bottomTabbarBounds = fromRect(await appPO.part({partId: 'part.bottom'}).bar.getBoundingBox());
 
       // Open view in the initial part.
       const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);

@@ -92,13 +92,3 @@ export const VIEW_TAB_RENDERING_CONTEXT = new InjectionToken<ViewTabRenderingCon
  * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.
  */
 export const ANONYMOUS_PERSPECTIVE_ID_PREFIX = 'anonymous.';
-
-// TODO [activity] Remove when changing to formatted PartId
-export function toPartOutlet(partId: string): PartOutlet {
-  return `${PART_ID_PREFIX}${partId}` satisfies PartOutlet;
-}
-
-// TODO [activity] Remove when changing to formatted PartId
-export function toPartId(outlet: PartOutlet): string {
-  return outlet.substring(PART_ID_PREFIX.length);
-}

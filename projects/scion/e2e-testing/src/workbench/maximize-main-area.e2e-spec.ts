@@ -21,8 +21,8 @@ test.describe('Workbench', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
-      .addView('view.100', {partId: 'left'})
+      .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
+      .addView('view.100', {partId: 'part.left'})
       .navigateView('view.100', ['test-view']),
     );
 
@@ -59,7 +59,7 @@ test.describe('Workbench', () => {
           direction: 'row',
           ratio: .2,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.100'}],
             activeViewId: 'view.100',
           }),
@@ -109,7 +109,7 @@ test.describe('Workbench', () => {
           direction: 'row',
           ratio: .2,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.100'}],
             activeViewId: 'view.100',
           }),

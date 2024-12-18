@@ -14,6 +14,7 @@ import {TestBed} from '@angular/core/testing';
 import {WORKBENCH_VIEW_REGISTRY} from '../../../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../../../part/workbench-part.registry';
 import {ViewId} from '../../../view/workbench-view.model';
+import {PartId} from '../../../part/workbench-part.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toBeRegistered}.
@@ -21,7 +22,7 @@ import {ViewId} from '../../../view/workbench-view.model';
 export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
   toBeRegistered: (): CustomMatcher => {
     return {
-      compare(viewId: ViewId, expected: {partId: string; active: boolean}, failOutput: string | undefined): CustomMatcherResult {
+      compare(viewId: ViewId, expected: {partId: PartId; active: boolean}, failOutput: string | undefined): CustomMatcherResult {
         const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(viewId, {orElse: null});
         // Assert the view to be registered.
         if (!view) {

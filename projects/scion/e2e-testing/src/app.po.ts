@@ -19,7 +19,7 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
 
 export class AppPO {
 
@@ -165,7 +165,7 @@ export class AppPO {
    * @param locateBy.partId - Identifies the part by its id
    * @param locateBy.cssClass - Identifies the part by its CSS class
    */
-  public part(locateBy: {partId?: string; cssClass?: string}): PartPO {
+  public part(locateBy: {partId: PartId}): PartPO {
     if (locateBy.partId !== undefined && locateBy.cssClass !== undefined) {
       return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"].${locateBy.cssClass}`));
     }

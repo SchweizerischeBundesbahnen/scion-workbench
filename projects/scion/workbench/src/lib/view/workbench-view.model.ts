@@ -20,8 +20,6 @@ export abstract class WorkbenchView {
   /**
    * Unique identity of this view.
    *
-   * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
-   *
    * @see alternativeId
    */
   public abstract readonly id: ViewId;

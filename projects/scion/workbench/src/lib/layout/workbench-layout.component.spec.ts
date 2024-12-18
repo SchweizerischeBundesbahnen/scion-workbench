@@ -55,11 +55,11 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
-      .addPart('right', {relativeTo: 'main', align: 'right', ratio: .5})
-      .addView('view.1', {partId: 'left', activateView: true})
-      .addView('view.2', {partId: 'main', activateView: true})
-      .addView('view.3', {partId: 'right', activateView: true}),
+      .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right', ratio: .5})
+      .addView('view.1', {partId: 'part.left', activateView: true})
+      .addView('view.2', {partId: 'part.main', activateView: true})
+      .addView('view.3', {partId: 'part.right', activateView: true}),
     );
     await waitUntilStable();
 
@@ -67,7 +67,7 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .2,
@@ -75,8 +75,8 @@ describe('WorkbenchLayout', () => {
       },
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -91,7 +91,7 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .2,
@@ -99,8 +99,8 @@ describe('WorkbenchLayout', () => {
       },
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -115,7 +115,7 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .2,
@@ -123,8 +123,8 @@ describe('WorkbenchLayout', () => {
       },
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -154,101 +154,101 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         position: 'start',
       },
     });
     await waitUntilStable();
 
     // THEN expect view.3 to be moved: ['view.3', 'view.1', 'view.2', 'view.4']
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('main').viewIds()).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.main').viewIds()).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         position: 1,
       },
     });
     await waitUntilStable();
 
     // THEN expect view.3 not to be moved
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('main').viewIds()).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.main').viewIds()).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         position: 2,
       },
     });
     await waitUntilStable();
 
     // THEN view.3 to be moved as follows: ['view.1', 'view.3', 'view.2', 'view.4']
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('main').viewIds()).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.main').viewIds()).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 3
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         position: 3,
       },
     });
     await waitUntilStable();
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.3', 'view.4']
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('main').viewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.main').viewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
 
     // WHEN moving view.3 to position 4
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         position: 'end',
       },
     });
     await waitUntilStable();
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.4', 'view.3']
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('main').viewIds()).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.main').viewIds()).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
   });
 
   it('allows to move a view to a new part in the east', async () => {
@@ -271,10 +271,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -284,27 +284,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -312,16 +312,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -345,10 +345,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -358,27 +358,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST'},
+        newPart: {id: 'part.WEST'},
       },
     });
     await waitUntilStable();
@@ -386,16 +386,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'WEST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.WEST', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -419,10 +419,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -432,27 +432,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 1 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'north',
-        newPart: {id: 'NORTH'},
+        newPart: {id: 'part.NORTH'},
       },
     });
     await waitUntilStable();
@@ -460,16 +460,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'NORTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.NORTH', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -493,10 +493,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -506,27 +506,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 1 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -534,16 +534,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -567,10 +567,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -580,37 +580,37 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 1 to a new part in the center
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
       },
     });
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -635,10 +635,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -648,12 +648,12 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Add view 3
@@ -663,29 +663,29 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: false});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: false});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -693,32 +693,32 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to the new part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST',
+        elementId: 'part.EAST',
       },
     });
     await waitUntilStable();
@@ -726,46 +726,46 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST', active: false});
+    expect('view.3').toBeRegistered({partId: 'part.EAST', active: false});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 1 to the new part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.1',
         viewUrlSegments: segments(['path/to/view/1']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST',
+        elementId: 'part.EAST',
       },
     });
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: false});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: false});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST', active: false});
+    expect('view.3').toBeRegistered({partId: 'part.EAST', active: false});
     expect('view.3').toHaveComponentState('C');
   });
 
@@ -789,10 +789,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -802,27 +802,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST-1'},
+        newPart: {id: 'part.EAST-1'},
       },
     });
     await waitUntilStable();
@@ -830,32 +830,32 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east of part EAST-1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-1',
+        partId: 'part.EAST-1',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST-2'},
+        newPart: {id: 'part.EAST-2'},
       },
     });
     await waitUntilStable();
@@ -863,16 +863,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-2', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-2', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -896,10 +896,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -909,27 +909,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -937,32 +937,32 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST-2'},
+        newPart: {id: 'part.WEST-2'},
       },
     });
     await waitUntilStable();
@@ -970,16 +970,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'WEST-2', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.WEST-2', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1003,10 +1003,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1016,27 +1016,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -1044,31 +1044,31 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the north of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'north',
-        newPart: {id: 'NORTH'},
+        newPart: {id: 'part.NORTH'},
       },
     });
     await waitUntilStable();
@@ -1076,16 +1076,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'NORTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.NORTH', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1109,10 +1109,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1122,27 +1122,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -1150,31 +1150,31 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -1182,16 +1182,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1216,10 +1216,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1229,12 +1229,12 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Add view 3
@@ -1244,29 +1244,29 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: false});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: false});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -1274,34 +1274,34 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the south of part 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST',
+        elementId: 'part.EAST',
         region: 'south',
-        newPart: {id: 'SOUTH-EAST'},
+        newPart: {id: 'part.SOUTH-EAST'},
       },
     });
     await waitUntilStable();
@@ -1309,10 +1309,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'SOUTH-EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child1: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.SOUTH-EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -1321,25 +1321,25 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH-EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH-EAST', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 2 to a new part in the south of part 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'SOUTH-EAST',
+        partId: 'part.SOUTH-EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
-        newPart: {id: 'SOUTH-WEST'},
+        elementId: 'part.main',
+        newPart: {id: 'part.SOUTH-WEST'},
         region: 'south',
       },
     });
@@ -1349,22 +1349,22 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: 'SOUTH-WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.SOUTH-WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH-WEST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH-WEST', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.3').toHaveComponentState('C');
   });
 
@@ -1388,10 +1388,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1401,27 +1401,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -1429,41 +1429,41 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 back to the initial part
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'SOUTH',
+        partId: 'part.SOUTH',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
       },
     });
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1487,10 +1487,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1500,27 +1500,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -1528,31 +1528,31 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -1560,16 +1560,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1593,10 +1593,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1606,27 +1606,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST'},
+        newPart: {id: 'part.WEST'},
       },
     });
     await waitUntilStable();
@@ -1634,31 +1634,31 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'WEST', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.WEST', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the south
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'WEST',
+        partId: 'part.WEST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -1666,16 +1666,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'column',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'SOUTH', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.SOUTH', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1699,11 +1699,11 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1713,26 +1713,26 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'main'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'part.main'});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
   });
 
@@ -1756,10 +1756,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1769,29 +1769,29 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'main', target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'part.main', target: 'blank'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: false});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: false});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'main', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.main', active: true});
     expect('view.3').toHaveComponentState('C');
   });
 
@@ -1817,10 +1817,10 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
     // Add view 2
@@ -1830,27 +1830,27 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: false});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: false});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.main', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Move view 2 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST-1'},
+        newPart: {id: 'part.EAST-1'},
       },
     });
     await waitUntilStable();
@@ -1858,16 +1858,16 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
 
     // Add view 3 to part EAST-1
@@ -1878,33 +1878,33 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: false});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: false});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Move view 3 to a new part in the east
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-1',
+        partId: 'part.EAST-1',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST-1',
+        elementId: 'part.EAST-1',
         region: 'east',
-        newPart: {id: 'EAST-2'},
+        newPart: {id: 'part.EAST-2'},
       },
     });
     await waitUntilStable();
@@ -1912,10 +1912,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -1924,11 +1924,11 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST-2', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST-2', active: true});
     expect('view.3').toHaveComponentState('C');
 
     // Add view 4 to part EAST-2
@@ -1939,10 +1939,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -1951,28 +1951,28 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST-2', active: false});
+    expect('view.3').toBeRegistered({partId: 'part.EAST-2', active: false});
     expect('view.3').toHaveComponentState('C');
-    expect('view.4').toBeRegistered({partId: 'EAST-2', active: true});
+    expect('view.4').toBeRegistered({partId: 'part.EAST-2', active: true});
     expect('view.4').toHaveComponentState('D');
 
     // Move view 4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-2',
+        partId: 'part.EAST-2',
         viewId: 'view.4',
         viewUrlSegments: segments(['path/to/view/4']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST-1'},
+        newPart: {id: 'part.WEST-1'},
       },
     });
     await waitUntilStable();
@@ -1981,14 +1981,14 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -1997,28 +1997,28 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'EAST-2', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.EAST-2', active: true});
     expect('view.3').toHaveComponentState('C');
-    expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
+    expect('view.4').toBeRegistered({partId: 'part.WEST-1', active: true});
     expect('view.4').toHaveComponentState('D');
 
     // Move view 3 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-2',
+        partId: 'part.EAST-2',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view/3']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'WEST-1',
+        elementId: 'part.WEST-1',
         region: 'west',
-        newPart: {id: 'WEST-2'},
+        newPart: {id: 'part.WEST-2'},
       },
     });
     await waitUntilStable();
@@ -2028,43 +2028,43 @@ describe('WorkbenchLayout', () => {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({
-              child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-              child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
               direction: 'row',
               ratio: .5,
             }),
-            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'EAST-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'WEST-2', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.WEST-2', active: true});
     expect('view.3').toHaveComponentState('C');
-    expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
+    expect('view.4').toBeRegistered({partId: 'part.WEST-1', active: true});
     expect('view.4').toHaveComponentState('D');
 
     // Move view 2 to a new part in the north
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-1',
+        partId: 'part.EAST-1',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view/2']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'north',
-        newPart: {id: 'NORTH-1'},
+        newPart: {id: 'part.NORTH-1'},
       },
     });
     await waitUntilStable();
@@ -2073,14 +2073,14 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
           child2: new MTreeNode({
-            child1: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child1: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2089,14 +2089,14 @@ describe('WorkbenchLayout', () => {
         }),
       },
     });
-    expect('view.1').toBeRegistered({partId: 'main', active: true});
+    expect('view.1').toBeRegistered({partId: 'part.main', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.NORTH-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'WEST-2', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.WEST-2', active: true});
     expect('view.3').toHaveComponentState('C');
-    expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
+    expect('view.4').toBeRegistered({partId: 'part.WEST-1', active: true});
     expect('view.4').toHaveComponentState('D');
 
     // Close view 1
@@ -2107,23 +2107,23 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').not.toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
+    expect('view.1').not.toBeRegistered({partId: 'part.main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.NORTH-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'WEST-2', active: true});
+    expect('view.3').toBeRegistered({partId: 'part.WEST-2', active: true});
     expect('view.3').toHaveComponentState('C');
-    expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
+    expect('view.4').toBeRegistered({partId: 'part.WEST-1', active: true});
     expect('view.4').toHaveComponentState('D');
 
     // Close view 3
@@ -2133,18 +2133,18 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
       },
     });
-    expect('view.1').not.toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
+    expect('view.1').not.toBeRegistered({partId: 'part.main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.NORTH-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').not.toBeRegistered({partId: 'WEST-2', active: true});
-    expect('view.4').toBeRegistered({partId: 'WEST-1', active: true});
+    expect('view.3').not.toBeRegistered({partId: 'part.WEST-2', active: true});
+    expect('view.4').toBeRegistered({partId: 'part.WEST-1', active: true});
     expect('view.4').toHaveComponentState('D');
 
     // Close view 4
@@ -2153,14 +2153,14 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
-    expect('view.1').not.toBeRegistered({partId: 'main', active: true});
-    expect('view.2').toBeRegistered({partId: 'NORTH-1', active: true});
+    expect('view.1').not.toBeRegistered({partId: 'part.main', active: true});
+    expect('view.2').toBeRegistered({partId: 'part.NORTH-1', active: true});
     expect('view.2').toHaveComponentState('B');
-    expect('view.3').not.toBeRegistered({partId: 'WEST-2', active: true});
-    expect('view.4').not.toBeRegistered({partId: 'WEST-1', active: true});
+    expect('view.3').not.toBeRegistered({partId: 'part.WEST-2', active: true});
+    expect('view.4').not.toBeRegistered({partId: 'part.WEST-1', active: true});
   });
 
   it('should detach views before being re-parented in the DOM (1)', async () => {
@@ -2177,9 +2177,9 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.2', ['path/to/view'])
       .navigateView('view.3', ['path/to/view'])
@@ -2204,15 +2204,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'right'},
+        newPart: {id: 'part.right'},
       },
     });
     await waitUntilStable();
@@ -2220,8 +2220,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2235,15 +2235,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'right',
+        elementId: 'part.right',
         region: 'north',
-        newPart: {id: 'top-right'},
+        newPart: {id: 'part.top-right'},
       },
     });
     await waitUntilStable();
@@ -2251,10 +2251,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'top-right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child1: new MPart({id: 'part.top-right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2282,9 +2282,9 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.2', ['path/to/view'])
       .navigateView('view.3', ['path/to/view'])
@@ -2309,15 +2309,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -2325,8 +2325,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2340,15 +2340,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST-2'},
+        newPart: {id: 'part.WEST-2'},
       },
     });
     await waitUntilStable();
@@ -2356,8 +2356,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2382,10 +2382,10 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'})
-      .addView('view.4', {partId: 'main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
+      .addView('view.4', {partId: 'part.main'})
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.2', ['path/to/view'])
       .navigateView('view.3', ['path/to/view'])
@@ -2415,15 +2415,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST-1'},
+        newPart: {id: 'part.EAST-1'},
       },
     });
     await waitUntilStable();
@@ -2431,8 +2431,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2447,15 +2447,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST-1',
+        elementId: 'part.EAST-1',
         region: 'east',
-        newPart: {id: 'EAST-2'},
+        newPart: {id: 'part.EAST-2'},
       },
     });
     await waitUntilStable();
@@ -2463,10 +2463,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -2484,15 +2484,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.4',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST-1'},
+        newPart: {id: 'part.WEST-1'},
       },
     });
     await waitUntilStable();
@@ -2501,14 +2501,14 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -2526,15 +2526,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-2',
+        partId: 'part.EAST-2',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'WEST-1',
+        elementId: 'part.WEST-1',
         region: 'west',
-        newPart: {id: 'WEST-2'},
+        newPart: {id: 'part.WEST-2'},
       },
     });
     await waitUntilStable();
@@ -2544,16 +2544,16 @@ describe('WorkbenchLayout', () => {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({
-              child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-              child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
               direction: 'row',
               ratio: .5,
             }),
-            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2568,15 +2568,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST-1',
+        partId: 'part.EAST-1',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'north',
-        newPart: {id: 'NORTH-1'},
+        newPart: {id: 'part.NORTH-1'},
       },
     });
     await waitUntilStable();
@@ -2585,14 +2585,14 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
           child2: new MTreeNode({
-            child1: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child1: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2614,12 +2614,12 @@ describe('WorkbenchLayout', () => {
       mainAreaGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2636,8 +2636,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2652,7 +2652,7 @@ describe('WorkbenchLayout', () => {
 
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
-        root: new MPart({id: 'NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        root: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
       },
     });
     expect('view.2').toHaveComponentState('B');
@@ -2672,9 +2672,9 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.2', ['path/to/view'])
       .navigateView('view.3', ['path/to/view'])
@@ -2699,15 +2699,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -2715,8 +2715,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2730,15 +2730,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST',
+        elementId: 'part.EAST',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -2746,10 +2746,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child1: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2766,15 +2766,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST',
+        elementId: 'part.EAST',
         region: 'north',
-        newPart: {id: 'NORTH'},
+        newPart: {id: 'part.NORTH'},
       },
     });
     await waitUntilStable();
@@ -2782,10 +2782,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2813,9 +2813,9 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
-      .addView('view.3', {partId: 'main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.2', ['path/to/view'])
       .navigateView('view.3', ['path/to/view'])
@@ -2840,15 +2840,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -2856,8 +2856,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -2871,15 +2871,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'EAST',
+        elementId: 'part.EAST',
         region: 'north',
-        newPart: {id: 'NORTH'},
+        newPart: {id: 'part.NORTH'},
       },
     });
     await waitUntilStable();
@@ -2887,10 +2887,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2907,15 +2907,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.3',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'NORTH',
+        elementId: 'part.NORTH',
         region: 'south',
-        newPart: {id: 'SOUTH'},
+        newPart: {id: 'part.SOUTH'},
       },
     });
     await waitUntilStable();
@@ -2923,10 +2923,10 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MTreeNode({
-            child1: new MPart({id: 'NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'SOUTH', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
             direction: 'column',
             ratio: .5,
           }),
@@ -2954,8 +2954,8 @@ describe('WorkbenchLayout', () => {
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addView('view.1', {partId: 'main'})
-      .addView('view.2', {partId: 'main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
       .navigateView('view.1', ['path/to/view'])
       .navigateView('view.2', ['path/to/view'])
       .activateView('view.2'),
@@ -2975,15 +2975,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'main',
+        partId: 'part.main',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'east',
-        newPart: {id: 'EAST'},
+        newPart: {id: 'part.EAST'},
       },
     });
     await waitUntilStable();
@@ -2991,8 +2991,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child1: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -3005,15 +3005,15 @@ describe('WorkbenchLayout', () => {
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        partId: 'EAST',
+        partId: 'part.EAST',
         viewId: 'view.2',
         viewUrlSegments: segments(['path/to/view']),
       },
       target: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
-        elementId: 'main',
+        elementId: 'part.main',
         region: 'west',
-        newPart: {id: 'WEST'},
+        newPart: {id: 'part.WEST'},
       },
     });
     await waitUntilStable();
@@ -3021,8 +3021,8 @@ describe('WorkbenchLayout', () => {
     expect(fixture).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+          child2: new MPart({id: 'part.main', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -3043,7 +3043,7 @@ describe('WorkbenchLayout', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.main'}),
         provideRouter([
           {
             path: 'path/to/view/1',
@@ -3084,8 +3084,8 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Expect part handle to still have previous state.
-    expect(TestBed.inject(WorkbenchService).getPart('main')!.activeViewId()).toEqual('view.101');
-    expect(TestBed.inject(WorkbenchService).getPart('main')!.viewIds()).toEqual(['view.101']);
+    expect(TestBed.inject(WorkbenchService).getPart('part.main')!.activeViewId()).toEqual('view.101');
+    expect(TestBed.inject(WorkbenchService).getPart('part.main')!.viewIds()).toEqual(['view.101']);
 
     // Expect view handle to be partially updated.
     expect(TestBed.inject(WorkbenchService).getView('view.101')!.active()).toBeTrue();
@@ -3097,7 +3097,7 @@ describe('WorkbenchLayout', () => {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
       },
     });
 
@@ -3112,7 +3112,7 @@ describe('WorkbenchLayout', () => {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {
-        root: new MPart({id: 'main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        root: new MPart({id: 'part.main', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
       },
     });
   });

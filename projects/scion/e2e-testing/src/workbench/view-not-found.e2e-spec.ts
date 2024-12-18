@@ -25,8 +25,8 @@ test.describe('Workbench Page Not Found', () => {
     // Add view.101 in peripheral area
     // Add view.102 in main area
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true})
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left', activateView: true})
       .addView('view.102', {partId: 'main'}),
     );
 
@@ -53,8 +53,8 @@ test.describe('Workbench Page Not Found', () => {
     // Add view.101 in peripheral area
     // Add view.102 in main area
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true})
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left', activateView: true})
       .addView('view.102', {partId: 'main'})
       .navigateView('view.101', ['does/not/exist'])
       .navigateView('view.102', ['does/not/exist']),
@@ -83,8 +83,8 @@ test.describe('Workbench Page Not Found', () => {
     // Add view.101 in peripheral area
     // Add view.102 in main area
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left'})
-      .addView('view.101', {partId: 'left', activateView: true})
+      .addPart('part.left', {align: 'left'})
+      .addView('view.101', {partId: 'part.left', activateView: true})
       .addView('view.102', {partId: 'main'})
       .navigateView('view.101', [], {hint: 'does-not-match'})
       .navigateView('view.102', [], {hint: 'does-not-match'}),
@@ -114,10 +114,10 @@ test.describe('Workbench Page Not Found', () => {
     const initialPartId = await initialPartView.view.part.getPartId();
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left'})
-      .addPart('right', {align: 'right'})
-      .addView('view.101', {partId: 'left', activateView: true})
-      .addView('view.102', {partId: 'right', activateView: true})
+      .addPart('part.left', {align: 'left'})
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.left', activateView: true})
+      .addView('view.102', {partId: 'part.right', activateView: true})
       .navigateView('view.101', ['does/not/exist']),
     );
 
@@ -125,12 +125,12 @@ test.describe('Workbench Page Not Found', () => {
 
     // Drag view to right part.
     const dragHandle1 = await viewPage.view.tab.startDrag();
-    await dragHandle1.dragToPart('right', {region: 'center'});
+    await dragHandle1.dragToPart('part.right', {region: 'center'});
     await dragHandle1.drop();
 
     // Expect view to be moved to right part.
     await expectView(viewPage).toBeActive();
-    await expect.poll(() => viewPage.view.part.getPartId()).toEqual('right');
+    await expect.poll(() => viewPage.view.part.getPartId()).toEqual('part.right');
 
     // Drag view to main area part
     const dragHandle2 = await viewPage.view.tab.startDrag();
@@ -147,11 +147,11 @@ test.describe('Workbench Page Not Found', () => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left'})
-      .addPart('right', {align: 'right'})
-      .addView('testee-1', {partId: 'left', activateView: true, cssClass: 'testee-1'})
+      .addPart('part.left', {align: 'left'})
+      .addPart('part.right', {align: 'right'})
+      .addView('testee-1', {partId: 'part.left', activateView: true, cssClass: 'testee-1'})
       .addView('testee-2', {partId: 'main', cssClass: 'testee-2'})
-      .addView('testee-3', {partId: 'right', cssClass: 'testee-3'})
+      .addView('testee-3', {partId: 'part.right', cssClass: 'testee-3'})
       .navigateView('testee-1', ['does/not/exist'])
       .navigateView('testee-2', ['does/not/exist'])
       .navigateView('testee-3', [], {hint: 'does-not-match'}),

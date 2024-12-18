@@ -11,13 +11,14 @@
 import {InjectionToken} from '@angular/core';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {PartId} from './workbench-part.model';
 
 /**
  * Registry for {@link WorkbenchPart} model objects.
  */
-export const WORKBENCH_PART_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<string, ɵWorkbenchPart>>('WORKBENCH_PART_REGISTRY', {
+export const WORKBENCH_PART_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<PartId, ɵWorkbenchPart>>('WORKBENCH_PART_REGISTRY', {
   providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<string, ɵWorkbenchPart>({
+  factory: () => new WorkbenchObjectRegistry<PartId, ɵWorkbenchPart>({
     keyFn: part => part.id,
     nullObjectErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
     onUnregister: part => part.destroy(),

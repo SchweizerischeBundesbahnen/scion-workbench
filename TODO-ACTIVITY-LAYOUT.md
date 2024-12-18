@@ -8,6 +8,11 @@
 [] Should also be possible to navigate MAIN_AREA, like any other part
    -> do we still need MainAreaPartComponent or integrate the special handling with sub grid in PartComponent?
    -> for the moment, we still require the primary router outlet in main area component to not be breaking
+[] Layout change detector does not work with dynamic part ids
+   -> partId -> excluded [check]
+   -> activePartId -> excluded [check]
+   -> outlets (part id) -> [??]
+
 
 ## TO CONSIDER:
 [] Consider replacing MPart class by interface
@@ -19,3 +24,6 @@
 
 
 ## TESTS:
+- add layout migration test (v7), required? why only for version 4
+- navigate multiple parts (workbench-layout.spec.ts)
+- remove multiple parts (workbench-layout.spec.ts)

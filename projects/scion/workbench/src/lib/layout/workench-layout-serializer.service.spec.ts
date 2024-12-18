@@ -24,8 +24,8 @@ describe('WorkbenchLayoutSerializer', () => {
 
   it('should not serialize "view.markedForRemoval" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('left')
-      .addView('view.1', {partId: 'left'})
+      .addPart('part.left')
+      .addView('view.1', {partId: 'part.left'})
       .removeView('view.1');
 
     // Expect view to be marked for removal.
@@ -41,8 +41,8 @@ describe('WorkbenchLayoutSerializer', () => {
 
   it('should not serialize "view.navigation.id" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('left')
-      .addView('view.1', {partId: 'left'})
+      .addPart('part.left')
+      .addView('view.1', {partId: 'part.left'})
       .navigateView('view.1', ['path/to/view']);
 
     // Expect navigation id to be set.
@@ -72,29 +72,64 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.part({partId: 'part.1'}).navigation!.id).toBeUndefined();
   });
 
-  it('should not serialize "TreeNode.id" field', () => {
+  it('should not serialize "part.id" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('left')
-      .addPart('right', {relativeTo: 'left', align: 'right'})
-      .addView('view.1', {partId: 'left'})
-      .addView('view.2', {partId: 'right'});
+      .addPart('right', {align: 'right', relativeTo: 'left'});
+
+    // Expect part id to be set.
+    expect(layout.parts({id: 'left'})[0].id).not.toBeUndefined();
+    expect(layout.parts({id: 'right'})[0].id).not.toBeUndefined();
+
+    // Serialize layout without "part.id".
+    const serializedLayout = layout.serialize({excludePartId: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+
+    // Expect part id not to be serialized.
+    expect(deserializedLayout.parts({id: 'left'})[0].id).toBeUndefined();
+    expect(deserializedLayout.parts({id: 'right'})[0].id).toBeUndefined();
+  });
+
+  it('should not serialize "TreeNode.id" field', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {relativeTo: 'part.left', align: 'right'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.right'});
 
     // Expect node id to be set.
-    expect(layout.part({partId: 'left'}).parent!.id).not.toBeUndefined();
-    expect(layout.part({partId: 'right'}).parent!.id).not.toBeUndefined();
-    expect(layout.part({partId: 'left'}).parent!.id).toEqual(layout.part({partId: 'right'}).parent!.id);
+    expect(layout.part({partId: 'part.left'}).parent!.id).not.toBeUndefined();
+    expect(layout.part({partId: 'part.right'}).parent!.id).not.toBeUndefined();
+    expect(layout.part({partId: 'part.left'}).parent!.id).toEqual(layout.part({partId: 'part.right'}).parent!.id);
 
     // Serialize layout without "nodeId".
     const serializedLayout = layout.serialize({excludeTreeNodeId: true});
     const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
 
     // Expect node id not to be serialized.
-    expect(deserializedLayout.part({partId: 'left'}).parent!.id).toBeUndefined();
-    expect(deserializedLayout.part({partId: 'right'}).parent!.id).toBeUndefined();
+    expect(deserializedLayout.part({partId: 'part.left'}).parent!.id).toBeUndefined();
+    expect(deserializedLayout.part({partId: 'part.right'}).parent!.id).toBeUndefined();
 
     // Expect part id to still be serialized.
-    expect(deserializedLayout.part({partId: 'left'}).id).not.toBeUndefined();
-    expect(deserializedLayout.part({partId: 'right'}).id).not.toBeUndefined();
+    expect(deserializedLayout.part({partId: 'part.left'}).id).not.toBeUndefined();
+    expect(deserializedLayout.part({partId: 'part.right'}).id).not.toBeUndefined();
+  });
+
+  it('should not serialize "activePartId" field', () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right', relativeTo: 'part.left'})
+      .activatePart('part.right');
+
+    // Expect active part id to be set.
+    expect(layout.workbenchGrid.activePartId).toEqual('part.right');
+
+    // Serialize layout without "activePartId".
+    const serializedLayout = layout.serialize({excludeActivePartId: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+
+    // Expect active part id not to be serialized.
+    expect(deserializedLayout.workbenchGrid.activePartId).toBeUndefined();
   });
 
   it('should not serialize "grid.migrated" field', () => {
@@ -154,7 +189,7 @@ describe('WorkbenchLayoutSerializer', () => {
           direction: 'row',
           ratio: .25,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.2'}, {id: 'view.3', navigation: {id: ANYTHING, hint: 'test-view'}}],
             activeViewId: 'view.2',
           }),
@@ -166,13 +201,13 @@ describe('WorkbenchLayoutSerializer', () => {
               id: MAIN_AREA,
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.4', navigation: {id: ANYTHING}}],
               activeViewId: 'view.4',
             }),
           }),
         }),
-        activePartId: 'left',
+        activePartId: 'part.left',
       },
       mainAreaGrid: {
         root: new MTreeNode({
@@ -180,17 +215,17 @@ describe('WorkbenchLayoutSerializer', () => {
           direction: 'column',
           ratio: .5,
           child1: new MPart({
-            id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7',
+            id: 'part.6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7',
             views: [{id: 'view.1', navigation: {id: ANYTHING}}],
             activeViewId: 'view.1',
           }),
           child2: new MPart({
-            id: '1d94dcb6-76b6-47eb-b300-39448993d36b',
+            id: 'part.1d94dcb6-76b6-47eb-b300-39448993d36b',
             views: [{id: 'view.5', navigation: {id: ANYTHING}}],
             activeViewId: 'view.5',
           }),
         }),
-        activePartId: '1d94dcb6-76b6-47eb-b300-39448993d36b',
+        activePartId: 'part.1d94dcb6-76b6-47eb-b300-39448993d36b',
       },
     });
   });

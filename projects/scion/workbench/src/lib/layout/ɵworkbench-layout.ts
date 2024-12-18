@@ -14,7 +14,7 @@ import {MAIN_AREA, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
-import {inject, Injectable, InjectionToken, Injector, Predicate, runInInjectionContext} from '@angular/core';
+import {inject, Injectable, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
@@ -24,7 +24,8 @@ import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {PartOutlet, toPartOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
+import {PartOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * @inheritDoc
@@ -91,14 +92,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Tests if given part is contained in the specified grid.
    */
   public hasPart(id: string, options?: {grid?: keyof Grids}): boolean {
-    return this.part({partId: id, grid: options?.grid}, {orElse: null}) !== null;
+    return this.parts({id, grid: options?.grid}).length > 0;
   }
 
   /**
    * Tests if given view is contained in the specified grid.
    */
   public hasView(id: string, options?: {grid?: keyof Grids}): boolean {
-    return this.views({grid: options?.grid, id: id}).length > 0;
+    return this.views({id, grid: options?.grid}).length > 0;
   }
 
   /**
@@ -109,7 +110,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return outlets matching the filter criteria.
    */
   public outlets(findBy?: {grid?: keyof Grids}): Outlets {
-    const partOutlets: PartOutlet[] = this.parts({grid: findBy?.grid}).map(part => toPartOutlet(part.id));
+    const partOutlets: PartOutlet[] = this.parts({grid: findBy?.grid}).map(part => part.id);
     const viewOutlets: ViewOutlet[] = this.views({grid: findBy?.grid}).map(view => view.id);
 
     const outlets = [...partOutlets, ...viewOutlets]
@@ -128,7 +129,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return state matching the filter criteria.
    */
   public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
-    const partStates = this.parts({grid: findBy?.grid}).map(part => [toPartOutlet(part.id), this._navigationStates.get(toPartOutlet(part.id)) ?? []]);
+    const partStates = this.parts({grid: findBy?.grid}).map(part => [part.id, this._navigationStates.get(part.id) ?? []]);
     const viewStates = this.views({grid: findBy?.grid}).map(view => [view.id, this._navigationStates.get(view.id) ?? {}]);
     return Object.fromEntries([...partStates, ...viewStates]);
   }
@@ -169,11 +170,35 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Finds parts based on the specified filter.
    *
    * @param findBy - Defines the search scope.
+   * @param findBy.id - Searches for parts with the specified id.
+   * @param findBy.viewId - Searches for parts that contain the specified view.
    * @param findBy.grid - Searches for parts contained in the specified grid.
+   * @param options - Controls the search.
+   * @param options.throwIfEmpty - Controls to error if no part is found.
+   * @param options.throwIfMulti - Controls to error if multiple parts are found.
    * @return parts matching the filter criteria.
    */
-  public parts(findBy?: {grid?: keyof Grids}): readonly MPart[] {
-    return this.findTreeElements((element: MTreeNode | MPart): element is MPart => element instanceof MPart, {grid: findBy?.grid});
+  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof Grids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
+    const parts = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
+      if (!(element instanceof MPart)) {
+        return false;
+      }
+      if (findBy?.id !== undefined && !matchesPartId(findBy.id, element)) {
+        return false;
+      }
+      if (findBy?.viewId !== undefined && !element.views.some(view => matchesViewId(findBy.viewId!, view))) {
+        return false;
+      }
+      return true;
+    }, {grid: findBy?.grid});
+
+    if (options?.throwIfEmpty && !parts.length) {
+      throw typeof options.throwIfEmpty === 'function' ? options.throwIfEmpty() : Error(`[NullPartError] No matching part found: [${stringifyFilter(findBy ?? {})}]`);
+    }
+    if (options?.throwIfMulti && parts.length > 1) {
+      throw typeof options.throwIfMulti === 'function' ? options.throwIfMulti() : Error(`[MultiPartError] Multiple parts found: [${stringifyFilter(findBy ?? {})}]`);
+    }
+    return parts;
   }
 
   /**
@@ -187,25 +212,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.orElse - Controls to return `null` instead of throwing an error if no part is found.
    * @return part matching the filter criteria.
    */
-  public part(findBy: {partId?: string; viewId?: string; grid?: keyof Grids}): MPart;
-  public part(findBy: {partId?: string; viewId?: string; grid?: keyof Grids}, options: {orElse: null}): MPart | null;
-  public part(findBy: {partId?: string; viewId?: string; grid?: keyof Grids}, options?: {orElse: null}): MPart | null {
+  public part(findBy: {partId?: PartId; viewId?: string; grid?: keyof Grids}): MPart;
+  public part(findBy: {partId?: PartId; viewId?: string; grid?: keyof Grids}, options: {orElse: null}): MPart | null;
+  public part(findBy: {partId?: PartId; viewId?: string; grid?: keyof Grids}, options?: {orElse: null}): MPart | null {
     if (!findBy.partId && !findBy.viewId) {
       throw Error(`[PartFindError] Missing required argument. Specify either 'partId' or 'viewId'.`);
     }
-    const part = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
-      if (!(element instanceof MPart)) {
-        return false;
-      }
-      if (findBy.partId !== undefined && element.id !== findBy.partId) {
-        return false;
-      }
-      if (findBy.viewId !== undefined && !element.views.some(matchViewById(findBy.viewId!))) {
-        return false;
-      }
-      return true;
-    }, {findFirst: true, grid: findBy.grid})[0];
 
+    const part = this.parts({id: findBy.partId, viewId: findBy.viewId, grid: findBy.grid}).at(0);
     if (!part && !options) {
       throw Error(`[NullPartError] No matching part found: [${stringifyFilter(findBy)}]`);
     }
@@ -223,7 +237,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.__addPart(id, relativeTo, options);
+    if (isPartId(id)) {
+      workingCopy.__addPart(id, relativeTo, options);
+    }
+    else {
+      workingCopy.__addPart(WorkbenchLayouts.computePartId(), relativeTo, {...options, alternativeId: id});
+    }
     return workingCopy;
   }
 
@@ -232,7 +251,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public removePart(id: string): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.__removePart(id);
+    workingCopy.parts({id}, {throwIfEmpty: true}).forEach(part => workingCopy.__removePart(part));
     return workingCopy;
   }
 
@@ -241,7 +260,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.__navigatePart(id, commands, extras);
+    workingCopy.parts({id}, {throwIfEmpty: true}).forEach(part => workingCopy.__navigatePart(part, commands, extras));
     return workingCopy;
   }
 
@@ -263,7 +282,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public activatePart(id: string): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.__activatePart(id);
+    workingCopy.parts({id}, {throwIfEmpty: true}).forEach(part => workingCopy.__activatePart(part));
     return workingCopy;
   }
 
@@ -297,10 +316,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param findBy.markedForRemoval - Searches for views marked (or not marked) for removal.
    * @param findBy.grid - Searches for views contained in the specified grid.
    * @param options - Controls the search.
-   * @param options.orElse - Controls to error if no view is found.
+   * @param options.throwIfEmpty - Controls to error if no view is found.
+   * @param options.throwIfMulti - Controls to error if multiple views are found.
    * @return views matching the filter criteria.
    */
-  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof Grids}, options?: {orElse: 'throwError'}): readonly MView[] {
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof Grids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
     const views = this.parts({grid: findBy?.grid})
       .filter(part => {
         if (findBy?.partId !== undefined && part.id !== findBy.partId) {
@@ -310,7 +330,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       })
       .flatMap(part => part.views)
       .filter(view => {
-        if (findBy?.id !== undefined && !matchViewById(findBy.id)(view)) {
+        if (findBy?.id !== undefined && !matchesViewId(findBy.id, view)) {
           return false;
         }
         if (findBy?.segments && !findBy.segments.matches(this.urlSegments({outlet: view.id}))) {
@@ -325,8 +345,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         return true;
       });
 
-    if (findBy && !views.length && options) {
-      throw Error(`[NullViewError] No matching view found: [${stringifyFilter(findBy)}]`);
+    if (options?.throwIfEmpty && !views.length) {
+      throw typeof options.throwIfEmpty === 'function' ? options.throwIfEmpty() : Error(`[NullViewError] No matching view found: [${stringifyFilter(findBy ?? {})}]`);
+    }
+    if (options?.throwIfMulti && views.length > 1) {
+      throw typeof options.throwIfMulti === 'function' ? options.throwIfMulti() : Error(`[MultiViewError] Multiple views found: [${stringifyFilter(findBy ?? {})}]`);
     }
     return views;
   }
@@ -350,7 +373,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public navigateView(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__navigateView(view, commands, extras));
+    workingCopy.views({id}, {throwIfEmpty: true}).forEach(view => workingCopy.__navigateView(view, commands, extras));
     return workingCopy;
   }
 
@@ -363,7 +386,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public removeView(id: string, options?: {force?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__removeView(view, {force: options?.force}));
+    workingCopy.views({id}, {throwIfEmpty: true}).forEach(view => workingCopy.__removeView(view, {force: options?.force}));
     return workingCopy;
   }
 
@@ -372,7 +395,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__moveView(view, targetPartId, options));
+    workingCopy.views({id}, {throwIfEmpty: true}).forEach(view => workingCopy.__moveView(view, targetPartId, options));
     return workingCopy;
   }
 
@@ -381,7 +404,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public activateView(id: string, options?: {activatePart?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__activateView(view, options));
+    workingCopy.views({id}, {throwIfEmpty: true}).forEach(view => workingCopy.__activateView(view, options));
     return workingCopy;
   }
 
@@ -395,7 +418,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public activateAdjacentView(id: string, options?: {activatePart?: boolean}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
-    workingCopy.views({id}, {orElse: 'throwError'}).forEach(view => workingCopy.__activateAdjacentView(view, options));
+    workingCopy.views({id}, {throwIfEmpty: true}).forEach(view => workingCopy.__activateAdjacentView(view, options));
     return workingCopy;
   }
 
@@ -473,12 +496,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addPart(id: string, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): void {
+  private __addPart(id: PartId, relativeTo: ReferenceElement, options?: {alternativeId?: string; activate?: boolean; structural?: boolean}): void {
     if (this.hasPart(id)) {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const newPart = new MPart({id, structural: options?.structural ?? true, views: []});
+    const newPart = new MPart({id, alternativeId: options?.alternativeId, structural: options?.structural ?? true, views: []});
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
     const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.workbenchGrid.root;
@@ -510,15 +533,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Activate the part.
     if (options?.activate) {
-      this.__activatePart(newPart.id);
+      this.__activatePart(newPart);
     }
   }
 
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removePart(id: string): void {
-    const part = this.part({partId: id});
+  private __removePart(part: MPart): void {
     const grid = this.grid({element: part});
     const gridName = this._gridNames.find(gridName => this._grids[gridName] === grid);
 
@@ -541,16 +563,22 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       part.parent!.parent.child2 = siblingElement;
     }
 
-    // Remove outlets and states of views contained in the part.
+    // Remove the part outlet.
+    this._outlets.delete(part.id);
+
+    // Remove navigation state.
+    this._navigationStates.delete(part.id);
+
+    // Remove outlets and state of views contained in the part.
     part.views.forEach(view => {
       this._outlets.delete(view.id);
       this._navigationStates.delete(view.id);
     });
 
     // If the removed part was the active part, make the last used part the active part.
-    if (grid.activePartId === id) {
+    if (grid.activePartId === part.id) {
       const activePart = parts
-        .filter(part => part.id !== id)
+        .filter(mPart => mPart.id !== part.id)
         .sort((part1, part2) => {
           const activationInstantPart1 = this._partActivationInstantProvider.getActivationInstant(part1.id);
           const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
@@ -563,26 +591,24 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): void {
-    const part = this.part({partId: id});
-
+  private __navigatePart(part: MPart, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute | null; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): void {
     if (!commands.length && !extras?.hint && !extras?.relativeTo) {
       throw Error('[NavigateError] Commands, relativeTo or hint must be set.');
     }
 
     const urlSegments = runInInjectionContext(this._injector, () => Routing.commandsToSegments(commands, {relativeTo: extras?.relativeTo}));
     if (urlSegments.length) {
-      this._outlets.set(toPartOutlet(part.id), urlSegments);
+      this._outlets.set(part.id, urlSegments);
     }
     else {
-      this._outlets.delete(toPartOutlet(part.id));
+      this._outlets.delete(part.id);
     }
 
     if (extras?.state && Objects.keys(extras.state).length) {
-      this._navigationStates.set(toPartOutlet(part.id), extras.state);
+      this._navigationStates.set(part.id, extras.state);
     }
     else {
-      this._navigationStates.delete(toPartOutlet(part.id));
+      this._navigationStates.delete(part.id);
     }
 
     part.navigation = Objects.withoutUndefinedEntries({
@@ -600,8 +626,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (this.hasView(view.id)) {
       throw Error(`[ViewAddError] View id must be unique. The layout already contains a view with the id '${view.id}'.`);
     }
+    const [part] = this.parts({id: options.partId}, {
+      throwIfEmpty: () => Error(`[ViewAddError] Cannot add view. No part found with id '${options.partId}'.`),
+      throwIfMulti: () => Error(`[ViewAddError] Cannot add view. Multiple parts found with id '${options.partId}'.`),
+    });
 
-    const part = this.part({partId: options.partId});
     const position = coercePosition(options.position ?? 'end', part);
     part.views.splice(position, 0, view);
 
@@ -609,7 +638,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this.__activateView(view);
     }
     if (options.activatePart) {
-      this.__activatePart(options.partId);
+      this.__activatePart(part);
     }
     if (options.cssClass) {
       view.cssClass = Arrays.coerce(options.cssClass);
@@ -652,7 +681,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private __moveView(view: MView, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): void {
     const sourcePart = this.part({viewId: view.id});
-    const targetPart = this.part({partId: targetPartId});
+    const [targetPart] = this.parts({id: targetPartId}, {
+      throwIfEmpty: () => Error(`[ViewMoveError] Cannot move view. No part found with id '${targetPartId}'.`),
+      throwIfMulti: () => Error(`[ViewMoveError] Cannot move view. Multiple parts found with id '${targetPartId}'.`),
+    });
 
     // Move the view.
     if (sourcePart !== targetPart) {
@@ -668,7 +700,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Activate view and part.
     if (options?.activatePart) {
-      this.__activatePart(targetPartId);
+      this.__activatePart(targetPart);
     }
     if (options?.activateView) {
       this.__activateView(view);
@@ -694,7 +726,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._outlets.delete(view.id);
     }
 
-    // Remove state.
+    // Remove navigation state.
     if (options?.removeNavigationState ?? true) {
       this._navigationStates.delete(view.id);
     }
@@ -712,7 +744,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Remove the part when removing its last view, but only if the part has no navigation and is not a structural part.
     if (!part.views.length && !part.navigation && !part.structural) {
-      this.__removePart(part.id);
+      this.__removePart(part);
     }
   }
 
@@ -726,7 +758,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Activate the part.
     if (options?.activatePart) {
-      this.__activatePart(part.id);
+      this.__activatePart(part);
     }
   }
 
@@ -740,7 +772,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Activate the part.
     if (options?.activatePart) {
-      this.__activatePart(part.id);
+      this.__activatePart(part);
     }
   }
 
@@ -757,9 +789,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __activatePart(id: string): void {
-    const part = this.part({partId: id});
-    this.grid({element: part}).activePartId = id;
+  private __activatePart(part: MPart): void {
+    this.grid({element: part}).activePartId = part.id;
   }
 
   /**
@@ -823,6 +854,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private findTreeElement<T extends MTreeNode | MPart>(findBy: {id: string}): T {
     const element = this.findTreeElements((element: MTreeNode | MPart): element is T => {
+      if (element instanceof MPart) {
+        return matchesPartId(findBy.id, element);
+      }
       return element.id === findBy.id;
     }, {findFirst: true}).at(0);
 
@@ -1018,9 +1052,9 @@ export interface ReferenceElement extends ReferencePart {
  *
  * @docs-private Not public API, intended for internal use only.
  */
-export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<string>('MAIN_AREA_INITIAL_PART_ID', {
+export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<PartId>('MAIN_AREA_INITIAL_PART_ID', {
   providedIn: 'root',
-  factory: () => UID.randomUID(),
+  factory: () => WorkbenchLayouts.computePartId(),
 });
 
 /**
@@ -1039,7 +1073,7 @@ export class PartActivationInstantProvider {
   /**
    * Returns the instant when the specified part was last activated.
    */
-  public getActivationInstant(partId: string): number {
+  public getActivationInstant(partId: PartId): number {
     return this._partRegistry.get(partId, {orElse: null})?.activationInstant ?? 0;
   }
 }
@@ -1066,14 +1100,26 @@ export class ViewActivationInstantProvider {
 }
 
 /**
- * Creates a predicate to match a view by its primary or alternative id, depending on the type of the passed id.
+ * Matches given view by its primary or alternative id, depending on the type of the passed id.
  */
-function matchViewById(id: string): Predicate<MView> {
+function matchesViewId(id: ViewId | string, view: MView): boolean {
   if (isViewId(id)) {
-    return view => view.id === id;
+    return view.id === id;
   }
   else {
-    return view => view.alternativeId === id;
+    return view.alternativeId === id;
+  }
+}
+
+/**
+ * Matches given part by its primary or alternative id, depending on the type of the passed id.
+ */
+function matchesPartId(id: PartId | string, part: MPart): boolean {
+  if (isPartId(id)) {
+    return part.id === id;
+  }
+  else {
+    return part.alternativeId === id;
   }
 }
 
@@ -1085,10 +1131,17 @@ function stringifyFilter(filter: {[property: string]: unknown}): string {
 }
 
 /**
- * Tests if the given id matches the format of a view identifier (e.g., `view.1`, `view.2`, etc.).
+ * Tests if the given id matches the format of a view identifier.
  */
 function isViewId(viewId: string | undefined | null): viewId is ViewId {
   return Routing.isViewOutlet(viewId);
+}
+
+/**
+ * Tests if the given id matches the format of a part identifier.
+ */
+export function isPartId(partId: string | undefined | null): partId is PartId {
+  return Routing.isPartOutlet(partId);
 }
 
 /**

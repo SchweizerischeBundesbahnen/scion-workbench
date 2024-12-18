@@ -21,10 +21,10 @@ import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {PART_ID_PREFIX} from '../workbench.constants';
-import {RootRouterOutletDirective} from '../routing/root-router-outlet.directive';
+import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
+import {PartId} from './workbench-part.model';
 import {MAIN_AREA} from '../layout/workbench-layout';
 
 @Component({
@@ -37,20 +37,18 @@ import {MAIN_AREA} from '../layout/workbench-layout';
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
     RouterOutlet,
-    RootRouterOutletDirective,
+    RouterOutletRootContextDirective,
     ViewPortalPipe,
     SciViewportComponent,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {
 
-  protected readonly PART_ID_PREFIX = PART_ID_PREFIX;
-
   @HostBinding('attr.tabindex')
   protected tabIndex = -1;
 
   @HostBinding('attr.data-partid')
-  protected get partId(): string {
+  protected get partId(): PartId {
     return this.part.id;
   }
 

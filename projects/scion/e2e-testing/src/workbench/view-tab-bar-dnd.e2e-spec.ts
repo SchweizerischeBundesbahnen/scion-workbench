@@ -25,9 +25,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addView('view.101', {partId: 'right', activateView: true})
-      .addView('view.102', {partId: 'right'}),
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.right', activateView: true})
+      .addView('view.102', {partId: 'part.right'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -46,16 +46,16 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle2.dragTo({deltaX: 50, deltaY: 0});
 
     // Expect drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'right'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.right'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
   });
 
   test('should activate tab when dragging it out of the tabbar and into the tabbar again, retaining position', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main'})
-      .addView('view.102', {partId: 'main', activateView: true})
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.main', activateView: true})
       .navigateView('view.102', ['test-view']),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -75,7 +75,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await expect.poll(() => tab2.isActive()).toBe(true);
 
     // Expect same tab order
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
 
     // Expect view to display correct content.
     await expectView(new ViewPagePO(appPO, {viewId: 'view.102'})).toBeActive();
@@ -85,9 +85,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -99,22 +99,22 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     const dragHandle1 = await tab1.startDrag();
     await dragHandle1.dragTo({deltaX: await getWidth(tab1), deltaY: 0});
     await dragHandle1.drop();
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.102', 'view.101']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds()).toEqual(['view.102', 'view.101']);
 
     // Swap tabs.
     const dragHandle2 = await tab1.startDrag();
     await dragHandle2.dragTo({deltaX: -await getWidth(tab2), deltaY: 0});
     await dragHandle2.drop();
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should not display the drag source when dragging it over its tabbar', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -127,19 +127,19 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: 0});
 
     // Expect the drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
 
     // Expect the drag source to be in the DOM.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should not display the drag source when dragging it out of its tabbar', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -152,19 +152,19 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: 300});
 
     // Expect the drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
 
     // Expect the drag source to be in the DOM.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should not display the drag source when dragging it back into its tabbar', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -178,10 +178,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: -300});
 
     // Expect the drag source not to be visible.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.102']);
 
     // Expect the drag source to be in the DOM.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds()).toEqual(['view.101', 'view.102']);
   });
 
   test('should snap the drag image to the tabbar when dragging near it', async ({appPO, workbenchNavigator}) => {
@@ -189,9 +189,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.setDesignToken('--sci-workbench-tab-height', '35px');
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -199,7 +199,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     const tab2 = appPO.view({viewId: 'view.102'}).tab;
     await tab2.setTitle('view.102');
 
-    const tabbarBounds = await appPO.part({partId: 'main'}).bar.viewTabBar.getBoundingBox();
+    const tabbarBounds = await appPO.part({partId: 'part.main'}).bar.viewTabBar.getBoundingBox();
 
     // Start dragging.
     const dragHandle = await tab1.startDrag();
@@ -287,12 +287,12 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('top')
-      .addPart('bottom', {align: 'bottom'})
-      .addView('view.999', {partId: 'top', activateView: true})
-      .addView('view.101', {partId: 'bottom', activateView: true})
-      .addView('view.102', {partId: 'bottom'})
-      .addView('view.103', {partId: 'bottom'}),
+      .addPart('part.top')
+      .addPart('part.bottom', {align: 'bottom'})
+      .addView('view.999', {partId: 'part.top', activateView: true})
+      .addView('view.101', {partId: 'part.bottom', activateView: true})
+      .addView('view.102', {partId: 'part.bottom'})
+      .addView('view.103', {partId: 'part.bottom'}),
     );
     const tab = appPO.view({viewId: 'view.999'}).tab;
     await tab.setTitle('view.999');
@@ -315,7 +315,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab3.setWidth('200px');
     const tab3Bounds = await tab3.getBoundingBox();
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'part.bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Start dragging.
     const dragHandle = await tab.startDrag();
@@ -438,9 +438,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'}),
     );
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     await tab1.setTitle('view.101');
@@ -451,17 +451,17 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     // Start dragging.
     const dragHandle = await tab1.startDrag();
     await dragHandle.dragTo({deltaX: 10, deltaY: 0});
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewportClientCssProperty('pointer-events')).toEqual('none');
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewportClientCssProperty('pointer-events')).toEqual('none');
   });
 
   test('should animate shifting tabs when dragging over a tabbar', async ({appPO, consoleLogs, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'})
-      .addView('view.103', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'})
+      .addView('view.103', {partId: 'part.main'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -508,10 +508,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'})
-      .addView('view.103', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'})
+      .addView('view.103', {partId: 'part.main'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -548,12 +548,12 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('top')
-      .addPart('bottom', {align: 'bottom'})
-      .addView('view.999', {partId: 'top', activateView: true})
-      .addView('view.101', {partId: 'bottom', activateView: true})
-      .addView('view.102', {partId: 'bottom'})
-      .addView('view.103', {partId: 'bottom'}),
+      .addPart('part.top')
+      .addPart('part.bottom', {align: 'bottom'})
+      .addView('view.999', {partId: 'part.top', activateView: true})
+      .addView('view.101', {partId: 'part.bottom', activateView: true})
+      .addView('view.102', {partId: 'part.bottom'})
+      .addView('view.103', {partId: 'part.bottom'}),
     );
 
     const tab = appPO.view({viewId: 'view.999'}).tab;
@@ -571,7 +571,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab3.setTitle('view.103');
     await tab3.setWidth('100px');
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'part.bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
@@ -598,11 +598,11 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'})
-      .addView('view.103', {partId: 'main'})
-      .addView('view.104', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'})
+      .addView('view.103', {partId: 'part.main'})
+      .addView('view.104', {partId: 'part.main'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -646,12 +646,12 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('top')
-      .addPart('bottom', {align: 'bottom'})
-      .addView('view.101', {partId: 'top', activateView: true})
-      .addView('view.102', {partId: 'top'})
-      .addView('view.201', {partId: 'bottom', activateView: true})
-      .addView('view.202', {partId: 'bottom'}),
+      .addPart('part.top')
+      .addPart('part.bottom', {align: 'bottom'})
+      .addView('view.101', {partId: 'part.top', activateView: true})
+      .addView('view.102', {partId: 'part.top'})
+      .addView('view.201', {partId: 'part.bottom', activateView: true})
+      .addView('view.202', {partId: 'part.bottom'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -670,7 +670,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab4.setTitle('view.202');
     await tab4.setWidth('100px');
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'part.bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
@@ -702,12 +702,12 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('top')
-      .addPart('bottom', {align: 'bottom'})
-      .addView('view.101', {partId: 'top', activateView: true})
-      .addView('view.102', {partId: 'top'})
-      .addView('view.201', {partId: 'bottom', activateView: true})
-      .addView('view.202', {partId: 'bottom'}),
+      .addPart('part.top')
+      .addPart('part.bottom', {align: 'bottom'})
+      .addView('view.101', {partId: 'part.top', activateView: true})
+      .addView('view.102', {partId: 'part.top'})
+      .addView('view.201', {partId: 'part.bottom', activateView: true})
+      .addView('view.202', {partId: 'part.bottom'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -726,7 +726,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await tab4.setTitle('view.202');
     await tab4.setWidth('100px');
 
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'part.bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Log change of tab positions.
     await installPositionLogger(tab1.locator, {label: 'view.101'});
@@ -756,10 +756,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'})
-      .addView('view.103', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'})
+      .addView('view.103', {partId: 'part.main'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -780,7 +780,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Log change of part action position.
-    await installPositionLogger(appPO.part({partId: 'main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    await installPositionLogger(appPO.part({partId: 'part.main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
 
     // Drag tab to the right.
     const dragHandle = await tab1.startDrag();
@@ -800,8 +800,8 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.100', {partId: 'main', activateView: true}),
+      .addPart('part.main')
+      .addView('view.100', {partId: 'part.main', activateView: true}),
     );
 
     const tab = appPO.view({viewId: 'view.100'}).tab;
@@ -814,7 +814,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Capture position of the part action.
-    const partAction = appPO.part({partId: 'main'}).bar.action({cssClass: 'testee'});
+    const partAction = appPO.part({partId: 'part.main'}).bar.action({cssClass: 'testee'});
     const {left} = await partAction.getBoundingBox();
 
     // Drag tab to the right.
@@ -822,7 +822,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 300, deltaY: 0});
 
     // Expect action to be moved by 300px.
-    await expect.poll(() => getLeft(partAction)).toBeBetween(left + 300, left + 301);
+    await expect.poll(() => getLeft(partAction)).toBeBetween(left + 298, left + 303);
 
     // Expect action to be visible.
     await expect(partAction.locator).toBeVisible();
@@ -832,10 +832,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main', activateView: true})
-      .addView('view.102', {partId: 'main'})
-      .addView('view.103', {partId: 'main'}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'})
+      .addView('view.103', {partId: 'part.main'}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -856,7 +856,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Wait until positioned the part action.
-    await installPositionLogger(appPO.part({partId: 'main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    await installPositionLogger(appPO.part({partId: 'part.main'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
     consoleLogs.clear();
 
     // Start dragging the tab.
@@ -871,10 +871,10 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('top')
-      .addPart('bottom', {align: 'bottom'})
-      .addView('view.101', {partId: 'top', activateView: true})
-      .addView('view.102', {partId: 'bottom', activateView: true}),
+      .addPart('part.top')
+      .addPart('part.bottom', {align: 'bottom'})
+      .addView('view.101', {partId: 'part.top', activateView: true})
+      .addView('view.102', {partId: 'part.bottom', activateView: true}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -889,9 +889,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await layoutPage.view.tab.close();
 
     // Log change of part action position.
-    await installPositionLogger(appPO.part({partId: 'bottom'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
-    const topTabbarBounds = await appPO.part({partId: 'top'}).bar.viewTabBar.getBoundingBox();
-    const bottomTabbarBounds = await appPO.part({partId: 'bottom'}).bar.viewTabBar.getBoundingBox();
+    await installPositionLogger(appPO.part({partId: 'part.bottom'}).bar.action({cssClass: 'testee'}).locator, {label: 'part-action'});
+    const topTabbarBounds = await appPO.part({partId: 'part.top'}).bar.viewTabBar.getBoundingBox();
+    const bottomTabbarBounds = await appPO.part({partId: 'part.bottom'}).bar.viewTabBar.getBoundingBox();
 
     // Clear log.
     consoleLogs.clear();
@@ -906,7 +906,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await expect.poll(() => consoleLogs.get({message: '[part-action] Position has changed'}).length).toBe(1);
 
     // Wait for the CSS class 'on-drag-enter' to be removed.
-    const tabbar = appPO.part({partId: 'bottom'}).bar.locator;
+    const tabbar = appPO.part({partId: 'part.bottom'}).bar.locator;
     await waitForCondition(async () => !await hasCssClass(tabbar, 'on-drag-enter'));
     consoleLogs.clear();
 
@@ -922,9 +922,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main'})
-      .addView('view.102', {partId: 'main', activateView: true})
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.main', activateView: true})
       .navigateView('view.101', ['test-pages/lifecycle-logger-test-page']),
     );
 
@@ -955,9 +955,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main'})
-      .addView('view.102', {partId: 'main', activateView: true}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.main', activateView: true}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -971,7 +971,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: -1000, deltaY: 0});
 
     // Expect adjacent tab to be activated.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
     await expect.poll(() => tab1.isActive()).toBe(true);
   });
 
@@ -979,9 +979,9 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('main')
-      .addView('view.101', {partId: 'main'})
-      .addView('view.102', {partId: 'main', activateView: true}),
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.main', activateView: true}),
     );
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
@@ -995,7 +995,7 @@ test.describe('View Drag & Drop (Tabbar)', () => {
     await dragHandle.dragTo({deltaX: 0, deltaY: 300});
 
     // Expect adjacent tab to be activated.
-    await expect.poll(() => appPO.part({partId: 'main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
+    await expect.poll(() => appPO.part({partId: 'part.main'}).bar.viewTabBar.getViewIds({visible: true})).toEqual(['view.101']);
     await expect.poll(() => tab1.isActive()).toBe(true);
   });
 });

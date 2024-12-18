@@ -19,6 +19,7 @@ import {ViewId} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 import {NavigationData} from '../routing/routing.model';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Coordinates cross application drag and drop of views.
@@ -33,7 +34,7 @@ export class ViewDragService implements OnDestroy {
   private readonly _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
   private readonly _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
   private readonly _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
-  private readonly _tabbarDragOver$ = new BehaviorSubject<string /* partId */ | false>(false);
+  private readonly _tabbarDragOver$ = new BehaviorSubject<PartId | false>(false);
   private readonly _viewMoved$ = new Subject<ViewMoveEvent>();
 
   /**
@@ -72,14 +73,14 @@ export class ViewDragService implements OnDestroy {
   /**
    * Signals start dragging a tab over specified tabbar (dragenter).
    */
-  public signalTabbarDragEnter(partId: string): void {
+  public signalTabbarDragEnter(partId: PartId): void {
     this._tabbarDragOver$.next(partId);
   }
 
   /**
    * Signals end dragging a tab over specified tabbar (dragleave).
    */
-  public signalTabbarDragLeave(partId: string): void {
+  public signalTabbarDragLeave(partId: PartId): void {
     if (this._tabbarDragOver$.value === partId) {
       this._tabbarDragOver$.next(false);
     }
@@ -295,7 +296,7 @@ export interface ViewDragData {
   navigationData?: NavigationData;
   viewClosable: boolean;
   viewDirty: boolean;
-  partId: string;
+  partId: PartId;
   viewTabWidth: number;
   viewTabHeight: number;
   workbenchId: string;
@@ -325,7 +326,7 @@ export interface ViewMoveEvent {
  */
 export interface ViewMoveEventSource {
   viewId: ViewId;
-  partId: string;
+  partId: PartId;
   navigationHint?: string;
   navigationData?: NavigationData;
   alternativeViewId?: string;
@@ -349,7 +350,7 @@ export interface ViewMoveEventTarget {
    *
    * Note: Property is ignored when moving the view to a new window.
    */
-  elementId?: string;
+  elementId?: PartId | string;
   /**
    * Region of {@link elementId} where to add the view (in a new part).
    *
@@ -373,9 +374,9 @@ export interface ViewMoveEventTarget {
    */
   newPart?: {
     /**
-     * Identity of the new part. If not set, assigns a UUID.
+     * Identity of the new part. If not set, assigns a random id.
      */
-    id?: string;
+    id?: PartId;
     /**
      * Proportional size of the part relative to the reference part.
      * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.

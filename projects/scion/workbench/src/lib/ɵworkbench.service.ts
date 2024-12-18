@@ -28,6 +28,7 @@ import {ViewId} from './view/workbench-view.model';
 import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {throwError} from './common/throw-error.util';
+import {PartId} from './part/workbench-part.model';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -64,7 +65,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public getPart(partId: string): ɵWorkbenchPart | null {
+  public getPart(partId: PartId): ɵWorkbenchPart | null {
     return this._partRegistry.get(partId, {orElse: null});
   }
 

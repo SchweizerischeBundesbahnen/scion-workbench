@@ -32,8 +32,8 @@ test.describe('Navigational Data', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addView('testee', {partId: 'right', activateView: true, cssClass: 'testee'})
+      .addPart('part.right', {align: 'right'})
+      .addView('testee', {partId: 'part.right', activateView: true, cssClass: 'testee'})
       .navigateView('testee', ['test-view'], {data: {some: 'data'}}),
     );
 

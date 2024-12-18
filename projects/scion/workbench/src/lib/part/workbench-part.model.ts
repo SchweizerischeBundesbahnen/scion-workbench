@@ -11,6 +11,7 @@
 import {WorkbenchPartAction} from '../workbench.model';
 import {ViewId} from '../view/workbench-view.model';
 import {Signal} from '@angular/core';
+import {PartOutlet} from '../workbench.constants';
 
 /**
  * Represents a part of the workbench layout.
@@ -24,7 +25,17 @@ export abstract class WorkbenchPart {
   /**
    * Unique identity of this part.
    */
-  public abstract readonly id: string;
+  public abstract readonly id: PartId;
+
+  /**
+   * Alternative identity of this part.
+   *
+   * A part can have an alternative id, a meaningful but not necessarily unique name. A part can
+   * be identified either by its unique or alternative id.
+   *
+   * @see id
+   */
+  public abstract readonly alternativeId: string | undefined;
 
   /**
    * Indicates whether this part is located in the main area.
@@ -59,3 +70,12 @@ export abstract class WorkbenchPart {
   public abstract get cssClass(): Signal<string[]>;
   public abstract set cssClass(cssClass: string | string[]);
 }
+
+/**
+ * Format of a part identifier.
+ *
+ * Each part is assigned a unique identifier (e.g., `part.9fdf7ab4`, `part.c6485225`, etc.).
+ * A part can also have an alternative id, a meaningful but not necessarily unique name. A part can
+ * be identified either by its unique or alternative id.
+ */
+export type PartId = PartOutlet;

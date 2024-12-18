@@ -10,7 +10,7 @@
 import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal, untracked} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction} from '../workbench.model';
-import {WorkbenchPart} from './workbench-part.model';
+import {PartId, WorkbenchPart} from './workbench-part.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
@@ -21,7 +21,6 @@ import {ActivatedRouteSnapshot, UrlSegment} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
-import {toPartOutlet} from '../workbench.constants';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
@@ -37,6 +36,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>;
 
+  public readonly alternativeId: string | undefined;
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId = signal<ViewId | null>(null);
@@ -48,12 +48,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   public navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
 
-  constructor(public readonly id: string, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) {
+  constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) {
+    this.alternativeId = layout.part({partId: this.id}).alternativeId;
     this._partComponent = options.component;
     this.actions = this.selectPartActions();
     this.touchOnActivate();
     this.installModelUpdater();
-    this.onLayoutChange({layout: this._workbenchRouter.getCurrentNavigationContext().layout});
+    this.onLayoutChange({layout});
   }
 
   /**
@@ -101,8 +102,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
         id: mPart.navigation.id,
         hint: mPart.navigation.hint,
         data: mPart.navigation.data ?? {},
-        state: layout.navigationState({outlet: toPartOutlet(this.id)}),
-        url: layout.urlSegments({outlet: toPartOutlet(this.id)}),
+        state: layout.navigationState({outlet: this.id}),
+        url: layout.urlSegments({outlet: this.id}),
       } : undefined);
       this.classList.navigation = mPart.navigation?.cssClass;
     }
@@ -184,7 +185,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * If the operation is cancelled (e.g., due to a navigation failure), it reverts the changes.
    */
   private installModelUpdater(): void {
-    Routing.activatedRoute$(toPartOutlet(this.id), {emitOn: 'always'})
+    Routing.activatedRoute$(this.id, {emitOn: 'always'})
       .pipe(takeUntilDestroyed())
       .subscribe(([previousRoute, route]: [ActivatedRouteSnapshot | null, ActivatedRouteSnapshot]) => {
         const navigationContext = this._workbenchRouter.getCurrentNavigationContext();

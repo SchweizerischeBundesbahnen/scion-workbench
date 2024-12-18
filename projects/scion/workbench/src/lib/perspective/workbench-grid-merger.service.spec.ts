@@ -33,11 +33,11 @@ describe('WorkbenchGridMerger', () => {
   it('should preserve local changes when no diff between base and remote', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-      .addView('view.1', {partId: 'topLeft'})
-      .addView('view.2', {partId: 'topLeft'})
-      .addView('view.3', {partId: 'bottomLeft'})
+      .addPart('part.topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('part.bottomLeft', {relativeTo: 'part.topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'part.topLeft'})
+      .addView('view.2', {partId: 'part.topLeft'})
+      .addView('view.3', {partId: 'part.bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', ['path/to/view/2'])
       .navigateView('view.3', [], {hint: 'hint-3'});
@@ -45,7 +45,7 @@ describe('WorkbenchGridMerger', () => {
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base
         .removeView('view.2', {force: true})
-        .addView('view.100', {partId: 'topLeft'})
+        .addView('view.100', {partId: 'part.topLeft'})
         .navigateView('view.100', ['path/to/view/100'])
         .navigateView('view.1', ['PATH/TO/VIEW/1']),
       base,
@@ -62,14 +62,14 @@ describe('WorkbenchGridMerger', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: 'topLeft',
+              id: 'part.topLeft',
               views: [
                 {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
                 {id: 'view.100', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
-              id: 'bottomLeft',
+              id: 'part.bottomLeft',
               views: [
                 {id: 'view.3', navigation: {id: ANYTHING, hint: 'hint-3'}},
               ],
@@ -96,11 +96,11 @@ describe('WorkbenchGridMerger', () => {
   it('should discard local changes when diff between base and remote grids', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-      .addView('view.1', {partId: 'topLeft'})
-      .addView('view.2', {partId: 'topLeft'})
-      .addView('view.3', {partId: 'bottomLeft'})
+      .addPart('part.topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('part.bottomLeft', {relativeTo: 'part.topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'part.topLeft'})
+      .addView('view.2', {partId: 'part.topLeft'})
+      .addView('view.3', {partId: 'part.bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', ['path/to/view/2'])
       .navigateView('view.3', [], {hint: 'hint-3'});
@@ -108,13 +108,13 @@ describe('WorkbenchGridMerger', () => {
     const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
       local: base
         .removeView('view.2', {force: true})
-        .addView('view.100', {partId: 'topLeft'})
+        .addView('view.100', {partId: 'part.topLeft'})
         .navigateView('view.100', ['path/to/view/100'])
         .navigateView('view.3', ['path/to/view/3']),
       base,
       remote: base
         .removeView('view.1', {force: true})
-        .addView('view.100', {partId: 'bottomLeft'})
+        .addView('view.100', {partId: 'part.bottomLeft'})
         .navigateView('view.100', ['PATH/TO/VIEW/100']),
     });
 
@@ -128,13 +128,13 @@ describe('WorkbenchGridMerger', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: 'topLeft',
+              id: 'part.topLeft',
               views: [
                 {id: 'view.2', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
-              id: 'bottomLeft',
+              id: 'part.bottomLeft',
               views: [
                 {id: 'view.3', navigation: {id: ANYTHING, hint: 'hint-3'}},
                 {id: 'view.100', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
@@ -162,10 +162,10 @@ describe('WorkbenchGridMerger', () => {
   it('should discard local changes when diff between base and remote paths', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-      .addView('view.1', {partId: 'topLeft'})
-      .addView('view.2', {partId: 'bottomLeft'})
+      .addPart('part.topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('part.bottomLeft', {relativeTo: 'part.topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'part.topLeft'})
+      .addView('view.2', {partId: 'part.bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', ['path/to/view/2']);
 
@@ -185,13 +185,13 @@ describe('WorkbenchGridMerger', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: 'topLeft',
+              id: 'part.topLeft',
               views: [
                 {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
-              id: 'bottomLeft',
+              id: 'part.bottomLeft',
               views: [
                 {id: 'view.2', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
@@ -218,10 +218,10 @@ describe('WorkbenchGridMerger', () => {
   it('should discard local changes when diff between base and remote hints', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-      .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
-      .addView('view.1', {partId: 'topLeft'})
-      .addView('view.2', {partId: 'bottomLeft'})
+      .addPart('part.topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('part.bottomLeft', {relativeTo: 'part.topLeft', align: 'bottom', ratio: .5})
+      .addView('view.1', {partId: 'part.topLeft'})
+      .addView('view.2', {partId: 'part.bottomLeft'})
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', [], {hint: 'hint-2'});
 
@@ -241,13 +241,13 @@ describe('WorkbenchGridMerger', () => {
             direction: 'column',
             ratio: .5,
             child1: new MPart({
-              id: 'topLeft',
+              id: 'part.topLeft',
               views: [
                 {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
-              id: 'bottomLeft',
+              id: 'part.bottomLeft',
               views: [
                 {id: 'view.2', navigation: {id: ANYTHING, hint: 'hint-2b'}},
               ],

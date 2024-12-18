@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2024 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,9 +25,9 @@ test.describe('Workbench View', () => {
 
     // Add two views to the peripheral area.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addView('view.101', {partId: 'left', activateView: true})
-      .addView('view.102', {partId: 'left', activateView: true})
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addView('view.101', {partId: 'part.left', activateView: true})
+      .addView('view.102', {partId: 'part.left', activateView: true})
       .navigateView('view.101', ['test-view'])
       .navigateView('view.102', ['test-view']),
     );
@@ -62,7 +62,7 @@ test.describe('Workbench View', () => {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: new MPart({id: 'left', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
@@ -74,9 +74,9 @@ test.describe('Workbench View', () => {
 
     // Define perspective with a view in the workbench grid.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addView('view.101', {partId: 'left', activateView: true})
-      .addView('view.102', {partId: 'left', activateView: true})
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addView('view.101', {partId: 'part.left', activateView: true})
+      .addView('view.102', {partId: 'part.left', activateView: true})
       .navigateView('view.101', [], {hint: 'test-view'})
       .navigateView('view.102', [], {hint: 'test-view'}),
     );
@@ -111,7 +111,7 @@ test.describe('Workbench View', () => {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
-          child1: new MPart({id: 'left', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
@@ -216,10 +216,10 @@ test.describe('Workbench View', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
-      .addPart('part')
-      .addView('view.101', {partId: 'part'})
-      .addView('view.102', {partId: 'part'})
-      .addView('view.103', {partId: 'part'})
+      .addPart('part.part')
+      .addView('view.101', {partId: 'part.part'})
+      .addView('view.102', {partId: 'part.part'})
+      .addView('view.103', {partId: 'part.part'})
       .navigateView('view.101', ['test-view']) // path-based view
       .navigateView('view.102', ['test-view']) // path-based view
       .navigateView('view.103', [], {hint: 'test-view'}), // empty-path view

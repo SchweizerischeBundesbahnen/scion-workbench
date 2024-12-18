@@ -10,6 +10,7 @@
 
 import {DomRect, fromRect} from './helper/testing.util';
 import {Locator, Mouse, Page} from '@playwright/test';
+import {PartId} from '@scion/workbench';
 
 /**
  * Reference to the drag handle of a view to control drag and drop.
@@ -49,7 +50,7 @@ export class ViewDrageHandlePO {
   /**
    * Drags this tab to the specified region in the specified part.
    */
-  public async dragToPart(partId: string, options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; steps?: number}): Promise<void> {
+  public async dragToPart(partId: PartId, options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; steps?: number}): Promise<void> {
     const steps = options.steps ?? 100;
 
     // 1. Activate drop zones by dragging the drag handle over the part.

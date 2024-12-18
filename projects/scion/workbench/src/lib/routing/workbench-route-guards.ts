@@ -13,7 +13,6 @@ import {inject} from '@angular/core';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {Routing} from './routing.util';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './workbench-auxiliary-route-installer.service';
-import {toPartId} from '../workbench.constants';
 
 /**
  * Matches the route if target of a workbench view and navigating with the given hint.
@@ -27,21 +26,21 @@ import {toPartId} from '../workbench.constants';
  * The following routes both match the empty path, but only if navigated with a specific hint.
  * ```ts
  * const routes: Routes = [
- *   {path: '', canMatch: [canMatchWorkbenchView('navigator')], component: NavigatorComponent},
+ *   {path: '', canMatch: [canMatchWorkbenchView('search')], component: SearchComponent},
  *   {path: '', canMatch: [canMatchWorkbenchView('outline')], component: OutlineComponent},
  * ];
  * ```
  *
- * The following example navigates to the `OutlineComponent`, passing a hint to match the route.
+ * The following example navigates to the `SearchComponent`, passing a hint to match the route.
  * ```ts
- * inject(WorkbenchRouter).navigate([], {hint: 'outline'});
+ * inject(WorkbenchRouter).navigate([], {hint: 'search'});
  * ```
  */
 export function canMatchWorkbenchView(navigationHint: string): CanMatchFn;
 /**
  * Matches the route if, or if not target of a workbench view.
  *
- * Can be used to guard the application's root route from matching an empty path view navigation.
+ * Can be used to guard the application's root route to not match an empty path view navigation.
  */
 export function canMatchWorkbenchView(canMatch: boolean): CanMatchFn;
 export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
@@ -67,8 +66,6 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 }
 
 /**
- * TODO [activity] Should we consolidate this function with canMatchWorkbenchView?
- *
  * Matches the route if target of a workbench part and navigating with the given hint.
  *
  * Can be used to differentiate between routes with an identical path. For example, the parts of the initial layout or a perspective
@@ -80,21 +77,21 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
  * The following routes both match the empty path, but only if navigated with a specific hint.
  * ```ts
  * const routes: Routes = [
- *   {path: '', canMatch: [canMatchWorkbenchPart('navigator')], component: NavigatorComponent},
+ *   {path: '', canMatch: [canMatchWorkbenchPart('search')], component: SearchComponent},
  *   {path: '', canMatch: [canMatchWorkbenchPart('outline')], component: OutlineComponent},
  * ];
  * ```
  *
- * The following example navigates to the `OutlineComponent`, passing a hint to match the route.
+ * The following example navigates to the `SearchComponent`, passing a hint to match the route.
  * ```ts
- * inject(WorkbenchRouter).navigate([], {hint: 'outline'});
+ * inject(WorkbenchRouter).navigate(layout => layout.navigatePart('search', [], {hint: 'search'}));
  * ```
  */
 export function canMatchWorkbenchPart(navigationHint: string): CanMatchFn;
 /**
  * Matches the route if, or if not target of a workbench part.
  *
- * Can be used to guard the application's root route from matching an empty path part navigation.
+ * Can be used to guard the application's root route to not match an empty path part navigation.
  */
 export function canMatchWorkbenchPart(canMatch: boolean): CanMatchFn;
 export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
@@ -112,7 +109,7 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
         }
 
         const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
-        const part = layout.part({partId: toPartId(outlet)}, {orElse: null});
+        const part = layout.part({partId: outlet}, {orElse: null});
         return part?.navigation?.hint === condition;
       }
     }
@@ -133,7 +130,7 @@ export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
 /**
  * Matches if the view or part has been navigated.
  *
- * Does not match if no navigation information is available, e.g., during initial navigation because the layout is loaded asynchronously, or when closing the view.
+ * Does not match if no navigation information is available, e.g., during initial navigation because the layout is loaded asynchronously, or when closing a view or part.
  */
 export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});

@@ -11,6 +11,10 @@
     <span class="e2e-part-id">{{view.part().id}}</span>
   </sci-form-field>
 
+  <sci-form-field label="Alternative Part ID">
+    <span class="e2e-alternative-part-id">{{view.part().alternativeId}}</span>
+  </sci-form-field>
+
   <sci-form-field label="View Title">
     <input class="e2e-title" [ngModel]="view.title()" (ngModelChange)="view.title = $event">
   </sci-form-field>

@@ -12,7 +12,7 @@ import {inject, Injectable, IterableChanges, IterableDiffers} from '@angular/cor
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {UrlTree} from '@angular/router';
 import {Routing} from './routing.util';
-import {DialogOutlet, MessageBoxOutlet, PartOutlet, PopupOutlet, toPartOutlet, ViewOutlet} from '../workbench.constants';
+import {DialogOutlet, MessageBoxOutlet, PartOutlet, PopupOutlet, ViewOutlet} from '../workbench.constants';
 
 /**
  * Stateful differ to compute added and removed outlets.
@@ -42,7 +42,7 @@ export class WorkbenchOutletDiffer {
     // available during initial navigation, and the URL does not contain outlets for empty-path navigations.
     const partOutlets = [
       ...Routing.parseOutlets(urlTree, {part: true}).keys(),
-      ...workbenchLayout?.parts().map(part => toPartOutlet(part.id)) ?? [],
+      ...workbenchLayout?.parts().map(part => part.id) ?? [],
     ];
 
     const popupOutlets = Routing.parseOutlets(urlTree, {popup: true}).keys();

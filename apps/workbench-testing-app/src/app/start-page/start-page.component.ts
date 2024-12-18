@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
-import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
+import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService as WorkbenchClientPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -48,7 +48,7 @@ export default class StartPageComponent {
   private _filterField!: SciFilterFieldComponent;
 
   @HostBinding('attr.data-partid')
-  public partId: string | undefined;
+  public partId: PartId | undefined;
 
   public filterControl = this._formBuilder.control('');
   public workbenchViewRoutes$: Observable<Routes>;

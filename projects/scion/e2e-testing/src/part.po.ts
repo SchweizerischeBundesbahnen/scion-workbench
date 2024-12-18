@@ -14,6 +14,7 @@ import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
 import {MAIN_AREA} from './workbench.model';
+import {PartId} from '@scion/workbench';
 
 /**
  * Handle for interacting with a workbench part.
@@ -41,8 +42,8 @@ export class PartPO {
     this.sash = new PartSashPO(this.locator);
   }
 
-  public async getPartId(): Promise<string> {
-    return (await this.locator.getAttribute('data-partid'))!;
+  public async getPartId(): Promise<PartId> {
+    return (await this.locator.getAttribute('data-partid')) as PartId;
   }
 
   /**

@@ -12,7 +12,7 @@ import {Disposable} from './common/disposable';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
-import {WorkbenchPart} from './part/workbench-part.model';
+import {PartId, WorkbenchPart} from './part/workbench-part.model';
 import {Injectable, Signal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
@@ -93,7 +93,7 @@ export abstract class WorkbenchService {
    *
    * A handle represents a part in the layout. The handle has methods to interact with the part. A part is added to the layout via {@link WorkbenchRouter}.
    */
-  public abstract getPart(partId: string): WorkbenchPart | null;
+  public abstract getPart(partId: PartId): WorkbenchPart | null;
 
   /**
    * Provides the handles of the views in the current workbench layout.

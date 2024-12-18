@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ɵWorkbenchLayout} from './ɵworkbench-layout';
+import {isPartId, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MPart, MPartGrid} from './workbench-layout.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {EnvironmentInjector, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA} from './workbench-layout';
 import {NavigationStates, Outlets} from '../routing/routing.model';
+import {WorkbenchLayouts} from './workbench-layouts.util';
 
 /**
  * @inheritDoc
@@ -28,8 +29,10 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
    * @inheritDoc
    */
   public addPart(id: string | MAIN_AREA): ɵWorkbenchLayout {
+    const partId = isPartId(id) ? id : WorkbenchLayouts.computePartId();
+    const alternativeId = isPartId(id) ? undefined : id;
     return this.create({
-      workbenchGrid: {root: new MPart({id, structural: true, views: []}), activePartId: id},
+      workbenchGrid: {root: new MPart({id: partId, alternativeId, structural: true, views: []}), activePartId: partId},
     });
   }
 

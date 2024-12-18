@@ -17,6 +17,7 @@ import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {WorkbenchLayouts} from '../workbench-layouts.util';
+import {PartId} from '../../part/workbench-part.model';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -55,7 +56,7 @@ export class GridElementComponent implements OnChanges {
   public nodeId: string | undefined;
 
   @HostBinding('attr.data-partid')
-  public partId: string | undefined;
+  public partId: PartId | undefined;
 
   @Input({required: true})
   public element!: MTreeNode | MPart;

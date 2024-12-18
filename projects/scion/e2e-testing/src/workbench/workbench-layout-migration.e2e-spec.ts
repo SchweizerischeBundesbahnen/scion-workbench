@@ -76,7 +76,7 @@ test.describe('Workbench Layout Migration', () => {
             direction: 'row',
             ratio: .2,
             child1: new MPart({
-              id: '33b22f60-bf34-4704-885d-7de0d707430f',
+              id: 'part.33b22f60-bf34-4704-885d-7de0d707430f',
               views: [{id: 'view.3'}],
               activeViewId: 'view.3',
             }),
@@ -85,29 +85,29 @@ test.describe('Workbench Layout Migration', () => {
             }),
           }),
           child2: new MPart({
-            id: '9bc4c09f-67a7-4c69-a28b-532781a1c98f',
+            id: 'part.9bc4c09f-67a7-4c69-a28b-532781a1c98f',
             views: [{id: 'view.5'}],
             activeViewId: 'view.5',
           }),
         }),
-        activePartId: '33b22f60-bf34-4704-885d-7de0d707430f',
+        activePartId: 'part.33b22f60-bf34-4704-885d-7de0d707430f',
       },
       mainAreaGrid: {
         root: new MTreeNode({
           direction: 'column',
           ratio: .5,
           child1: new MPart({
-            id: 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1',
+            id: 'part.a25eb4cf-9da7-43e7-8db2-302fd38e59a1',
             views: [{id: 'view.1'}, {id: 'view.4'}],
             activeViewId: 'view.4',
           }),
           child2: new MPart({
-            id: '2b534d97-ed7d-43b3-bb2c-0e59d9766e86',
+            id: 'part.2b534d97-ed7d-43b3-bb2c-0e59d9766e86',
             views: [{id: 'view.2'}],
             activeViewId: 'view.2',
           }),
         }),
-        activePartId: 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1',
+        activePartId: 'part.a25eb4cf-9da7-43e7-8db2-302fd38e59a1',
       },
     });
 
@@ -198,7 +198,7 @@ test.describe('Workbench Layout Migration', () => {
           direction: 'row',
           ratio: .25,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.2'}, {id: 'view.3'}],
             activeViewId: 'view.2',
           }),
@@ -209,30 +209,30 @@ test.describe('Workbench Layout Migration', () => {
               id: MAIN_AREA,
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.4'}],
               activeViewId: 'view.4',
             }),
           }),
         }),
-        activePartId: 'left',
+        activePartId: 'part.left',
       },
       mainAreaGrid: {
         root: new MTreeNode({
           direction: 'column',
           ratio: .5,
           child1: new MPart({
-            id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7',
+            id: 'part.6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7',
             views: [{id: 'view.1'}],
             activeViewId: 'view.1',
           }),
           child2: new MPart({
-            id: '1d94dcb6-76b6-47eb-b300-39448993d36b',
+            id: 'part.1d94dcb6-76b6-47eb-b300-39448993d36b',
             views: [{id: 'view.5'}],
             activeViewId: 'view.5',
           }),
         }),
-        activePartId: '1d94dcb6-76b6-47eb-b300-39448993d36b',
+        activePartId: 'part.1d94dcb6-76b6-47eb-b300-39448993d36b',
       },
     });
 

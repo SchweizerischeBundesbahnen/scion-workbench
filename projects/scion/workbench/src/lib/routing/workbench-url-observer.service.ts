@@ -23,7 +23,6 @@ import {Logger, LoggerNames} from '../logging';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {MainAreaPartComponent} from '../part/main-area-part/main-area-part.component';
 import {PartComponent} from '../part/part.component';
-import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {Routing} from './routing.util';
@@ -33,6 +32,9 @@ import {WorkbenchNavigationContext} from './routing.model';
 import {canMatchNotFoundPage} from './workbench-route-guards';
 import {WorkbenchOutletDiffer} from './workbench-outlet-differ';
 import {filter} from 'rxjs/operators';
+import {MAIN_AREA} from '../layout/workbench-layout';
+import {PartId} from '../part/workbench-part.model';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -229,11 +231,11 @@ export class WorkbenchUrlObserver {
    */
   private registerAddedWorkbenchParts(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const {layoutDiff} = navigationContext;
+    const {layoutDiff, layout} = navigationContext;
 
     layoutDiff.addedParts.forEach(partId => {
       this._logger.debug(() => `Constructing ɵWorkbenchPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-      this._partRegistry.register(this.createWorkbenchPart(partId));
+      this._partRegistry.register(this.createWorkbenchPart(partId, layout));
       navigationContext.registerUndoAction(() => this._partRegistry.unregister(partId));
     });
   }
@@ -255,11 +257,11 @@ export class WorkbenchUrlObserver {
    */
   private registerAddedWorkbenchViews(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const {layoutDiff} = navigationContext;
+    const {layoutDiff, layout} = navigationContext;
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
-      this._viewRegistry.register(this.createWorkbenchView(viewId));
+      this._viewRegistry.register(this.createWorkbenchView(viewId, layout));
       navigationContext.registerUndoAction(() => this._viewRegistry.unregister(viewId));
     });
   }
@@ -276,18 +278,18 @@ export class WorkbenchUrlObserver {
     });
   }
 
-  private createWorkbenchPart(partId: string): ɵWorkbenchPart {
+  private createWorkbenchPart(partId: PartId, layout: ɵWorkbenchLayout): ɵWorkbenchPart {
     // Construct the handle in an injection context that shares the part's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const partEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Part ${partId}`);
-    return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, {
+    return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, layout, {
       component: partId === MAIN_AREA ? MainAreaPartComponent : PartComponent,
     }));
   }
 
-  private createWorkbenchView(viewId: ViewId): ɵWorkbenchView {
+  private createWorkbenchView(viewId: ViewId, layout: ɵWorkbenchLayout): ɵWorkbenchView {
     // Construct the handle in an injection context that shares the view's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const viewEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench View ${viewId}`);
-    return runInInjectionContext(viewEnvironmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent}));
+    return runInInjectionContext(viewEnvironmentInjector, () => new ɵWorkbenchView(viewId, layout, {component: ViewComponent}));
   }
 
   /**

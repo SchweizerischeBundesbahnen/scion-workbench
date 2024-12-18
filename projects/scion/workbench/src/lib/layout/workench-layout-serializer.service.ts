@@ -19,6 +19,7 @@ import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {Exclusion, stringify} from './stringifier';
 import {WorkbenchOutlet} from '../workbench.constants';
+import {WorkbenchLayoutMigrationV7} from './migration/workbench-layout-migration-v7.service';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -30,7 +31,8 @@ export class WorkbenchLayoutSerializer {
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
     .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
     .registerMigration(4, inject(WorkbenchLayoutMigrationV5))
-    .registerMigration(5, inject(WorkbenchLayoutMigrationV6));
+    .registerMigration(5, inject(WorkbenchLayoutMigrationV6))
+    .registerMigration(6, inject(WorkbenchLayoutMigrationV7));
 
   /**
    * Serializes the given grid into a URL-safe base64 string.
@@ -51,7 +53,9 @@ export class WorkbenchLayoutSerializer {
       .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
       .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
       .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
-      .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []));
+      .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : [])
+      .concat(flags?.excludePartId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MPart}) : [])
+      .concat(flags?.excludeActivePartId ? 'activePartId' : []));
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
   }
 
@@ -117,7 +121,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 6;
+export const WORKBENCH_LAYOUT_VERSION = 7;
 
 /**
  * Separates the serialized JSON model and its version in the base64-encoded string.
@@ -144,4 +148,6 @@ export interface GridSerializationFlags {
   excludeViewMarkedForRemoval?: true;
   excludeViewNavigationId?: true;
   excludePartNavigationId?: true;
+  excludePartId?: true;
+  excludeActivePartId?: true;
 }

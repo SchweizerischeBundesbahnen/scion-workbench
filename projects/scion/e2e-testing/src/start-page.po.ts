@@ -14,7 +14,7 @@ import {Locator} from '@playwright/test';
 import {SciTabbarPO} from './@scion/components.internal/tabbar.po';
 import {SciRouterOutletPO} from './workbench-client/page-object/sci-router-outlet.po';
 import {WorkbenchViewPagePO} from './workbench/page-object/workbench-view-page.po';
-import {ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link StartPageComponent}.
@@ -51,8 +51,8 @@ export class StartPagePO implements WorkbenchViewPagePO {
   /**
    * Returns the part in which this page is displayed.
    */
-  public getPartId(): Promise<string | null> {
-    return this.locator.getAttribute('data-partid');
+  public async getPartId(): Promise<PartId | null> {
+    return (await this.locator.getAttribute('data-partid')) as PartId | null;
   }
 
   /**

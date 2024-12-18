@@ -45,8 +45,8 @@ test.describe('Navigational State', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addView('testee', {partId: 'right', activateView: true, cssClass: 'testee'})
+      .addPart('part.right', {align: 'right'})
+      .addView('testee', {partId: 'part.right', activateView: true, cssClass: 'testee'})
       .navigateView('testee', ['test-view'], {state: {some: 'state'}}),
     );
 
@@ -168,10 +168,10 @@ test.describe('Navigational State', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
-      .addPart('left')
-      .addPart('right', {align: 'right'})
-      .addView('router', {partId: 'left', cssClass: 'router'})
-      .addView('testee', {partId: 'right', cssClass: 'testee'})
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('router', {partId: 'part.left', cssClass: 'router'})
+      .addView('testee', {partId: 'part.right', cssClass: 'testee'})
       .navigateView('router', ['test-router'])
       .navigateView('testee', ['test-view']),
     );
@@ -187,8 +187,8 @@ test.describe('Navigational State', () => {
 
     // Move the view to the left and back again, simulating navigation without explicitly setting the state.
     // When navigating back, expect the view state to be restored.
-    await viewPage.view.tab.moveTo('left');
-    await viewPage.view.tab.moveTo('right');
+    await viewPage.view.tab.moveTo('part.left');
+    await viewPage.view.tab.moveTo('part.right');
 
     await routerPage.navigate(['test-view'], {
       target: 'testee',
@@ -219,10 +219,10 @@ test.describe('Navigational State', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
-      .addPart('left')
-      .addPart('right', {align: 'right'})
-      .addView('workbench-router', {partId: 'left', cssClass: 'workbench-router'})
-      .addView('angular-router', {partId: 'left', cssClass: 'angular-router'})
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('workbench-router', {partId: 'part.left', cssClass: 'workbench-router'})
+      .addView('angular-router', {partId: 'part.left', cssClass: 'angular-router'})
       .navigateView('workbench-router', ['test-router'])
       .navigateView('angular-router', ['test-pages/angular-router-test-page']),
     );
@@ -231,7 +231,7 @@ test.describe('Navigational State', () => {
     const routerPage = new RouterPagePO(appPO, {cssClass: 'workbench-router'});
     await routerPage.navigate(['test-view'], {
       target: 'blank',
-      partId: 'right',
+      partId: 'part.right',
       state: {some: 'state'},
       cssClass: 'testee',
     });

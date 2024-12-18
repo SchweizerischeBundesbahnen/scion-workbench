@@ -9,9 +9,9 @@
  */
 
 import {assertType} from '../common/asserts.util';
-import {Defined} from '@scion/toolkit/util';
 import {ViewId} from '../view/workbench-view.model';
 import {NavigationData} from '../routing/routing.model';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -20,7 +20,7 @@ import {NavigationData} from '../routing/routing.model';
  */
 export interface MPartGrid {
   root: MTreeNode | MPart;
-  activePartId: string;
+  activePartId: PartId;
 }
 
 /**
@@ -82,7 +82,8 @@ export class MPart {
    * Discriminator to unmarshall {@link MPart} to its class type.
    */
   public readonly type = 'MPart';
-  public readonly id!: string; // TODO [activity] Consider changing to formatted PartId
+  public readonly id!: PartId;
+  public readonly alternativeId?: string;
   public parent?: MTreeNode;
   public views!: MView[];
   public activeViewId?: ViewId;
@@ -95,7 +96,6 @@ export class MPart {
   };
 
   constructor(part: Omit<MPart, 'type'>) {
-    Defined.orElseThrow(part.id, () => Error('MPart requires an id'));
     part.parent && assertType(part.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
     Object.assign(this, part);
   }

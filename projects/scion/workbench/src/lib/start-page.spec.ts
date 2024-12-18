@@ -97,8 +97,8 @@ describe('Start Page', () => {
         providers: [
           provideWorkbenchForTest({
             layout: (factory: WorkbenchLayoutFactory) => factory
-              .addPart('part')
-              .addView('test-view', {partId: 'part'})
+              .addPart('part.part')
+              .addView('test-view', {partId: 'part.part'})
               .navigateView('test-view', ['path/to/view']),
           }),
           provideRouter([
@@ -136,7 +136,7 @@ describe('Start Page', () => {
       TestBed.configureTestingModule({
         providers: [
           provideWorkbenchForTest({
-            layout: (factory: WorkbenchLayoutFactory) => factory.addPart('part'),
+            layout: (factory: WorkbenchLayoutFactory) => factory.addPart('part.part'),
           }),
           provideRouter([
             {

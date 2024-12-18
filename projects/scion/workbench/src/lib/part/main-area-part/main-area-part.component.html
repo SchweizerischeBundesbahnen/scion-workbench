@@ -16,7 +16,7 @@
   <sci-viewport class="content">
     <!-- TODO [activity] Consider using a portal similar to view (like desktop) to not lose data when moving the part  -->
     <!-- TODO [activity] Do we need drop zones? Maybe configurable; not in activities  -->
-    <router-outlet [name]="PART_ID_PREFIX + part.id" wbRoot/>
+    <router-outlet [name]="part.id" wbRouterOutletRootContext/>
   </sci-viewport>
 } @else {
   <!-- TODO [activity] Backward compatibility -> deprecate -->

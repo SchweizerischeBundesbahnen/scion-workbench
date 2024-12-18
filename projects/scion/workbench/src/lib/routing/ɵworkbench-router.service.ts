@@ -24,6 +24,7 @@ import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {ViewId} from '../view/workbench-view.model';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -296,7 +297,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
   /**
    * Adds the specified view to the layout.
    */
-  function addView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+  function addView(viewId: ViewId | string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     // Default to the active part if not specified or not in the layout, with the active part of the main area taking precedence.
     const partId = ((): string => {
       if (extras.partId && layout.hasPart(extras.partId)) {
@@ -324,7 +325,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
   /**
    * Updates the specified view.
    */
-  function updateView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+  function updateView(viewId: ViewId | string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     if (extras.activate ?? true) {
       layout = layout.activateView(viewId, {activatePart: true});
     }

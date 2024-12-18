@@ -22,6 +22,7 @@ import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {WORKBENCH_ID} from '../workbench-id';
 import {UID} from '../common/uid.util';
 import {filter} from 'rxjs/operators';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Updates the workbench layout when receiving a {@link ViewMoveEvent} event relevant for this application.
@@ -73,7 +74,7 @@ export class ViewMoveHandler {
     await this._workbenchRouter.navigate(layout => {
       const newViewId = event.source.alternativeViewId ?? layout.computeNextViewId();
       if (addToNewPart) {
-        const newPartId = event.target.newPart?.id ?? UID.randomUID();
+        const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
         return layout
           .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
           .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
@@ -120,7 +121,7 @@ export class ViewMoveHandler {
   private async moveView(event: ViewMoveEvent): Promise<void> {
     const addToNewPart = !!event.target.region;
     if (addToNewPart) {
-      const newPartId = event.target.newPart?.id ?? UID.randomUID();
+      const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
       await this._workbenchRouter.navigate(layout => layout
         .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(event.target.region!), ratio: event.target.newPart?.ratio}, {structural: false})
         .moveView(event.source.viewId, newPartId, {activatePart: true, activateView: true}),

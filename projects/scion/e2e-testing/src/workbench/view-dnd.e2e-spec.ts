@@ -355,9 +355,9 @@ test.describe('View Drag & Drop', () => {
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to the center of the initial part.
@@ -378,7 +378,7 @@ test.describe('View Drag & Drop', () => {
               activeViewId: 'view.101',
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -402,9 +402,9 @@ test.describe('View Drag & Drop', () => {
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the west of the initial part.
@@ -435,7 +435,7 @@ test.describe('View Drag & Drop', () => {
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -459,9 +459,9 @@ test.describe('View Drag & Drop', () => {
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the east of the initial part.
@@ -492,7 +492,7 @@ test.describe('View Drag & Drop', () => {
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -519,9 +519,9 @@ test.describe('View Drag & Drop', () => {
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the north of the initial part.
@@ -552,7 +552,7 @@ test.describe('View Drag & Drop', () => {
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -579,9 +579,9 @@ test.describe('View Drag & Drop', () => {
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: initialPartId, align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the south of the initial part.
@@ -612,7 +612,7 @@ test.describe('View Drag & Drop', () => {
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -630,8 +630,8 @@ test.describe('View Drag & Drop', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('left', {align: 'left'})
-        .addView('testee', {partId: 'left', cssClass: 'testee'})
+        .addPart('part.left', {align: 'left'})
+        .addView('testee', {partId: 'part.left', cssClass: 'testee'})
         .navigateView('testee', ['test-view']),
       );
 
@@ -651,15 +651,15 @@ test.describe('View Drag & Drop', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('left', {align: 'left'})
-        .addView('testee', {partId: 'left', cssClass: 'testee'})
+        .addPart('part.left', {align: 'left'})
+        .addView('testee', {partId: 'part.left', cssClass: 'testee'})
         .navigateView('testee', ['test-view']),
       );
 
       // Change the grid root of the main area to a `MTreeNode`.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('main-left', {relativeTo: 'main', align: 'left'})
-        .addPart('main-right', {relativeTo: 'main', align: 'right'}),
+        .addPart('part.main-left', {relativeTo: 'main', align: 'left'})
+        .addPart('part.main-right', {relativeTo: 'main', align: 'right'}),
       );
 
       // Drop view on the start page of the main area.

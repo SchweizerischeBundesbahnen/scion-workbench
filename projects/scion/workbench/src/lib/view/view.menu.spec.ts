@@ -19,6 +19,7 @@ import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {of} from 'rxjs';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {ViewId} from './workbench-view.model';
 
 describe('View Menu', () => {
 
@@ -210,7 +211,7 @@ describe('View Menu', () => {
 class SpecViewComponent {
 }
 
-async function openViewContextMenu(fixture: ComponentFixture<unknown>, locator: {viewId: string}): Promise<DebugElement> {
+async function openViewContextMenu(fixture: ComponentFixture<unknown>, locator: {viewId: ViewId}): Promise<DebugElement> {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${locator.viewId}"]`));
   viewTabElement.nativeElement.dispatchEvent(new MouseEvent('contextmenu'));
   await waitUntilStable();
