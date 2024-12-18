@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
+import {PartId} from '@scion/workbench';
 
 /**
  * Provides query parameters to instrument the startup of the workbench testing app.
@@ -101,7 +102,7 @@ export const WorkbenchStartupQueryParams = {
   /**
    * Reads the query param to control the identity of the initial part in the main area.
    */
-  mainAreaInitialPartId: (): string | undefined => {
-    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID) ?? undefined;
+  mainAreaInitialPartId: (): PartId | undefined => {
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID) as PartId ?? undefined;
   },
 } as const;

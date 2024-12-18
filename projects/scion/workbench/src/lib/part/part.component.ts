@@ -25,7 +25,6 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
 import {PartId} from './workbench-part.model';
-import {MAIN_AREA} from '../layout/workbench-layout';
 
 @Component({
   selector: 'wb-part',
@@ -56,8 +55,8 @@ export class PartComponent implements OnInit, OnDestroy {
    * Gets the context in which this part is used.
    */
   @HostBinding('attr.data-context')
-  protected get context(): MAIN_AREA | null {
-    return this.part.isInMainArea ? MAIN_AREA : null;
+  protected get context(): 'main-area' | null {
+    return this.part.isInMainArea ? 'main-area' : null;
   }
 
   @HostBinding('class.active')

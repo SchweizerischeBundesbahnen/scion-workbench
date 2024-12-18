@@ -18,14 +18,14 @@ import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 test.describe('Workbench Perspective Storage', () => {
 
   test('should restore workbench grid from storage', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     // Add part and view to the workbench grid
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
       .addView('view.101', {partId: 'part.left'})
       .addView('view.102', {partId: 'part.left', activateView: true, activatePart: true})
-      .addView('view.103', {partId: 'main', activateView: true})
+      .addView('view.103', {partId: 'part.main', activateView: true})
       .navigateView('view.101', ['test-view'])
       .navigateView('view.102', ['test-view'])
       .navigateView('view.103', ['test-view']),

@@ -24,7 +24,7 @@
         },
         "layout": [
           {
-            "id": "main-area"
+            "id": "part.main-area"
           },
           {
             "id": "right-top",

@@ -15,6 +15,7 @@ import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchOutletDiff} from './workbench-outlet-differ';
 import {WorkbenchOutlet} from '../workbench.constants';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Options to control the navigation.
@@ -37,7 +38,7 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    *
    * If the specified part is not in the layout, opens the view in the active part, with the active part of the main area taking precedence.
    */
-  partId?: string;
+  partId?: PartId | string;
   /**
    * Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
    *

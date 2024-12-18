@@ -39,6 +39,9 @@ export interface WorkbenchLayout {
    */
   addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
 
+  /**
+   * TODO [activity] Add docu
+   */
   navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**

@@ -63,7 +63,7 @@ export interface WorkbenchPerspectiveCapability extends Capability {
      * {
      *   "layout": [
      *     {
-     *       "id": "main-area"
+     *       "id": "part.main-area"
      *     },
      *     {
      *       "id": "topLeft",
@@ -183,9 +183,9 @@ export interface WorkbenchPerspectiveView {
  *
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA: MAIN_AREA = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
  * Identifies the main area.
  */
-export type MAIN_AREA = 'main-area';
+export type MAIN_AREA = 'part.main-area';

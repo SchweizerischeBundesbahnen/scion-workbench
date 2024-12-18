@@ -647,7 +647,7 @@ test.describe('View Drag & Drop', () => {
     });
 
     test('should drop view on start page of the main area (grid root is MTreeNode)', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
@@ -658,8 +658,8 @@ test.describe('View Drag & Drop', () => {
 
       // Change the grid root of the main area to a `MTreeNode`.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('part.main-left', {relativeTo: 'main', align: 'left'})
-        .addPart('part.main-right', {relativeTo: 'main', align: 'right'}),
+        .addPart('part.main-left', {relativeTo: 'part.main', align: 'left'})
+        .addPart('part.main-right', {relativeTo: 'part.main', align: 'right'}),
       );
 
       // Drop view on the start page of the main area.

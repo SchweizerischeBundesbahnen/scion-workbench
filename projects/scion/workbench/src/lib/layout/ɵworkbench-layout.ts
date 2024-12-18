@@ -321,13 +321,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return views matching the filter criteria.
    */
   public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof Grids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
-    const views = this.parts({grid: findBy?.grid})
-      .filter(part => {
-        if (findBy?.partId !== undefined && part.id !== findBy.partId) {
-          return false;
-        }
-        return true;
-      })
+    const views = this.parts({id: findBy?.partId, grid: findBy?.grid})
       .flatMap(part => part.views)
       .filter(view => {
         if (findBy?.id !== undefined && !matchesViewId(findBy.id, view)) {
@@ -1046,8 +1040,9 @@ export interface ReferenceElement extends ReferencePart {
  * special meaning to the workbench and can be removed by the user. If not set, a UUID is assigned.
  *
  * Overwrite this DI token in tests to control the identity of the initial part.
- * ```
- * TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'main'})
+ *
+ * ```ts
+ * TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.main'})
  * ```
  *
  * @docs-private Not public API, intended for internal use only.

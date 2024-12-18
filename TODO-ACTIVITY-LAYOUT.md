@@ -13,6 +13,10 @@
    -> activePartId -> excluded [check]
    -> outlets (part id) -> [??]
 
+## TO DISCUSS:
+[] Should it be possible to add a view to multiple parts? 
+   I.e., to parts with the same alternative id? For example, navigating via router (by path) without specifying a target,
+   only specifying the part by alternative id which is contained at multiple times in the layout?
 
 ## TO CONSIDER:
 [] Consider replacing MPart class by interface
@@ -27,3 +31,6 @@
 - add layout migration test (v7), required? why only for version 4
 - navigate multiple parts (workbench-layout.spec.ts)
 - remove multiple parts (workbench-layout.spec.ts)
+- add router test (simple navigation), adding view to part referenced by alternative id 
+- add router test (simple navigation), adding view to multiple parts referenced by alternative id (expect error)
+- extend test where we reload the app to test that the layout is not reset (this test must also include a navigated part!) (F5)

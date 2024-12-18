@@ -106,7 +106,7 @@ function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualEleme
   }
   // Assert only the main area grid, but not the workbench grid since not expected.
   else if (expected.mainAreaGrid) {
-    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-part[data-partid="main-area"] > wb-grid-element'), expected);
+    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-part[data-partid="part.main-area"] > wb-grid-element'), expected);
   }
 }
 
@@ -188,9 +188,9 @@ function assertMPartDOM(expectedPart: MPart, actualElement: Element, expectedWor
   }
 
   if (partId === MAIN_AREA) {
-    const actualPartElement = actualElement.querySelector('wb-part[data-partid="main-area"]');
+    const actualPartElement = actualElement.querySelector('wb-part[data-partid="part.main-area"]');
     if (!actualPartElement) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-part[data-partid="main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-part[data-partid="part.main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
     if (expectedWorkbenchLayout.mainAreaGrid) {
       assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);

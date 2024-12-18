@@ -20,14 +20,14 @@ import {ViewPagePO} from './page-object/view-page.po';
 test.describe('Workbench Page Not Found', () => {
 
   test('should display blank page when adding a view but not navigating it', async ({appPO, workbenchNavigator, consoleLogs}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     // Add view.101 in peripheral area
     // Add view.102 in main area
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left'})
       .addView('view.101', {partId: 'part.left', activateView: true})
-      .addView('view.102', {partId: 'main'}),
+      .addView('view.102', {partId: 'part.main'}),
     );
 
     const viewPage1 = new BlankViewPagePO(appPO, {viewId: 'view.101'});
@@ -48,14 +48,14 @@ test.describe('Workbench Page Not Found', () => {
   });
 
   test('should display "Not Found" page when navigating to an unknown path', async ({appPO, workbenchNavigator, consoleLogs}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     // Add view.101 in peripheral area
     // Add view.102 in main area
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left'})
       .addView('view.101', {partId: 'part.left', activateView: true})
-      .addView('view.102', {partId: 'main'})
+      .addView('view.102', {partId: 'part.main'})
       .navigateView('view.101', ['does/not/exist'])
       .navigateView('view.102', ['does/not/exist']),
     );
@@ -78,14 +78,14 @@ test.describe('Workbench Page Not Found', () => {
   });
 
   test('should display "Not Found" page when navigating with a hint that matches no route', async ({appPO, workbenchNavigator, consoleLogs}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     // Add view.101 in peripheral area
     // Add view.102 in main area
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left'})
       .addView('view.101', {partId: 'part.left', activateView: true})
-      .addView('view.102', {partId: 'main'})
+      .addView('view.102', {partId: 'part.main'})
       .navigateView('view.101', [], {hint: 'does-not-match'})
       .navigateView('view.102', [], {hint: 'does-not-match'}),
     );
@@ -144,13 +144,13 @@ test.describe('Workbench Page Not Found', () => {
   });
 
   test('should drag "Not Found" page to a new window', async ({appPO, workbenchNavigator, consoleLogs}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left'})
       .addPart('part.right', {align: 'right'})
       .addView('testee-1', {partId: 'part.left', activateView: true, cssClass: 'testee-1'})
-      .addView('testee-2', {partId: 'main', cssClass: 'testee-2'})
+      .addView('testee-2', {partId: 'part.main', cssClass: 'testee-2'})
       .addView('testee-3', {partId: 'part.right', cssClass: 'testee-3'})
       .navigateView('testee-1', ['does/not/exist'])
       .navigateView('testee-2', ['does/not/exist'])

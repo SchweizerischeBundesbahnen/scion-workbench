@@ -154,7 +154,7 @@ export class AppPO {
       return new PartPO(this.page.locator('wb-part[data-context="main-area"].active'));
     }
     else {
-      return new PartPO(this.page.locator('wb-part:not([data-partid="main-area"]):not([data-context="main-area"]).active'));
+      return new PartPO(this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]).active'));
     }
   }
 
@@ -165,7 +165,7 @@ export class AppPO {
    * @param locateBy.partId - Identifies the part by its id
    * @param locateBy.cssClass - Identifies the part by its CSS class
    */
-  public part(locateBy: {partId: PartId}): PartPO {
+  public part(locateBy: {partId?: PartId; cssClass?: string}): PartPO {
     if (locateBy.partId !== undefined && locateBy.cssClass !== undefined) {
       return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"].${locateBy.cssClass}`));
     }
@@ -190,7 +190,7 @@ export class AppPO {
       return this.page.locator('wb-part[data-context="main-area"] wb-view-tab').locator(locateByCssClass);
     }
     if (locateBy?.inMainArea === false) {
-      return this.page.locator('wb-part:not([data-partid="main-area"]):not([data-context="main-area"]) wb-view-tab').locator(locateByCssClass);
+      return this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]) wb-view-tab').locator(locateByCssClass);
     }
     else {
       return this.page.locator('wb-view-tab').locator(locateByCssClass);
@@ -208,19 +208,19 @@ export class AppPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
-      const partLocator = this.page.locator('wb-part:not([data-partid="main-area"])', {has: viewTabLocator});
+      const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.viewId !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"]`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
-      const partLocator = this.page.locator('wb-part:not([data-partid="main-area"])', {has: viewTabLocator});
+      const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view.${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab.${locateBy.cssClass}`);
-      const partLocator: Locator = this.page.locator('wb-part:not([data-partid="main-area"])', {has: viewTabLocator});
+      const partLocator: Locator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
@@ -389,7 +389,7 @@ export class AppPO {
    * Tests if the layout has a main area.
    */
   public hasMainArea(): Promise<boolean> {
-    return this.workbench.locator('wb-part[data-partid="main-area"]').isVisible();
+    return this.workbench.locator('wb-part[data-partid="part.main-area"]').isVisible();
   }
 
   /**
@@ -461,7 +461,7 @@ export interface Options {
   /**
    * Controls the identity of the initial part in the main area. If not set, a UUID is assigned.
    */
-  mainAreaInitialPartId?: string;
+  mainAreaInitialPartId?: PartId;
   /**
    * Specifies data to be in local storage.
    */

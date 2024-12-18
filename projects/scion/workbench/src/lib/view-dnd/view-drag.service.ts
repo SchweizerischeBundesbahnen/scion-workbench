@@ -52,7 +52,7 @@ export class ViewDragService implements OnDestroy {
    *
    * Upon subscription, emits the current dragover state, and then each time the state changes. The observable never completes.
    */
-  public readonly tabbarDragOver$: Observable<string | false> = this._tabbarDragOver$;
+  public readonly tabbarDragOver$: Observable<PartId | false> = this._tabbarDragOver$;
 
   /**
    * Provides the drag data of the current drag operation. Is `null` if no drag operation is in progress.
@@ -96,7 +96,7 @@ export class ViewDragService implements OnDestroy {
   /**
    * Indicates if dragging a tab over a tabbar, returning the id of the part being dragged over, or `false` if not dragging over a tabbar.
    */
-  public get isDragOverTabbar(): string | false {
+  public get isDragOverTabbar(): PartId | false {
     return this._tabbarDragOver$.value;
   }
 

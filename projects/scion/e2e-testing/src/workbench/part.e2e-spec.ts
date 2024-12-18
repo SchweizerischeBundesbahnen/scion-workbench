@@ -62,23 +62,23 @@ test.describe('Workbench Part', () => {
 
     await workbenchNavigator.createPerspective('testee', layout => layout
       .addPart(MAIN_AREA)
-      .addPart('left', {align: 'left'})
-      .addPart('right', {align: 'right'})
-      .navigatePart('left', ['test-part'])
-      .navigatePart('right', ['test-part']),
+      .addPart('part.left', {align: 'left'})
+      .addPart('part.right', {align: 'right'})
+      .navigatePart('part.left', ['test-part'])
+      .navigatePart('part.right', ['test-part']),
     );
 
     // Expect left part to display the part page.
-    const leftPartPage = new PartPagePO(appPO, {partId: 'left'});
+    const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
     await expectPartPage(leftPartPage).toBeVisible();
 
     // Expect right part to display the part page.
-    const rightPartPage = new PartPagePO(appPO, {partId: 'right'});
+    const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
     await expectPartPage(rightPartPage).toBeVisible();
   });
 
   test('should navigate the main area part', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     await workbenchNavigator.modifyLayout(layout => layout.navigatePart(MAIN_AREA, ['test-part']));
 
@@ -88,7 +88,7 @@ test.describe('Workbench Part', () => {
 
     // Open view in main area.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addView('view.100', {partId: 'main'}),
+      .addView('view.100', {partId: 'part.main'}),
     );
 
     // Expect view to display.
@@ -105,18 +105,18 @@ test.describe('Workbench Part', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective('testee', layout => layout
-      .addPart('left')
-      .addPart('right', {align: 'right'})
-      .addView('view.101', {partId: 'left'})
-      .addView('view.102', {partId: 'right'})
-      .navigatePart('right', ['test-part']),
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .navigatePart('part.right', ['test-part']),
     );
 
     // Close the last view of right part.
     await appPO.view({viewId: 'view.102'}).tab.close();
 
     // Expect part to display the part page.
-    const partPage = new PartPagePO(appPO, {partId: 'right'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
     await expectPartPage(partPage).toBeVisible();
   });
 
@@ -124,18 +124,18 @@ test.describe('Workbench Part', () => {
    * This test verifies the main area grid not to be removed from the URL if no views are opened in the main area.
    */
   test('should support main area to have a single "navigated" part', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.main'});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .navigatePart('main', ['test-part'])
-      .addView('view.100', {partId: 'main'}),
+      .navigatePart('part.main', ['test-part'])
+      .addView('view.100', {partId: 'part.main'}),
     );
 
     // Close the last view of the main area.
     await appPO.view({viewId: 'view.100'}).tab.close();
 
     // Expect part to display the part page.
-    const partPage = new PartPagePO(appPO, {partId: 'main'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.main'});
     await expectPartPage(partPage).toBeVisible();
   });
 });

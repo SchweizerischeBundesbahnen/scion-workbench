@@ -13,7 +13,6 @@ import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
-import {MAIN_AREA} from './workbench.model';
 import {PartId} from '@scion/workbench';
 
 /**
@@ -50,6 +49,6 @@ export class PartPO {
    * Indicates if this part is contained in the main area.
    */
   public async isInMainArea(): Promise<boolean> {
-    return (await this.locator.getAttribute('data-context')) === MAIN_AREA;
+    return (await this.locator.getAttribute('data-context')) === 'main-area';
   }
 }

@@ -12,6 +12,7 @@ import {AppPO} from '../../app.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPartPagePO} from './workbench-part-page.po';
 import {PartPO} from '../../part.po';
+import {PartId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link PartPageComponent}.
@@ -21,7 +22,7 @@ export class PartPagePO implements WorkbenchPartPagePO {
   public readonly locator: Locator;
   public readonly part: PartPO;
 
-  constructor(appPO: AppPO, locateBy: {partId?: string; cssClass?: string}) {
+  constructor(appPO: AppPO, locateBy: {partId?: PartId; cssClass?: string}) {
     this.part = appPO.part({partId: locateBy?.partId, cssClass: locateBy?.cssClass});
     this.locator = this.part.locator.locator('app-part-page');
   }

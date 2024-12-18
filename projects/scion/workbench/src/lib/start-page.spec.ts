@@ -45,8 +45,8 @@ describe('Start Page', () => {
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect start page to display
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="main-area"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
-      expect(fixture.debugElement.query(By.css('wb-part:not([data-partid="main-area"])'))).toBeNull();
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+      expect(fixture.debugElement.query(By.css('wb-part:not([data-partid="part.main-area"])'))).toBeNull();
 
       // Open view
       await wbRouter.navigate(['/test-view']);
@@ -61,8 +61,8 @@ describe('Start Page', () => {
       await waitUntilStable();
 
       // Expect start page to display
-      expect(fixture.debugElement.query(By.css('wb-part[data-partid="main-area"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
-      expect(fixture.debugElement.query(By.css('wb-part:not([data-partid="main-area"])'))).toBeNull();
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport > router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page');
+      expect(fixture.debugElement.query(By.css('wb-part:not([data-partid="part.main-area"])'))).toBeNull();
     });
 
     it('should overflow start page if exceeding available vertical space ', async () => {
@@ -86,7 +86,7 @@ describe('Start Page', () => {
       fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
 
       // Expect start page not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="main-area"] > sci-viewport')).nativeElement).height).toEqual('500px');
+      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport')).nativeElement).height).toEqual('500px');
     });
   });
 

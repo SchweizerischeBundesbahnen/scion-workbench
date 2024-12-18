@@ -38,15 +38,15 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
   }
   // Assert only the main area grid, but not the workbench grid since not expected.
   else if (expected.mainAreaGrid) {
-    await assertGridElement(expected.mainAreaGrid.root, locator.locator('wb-part[data-partid="main-area"] > wb-grid-element'), expected);
+    await assertGridElement(expected.mainAreaGrid.root, locator.locator('wb-part[data-partid="part.main-area"] > wb-grid-element'), expected);
   }
 
   // Assert active part of the main area grid.
   if (expected.mainAreaGrid?.activePartId) {
     const activePartId = expected.mainAreaGrid.activePartId;
-    const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="main-area"] wb-part[data-partid="${activePartId}"].active`);
+    const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="part.main-area"] wb-part[data-partid="${activePartId}"].active`);
     await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main area grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-workbench-layout wb-part[data-partid="main-area"] wb-part:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
+    await throwIfPresent(locator.locator(`wb-workbench-layout wb-part[data-partid="part.main-area"] wb-part:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
   }
   // Assert active part of the workbench grid.
   if (expected.workbenchGrid?.activePartId) {
@@ -130,8 +130,8 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
   }
 
   if (partId === MAIN_AREA) {
-    const mainAreaPartLocator = gridElementLocator.locator('wb-part[data-partid="main-area"]');
-    await throwIfAbsent(mainAreaPartLocator, () => Error(`[DOMAssertError] Expected element 'wb-part[data-partid="main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${mainAreaPartLocator}]`));
+    const mainAreaPartLocator = gridElementLocator.locator('wb-part[data-partid="part.main-area"]');
+    await throwIfAbsent(mainAreaPartLocator, () => Error(`[DOMAssertError] Expected element 'wb-part[data-partid="part.main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${mainAreaPartLocator}]`));
     if (expectedWorkbenchLayout.mainAreaGrid) {
       await assertGridElement(expectedWorkbenchLayout.mainAreaGrid.root, mainAreaPartLocator.locator(`> wb-grid-element`), expectedWorkbenchLayout);
     }
