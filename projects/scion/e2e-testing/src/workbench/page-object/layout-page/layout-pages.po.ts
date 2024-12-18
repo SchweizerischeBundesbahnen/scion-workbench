@@ -10,7 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {coerceArray, commandsToPath, toMatrixNotation} from '../../../helper/testing.util';
-import {PartDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
+import {PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 
 export const LayoutPages = {
@@ -47,6 +47,21 @@ export const LayoutPages = {
       await locator.locator('input.e2e-class').nth(i).fill(coerceArray(view.cssClass).join(' '));
       await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-activate-view').nth(i)).toggle(view.activateView === true);
       await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-activate-part').nth(i)).toggle(view.activatePart === true);
+    }
+  },
+
+  /**
+   * Enters part navigations into {@link NavigatePartsComponent}.
+   */
+  enterPartNavigations: async (locator: Locator, partNavigations: PartNavigationDescriptor[] = []): Promise<void> => {
+    for (const [i, partNavigation] of partNavigations.entries()) {
+      await locator.locator('button.e2e-add').click();
+      await locator.locator('input.e2e-part-id').nth(i).fill(partNavigation.id);
+      await locator.locator('input.e2e-commands').nth(i).fill(commandsToPath(partNavigation.commands));
+      await locator.locator('input.e2e-hint').nth(i).fill(partNavigation.hint ?? '');
+      await locator.locator('input.e2e-data').nth(i).fill(toMatrixNotation(partNavigation.data));
+      await locator.locator('input.e2e-state').nth(i).fill(toMatrixNotation(partNavigation.state));
+      await locator.locator('input.e2e-class').nth(i).fill(coerceArray(partNavigation.cssClass).join(' '));
     }
   },
 

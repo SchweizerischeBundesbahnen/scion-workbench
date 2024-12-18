@@ -35,20 +35,20 @@ export class PartPO {
    */
   public readonly sash: PartSashPO;
 
-  constructor(private readonly _locator: Locator) {
-    this.bar = new PartBarPO(this._locator.locator('wb-part-bar'), this);
-    this.activeView = new ViewPO(this._locator.locator('wb-view'), new ViewTabPO(this._locator.locator('wb-view-tab.active'), this));
-    this.sash = new PartSashPO(this._locator);
+  constructor(public readonly locator: Locator) {
+    this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
+    this.activeView = new ViewPO(this.locator.locator('wb-view'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
+    this.sash = new PartSashPO(this.locator);
   }
 
   public async getPartId(): Promise<string> {
-    return (await this._locator.getAttribute('data-partid'))!;
+    return (await this.locator.getAttribute('data-partid'))!;
   }
 
   /**
    * Indicates if this part is contained in the main area.
    */
   public async isInMainArea(): Promise<boolean> {
-    return (await this._locator.getAttribute('data-context')) === MAIN_AREA;
+    return (await this.locator.getAttribute('data-context')) === MAIN_AREA;
   }
 }

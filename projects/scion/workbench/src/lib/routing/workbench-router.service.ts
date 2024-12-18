@@ -24,7 +24,7 @@ import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 export abstract class WorkbenchRouter {
 
   /**
-   * Navigates based on the provided array of commands and extras. This method is similar to Angular's `Router.navigate(...)`, but with a view as the navigation target.
+   * Navigates views based on the provided array of commands and extras. This method is similar to Angular's `Router.navigate(...)`, but with a view as the navigation target.
    *
    * A command can be a string or an object literal. A string represents a path segment, an object literal associates matrix parameters with the preceding segment.
    * Multiple segments can be combined into a single command, separated by a forward slash.

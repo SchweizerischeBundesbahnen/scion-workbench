@@ -22,6 +22,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {Observable} from 'rxjs';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {AsyncPipe} from '@angular/common';
+import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 
 @Component({
   selector: 'app-create-perspective-page',
@@ -37,6 +38,7 @@ import {AsyncPipe} from '@angular/common';
     SciCheckboxComponent,
     SciKeyValueFieldComponent,
     AsyncPipe,
+    NavigatePartsComponent,
   ],
 })
 export default class CreatePerspectivePageComponent {
@@ -47,6 +49,7 @@ export default class CreatePerspectivePageComponent {
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([], Validators.required),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
+    partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
   });
 
@@ -84,6 +87,7 @@ export default class CreatePerspectivePageComponent {
     // Capture form values, since the `layout` function is evaluated independently of the form life-cycle
     const [initialPart, ...parts] = this.form.controls.parts.value;
     const views = this.form.controls.views.value;
+    const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
@@ -112,7 +116,17 @@ export default class CreatePerspectivePageComponent {
         });
       }
 
-      // Add navigations.
+      // Add part navigations.
+      for (const partNavigation of partNavigations) {
+        layout = layout.navigatePart(partNavigation.id, partNavigation.commands, {
+          hint: partNavigation.extras?.hint,
+          data: partNavigation.extras?.data,
+          state: partNavigation.extras?.state,
+          cssClass: partNavigation.extras?.cssClass,
+        });
+      }
+
+      // Add view navigations.
       for (const viewNavigation of viewNavigations) {
         layout = layout.navigateView(viewNavigation.id, viewNavigation.commands, {
           hint: viewNavigation.extras?.hint,

@@ -13,7 +13,7 @@
     position: relative; // positioning context for content and drop zone
   }
 
-  > sci-viewport.content {
+  > sci-viewport.part-page {
     flex: 1 1 0;
     display: grid;
     position: relative; // positioning context for content

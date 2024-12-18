@@ -12,6 +12,9 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
+import {expectPartPage} from '../matcher/part-page-matcher';
+import {PartPagePO} from './page-object/part-page.po';
+import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Workbench Part', () => {
 
@@ -52,5 +55,87 @@ test.describe('Workbench Part', () => {
     await expect(viewListMenu.locator).not.toBeAttached();
     // Expect focus to remain in the input field that caused focus loss of the menu.
     await expect(testPage.input).toBeFocused();
+  });
+
+  test('should navigate parts', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective('testee', layout => layout
+      .addPart(MAIN_AREA)
+      .addPart('left', {align: 'left'})
+      .addPart('right', {align: 'right'})
+      .navigatePart('left', ['test-part'])
+      .navigatePart('right', ['test-part']),
+    );
+
+    // Expect left part to display the part page.
+    const leftPartPage = new PartPagePO(appPO, {partId: 'left'});
+    await expectPartPage(leftPartPage).toBeVisible();
+
+    // Expect right part to display the part page.
+    const rightPartPage = new PartPagePO(appPO, {partId: 'right'});
+    await expectPartPage(rightPartPage).toBeVisible();
+  });
+
+  test('should navigate the main area part', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+
+    await workbenchNavigator.modifyLayout(layout => layout.navigatePart(MAIN_AREA, ['test-part']));
+
+    // Expect main area part to display the part page.
+    const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+    await expectPartPage(partPage).toBeVisible();
+
+    // Open view in main area.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.100', {partId: 'main'}),
+    );
+
+    // Expect view to display.
+    await expect(appPO.view({viewId: 'view.100'}).locator).toBeVisible();
+
+    // Close the view.
+    await appPO.view({viewId: 'view.100'}).tab.close();
+
+    // Expect main area part to display the part page.
+    await expectPartPage(partPage).toBeVisible();
+  });
+
+  test('should not remove "navigated" part when removing last view', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective('testee', layout => layout
+      .addPart('left')
+      .addPart('right', {align: 'right'})
+      .addView('view.101', {partId: 'left'})
+      .addView('view.102', {partId: 'right'})
+      .navigatePart('right', ['test-part']),
+    );
+
+    // Close the last view of right part.
+    await appPO.view({viewId: 'view.102'}).tab.close();
+
+    // Expect part to display the part page.
+    const partPage = new PartPagePO(appPO, {partId: 'right'});
+    await expectPartPage(partPage).toBeVisible();
+  });
+
+  /**
+   * This test verifies the main area grid not to be removed from the URL if no views are opened in the main area.
+   */
+  test('should support main area to have a single "navigated" part', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'main'});
+
+    await workbenchNavigator.modifyLayout(layout => layout
+      .navigatePart('main', ['test-part'])
+      .addView('view.100', {partId: 'main'}),
+    );
+
+    // Close the last view of the main area.
+    await appPO.view({viewId: 'view.100'}).tab.close();
+
+    // Expect part to display the part page.
+    const partPage = new PartPagePO(appPO, {partId: 'main'});
+    await expectPartPage(partPage).toBeVisible();
   });
 });

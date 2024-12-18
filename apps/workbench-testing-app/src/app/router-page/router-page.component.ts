@@ -98,10 +98,6 @@ export default class RouterPageComponent {
     this.resetForm();
   }
 
-  protected onNavigatePart(partId: string): void {
-    this._wbRouter.navigate(layout => layout.navigatePart(partId, ['test-part']));
-  }
-
   private readExtrasFromUI(): WorkbenchNavigationExtras {
     const extras = this.form.controls.extras.controls;
     return {
