@@ -72,24 +72,6 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.part({partId: 'part.1'}).navigation!.id).toBeUndefined();
   });
 
-  it('should not serialize "part.id" field', () => {
-    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('left')
-      .addPart('right', {align: 'right', relativeTo: 'left'});
-
-    // Expect part id to be set.
-    expect(layout.parts({id: 'left'})[0].id).not.toBeUndefined();
-    expect(layout.parts({id: 'right'})[0].id).not.toBeUndefined();
-
-    // Serialize layout without "part.id".
-    const serializedLayout = layout.serialize({excludePartId: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
-
-    // Expect part id not to be serialized.
-    expect(deserializedLayout.parts({id: 'left'})[0].id).toBeUndefined();
-    expect(deserializedLayout.parts({id: 'right'})[0].id).toBeUndefined();
-  });
-
   it('should not serialize "TreeNode.id" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.left')
@@ -115,23 +97,6 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.part({partId: 'part.right'}).id).not.toBeUndefined();
   });
 
-  it('should not serialize "activePartId" field', () => {
-    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('part.left')
-      .addPart('part.right', {align: 'right', relativeTo: 'part.left'})
-      .activatePart('part.right');
-
-    // Expect active part id to be set.
-    expect(layout.workbenchGrid.activePartId).toEqual('part.right');
-
-    // Serialize layout without "activePartId".
-    const serializedLayout = layout.serialize({excludeActivePartId: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
-
-    // Expect active part id not to be serialized.
-    expect(deserializedLayout.workbenchGrid.activePartId).toBeUndefined();
-  });
-
   it('should not serialize "grid.migrated" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
 
@@ -149,6 +114,36 @@ describe('WorkbenchLayoutSerializer', () => {
     // Expect "migrated" flag not to be serialized.
     expect(deserializedLayout.workbenchGrid.migrated).toBeUndefined();
     expect(deserializedLayout.mainAreaGrid!.migrated).toBeUndefined();
+  });
+
+  it('should serialize part identifiers into logical identifiers based on their order in the layout', async () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.right-top', {align: 'right', relativeTo: MAIN_AREA})
+      .addPart('right-bottom', {align: 'bottom', relativeTo: 'part.right-top'});
+
+    // Serialize and deserialize the layout.
+    const serializedLayout = workbenchLayout.serialize({withLogicalPartIdentifiers: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+
+    expect(deserializedLayout).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({
+            id: 'part.1',
+          }),
+          child2: new MTreeNode({
+            child1: new MPart({
+              id: 'part.2',
+            }),
+            child2: new MPart({
+              id: 'part.3',
+              alternativeId: 'right-bottom',
+            }),
+          }),
+        }),
+      },
+    });
   });
 
   /**

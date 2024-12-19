@@ -2457,6 +2457,24 @@ describe('WorkbenchLayout', () => {
       },
     });
   });
+
+  it('should compare part identifiers based on their order in the layout', async () => {
+    const workbenchLayout1 = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('right-top', {align: 'right', relativeTo: MAIN_AREA})
+      .addPart('right-bottom', {align: 'bottom', relativeTo: 'right-top'});
+
+    const workbenchLayout2 = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('right-top', {align: 'right', relativeTo: MAIN_AREA})
+      .addPart('right-bottom', {align: 'bottom', relativeTo: 'right-top'});
+
+    // Expect layout not to be equal if not using logical part identifiers.
+    expect(workbenchLayout1.equals(workbenchLayout2)).toBeFalse();
+
+    // Expect layout to be equal if using logical part identifiers.
+    expect(workbenchLayout1.equals(workbenchLayout2, {withLogicalPartIdentifiers: true, excludeTreeNodeId: true})).toBeTrue();
+  });
 });
 
 /**

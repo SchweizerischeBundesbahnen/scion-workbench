@@ -53,9 +53,7 @@ export class WorkbenchLayoutSerializer {
       .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
       .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
       .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
-      .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : [])
-      .concat(flags?.excludePartId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MPart}) : [])
-      .concat(flags?.excludeActivePartId ? 'activePartId' : []));
+      .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []));
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
   }
 
@@ -148,6 +146,5 @@ export interface GridSerializationFlags {
   excludeViewMarkedForRemoval?: true;
   excludeViewNavigationId?: true;
   excludePartNavigationId?: true;
-  excludePartId?: true;
-  excludeActivePartId?: true;
+  withLogicalPartIdentifiers?: true;
 }

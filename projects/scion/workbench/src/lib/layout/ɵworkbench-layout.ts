@@ -24,7 +24,7 @@ import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {PartOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
+import {PART_ID_PREFIX, PartOutlet, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
 
 /**
@@ -450,11 +450,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const root = this.mainAreaGrid?.root;
     const isMainAreaEmpty = root instanceof MPart && !root.views.length && !root.navigation && !root.structural;
 
+    const workingCopy = this.workingCopy();
+    if (flags?.withLogicalPartIdentifiers) {
+      workingCopy.parts().forEach((part, index) => workingCopy.__renamePart(part, `${PART_ID_PREFIX}${index + 1}`));
+    }
     return {
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid, flags),
-      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(this._grids.mainArea, flags),
-      workbenchOutlets: this._serializer.serializeOutlets(this.outlets({grid: 'workbench'})),
-      mainAreaOutlets: this._serializer.serializeOutlets(this.outlets({grid: 'mainArea'})),
+      workbenchGrid: this._serializer.serializeGrid(workingCopy.workbenchGrid, flags),
+      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(workingCopy.mainAreaGrid, flags),
+      workbenchOutlets: this._serializer.serializeOutlets(workingCopy.outlets({grid: 'workbench'})),
+      mainAreaOutlets: this._serializer.serializeOutlets(workingCopy.outlets({grid: 'mainArea'})),
     };
   }
 
@@ -611,6 +615,31 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       data: extras?.data,
       cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
     } satisfies MPart['navigation']);
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __renamePart(part: Mutable<MPart>, newPartId: PartId): void {
+    if (this.hasView(newPartId)) {
+      throw Error(`[PartRenameError] Part id must be unique. The layout already contains a part with the id '${newPartId}'.`);
+    }
+
+    if (this._outlets.has(part.id)) {
+      this._outlets.set(newPartId, this._outlets.get(part.id)!);
+      this._outlets.delete(part.id);
+    }
+    if (this._navigationStates.has(part.id)) {
+      this._navigationStates.set(newPartId, this._navigationStates.get(part.id)!);
+      this._navigationStates.delete(part.id);
+    }
+
+    const grid = this.grid({element: part});
+    if (grid.activePartId === part.id) {
+      grid.activePartId = newPartId;
+    }
+
+    part.id = newPartId;
   }
 
   /**
@@ -1148,3 +1177,7 @@ export interface SerializedWorkbenchLayout {
   mainAreaGrid: string | null;
   mainAreaOutlets: string;
 }
+
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
