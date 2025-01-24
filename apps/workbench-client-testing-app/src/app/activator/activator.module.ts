@@ -47,7 +47,7 @@ export default class ActivatorModule {
       properties: {
         path: 'test-view',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Workbench View',
         heading,
         cssClass: 'e2e-test-view',
@@ -66,7 +66,7 @@ export default class ActivatorModule {
       properties: {
         path: 'test-router',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Workbench Router',
         heading,
         cssClass: 'e2e-test-router',
@@ -85,7 +85,7 @@ export default class ActivatorModule {
       properties: {
         path: 'register-workbench-capability',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Register Capability',
         heading,
         cssClass: 'e2e-register-workbench-capability',
@@ -104,7 +104,7 @@ export default class ActivatorModule {
       properties: {
         path: 'unregister-workbench-capability',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Unregister Capability',
         heading,
         cssClass: 'e2e-unregister-workbench-capability',
@@ -123,7 +123,7 @@ export default class ActivatorModule {
       properties: {
         path: 'register-workbench-intention',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Register Intention',
         heading,
         cssClass: 'e2e-register-workbench-intention',
@@ -142,7 +142,7 @@ export default class ActivatorModule {
       properties: {
         path: 'test-popup-opener',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Workbench Popup',
         heading,
         cssClass: 'e2e-test-popup-opener',
@@ -176,7 +176,7 @@ export default class ActivatorModule {
       properties: {
         path: 'test-dialog-opener',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Workbench Dialog',
         heading,
         cssClass: 'e2e-test-dialog-opener',
@@ -214,7 +214,7 @@ export default class ActivatorModule {
       properties: {
         path: 'test-message-box-opener',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Workbench Message Box',
         heading,
         cssClass: 'e2e-test-message-box-opener',
@@ -252,7 +252,7 @@ export default class ActivatorModule {
       properties: {
         path: 'test-notification-opener',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Workbench Notification',
         heading,
         cssClass: 'e2e-test-notification-opener',
@@ -271,7 +271,7 @@ export default class ActivatorModule {
       properties: {
         path: 'messaging',
         showSplash: true,
-        pinToStartPage: true,
+        pinToDesktop: true,
         title: 'Messaging',
         heading,
         cssClass: 'e2e-messaging',
@@ -280,4 +280,4 @@ export default class ActivatorModule {
   }
 }
 
-type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToStartPage?: boolean}};
+type TestingAppViewCapability = WorkbenchViewCapability & {properties: {pinToDesktop?: boolean}};

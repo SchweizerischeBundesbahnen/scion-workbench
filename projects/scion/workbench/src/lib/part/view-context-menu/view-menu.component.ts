@@ -18,6 +18,7 @@ import {AsyncPipe, KeyValuePipe, NgClass} from '@angular/common';
 import {PortalModule} from '@angular/cdk/portal';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
 import {MapCoercePipe} from '../../common/map-coerce.pipe';
+import {ViewId} from '../../view/workbench-view.model';
 
 type MenuItemGroups = Map<string, WorkbenchMenuItem[]>;
 
@@ -57,7 +58,7 @@ export class ViewMenuComponent {
   }
 
   @HostBinding('attr.data-viewid')
-  public get viewId(): string {
+  public get viewId(): ViewId {
     return this._view.id;
   }
 

@@ -92,34 +92,32 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   /**
    * Creates the perspective layout using the main area of the current layout.
    *
-   * When switching perspective, id clashes between the views contained in the perspective and the
-   * views contained in the main area are possible. The activation detects and resolves conflicts,
-   * changing the layout of this perspective if necessary.
+   * When switching perspective, id clashes between views contained in the perspective and the main area are possible.
+   * The activation detects and resolves conflicts, changing the layout of this perspective if necessary.
    */
   private createLayoutForActivation(currentLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     if (!this._perspectiveLayout) {
       throw Error(`[PerspectiveActivateError] Perspective '${this.id}' not constructed.`);
     }
 
-    // View outlets of the new layout.
-    const viewOutlets = new Map<string, UrlSegment[]>();
+    // Outlets of the new layout.
+    const outlets = new Map<string, UrlSegment[]>();
 
-    // Detect and resolve id clashes between views defined by this perspective and views contained in the main area,
-    // assigning views of this perspective a new identity.
+    // Add outlets of the main area and resolve conflicts if any.
     if (currentLayout.hasPart(MAIN_AREA, {grid: 'workbench'}) && this._perspectiveLayout.hasPart(MAIN_AREA, {grid: 'workbench'})) {
+      // Detect and resolve id clashes between views defined by this perspective and views contained in the main area,
+      // assigning views of this perspective a new identity.
       this._perspectiveLayout = this._perspectiveViewConflictResolver.resolve(currentLayout, this._perspectiveLayout);
-    }
 
-    // Add view outlets of views contained in the main area.
-    if (currentLayout.hasPart(MAIN_AREA, {grid: 'workbench'}) && this._perspectiveLayout.hasPart(MAIN_AREA, {grid: 'workbench'})) {
-      Object.entries(currentLayout.viewOutlets({grid: 'mainArea'})).forEach(([viewId, segments]) => {
-        viewOutlets.set(viewId, segments);
+      // Add outlets contained in the main area.
+      Object.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([outlet, segments]) => {
+        outlets.set(outlet, segments);
       });
     }
 
-    // Add view outlets of views contained in this perspective.
-    Object.entries(this._perspectiveLayout.viewOutlets()).forEach(([viewId, segments]) => {
-      viewOutlets.set(viewId, segments);
+    // Add outlets contained in this perspective.
+    Object.entries(this._perspectiveLayout.outlets()).forEach(([outlet, segments]) => {
+      outlets.set(outlet, segments);
     });
 
     // Create the layout for this perspective.
@@ -127,8 +125,8 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       workbenchGrid: this._perspectiveLayout.workbenchGrid,
       mainAreaGrid: currentLayout.mainAreaGrid,
       perspectiveId: this.id,
-      viewOutlets: Object.fromEntries(viewOutlets),
-      navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of views in the main area; navigation state of other views cannot be restored since not persisted
+      outlets: Object.fromEntries(outlets),
+      navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of parts and views in the main area; navigation state of parts and views outside the main area cannot be restored since not persisted.
       maximized: undefined, // Do not preserve maximized state when switching between perspectives.
     });
   }
@@ -183,11 +181,11 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     return this._workbenchGridMerger.merge({
       local: this._workbenchLayoutFactory.create({
         workbenchGrid: perspectiveLayout.userLayout.workbenchGrid,
-        viewOutlets: perspectiveLayout.userLayout.viewOutlets,
+        outlets: perspectiveLayout.userLayout.outlets,
       }),
       base: this._workbenchLayoutFactory.create({
         workbenchGrid: perspectiveLayout.referenceLayout.workbenchGrid,
-        viewOutlets: perspectiveLayout.referenceLayout.viewOutlets,
+        outlets: perspectiveLayout.referenceLayout.outlets,
       }),
       remote: this._initialPerspectiveLayout!,
     });
@@ -202,7 +200,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     // Memoize the layout of this perspective.
     this._perspectiveLayout = this._workbenchLayoutFactory.create({
       workbenchGrid: currentLayout.workbenchGrid,
-      viewOutlets: currentLayout.viewOutlets({grid: 'workbench'}),
+      outlets: currentLayout.outlets({grid: 'workbench'}),
     });
 
     // Do not store the layout if a transient perspective.
@@ -216,11 +214,11 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     await this._workbenchPerspectiveStorageService.storePerspectiveLayout(this.id, {
       referenceLayout: {
         workbenchGrid: serializedReferenceLayout.workbenchGrid,
-        viewOutlets: serializedReferenceLayout.workbenchViewOutlets,
+        outlets: serializedReferenceLayout.workbenchOutlets,
       },
       userLayout: {
         workbenchGrid: serializedUserLayout.workbenchGrid,
-        viewOutlets: serializedUserLayout.workbenchViewOutlets,
+        outlets: serializedUserLayout.workbenchOutlets,
       },
     });
   }

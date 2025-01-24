@@ -19,23 +19,22 @@ import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ViewComponent} from '../view/view.component';
 import {WorkbenchLayoutDiffer} from './workbench-layout-differ';
-import {WorkbenchPopupDiffer} from './workbench-popup-differ';
 import {Logger, LoggerNames} from '../logging';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
-import {MainAreaLayoutComponent} from '../layout/main-area-layout/main-area-layout.component';
+import {MainAreaPartComponent} from '../part/main-area-part/main-area-part.component';
 import {PartComponent} from '../part/part.component';
-import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
-import {WorkbenchDialogDiffer} from './workbench-dialog-differ';
 import {Routing} from './routing.util';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {WorkbenchNavigationContext} from './routing.model';
-import {canMatchNotFoundPage} from './workbench-route-guards';
-import {WorkbenchMessageBoxDiffer} from './workbench-message-box-differ';
-import {WorkbenchViewOutletDiffer} from './workbench-view-outlet-differ';
+import {matchesIfNavigated} from './workbench-route-guards';
+import {WorkbenchOutletDiffer} from './workbench-outlet-differ';
 import {filter} from 'rxjs/operators';
+import {MAIN_AREA} from '../layout/workbench-layout';
+import {PartId} from '../part/workbench-part.model';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -58,10 +57,7 @@ export class WorkbenchUrlObserver {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
   private readonly _workbenchLayoutDiffer = inject(WorkbenchLayoutDiffer);
-  private readonly _workbenchViewOutletDiffer = inject(WorkbenchViewOutletDiffer);
-  private readonly _workbenchPopupDiffer = inject(WorkbenchPopupDiffer);
-  private readonly _workbenchDialogDiffer = inject(WorkbenchDialogDiffer);
-  private readonly _workbenchMessageBoxDiffer = inject(WorkbenchMessageBoxDiffer);
+  private readonly _workbenchOutletDiffer = inject(WorkbenchOutletDiffer);
   private readonly _logger = inject(Logger);
 
   constructor() {
@@ -71,7 +67,7 @@ export class WorkbenchUrlObserver {
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
     const context = this.createWorkbenchNavigationContext(event.url);
-    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, popupDiff=${context.popupDiff.toString()}, dialogDiff=${context.dialogDiff.toString()}, messageBoxDiff=${context.messageBoxDiff.toString()}]`);
+    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, outletDiff=${context.outletDiff.toString()}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
     this.registerAddedOutletAuxiliaryRoutes();
     this.registerAddedWorkbenchParts();
@@ -140,7 +136,7 @@ export class WorkbenchUrlObserver {
       perspectiveId: workbenchNavigationalState?.perspectiveId ?? previousLayout?.perspectiveId,
       maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
       navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
-      viewOutlets: Object.fromEntries(Routing.parseViewOutlets(urlTree)),
+      outlets: Object.fromEntries(Routing.parseOutlets(urlTree, {part: true, view: true})),
     });
 
     const undoActions = new Array<() => void>();
@@ -150,17 +146,11 @@ export class WorkbenchUrlObserver {
       layout: newLayout,
       previousLayout,
       layoutDiff: this._workbenchLayoutDiffer.diff(newLayout),
-      viewOutletDiff: this._workbenchViewOutletDiffer.diff(newLayout, urlTree),
-      popupDiff: this._workbenchPopupDiffer.diff(urlTree),
-      dialogDiff: this._workbenchDialogDiffer.diff(urlTree),
-      messageBoxDiff: this._workbenchMessageBoxDiffer.diff(urlTree),
+      outletDiff: this._workbenchOutletDiffer.diff(newLayout, urlTree),
       undoChanges: () => {
         // Revert differs to the state before the navigation.
         this._workbenchLayoutDiffer.diff(previousLayout);
-        this._workbenchViewOutletDiffer.diff(previousLayout, previousUrl);
-        this._workbenchPopupDiffer.diff(previousUrl);
-        this._workbenchDialogDiffer.diff(previousUrl);
-        this._workbenchMessageBoxDiffer.diff(previousUrl);
+        this._workbenchOutletDiffer.diff(previousLayout, previousUrl);
         // Run registered undo actions.
         undoActions.forEach(action => action());
       },
@@ -177,28 +167,35 @@ export class WorkbenchUrlObserver {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
 
     // Register view auxiliary routes.
-    const addedViewOutlets = navigationContext.viewOutletDiff.addedViewOutlets;
+    const addedViewOutlets = navigationContext.outletDiff.addedViewOutlets;
     if (addedViewOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {canMatchNotFoundPage: [canMatchNotFoundPage]});
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {canMatchNotFoundPage: [matchesIfNavigated]});
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
+    // Register part auxiliary routes.
+    const addedPartOutlets = navigationContext.outletDiff.addedPartOutlets;
+    if (addedPartOutlets.length) {
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPartOutlets, {canMatchNotFoundPage: [matchesIfNavigated]});
+      this._logger.debug(() => `Registered auxiliary routes for parts: ${addedPartOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
+    }
+
     // Register popup auxiliary routes.
-    const addedPopupOutlets = navigationContext.popupDiff.addedPopupOutlets;
+    const addedPopupOutlets = navigationContext.outletDiff.addedPopupOutlets;
     if (addedPopupOutlets.length) {
       const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPopupOutlets);
       this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register dialog auxiliary routes.
-    const addedDialogOutlets = navigationContext.dialogDiff.addedDialogOutlets;
+    const addedDialogOutlets = navigationContext.outletDiff.addedDialogOutlets;
     if (addedDialogOutlets.length) {
       const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedDialogOutlets);
       this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register message box auxiliary routes.
-    const addedMessageBoxOutlets = navigationContext.messageBoxDiff.addedMessageBoxOutlets;
+    const addedMessageBoxOutlets = navigationContext.outletDiff.addedMessageBoxOutlets;
     if (addedMessageBoxOutlets.length) {
       const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedMessageBoxOutlets);
       this._logger.debug(() => `Registered auxiliary routes for message boxes: ${addedMessageBoxOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
@@ -206,7 +203,7 @@ export class WorkbenchUrlObserver {
 
     // Revert registration if the navigation fails.
     navigationContext.registerUndoAction(() => {
-      const addedOutlets = [...addedViewOutlets, ...addedPopupOutlets, ...addedDialogOutlets, ...addedMessageBoxOutlets];
+      const addedOutlets = [...addedViewOutlets, ...addedPartOutlets, ...addedPopupOutlets, ...addedDialogOutlets, ...addedMessageBoxOutlets];
       this._auxiliaryRouteInstaller.unregisterAuxiliaryRoutes(addedOutlets);
     });
   }
@@ -217,10 +214,11 @@ export class WorkbenchUrlObserver {
   private unregisterRemovedOutletAuxiliaryRoutes(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
     const removedOutlets: string[] = [
-      ...navigationContext.viewOutletDiff.removedViewOutlets,
-      ...navigationContext.popupDiff.removedPopupOutlets,
-      ...navigationContext.dialogDiff.removedDialogOutlets,
-      ...navigationContext.messageBoxDiff.removedMessageBoxOutlets,
+      ...navigationContext.outletDiff.removedViewOutlets,
+      ...navigationContext.outletDiff.removedPartOutlets,
+      ...navigationContext.outletDiff.removedPopupOutlets,
+      ...navigationContext.outletDiff.removedDialogOutlets,
+      ...navigationContext.outletDiff.removedMessageBoxOutlets,
     ];
     if (removedOutlets.length) {
       this._logger.debug(() => 'Unregistering outlet auxiliary routes: ', LoggerNames.ROUTING, removedOutlets);
@@ -233,11 +231,11 @@ export class WorkbenchUrlObserver {
    */
   private registerAddedWorkbenchParts(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const {layoutDiff} = navigationContext;
+    const {layoutDiff, layout} = navigationContext;
 
     layoutDiff.addedParts.forEach(partId => {
       this._logger.debug(() => `Constructing ɵWorkbenchPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-      this._partRegistry.register(this.createWorkbenchPart(partId));
+      this._partRegistry.register(this.createWorkbenchPart(partId, layout));
       navigationContext.registerUndoAction(() => this._partRegistry.unregister(partId));
     });
   }
@@ -259,11 +257,11 @@ export class WorkbenchUrlObserver {
    */
   private registerAddedWorkbenchViews(): void {
     const navigationContext = this._workbenchRouter.getCurrentNavigationContext();
-    const {layoutDiff} = navigationContext;
+    const {layoutDiff, layout} = navigationContext;
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
-      this._viewRegistry.register(this.createWorkbenchView(viewId));
+      this._viewRegistry.register(this.createWorkbenchView(viewId, layout));
       navigationContext.registerUndoAction(() => this._viewRegistry.unregister(viewId));
     });
   }
@@ -280,18 +278,18 @@ export class WorkbenchUrlObserver {
     });
   }
 
-  private createWorkbenchPart(partId: string): ɵWorkbenchPart {
+  private createWorkbenchPart(partId: PartId, layout: ɵWorkbenchLayout): ɵWorkbenchPart {
     // Construct the handle in an injection context that shares the part's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const partEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench Part ${partId}`);
-    return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, {
-      component: partId === MAIN_AREA ? MainAreaLayoutComponent : PartComponent,
+    return runInInjectionContext(partEnvironmentInjector, () => new ɵWorkbenchPart(partId, layout, {
+      component: partId === MAIN_AREA ? MainAreaPartComponent : PartComponent,
     }));
   }
 
-  private createWorkbenchView(viewId: ViewId): ɵWorkbenchView {
+  private createWorkbenchView(viewId: ViewId, layout: ɵWorkbenchLayout): ɵWorkbenchView {
     // Construct the handle in an injection context that shares the view's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const viewEnvironmentInjector = createEnvironmentInjector([], this._environmentInjector, `Workbench View ${viewId}`);
-    return runInInjectionContext(viewEnvironmentInjector, () => new ɵWorkbenchView(viewId, {component: ViewComponent}));
+    return runInInjectionContext(viewEnvironmentInjector, () => new ɵWorkbenchView(viewId, layout, {component: ViewComponent}));
   }
 
   /**

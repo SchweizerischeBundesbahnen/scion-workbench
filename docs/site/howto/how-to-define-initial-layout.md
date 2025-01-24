@@ -5,7 +5,7 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
 
 The workbench layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views. The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable area for user interaction.
 
@@ -88,7 +88,7 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-> To avoid cluttering the initial URL, we recommend navigating the views of the initial layout to empty path routes and using a navigation hint to differentiate.
+> To maintain a clean URL, we recommend navigating the parts and views of the initial layout to empty path routes and using a navigation hint to differentiate.
 
 > Use the `canMatchWorkbenchView` guard to match a route only when navigating a view with a particular hint.
 

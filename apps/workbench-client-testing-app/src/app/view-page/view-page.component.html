@@ -112,11 +112,11 @@
     </sci-form-field>
   </section>
 
-  <sci-accordion class="e2e-view-actions" variant="solid">
-    <ng-template sciAccordionItem [panel]="panel_view_actions">
-      <header>View Actions</header>
+  <sci-accordion class="e2e-view-methods" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_view_methods">
+      <header>View Methods</header>
     </ng-template>
-    <ng-template #panel_view_actions>
+    <ng-template #panel_view_methods>
       <button (click)="view.close()" class="e2e-close">Close</button>
     </ng-template>
   </sci-accordion>

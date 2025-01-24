@@ -68,7 +68,7 @@ export class LegacyMessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
         path: 'test-pages/legacy-message-box-opener-page',
         cssClass: 'legacy-message-box-opener',
         title: 'Legacy Message Box Opener',
-        pinToStartPage: true,
+        pinToDesktop: true,
       },
     });
 

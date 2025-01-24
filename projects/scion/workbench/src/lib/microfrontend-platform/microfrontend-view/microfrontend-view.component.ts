@@ -18,7 +18,7 @@ import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_K
 import {Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanCloseRef} from '../../workbench.model';
-import {IFRAME_OVERLAY_HOST} from '../../content-projection/workbench-element-references';
+import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {filterArray, mapArray} from '@scion/toolkit/operators';

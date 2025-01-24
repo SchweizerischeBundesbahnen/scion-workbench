@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,21 +11,24 @@
 /**
  * Stringifies given data, exluding specified fields from serialization.
  *
- * To exclude a field, specify the path to the field in the object tree,
- * using the slash as delimiter. The path supports the asterisk (`*`) to match a
- * single segment or the globstar (`**`) to match multiple segments.
+ * @param data - Data to serialize to json.
+ * @param options - Controls how to serialize data.
+ * @param options.exclusions - Controls which fields to exclude from serialization.\
+ *                             To exclude a field, specify the path to the field in the object tree,
+ *                             using the slash as delimiter. The path supports the asterisk (`*`) to match a
+ *                             single segment or the globstar (`**`) to match multiple segments.
+ * @param options.sort - Controls if to sort the fields by name. Defaults to `false`.
  */
-export function stringify(data: unknown, exclusions?: Array<string | Exclusion>): string {
-  if (!exclusions?.length) {
-    return JSON.stringify(data);
-  }
+export function stringify(data: unknown, options?: {exclusions?: Array<string | Exclusion>; sort?: true}): string {
+  const exclusions = options?.exclusions ?? [];
+  const sort = options?.sort ?? false;
 
   const objectStack = new Array<ObjectValue>();
   const compiledExclusions = exclusions.map(exclusion => new CompiledExclusion(exclusion));
 
   return JSON.stringify(data, (key, value) => {
     if (key === '') { // root node
-      return value;
+      return sort ? sortProperties(value) : value;
     }
 
     // Remove object(s) from the stack if finished their serialization.
@@ -44,8 +47,29 @@ export function stringify(data: unknown, exclusions?: Array<string | Exclusion>)
       objectStack.push({key, value, fieldsToSerialize: new Set(Object.keys(value))});
     }
 
-    return exclude ? undefined : value;
+    if (exclude) {
+      return undefined;
+    }
+
+    return sort ? sortProperties(value) : value;
   });
+}
+
+/**
+ * Sorts the properties of the passed object literal by name. The original object literal will not be changed. Has no effect if not an object literal.
+ */
+function sortProperties(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value) || value instanceof Set || value instanceof Map) {
+    return value;
+  }
+
+  const unsorted = value as Record<string, unknown>;
+  return Object.keys(unsorted)
+    .sort()
+    .reduce((sorted, key) => {
+      sorted[key] = unsorted[key];
+      return sorted;
+    }, {} as Record<string, unknown>);
 }
 
 /**
@@ -79,7 +103,7 @@ export interface Exclusion {
    * Tests if to exclude the resolved field, enabling extended checks if the field cannot be uniquely identified via the path.
    *
    * @param objectPath - path to the field in the object tree.
-   * @param key - key under with the field is associated in the parent object.
+   * @param key - key under which the field is associated in the parent object.
    * @param value - value of the field.
    */
   predicate: (objectPath: unknown[], key: string, value: unknown) => boolean;

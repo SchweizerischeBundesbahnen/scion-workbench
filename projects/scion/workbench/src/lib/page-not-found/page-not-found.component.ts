@@ -10,6 +10,7 @@
 
 import {Component, computed, inject, isDevMode} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchPart} from '../part/workbench-part.model';
 
 @Component({
   selector: 'wb-page-not-found',
@@ -19,7 +20,8 @@ import {WorkbenchView} from '../view/workbench-view.model';
 })
 export default class PageNotFoundComponent {
 
-  protected isDevMode = isDevMode();
-  protected view = inject(WorkbenchView);
-  protected urlSegments = computed(() => this.view.urlSegments().map(segment => `${segment}`).join('/'));
+  protected readonly isDevMode = isDevMode();
+  protected readonly view = inject(WorkbenchView, {optional: true});
+  protected readonly part = inject(WorkbenchPart, {optional: true});
+  protected readonly path = computed(() => (this.view ?? this.part)?.navigation()?.path.map(segment => `${segment}`).join('/'));
 }

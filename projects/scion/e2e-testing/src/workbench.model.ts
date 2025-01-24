@@ -19,9 +19,16 @@
  *
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA: MAIN_AREA = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
  * Represents the type of the constant {@link MAIN_AREA}.
  */
-export type MAIN_AREA = 'main-area';
+export type MAIN_AREA = 'part.main-area';
+
+/**
+ * Represents the alternative id of the main area part.
+ *
+ * @see MAIN_AREA
+ */
+export const MAIN_AREA_ALTERNATIVE_ID = 'main-area';

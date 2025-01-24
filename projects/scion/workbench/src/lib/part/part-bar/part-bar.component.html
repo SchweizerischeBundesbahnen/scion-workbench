@@ -1,18 +1,7 @@
-<sci-viewport class="tabbar e2e-tabbar" scrollbarStyle="hidden">
-  @for (viewId of part.viewIds(); track viewId) {
-    @if (viewtab === dropTargetViewTab()) {
-      <div class="divider"></div>
-    }
-    <wb-view-tab #viewtab
-                 [viewId]="viewId"
-                 [class.drag-source]="viewtab === dragSourceViewTab()"
-                 [class.drop-target]="viewtab === dropTargetViewTab()"/>
-    <div class="divider"></div>
-  }
-
-  <!-- Placeholder for expanding the viewport when dragging a tab to the right, moving part actions along with the dragover event. -->
-  <div class="drag-placeholder"></div>
-</sci-viewport>
+<!-- View Tabs -->
+@if (part.viewIds().length) {
+  <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
+}
 
 <!-- Actions -->
 @if (startActions().length) {
@@ -24,9 +13,7 @@
 }
 
 <!-- View List Dropdown -->
-<wb-view-list-button/>
+@if (part.viewIds().length) {
+  <wb-view-list-button/>
+}
 
-<!-- Element for injecting the corner radius into the component. -->
-<div class="tab-corner-radius" #tab_corner_radius></div>
-<!-- Element for injecting the tabbar padding into the component. -->
-<div class="padding-inline" #padding_inline></div>

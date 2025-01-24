@@ -16,13 +16,13 @@ import {ActivationInstantProvider} from '../activation-instant.provider';
 import {MAIN_AREA_INITIAL_PART_ID} from '../layout/ɵworkbench-layout';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Router} from '@angular/router';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Enables and configures the SCION Workbench in tests., returning a set of dependency-injection providers to be registered in Angular.
  *
  * Does the following:
  * - provides the workbench with given config
- * - configures the workbench to name the initial part 'main'
  * - installs a sequence for activation instants
  * - configures the testbed to auto-detect changes
  * - disables animations
@@ -40,12 +40,12 @@ import {Router} from '@angular/router';
  * });
  * ```
  */
-export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInitialPartId?: string}): EnvironmentProviders {
+export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInitialPartId?: PartId}): EnvironmentProviders {
   return makeEnvironmentProviders([
     provideWorkbench(config),
     provideNoopAnimations(),
     {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
-    {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config?.mainAreaInitialPartId ?? 'main'},
+    config?.mainAreaInitialPartId ? {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config.mainAreaInitialPartId} : [],
     {provide: ComponentFixtureAutoDetect, useValue: true},
     {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
     {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},

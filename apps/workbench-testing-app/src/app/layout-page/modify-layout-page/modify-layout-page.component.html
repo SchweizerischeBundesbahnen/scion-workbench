@@ -10,6 +10,11 @@
   </section>
 
   <section>
+    <header>Part Navigations</header>
+    <app-navigate-parts [formControl]="form.controls.partNavigations" [partProposals]="partProposals()"/>
+  </section>
+
+  <section>
     <header>View Navigations</header>
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
   </section>

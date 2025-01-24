@@ -30,7 +30,7 @@ const relativeTo = inject(ActivatedRoute);
 inject(WorkbenchRouter).navigate(['../path/to/view'], {relativeTo});
 ```
 
-Additional data can be passed to the navigation as matrix parameters or navigation data. Matrix parameters are added to the path, while navigation data is stored in the layout. Unlike matrix parameters, navigation data can be passed to empty path navigations. The view can read matrix parameters from `ActivatedRoute.params` and navigation data from `WorkbenchView.navigationData`.
+Additional data can be passed to the navigation as matrix parameters or navigation data. Matrix parameters are added to the path, while navigation data is stored in the layout. Unlike matrix parameters, navigation data can be passed to empty path navigations. The view can read matrix parameters from `ActivatedRoute.params` and navigation data from `WorkbenchView.navigation.data`.
 
 ```ts
 import {inject} from '@angular/core';
@@ -57,7 +57,7 @@ The default behavior can be overridden by specifying a `target` via navigation e
 ### How to differentiate between routes with an identical path
 The workbench router supports passing a hint to the navigation to differentiate between routes with an identical path.
 
-For example, views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
+For example, views of the initial layout or a perspective are usually navigated to the empty path route to maintain a clean URL,
 requiring a navigation hint to differentiate between the routes.
 
 Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.

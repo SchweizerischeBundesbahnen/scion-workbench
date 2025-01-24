@@ -22,7 +22,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {setStyle} from '../common/dom.util';
 import {fromResize$} from '@scion/toolkit/observable';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WORKBENCH_ELEMENT_REF} from '../content-projection/workbench-element-references';
+import {WORKBENCH_ELEMENT_REF} from '../workbench-element-references';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchConfig} from '../workbench-config';
 import {distinctUntilChanged, filter} from 'rxjs/operators';

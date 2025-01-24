@@ -9,6 +9,7 @@
  */
 import {DebugElement, Predicate, Type} from '@angular/core';
 import {ExpectedWorkbenchLayout} from './to-equal-workbench-layout.matcher';
+import {PartId} from '../../../part/workbench-part.model';
 
 /**
  * Extends the Jasmine expect API with project specific custom matchers.
@@ -106,7 +107,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
    * expect('view.1').toBeRegistered({partId: 'top-left', active: true});
    * ```
    */
-  toBeRegistered(expected: {partId: string; active: boolean}, expectationFailOutput?: any): boolean;
+  toBeRegistered(expected: {partId: PartId; active: boolean}, expectationFailOutput?: any): boolean;
 
   /**
    * Expects the component displayed in the view to have the specified component state.

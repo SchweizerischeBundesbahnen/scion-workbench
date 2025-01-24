@@ -17,129 +17,30 @@ import {MAIN_AREA} from '../workbench.model';
 
 test.describe('View Drag & Drop', () => {
 
-  test.describe('view (de-)activation on drag', () => {
-    test('should deactivate view when moving it quickly to the center', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open view 1
-      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Open view 2
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Drag view 2 to the center quickly
-      const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      const dragHandle = await viewPage2.view.tab.startDrag();
-      await dragHandle.dragToPart(partId, {region: 'center', steps: 1});
-
-      // Expect view 1 to be activated
-      await expectView(viewPage1).toBeActive();
-      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
-
-      // Expect view 2 not to be attached
-      await expect(viewPage2.view.locator).not.toBeAttached();
-      await expect(viewPage2.view.tab.locator).not.toBeVisible();
-      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
-    });
-
-    test('should deactivate view when moving it quickly to the north', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open view 1
-      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Open view 2
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Drag view 2 to the north quickly
-      const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      const dragHandle = await viewPage2.view.tab.startDrag();
-      await dragHandle.dragToPart(partId, {region: 'north', steps: 1});
-
-      // Expect view 1 to be activated
-      await expectView(viewPage1).toBeActive();
-      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
-
-      // Expect view 2 not to be attached
-      await expect(viewPage2.view.locator).not.toBeAttached();
-      await expect(viewPage2.view.tab.locator).not.toBeVisible();
-      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
-    });
-
-    test('should deactivate view when moving it quickly to the east', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open view 1
-      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Open view 2
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Drag view 2 to the east quickly
-      const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      const dragHandle = await viewPage2.view.tab.startDrag();
-      await dragHandle.dragToPart(partId, {region: 'east', steps: 1});
-
-      // Expect view 1 to be activated
-      await expectView(viewPage1).toBeActive();
-      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
-
-      // Expect view 2 not to be attached
-      await expect(viewPage2.view.locator).not.toBeAttached();
-      await expect(viewPage2.view.tab.locator).not.toBeVisible();
-      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
-    });
-
-    test('should deactivate view when moving it quickly to the south', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open view 1
-      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Open view 2
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Drag view 2 to the south quickly
-      const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      const dragHandle = await viewPage2.view.tab.startDrag();
-      await dragHandle.dragToPart(partId, {region: 'south', steps: 1});
-
-      // Expect view 1 to be activated
-      await expectView(viewPage1).toBeActive();
-      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
-
-      // Expect view 2 not to be attached
-      await expect(viewPage2.view.locator).not.toBeAttached();
-      await expect(viewPage2.view.tab.locator).not.toBeVisible();
-      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
-    });
-
-    test('should deactivate view when moving it quickly to the west', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
-
-      // Open view 1
-      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Open view 2
-      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
-
-      // Drag view 2 to the west quickly
-      const partId = await appPO.activePart({inMainArea: true}).getPartId();
-      const dragHandle = await viewPage2.view.tab.startDrag();
-      await dragHandle.dragToPart(partId, {region: 'west', steps: 1});
-
-      // Expect view 1 to be activated
-      await expectView(viewPage1).toBeActive();
-      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual(partId);
-
-      // Expect view 2 not to be attached
-      await expect(viewPage2.view.locator).not.toBeAttached();
-      await expect(viewPage2.view.tab.locator).not.toBeVisible();
-      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual(partId);
-    });
-  });
-
   test.describe('drag to own part', () => {
+
+    test('should deactivate view when moving view quickly out of the tabbar', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      // Open view 1
+      const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+      // Open view 2
+      const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+      // Drag view 2 quickly out of the tabbar
+      const dragHandle = await viewPage2.view.tab.startDrag();
+      await dragHandle.dragTo({deltaX: 0, deltaY: 500}, {steps: 1});
+
+      // Expect view 1 to be activated
+      await expectView(viewPage1).toBeActive();
+      await expect.poll(() => viewPage1.view.part.getPartId()).toEqual('part.initial');
+
+      // Expect view 2 not to be attached
+      await expect(viewPage2.view.locator).not.toBeAttached();
+      await expect(viewPage2.view.tab.locator).not.toBeVisible();
+      await expect.poll(() => viewPage2.view.part.getPartId()).toEqual('part.initial');
+    });
 
     /**
      * +-----------------+    +-----------------+
@@ -160,7 +61,7 @@ test.describe('View Drag & Drop', () => {
       await dragHandle.drop();
 
       // Expect view 2 not to be moved.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MPart({
             id: await view1.part.getPartId(),
@@ -191,7 +92,7 @@ test.describe('View Drag & Drop', () => {
       await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the west.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -231,7 +132,7 @@ test.describe('View Drag & Drop', () => {
       await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the east.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -274,7 +175,7 @@ test.describe('View Drag & Drop', () => {
       await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the north.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
@@ -317,7 +218,7 @@ test.describe('View Drag & Drop', () => {
       await dragHandle.drop();
 
       // Expect view 2 to be moved to a new part in the south.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'column',
@@ -348,42 +249,41 @@ test.describe('View Drag & Drop', () => {
      * +-----------+----------------------+    +--------------------+------------+
      */
     test('should allow dragging a view to the center of another part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
-      const initialPartId = await initialPartView.view.part.getPartId();
+      await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to the center of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
       const dragHandle = await testView.tab.startDrag();
-      await dragHandle.dragToPart(initialPartId, {region: 'center'});
+      await dragHandle.dragToPart('part.initial', {region: 'center'});
       await dragHandle.drop();
 
       // Expect view to be moved to the initial part.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .5,
             child1: new MPart({
-              id: initialPartId,
+              id: 'part.initial',
               views: [{id: 'view.1'}, {id: 'view.101'}],
               activeViewId: 'view.101',
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
           }),
-          activePartId: initialPartId,
+          activePartId: 'part.initial',
         },
       });
     });
@@ -395,27 +295,26 @@ test.describe('View Drag & Drop', () => {
      * +-----------+----------------------+    +------------+------------+------------+
      */
     test('should allow dragging a view to the west of another part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
-      const initialPartId = await initialPartView.view.part.getPartId();
+      await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the west of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
       const dragHandle = await testView.tab.startDrag();
-      await dragHandle.dragToPart(initialPartId, {region: 'west'});
+      await dragHandle.dragToPart('part.initial', {region: 'west'});
       await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the west of the initial part.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -429,13 +328,13 @@ test.describe('View Drag & Drop', () => {
                 activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: initialPartId,
+                id: 'part.initial',
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -452,27 +351,26 @@ test.describe('View Drag & Drop', () => {
      * +----------+----------------------+    +----------+------------+------------+
      */
     test('should allow dragging a view to the east of another part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
-      const initialPartId = await initialPartView.view.part.getPartId();
+      await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the east of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
       const dragHandle = await testView.tab.startDrag();
-      await dragHandle.dragToPart(initialPartId, {region: 'east'});
+      await dragHandle.dragToPart('part.initial', {region: 'east'});
       await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the east of the initial part.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -481,7 +379,7 @@ test.describe('View Drag & Drop', () => {
               direction: 'row',
               ratio: .5,
               child1: new MPart({
-                id: initialPartId,
+                id: 'part.initial',
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
@@ -492,7 +390,7 @@ test.describe('View Drag & Drop', () => {
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -512,27 +410,26 @@ test.describe('View Drag & Drop', () => {
      * +----------+----------------------+    +------------+------------+
      */
     test('should allow dragging a view to the north of another part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
-      const initialPartId = await initialPartView.view.part.getPartId();
+      await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the north of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
       const dragHandle = await testView.tab.startDrag();
-      await dragHandle.dragToPart(initialPartId, {region: 'north'});
+      await dragHandle.dragToPart('part.initial', {region: 'north'});
       await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the north of the initial part.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -546,13 +443,13 @@ test.describe('View Drag & Drop', () => {
                 activeViewId: 'view.101',
               }),
               child2: new MPart({
-                id: initialPartId,
+                id: 'part.initial',
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -572,27 +469,26 @@ test.describe('View Drag & Drop', () => {
      * +----------+----------------------+    +------------+------------+
      */
     test('should allow dragging a view to the south of another part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      const initialPartView = await workbenchNavigator.openInNewTab(ViewPagePO);
-      const initialPartId = await initialPartView.view.part.getPartId();
+      await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('right', {relativeTo: initialPartId, align: 'right', ratio: .5})
-        .addView('view.101', {partId: 'right', activateView: true})
-        .addView('view.102', {partId: 'right'}),
+        .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
+        .addView('view.101', {partId: 'part.right', activateView: true})
+        .addView('view.102', {partId: 'part.right'}),
       );
 
       // Move view to a new part in the south of the initial part.
       const testView = appPO.view({viewId: 'view.101'});
       const dragHandle = await testView.tab.startDrag();
-      await dragHandle.dragToPart(initialPartId, {region: 'south'});
+      await dragHandle.dragToPart('part.initial', {region: 'south'});
       await dragHandle.drop();
       const testViewInfo = await testView.getInfo();
 
       // Expect view to be moved to a new part in the south of the initial part.
-      await expect(appPO.workbench).toEqualWorkbenchLayout({
+      await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainAreaGrid: {
           root: new MTreeNode({
             direction: 'row',
@@ -601,7 +497,7 @@ test.describe('View Drag & Drop', () => {
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: initialPartId,
+                id: 'part.initial',
                 views: [{id: 'view.1'}],
                 activeViewId: 'view.1',
               }),
@@ -612,7 +508,7 @@ test.describe('View Drag & Drop', () => {
               }),
             }),
             child2: new MPart({
-              id: 'right',
+              id: 'part.right',
               views: [{id: 'view.102'}],
               activeViewId: 'view.102',
             }),
@@ -623,22 +519,23 @@ test.describe('View Drag & Drop', () => {
     });
   });
 
-  test.describe('drag to start page', () => {
+  test.describe('drag to main area', () => {
 
-    test('should drop view on start page of the main area (grid root is MPart)', async ({appPO, workbenchNavigator}) => {
+    test('should drop view on navigated main area part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('left', {align: 'left'})
-        .addView('testee', {partId: 'left', cssClass: 'testee'})
-        .navigateView('testee', ['test-view']),
+        .addPart('part.left', {align: 'left'})
+        .addView('view.100', {partId: 'part.left'})
+        .navigatePart(MAIN_AREA, ['test-part'])
+        .navigateView('view.100', ['test-view']),
       );
 
-      // Drop view on the start page of the main area.
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      // Drop view on the main area.
+      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
       const dragHandle = await testeeViewPage.view.tab.startDrag();
-      await dragHandle.dragToGrid('mainArea', {region: 'center'});
+      await dragHandle.dragToPart(MAIN_AREA, {region: 'center'});
       await dragHandle.drop();
 
       // Expect view to be moved to the main area.
@@ -646,26 +543,42 @@ test.describe('View Drag & Drop', () => {
       await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
     });
 
-    test('should drop view on start page of the main area (grid root is MTreeNode)', async ({appPO, workbenchNavigator}) => {
+    test('should drop view on desktop of the main area', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart(MAIN_AREA)
-        .addPart('left', {align: 'left'})
-        .addView('testee', {partId: 'left', cssClass: 'testee'})
-        .navigateView('testee', ['test-view']),
+        .addPart('part.left', {align: 'left'})
+        .addView('view.100', {partId: 'part.left'})
+        .navigateView('view.100', ['test-view']),
       );
 
-      // Change the grid root of the main area to a `MTreeNode`.
-      await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-        .addPart('main-left', {relativeTo: activePartId, align: 'left'})
-        .addPart('main-right', {relativeTo: activePartId, align: 'right'}),
-      );
-
-      // Drop view on the start page of the main area.
-      const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
+      // Drop view on the main area.
+      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
       const dragHandle = await testeeViewPage.view.tab.startDrag();
-      await dragHandle.dragToGrid('mainArea', {region: 'center'});
+      await dragHandle.dragToPart(MAIN_AREA, {region: 'center'});
+      await dragHandle.drop();
+
+      // Expect view to be moved to the main area.
+      await expectView(testeeViewPage).toBeActive();
+      await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+    });
+
+    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
+    test('should drop view on start page of the main area [deprecated]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, useLegacyStartPage: true});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addView('view.100', {partId: 'part.left'})
+        .navigateView('view.100', ['test-view']),
+      );
+
+      // Drop view on the main area.
+      const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      const dragHandle = await testeeViewPage.view.tab.startDrag();
+      await dragHandle.dragToPart(MAIN_AREA, {region: 'center'});
       await dragHandle.drop();
 
       // Expect view to be moved to the main area.
@@ -723,6 +636,815 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view tab to render content.
       await expect(page.locator('wb-view-tab-drag-image').locator('span.e2e-title')).toHaveText('Title');
+    });
+  });
+
+  test.describe('drop zone', () => {
+
+    test('should activate drop zone when dragging over a view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart('part.part')
+        .addView('view.101', {partId: 'part.part'})
+        .addView('view.102', {partId: 'part.part'}),
+      );
+      const tab1 = appPO.view({viewId: 'view.101'}).tab;
+      await tab1.setTitle('view.101');
+
+      const tab2 = appPO.view({viewId: 'view.102'}).tab;
+      await tab2.setTitle('view.102');
+
+      const part = appPO.part({partId: 'part.part'});
+      const {top, right, bottom, left, vcenter, hcenter} = await part.activeView.getBoundingBox();
+
+      const dragHandle = await tab1.startDrag();
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+      });
+
+      await test.step('drag to the north/east', async () => {
+        await dragHandle.dragTo({x: right - 10, y: top + 9});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+
+        await dragHandle.dragTo({x: right - 10, y: top + 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+
+        await dragHandle.dragTo({x: right - 10, y: top + 11});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the south/east', async () => {
+        await dragHandle.dragTo({x: right - 10, y: bottom - 11});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('east');
+
+        await dragHandle.dragTo({x: right - 10, y: bottom - 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+
+        await dragHandle.dragTo({x: right - 10, y: bottom - 9});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the south/west', async () => {
+        await dragHandle.dragTo({x: left + 10, y: bottom - 9});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+
+        await dragHandle.dragTo({x: left + 10, y: bottom - 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+
+        await dragHandle.dragTo({x: left + 10, y: bottom - 11});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the north/west', async () => {
+        await dragHandle.dragTo({x: left + 10, y: top + 11});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('west');
+
+        await dragHandle.dragTo({x: left + 10, y: top + 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+
+        await dragHandle.dragTo({x: left + 10, y: top + 9});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter - 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter + 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter, y: vcenter - 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter, y: vcenter + 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+      });
+    });
+
+    test('should activate drop zone when dragging the only view of a part over its part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart('part.part')
+        .addView('view.100', {partId: 'part.part'}),
+      );
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      await tab.setTitle('view.100');
+
+      const part = appPO.part({partId: 'part.part'});
+      const {top, right, bottom, left, vcenter, hcenter} = await part.activeView.getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 10});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('center');
+      });
+    });
+
+    test('should activate drop zone when dragging over a navigated part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right', ratio: .75})
+        .addView('view.100', {partId: 'part.left'})
+        .navigatePart('part.right', ['test-part']),
+      );
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const part = appPO.part({partId: 'part.right'});
+      const {top, right, bottom, left, vcenter, hcenter} = await part.getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 75});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+      });
+
+      await test.step('drag to the north/east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: top + 74});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+
+        await dragHandle.dragTo({x: right - 75, y: top + 76});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the south/east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: bottom - 76});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('east');
+
+        await dragHandle.dragTo({x: right - 75, y: bottom - 74});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the south/west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: bottom - 74});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('south');
+
+        await dragHandle.dragTo({x: left + 75, y: bottom - 76});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the north/west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: top + 76});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('west');
+
+        await dragHandle.dragTo({x: left + 75, y: top + 74});
+        await expect.poll(() => part.getActiveDropZone()).toEqual('north');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).not.toBeNull();
+        await expect.poll(() => part.getActiveDropZone()).not.toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter - 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).not.toBeNull();
+        await expect.poll(() => part.getActiveDropZone()).not.toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter + 10, y: vcenter});
+        await expect.poll(() => part.getActiveDropZone()).not.toBeNull();
+        await expect.poll(() => part.getActiveDropZone()).not.toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter, y: vcenter - 10});
+        await expect.poll(() => part.getActiveDropZone()).not.toBeNull();
+        await expect.poll(() => part.getActiveDropZone()).not.toEqual('center');
+
+        await dragHandle.dragTo({x: hcenter, y: vcenter + 10});
+        await expect.poll(() => part.getActiveDropZone()).not.toBeNull();
+        await expect.poll(() => part.getActiveDropZone()).not.toEqual('center');
+      });
+    });
+
+    test('should activate drop zone when dragging over the navigated main area part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart('part.left')
+        .addPart(MAIN_AREA, {align: 'right', ratio: .75})
+        .addView('view.100', {partId: 'part.left'})
+        .navigatePart(MAIN_AREA, ['test-part']),
+      );
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const mainAreaPart = appPO.part({partId: MAIN_AREA});
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 75});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: vcenter});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: vcenter});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('center');
+      });
+    });
+
+    test('should activate drop zone when dragging over the desktop of the main area', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(layout => layout.addPart(MAIN_AREA));
+      await workbenchNavigator.modifyLayout(layout => layout.addView('view.100', {partId: 'part.initial'}));
+
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const mainAreaPart = appPO.part({partId: MAIN_AREA});
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+      await dragHandle.dragTo({x: hcenter, y: vcenter});
+
+      // Close view to display the desktop.
+      await appPO.workbench.closeViews('view.100');
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+    });
+
+    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
+    test('should activate drop zone when dragging over the desktop of the main area [deprecated]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial', useLegacyStartPage: true});
+
+      await workbenchNavigator.createPerspective(layout => layout.addPart(MAIN_AREA));
+      await workbenchNavigator.modifyLayout(layout => layout.addView('view.100', {partId: 'part.initial'}));
+
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const mainAreaPart = appPO.part({partId: MAIN_AREA});
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+      await dragHandle.dragTo({x: hcenter, y: vcenter});
+
+      // Close view to display the desktop.
+      await appPO.workbench.closeViews('view.100');
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+    });
+
+    test('should activate drop zone when dragging over the desktop of the workbench', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart('part.part')
+        .addView('view.100', {partId: 'part.part'}),
+      );
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const {top, right, bottom, left, vcenter, hcenter} = await appPO.workbenchBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+      await dragHandle.dragTo({x: hcenter, y: vcenter});
+
+      // Close view to display the desktop.
+      await appPO.workbench.closeViews('view.100');
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+    });
+
+    /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
+    test('should activate drop zone when dragging over the desktop of the workbench [deprecated]', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, useLegacyStartPage: true});
+
+      await workbenchNavigator.createPerspective(layout => layout
+        .addPart('part.part')
+        .addView('view.100', {partId: 'part.part'}),
+      );
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const {top, right, bottom, left, vcenter, hcenter} = await appPO.workbenchBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+      await dragHandle.dragTo({x: hcenter, y: vcenter});
+
+      // Close view to display the desktop.
+      await appPO.workbench.closeViews('view.100');
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 75});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 75, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the center', async () => {
+        await dragHandle.dragTo({x: hcenter, y: vcenter});
+        await expect.poll(() => appPO.getActiveDesktopDropZone()).toEqual('center');
+      });
+    });
+
+    test('should activate drop zone when dragging near workbench edge', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addView('view.100', {partId: 'part.initial'})
+        .navigateView('view.100', ['test-view']),
+      );
+      const tab = appPO.view({viewId: 'view.100'}).tab;
+      const mainAreaPart = appPO.part({partId: MAIN_AREA});
+      const {top, right, bottom, left, vcenter, hcenter} = await mainAreaPart.getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+
+      await test.step('drag to the north', async () => {
+        await dragHandle.dragTo({x: hcenter, y: top + 40});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the north/east', async () => {
+        await dragHandle.dragTo({x: right - 40, y: top + 39});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+
+        await dragHandle.dragTo({x: right - 40, y: top + 41});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the east', async () => {
+        await dragHandle.dragTo({x: right - 40, y: vcenter});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the south/east', async () => {
+        await dragHandle.dragTo({x: right - 40, y: bottom - 41});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+
+        await dragHandle.dragTo({x: right - 40, y: bottom - 39});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the south', async () => {
+        await dragHandle.dragTo({x: hcenter, y: bottom - 40});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the south/west', async () => {
+        await dragHandle.dragTo({x: left + 40, y: bottom - 39});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+
+        await dragHandle.dragTo({x: left + 40, y: bottom - 41});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the west', async () => {
+        await dragHandle.dragTo({x: left + 40, y: vcenter});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the north/west', async () => {
+        await dragHandle.dragTo({x: left + 40, y: top + 41});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+
+        await dragHandle.dragTo({x: left + 40, y: top + 39});
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+      });
+    });
+
+    /**
+     * This test operates on the following layout, dragging a view tab from the left-top part
+     * to the mid-top part and back again.
+     *
+     *
+     *   PERIPHERY       MAIN AREA
+     * +-------------++-------------+
+     * |             ||             |
+     * |  left-top   ||  mid-top    |
+     * |             ||             |
+     * +-------------++-------------+
+     * |             ||             |
+     * | left-bottom || mid-bottom  |
+     * |             ||             |
+     * +-------------++-------------+
+     */
+    test('should render correct drop zones when dragging horizontally', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.mid-top'});
+
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.left-top', {align: 'left', ratio: .25})
+        .addPart('part.left-bottom', {align: 'bottom', relativeTo: 'part.left-top', ratio: .25}) // split left part
+        .addPart('part.mid-bottom', {align: 'bottom', relativeTo: 'part.mid-top'}) // split main area
+        .addView('view.101', {partId: 'part.left-top', activateView: true})
+        .addView('view.102', {partId: 'part.left-top'})
+        .addView('view.103', {partId: 'part.left-bottom', activateView: true})
+        .addView('view.104', {partId: 'part.mid-top', activateView: true})
+        .addView('view.105', {partId: 'part.mid-bottom', activateView: true}),
+      );
+
+      const tab = appPO.view({viewId: 'view.101'}).tab;
+      const mainAreaPart = appPO.part({partId: MAIN_AREA});
+      const leftTopPart = appPO.part({partId: 'part.left-top'});
+      const leftTopPartBounds = await appPO.part({partId: 'part.left-top'}).getBoundingBox();
+      const midTopPart = appPO.part({partId: 'part.mid-top'});
+      const midTopPartBounds = await appPO.part({partId: 'part.mid-top'}).getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+
+      await test.step('drag to the vertical center of the left-top part, 10px to the right of its left edge', async () => {
+        await dragHandle.dragTo({x: 10, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the right, 75px to the right of the left edge of the left-top part', async () => {
+        await dragHandle.dragTo({x: 75, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('west');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the right, to the middle of the left-top part', async () => {
+        await dragHandle.dragTo({x: leftTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('center');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the right, 25px to the left of the right edge of the left-top part', async () => {
+        await dragHandle.dragTo({x: leftTopPartBounds.right - 25, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('east');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the right, 25px to the right of the left main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.x + 25, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('west');
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the right, 200px to the right of the left main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.x + 200, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the right, to the middle of the main area', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the right, 200px to the left of the right main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.right - 200, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the right, 75px to the left of the right main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.right - 75, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('east');
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the right, 25px to the left of the right main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.right - 25, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the left, 75px to the left of the right main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.right - 75, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('east');
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the left, 200px to the left of the right main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.right - 200, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('east');
+      });
+
+      await test.step('drag to the left, to the middle of the main area', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('center');
+      });
+
+      await test.step('drag to the left, 200px to the right of the left main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.x + 200, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('west');
+      });
+
+      await test.step('drag to the left, 25px to the right of the left main area edge', async () => {
+        await dragHandle.dragTo({x: midTopPartBounds.x + 25, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('west');
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the left, 25px to the left of the right edge of the left-top part', async () => {
+        await dragHandle.dragTo({x: leftTopPartBounds.right - 25, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('east');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the left, to the middle of the left-top part', async () => {
+        await dragHandle.dragTo({x: leftTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('center');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the left, 75px to the right of the left edge of the left-top part', async () => {
+        await dragHandle.dragTo({x: 75, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('west');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the left, 10px to the right of the left edge of the left-top part', async () => {
+        await dragHandle.dragTo({x: 10, y: leftTopPartBounds.vcenter});
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
+      });
+    });
+
+    /**
+     * This test operates on the following layout, dragging a view tab
+     * in the right part from the top to the bottom and back.
+     *
+     *
+     *      MAIN AREA
+     * +--------++-------+
+     * |        |        |
+     * |  left  |  right |
+     * |        |        |
+     * +--------+--------+
+     */
+    test('should render correct drop zones when dragging vertically', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.left'});
+
+      await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.right', {align: 'right', relativeTo: 'part.left'})
+        .addView('view.101', {partId: 'part.left', activateView: true})
+        .addView('view.102', {partId: 'part.right', activateView: true})
+        .addView('view.103', {partId: 'part.right'}),
+      );
+
+      const tab = appPO.view({viewId: 'view.101'}).tab;
+      const mainAreaPart = appPO.part({partId: MAIN_AREA});
+      const rightPart = appPO.part({partId: 'part.right'});
+      const viewBounds = await appPO.view({viewId: 'view.102'}).getBoundingBox();
+
+      const dragHandle = await tab.startDrag();
+
+      await test.step('drag to the horizontal center of the right part, 10px to the bottom of its top edge', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.top + 10});
+        await expect.poll(() => rightPart.getActiveDropZone()).toEqual('north');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the bottom, to the middle of the right part', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.vcenter});
+        await expect.poll(() => rightPart.getActiveDropZone()).toEqual('center');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the bottom, 125px to the top of the bottom edge', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 125});
+        await expect.poll(() => rightPart.getActiveDropZone()).toEqual('south');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the bottom, 75px to the top of the bottom edge', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 75});
+        await expect.poll(() => rightPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('south');
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the bottom, 25px to the top of the bottom edge', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 25});
+        await expect.poll(() => rightPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+      });
+
+      await test.step('drag to the top, 75px to the top of the bottom edge', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 75});
+        await expect.poll(() => rightPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('south');
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the top, 125px to the top of the bottom edge', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 125});
+        await expect.poll(() => rightPart.getActiveDropZone()).toEqual('south');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the top, to the middle of the right part', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.vcenter});
+        await expect.poll(() => rightPart.getActiveDropZone()).toEqual('center');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
+
+      await test.step('drag to the top, 10px to the bottom of the top edge of the right part', async () => {
+        await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.top + 10});
+        await expect.poll(() => rightPart.getActiveDropZone()).toEqual('north');
+        await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+      });
     });
   });
 });

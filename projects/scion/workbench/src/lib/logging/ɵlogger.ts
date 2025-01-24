@@ -8,43 +8,49 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Inject, Injectable, Optional} from '@angular/core';
-import {NavigationStart, ParamMap, Router, RouterEvent} from '@angular/router';
+import {computed, inject, Injectable, Signal} from '@angular/core';
+import {NavigationStart, Router} from '@angular/router';
 import {filter, map, startWith} from 'rxjs/operators';
-import {Observable} from 'rxjs';
 import {LogAppender, LogEvent, LoggerName, LogLevel} from './logging.model';
 import {Logger} from './logger';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchConfig} from '../workbench-config';
-
-type LogLevelStrings = keyof typeof LogLevel;
 
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `Logger` DI token. */)
 export class ɵLogger implements Logger {
 
-  public logLevel!: LogLevel;
+  // TODO [Angular 20] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens.
+  private readonly _logAppenders = inject(LogAppender, {optional: true}) as unknown as LogAppender[];
 
-  constructor(@Inject(LogAppender) @Optional() private _logAppenders: LogAppender[]) {
+  private readonly _logLevel: Signal<LogLevel>;
+
+  constructor() {
     const defaultLogLevel = inject(WorkbenchConfig, {optional: true})?.logging?.logLevel ?? LogLevel.INFO;
-    this.observeLogLevelQueryParam$(inject(Router))
-      .pipe(takeUntilDestroyed())
-      .subscribe((queryParamLogLevel: LogLevel | undefined) => {
-        this.logLevel = queryParamLogLevel ?? defaultLogLevel;
-      });
+    const logLevel = queryParam('loglevel');
+    this._logLevel = computed(() => (logLevel() ? LogLevel[logLevel()!.toUpperCase() as keyof typeof LogLevel] : defaultLogLevel) ?? defaultLogLevel);
   }
 
+  /** @inheritDoc */
+  public get logLevel(): LogLevel {
+    return this._logLevel();
+  }
+
+  /** @inheritDoc */
   public debug(message: string | (() => string), ...args: any[]): void {
     this.log(coerceLogEvent(LogLevel.DEBUG, message, args));
   }
 
+  /** @inheritDoc */
   public info(message: string | (() => string), ...args: any[]): void {
     this.log(coerceLogEvent(LogLevel.INFO, message, args));
   }
 
+  /** @inheritDoc */
   public warn(message: string | (() => string), ...args: any[]): void {
     this.log(coerceLogEvent(LogLevel.WARN, message, args));
   }
 
+  /** @inheritDoc */
   public error(message: string | (() => string), ...args: any[]): void {
     this.log(coerceLogEvent(LogLevel.ERROR, message, args));
   }
@@ -60,17 +66,21 @@ export class ɵLogger implements Logger {
 
     this._logAppenders.forEach(logAppender => logAppender.onLogMessage(event));
   }
+}
 
-  private observeLogLevelQueryParam$(router: Router): Observable<LogLevel | undefined> {
-    return router.events
-      .pipe(
-        startWith(router.url),
-        filter((event): event is NavigationStart => event instanceof NavigationStart),
-        map<RouterEvent, ParamMap>(routerEvent => router.parseUrl(routerEvent.url).queryParamMap),
-        map(queryParamMap => queryParamMap.get('loglevel')?.toUpperCase() as LogLevelStrings | undefined),
-        map(logLevelString => logLevelString ? LogLevel[logLevelString] : undefined),
-      );
-  }
+/**
+ * Reads the specified query parameter from the URL.
+ */
+function queryParam(queryParam: string): Signal<string | null> {
+  const router = inject(Router);
+  const queryParam$ = router.events
+    .pipe(
+      filter(event => event instanceof NavigationStart),
+      map(event => event.url),
+      startWith(router.url),
+      map(url => router.parseUrl(url).queryParamMap.get(queryParam)),
+    );
+  return toSignal(queryParam$, {requireSync: true});
 }
 
 /**

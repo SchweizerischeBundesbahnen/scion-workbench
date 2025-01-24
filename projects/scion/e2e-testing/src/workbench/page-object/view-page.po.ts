@@ -110,28 +110,13 @@ export class ViewPagePO implements WorkbenchViewPagePO {
   }
 
   public async clickClose(): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-methods'));
     await accordion.expand();
     await this.locator.locator('button.e2e-close').click();
   }
 
-  public async addViewAction(partAction: WorkbenchPartActionDescriptor, options?: {append?: boolean}): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-part-actions'));
-    await accordion.expand();
-    try {
-      const inputLocator = this.locator.locator('input.e2e-part-actions');
-      if (options?.append ?? true) {
-        const input = await inputLocator.inputValue() || null;
-        const presentActions: WorkbenchPartActionDescriptor[] = coerceArray(input ? JSON.parse(input) : null);
-        await inputLocator.fill(JSON.stringify(presentActions.concat(partAction)));
-      }
-      else {
-        await inputLocator.fill(JSON.stringify(new Array<WorkbenchPartActionDescriptor>().concat(partAction)));
-      }
-    }
-    finally {
-      await accordion.collapse();
-    }
+  public async registerPartActions(partAction: WorkbenchPartActionDescriptor | WorkbenchPartActionDescriptor[]): Promise<void> {
+    await this.locator.locator('input.e2e-part-actions').fill(JSON.stringify(coerceArray(partAction)));
   }
 }
 

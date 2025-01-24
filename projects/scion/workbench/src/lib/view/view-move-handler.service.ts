@@ -22,6 +22,7 @@ import {ANONYMOUS_PERSPECTIVE_ID_PREFIX} from '../workbench.constants';
 import {WORKBENCH_ID} from '../workbench-id';
 import {UID} from '../common/uid.util';
 import {filter} from 'rxjs/operators';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Updates the workbench layout when receiving a {@link ViewMoveEvent} event relevant for this application.
@@ -68,16 +69,16 @@ export class ViewMoveHandler {
   private async addView(event: ViewMoveEvent): Promise<void> {
     const region = event.target.region;
     const addToNewPart = !!region;
-    const commands = Routing.segmentsToCommands(event.source.viewUrlSegments);
+    const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
 
     await this._workbenchRouter.navigate(layout => {
       const newViewId = event.source.alternativeViewId ?? layout.computeNextViewId();
       if (addToNewPart) {
-        const newPartId = event.target.newPart?.id ?? UID.randomUID();
+        const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
         return layout
           .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
           .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
-          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigationData});
+          .modify(layout => event.source.navigation ? layout.navigateView(newViewId, commands, {hint: event.source.navigation.hint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigation.data}) : layout);
       }
       else {
         return layout
@@ -88,7 +89,7 @@ export class ViewMoveHandler {
             activateView: true,
             activatePart: true,
           })
-          .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigationData});
+          .modify(layout => event.source.navigation ? layout.navigateView(newViewId, commands, {hint: event.source.navigation.hint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigation.data}) : layout);
       }
     });
   }
@@ -98,14 +99,14 @@ export class ViewMoveHandler {
     const urlTree = await this._workbenchRouter.createUrlTree(() => {
       const newLayout = this._workbenchLayoutFactory.create();
       const newViewId = event.source.alternativeViewId ?? newLayout.computeNextViewId();
-      const commands = Routing.segmentsToCommands(event.source.viewUrlSegments);
+      const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
       return newLayout
         .addView(newViewId, {
           partId: newLayout.activePart({grid: 'mainArea'})!.id,
           activateView: true,
           cssClass: event.source.classList?.get('layout'),
         })
-        .navigateView(newViewId, commands, {hint: event.source.navigationHint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigationData});
+        .modify(layout => event.source.navigation ? layout.navigateView(newViewId, commands, {hint: event.source.navigation.hint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigation.data}) : layout);
     });
     const target = generatePerspectiveWindowName(`${ANONYMOUS_PERSPECTIVE_ID_PREFIX}${UID.randomUID()}`);
     if (window.open(this._locationStrategy.prepareExternalUrl(this._router.serializeUrl(urlTree!)), target)) {
@@ -120,7 +121,7 @@ export class ViewMoveHandler {
   private async moveView(event: ViewMoveEvent): Promise<void> {
     const addToNewPart = !!event.target.region;
     if (addToNewPart) {
-      const newPartId = event.target.newPart?.id ?? UID.randomUID();
+      const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
       await this._workbenchRouter.navigate(layout => layout
         .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(event.target.region!), ratio: event.target.newPart?.ratio}, {structural: false})
         .moveView(event.source.viewId, newPartId, {activatePart: true, activateView: true}),

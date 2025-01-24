@@ -5,23 +5,22 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
+Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
 
-### How to contribute a part action
-Actions can be contributed declaratively from an HTML template or registered programmatically via the `WorkbenchService`.
+### How to add a part action
+Actions can be added declaratively in an HTML template or via `WorkbenchService`.
 
-Declaring an action in the HTML template of a workbench view displays it only if that view is active. To display it for every view or based on some condition, declare it outside a view context, such as in `app.component.html`, or register it programmatically.
+Actions are context-sensitive:
+- Declaring an action in a part's template displays it only in that part.
+- Declaring an action in a view's template displays it only in that view.
 
-Specifying a `canMatch` function enables the action to match a specific part, parts in a specific area, or parts from a specific perspective.
-
-The alignment of an action in the action bar can be controlled with the `align` property.
-
+To contribute an action based on other conditions, declare it as a child of `<wb-workbench>` or register it via `WorkbenchService`.
 
 #### Contribute an action via HTML template
-Add a `<ng-template>` to an HTML template and decorate it with the `wbPartAction` directive. The template content is used as the action content. The action shares the lifecycle of the containing component.
+Add the directive `wbPartAction` to an `<ng-template>`. The template content will be used as the action content. The action shares the lifecycle of its embedding context.
 
 ```html
-<ng-template wbPartAction align="end">
+<ng-template wbPartAction>
   <button [wbRouterLink]="'/path/to/view'">
     Open View
   </button>
@@ -29,21 +28,18 @@ Add a `<ng-template>` to an HTML template and decorate it with the `wbPartAction
 ```
 
 #### Contribute an action via WorkbenchService
-As an alternative to modeling an action in HTML templates, actions can be contributed programmatically using the `WorkbenchService.registerPartAction` method. The content is specified in the form of a CDK portal, i.e., a component portal or a template portal.
+As an alternative to modeling an action in HTML templates, actions can be contributed using the `WorkbenchService.registerPartAction` method. The content is specified in the form of a CDK portal, i.e., a component portal or a template portal.
 
 ```ts
 import {inject} from '@angular/core';
 import {WorkbenchService} from '@scion/workbench';
 import {ComponentPortal} from '@angular/cdk/portal';
 
-inject(WorkbenchService).registerPartAction({
-  portal: new ComponentPortal(YourComponent),
-  align: 'end',
-});
+inject(WorkbenchService).registerPartAction({portal: new ComponentPortal(YourComponent)});
 ```
 
-#### Control into which part to contribute an action
-The action can be configured with a `canMatch` function to match a specific part, parts in a specific area, or parts from a specific perspective.
+#### Use a condition to control contribution 
+The action can be configured with a `canMatch` function to match a specific context, such as a particular part or condition. Defaults to any context.
 
 ```html
 <wb-workbench>
@@ -61,8 +57,8 @@ The following function contributes the action only to parts in the perspective '
 import {inject} from '@angular/core';
 import {CanMatchPartFn, WorkbenchPart, WorkbenchService} from '@scion/workbench';
 
-public canMatch: CanMatchPartFn = (part: WorkbenchPart): boolean => {
-  if (!inject(WorkbenchService).getPerspective('MyPerspective')?.active) {
+const canMatch: CanMatchPartFn = (part: WorkbenchPart): boolean => {
+  if (inject(WorkbenchService).activePerspective()?.id === 'MyPerspective') {
     return false;
   }
   if (!part.isInMainArea) {
@@ -71,6 +67,16 @@ public canMatch: CanMatchPartFn = (part: WorkbenchPart): boolean => {
   return true;
 };
 ```
+
+#### Control alignment
+By default, actions are aligned to the start, which can be changed using the `align` property.
+
+```html
+<ng-template wbPartAction align="end">
+  ...
+</ng-template>
+```
+
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

@@ -58,6 +58,7 @@ export class AppComponent implements DoCheck {
               protected workbenchStartup: WorkbenchStartup) {
     this.installRouterEventListeners();
     this.installPropagatedKeyboardEventLogger();
+    this.provideWorkbenchService();
 
     settingsService.observe$('logAngularChangeDetectionCycles')
       .pipe(takeUntilDestroyed())
@@ -97,5 +98,12 @@ export class AppComponent implements DoCheck {
           console.debug(`[AppComponent][synth-event][event=${event.type}][key=${event.key}][key.control=${event.ctrlKey}][key.shift=${event.shiftKey}][key.alt=${event.altKey}][key.meta=${event.metaKey}]`);
         }
       });
+  }
+
+  /**
+   * Injects {@link WorkbenchService} into the global window object for tests to interact with the workbench.
+   */
+  private provideWorkbenchService(): void {
+    (window as unknown as Record<string, unknown>)['__workbenchService'] = inject(WorkbenchService);
   }
 }

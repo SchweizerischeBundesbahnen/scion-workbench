@@ -8,14 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, NgZone} from '@angular/core';
-import {createElement, setStyle} from '../common/dom.util';
-import {ViewDragService} from './view-drag.service';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {subscribeIn} from '@scion/toolkit/operators';
-import {VIEW_DROP_ZONE_OVERLAY_HOST} from '../content-projection/workbench-element-references';
-import {filter} from 'rxjs/operators';
-import {merge} from 'rxjs';
+import {inject, Injectable} from '@angular/core';
+import {createElement, setAttribute, setStyle} from '../common/dom.util';
+import {VIEW_DROP_ZONE_OVERLAY_HOST} from '../workbench-element-references';
 
 /**
  * Renders the visual placeholder when dragging a view over a valid drop zone.
@@ -26,34 +21,49 @@ import {merge} from 'rxjs';
 @Injectable({providedIn: 'root'})
 export class ViewDropPlaceholderRenderer {
 
-  private _dropPlaceholderOverlayHost = inject(VIEW_DROP_ZONE_OVERLAY_HOST);
+  private readonly _dropPlaceholderOverlayHost = inject(VIEW_DROP_ZONE_OVERLAY_HOST);
+
   private _dropPlaceholder: HTMLElement | null = null;
 
-  constructor(private _viewDragService: ViewDragService, private _zone: NgZone) {
-    this.installDropPlaceholderDisposer();
-  }
+  /**
+   * Identifies the drop zone displaying the placeholder.
+   *
+   * This id is used to guard disposal, so that only the drop zone displaying the placeholder can remove it.
+   */
+  private _dropZoneId: string | null = null;
 
   /**
-   * Repositions the placeholder, or creates it if not created yet.
+   * Renders the placeholder.
    *
-   * @param referenceElement - Specifies the element that serves as the reference point for positioning the placeholder.
-   * @param inset - Specifies the spacing between the placeholder and the boundaries of the reference element.
+   * @param dropZoneId - Identifies the drop zone which renders the placeholder.
+   * @param rect - Specifies position and size of the placeholder. Passing `null` removes the placeholder.
    */
-  public updatePosition(referenceElement: HTMLElement, inset: {top: number; right: number; bottom: number; left: number}): void {
-    this._dropPlaceholder ??= this.createDropPlaceholder();
-    const referenceElementBounds = referenceElement.getBoundingClientRect();
+  public render(dropZoneId: string, rect: DOMRect | null): void {
+    if (rect) {
+      this._dropZoneId = dropZoneId;
+      this._dropPlaceholder ??= this.createDropPlaceholder();
 
-    setStyle(this._dropPlaceholder, {
-      top: `${referenceElementBounds.top + inset.top}px`,
-      left: `${referenceElementBounds.left + inset.left}px`,
-      width: `${referenceElement.clientWidth - inset.left - inset.right}px`,
-      height: `${referenceElement.clientHeight - inset.top - inset.bottom}px`,
-    });
+      setStyle(this._dropPlaceholder, {
+        top: `${rect.top}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+      });
+      setAttribute(this._dropPlaceholder, {
+        'data-dropzoneid': this._dropZoneId,
+      });
+    }
+    else if (dropZoneId === this._dropZoneId) {
+      this._dropPlaceholder?.remove();
+      this._dropPlaceholder = null;
+      this._dropZoneId = null;
+    }
   }
 
   private createDropPlaceholder(): HTMLElement {
     return createElement('div', {
       parent: this._dropPlaceholderOverlayHost()!.element.nativeElement,
+      cssClass: 'e2e-drop-placeholder',
       style: {
         'position': 'fixed',
         'background-color': 'var(--sci-workbench-part-dropzone-background-color)',
@@ -65,28 +75,5 @@ export class ViewDropPlaceholderRenderer {
         'transition-timing-function': 'ease-out',
       },
     });
-  }
-
-  /**
-   * Disposes the drop placeholder in the following events:
-   *
-   * - When the user drags a view over the tab bar, as the tabbar takes precedence over the drop zones.
-   * - When the user drags a view over a non-valid drop target, such as outside the workbench.
-   * - When the user drags a view out of the window, cancels or completes the drag operation.
-   */
-  private installDropPlaceholderDisposer(): void {
-    const tabbarDragOver$ = this._viewDragService.tabbarDragOver$.pipe(filter(Boolean));
-    const nonDropTargetDragOver$ = this._viewDragService.viewDrag$(window, {eventType: 'dragover'}).pipe(filter(event => !event.defaultPrevented));
-    const dragEnd$ = this._viewDragService.viewDrag$(window, {eventType: ['dragend', 'drop', 'dragleave']});
-
-    merge(tabbarDragOver$, nonDropTargetDragOver$, dragEnd$)
-      .pipe(
-        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this._dropPlaceholder?.remove();
-        this._dropPlaceholder = null;
-      });
   }
 }

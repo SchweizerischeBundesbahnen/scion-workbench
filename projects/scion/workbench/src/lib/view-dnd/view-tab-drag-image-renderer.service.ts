@@ -18,12 +18,13 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewTabDragImageComponent} from '../part/view-tab-drag-image/view-tab-drag-image.component';
 import {UrlSegment} from '@angular/router';
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
-import {ViewId, WorkbenchView} from '../view/workbench-view.model';
+import {ViewId, WorkbenchView, WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../workbench.constants';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {Disposable} from '../common/disposable';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {throwError} from '../common/throw-error.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 export type ConstrainFn = (rect: DOMRect) => DOMRect;
 
@@ -201,6 +202,7 @@ class DragImageWorkbenchView implements WorkbenchView {
 
   public readonly id: ViewId;
   public readonly alternativeId: string | undefined;
+  public readonly navigation: Signal<WorkbenchViewNavigation | undefined>;
   public readonly navigationHint: Signal<string | undefined>;
   public readonly navigationData: Signal<NavigationData>;
   public readonly navigationState: Signal<NavigationState>;
@@ -223,14 +225,15 @@ class DragImageWorkbenchView implements WorkbenchView {
     this.id = dragData.viewId;
     this.alternativeId = dragData.alternativeViewId;
     this.part = computed(() => throwError('UnsupportedOperationError'));
-    this.navigationHint = signal(dragData.navigationHint).asReadonly();
-    this.navigationData = signal(dragData.navigationData ?? {}).asReadonly();
-    this.navigationState = signal({}).asReadonly();
+    this.navigation = signal(dragData.navigation && {...dragData.navigation, id: UUID.randomUUID()});
+    this.navigationHint = computed(() => this.navigation()?.hint);
+    this.navigationData = computed(() => this.navigation()?.data ?? {});
+    this.navigationState = computed(() => this.navigation()?.state ?? {});
+    this.urlSegments = computed(() => this.navigation()?.path ?? []);
     this.title = signal(dragData.viewTitle).asReadonly();
     this.heading = signal(dragData.viewHeading).asReadonly();
     this.dirty = signal(dragData.viewDirty).asReadonly();
     this.closable = signal(dragData.viewClosable).asReadonly();
-    this.urlSegments = signal(dragData.viewUrlSegments).asReadonly();
   }
 
   public close(): Promise<boolean> {

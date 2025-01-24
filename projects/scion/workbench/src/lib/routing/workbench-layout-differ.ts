@@ -11,6 +11,7 @@
 import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {ViewId} from '../view/workbench-view.model';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Stateful differ for finding added/removed workbench layout elements.
@@ -18,11 +19,11 @@ import {ViewId} from '../view/workbench-view.model';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutDiffer {
 
-  private _partsDiffer: IterableDiffer<string>;
+  private _partsDiffer: IterableDiffer<PartId>;
   private _viewsDiffer: IterableDiffer<ViewId>;
 
   constructor(differs: IterableDiffers) {
-    this._partsDiffer = differs.find([]).create<string>();
+    this._partsDiffer = differs.find([]).create<PartId>();
     this._viewsDiffer = differs.find([]).create<ViewId>();
   }
 
@@ -44,13 +45,13 @@ export class WorkbenchLayoutDiffer {
  */
 export class WorkbenchLayoutDiff {
 
-  public readonly addedParts = new Array<string>();
-  public readonly removedParts = new Array<string>();
+  public readonly addedParts = new Array<PartId>();
+  public readonly removedParts = new Array<PartId>();
 
   public readonly addedViews = new Array<ViewId>();
   public readonly removedViews = new Array<ViewId>();
 
-  constructor(changes: {parts: IterableChanges<string> | null; views: IterableChanges<ViewId> | null}) {
+  constructor(changes: {parts: IterableChanges<PartId> | null; views: IterableChanges<ViewId> | null}) {
     changes.parts?.forEachAddedItem(({item}) => this.addedParts.push(item));
     changes.parts?.forEachRemovedItem(({item}) => this.removedParts.push(item));
 

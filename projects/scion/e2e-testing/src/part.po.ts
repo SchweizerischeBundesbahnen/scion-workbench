@@ -13,6 +13,9 @@ import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
+import {PartId} from '@scion/workbench';
+import {DomRect, fromRect} from './helper/testing.util';
+import {getCssClasses} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench part.
@@ -34,21 +37,47 @@ export class PartPO {
    */
   public readonly sash: PartSashPO;
 
-  constructor(private readonly _locator: Locator) {
-    this.bar = new PartBarPO(this._locator.locator('wb-part-bar'), this);
-    this.activeView = new ViewPO(this._locator.locator('wb-view'), new ViewTabPO(this._locator.locator('wb-view-tab.active'), this));
-    this.sash = new PartSashPO(this._locator);
+  constructor(public readonly locator: Locator) {
+    this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
+    this.activeView = new ViewPO(this.locator.locator('wb-view'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
+    this.sash = new PartSashPO(this.locator);
   }
 
-  public async getPartId(): Promise<string> {
-    return (await this._locator.getAttribute('data-partid'))!;
+  public async getPartId(): Promise<PartId> {
+    return (await this.locator.getAttribute('data-partid')) as PartId;
   }
 
   /**
    * Indicates if this part is contained in the main area.
    */
   public async isInMainArea(): Promise<boolean> {
-    const count = await this._locator.page().locator('wb-main-area-layout[data-partid="main-area"]', {has: this._locator}).count();
-    return count > 0;
+    return (await this.locator.getAttribute('data-context')) === 'main-area';
+  }
+
+  /**
+   * Gets the active drop zone when dragging a view over this part.
+   */
+  public async getActiveDropZone(): Promise<'north' | 'east' | 'south' | 'west' | 'center' | null> {
+    const partId = await this.getPartId();
+    const dropZone = this.locator.locator(`div.e2e-part-drop-zone[data-partid="${partId}"]`);
+    if (!await dropZone.isVisible()) {
+      return null;
+    }
+
+    const dropZoneId = await dropZone.getAttribute('data-id');
+    const dropPlaceholder = this.locator.page().locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
+    if (!await dropPlaceholder.isVisible()) {
+      return null;
+    }
+
+    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | 'center' | null;
+  }
+
+  public async getBoundingBox(): Promise<DomRect> {
+    return fromRect(await this.locator.boundingBox());
+  }
+
+  public getCssClasses(): Promise<string[]> {
+    return getCssClasses(this.locator);
   }
 }

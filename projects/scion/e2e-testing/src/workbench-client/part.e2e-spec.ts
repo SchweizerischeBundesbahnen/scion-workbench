@@ -35,7 +35,7 @@ test.describe('Workbench Part', () => {
     const rightViewId = await rightTestPage.view.getViewId();
 
     // Expect right part to be activated.
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -59,7 +59,7 @@ test.describe('Workbench Part', () => {
     await leftTestPage.clickInputField();
 
     // Expect left part to be activated.
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
           direction: 'row',

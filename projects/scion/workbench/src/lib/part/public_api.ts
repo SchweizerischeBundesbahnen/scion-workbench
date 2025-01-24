@@ -10,4 +10,4 @@
 
 export {WorkbenchViewMenuItemDirective} from './view-context-menu/view-menu.directive';
 export {WorkbenchPartActionDirective} from './part-action-bar/part-action.directive';
-export {WorkbenchPart} from './workbench-part.model';
+export {WorkbenchPart, WorkbenchPartNavigation, PartId} from './workbench-part.model';

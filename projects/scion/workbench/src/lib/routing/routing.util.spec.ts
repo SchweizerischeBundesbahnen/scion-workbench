@@ -244,14 +244,15 @@ describe('Routing.pathToCommands', () => {
   });
 });
 
-describe('Routing.parseViewOutlets', () => {
+describe('Routing.parseOutlets', () => {
 
-  it('should parse view outlets from URL', async () => {
+  it('should parse outlets from URL', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({startup: {launcher: 'APP_INITIALIZER'}}),
         provideRouter([
           {path: 'path/to/view/:id', component: TestComponent},
+          {path: 'path/to/part/:id', component: TestComponent},
           {path: 'a/b/c', outlet: 'otherOutlet', component: TestComponent},
         ]),
       ],
@@ -270,14 +271,28 @@ describe('Routing.parseViewOutlets', () => {
       },
     );
 
-    // Add a non-view outlet.
+    // Add part outlets part.left and part.right to the URL.
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
+      .addPart('part.left', {align: 'left'})
+      .addPart('part.right', {align: 'right'})
+      .navigatePart('part.left', ['path/to/part/left'])
+      .navigatePart('part.right', ['path/to/part/right', {param1: 'value1', param2: 'value2'}]),
+    );
+
+    // Add a different outlet.
     await TestBed.inject(Router).navigate([{outlets: {otherOutlet: ['a', 'b', 'c']}}]);
 
     // Expect to parse view outlets contained in the URL.
     const urlTree = TestBed.inject(Router).parseUrl(TestBed.inject(Router).url);
-    expect(Routing.parseViewOutlets(urlTree)).toEqual(new Map()
+    expect(Routing.parseOutlets(urlTree, {view: true})).toEqual(new Map()
       .set('view.101', [new UrlSegment('path', {}), new UrlSegment('to', {}), new UrlSegment('view', {}), new UrlSegment('101', {})])
       .set('view.103', [new UrlSegment('path', {}), new UrlSegment('to', {}), new UrlSegment('view', {}), new UrlSegment('103', {param1: 'value1', param2: 'value2'})]),
+    );
+
+    // Expect to parse part outlets contained in the URL.
+    expect(Routing.parseOutlets(urlTree, {part: true})).toEqual(new Map()
+      .set('part.left', [new UrlSegment('path', {}), new UrlSegment('to', {}), new UrlSegment('part', {}), new UrlSegment('left', {})])
+      .set('part.right', [new UrlSegment('path', {}), new UrlSegment('to', {}), new UrlSegment('part', {}), new UrlSegment('right', {param1: 'value1', param2: 'value2'})]),
     );
   });
 });

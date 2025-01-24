@@ -9,9 +9,9 @@
  */
 
 import {assertType} from '../common/asserts.util';
-import {Defined} from '@scion/toolkit/util';
 import {ViewId} from '../view/workbench-view.model';
 import {NavigationData} from '../routing/routing.model';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -20,7 +20,7 @@ import {NavigationData} from '../routing/routing.model';
  */
 export interface MPartGrid {
   root: MTreeNode | MPart;
-  activePartId: string;
+  activePartId: PartId;
 }
 
 /**
@@ -47,7 +47,7 @@ export class MTreeNode {
    * Discriminator to unmarshall {@link MTreeNode} to its class type.
    */
   public readonly type = 'MTreeNode';
-  public readonly id!: string;
+  public id!: string;
   public child1!: MTreeNode | MPart;
   public child2!: MTreeNode | MPart;
   public ratio!: number;
@@ -82,14 +82,20 @@ export class MPart {
    * Discriminator to unmarshall {@link MPart} to its class type.
    */
   public readonly type = 'MPart';
-  public readonly id!: string;
+  public id!: PartId;
+  public alternativeId?: string;
   public parent?: MTreeNode;
   public views!: MView[];
   public activeViewId?: ViewId;
   public structural!: boolean;
+  public navigation?: {
+    id: string;
+    hint?: string;
+    data?: NavigationData;
+    cssClass?: string[];
+  };
 
   constructor(part: Omit<MPart, 'type'>) {
-    Defined.orElseThrow(part.id, () => Error('MPart requires an id'));
     part.parent && assertType(part.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
     Object.assign(this, part);
   }

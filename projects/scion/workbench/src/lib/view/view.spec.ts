@@ -13,7 +13,7 @@ import {Component, DestroyRef, Directive, effect, inject, Injector, OnDestroy, O
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {ViewId, WorkbenchView} from './workbench-view.model';
+import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
@@ -43,6 +43,7 @@ import {NavigationData, NavigationState} from '../routing/routing.model';
 import {BlankComponent} from '../routing/workbench-auxiliary-route-installer.service';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {PartId} from '../part/workbench-part.model';
 
 describe('View', () => {
 
@@ -895,15 +896,15 @@ describe('View', () => {
               {
                 id: 'A',
                 layout: factory => factory
-                  .addPart('left')
-                  .addView('view.100', {partId: 'left'})
+                  .addPart('part.left')
+                  .addView('view.100', {partId: 'part.left'})
                   .navigateView('view.100', ['path/to/view/1']),
               },
               {
                 id: 'B',
                 layout: factory => factory
-                  .addPart('left')
-                  .addView('view.100', {partId: 'left'}) // Add view with same id as in perspective A.
+                  .addPart('part.left')
+                  .addView('view.100', {partId: 'part.left'}) // Add view with same id as in perspective A.
                   .navigateView('view.100', ['path/to/view/2'])
                   .removeView('view.100'), // Remove view to test that `CanClose` of view.100 in perspective A is not invoked.
               },
@@ -1000,8 +1001,8 @@ describe('View', () => {
 
     // Navigate to "path/to/view".
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addPart('part', {align: 'right'})
-      .addView('view.100', {partId: 'part'}) // add view
+      .addPart('part.part', {align: 'right'})
+      .addView('view.100', {partId: 'part.part'}) // add view
       .removeView('view.100'), // remove view in same navigation
     );
     await fixture.whenStable();
@@ -1359,7 +1360,7 @@ describe('View', () => {
   it('should have alternative id from MView', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
       ],
     });
 
@@ -1367,13 +1368,13 @@ describe('View', () => {
     await waitForInitialWorkbenchLayout();
 
     // Add layout with view "view.1" and alternative view id "testee-1"
-    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'main'}));
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'part.initial'}));
     const view1 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-1')!;
 
     // Replace layout with view "view.1" and alternative view id "testee-2"
     await TestBed.inject(ɵWorkbenchRouter).navigate(() => inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addView('testee-2', {partId: 'main'}),
+      .addView('testee-2', {partId: 'part.initial'}),
     );
 
     // Expect the view handle to be the same.
@@ -1383,7 +1384,7 @@ describe('View', () => {
     // Replace layout with view "view.1" and alternative view id "testee-2"
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
       .removeView('testee-2', {force: true})
-      .addView('testee-3', {partId: 'main'}),
+      .addView('testee-3', {partId: 'part.initial'}),
     );
 
     // Expect the view handle to be the same.
@@ -1814,14 +1815,8 @@ describe('View', () => {
         public headingReadInConstructor: string | null = null;
         public headingReadInDestroy: string | null = null;
 
-        public navigationHintReadInConstructor: string | undefined;
-        public navigationHintReadInDestroy: string | undefined;
-
-        public navigationDataReadInConstructor: NavigationData;
-        public navigationDataReadInDestroy: NavigationData | undefined;
-
-        public navigationStateReadInConstructor: NavigationState;
-        public navigationStateReadInDestroy: NavigationState | undefined;
+        public navigationReadInConstructor: WorkbenchViewNavigation | undefined;
+        public navigationReadInDestroy: WorkbenchViewNavigation | undefined;
 
         public navigationCssClassReadInConstructor: string[];
         public navigationCssClassReadInDestroy: string[] | undefined;
@@ -1831,12 +1826,8 @@ describe('View', () => {
           this.titleReadInConstructor = this._view.title();
           // Heading
           this.headingReadInConstructor = this._view.heading();
-          // Navigation Data
-          this.navigationDataReadInConstructor = this._view.navigationData();
-          // Navigation State
-          this.navigationStateReadInConstructor = this._view.navigationState();
-          // Navigation Hint
-          this.navigationHintReadInConstructor = this._view.navigationHint();
+          // Navigation
+          this.navigationReadInConstructor = this._view.navigation();
           // Navigation CSS Class
           this.navigationCssClassReadInConstructor = this._view.classList.navigation();
         }
@@ -1846,12 +1837,8 @@ describe('View', () => {
           this.titleReadInDestroy = this._view.title();
           // Heading
           this.headingReadInDestroy = this._view.heading();
-          // Navigation Hint
-          this.navigationHintReadInDestroy = this._view.navigationHint();
-          // Navigation Data
-          this.navigationDataReadInDestroy = this._view.navigationData();
-          // Navigation State
-          this.navigationStateReadInDestroy = this._view.navigationState();
+          // Navigation
+          this.navigationReadInDestroy = this._view.navigation();
           // Navigation CSS Class
           this.navigationCssClassReadInDestroy = this._view.classList.navigation();
         }
@@ -1951,9 +1938,7 @@ describe('View', () => {
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
       expect(componentInstanceView1.titleReadInConstructor).toEqual('Title View 1');
       expect(componentInstanceView1.headingReadInConstructor).toEqual('Heading View 1');
-      expect(componentInstanceView1.navigationDataReadInConstructor).toEqual({data: 'view-1'});
-      expect(componentInstanceView1.navigationStateReadInConstructor).toEqual({state: 'view-1'});
-      expect(componentInstanceView1.navigationHintReadInConstructor).toEqual('view-1');
+      expect(componentInstanceView1.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-1'}, state: {state: 'view-1'}, hint: 'view-1'}));
       expect(componentInstanceView1.navigationCssClassReadInConstructor).toEqual(['view-1']);
 
       // Navigate "view.100" to "view-2".
@@ -1964,16 +1949,12 @@ describe('View', () => {
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
       expect(componentInstanceView2.titleReadInConstructor).toEqual('Title View 2');
       expect(componentInstanceView2.headingReadInConstructor).toEqual('Heading View 2');
-      expect(componentInstanceView2.navigationDataReadInConstructor).toEqual({data: 'view-2'});
-      expect(componentInstanceView2.navigationStateReadInConstructor).toEqual({state: 'view-2'});
-      expect(componentInstanceView2.navigationHintReadInConstructor).toEqual('view-2');
+      expect(componentInstanceView2.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-2'}, state: {state: 'view-2'}, hint: 'view-2'}));
       expect(componentInstanceView2.navigationCssClassReadInConstructor).toEqual(['view-2']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView1.titleReadInDestroy).toEqual('Title View 1');
       expect(componentInstanceView1.headingReadInDestroy).toEqual('Heading View 1');
-      expect(componentInstanceView1.navigationDataReadInDestroy).toEqual({data: 'view-1'});
-      expect(componentInstanceView1.navigationStateReadInDestroy).toEqual({state: 'view-1'});
-      expect(componentInstanceView1.navigationHintReadInDestroy).toEqual('view-1');
+      expect(componentInstanceView1.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-1'}, state: {state: 'view-1'}, hint: 'view-1'}));
       expect(componentInstanceView1.navigationCssClassReadInDestroy).toEqual(['view-1']);
 
       // Navigate "view.100" to "view/3".
@@ -1984,16 +1965,12 @@ describe('View', () => {
       expect(componentInstanceView3).toBeInstanceOf(SpecView3Component);
       expect(componentInstanceView3.titleReadInConstructor).toEqual('Title View 3');
       expect(componentInstanceView3.headingReadInConstructor).toEqual('Heading View 3');
-      expect(componentInstanceView3.navigationDataReadInConstructor).toEqual({data: 'view-3'});
-      expect(componentInstanceView3.navigationStateReadInConstructor).toEqual({state: 'view-3'});
-      expect(componentInstanceView3.navigationHintReadInConstructor).toEqual('view-3');
+      expect(componentInstanceView3.navigationReadInConstructor ).toEqual(jasmine.objectContaining({data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3'}));
       expect(componentInstanceView3.navigationCssClassReadInConstructor).toEqual(['view-3']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView2.titleReadInDestroy).toEqual('Title View 2');
       expect(componentInstanceView2.headingReadInDestroy).toEqual('Heading View 2');
-      expect(componentInstanceView2.navigationDataReadInDestroy).toEqual({data: 'view-2'});
-      expect(componentInstanceView2.navigationStateReadInDestroy).toEqual({state: 'view-2'});
-      expect(componentInstanceView2.navigationHintReadInDestroy).toEqual('view-2');
+      expect(componentInstanceView2.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-2'}, state: {state: 'view-2'}, hint: 'view-2'}));
       expect(componentInstanceView2.navigationCssClassReadInDestroy).toEqual(['view-2']);
 
       // Navigate "view.100" to "view/4".
@@ -2004,16 +1981,12 @@ describe('View', () => {
       expect(componentInstanceView4).toBeInstanceOf(SpecView4Component);
       expect(componentInstanceView4.titleReadInConstructor).toEqual('Title View 4');
       expect(componentInstanceView4.headingReadInConstructor).toEqual('Heading View 4');
-      expect(componentInstanceView4.navigationDataReadInConstructor).toEqual({data: 'view-4'});
-      expect(componentInstanceView4.navigationStateReadInConstructor).toEqual({state: 'view-4'});
-      expect(componentInstanceView4.navigationHintReadInConstructor).toEqual('view-4');
+      expect(componentInstanceView4.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-4'}, state: {state: 'view-4'}, hint: 'view-4'}));
       expect(componentInstanceView4.navigationCssClassReadInConstructor).toEqual(['view-4']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView3.titleReadInDestroy).toEqual('Title View 3');
       expect(componentInstanceView3.headingReadInDestroy).toEqual('Heading View 3');
-      expect(componentInstanceView3.navigationDataReadInDestroy).toEqual({data: 'view-3'});
-      expect(componentInstanceView3.navigationStateReadInDestroy).toEqual({state: 'view-3'});
-      expect(componentInstanceView3.navigationHintReadInDestroy).toEqual('view-3');
+      expect(componentInstanceView3.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3'}));
       expect(componentInstanceView3.navigationCssClassReadInDestroy).toEqual(['view-3']);
 
       // Navigate "view.100" to "path/to/module-a/view-5".
@@ -2024,16 +1997,12 @@ describe('View', () => {
       expect(componentInstanceView5).toBeInstanceOf(SpecView5Component);
       expect(componentInstanceView5.titleReadInConstructor).toEqual('Title View 5');
       expect(componentInstanceView5.headingReadInConstructor).toEqual('Heading View 5');
-      expect(componentInstanceView5.navigationDataReadInConstructor).toEqual({data: 'view-5'});
-      expect(componentInstanceView5.navigationStateReadInConstructor).toEqual({state: 'view-5'});
-      expect(componentInstanceView5.navigationHintReadInConstructor).toEqual('view-5');
+      expect(componentInstanceView5.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-5'}, state: {state: 'view-5'}, hint: 'view-5'}));
       expect(componentInstanceView5.navigationCssClassReadInConstructor).toEqual(['view-5']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView4.titleReadInDestroy).toEqual('Title View 4');
       expect(componentInstanceView4.headingReadInDestroy).toEqual('Heading View 4');
-      expect(componentInstanceView4.navigationDataReadInDestroy).toEqual({data: 'view-4'});
-      expect(componentInstanceView4.navigationStateReadInDestroy).toEqual({state: 'view-4'});
-      expect(componentInstanceView4.navigationHintReadInDestroy).toEqual('view-4');
+      expect(componentInstanceView4.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-4'}, state: {state: 'view-4'}, hint: 'view-4'}));
       expect(componentInstanceView4.navigationCssClassReadInDestroy).toEqual(['view-4']);
 
       // Navigate "view.100" to "path/to/module-b/view/6".
@@ -2044,16 +2013,12 @@ describe('View', () => {
       expect(componentInstanceView6).toBeInstanceOf(SpecView6Component);
       expect(componentInstanceView6.titleReadInConstructor).toEqual('Title View 6');
       expect(componentInstanceView6.headingReadInConstructor).toEqual('Heading View 6');
-      expect(componentInstanceView6.navigationDataReadInConstructor).toEqual({data: 'view-6'});
-      expect(componentInstanceView6.navigationStateReadInConstructor).toEqual({state: 'view-6'});
-      expect(componentInstanceView6.navigationHintReadInConstructor).toEqual('view-6');
+      expect(componentInstanceView6.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-6'}, state: {state: 'view-6'}, hint: 'view-6'}));
       expect(componentInstanceView6.navigationCssClassReadInConstructor).toEqual(['view-6']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView5.titleReadInDestroy).toEqual('Title View 5');
       expect(componentInstanceView5.headingReadInDestroy).toEqual('Heading View 5');
-      expect(componentInstanceView5.navigationDataReadInDestroy).toEqual({data: 'view-5'});
-      expect(componentInstanceView5.navigationStateReadInDestroy).toEqual({state: 'view-5'});
-      expect(componentInstanceView5.navigationHintReadInDestroy).toEqual('view-5');
+      expect(componentInstanceView5.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-5'}, state: {state: 'view-5'}, hint: 'view-5'}));
       expect(componentInstanceView5.navigationCssClassReadInDestroy).toEqual(['view-5']);
 
       // Navigate "view.100" to "path/to/module-b/view/7".
@@ -2064,16 +2029,12 @@ describe('View', () => {
       expect(componentInstanceView7).toBeInstanceOf(SpecView7Component);
       expect(componentInstanceView7.titleReadInConstructor).toEqual('Title View 7');
       expect(componentInstanceView7.headingReadInConstructor).toEqual('Heading View 7');
-      expect(componentInstanceView7.navigationDataReadInConstructor).toEqual({data: 'view-7'});
-      expect(componentInstanceView7.navigationStateReadInConstructor).toEqual({state: 'view-7'});
-      expect(componentInstanceView7.navigationHintReadInConstructor).toEqual('view-7');
+      expect(componentInstanceView7.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-7'}, state: {state: 'view-7'}, hint: 'view-7'}));
       expect(componentInstanceView7.navigationCssClassReadInConstructor).toEqual(['view-7']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView6.titleReadInDestroy).toEqual('Title View 6');
       expect(componentInstanceView6.headingReadInDestroy).toEqual('Heading View 6');
-      expect(componentInstanceView6.navigationDataReadInDestroy).toEqual({data: 'view-6'});
-      expect(componentInstanceView6.navigationStateReadInDestroy).toEqual({state: 'view-6'});
-      expect(componentInstanceView6.navigationHintReadInDestroy).toEqual('view-6');
+      expect(componentInstanceView6.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-6'}, state: {state: 'view-6'}, hint: 'view-6'}));
       expect(componentInstanceView6.navigationCssClassReadInDestroy).toEqual(['view-6']);
 
       // Close view.
@@ -2082,9 +2043,7 @@ describe('View', () => {
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView7.titleReadInDestroy).toEqual('Title View 7');
       expect(componentInstanceView7.headingReadInDestroy).toEqual('Heading View 7');
-      expect(componentInstanceView7.navigationDataReadInDestroy).toEqual({data: 'view-7'});
-      expect(componentInstanceView7.navigationStateReadInDestroy).toEqual({state: 'view-7'});
-      expect(componentInstanceView7.navigationHintReadInDestroy).toEqual('view-7');
+      expect(componentInstanceView7.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'view-7'}, state: {state: 'view-7'}, hint: 'view-7'}));
       expect(componentInstanceView7.navigationCssClassReadInDestroy).toEqual(['view-7']);
     });
 
@@ -2099,8 +2058,8 @@ describe('View', () => {
 
         private _view = inject(ɵWorkbenchView);
 
-        public partReadInConstructor: string | null = null;
-        public partReadInDestroy: string | null = null;
+        public partReadInConstructor: PartId | null = null;
+        public partReadInDestroy: PartId | null = null;
 
         constructor() {
           this.partReadInConstructor = this._view.part().id;
@@ -2153,8 +2112,8 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-a/view-1" in the left part.
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addPart('left', {align: 'left'})
-        .addView('view.100', {partId: 'left'})
+        .addPart('part.left', {align: 'left'})
+        .addView('view.100', {partId: 'part.left'})
         .navigateView('view.100', ['path/to/module-a/view-1'])
         .activateView('view.100'),
       );
@@ -2162,13 +2121,13 @@ describe('View', () => {
       // Expect properties to be set in constructor.
       const componentInstanceView1 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView1Component>()!;
       expect(componentInstanceView1).toBeInstanceOf(SpecView1Component);
-      expect(componentInstanceView1.partReadInConstructor).toEqual('left');
+      expect(componentInstanceView1.partReadInConstructor).toEqual('part.left');
 
       // Navigate "view.100" to "path/to/module-b/view-2" in the right part.
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addPart('right', {align: 'right'})
-        .addView('view.100', {partId: 'right'})
+        .addPart('part.right', {align: 'right'})
+        .addView('view.100', {partId: 'part.right'})
         .navigateView('view.100', ['path/to/module-b/view-2'])
         .activateView('view.100'),
       );
@@ -2176,15 +2135,15 @@ describe('View', () => {
       // Expect properties to be set in constructor.
       const componentInstanceView2 = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecView2Component>()!;
       expect(componentInstanceView2).toBeInstanceOf(SpecView2Component);
-      expect(componentInstanceView2.partReadInConstructor).toEqual('right');
+      expect(componentInstanceView2.partReadInConstructor).toEqual('part.right');
       // Expect properties not to be changed until destroyed previous component.
-      expect(componentInstanceView1.partReadInDestroy).toEqual('left');
+      expect(componentInstanceView1.partReadInDestroy).toEqual('part.left');
 
       // Close view
       await workbenchRouter.navigate([], {target: 'view.100', close: true});
       await waitUntilStable();
       // Expect properties not to be changed until destroyed previous component.
-      expect(componentInstanceView2.partReadInDestroy).toEqual('right');
+      expect(componentInstanceView2.partReadInDestroy).toEqual('part.right');
     });
 
     /**
@@ -2221,7 +2180,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {
               path: 'path/to/module-a',
@@ -2253,7 +2212,7 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-a/view-1".
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.initial'})
         .navigateView('view.100', ['path/to/module-a/view-1'])
         .activateView('view.100'),
       );
@@ -2266,7 +2225,7 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-b/view-2".
       await workbenchRouter.navigate(layout => layout
         .navigateView('view.100', ['path/to/module-b/view-2'])
-        .addView('view.101', {partId: 'main'})
+        .addView('view.101', {partId: 'part.initial'})
         .activateView('view.101'),
       );
       await waitUntilStable();
@@ -2317,7 +2276,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {
               path: 'path/to/module-a',
@@ -2349,7 +2308,7 @@ describe('View', () => {
       // Navigate "view.100" to "path/to/module-a/view-1".
       await workbenchRouter.navigate(() => inject(WorkbenchLayoutFactory)
         .addPart(MAIN_AREA)
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.initial'})
         .navigateView('view.100', ['path/to/module-a/view-1'])
         .activateView('view.100'),
       );
@@ -2383,16 +2342,16 @@ describe('View', () => {
       @Component({selector: 'spec-view', template: 'View', standalone: true})
       class SpecViewComponent {
 
-        public navigationDataCaptor = new Array<NavigationData>();
+        public navigationDataCaptor = new Array<NavigationData | undefined>();
 
         constructor(public view: WorkbenchView) {
-          effect(() => this.navigationDataCaptor.push(view.navigationData()));
+          effect(() => this.navigationDataCaptor.push(view.navigation()?.data));
         }
       }
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {path: 'path/to/view', component: SpecViewComponent},
           ]),
@@ -2404,25 +2363,25 @@ describe('View', () => {
 
       // Navigate view with data.
       await workbenchRouter.navigate(layout => layout
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.initial'})
         .navigateView('view.100', ['path/to/view'], {data: {data: 'a'}})
         .activateView('view.100'),
       );
       await waitUntilStable();
       const viewComponent = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecViewComponent>()!;
-      expect(viewComponent.view.navigationData()).toEqual({data: 'a'});
+      expect(viewComponent.view.navigation()!.data).toEqual({data: 'a'});
       expect(viewComponent.navigationDataCaptor).toEqual([{data: 'a'}]);
 
       // Navigate view with different data.
       await workbenchRouter.navigate(layout => layout.navigateView('view.100', ['path/to/view'], {data: {data: 'b'}}));
       await waitUntilStable();
-      expect(viewComponent.view.navigationData()).toEqual({data: 'b'});
+      expect(viewComponent.view.navigation()!.data).toEqual({data: 'b'});
       expect(viewComponent.navigationDataCaptor).toEqual([{data: 'a'}, {data: 'b'}]);
 
       // Navigate view with different data.
       await workbenchRouter.navigate(['path/to/view'], {data: {data: 'c'}});
       await waitUntilStable();
-      expect(viewComponent.view.navigationData()).toEqual({data: 'c'});
+      expect(viewComponent.view.navigation()!.data).toEqual({data: 'c'});
       expect(viewComponent.navigationDataCaptor).toEqual([{data: 'a'}, {data: 'b'}, {data: 'c'}]);
     });
 
@@ -2430,16 +2389,16 @@ describe('View', () => {
       @Component({selector: 'spec-view', template: 'View', standalone: true})
       class SpecViewComponent {
 
-        public navigationStateCaptor = new Array<NavigationState>();
+        public navigationStateCaptor = new Array<NavigationState | undefined>();
 
         constructor(public view: WorkbenchView) {
-          effect(() => this.navigationStateCaptor.push(view.navigationState()));
+          effect(() => this.navigationStateCaptor.push(view.navigation()?.state));
         }
       }
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {path: 'path/to/view', component: SpecViewComponent},
           ]),
@@ -2451,25 +2410,25 @@ describe('View', () => {
 
       // Navigate view with state.
       await workbenchRouter.navigate(layout => layout
-        .addView('view.100', {partId: 'main'})
+        .addView('view.100', {partId: 'part.initial'})
         .navigateView('view.100', ['path/to/view'], {state: {state: 'a'}})
         .activateView('view.100'),
       );
       await waitUntilStable();
       const viewComponent = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent<SpecViewComponent>()!;
-      expect(viewComponent.view.navigationState()).toEqual({state: 'a'});
+      expect(viewComponent.view.navigation()!.state).toEqual({state: 'a'});
       expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}]);
 
       // Navigate view with different state.
       await workbenchRouter.navigate(layout => layout.navigateView('view.100', ['path/to/view'], {state: {state: 'b'}}));
       await waitUntilStable();
-      expect(viewComponent.view.navigationState()).toEqual({state: 'b'});
+      expect(viewComponent.view.navigation()!.state).toEqual({state: 'b'});
       expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}, {state: 'b'}]);
 
       // Navigate view with different state.
       await workbenchRouter.navigate(['path/to/view'], {state: {state: 'c'}});
       await waitUntilStable();
-      expect(viewComponent.view.navigationState()).toEqual({state: 'c'});
+      expect(viewComponent.view.navigation()!.state).toEqual({state: 'c'});
       expect(viewComponent.navigationStateCaptor).toEqual([{state: 'a'}, {state: 'b'}, {state: 'c'}]);
     });
 
@@ -2506,7 +2465,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {path: 'path/to/view/1', component: SpecViewComponent1},
             {path: 'path/to/view/2', component: SpecViewComponent2},
@@ -2518,7 +2477,7 @@ describe('View', () => {
       await waitForInitialWorkbenchLayout();
 
       // Open view 1.
-      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'main', activateView: true}));
+      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.initial', activateView: true}));
 
       // Open view 2 and navigate it to "path/to/view/1".
       await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.102', activate: false});
@@ -2565,7 +2524,7 @@ describe('View', () => {
 
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {path: '', canMatch: [canMatchWorkbenchView('view-101')], component: SpecViewComponent1},
             {path: '', canMatch: [canMatchWorkbenchView('view-102')], component: SpecViewComponent2},
@@ -2577,7 +2536,7 @@ describe('View', () => {
       await waitForInitialWorkbenchLayout();
 
       // Open view 1.
-      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'main', activateView: true}));
+      await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.initial', activateView: true}));
 
       // Open view 2 and navigate it to "" passing hint "view-101".
       await workbenchRouter.navigate([], {target: 'view.102', hint: 'view-101', activate: false});
@@ -2773,7 +2732,7 @@ describe('View', () => {
     it('should retain view scroll position when moving view', async () => {
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {path: 'path/to/view', loadComponent: () => TestViewComponent},
           ]),
@@ -2808,11 +2767,11 @@ describe('View', () => {
       expect(scrollTop).toBeGreaterThan(0);
 
       // Add right part.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('right', {relativeTo: 'main', align: 'right'}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
       await waitUntilStable();
 
       // Move view to the right part.
-      view2.move('right');
+      view2.move('part.right');
       await waitUntilStable();
 
       // Expect scroll position to be restored.
@@ -2825,8 +2784,8 @@ describe('View', () => {
         },
         mainAreaGrid: {
           root: new MTreeNode({
-            child1: new MPart({id: 'main', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-            child2: new MPart({id: 'right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
           }),
         },
       });
@@ -2835,7 +2794,7 @@ describe('View', () => {
     it('should retain view scroll position when changing the layout', async () => {
       TestBed.configureTestingModule({
         providers: [
-          provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+          provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
           provideRouter([
             {path: 'path/to/view', loadComponent: () => TestViewComponent},
           ]),
@@ -2871,14 +2830,14 @@ describe('View', () => {
 
       // Change layout.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-        .addPart('left', {relativeTo: 'main', align: 'left'})
-        .addPart('right', {relativeTo: 'main', align: 'right'})
-        .addPart('top', {relativeTo: 'main', align: 'top'})
-        .addPart('bottom', {relativeTo: 'main', align: 'bottom'})
-        .addView('view.103', {partId: 'left', activateView: true})
-        .addView('view.104', {partId: 'right', activateView: true})
-        .addView('view.105', {partId: 'top', activateView: true})
-        .addView('view.106', {partId: 'bottom', activateView: true}),
+        .addPart('part.left', {relativeTo: 'part.initial', align: 'left'})
+        .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
+        .addPart('part.top', {relativeTo: 'part.initial', align: 'top'})
+        .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom'})
+        .addView('view.103', {partId: 'part.left', activateView: true})
+        .addView('view.104', {partId: 'part.right', activateView: true})
+        .addView('view.105', {partId: 'part.top', activateView: true})
+        .addView('view.106', {partId: 'part.bottom', activateView: true}),
       );
       await waitUntilStable();
 
@@ -2886,31 +2845,31 @@ describe('View', () => {
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // Move view to part 'top'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'top', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.top', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('top');
+      expect(view2.part().id).toEqual('part.top');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // // Move view to part 'bottom'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'bottom', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.bottom', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('bottom');
+      expect(view2.part().id).toEqual('part.bottom');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // // Move view to part 'right'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'right', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.right', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('right');
+      expect(view2.part().id).toEqual('part.right');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
       // // Move view to part 'left'.
-      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'left', {activateView: true}));
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.left', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
-      expect(view2.part().id).toEqual('left');
+      expect(view2.part().id).toEqual('part.left');
       expect(viewportView2.scrollTop).toBe(scrollTop);
     });
   });
@@ -2945,7 +2904,7 @@ class SpecViewComponent implements OnDestroy {
       this.view.cssClass = params.get('cssClass')!;
     }
     this.view.canClose(() => {
-      console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.urlSegments().join('/')}]`);
+      console.log(`[SpecViewComponent][CanClose] CanClose invoked for view '${this.view.id}'. [path=${this.view.navigation()?.path.join('/')}]`);
       this.canCloseInjector = inject(Injector);
       return !this.preventClosing;
     });

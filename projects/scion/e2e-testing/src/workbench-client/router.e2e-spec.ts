@@ -864,7 +864,7 @@ test.describe('Workbench Router', () => {
     await appPO.reload();
 
     // expect the view to display "Not Found" page
-    const notFoundPage = new PageNotFoundPagePO(appPO, {viewId: 'view.100'});
+    const notFoundPage = new PageNotFoundPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(notFoundPage).toBeActive();
     await expect(appPO.views()).toHaveCount(2);
   });
@@ -1200,7 +1200,7 @@ test.describe('Workbench Router', () => {
     await microfrontendNavigator.unregisterCapability('app1', capability.metadata!.id);
 
     // expect the view to display "Not Found" page
-    const notFoundPage = new PageNotFoundPagePO(appPO, {viewId: 'view.100'});
+    const notFoundPage = new PageNotFoundPagePO(appPO.view({viewId: 'view.100'}));
     await expectView(notFoundPage).toBeActive();
     await expectView(routerPage).toBeInactive();
     await expect(appPO.views()).toHaveCount(2);
@@ -2041,8 +2041,8 @@ test.describe('Workbench Router', () => {
 
     // Add parts on the left and right.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addPart('right', {align: 'right', ratio: .25}),
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addPart('part.right', {align: 'right', ratio: .25}),
     );
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -2057,7 +2057,7 @@ test.describe('Workbench Router', () => {
     // Open view in the left part.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'left',
+      partId: 'part.left',
       cssClass: 'testee',
     });
 
@@ -2065,7 +2065,7 @@ test.describe('Workbench Router', () => {
     const view = appPO.view({cssClass: 'testee'});
     await expect.poll(() => view.getInfo()).toMatchObject(
       {
-        partId: 'left',
+        partId: 'part.left',
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(2);
@@ -2076,8 +2076,8 @@ test.describe('Workbench Router', () => {
 
     // Add parts on the left and right.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addPart('right', {align: 'right', ratio: .25}),
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addPart('part.right', {align: 'right', ratio: .25}),
     );
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -2099,7 +2099,7 @@ test.describe('Workbench Router', () => {
     // Open view in the left part.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'left',
+      partId: 'part.left',
       params: {state: '1'},
       cssClass: 'testee-1',
     });
@@ -2107,7 +2107,7 @@ test.describe('Workbench Router', () => {
     // Expect view to be opened in the left part.
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
-        partId: 'left',
+        partId: 'part.left',
         routeParams: {state: '1'},
       } satisfies Partial<ViewInfo>,
     );
@@ -2115,7 +2115,7 @@ test.describe('Workbench Router', () => {
 
     // Open view in the right part.
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'right',
+      partId: 'part.right',
       params: {state: '2'},
       cssClass: 'testee-2',
     });
@@ -2123,14 +2123,14 @@ test.describe('Workbench Router', () => {
     // Expect view in the left part not to be navigated.
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
-        partId: 'left',
+        partId: 'part.left',
         routeParams: {state: '1'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view to be opened in the right part.
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
-        partId: 'right',
+        partId: 'part.right',
         routeParams: {state: '2'},
       } satisfies Partial<ViewInfo>,
     );
@@ -2138,7 +2138,7 @@ test.describe('Workbench Router', () => {
 
     // Navigate view in the left part.
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'left',
+      partId: 'part.left',
       params: {state: '3'},
       cssClass: 'testee-1',
     });
@@ -2146,14 +2146,14 @@ test.describe('Workbench Router', () => {
     // Expect view in the left part to be navigated.
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
-        partId: 'left',
+        partId: 'part.left',
         routeParams: {state: '3'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view in the right part not to be navigated.
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
-        partId: 'right',
+        partId: 'part.right',
         routeParams: {state: '2'},
       } satisfies Partial<ViewInfo>,
     );
@@ -2161,7 +2161,7 @@ test.describe('Workbench Router', () => {
 
     // Open new view in the right part.
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'right',
+      partId: 'part.right',
       target: 'blank',
       params: {state: '4'},
       cssClass: 'testee-3',
@@ -2170,21 +2170,21 @@ test.describe('Workbench Router', () => {
     // Expect view in the left part not to be navigated.
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
-        partId: 'left',
+        partId: 'part.left',
         routeParams: {state: '3'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view in the right part not to be navigated.
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
-        partId: 'right',
+        partId: 'part.right',
         routeParams: {state: '2'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view to be opened in the right part.
     await expect.poll(() => view3.getInfo()).toMatchObject(
       {
-        partId: 'right',
+        partId: 'part.right',
         routeParams: {state: '4'},
       } satisfies Partial<ViewInfo>,
     );
@@ -2196,8 +2196,8 @@ test.describe('Workbench Router', () => {
 
     // Add parts on the left and right.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addPart('right', {align: 'right', ratio: .25}),
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addPart('part.right', {align: 'right', ratio: .25}),
     );
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -2231,8 +2231,8 @@ test.describe('Workbench Router', () => {
 
     // Add parts on the left and right.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addPart('right', {align: 'right', ratio: .25}),
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addPart('part.right', {align: 'right', ratio: .25}),
     );
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -2250,33 +2250,33 @@ test.describe('Workbench Router', () => {
     // Open view in the left part.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'left',
+      partId: 'part.left',
       cssClass: 'testee-1',
     });
 
     // Open view in the right part.
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'right',
+      partId: 'part.right',
       cssClass: 'testee-2',
     });
 
     // Expect view to be opened in the left part.
     await expect.poll(() => viewPage1.view.getInfo()).toMatchObject(
       {
-        partId: 'left',
+        partId: 'part.left',
       } satisfies Partial<ViewInfo>,
     );
     // Expect view to be opened in the right part.
     await expect.poll(() => viewPage2.view.getInfo()).toMatchObject(
       {
-        partId: 'right',
+        partId: 'part.right',
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
 
     // Close view in the right part.
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'right',
+      partId: 'part.right',
       close: true,
     });
 
@@ -2287,7 +2287,7 @@ test.describe('Workbench Router', () => {
 
     // Close view in the left part.
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'left',
+      partId: 'part.left',
       close: true,
     });
 

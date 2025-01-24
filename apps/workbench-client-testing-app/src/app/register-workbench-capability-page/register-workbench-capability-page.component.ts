@@ -60,7 +60,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       closable: this._formBuilder.control<boolean | null>(null),
       showSplash: this._formBuilder.control<boolean | null>(null),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
-      pinToStartPage: this._formBuilder.control(false),
+      pinToDesktop: this._formBuilder.control(false),
     }),
     popupProperties: this._formBuilder.group({
       path: this._formBuilder.control(''),
@@ -73,7 +73,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         maxWidth: this._formBuilder.control(''),
       }),
       showSplash: this._formBuilder.control<boolean | null>(null),
-      pinToStartPage: this._formBuilder.control(false),
+      pinToDesktop: this._formBuilder.control(false),
       cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
     }),
     dialogProperties: this._formBuilder.group({
@@ -163,7 +163,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     };
   }
 
-  private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToStartPage: boolean}} {
+  private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToDesktop: boolean}} {
     const requiredParams: ViewParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ViewParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
@@ -183,12 +183,12 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         cssClass: this.form.controls.viewProperties.controls.cssClass.value,
         closable: this.form.controls.viewProperties.controls.closable.value ?? undefined,
         showSplash: this.form.controls.viewProperties.controls.showSplash.value ?? undefined,
-        pinToStartPage: this.form.controls.viewProperties.controls.pinToStartPage.value,
+        pinToDesktop: this.form.controls.viewProperties.controls.pinToDesktop.value,
       },
     };
   }
 
-  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & {properties: {pinToStartPage: boolean}} {
+  private readPopupCapabilityFromUI(): WorkbenchPopupCapability & {properties: {pinToDesktop: boolean}} {
     const requiredParams: ParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
     return {
@@ -210,7 +210,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
           maxHeight: this.form.controls.popupProperties.controls.size.controls.maxHeight.value || undefined,
         }),
         showSplash: this.form.controls.popupProperties.controls.showSplash.value ?? undefined,
-        pinToStartPage: this.form.controls.popupProperties.controls.pinToStartPage.value,
+        pinToDesktop: this.form.controls.popupProperties.controls.pinToDesktop.value,
         cssClass: this.form.controls.popupProperties.controls.cssClass.value,
       },
     };

@@ -13,18 +13,18 @@ import {WorkbenchRouter} from './workbench-router.service';
 import {Defined} from '@scion/toolkit/util';
 import {assertNotInReactiveContext, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {MAIN_AREA_LAYOUT_QUERY_PARAM} from '../workbench.constants';
+import {MAIN_AREA_LAYOUT_QUERY_PARAM, WorkbenchOutlet} from '../workbench.constants';
 import {ANGULAR_ROUTER_MUTEX, SingleTaskExecutor} from '../executor/single-task-executor';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchNavigationalStates} from './workbench-navigational-states';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Routing} from './routing.util';
-import {Commands, ViewOutlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
-import {ViewId} from '../view/workbench-view.model';
+import {Commands, Outlets, WorkbenchNavigationContext, WorkbenchNavigationExtras} from './routing.model';
 import {UrlSegmentMatcher} from './url-segment-matcher';
 import {Objects} from '../common/objects.util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {ViewId} from '../view/workbench-view.model';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -94,7 +94,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Perform the navigation.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
       if (!await this._angularRouterMutex.submit(() => this._router.navigate(commands, extras))) {
         return null;
       }
@@ -166,7 +166,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Create the new URL tree.
-      const commands: Commands = computeNavigationCommands(currentLayout.viewOutlets(), newLayout.viewOutlets());
+      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
       return this._router.createUrlTree(commands, extras);
     });
   }
@@ -197,12 +197,12 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       .filter((view): view is ɵWorkbenchView => !!view && view.closable())
       .map(async view => {
         // Capture current navigation id to not proceed closing if navigated in the meantime.
-        const navigationId = view.navigationId;
+        const navigationId = view.navigation()?.id;
         // Make view non-closable to prevent closing the view again while awaiting closing confirmation.
         view.closable = false;
         try {
           const close = await view.canCloseGuard!();
-          if (close && view.navigationId === navigationId) {
+          if (close && view.navigation()?.id === navigationId) {
             return this.navigate(layout => layout.removeView(view.id, {force: true}));
           }
           return true;
@@ -297,7 +297,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
   /**
    * Adds the specified view to the layout.
    */
-  function addView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+  function addView(viewId: ViewId | string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     // Default to the active part if not specified or not in the layout, with the active part of the main area taking precedence.
     const partId = ((): string => {
       if (extras.partId && layout.hasPart(extras.partId)) {
@@ -325,7 +325,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
   /**
    * Updates the specified view.
    */
-  function updateView(viewId: string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+  function updateView(viewId: ViewId | string, layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     if (extras.activate ?? true) {
       layout = layout.activateView(viewId, {activatePart: true});
     }
@@ -373,31 +373,31 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
 }
 
 /**
- * Computes commands that can be passed to the Angular router to navigate view outlets and to remove view outlets of removed views.
+ * Computes commands that can be passed to the Angular router to navigate views and parts.
  */
-function computeNavigationCommands(previousViewOutlets: ViewOutlets, nextViewOutlets: ViewOutlets): [{outlets: {[outlet: ViewId]: Commands | null}}] | [] {
-  const previousViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(previousViewOutlets));
-  const nextViewOutletMap = new Map<ViewId, UrlSegment[]>(Objects.entries(nextViewOutlets));
+function computeNavigationCommands(currentOutlets: Outlets, newOutlets: Outlets): [{outlets: {[outlet: WorkbenchOutlet]: Commands | null}}] | [] {
+  const currentOutletMap = new Map<WorkbenchOutlet, UrlSegment[]>(Objects.entries(currentOutlets));
+  const newOutletMap = new Map<WorkbenchOutlet, UrlSegment[]>(Objects.entries(newOutlets));
 
-  const commands = new Map<ViewId, Commands | null>();
-  const viewIds = new Set<ViewId>([...previousViewOutletMap.keys(), ...nextViewOutletMap.keys()]);
+  const commands = new Map<WorkbenchOutlet, Commands | null>();
+  const outlets = new Set<WorkbenchOutlet>([...currentOutletMap.keys(), ...newOutletMap.keys()]);
 
-  viewIds.forEach(viewId => {
-    // Test if the view was added to the layout.
-    if (!previousViewOutletMap.has(viewId)) {
-      commands.set(viewId, Routing.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+  outlets.forEach(outlet => {
+    // Test if the outlet was added to the layout.
+    if (!currentOutletMap.has(outlet)) {
+      commands.set(outlet, Routing.segmentsToCommands(newOutletMap.get(outlet)!));
     }
-    // Test if the view was removed from the layout.
-    else if (!nextViewOutletMap.has(viewId)) {
-      commands.set(viewId, null);
+    // Test if the outlet was removed from the layout.
+    else if (!newOutletMap.has(outlet)) {
+      commands.set(outlet, null);
     }
-    // Test if the view was updated.
-    else if (!new UrlSegmentMatcher(previousViewOutletMap.get(viewId)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(nextViewOutletMap.get(viewId)!)) {
-      commands.set(viewId, Routing.segmentsToCommands(nextViewOutletMap.get(viewId)!));
+    // Test if the outlet was changed.
+    else if (!new UrlSegmentMatcher(currentOutletMap.get(outlet)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(newOutletMap.get(outlet)!)) {
+      commands.set(outlet, Routing.segmentsToCommands(newOutletMap.get(outlet)!));
     }
   });
 
-  // Add view commands to the 'outlets' property to be interpreted by the Angular router.
+  // Add commands to the 'outlets' property to be interpreted by the Angular router.
   return commands.size ? [{outlets: Object.fromEntries(commands)}] : [];
 }
 

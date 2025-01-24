@@ -13,17 +13,22 @@
 
   <section>
     <header>Parts</header>
-    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals$ | async" [requiresInitialPart]="true"/>
+    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals()" [requiresInitialPart]="true"/>
   </section>
 
   <section>
     <header>Views</header>
-    <app-add-views [formControl]="form.controls.views" [partProposals]="partProposals$ | async"/>
+    <app-add-views [formControl]="form.controls.views" [partProposals]="partProposals()"/>
+  </section>
+
+  <section>
+    <header>Part Navigations</header>
+    <app-navigate-parts [formControl]="form.controls.partNavigations" [partProposals]="partProposals()"/>
   </section>
 
   <section>
     <header>View Navigations</header>
-    <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals$ | async"/>
+    <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
   </section>
 
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>Register</button>

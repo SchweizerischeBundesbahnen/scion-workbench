@@ -63,7 +63,7 @@ export class HeaderComponent {
         new MenuItemSeparator(),
         ...this.contributeLoggerMenuItems(),
         new MenuItemSeparator(),
-        ...this.contributeStartPageMenuItem(),
+        ...this.contributeViewMenuItems(),
         new MenuItemSeparator(),
         ...this.contributeStartupMenuItems(),
         new MenuItemSeparator(),
@@ -108,7 +108,7 @@ export class HeaderComponent {
     ];
   }
 
-  private contributeStartPageMenuItem(): MenuItem[] {
+  private contributeViewMenuItems(): MenuItem[] {
     return [
       new MenuItem({
         text: 'Open Start Page',

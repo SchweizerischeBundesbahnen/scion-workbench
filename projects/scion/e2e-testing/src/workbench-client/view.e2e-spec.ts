@@ -982,8 +982,8 @@ test.describe('Workbench View', () => {
 
     // Add parts on the left and right.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addPart('left', {align: 'left'}),
+      .addPart('part.right', {align: 'right'})
+      .addPart('part.left', {align: 'left'}),
     );
 
     const testeeViewPage = new ViewPagePO(appPO, {cssClass: 'testee'});
@@ -991,14 +991,14 @@ test.describe('Workbench View', () => {
     // Open view in the right part.
     const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
     await routerPage.navigate({component: 'testee'}, {
-      partId: 'right',
+      partId: 'part.right',
       cssClass: 'testee',
     });
-    await expect(testeeViewPage.partId).toHaveText('right');
+    await expect(testeeViewPage.partId).toHaveText('part.right');
 
     // Move View to the left part.
-    await testeeViewPage.view.tab.moveTo('left');
-    await expect(testeeViewPage.partId).toHaveText('left');
+    await testeeViewPage.view.tab.moveTo('part.left');
+    await expect(testeeViewPage.partId).toHaveText('part.left');
   });
 
   test.describe('keystroke bubbling of view context menu items', () => {
@@ -1083,7 +1083,7 @@ test.describe('Workbench View', () => {
 
     // Drag view 2 into peripheral area.
     const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.dragToEdge('east');
     await dragHandle.drop();
 
     await expectView(viewPage1).toBeActive();
@@ -1222,8 +1222,8 @@ test.describe('Workbench View', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('right', {align: 'right'})
-      .addView('view.100', {partId: 'right', activateView: true}),
+      .addPart('part.right', {align: 'right'})
+      .addView('view.100', {partId: 'part.right', activateView: true}),
     );
 
     // Register view 1.
@@ -1289,8 +1289,8 @@ test.describe('Workbench View', () => {
 
     // Create left and right part, both of equal size.
     await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('left', {align: 'left', ratio: .25})
-      .addPart('right', {align: 'right', ratio: .25}),
+      .addPart('part.left', {align: 'left', ratio: .25})
+      .addPart('part.right', {align: 'right', ratio: .25}),
     );
 
     // Open view.
@@ -1303,9 +1303,9 @@ test.describe('Workbench View', () => {
 
     // Move view to the left part.
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
-    await appPO.view({viewId: 'view.100'}).tab.moveTo('left');
+    await appPO.view({viewId: 'view.100'}).tab.moveTo('part.left');
     // Expect the microfrontend to be aligned to the view bounds.
-    await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'left'} satisfies Partial<ViewInfo>);
+    await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'part.left'} satisfies Partial<ViewInfo>);
     await expect(async () => {
       const outletBounds = await viewPage.outlet.getBoundingBox();
       const viewBounds = await viewPage.view.getBoundingBox();
@@ -1313,9 +1313,9 @@ test.describe('Workbench View', () => {
     }).toPass();
 
     // Move view to the right part.
-    await appPO.view({viewId: 'view.100'}).tab.moveTo('right');
+    await appPO.view({viewId: 'view.100'}).tab.moveTo('part.right');
     // Expect the microfrontend to be aligned to the view bounds.
-    await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'right'} satisfies Partial<ViewInfo>);
+    await expect.poll(() => viewPage.view.getInfo()).toMatchObject({viewId: 'view.100', partId: 'part.right'} satisfies Partial<ViewInfo>);
     await expect(async () => {
       const outletBounds = await viewPage.outlet.getBoundingBox();
       const viewBounds = await viewPage.view.getBoundingBox();
@@ -1366,21 +1366,21 @@ test.describe('Workbench View', () => {
             id: MAIN_AREA,
           },
           {
-            id: 'left',
+            id: 'part.left',
             align: 'left',
             views: [
               {qualifier: {view: 'input-test-page'}, cssClass: 'testee'},
             ],
           },
           {
-            id: 'bottom',
+            id: 'part.bottom',
             align: 'bottom',
             views: [
               {qualifier: {view: 'view-1'}, cssClass: 'testee-1'},
             ],
           },
           {
-            id: 'right',
+            id: 'part.right',
             align: 'right',
             views: [
               {qualifier: {view: 'view-2'}, cssClass: 'testee-2'},
@@ -1403,7 +1403,7 @@ test.describe('Workbench View', () => {
 
     await test.step('move view to bottom part', async () => {
       // Move view to bottom part.
-      await testeeViewPage.view.tab.moveTo('bottom');
+      await testeeViewPage.view.tab.moveTo('part.bottom');
 
       // Expect component state to be preserved.
       await expect(testeeViewPage.input).toHaveValue('A');
@@ -1423,7 +1423,7 @@ test.describe('Workbench View', () => {
 
     await test.step('split view to the east', async () => {
       // Split view to the east.
-      await testeeViewPage.view.tab.moveTo('bottom', {region: 'east'});
+      await testeeViewPage.view.tab.moveTo('part.bottom', {region: 'east'});
 
       // Expect component state to be preserved.
       await expect(testeeViewPage.input).toHaveValue('A');

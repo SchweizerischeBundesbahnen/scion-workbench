@@ -11,6 +11,13 @@
 import {InjectionToken} from '@angular/core';
 
 /**
+ * Represents the id prefix of parts.
+ *
+ * @see PartId
+ */
+export const PART_ID_PREFIX = 'part.';
+
+/**
  * Represents the id prefix of views.
  *
  * @see ViewId
@@ -31,6 +38,36 @@ export const DIALOG_ID_PREFIX = 'dialog.';
  * Represents the id prefix of message boxes.
  */
 export const MESSAGE_BOX_ID_PREFIX = 'messagebox.';
+
+/**
+ * Format of a part outlet name.
+ */
+export type PartOutlet = `${typeof PART_ID_PREFIX}${string}`;
+
+/**
+ * Format of a view outlet name.
+ */
+export type ViewOutlet = `${typeof VIEW_ID_PREFIX}${number}`;
+
+/**
+ * Format of a popup outlet name.
+ */
+export type PopupOutlet = `${typeof POPUP_ID_PREFIX}${string}`;
+
+/**
+ * Format of a dialog outlet name.
+ */
+export type DialogOutlet = `${typeof DIALOG_ID_PREFIX}${string}`;
+
+/**
+ * Format of a messagebox outlet name.
+ */
+export type MessageBoxOutlet = `${typeof MESSAGE_BOX_ID_PREFIX}${string}`;
+
+/**
+ * Union of workbench outlets.
+ */
+export type WorkbenchOutlet = PartOutlet | ViewOutlet | PopupOutlet | DialogOutlet | MessageBoxOutlet;
 
 /**
  * Name of the query parameter that contains the layout of the main area.

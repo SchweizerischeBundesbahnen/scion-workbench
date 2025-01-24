@@ -62,8 +62,8 @@
           <app-css-class [formControl]="form.controls.viewProperties.controls.cssClass"/>
         </sci-form-field>
 
-        <sci-form-field label="Pin to Startpage">
-          <sci-checkbox [formControl]="form.controls.viewProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"/>
+        <sci-form-field label="Pin to Desktop">
+          <sci-checkbox [formControl]="form.controls.viewProperties.controls.pinToDesktop" class="e2e-pin-to-desktop"/>
         </sci-form-field>
       }
       @case (WorkbenchCapabilities.Popup) {
@@ -99,8 +99,8 @@
           <sci-checkbox [formControl]="form.controls.popupProperties.controls.showSplash" class="e2e-show-splash"/>
         </sci-form-field>
 
-        <sci-form-field label="Pin to Startpage">
-          <sci-checkbox [formControl]="form.controls.popupProperties.controls.pinToStartPage" class="e2e-pin-to-startpage"/>
+        <sci-form-field label="Pin to Desktop">
+          <sci-checkbox [formControl]="form.controls.popupProperties.controls.pinToDesktop" class="e2e-pin-to-desktop"/>
         </sci-form-field>
 
         <sci-form-field label="CSS Class(es)">

@@ -1,93 +1,25 @@
-:host {
-  --ɵpart-bar-indent-left: 0;
-  --ɵpart-bar-indent-right: 0;
-  --ɵpart-bar-drag-source-width: 0;
-  --ɵpart-bar-drag-placeholder-width: 0;
+@use '../../common/workbench-mixins';
 
+:host {
   display: flex;
   color: var(--sci-workbench-tab-text-color);
   background-color: var(--sci-workbench-part-bar-background-color);
-  // Set border-top instead of padding-top because the viewtab containment context would otherwise displace the tab content.
-  border-top: var(--sci-workbench-part-bar-padding-top) solid transparent;
+  border-top: var(--sci-workbench-part-bar-padding-top) solid transparent; // Set border-top instead of padding-top because the viewtab containment context would otherwise displace the tab content.
   background-clip: border-box;
   height: var(--sci-workbench-tab-height);
   box-sizing: content-box;
-  // Positioning context for the bottom border pseudo element
-  position: relative;
-  // Containment context for view tabs to query their height, enabling view tabs to apply styles based on their height.
-  container-name: viewtab;
+  container-name: viewtab; // Create containment context for view tabs to query their height, enabling view tabs to apply styles based on their height.
   container-type: size;
+  position: relative; // Positioning context for the bottom border pseudo element.
+  padding-inline: var(--sci-workbench-part-bar-padding-inline);
 
-  wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+  @include workbench-mixins.peripheral-workbench-parts-selector {
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
   }
 
-  > sci-viewport.tabbar {
-    // Use 'flex: initial' instead of 'flex: auto' to not grow to absorb any extra free space in the partbar,
-    // so that left-aligned actions will directly follow the viewtabs.
+  > wb-view-tab-bar {
+    // Use 'flex: initial' and not 'flex: none' to overflow if exceeding the maximum available space.
     flex: initial;
-
-    &::part(content) {
-      display: flex;
-      padding-left: var(--ɵpart-bar-indent-left);
-      padding-right: var(--ɵpart-bar-indent-right);
-    }
-
-    > wb-view-tab {
-      flex: none;
-
-      &.drag-source {
-        display: none;
-      }
-    }
-
-    > div.divider {
-      flex: none;
-      display: flex;
-      position: relative; // positioning context for the :after pseudo element, which actually renders the divider as an overlay
-      width: 0; // divider must not occupy space
-
-      &:after {
-        flex: none;
-        align-self: center;
-        content: '';
-        position: absolute;
-        width: 1px;
-        left: -1px;
-        height: 65%;
-        background-color: var(--sci-workbench-part-bar-divider-color);
-      }
-    }
-
-    > div.drag-placeholder {
-      flex: none;
-      width: var(--ɵpart-bar-drag-placeholder-width);
-    }
-
-    // Shift drop target and subsequent tabs and dividers to the right.
-    > wb-view-tab.drop-target, wb-view-tab.drop-target ~ :is(wb-view-tab, div.divider), > div.divider:has(+ wb-view-tab.drop-target) {
-      transform: translateX(var(--ɵpart-bar-drag-source-width));
-    }
-
-    // Do not render divider following the active tab or drag source.
-    > wb-view-tab:is(.active, .drag-source) + div.divider {
-      display: none;
-    }
-
-    // Do not render divider preceding the active tab
-    > div.divider:has(+ wb-view-tab.active:not(.drag-source)) {
-      display: none;
-    }
-
-    // Do not render divider preceding the tab being dragged out of its tabbar
-    > div.divider:has(+ wb-view-tab.drag-source:not(.active)) {
-      display: none;
-    }
-  }
-
-  // Do not set right indent if the tabbar has no (visible) tabs, such as when dragging the last tab out of the tabbar.
-  &:not(.drag-over) > sci-viewport.tabbar:not(:has(wb-view-tab:not(.drag-source)))::part(content) {
-    padding-right: 0;
   }
 
   > wb-part-action-bar.start {
@@ -118,47 +50,5 @@
     right: 0;
     height: 1px;
     background-color: var(--sci-workbench-tab-border-color);
-  }
-
-  > div.tab-corner-radius {
-    position: absolute; // out of document flow
-    visibility: hidden; // must not be `display:none` to have an effective size
-    width: var(--sci-workbench-tab-border-radius);
-  }
-
-  > div.padding-inline {
-    position: absolute; // out of document flow
-    visibility: hidden; // must not be `display:none` to have an effective size
-    width: var(--sci-workbench-part-bar-padding-inline);
-  }
-
-  // Animate shifting tabs during drag and drop.
-  &.on-drag-enter:not(.on-drag-start), &.drag-over, &.on-drag-leave {
-    wb-view-tab, div.divider {
-      transition: transform 175ms cubic-bezier(0, 0, 0.2, 1);
-    }
-  }
-
-  // Animate the drag placeholder when entering or leaving the tabbar, but not when dragging over the tabbar, for instant feedback.
-  &.on-drag-enter:not(.on-drag-start), &.on-drag-leave {
-    div.drag-placeholder {
-      transition: width 175ms cubic-bezier(0, 0, 0.2, 1);
-    }
-  }
-
-  // Display drag placeholder only after updated the DOM with the drag source and/or drop target,
-  // preventing flickering because the drag source and drop target are set via Angular binding while
-  // the placeholder width is set directly via DOM update.
-  &:not(:has(wb-view-tab.drag-source)):not(:has(wb-view-tab.drop-target)):not(.drag-over) {
-    div.drag-placeholder {
-      display: none;
-    }
-  }
-
-  // Disable pointer events on the tabbar for a smoother drag and drop experience.
-  // Without this, crossing tab boundaries triggers unnecessary dragleave/dragenter events,
-  // causing flickering of the drag effect and preventing accurate tab drop when quickly swapping tabs.
-  &.pointer-events-disabled > sci-viewport.tabbar::part(content) {
-    pointer-events: none;
   }
 }

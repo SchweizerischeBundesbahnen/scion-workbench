@@ -1,6 +1,8 @@
 :host {
+  --sci-workbench-tab-active-text-color: var(--sci-workbench-tab-drag-text-color);
+
   &.drag-over-peripheral-tabbar {
-    background-color: var(--sci-workbench-view-peripheral-background-color);
+    --sci-workbench-view-background-color: var(--sci-workbench-view-peripheral-background-color);
   }
 
   &:not(.drag-over-tabbar) {
@@ -9,6 +11,15 @@
 
     > div.corner-radius {
       display: none;
+    }
+  }
+
+  &:not(.can-drop) {
+    --sci-workbench-tab-active-text-color: var(--sci-workbench-tab-drag-text-color-disabled);
+    --sci-workbench-tab-drag-border-color: var(--sci-workbench-tab-drag-border-color-disabled);
+
+    button.close {
+      color: var(--sci-workbench-tab-drag-text-color-disabled);
     }
   }
 }

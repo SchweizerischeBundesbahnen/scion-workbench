@@ -961,7 +961,7 @@ test.describe('Workbench View', () => {
 
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -1001,7 +1001,7 @@ test.describe('Workbench View', () => {
 
     // Drag view in the layout.
     const dragHandle = await testee2ViewPage.view.tab.startDrag();
-    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.dragToEdge('east');
     await dragHandle.drop();
 
     // Expect `CanClose` guard not to be invoked.
@@ -1009,7 +1009,7 @@ test.describe('Workbench View', () => {
 
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -1061,7 +1061,7 @@ test.describe('Workbench View', () => {
     await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
 
     // Expect view to be moved to the new window.
-    await expect(newAppPO.workbench).toEqualWorkbenchLayout({
+    await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({
           views: [{id: 'view.1'}],
@@ -1072,7 +1072,7 @@ test.describe('Workbench View', () => {
     await expectView(new ViewPagePO(newWindow.appPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({
           views: [{id: testee1ViewId}],
@@ -1118,7 +1118,7 @@ test.describe('Workbench View', () => {
     await expect(appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]}).locator).not.toBeAttached();
 
     // Expect view to be moved to the new window.
-    await expect(newAppPO.workbench).toEqualWorkbenchLayout({
+    await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({
           views: [{id: 'view.1'}],
@@ -1129,7 +1129,7 @@ test.describe('Workbench View', () => {
     await expectView(new ViewPagePO(newAppPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainAreaGrid: {
         root: new MPart({
           views: [{id: testee1ViewId}],
@@ -1172,7 +1172,7 @@ test.describe('Workbench View', () => {
 
     // Drag view 2 into peripheral area.
     const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToGrid('workbench', {region: 'east'});
+    await dragHandle.dragToEdge('east');
     await dragHandle.drop();
 
     await expectView(viewPage1).toBeActive();

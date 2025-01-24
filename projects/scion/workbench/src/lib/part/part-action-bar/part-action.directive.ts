@@ -17,11 +17,13 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {CanMatchPartFn} from '../../workbench.model';
 
 /**
- * Use this directive to contribute an action to the action bar of a {@link WorkbenchPart}.
+ * Directive to add an action to a part.
  *
- * Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
+ * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
  *
- * The host element of this modeling directive must be a <ng-template>. The action shares the lifecycle of the host element.
+ * Usage:
+ * Add this directive to an `<ng-template>`. The template content will be used as the action content.
+ * The action shares the lifecycle of its embedding context.
  *
  * ```html
  * <ng-template wbPartAction>
@@ -31,10 +33,13 @@ import {CanMatchPartFn} from '../../workbench.model';
  * </ng-template>
  * ```
  *
- * If the action is modeled in a view template, it is inherently associated with that view, i.e., only displayed when active.
- * To not associate an action with a view, model the action inside the `wb-workbench` HTML element or register it programmatically.
+ * Actions are context-sensitive:
+ * - Declaring the action in a part's template displays it only in that part.
+ * - Declaring the action in a view's template displays it only in that view.
  *
- * Specify a `canMatch` function to match a specific part, parts in a specific area, or parts from a specific perspective.
+ * To contribute the action based on other conditions, declare it as a child of `<wb-workbench>` or register it via `WorkbenchService`.
+ *
+ * Use a `canMatch` function to match a specific context, such as a particular part or condition. Defaults to any context.
  */
 @Directive({selector: 'ng-template[wbPartAction]', standalone: true})
 export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
@@ -42,19 +47,18 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
   private _action: Disposable | undefined;
 
   /**
-   * Specifies where to place this action in the part bar.
+   * Specifies where to place this action in the part bar. Defaults to `start`.
    */
   @Input()
   public align: 'start' | 'end' = 'start';
 
   /**
-   * Predicate to match a specific part, parts in a specific area, or parts from a specific perspective.
+   * Predicate to match a specific context, such as a particular part or condition. Defaults to any context.
    *
-   * If the action is modeled in a view template, it is inherently associated with that view, i.e., only displayed
-   * when active. To not associate an action with a view, model the action inside the `wb-workbench` HTML element
-   * or register it programmatically.
-   *
-   * The function can call `inject` to get any required dependencies.
+   * The function:
+   * - Can call `inject` to get any required dependencies, such as the contextual part.
+   * - Runs in a reactive context, re-evaluating when tracked signals change.
+   *   To execute code outside this reactive context, use Angular's `untracked` function.
    */
   @Input()
   public canMatch?: CanMatchPartFn;
@@ -67,6 +71,7 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
 
   constructor(private _template: TemplateRef<void>,
               private _workbenchService: WorkbenchService,
+              @Optional() private _part: WorkbenchPart,
               @Optional() private _view: WorkbenchView) {
   }
 
@@ -80,8 +85,11 @@ export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
   }
 
   private matchesContextualView(part: WorkbenchPart): boolean {
-    if (this._view?.id) {
-      return part.activeViewId() === this._view.id;
+    if (this._part && part.id !== this._part.id) {
+      return false;
+    }
+    if (this._view && part.activeViewId() !== this._view.id) {
+      return false;
     }
     return true;
   }

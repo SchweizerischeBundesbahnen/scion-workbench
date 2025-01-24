@@ -11,7 +11,7 @@
 import {Component, HostListener, inject, signal, WritableSignal} from '@angular/core';
 import {Skeletons} from '../skeletons.util';
 import {NgClass} from '@angular/common';
-import {WorkbenchView} from '@scion/workbench';
+import {WorkbenchPart, WorkbenchView} from '@scion/workbench';
 import {Chart} from './chart';
 
 /**
@@ -30,9 +30,9 @@ import {Chart} from './chart';
 })
 export class ChartSkeletonComponent {
 
-  protected view = inject(WorkbenchView);
   protected chart = new Chart({paddingTop: 2, paddingBottom: 2});
   protected chartType: WritableSignal<ChartType>;
+  protected active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   constructor() {
     this.chartType = signal(chartTypes[Skeletons.random(0, chartTypes.length - 1)]);

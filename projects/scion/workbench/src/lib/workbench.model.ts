@@ -9,7 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
-import {ComponentPortal, Portal, TemplatePortal} from '@angular/cdk/portal';
+import {ComponentPortal, TemplatePortal} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPart} from './part/workbench-part.model';
 
@@ -66,26 +66,24 @@ export interface CanCloseRef {
 /**
  * Describes an action contributed to a part.
  *
- * Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
+ * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
  */
 export interface WorkbenchPartAction {
   /**
-   * Specifies the portal to render the action.
+   * Specifies the content of the action.
    *
    * Use a {@link ComponentPortal} to render a component, or a {@link TemplatePortal} to render a template.
    */
-  portal: Portal<unknown>;
+  portal: TemplatePortal<void> | ComponentPortal<unknown>;
   /**
-   * Specifies where to place this action in the action bar.
+   * Controls where to place this action in the part bar.
    */
   align?: 'start' | 'end';
   /**
-   * Predicate to match a specific part, parts in a specific area, or parts from a specific perspective.
-   *
-   * By default, if not specified, matches any part.
+   * Predicate to match a specific context, such as a particular part or condition. Defaults to any context.
    *
    * The function:
-   * - Can call `inject` to get any required dependencies.
+   * - Can call `inject` to get any required dependencies, such as the contextual part.
    * - Runs in a reactive context, re-evaluating when tracked signals change.
    *   To execute code outside this reactive context, use Angular's `untracked` function.
    */

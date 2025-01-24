@@ -8,22 +8,29 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AppPO} from '../../app.po';
 import {ViewPO} from '../../view.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchViewPagePO} from './workbench-view-page.po';
-import {ViewId} from '@scion/workbench';
+import {PartPO} from '../../part.po';
 
 /**
  * Page object to interact with {@link PageNotFoundComponent}.
  */
 export class PageNotFoundPagePO implements WorkbenchViewPagePO {
 
+  public static readonly selector = 'wb-page-not-found';
   public readonly locator: Locator;
-  public readonly view: ViewPO;
 
-  constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
-    this.locator = this.view.locator.locator('wb-page-not-found');
+  constructor(private _locateBy: ViewPO | PartPO) {
+    this.locator = _locateBy.locator.locator('wb-page-not-found');
+  }
+
+  public get view(): ViewPO {
+    if (this._locateBy instanceof ViewPO) {
+      return this._locateBy;
+    }
+    else {
+      throw Error('[PageObjectError] Test page not opened in a view.');
+    }
   }
 }

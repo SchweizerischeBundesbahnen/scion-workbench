@@ -7,7 +7,7 @@
 
 A perspective is a named arrangement of views. Different perspectives provide a different perspective on the application. A perspective can be divided into a main and a peripheral area, with the main area as the primary place for opening views. Views in the main area are retained when switching perspectives.
 
-The layout of a perspective is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+The layout of a perspective is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
 
 ### How to provide a perspective
 
@@ -143,7 +143,7 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-> To avoid cluttering the initial URL, we recommend navigating the views of a perspective to empty path routes and using a navigation hint to differentiate.
+> To maintain a clean URL, we recommend navigating the parts and views of a perspective to empty path routes and using a navigation hint to differentiate.
 
 > Use the `canMatchWorkbenchView` guard to match a route only when navigating a view with a particular hint.
 

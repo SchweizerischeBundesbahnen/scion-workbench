@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
@@ -42,8 +42,8 @@ describe('WorkbenchPerspectiveStorage', () => {
                 id: 'perspective',
                 layout: factory => factory
                   .addPart(MAIN_AREA)
-                  .addPart('left-top', {align: 'left'})
-                  .addPart('left-bottom', {relativeTo: 'left-top', align: 'bottom'}),
+                  .addPart('part.left-top', {align: 'left'})
+                  .addPart('part.left-bottom', {relativeTo: 'part.left-top', align: 'bottom'}),
               },
             ],
           },
@@ -51,6 +51,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         }),
         provideRouter([
           {path: 'view', component: TestComponent},
+          {path: 'part', component: TestComponent},
         ]),
       ],
     });
@@ -58,7 +59,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in part 'left-top'
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left-top', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'part.left-top', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
@@ -66,8 +67,8 @@ describe('WorkbenchPerspectiveStorage', () => {
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: 'left-bottom', views: []}),
+            child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.left-bottom', views: []}),
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
@@ -75,7 +76,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     });
 
     // WHEN: Opening view.2 in part 'left-bottom'
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left-bottom', target: 'view.2'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'part.left-bottom', target: 'view.2'});
     await waitUntilStable();
 
     // THEN: Expect the layout to be stored.
@@ -83,10 +84,36 @@ describe('WorkbenchPerspectiveStorage', () => {
       workbenchGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
-            child1: new MPart({id: 'left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: 'left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           }),
           child2: new MPart({id: MAIN_AREA}),
+        }),
+      },
+    });
+
+    // WHEN: Adding part.left and navigating it
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.left', {align: 'left'})
+      .navigatePart('part.left', ['part']),
+    );
+    await waitUntilStable();
+
+    // THEN: Expect the layout to be stored.
+    expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          child1: new MPart({
+            id: 'part.left',
+            navigation: {id: ANYTHING},
+          }),
+          child2: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: 'part.left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            }),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
         }),
       },
     });
@@ -137,7 +164,7 @@ describe('WorkbenchPerspectiveStorage', () => {
             perspectives: [
               {
                 id: 'perspective',
-                layout: factory => factory.addPart('main'),
+                layout: factory => factory.addPart('part.part'),
               },
             ],
           },
@@ -160,11 +187,11 @@ describe('WorkbenchPerspectiveStorage', () => {
     storage.enableThrottling();
 
     // Modify the layout in quick succession.
-    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.1'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.2'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.3'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.4'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'main', target: 'view.5'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.1'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.2'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.3'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.4'}).then();
+    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.5'}).then();
     await waitUntilStable();
 
     // The first write is still in progress (because writes are throttled), blocking subsequent writes (serial execution).
@@ -179,7 +206,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MPart({
-          id: 'main',
+          id: 'part.part',
           views: [
             {id: 'view.1'},
             {id: 'view.2'},
@@ -202,7 +229,7 @@ describe('WorkbenchPerspectiveStorage', () => {
             perspectives: [
               {
                 id: 'perspective-1',
-                layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('part.left', {align: 'left'}),
               },
               {
                 id: 'perspective-2',
@@ -215,6 +242,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         }),
         provideRouter([
           {path: 'view', component: TestComponent},
+          {path: 'part', component: TestComponent},
         ]),
       ],
     });
@@ -222,14 +250,28 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1.
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'part.left', target: 'view.1'});
+    await waitUntilStable();
+
+    // Add part.right and navigate it in perspective-1.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.right', {align: 'right'})
+      .navigatePart('part.right', ['part']),
+    );
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
+          child1: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+          child2: new MPart({
+            id: 'part.right',
+            navigation: {id: ANYTHING},
+            views: [],
+          }),
         }),
       },
     });
@@ -238,14 +280,35 @@ describe('WorkbenchPerspectiveStorage', () => {
     const layout = localStorage.getItem('scion.workbench.perspectives.perspective-1')!;
 
     // Open view.2 in perspective-1.
-    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'left', target: 'view.2'});
+    await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'part.left', target: 'view.2'});
+    await waitUntilStable();
+
+    // Add part.bottom and navigate it in perspective-1.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.bottom', {align: 'bottom'})
+      .navigatePart('part.bottom', ['part']),
+    );
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: MAIN_AREA}),
+          child1: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
+            child2: new MPart({
+              id: 'part.right',
+              navigation: {id: ANYTHING},
+              views: [],
+            }),
+          }),
+          child2: new MPart({
+            id: 'part.bottom',
+            navigation: {id: ANYTHING},
+            views: [],
+          }),
         }),
       },
     });
@@ -265,8 +328,15 @@ describe('WorkbenchPerspectiveStorage', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
+          child1: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+          child2: new MPart({
+            id: 'part.right',
+            navigation: {id: ANYTHING},
+            views: [],
+          }),
         }),
       },
     });
@@ -281,11 +351,11 @@ describe('WorkbenchPerspectiveStorage', () => {
             perspectives: [
               {
                 id: 'perspective-1',
-                layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('part.left', {align: 'left'}),
               },
               {
                 id: 'perspective-2',
-                layout: factory => factory.addPart(MAIN_AREA).addPart('left', {align: 'left'}),
+                layout: factory => factory.addPart(MAIN_AREA).addPart('part.left', {align: 'left'}),
               },
             ],
             initialPerspective: 'perspective-1',
@@ -294,6 +364,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         }),
         provideRouter([
           {path: 'path/to/view', component: TestComponent},
+          {path: 'path/to/part', component: TestComponent},
         ]),
       ],
     });
@@ -301,15 +372,29 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in perspective-1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'part.left', target: 'view.1'});
+    await waitUntilStable();
+
+    // WHEN: Adding part.bottom and navigating it in perspective-1
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.bottom', {align: 'bottom'})
+      .navigatePart('part.bottom', ['path/to/part']),
+    );
     await waitUntilStable();
 
     // THEN: Expect the layout of perspective-1 to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective-1')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
+          child1: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+          child2: new MPart({
+            id: 'part.bottom',
+            navigation: {id: ANYTHING},
+            views: [],
+          }),
         }),
       },
     });
@@ -324,14 +409,14 @@ describe('WorkbenchPerspectiveStorage', () => {
     localStorage.clear();
 
     // WHEN: Opening view.1 in perspective-2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'left', target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'part.left', target: 'view.1'});
     await waitUntilStable();
 
     // THEN: Expect the layout of perspective-2 to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective-2')).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
         }),
       },
@@ -349,6 +434,6 @@ async function loadPerspectiveLayoutFromStorage(perspectiveId: string): Promise<
 
   return TestBed.inject(ɵWorkbenchLayoutFactory).create({
     workbenchGrid: perspectiveLayout.userLayout.workbenchGrid,
-    viewOutlets: perspectiveLayout.userLayout.viewOutlets,
+    outlets: perspectiveLayout.userLayout.outlets,
   });
 }

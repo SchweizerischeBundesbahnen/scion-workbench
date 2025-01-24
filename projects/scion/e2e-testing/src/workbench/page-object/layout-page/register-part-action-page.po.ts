@@ -10,7 +10,7 @@
 
 import {coerceArray, rejectWhenAttached, waitUntilAttached} from '../../../helper/testing.util';
 import {Locator} from '@playwright/test';
-import {ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
 
 /**
  * Page object to interact with {@link RegisterPartActionPageComponent}.
@@ -20,7 +20,7 @@ export class RegisterPartActionPagePO {
   constructor(public locator: Locator) {
   }
 
-  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: string | string[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
+  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: PartId | PartId[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
     await this.locator.locator('input.e2e-content').fill(content);
     await this.locator.locator('select.e2e-align').selectOption(options?.align ?? '');
     await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));

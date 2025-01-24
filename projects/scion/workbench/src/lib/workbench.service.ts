@@ -12,7 +12,7 @@ import {Disposable} from './common/disposable';
 import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
-import {WorkbenchPart} from './part/workbench-part.model';
+import {PartId, WorkbenchPart} from './part/workbench-part.model';
 import {Injectable, Signal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
@@ -24,7 +24,7 @@ import {WorkbenchLayout} from './layout/workbench-layout';
  * or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows,
  * enabling users to work on content in parallel.
  *
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
  *
  * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
  * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
@@ -93,7 +93,7 @@ export abstract class WorkbenchService {
    *
    * A handle represents a part in the layout. The handle has methods to interact with the part. A part is added to the layout via {@link WorkbenchRouter}.
    */
-  public abstract getPart(partId: string): WorkbenchPart | null;
+  public abstract getPart(partId: PartId): WorkbenchPart | null;
 
   /**
    * Provides the handles of the views in the current workbench layout.
@@ -117,22 +117,16 @@ export abstract class WorkbenchService {
   public abstract closeViews(...viewIds: ViewId[]): Promise<boolean>;
 
   /**
-   * Contributes an action to the action bar of a {@link WorkbenchPart}.
+   * Contributes an action to a {@link WorkbenchPart}.
    *
-   * Part actions are displayed to the right of the view tabs and enable interaction with the part and its content.
+   * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
    *
-   * ---
-   * As an alternative to programmatic registration, actions can be contributed declaratively from an HTML template.
-   * Declaring an action in the HTML template of a workbench view displays it only if that view is active. To display it for every
-   * view or based on some condition, declare it outside a view context, such as in `app.component.html`, or register it programmatically.
-   * Refer to {@link WorkbenchPartActionDirective} for more information.
+   * Alternatively, actions can be provided declaratively in HTML templates. See the {@link WorkbenchPartAction} directive for more information.
    *
    * Example:
    * ```html
    * <ng-template wbPartAction>
-   *   <button wbRouterLink="/path/to/view" [wbRouterLinkExtras]="{target: 'blank'}" class="material-icons">
-   *     add
-   *   </button>
+   *   ...
    * </ng-template>
    * ```
    *

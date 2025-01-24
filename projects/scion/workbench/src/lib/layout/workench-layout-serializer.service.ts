@@ -10,15 +10,16 @@
 
 import {inject, Injectable} from '@angular/core';
 import {MPart, MPartGrid, MTreeNode, ɵMPartGrid} from './workbench-layout.model';
-import {ViewOutlets} from '../routing/routing.model';
+import {Outlets} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchMigrator} from '../migration/workbench-migrator';
-import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
 import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
 import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
 import {Exclusion, stringify} from './stringifier';
+import {WorkbenchOutlet} from '../workbench.constants';
+import {WorkbenchLayoutMigrationV7} from './migration/workbench-layout-migration-v7.service';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -30,13 +31,14 @@ export class WorkbenchLayoutSerializer {
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
     .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
     .registerMigration(4, inject(WorkbenchLayoutMigrationV5))
-    .registerMigration(5, inject(WorkbenchLayoutMigrationV6));
+    .registerMigration(5, inject(WorkbenchLayoutMigrationV6))
+    .registerMigration(6, inject(WorkbenchLayoutMigrationV7));
 
   /**
    * Serializes the given grid into a URL-safe base64 string.
    *
    * @param grid - Specifies the grid to be serialized.
-   * @param flags - Controls which fields not to serialize. By default, all fields are serialized.
+   * @param flags - Controls how to serialize the grid.
    */
   public serializeGrid(grid: MPartGrid, flags?: GridSerializationFlags): string;
   public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): null | string;
@@ -45,12 +47,16 @@ export class WorkbenchLayoutSerializer {
       return null;
     }
 
-    const json = stringify(grid, new Array<string | Exclusion>()
-      .concat('**/parent')
-      .concat('migrated')
-      .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
-      .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
-      .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : []));
+    const json = stringify(grid, {
+      exclusions: new Array<string | Exclusion>()
+        .concat('**/parent')
+        .concat('migrated')
+        .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
+        .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
+        .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
+        .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
+      sort: flags?.sort,
+    });
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
   }
 
@@ -89,22 +95,22 @@ export class WorkbenchLayoutSerializer {
   /**
    * Serializes the given outlets.
    */
-  public serializeViewOutlets(viewOutlets: ViewOutlets): string {
-    return JSON.stringify(Object.fromEntries(Object.entries(viewOutlets)
-      .map(([viewId, segments]: [string, UrlSegment[]]): [string, MUrlSegment[]] => {
-        return [viewId, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
+  public serializeOutlets(outlets: Outlets): string {
+    return JSON.stringify(Object.fromEntries(Object.entries(outlets)
+      .map(([outlet, segments]: [string, UrlSegment[]]): [string, MUrlSegment[]] => {
+        return [outlet, segments.map(segment => ({path: segment.path, parameters: segment.parameters}))];
       })));
   }
 
   /**
    * Deserializes the given outlets.
    */
-  public deserializeViewOutlets(serialized: string): ViewOutlets {
-    const viewOutlets: {[viewId: ViewId]: MUrlSegment[]} = JSON.parse(serialized);
+  public deserializeOutlets(serialized: string): Outlets {
+    const outlets: {[outlet: WorkbenchOutlet]: MUrlSegment[]} = JSON.parse(serialized);
 
-    return Object.fromEntries(Object.entries(viewOutlets)
-      .map(([viewId, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
-        return [viewId, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
+    return Object.fromEntries(Object.entries(outlets)
+      .map(([outlet, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {
+        return [outlet, segments.map(segment => new UrlSegment(segment.path, segment.parameters))];
       }));
   }
 }
@@ -116,7 +122,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 6;
+export const WORKBENCH_LAYOUT_VERSION = 7;
 
 /**
  * Separates the serialized JSON model and its version in the base64-encoded string.
@@ -136,10 +142,35 @@ interface MUrlSegment {
 }
 
 /**
- * Controls which fields not to serialize. By default, all fields are serialized.
+ * Controls how to serialize the grid.
  */
 export interface GridSerializationFlags {
+  /**
+   * Excludes the node id from the serialization.
+   */
   excludeTreeNodeId?: true;
+  /**
+   * Excludes views marked for removal from the serialization.
+   */
   excludeViewMarkedForRemoval?: true;
+  /**
+   * Excludes the view navigation id from the serialization.
+   */
   excludeViewNavigationId?: true;
+  /**
+   * Excludes the part navigation id from the serialization.
+   */
+  excludePartNavigationId?: true;
+  /**
+   * Assigns each part a stable id based on its position in the grid.
+   *
+   * Stable part identifiers are required to compare the initial grid with the user-modified grid to detect layout changes.
+   */
+  assignStablePartIdentifier?: true;
+  /**
+   * Controls if to sort the fields of the grid by name. Defaults to `false`.
+   *
+   * Stable sort order is required to compare the initial grid with the user-modified grid to detect layout changes.
+   */
+  sort?: true;
 }
