@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, HostBinding, inject, signal, untracked} from '@angular/core';
+import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {TableSkeletonComponent} from '../skeletons/table-sekeleton/table-skeleton.component';
 import {InputFieldSkeletonComponent} from '../skeletons/input-field-sekeleton/input-field-skeleton.component';
 import {TabbarSkeletonComponent} from '../skeletons/tabbar-sekeleton/tabbar-skeleton.component';
@@ -53,14 +53,9 @@ export default class SampleViewComponent {
   protected selectedTab = signal(Skeletons.random(0, this.tabs.length - 1));
   protected view = inject(WorkbenchView);
 
-  @HostBinding('class.main-area')
-  protected get isInMainArea(): boolean {
-    return this.view.part().isInMainArea;
-  }
-
   constructor() {
     effect(() => {
-      const navigationData = this.view.navigationData() as SkeletonNavigationData;
+      const navigationData = this.view.navigation()!.data as ViewSkeletonNavigationData;
       untracked(() => this.onNavigationChange(navigationData));
     });
     effect(() => {
@@ -69,7 +64,7 @@ export default class SampleViewComponent {
     });
   }
 
-  private onNavigationChange(navigationData: SkeletonNavigationData): void {
+  private onNavigationChange(navigationData: ViewSkeletonNavigationData): void {
     if (navigationData.style) {
       this.selectedTab.set(this.tabs.indexOf(navigationData.style));
     }
@@ -90,18 +85,18 @@ export default class SampleViewComponent {
     this.persist({style: this.tabs[index]});
   }
 
-  private persist(data: SkeletonNavigationData): void {
+  private persist(data: ViewSkeletonNavigationData): void {
     data = {
       style: data.style ?? this.tabs[this.selectedTab()],
       title: data.title ?? this.view.title() ?? undefined,
     };
 
-    if (Objects.isEqual(data, this.view.navigationData())) {
+    if (Objects.isEqual(data, this.view.navigation()!.data)) {
       return;
     }
 
     this._workbenchRouter.navigate([], {
-      hint: this.view.navigationHint(),
+      hint: this.view.navigation()?.hint,
       target: this.view.id,
       data,
       relativeTo: this._route,
@@ -123,7 +118,7 @@ export type SkeletonStyle = 'list' | 'table' | 'form';
 /**
  * Navigation data to persist the visual representation of {@link SampleViewComponent}.
  */
-export interface SkeletonNavigationData extends NavigationData {
+export interface ViewSkeletonNavigationData extends NavigationData {
   /**
    * Title of the view.
    */

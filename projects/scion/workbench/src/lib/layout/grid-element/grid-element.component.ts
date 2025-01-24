@@ -17,6 +17,7 @@ import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {WorkbenchLayouts} from '../workbench-layouts.util';
+import {PartId} from '../../part/workbench-part.model';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -25,10 +26,7 @@ import {WorkbenchLayouts} from '../workbench-layouts.util';
  * Each node has two children, which can be either another node or a part (leaf). A node defines
  * a split layout in which the two children are arranged vertically or horizontally.
  *
- * Nodes are rendered as {@link SciSashboxComponent} and parts as {@link PartComponent} or
- * {@link MainAreaLayoutComponent}.
- *
- * @see WorkbenchLayoutComponent
+ * Nodes are rendered as {@link SciSashboxComponent} and parts as {@link PartComponent} or {@link MainAreaPartComponent}.
  */
 @Component({
   selector: 'wb-grid-element',
@@ -57,7 +55,7 @@ export class GridElementComponent implements OnChanges {
   public nodeId: string | undefined;
 
   @HostBinding('attr.data-partid')
-  public partId: string | undefined;
+  public partId: PartId | undefined;
 
   @Input({required: true})
   public element!: MTreeNode | MPart;

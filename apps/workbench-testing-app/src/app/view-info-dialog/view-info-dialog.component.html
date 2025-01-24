@@ -11,6 +11,10 @@
     <span class="e2e-part-id">{{view.part().id}}</span>
   </sci-form-field>
 
+  <sci-form-field label="Alternative Part ID">
+    <span class="e2e-alternative-part-id">{{view.part().alternativeId}}</span>
+  </sci-form-field>
+
   <sci-form-field label="View Title">
     <input class="e2e-title" [ngModel]="view.title()" (ngModelChange)="view.title = $event">
   </sci-form-field>
@@ -20,11 +24,11 @@
   </sci-form-field>
 
   <sci-form-field label="Navigation Hint">
-    <span class="e2e-navigation-hint">{{view.navigationHint()}}</span>
+    <span class="e2e-navigation-hint">{{view.navigation()?.hint}}</span>
   </sci-form-field>
 
   <sci-form-field label="URL Segments">
-    <span class="e2e-url-segments">{{view.urlSegments() | appJoin:'/'}}</span>
+    <span class="e2e-url-segments">{{view.navigation()?.path | appJoin:'/'}}</span>
   </sci-form-field>
 </section>
 
@@ -42,14 +46,14 @@
   </section>
 }
 
-@if (view.navigationData() | appNullIfEmpty; as data) {
+@if (view.navigation()?.data | appNullIfEmpty; as data) {
   <section>
     <header>Navigation Data</header>
     <sci-key-value [object]="data" class="e2e-navigation-data"/>
   </section>
 }
 
-@if (view.navigationState() | appNullIfEmpty; as state) {
+@if (view.navigation()?.state | appNullIfEmpty; as state) {
   <section>
     <header>Navigation State</header>
     <sci-key-value [object]="state" class="e2e-navigation-state"/>

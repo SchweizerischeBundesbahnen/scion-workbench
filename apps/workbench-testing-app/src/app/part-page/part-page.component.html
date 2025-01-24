@@ -1,0 +1,93 @@
+<section>
+  <sci-form-field label="Part ID">
+    <span class="e2e-part-id">{{part.id}}</span>
+  </sci-form-field>
+
+  @if (part.alternativeId) {
+    <sci-form-field label="Alternative Part ID">
+      <span>{{part.alternativeId}}</span>
+    </sci-form-field>
+  }
+
+  @if (part.navigation()?.path; as path) {
+    <sci-form-field label="Path">
+      <span>{{path | appJoin:'/'}}</span>
+    </sci-form-field>
+  }
+
+  @if (part.navigation()?.hint; as hint) {
+    <sci-form-field label="Navigation Hint">
+      <span>{{hint}}</span>
+    </sci-form-field>
+  }
+
+  <sci-form-field label="Instantiation ID" title="Unique identifier of this component instance">
+    <span class="e2e-component-instance-id">{{uuid}}</span>
+  </sci-form-field>
+</section>
+
+@if (route.params | async | appNullIfEmpty; as params) {
+  <sci-accordion class="e2e-params" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_params">
+      <header>Route Params</header>
+    </ng-template>
+    <ng-template #panel_route_params>
+      <sci-key-value [object]="params | appAppendParamDataType" class="e2e-params"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (route.data | async | appNullIfEmpty; as data) {
+  <sci-accordion class="e2e-route-data" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_route_data">
+      <header>Route Data</header>
+    </ng-template>
+    <ng-template #panel_route_data>
+      <sci-key-value [object]="data" class="e2e-route-data"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (part.navigation()?.data | appNullIfEmpty; as data) {
+  <sci-accordion class="e2e-navigation-data" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_data">
+      <header>Navigation Data</header>
+    </ng-template>
+    <ng-template #panel_navigation_data>
+      <sci-key-value [object]="data | appAppendParamDataType" class="e2e-navigation-data"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+@if (part.navigation()?.state | appNullIfEmpty; as state) {
+  <sci-accordion class="e2e-navigation-state" variant="solid">
+    <ng-template sciAccordionItem [panel]="panel_navigation_state">
+      <header>Navigation State</header>
+    </ng-template>
+    <ng-template #panel_navigation_state>
+      <sci-key-value [object]="state | appAppendParamDataType" class="e2e-navigation-state"/>
+    </ng-template>
+  </sci-accordion>
+}
+
+<section>
+  <header>Part Properties</header>
+
+  <sci-form-field label="CSS Class(es)">
+    <app-css-class [formControl]="form.controls.cssClass"/>
+  </sci-form-field>
+
+  <sci-form-field label="Actions">
+    <input class="e2e-part-actions"
+           [formControl]="form.controls.partActions"
+           placeholder='Enter action(s) as JSON array: [{"content":"...","align":"end","cssClass":"e2e-open-in-new"}]'>
+  </sci-form-field>
+</section>
+
+@for (action of partActions(); track action) {
+  <ng-template wbPartAction
+               [align]="action.align"
+               [cssClass]="action.cssClass">
+    {{action.content}}
+  </ng-template>
+}

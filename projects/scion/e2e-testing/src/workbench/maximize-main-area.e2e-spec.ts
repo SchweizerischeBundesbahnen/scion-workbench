@@ -21,9 +21,11 @@ test.describe('Workbench', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
-      .addView('view.100', {partId: 'left'})
-      .navigateView('view.100', ['test-view']),
+      .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .2})
+      .addPart('part.right', {relativeTo: MAIN_AREA, align: 'right', ratio: .2})
+      .addView('view.100', {partId: 'part.left'})
+      .navigateView('view.100', ['test-view'])
+      .navigatePart('part.right', ['test-part']),
     );
 
     // Open view 1 in main area.
@@ -53,17 +55,26 @@ test.describe('Workbench', () => {
     const viewId2 = await view2.getViewId();
 
     // Expect the workbench layout.
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .2,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.100'}],
             activeViewId: 'view.100',
           }),
-          child2: new MPart({id: MAIN_AREA}),
+          child2: new MTreeNode({
+            direction: 'row',
+            ratio: .8,
+            child1: new MPart({
+              id: MAIN_AREA,
+            }),
+            child2: new MPart({
+              id: 'part.right',
+            }),
+          }),
         }),
       },
       mainAreaGrid: {
@@ -84,7 +95,7 @@ test.describe('Workbench', () => {
 
     // Maximize the main area.
     await view2.tab.dblclick();
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
@@ -103,17 +114,26 @@ test.describe('Workbench', () => {
 
     // Restore the main area.
     await view2.tab.dblclick();
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .2,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.100'}],
             activeViewId: 'view.100',
           }),
-          child2: new MPart({id: MAIN_AREA}),
+          child2: new MTreeNode({
+            direction: 'row',
+            ratio: .8,
+            child1: new MPart({
+              id: MAIN_AREA,
+            }),
+            child2: new MPart({
+              id: 'part.right',
+            }),
+          }),
         }),
       },
       mainAreaGrid: {

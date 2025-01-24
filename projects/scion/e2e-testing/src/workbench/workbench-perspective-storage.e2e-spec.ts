@@ -14,46 +14,58 @@ import {MAIN_AREA} from '../workbench.model';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {PartPagePO} from './page-object/part-page.po';
+import {expectPart} from '../matcher/part-matcher';
 
 test.describe('Workbench Perspective Storage', () => {
 
   test('should restore workbench grid from storage', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false});
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Add part and view to the workbench grid
-    await workbenchNavigator.modifyLayout((layout, activePartId) => layout
-      .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-      .addView('view.101', {partId: 'left'})
-      .addView('view.102', {partId: 'left', activateView: true, activatePart: true})
-      .addView('view.103', {partId: activePartId, activateView: true})
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+      .addPart('part.right', {relativeTo: MAIN_AREA, align: 'right', ratio: .25})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.left', activateView: true, activatePart: true})
+      .addView('view.103', {partId: 'part.initial', activateView: true})
       .navigateView('view.101', ['test-view'])
       .navigateView('view.102', ['test-view'])
-      .navigateView('view.103', ['test-view']),
+      .navigateView('view.103', ['test-view'])
+      .navigatePart('part.right', ['test-part']),
     );
 
     const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
     const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
     const viewPage3 = new ViewPagePO(appPO, {viewId: 'view.103'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
 
     // Reopen the page
     await appPO.reload();
 
     // Expect perspective to be restored from the storage
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.101'}, {id: 'view.102'}],
             activeViewId: 'view.102',
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
+          child2: new MTreeNode({
+            direction: 'row',
+            ratio: .75,
+            child1: new MPart({
+              id: MAIN_AREA,
+            }),
+            child2: new MPart({
+              id: 'part.right',
+            }),
           }),
         }),
-        activePartId: 'left',
+        activePartId: 'part.left',
       },
       mainAreaGrid: {
         root: new MPart({
@@ -66,6 +78,7 @@ test.describe('Workbench Perspective Storage', () => {
     await expectView(viewPage1).toBeInactive();
     await expectView(viewPage2).toBeActive();
     await expectView(viewPage3).toBeActive();
+    await expectPart(partPage.part).toDisplayComponent(PartPagePO.selector);
 
     // Close view
     await viewPage2.view.tab.close();
@@ -74,21 +87,28 @@ test.describe('Workbench Perspective Storage', () => {
     await appPO.reload();
 
     // Expect perspective to be restored from the storage
-    await expect(appPO.workbench).toEqualWorkbenchLayout({
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
           child1: new MPart({
-            id: 'left',
+            id: 'part.left',
             views: [{id: 'view.101'}],
             activeViewId: 'view.101',
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
+          child2: new MTreeNode({
+            direction: 'row',
+            ratio: .75,
+            child1: new MPart({
+              id: MAIN_AREA,
+            }),
+            child2: new MPart({
+              id: 'part.right',
+            }),
           }),
         }),
-        activePartId: 'left',
+        activePartId: 'part.left',
       },
       mainAreaGrid: {
         root: new MPart({
@@ -100,6 +120,7 @@ test.describe('Workbench Perspective Storage', () => {
     await expectView(viewPage1).toBeActive();
     await expectView(viewPage2).not.toBeAttached();
     await expectView(viewPage3).toBeActive();
+    await expectPart(partPage.part).toDisplayComponent(PartPagePO.selector);
   });
 
   test('should not set the initial perspective as the active perspective in storage and window', async ({appPO}) => {

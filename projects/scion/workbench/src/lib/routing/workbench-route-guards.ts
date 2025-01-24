@@ -15,32 +15,28 @@ import {Routing} from './routing.util';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './workbench-auxiliary-route-installer.service';
 
 /**
- * Matches the route if target of a workbench view and navigating with the given hint.
+ * Configures a route to only match workbench views navigated with a specific hint.
  *
- * Can be used to differentiate between routes with an identical path. For example, the views of the initial layout or a perspective
- * are usually navigated to the empty path route to avoid cluttering the URL. A hint can be set when navigating the view to match a
- * particular route.
+ * Use as a `canMatch` guard in {@link Route} config to differentiate between routes with identical paths.
+ * For example, multiple views can navigate to the same path while resolving to different routes, such as the empty path route to maintain a clean URL.
  *
- * ### Example:
- *
- * The following routes both match the empty path, but only if navigated with a specific hint.
+ * Example for navigating a view to the 'SearchComponent':
  * ```ts
+ * // Navigation
+ * inject(WorkbenchRouter).navigate([], {hint: 'search'});
+ *
+ * // Routes
  * const routes: Routes = [
- *   {path: '', canMatch: [canMatchWorkbenchView('navigator')], component: NavigatorComponent},
+ *   {path: '', canMatch: [canMatchWorkbenchView('search')], component: SearchComponent},
  *   {path: '', canMatch: [canMatchWorkbenchView('outline')], component: OutlineComponent},
  * ];
- * ```
- *
- * The following example navigates to the `OutlineComponent`, passing a hint to match the route.
- * ```ts
- * inject(WorkbenchRouter).navigate([], {hint: 'outline'});
  * ```
  */
 export function canMatchWorkbenchView(navigationHint: string): CanMatchFn;
 /**
- * Matches the route if, or if not target of a workbench view.
+ * Configures a route to only or never match workbench views.
  *
- * Can be used to guard the application's root route from matching an empty path view navigation.
+ * For example, can be used to guard the application's root route to not match empty path view navigation.
  */
 export function canMatchWorkbenchView(canMatch: boolean): CanMatchFn;
 export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
@@ -66,9 +62,57 @@ export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
 }
 
 /**
+ * Configures a route to only match workbench parts navigated with a specific hint.
+ *
+ * Use as a `canMatch` guard in {@link Route} config to differentiate between routes with identical paths.
+ * For example, multiple parts can navigate to the same path while resolving to different routes, such as the empty path route to maintain a clean URL.
+ *
+ * Example for navigating a part to the 'SearchComponent':
+ * ```ts
+ * inject(WorkbenchRouter).navigate(layout => {
+ *   return layout.navigatePart('search', [], {hint: 'search'});
+ * });
+ *
+ * // Routes
+ * const routes: Routes = [
+ *   {path: '', canMatch: [canMatchWorkbenchPart('search')], component: SearchComponent},
+ *   {path: '', canMatch: [canMatchWorkbenchPart('outline')], component: OutlineComponent},
+ * ];
+ * ```
+ */
+export function canMatchWorkbenchPart(navigationHint: string): CanMatchFn;
+/**
+ * Configures a route to only or never match workbench parts.
+ *
+ * For example, can be used to guard the application's root route to not match empty path part navigation.
+ */
+export function canMatchWorkbenchPart(canMatch: boolean): CanMatchFn;
+export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+
+    switch (condition) {
+      case true:
+        return Routing.isPartOutlet(outlet);
+      case false:
+        return !Routing.isPartOutlet(outlet);
+      default: { // hint
+        if (!Routing.isPartOutlet(outlet)) {
+          return false;
+        }
+
+        const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+        const part = layout.part({partId: outlet}, {orElse: null});
+        return part?.navigation?.hint === condition;
+      }
+    }
+  };
+}
+
+/**
  * Matches the route based on the active perspective.
  *
- * Can be used to have a different start page per perspective.
+ * Can be used to activate a different route based on the active perspective.
  */
 export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
   return (): boolean => {
@@ -77,18 +121,20 @@ export function canMatchWorkbenchPerspective(id: string): CanMatchFn {
 }
 
 /**
- * Matches if the view has been navigated.
- *
- * Does not match if no navigation information is available, e.g., during initial navigation because the layout is loaded asynchronously, or when closing the view.
+ * Matches workbench parts and views that have been navigated.
  */
-export const canMatchNotFoundPage: CanMatchFn = (): boolean => {
+export const matchesIfNavigated: CanMatchFn = (): boolean => {
   const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
 
-  if (!Routing.isViewOutlet(outlet)) {
-    throw Error(`[WorkbenchError] Guard can only be installed on view auxiliary route. [outlet=${outlet}]`);
+  if (Routing.isViewOutlet(outlet)) {
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const view = layout.view({viewId: outlet}, {orElse: null});
+    return !!view?.navigation;
   }
-
-  const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
-  const view = layout.view({viewId: outlet}, {orElse: null});
-  return !!view?.navigation;
+  if (Routing.isPartOutlet(outlet)) {
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    const part = layout.part({partId: outlet}, {orElse: null});
+    return !!part?.navigation;
+  }
+  throw Error(`[WorkbenchError] Guard can only be installed on view or part auxiliary route. [outlet=${outlet}]`);
 };

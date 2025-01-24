@@ -17,6 +17,7 @@ import {SettingsService} from '../../settings.service';
 import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {stringifyError} from '../../common/stringify-error.util';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -28,6 +29,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
     AddViewsComponent,
     NavigateViewsComponent,
     ReactiveFormsModule,
+    NavigatePartsComponent,
   ],
 })
 export default class ModifyLayoutPageComponent {
@@ -35,6 +37,7 @@ export default class ModifyLayoutPageComponent {
   protected form = this._formBuilder.group({
     parts: this._formBuilder.control<PartDescriptor[]>([]),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
+    partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
   });
 
@@ -105,7 +108,17 @@ export default class ModifyLayoutPageComponent {
         });
       }
 
-      // Add navigations.
+      // Add part navigations.
+      for (const partNavigation of this.form.controls.partNavigations.value) {
+        layout = layout.navigatePart(partNavigation.id, partNavigation.commands, {
+          hint: partNavigation.extras?.hint,
+          data: partNavigation.extras?.data,
+          state: partNavigation.extras?.state,
+          cssClass: partNavigation.extras?.cssClass,
+        });
+      }
+
+      // Add view navigations.
       for (const viewNavigation of this.form.controls.viewNavigations.value) {
         layout = layout.navigateView(viewNavigation.id, viewNavigation.commands, {
           hint: viewNavigation.extras?.hint,

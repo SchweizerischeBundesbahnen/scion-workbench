@@ -1,0 +1,45 @@
+@if (part.isInMainArea) {
+  <form>
+    <app-input-field-skeleton/>
+    <app-input-field-skeleton/>
+    <app-input-field-skeleton/>
+    <app-input-field-skeleton/>
+    <app-input-field-skeleton/>
+    <app-input-field-skeleton/>
+  </form>
+
+  <app-tabbar-skeleton [tabs]="tabs.length" [selectedTab]="selectedTab()" (selectedTabChange)="onTabChange($event)"/>
+}
+
+@switch (tabs[selectedTab()]) {
+  @case ('table') {
+    <section class="tab table">
+      <app-table-skeleton/>
+      <app-chart-skeleton/>
+    </section>
+  }
+  @case ('form') {
+    <section class="tab form">
+      <sci-viewport>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+        <app-input-field-skeleton/>
+      </sci-viewport>
+    </section>
+  }
+  @case ('list') {
+    <section class="tab list">
+      <app-list-skeleton/>
+    </section>
+  }
+}
+
+<button sciMaterialIcon class="reload" (click)="onReload()">autorenew</button>

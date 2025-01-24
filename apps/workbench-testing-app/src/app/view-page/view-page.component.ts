@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, inject} from '@angular/core';
-import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchRouteData, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
-import {mergeWith, Observable} from 'rxjs';
+import {Component, computed, effect, inject, Signal} from '@angular/core';
+import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
+import {mergeWith} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
@@ -19,7 +19,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {AsyncPipe} from '@angular/common';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {JoinPipe} from '../common/join.pipe';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -51,10 +51,14 @@ import {CanClose} from '@scion/workbench-client';
 })
 export default class ViewPageComponent {
 
-  public uuid = UUID.randomUUID();
-  public partActions$: Observable<WorkbenchPartActionDescriptor[]>;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  public form = this._formBuilder.group({
+  protected readonly view = inject(WorkbenchView);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly uuid = UUID.randomUUID();
+  protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
+
+  protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
     confirmClosing: this._formBuilder.control(false),
@@ -62,22 +66,12 @@ export default class ViewPageComponent {
     useClassBasedCanCloseGuard: this._formBuilder.control(false),
   });
 
-  public WorkbenchRouteData = WorkbenchRouteData;
-
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              public view: WorkbenchView,
-              public route: ActivatedRoute,
-              workbenchStartup: WorkbenchStartup) {
-    if (!workbenchStartup.isStarted()) {
+  constructor() {
+    if (!inject(WorkbenchStartup).isStarted()) {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
-    this.partActions$ = this.form.controls.partActions.valueChanges
-      .pipe(
-        map(() => this.parsePartActions()),
-        startWith(this.parsePartActions()),
-      );
-
+    this.partActions = this.computePartActions();
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
     this.installCanCloseGuard();
@@ -96,17 +90,16 @@ export default class ViewPageComponent {
     return action === 'yes';
   }
 
-  private parsePartActions(): WorkbenchPartActionDescriptor[] {
-    if (!this.form.controls.partActions.value) {
-      return [];
-    }
-
-    try {
-      return Arrays.coerce(JSON.parse(this.form.controls.partActions.value));
-    }
-    catch {
-      return [];
-    }
+  private computePartActions(): Signal<WorkbenchPartActionDescriptor[]> {
+    const partActions = toSignal(this.form.controls.partActions.valueChanges, {initialValue: this.form.controls.partActions.value});
+    return computed(() => {
+      try {
+        return Arrays.coerce(JSON.parse(partActions() || '[]'));
+      }
+      catch {
+        return [];
+      }
+    });
   }
 
   private installViewActiveStateLogger(): void {
@@ -173,7 +166,7 @@ export default class ViewPageComponent {
   }
 }
 
-export interface WorkbenchPartActionDescriptor {
+interface WorkbenchPartActionDescriptor {
   content: string;
   align: 'start' | 'end';
   cssClass: string;

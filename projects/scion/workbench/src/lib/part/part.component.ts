@@ -20,6 +20,11 @@ import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.
 import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
+import {SciViewportComponent} from '@scion/components/viewport';
+import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
+import {synchronizeCssClasses} from '../common/css-class.util';
+import {RouterOutlet} from '@angular/router';
+import {PartId} from './workbench-part.model';
 
 @Component({
   selector: 'wb-part',
@@ -30,33 +35,13 @@ import {WORKBENCH_ID} from '../workbench-id';
     PartBarComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
+    RouterOutlet,
+    RouterOutletRootContextDirective,
     ViewPortalPipe,
+    SciViewportComponent,
   ],
 })
 export class PartComponent implements OnInit, OnDestroy {
-
-  @HostBinding('attr.tabindex')
-  public tabIndex = -1;
-
-  @HostBinding('attr.data-partid')
-  public get partId(): string {
-    return this.part.id;
-  }
-
-  @HostBinding('class.e2e-main-area')
-  public get isInMainArea(): boolean {
-    return this.part.isInMainArea;
-  }
-
-  @HostBinding('class.main-area')
-  public get isMainArea(): boolean {
-    return this.part.isInMainArea;
-  }
-
-  @HostBinding('class.active')
-  public get isActive(): boolean {
-    return this.part.active();
-  }
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
@@ -67,10 +52,32 @@ export class PartComponent implements OnInit, OnDestroy {
 
   protected readonly part = inject(ɵWorkbenchPart);
 
+  @HostBinding('attr.tabindex')
+  protected tabIndex = -1;
+
+  @HostBinding('attr.data-partid')
+  protected get partId(): PartId {
+    return this.part.id;
+  }
+
+  /**
+   * Gets the context in which this part is used.
+   */
+  @HostBinding('attr.data-context')
+  protected get context(): 'main-area' | null {
+    return this.part.isInMainArea ? 'main-area' : null;
+  }
+
+  @HostBinding('class.active')
+  protected get isActive(): boolean {
+    return this.part.active();
+  }
+
   constructor() {
     this._logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
     this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
+    this.addHostCssClasses();
   }
 
   public ngOnInit(): void {
@@ -84,16 +91,14 @@ export class PartComponent implements OnInit, OnDestroy {
   /**
    * Method invoked to move a view into this part.
    */
-  public onViewDrop(event: WbViewDropEvent): void {
+  protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,
         partId: event.dragData.partId,
         viewId: event.dragData.viewId,
         alternativeViewId: event.dragData.alternativeViewId,
-        viewUrlSegments: event.dragData.viewUrlSegments,
-        navigationHint: event.dragData.navigationHint,
-        navigationData: event.dragData.navigationData,
+        navigation: event.dragData.navigation,
         classList: event.dragData.classList,
       },
       target: {
@@ -134,6 +139,11 @@ export class PartComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.part.activate().then();
       });
+  }
+
+  private addHostCssClasses(): void {
+    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    synchronizeCssClasses(host, this.part.classList.asList);
   }
 
   public ngOnDestroy(): void {

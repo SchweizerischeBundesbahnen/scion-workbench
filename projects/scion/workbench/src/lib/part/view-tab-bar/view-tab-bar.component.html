@@ -1,0 +1,18 @@
+<sci-viewport class="e2e-tab-viewport" scrollbarStyle="hidden">
+  @for (viewId of part.viewIds(); track viewId) {
+    @if (viewtab === dropTargetViewTab()) {
+      <div class="divider"></div>
+    }
+    <wb-view-tab #viewtab
+                 [viewId]="viewId"
+                 [class.drag-source]="viewtab === dragSourceViewTab()"
+                 [class.drop-target]="viewtab === dropTargetViewTab()"/>
+    <div class="divider"></div>
+  }
+
+  <!-- Placeholder for expanding the viewport when dragging a tab to the right, moving part actions along with the dragover event. -->
+  <div class="drag-placeholder"></div>
+</sci-viewport>
+
+<!-- Element for injecting the corner radius into the component. -->
+<div class="tab-corner-radius" #tab_corner_radius></div>

@@ -296,11 +296,11 @@ describe('Router', () => {
       providers: [
         provideWorkbenchForTest({
           layout: factory => factory
-            .addPart('left')
-            .addPart('right', {align: 'right'})
-            .addView('view.1', {partId: 'left'})
-            .addView('view.2', {partId: 'right'})
-            .activatePart('right'),
+            .addPart('part.left')
+            .addPart('part.right', {align: 'right'})
+            .addView('view.1', {partId: 'part.left'})
+            .addView('view.2', {partId: 'part.right'})
+            .activatePart('part.right'),
         }),
         provideRouter([
           {path: 'path/to/view/1', canActivate: [() => firstValueFrom(canActivateView1)], component: SpecView1Component},

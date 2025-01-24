@@ -2,6 +2,12 @@
   display: flex;
   flex-direction: column;
   outline: none;
+  background-color: var(--sci-workbench-part-background-color);
+  overflow: hidden; // required for the part bar not to exceed available space
+
+  wb-workbench:has(wb-part[data-partid="part.main-area"]) &:not([data-context="main-area"]) {
+    background-color: var(--sci-workbench-part-peripheral-background-color);
+  }
 
   > wb-part-bar {
     flex: none;
@@ -10,6 +16,16 @@
   > div.active-view {
     flex: auto;
     display: grid;
-    position: relative; // positioning context for view and drop zone
+    position: relative; // positioning context for view content
+  }
+
+  > sci-viewport.part-content {
+    flex: 1 1 0; // set flex-basis to 0 to not exceed available vertical space
+    display: grid;
+    position: relative; // positioning context for routed content
+
+    > router-outlet {
+      position: absolute; // out of document flow
+    }
   }
 }

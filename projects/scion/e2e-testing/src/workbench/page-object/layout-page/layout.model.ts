@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, NavigationState, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {Commands, NavigationData, NavigationState, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -29,6 +29,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
   public parts = new Array<PartDescriptor>();
   public views = new Array<ViewDescriptor>();
+  public partNavigations = new Array<PartNavigationDescriptor>();
   public viewNavigations = new Array<ViewNavigationDescriptor>();
 
   public addInitialPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
@@ -55,6 +56,22 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       cssClass: options.cssClass,
       activatePart: options.activatePart,
       activateView: options.activateView,
+    });
+    return this;
+  }
+
+  public navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout {
+    if (extras?.relativeTo) {
+      throw Error('[PageObjectError] Property `relativeTo` in `WorkbenchLayout.navigatePart` is not supported.');
+    }
+
+    this.partNavigations.push({
+      id,
+      commands,
+      hint: extras?.hint,
+      data: extras?.data,
+      state: extras?.state,
+      cssClass: extras?.cssClass,
     });
     return this;
   }
@@ -94,6 +111,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout {
     throw Error('[PageObjectError] Operation `WorkbenchLayout.moveView` is not supported.');
   }
+
+  public modify(modifyFn: (layout: WorkbenchLayout) => WorkbenchLayout): WorkbenchLayout {
+    throw Error('[PageObjectError] Operation `WorkbenchLayout.modify` is not supported.');
+  }
 }
 
 /**
@@ -112,10 +133,22 @@ export interface PartDescriptor {
  */
 export interface ViewDescriptor {
   id: string;
-  partId: string;
+  partId: PartId | string;
   position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   activateView?: boolean;
   activatePart?: boolean;
+  cssClass?: string | string[];
+}
+
+/**
+ * Represents a part navigation in the layout.
+ */
+export interface PartNavigationDescriptor {
+  id: string;
+  commands: Commands;
+  hint?: string;
+  data?: NavigationData;
+  state?: NavigationState;
   cssClass?: string | string[];
 }
 

@@ -145,7 +145,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   }
 
   public async clickClose(): Promise<void> {
-    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-actions'));
+    const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-methods'));
     await accordion.expand();
     await this.locator.locator('button.e2e-close').click();
     // do not close the accordion as this action removes the iframe from the DOM.

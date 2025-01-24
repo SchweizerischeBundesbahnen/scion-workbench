@@ -20,7 +20,7 @@ import {Beans} from '@scion/toolkit/bean-manager';
 const DEVTOOLS_QUALIFIER_MATCHER = new QualifierMatcher({component: 'devtools', vendor: 'scion'});
 
 /**
- * Intercepts the DevTools view capability to pin it to the start page.
+ * Intercepts the DevTools view capability to pin it to the desktop.
  */
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, WorkbenchInitializer {
@@ -38,10 +38,10 @@ class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, Workbe
       return capability;
     }
 
-    // Add property to pin DevTools to the start page.
+    // Add property to pin DevTools to the desktop.
     capability.properties = {
       ...capability.properties,
-      pinToStartPage: true,
+      pinToDesktop: true,
     };
 
     return capability;
@@ -49,7 +49,7 @@ class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, Workbe
 }
 
 /**
- * Provides a set of DI providers to pin DevTools to the start page.
+ * Provides a set of DI providers to pin DevTools to the desktop.
  */
 export function provideDevToolsInterceptor(): EnvironmentProviders {
   return makeEnvironmentProviders([

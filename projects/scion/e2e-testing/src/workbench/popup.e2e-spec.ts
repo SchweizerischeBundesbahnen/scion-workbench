@@ -478,7 +478,7 @@ test.describe('Workbench Popup', () => {
 
       // Drag popup opener view into peripheral area.
       const dragHandle = await popupOpenerView.view.tab.startDrag();
-      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.dragToEdge('east');
       await dragHandle.drop();
 
       // Open popup.
@@ -948,10 +948,10 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('bottom', {align: 'bottom'})
-        .addView('testee', {partId: 'middle'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.bottom', {align: 'bottom'})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -983,10 +983,10 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('bottom', {align: 'bottom'})
-        .addView('testee', {partId: 'middle'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.bottom', {align: 'bottom'})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1018,12 +1018,12 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
-        .addView('testee', {partId: 'middle'})
-        .addView('left', {partId: 'left'})
-        .addView('right', {partId: 'right'})
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('left', {partId: 'part.left'})
+        .addView('right', {partId: 'part.right'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1055,12 +1055,12 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
-        .addView('testee', {partId: 'middle'})
-        .addView('left', {partId: 'left'})
-        .addView('right', {partId: 'right'})
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('left', {partId: 'part.left'})
+        .addView('right', {partId: 'part.right'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1092,13 +1092,13 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
-        .addPart('bottom', {align: 'bottom', ratio: .1})
-        .addView('testee', {partId: 'middle'})
-        .addView('right', {partId: 'right'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addPart('part.bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('right', {partId: 'part.right'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1136,14 +1136,14 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
-        .addPart('top', {align: 'top', ratio: .1})
-        .addPart('bottom', {align: 'bottom', ratio: .1})
-        .addView('testee', {partId: 'middle'})
-        .addView('right', {partId: 'right'})
-        .addView('top', {partId: 'top'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addPart('part.top', {align: 'top', ratio: .1})
+        .addPart('part.bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('right', {partId: 'part.right'})
+        .addView('top', {partId: 'part.top'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1181,14 +1181,14 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('bottom', {align: 'bottom', ratio: .1})
-        .addView('testee', {partId: 'middle'})
-        .addView('left', {partId: 'left'})
-        .addView('right', {partId: 'right'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('left', {partId: 'part.left'})
+        .addView('right', {partId: 'part.right'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1228,14 +1228,14 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('right', {align: 'right', ratio: .3})
-        .addPart('bottom', {align: 'bottom', ratio: .1})
-        .addView('testee', {partId: 'middle'})
-        .addView('left', {partId: 'left'})
-        .addView('right', {partId: 'right'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.right', {align: 'right', ratio: .3})
+        .addPart('part.bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('left', {partId: 'part.left'})
+        .addView('right', {partId: 'part.right'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1275,12 +1275,12 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('right', {align: 'right', ratio: .3})
-        .addView('testee', {partId: 'middle'})
-        .addView('left', {partId: 'left'})
-        .addView('right', {partId: 'right'})
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.right', {align: 'right', ratio: .3})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('left', {partId: 'part.left'})
+        .addView('right', {partId: 'part.right'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 
@@ -1329,13 +1329,13 @@ test.describe('Workbench Popup', () => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
-        .addPart('middle')
-        .addPart('left', {relativeTo: 'middle', align: 'left', ratio: .3})
-        .addPart('right', {relativeTo: 'middle', align: 'right', ratio: .3})
-        .addPart('bottom', {align: 'bottom', ratio: .1})
-        .addView('testee', {partId: 'middle'})
-        .addView('right', {partId: 'right'})
-        .addView('bottom', {partId: 'bottom'})
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addPart('part.bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('right', {partId: 'part.right'})
+        .addView('bottom', {partId: 'part.bottom'})
         .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
       );
 

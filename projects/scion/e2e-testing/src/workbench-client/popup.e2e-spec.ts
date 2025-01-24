@@ -496,7 +496,7 @@ test.describe('Workbench Popup', () => {
 
       // Drag popup opener view into peripheral area.
       const dragHandle = await popupOpenerView.view.tab.startDrag();
-      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.dragToEdge('east');
       await dragHandle.drop();
 
       // Open popup.

@@ -14,13 +14,12 @@ import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
 import {By} from '@angular/platform-browser';
-import {DestroyRef, inject, isSignal} from '@angular/core';
+import {Component, DestroyRef, inject, isSignal} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {firstValueFrom, Subject, timer} from 'rxjs';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -28,6 +27,7 @@ import {canMatchWorkbenchPerspective, canMatchWorkbenchView} from '../routing/wo
 import {WorkbenchPerspective} from './workbench-perspective.model';
 import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
+import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
 
 describe('Workbench Perspective', () => {
 
@@ -43,7 +43,7 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     // Register perspective.
-    await TestBed.inject(WorkbenchService).registerPerspective({id: 'perspective', layout: factory => factory.addPart('main')});
+    await TestBed.inject(WorkbenchService).registerPerspective({id: 'perspective', layout: factory => factory.addPart('part.part')});
     await waitUntilStable();
 
     // Get reference to the perspective injector.
@@ -63,6 +63,7 @@ describe('Workbench Perspective', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
+          mainAreaInitialPartId: 'part.initial',
           startup: {launcher: 'APP_INITIALIZER'},
         }),
       ],
@@ -76,7 +77,7 @@ describe('Workbench Perspective', () => {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {
-        root: new MPart({id: 'main'}),
+        root: new MPart({id: 'part.initial'}),
       },
     });
   });
@@ -87,8 +88,8 @@ describe('Workbench Perspective', () => {
         provideWorkbenchForTest({
           startup: {launcher: 'APP_INITIALIZER'},
           layout: factory => factory
-            .addPart('left')
-            .addPart('right', {align: 'right'}),
+            .addPart('part.left')
+            .addPart('part.right', {align: 'right'}),
         }),
       ],
     });
@@ -99,8 +100,8 @@ describe('Workbench Perspective', () => {
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left'}),
-          child2: new MPart({id: 'right'}),
+          child1: new MPart({id: 'part.left'}),
+          child2: new MPart({id: 'part.right'}),
         }),
       },
     });
@@ -117,15 +118,15 @@ describe('Workbench Perspective', () => {
                 id: 'perspective-1',
                 data: {label: 'Perspective 1'},
                 layout: factory => factory
-                  .addPart('left')
-                  .addPart('right', {align: 'right'}),
+                  .addPart('part.left')
+                  .addPart('part.right', {align: 'right'}),
               },
               {
                 id: 'perspective-2',
                 data: {label: 'Perspective 2'},
                 layout: factory => factory
-                  .addPart('top')
-                  .addPart('bottom', {align: 'bottom'}),
+                  .addPart('part.top')
+                  .addPart('part.bottom', {align: 'bottom'}),
               },
             ],
           },
@@ -142,8 +143,8 @@ describe('Workbench Perspective', () => {
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left'}),
-          child2: new MPart({id: 'right'}),
+          child1: new MPart({id: 'part.left'}),
+          child2: new MPart({id: 'part.right'}),
         }),
       },
     });
@@ -159,14 +160,14 @@ describe('Workbench Perspective', () => {
               {
                 id: 'perspective-1',
                 layout: factory => factory
-                  .addPart('left')
-                  .addPart('right', {align: 'right'}),
+                  .addPart('part.left')
+                  .addPart('part.right', {align: 'right'}),
               },
               {
                 id: 'perspective-2',
                 layout: factory => factory
-                  .addPart('top')
-                  .addPart('bottom', {align: 'bottom'}),
+                  .addPart('part.top')
+                  .addPart('part.bottom', {align: 'bottom'}),
               },
               {
                 id: 'perspective-3',
@@ -189,8 +190,8 @@ describe('Workbench Perspective', () => {
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'top'}),
-          child2: new MPart({id: 'bottom'}),
+          child1: new MPart({id: 'part.top'}),
+          child2: new MPart({id: 'part.bottom'}),
         }),
       },
     });
@@ -207,21 +208,21 @@ describe('Workbench Perspective', () => {
               {
                 id: 'perspective-1',
                 layout: factory => factory
-                  .addPart('left')
-                  .addPart('right', {align: 'right'}),
+                  .addPart('part.left')
+                  .addPart('part.right', {align: 'right'}),
               },
               {
                 id: 'perspective-2',
                 layout: factory => factory
-                  .addPart('top')
-                  .addPart('bottom', {align: 'bottom'}),
+                  .addPart('part.top')
+                  .addPart('part.bottom', {align: 'bottom'}),
               },
               {
                 id: 'perspective-3',
                 layout: factory => factory
-                  .addPart('left')
+                  .addPart('part.left')
                   .addPart(MAIN_AREA, {align: 'right'})
-                  .addPart('right', {align: 'right'}),
+                  .addPart('part.right', {align: 'right'}),
               },
             ],
             initialPerspective: (perspectives: WorkbenchPerspective[]): string => {
@@ -243,8 +244,8 @@ describe('Workbench Perspective', () => {
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'top'}),
-          child2: new MPart({id: 'bottom'}),
+          child1: new MPart({id: 'part.top'}),
+          child2: new MPart({id: 'part.bottom'}),
         }),
       },
     });
@@ -261,14 +262,14 @@ describe('Workbench Perspective', () => {
               {
                 id: 'perspective-1',
                 layout: factory => factory
-                  .addPart('left')
-                  .addPart('right', {align: 'right'}),
+                  .addPart('part.left')
+                  .addPart('part.right', {align: 'right'}),
               },
               {
                 id: 'perspective-2',
                 layout: factory => factory
-                  .addPart('top')
-                  .addPart('bottom', {align: 'bottom'}),
+                  .addPart('part.top')
+                  .addPart('part.bottom', {align: 'bottom'}),
               },
             ],
           },
@@ -285,8 +286,8 @@ describe('Workbench Perspective', () => {
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left'}),
-          child2: new MPart({id: 'right'}),
+          child1: new MPart({id: 'part.left'}),
+          child2: new MPart({id: 'part.right'}),
         }),
       },
     });
@@ -302,14 +303,14 @@ describe('Workbench Perspective', () => {
               {
                 id: 'perspective-1',
                 layout: factory => factory
-                  .addPart('left')
-                  .addPart('right', {align: 'right'}),
+                  .addPart('part.left')
+                  .addPart('part.right', {align: 'right'}),
               },
               {
                 id: 'perspective-2',
                 layout: factory => factory
-                  .addPart('top')
-                  .addPart('bottom', {align: 'bottom'}),
+                  .addPart('part.top')
+                  .addPart('part.bottom', {align: 'bottom'}),
               },
             ],
             initialPerspective: () => undefined,
@@ -327,22 +328,23 @@ describe('Workbench Perspective', () => {
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left'}),
-          child2: new MPart({id: 'right'}),
+          child1: new MPart({id: 'part.left'}),
+          child2: new MPart({id: 'part.right'}),
         }),
       },
     });
   });
 
-  it('should support configuring different start page per perspective', async () => {
+  /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
+  it('should support configuring different start page per perspective [deprecated]', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
           layout: {
             perspectives: [
-              {id: 'perspective-1', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
-              {id: 'perspective-2', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
-              {id: 'perspective-3', layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)},
+              {id: 'perspective-1', layout: factory => factory.addPart(MAIN_AREA)},
+              {id: 'perspective-2', layout: factory => factory.addPart(MAIN_AREA)},
+              {id: 'perspective-3', layout: factory => factory.addPart(MAIN_AREA)},
             ],
           },
         }),
@@ -386,6 +388,98 @@ describe('Workbench Perspective', () => {
     expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
   });
 
+  it('should support configuring different desktop per perspective', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: {
+            perspectives: [
+              {id: 'perspective-1', layout: factory => factory.addPart(MAIN_AREA).navigatePart(MAIN_AREA, ['perspective-1/desktop'])},
+              {id: 'perspective-2', layout: factory => factory.addPart(MAIN_AREA).navigatePart(MAIN_AREA, ['perspective-2/desktop'])},
+              {id: 'perspective-3', layout: factory => factory.addPart(MAIN_AREA)}, // no navigation
+              {id: 'perspective-4', layout: factory => factory.addPart('part.part')}, // no main area
+            ],
+          },
+        }),
+        provideRouter([
+          {
+            path: 'perspective-1/desktop',
+            loadComponent: () => import('../testing/test.component'),
+            providers: [withComponentContent('Desktop Perspective 1 (main area navigation)')],
+          },
+          {
+            path: 'perspective-2/desktop',
+            loadComponent: () => import('../testing/test.component'),
+            providers: [withComponentContent('Desktop Perspective 2 (main area navigation)')],
+          },
+        ]),
+      ],
+    });
+
+    @Component({
+      selector: 'spec-root',
+      template: `
+        <wb-workbench>
+          @switch (workbenchService.activePerspective()?.id) {
+            @case ('perspective-1') {
+              <ng-template wbDesktop>
+                Desktop Perspective 1 (wbDesktop)
+              </ng-template>
+            }
+            @case ('perspective-2') {
+              <ng-template wbDesktop>
+                Desktop Perspective 2 (wbDesktop)
+              </ng-template>
+            }
+            @case ('perspective-3') {
+              <ng-template wbDesktop>
+                Desktop Perspective 3 (wbDesktop)
+              </ng-template>
+            }
+            @default {
+              <ng-template wbDesktop>
+                Desktop Perspective (wbDesktop)
+              </ng-template>
+            }
+          }
+        </wb-workbench>
+      `,
+      styles: `
+        :host {
+          display: grid;
+        }
+      `,
+      standalone: true,
+      imports: [WorkbenchComponent, WorkbenchDesktopDirective],
+    })
+    class SpecRootComponent {
+      protected workbenchService = inject(WorkbenchService);
+    }
+
+    const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
+    await waitForInitialWorkbenchLayout();
+    const workbenchService = TestBed.inject(WorkbenchService);
+
+    // Expect perspective-1
+    expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 1 (main area navigation)');
+
+    // Switch to perspective-2
+    await workbenchService.switchPerspective('perspective-2');
+    expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 2 (main area navigation)');
+
+    // Switch to perspective-3
+    await workbenchService.switchPerspective('perspective-3');
+    expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 3 (wbDesktop)');
+    //
+    // // Switch to perspective-4
+    await workbenchService.switchPerspective('perspective-4');
+    expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective (wbDesktop)');
+
+    // Switch to perspective-1
+    await workbenchService.switchPerspective('perspective-1');
+    expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 1 (main area navigation)');
+  });
+
   /**
    * Regression test for a bug where the workbench grid of the initial layout got replaced by the "default" grid deployed during the initial navigation,
    * resulting in only the main area being displayed.
@@ -398,8 +492,8 @@ describe('Workbench Perspective', () => {
         provideWorkbenchForTest({
           layout: factory => factory
             .addPart(MAIN_AREA)
-            .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-            .addView('view.101', {partId: 'left'})
+            .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+            .addView('view.101', {partId: 'part.left'})
             .navigateView('view.101', [], {hint: 'navigator'}),
           startup: {launcher: 'APP_INITIALIZER'},
         }),
@@ -425,7 +519,7 @@ describe('Workbench Perspective', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: MAIN_AREA}),
           direction: 'row',
           ratio: .25,
@@ -439,13 +533,13 @@ describe('Workbench Perspective', () => {
       providers: [
         provideWorkbenchForTest({
           layout: factory => factory
-            .addPart('left')
-            .addPart('right', {align: 'right'})
-            .addView('view.101', {partId: 'left'})
-            .addView('view.102', {partId: 'right'})
+            .addPart('part.left')
+            .addPart('part.right', {align: 'right'})
+            .addView('view.101', {partId: 'part.left'})
+            .addView('view.102', {partId: 'part.right'})
             .navigateView('view.101', [], {hint: 'list'})
             .navigateView('view.102', [], {hint: 'overview'})
-            .activatePart('right'),
+            .activatePart('part.right'),
           startup: {launcher: 'APP_INITIALIZER'},
         }),
         provideRouter([
@@ -462,8 +556,8 @@ describe('Workbench Perspective', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -478,8 +572,8 @@ describe('Workbench Perspective', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -492,14 +586,14 @@ describe('Workbench Perspective', () => {
       providers: [
         provideWorkbenchForTest({
           layout: factory => factory
-            .addPart('left')
-            .addPart('right', {align: 'right'})
-            .addView('view.101', {partId: 'left'})
-            .addView('view.102', {partId: 'left'})
-            .addView('view.103', {partId: 'left'})
-            .addView('view.201', {partId: 'right'})
-            .addView('view.202', {partId: 'right', activateView: true})
-            .addView('view.203', {partId: 'right'}),
+            .addPart('part.left')
+            .addPart('part.right', {align: 'right'})
+            .addView('view.101', {partId: 'part.left'})
+            .addView('view.102', {partId: 'part.left'})
+            .addView('view.103', {partId: 'part.left'})
+            .addView('view.201', {partId: 'part.right'})
+            .addView('view.202', {partId: 'part.right', activateView: true})
+            .addView('view.203', {partId: 'part.right'}),
           startup: {launcher: 'APP_INITIALIZER'},
         }),
       ],
@@ -511,8 +605,8 @@ describe('Workbench Perspective', () => {
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          child1: new MPart({id: 'left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),
+          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
+          child2: new MPart({id: 'part.right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),
           direction: 'row',
           ratio: .5,
         }),
@@ -537,8 +631,8 @@ describe('Workbench Perspective', () => {
             await workbenchService.registerPerspective({
               id: 'perspective',
               layout: factory => factory
-                .addPart('left')
-                .addPart('right', {align: 'right'}),
+                .addPart('part.left')
+                .addPart('part.right', {align: 'right'}),
             });
           },
         },

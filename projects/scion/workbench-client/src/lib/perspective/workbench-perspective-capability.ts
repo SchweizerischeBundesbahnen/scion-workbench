@@ -36,7 +36,7 @@ export interface WorkbenchPerspectiveCapability extends Capability {
     /**
      * Defines the layout of this perspective.
      *
-     * The layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+     * The layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
      *
      * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
      * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
@@ -183,9 +183,9 @@ export interface WorkbenchPerspectiveView {
  *
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA: MAIN_AREA = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
  * Identifies the main area.
  */
-export type MAIN_AREA = 'main-area';
+export type MAIN_AREA = 'part.main-area';

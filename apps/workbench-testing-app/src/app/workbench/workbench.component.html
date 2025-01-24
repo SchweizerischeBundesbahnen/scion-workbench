@@ -1,4 +1,10 @@
 <wb-workbench>
+  @if (!useLegacyStartPage()) {
+    <ng-template wbDesktop>
+      <app-start-page/>
+    </ng-template>
+  }
+
   <ng-template wbPartAction [canMatch]="isPartInMainArea" cssClass="e2e-open-new-tab">
     <button [wbRouterLink]="'/start-page'" [wbRouterLinkExtras]="{target: 'blank', position: 'end'}" sciMaterialIcon>
       add

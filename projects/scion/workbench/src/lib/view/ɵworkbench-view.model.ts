@@ -9,14 +9,13 @@
  */
 
 import {BehaviorSubject, combineLatest, firstValueFrom, Observable} from 'rxjs';
-import {ActivatedRouteSnapshot, ChildrenOutletContexts, UrlSegment} from '@angular/router';
+import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {map} from 'rxjs/operators';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {Disposable} from '../common/disposable';
-import {throwError} from '../common/throw-error.util';
 import {CanClose, CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
-import {ViewId, WorkbenchView} from './workbench-view.model';
+import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
@@ -33,7 +32,6 @@ import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {WORKBENCH_ID} from '../workbench-id';
 import {ClassList} from '../common/class-list';
-import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
@@ -48,7 +46,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _workbenchService = inject(ɵWorkbenchService);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
-  private readonly _childrenOutletContexts = inject(ChildrenOutletContexts);
+  private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
@@ -71,14 +69,14 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private _canCloseFn: (() => Promise<boolean>) | undefined;
 
   public alternativeId: string | undefined;
-  public navigationId = signal<string | undefined>(undefined);
-  public navigationHint = signal<string | undefined>(undefined);
-  public navigationData = signal<NavigationData>({});
-  public navigationState = signal<NavigationState>({});
-  public urlSegments = signal<UrlSegment[]>([], {equal: (a, b) => a.join('/') === b.join('/')});
-  public position = computed(() => this.part().viewIds().indexOf(this.id));
-  public first = computed(() => this.position() === 0);
-  public last = computed(() => this.position() === this.part().viewIds().length - 1);
+  public readonly navigation = signal<WorkbenchViewNavigation | undefined>(undefined);
+  public readonly navigationHint = computed(() => this.navigation()?.hint);
+  public readonly navigationData = computed(() => this.navigation()?.data ?? {});
+  public readonly navigationState = computed(() => this.navigation()?.state ?? {});
+  public readonly urlSegments = computed(() => this.navigation()?.path ?? []);
+  public readonly position = computed(() => this.part().viewIds().indexOf(this.id));
+  public readonly first = computed(() => this.position() === 0);
+  public readonly last = computed(() => this.position() === this.part().viewIds().length - 1);
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly active = signal<boolean>(false);
@@ -87,7 +85,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
-  constructor(public readonly id: ViewId, options: {component: ComponentType<ViewComponent>}) {
+  constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout, options: {component: ComponentType<ViewComponent>}) {
+    this.alternativeId = layout.view({viewId: this.id}).alternativeId;
     this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
       .pipe(
         map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
@@ -98,20 +97,16 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.portal = this.createPortal(options.component);
     this.touchOnActivate();
     this.installModelUpdater();
-    this.onLayoutChange({layout: this._workbenchRouter.getCurrentNavigationContext().layout});
+    this.onLayoutChange({layout});
   }
 
   private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
     return new WbComponentPortal(viewComponent, {
       providers: [
         provideViewContext(this),
-        // For each view, the workbench registers auxiliary routes of all top-level routes, enabling routing on a per-view basis.
-        // But, if the workbench component itself is displayed in a router outlet, view outlets are not top-level outlets.
-        // Therefore, we instruct the outlet to act as a top-level outlet to be the target of the registered top-level view routes.
-        {provide: ChildrenOutletContexts, useValue: this._childrenOutletContexts},
         // Prevent injecting this part into the view because the view may be dragged to a different part.
-        {provide: WorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchPart'`)},
-        {provide: ɵWorkbenchPart, useFactory: () => throwError(`[NullInjectorError] No provider for 'ɵWorkbenchPart'`)},
+        {provide: WorkbenchPart, useFactory: () => undefined},
+        {provide: ɵWorkbenchPart, useFactory: () => undefined},
       ],
     });
   }
@@ -131,8 +126,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
-    this.urlSegments.set(layout.urlSegments({viewId: this.id}));
 
+    // TODO [#626]: Remove assignment and change `alternativeId` to read only when resolved the issue #626
     this.alternativeId = mView.alternativeId;
     this.classList.layout = mView.cssClass;
 
@@ -148,12 +143,15 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     }
 
     // Test if this view was navigated. Navigation does not necessarily cause the route to change.
-    const navigationChanged = mView.navigation?.id !== this.navigationId();
+    const navigationChanged = mView.navigation?.id !== this.navigation()?.id;
     if (navigationChanged) {
-      this.navigationId.set(mView.navigation?.id);
-      this.navigationHint.set(mView.navigation?.hint);
-      this.navigationData.set(mView.navigation?.data ?? {});
-      this.navigationState.set(layout.navigationState({viewId: this.id}));
+      this.navigation.set(mView.navigation && {
+        id: mView.navigation.id,
+        hint: mView.navigation.hint,
+        data: mView.navigation.data,
+        state: layout.navigationState({outlet: this.id}),
+        path: layout.urlSegments({outlet: this.id}),
+      });
       this.classList.navigation = mView.navigation?.cssClass;
     }
 
@@ -170,7 +168,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    * Returns the component of this view. Returns `null` if not navigated the view, or before it was activated for the first time.
    */
   public getComponent<T = unknown>(): T | null {
-    const outlet = Routing.resolveEffectiveOutletContext(this._childrenOutletContexts.getContext(this.id))?.outlet;
+    const outlet = Routing.resolveEffectiveOutletContext(this._rootOutletContexts.getContext(this.id))?.outlet;
     return outlet?.isActivated ? outlet.component as T : null;
   }
 
@@ -288,9 +286,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       partId: this.part().id,
       viewId: this.id,
       alternativeViewId: this.alternativeId,
-      viewUrlSegments: this.urlSegments(),
-      navigationHint: this.navigationHint(),
-      navigationData: this.navigationData(),
+      navigation: this.navigation() && {
+        path: this.navigation()!.path,
+        hint: this.navigation()!.hint,
+        data: this.navigation()!.data,
+      },
       classList: this.classList.asMap(),
     };
 

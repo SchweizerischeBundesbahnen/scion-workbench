@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Provider, viewChild, ViewContainerRef} from '@angular/core';
-import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './content-projection/workbench-element-references';
+import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchConfig} from './workbench-config';
 import {SplashComponent} from './startup/splash/splash.component';

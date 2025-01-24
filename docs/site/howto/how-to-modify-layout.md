@@ -5,7 +5,7 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
 
 ### How to modify the workbench layout
 

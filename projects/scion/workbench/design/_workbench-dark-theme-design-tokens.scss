@@ -2,8 +2,10 @@
  * Design tokens specific to the SCION Workbench.
  */
 $tokens: (
-  --sci-workbench-view-background-color: var(--sci-color-background-primary),
-  --sci-workbench-view-peripheral-background-color: var(--sci-color-gray-75),
+  --sci-workbench-view-background-color: var(--sci-workbench-part-background-color),
+  --sci-workbench-view-peripheral-background-color: var(--sci-workbench-part-peripheral-background-color),
+  --sci-workbench-part-background-color: var(--sci-color-background-primary),
+  --sci-workbench-part-peripheral-background-color: var(--sci-color-gray-75),
   --sci-workbench-part-bar-padding-top: .25rem,
   --sci-workbench-part-bar-padding-inline: .1rem,
   --sci-workbench-part-bar-background-color: var(--sci-color-background-secondary),
@@ -32,6 +34,9 @@ $tokens: (
   --sci-workbench-tab-padding-inline: .725em,
   --sci-workbench-tab-hover-background-color: none,
   --sci-workbench-tab-drag-border-color: var(--sci-color-accent),
+  --sci-workbench-tab-drag-text-color: var(--sci-workbench-part-active-tab-active-text-color),
+  --sci-workbench-tab-drag-border-color-disabled: var(--sci-color-gray-600),
+  --sci-workbench-tab-drag-text-color-disabled: var(--sci-color-gray-600),
   --sci-workbench-tab-active-text-color: var(--sci-color-text),
   --sci-workbench-notification-width: 350px,
   --sci-workbench-notification-severity-indicator-size: 6px,

@@ -209,3 +209,10 @@ export function commandsToPath(commands: Commands): string {
     }, [])
     .join('/');
 }
+
+/**
+ * Throws the specified error, useful in arrow functions that do not support throwing without a body.
+ */
+export function throwError(error: string): never {
+  throw Error(error);
+}

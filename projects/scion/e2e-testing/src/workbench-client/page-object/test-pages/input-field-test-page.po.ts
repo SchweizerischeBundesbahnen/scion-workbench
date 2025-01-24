@@ -61,7 +61,7 @@ export class InputFieldTestPagePO implements MicrofrontendViewPagePO {
         path: 'test-pages/input-field-test-page',
         cssClass: 'test-input-field',
         title: 'Input Field Test Page',
-        pinToStartPage: true,
+        pinToDesktop: true,
       },
     });
 

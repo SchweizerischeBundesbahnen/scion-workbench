@@ -24,7 +24,7 @@ import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 export abstract class WorkbenchRouter {
 
   /**
-   * Navigates based on the provided array of commands and extras. This method is similar to Angular's `Router.navigate(...)`, but with a view as the navigation target.
+   * Navigates views based on the provided array of commands and extras. This method is similar to Angular's `Router.navigate(...)`, but with a view as the navigation target.
    *
    * A command can be a string or an object literal. A string represents a path segment, an object literal associates matrix parameters with the preceding segment.
    * Multiple segments can be combined into a single command, separated by a forward slash.
@@ -56,7 +56,7 @@ export abstract class WorkbenchRouter {
    * The function can call `inject` to get any required dependencies.
    *
    * ## Workbench Layout
-   * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+   * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
    *
    * ## Example
    * The following example adds a part to the left of the main area, inserts a view and navigates it.

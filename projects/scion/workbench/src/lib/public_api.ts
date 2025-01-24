@@ -17,6 +17,7 @@ export {WorkbenchComponent} from './workbench.component';
 export {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from './workbench.constants';
 
 export * from './layout/public_api';
+export * from './desktop/public_api';
 export * from './perspective/public_api';
 export * from './part/public_api';
 export * from './view/public_api';

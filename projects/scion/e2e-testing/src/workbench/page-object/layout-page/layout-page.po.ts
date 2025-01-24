@@ -11,7 +11,7 @@
 import {AppPO} from '../../../app.po';
 import {ViewPO} from '../../../view.po';
 import {Locator} from '@playwright/test';
-import {ViewId, WorkbenchLayout} from '@scion/workbench';
+import {PartId, ViewId, WorkbenchLayout} from '@scion/workbench';
 import {SciTabbarPO} from '../../../@scion/components.internal/tabbar.po';
 import {WorkbenchViewPagePO} from '../workbench-view-page.po';
 import {RegisterPartActionPagePO} from './register-part-action-page.po';
@@ -52,15 +52,15 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
    *
    * @see WorkbenchRouter.navigate
    */
-  public async modifyLayout(fn: (layout: WorkbenchLayout, activePartId: string) => WorkbenchLayout): Promise<void> {
+  public async modifyLayout(fn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
     await this.view.tab.click();
     await this._tabbar.selectTab('e2e-modify-layout');
 
-    const modifyLayoutPage = new ModifyLayoutPagePO(this.view, this.locator.locator('app-modify-layout-page'));
+    const modifyLayoutPage = new ModifyLayoutPagePO(this.locator.locator('app-modify-layout-page'));
     return modifyLayoutPage.modify(fn);
   }
 
-  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: string | string[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
+  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: PartId | PartId[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
     await this.view.tab.click();
     await this._tabbar.selectTab('e2e-register-part-action');
 

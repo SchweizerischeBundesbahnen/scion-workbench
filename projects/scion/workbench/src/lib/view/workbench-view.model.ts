@@ -4,6 +4,7 @@ import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
+import {ViewOutlet} from '../workbench.constants';
 
 /**
  * Handle to interact with a view opened via {@link WorkbenchRouter}.
@@ -18,8 +19,6 @@ export abstract class WorkbenchView {
 
   /**
    * Unique identity of this view.
-   *
-   * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
    *
    * @see alternativeId
    */
@@ -36,22 +35,30 @@ export abstract class WorkbenchView {
   public abstract readonly alternativeId: string | undefined;
 
   /**
+   * Provides navigation details of this view.
+   *
+   * A view can be navigated using {@link WorkbenchRouter#navigate} or {@link WorkbenchLayout#navigateView}.
+   */
+  public abstract readonly navigation: Signal<WorkbenchViewNavigation | undefined>;
+
+  /**
    * Hint passed to the navigation.
    *
-   * A hint can be passed to the navigation to differentiate between routes with identical paths.
-   *
-   * For example, the views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
-   * requiring a navigation hint to differentiate between the routes.
+   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.hint} instead. API will be removed in version 21.
    */
   public abstract readonly navigationHint: Signal<string | undefined>;
 
   /**
    * Data passed to the navigation.
+   *
+   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.data} instead. API will be removed in version 21.
    */
   public abstract readonly navigationData: Signal<NavigationData>;
 
   /**
    * State passed to the navigation.
+   *
+   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.state} instead. API will be removed in version 21.
    */
   public abstract readonly navigationState: Signal<NavigationState>;
 
@@ -125,6 +132,8 @@ export abstract class WorkbenchView {
 
   /**
    * URL associated with this view.
+   *
+   * @deprecated since version 19.0.0-beta.2. Use {@link navigation.path} instead. API will be removed in version 21.
    */
   public abstract readonly urlSegments: Signal<UrlSegment[]>;
 
@@ -232,4 +241,36 @@ export abstract class WorkbenchView {
  * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
  * be identified either by its unique or alternative id.
  */
-export type ViewId = `view.${number}`;
+export type ViewId = ViewOutlet;
+
+/**
+ * Provides navigation details of a workbench view.
+ */
+export interface WorkbenchViewNavigation {
+  /**
+   * Unique ID per navigation.
+   *
+   * @internal
+   */
+  id: string;
+
+  /**
+   * Path of this view.
+   */
+  path: UrlSegment[];
+
+  /**
+   * Hint passed to the navigation.
+   */
+  hint?: string;
+
+  /**
+   * Data passed to the navigation.
+   */
+  data?: NavigationData;
+
+  /**
+   * State passed to the navigation.
+   */
+  state?: NavigationState;
+}

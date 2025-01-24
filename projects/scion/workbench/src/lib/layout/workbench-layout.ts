@@ -12,8 +12,8 @@ import {Commands, NavigationData, NavigationState} from '../routing/routing.mode
 import {ActivatedRoute} from '@angular/router';
 
 /**
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is
- * displayed in views.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
+ * displayed in views or parts.
  *
  * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
  * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
@@ -31,13 +31,66 @@ export interface WorkbenchLayout {
   /**
    * Adds a part with the given id to this layout. Position and size are expressed relative to a reference part.
    *
-   * @param id - Unique id of the part. Use {@link MAIN_AREA} to add the main area.
+   * @param id - The id of the part to add.  Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
    * @param options - Controls how to add the part to the layout.
    * @param options.activate - Controls whether to activate the part. Default is `false`.
    * @return a copy of this layout with the part added.
    */
   addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
+
+  /**
+   * Navigates the specified part based on the provided array of commands and extras.
+   *
+   * Navigating a part displays content when its view stack is empty. A navigated part can still have views but won't display
+   * navigated content unless its view stack is empty. Views cannot be dragged into parts displaying navigated content, except
+   * for the main area part.
+   *
+   * A command can be a string or an object literal. A string represents a path segment, an object literal associates matrix parameters with the preceding segment.
+   * Multiple segments can be combined into a single command, separated by a forward slash.
+   *
+   * By default, navigation is absolute. Set `relativeTo` in extras for relative navigation.
+   *
+   * Usage:
+   * ```
+   * layout.navigatePart(partId, ['path', 'to', 'part', {param 'value'}]);
+   * layout.navigatePart(partId, ['path/to/part', {param: 'value'}]);
+   * ```
+   *
+   * @param id - Identifies the part for navigation.
+   * @param commands - Instructs the router which route to navigate to.
+   * @param extras - Controls navigation:
+   * @param extras.hint - Allows differentiation between routes with identical paths.
+   *                      Multiple parts can navigate to the same path but still resolve to different routes, e.g., the empty path route to maintain a clean URL.
+   *
+   *                      Example:
+   *                      ```ts
+   *                      import {canMatchWorkbenchPart} from '@scion/workbench';
+   *
+   *                      const routes = [
+   *                         {
+   *                           path: '',
+   *                           component: Part1Component,
+   *                           canMatch: [canMatchWorkbenchPart('hint-1')], // matches navigations with hint 'hint-1'
+   *                         },
+   *                         {
+   *                           path: '',
+   *                           component: Part2Component,
+   *                           canMatch: [canMatchWorkbenchPart('hint-2')], // matches navigations with hint 'hint-1'
+   *                         },
+   *                       ];
+   *                      ```
+   * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
+   * @param extras.data - Associates data with the navigation.
+   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to empty path navigations.
+   *                      Data must be JSON serializable. Data can be read from {@link WorkbenchPart.navigation.data}.
+   * @param extras.state - Passes state to the navigation.
+   *                       State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
+   *                       State can be read from {@link WorkbenchPart.navigation.state} or from the browser's session history via `history.state`.
+   * @param extras.cssClass - Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.
+   * @return a copy of this layout with the part navigated.
+   */
+  navigatePart(id: string, commands: Commands, extras?: {hint?: string; relativeTo?: ActivatedRoute; data?: NavigationData; state?: NavigationState; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Adds a view to the specified part.
@@ -62,24 +115,41 @@ export interface WorkbenchLayout {
    *
    * Usage:
    * ```
-   * layout.navigateView(viewId, ['path', 'to', 'view', {param1: 'value1', param2: 'value2'}]);
-   * layout.navigateView(viewId, ['path/to/view', {param1: 'value1', param2: 'value2'}]);
+   * layout.navigateView(viewId, ['path', 'to', 'view', {param 'value'}]);
+   * layout.navigateView(viewId, ['path/to/view', {param: 'value'}]);
    * ```
    *
    * @param id - Identifies the view for navigation.
    * @param commands - Instructs the router which route to navigate to.
-   * @param extras - Controls navigation.
-   * @param extras.hint - Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
-   *                      For example, views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
-   *                      requiring a navigation hint to differentiate between the routes. See {@link canMatchWorkbenchView} for an example.
+   * @param extras - Controls navigation:
+   * @param extras.hint - Allows differentiation between routes with identical paths.
+   *                      Multiple views can navigate to the same path but still resolve to different routes, e.g., the empty path route to maintain a clean URL.
    *                      Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
+   *
+   *                      Example route config matching routes based on the hint passed to the navigation:
+   *                      ```ts
+   *                      import {canMatchWorkbenchView} from '@scion/workbench';
+   *
+   *                      const routes = [
+   *                        {
+   *                          path: '',
+   *                          component: View1Component,
+   *                          canMatch: [canMatchWorkbenchView('hint-1')], // matches navigations with hint 'hint-1'
+   *                        },
+   *                        {
+   *                          path: '',
+   *                          component: View2Component,
+   *                          canMatch: [canMatchWorkbenchView('hint-2')], // matches navigations with hint 'hint-2'
+   *                        },
+   *                      ];
+   *                      ```
    * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
-   * @param extras.data - Associates data with a view navigation.
-   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the path, allowing data to be passed to empty path navigations.
-   *                      Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigationData}.
-   * @param extras.state - Passes state to a view navigation.
-   *                       State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
-   *                       State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
+   * @param extras.data - Associates data with the navigation.
+   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to empty path navigations.
+   *                      Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigation.data}.
+   * @param extras.state - Passes state to the navigation.
+   *                       State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
+   *                       State can be read from {@link WorkbenchView.navigation.state} or from the browser's session history via `history.state`.
    * @param extras.cssClass - Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    * @return a copy of this layout with the view navigated.
    */
@@ -136,6 +206,14 @@ export interface WorkbenchLayout {
    * @return a copy of this layout with the part activated.
    */
   activatePart(id: string): WorkbenchLayout;
+
+  /**
+   * Applies a modification function to this layout, enabling conditional changes while maintaining method chaining.
+   *
+   * @param modifyFn - A function that takes the current layout and returns a modified layout.
+   * @return The modified layout returned by the modify function.
+   */
+  modify(modifyFn: (layout: WorkbenchLayout) => WorkbenchLayout): WorkbenchLayout;
 }
 
 /**
@@ -163,9 +241,16 @@ export interface ReferencePart {
  *
  * Refer to this part to align parts relative to the main area.
  */
-export const MAIN_AREA: MAIN_AREA = 'main-area';
+export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
  * Represents the type of the constant {@link MAIN_AREA}.
  */
-export type MAIN_AREA = 'main-area';
+export type MAIN_AREA = 'part.main-area';
+
+/**
+ * Represents the alternative id of the main area part.
+ *
+ * @see MAIN_AREA
+ */
+export const MAIN_AREA_ALTERNATIVE_ID = 'main-area';

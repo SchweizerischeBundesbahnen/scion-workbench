@@ -22,7 +22,7 @@ describe('WorkbenchViewRegistry', () => {
   it('should have part associated when views are emitted', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'main'}),
+        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
         provideRouter([
           {path: 'test-view', component: TestComponent},
         ]),
@@ -39,12 +39,12 @@ describe('WorkbenchViewRegistry', () => {
 
     // Open view in the right part.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
-      .addPart('right', {relativeTo: 'main', align: 'right'})
-      .addView('view', {partId: 'right'})
+      .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
+      .addView('view', {partId: 'part.right'})
       .navigateView('view', ['test-view']),
     );
 
     // Expect the part to be resolved.
-    expect(captor).toEqual([[], ['right']]);
+    expect(captor).toEqual([[], ['part.right']]);
   });
 });

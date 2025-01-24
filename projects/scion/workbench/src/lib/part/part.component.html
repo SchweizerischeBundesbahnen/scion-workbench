@@ -1,10 +1,26 @@
-<wb-part-bar/>
+@if (part.viewIds().length || part.actions().length) {
+  <wb-part-bar/>
+}
 
-<div wbViewDropZone
-     [wbViewDropZoneSize]=".3"
-     [wbViewDropZonePlaceholderSize]=".5"
-     [wbViewDropZoneCssClass]="'e2e-part'"
-     (wbViewDropZoneDrop)="onViewDrop($event)"
-     class="active-view e2e-active-view">
-  <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
-</div>
+@if (part.viewIds().length) {
+  @let canSplit = !!part.activeViewId();
+  <div wbViewDropZone
+       [wbViewDropZoneRegionSize]=".25"
+       [wbViewDropZonePlaceholderSize]=".5"
+       [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
+       [wbViewDropZoneAttributes]="{'data-partid': part.id}"
+       [wbViewDropZoneRegions]="{center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
+       (wbViewDropZoneDrop)="onViewDrop($event)"
+       class="active-view e2e-view-content">
+    <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
+  </div>
+} @else if (part.navigation()) {
+  <sci-viewport class="part-content e2e-part-content"
+                wbViewDropZone
+                [wbViewDropZoneRegions]="{center: false, north: true, south: true, west: true, east: true}"
+                [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
+                [wbViewDropZoneAttributes]="{'data-partid': part.id}"
+                (wbViewDropZoneDrop)="onViewDrop($event)">
+    <router-outlet [name]="part.id" wbRouterOutletRootContext/>
+  </sci-viewport>
+}

@@ -18,9 +18,10 @@ import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
-import {WorkbenchView} from './workbench-view.model';
+import {ViewId, WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
+import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -32,6 +33,7 @@ import {synchronizeCssClasses} from '../common/css-class.util';
   standalone: true,
   imports: [
     RouterOutlet,
+    RouterOutletRootContextDirective,
     A11yModule,
     SciViewportComponent,
   ],
@@ -49,7 +51,7 @@ export class ViewComponent implements OnDestroy, OnAttach, OnDetach {
   private _scrollLeft = 0;
 
   @HostBinding('attr.data-viewid')
-  public get viewId(): string {
+  public get viewId(): ViewId {
     return this._view.id;
   }
 

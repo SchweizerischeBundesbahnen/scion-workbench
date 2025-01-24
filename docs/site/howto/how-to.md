@@ -19,7 +19,6 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to modify the workbench layout](how-to-modify-layout.md)
 - [How to provide a perspective](how-to-provide-perspective.md)
 - [How to work with perspectives](how-to-perspective.md)
-- [How to configure a start page](how-to-configure-start-page.md)
 
 #### View
 - [How to provide a view](how-to-provide-view.md)
@@ -27,9 +26,15 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to interact with a view](how-to-interact-with-view.md)
 - [How to close a view](how-to-close-view.md)
 - [How to prevent a view from closing](how-to-prevent-view-closing.md)
-- [How to provide a part action](how-to-provide-part-action.md)
 - [How to contribute to the view's context menu](how-to-provide-view-menu-item.md)
 - [How to provide a "Not Found" page](how-to-provide-not-found-page.md)
+
+#### Part
+- [How to display content in a part](how-to-navigate-part.md)
+- [How to provide a part action](how-to-provide-part-action.md)
+
+#### Desktop
+- [How to provide a desktop](how-to-provide-desktop.md)
 
 #### Dialog, Popup, Messagebox, Notification
 - [How to open a dialog](how-to-open-dialog.md)

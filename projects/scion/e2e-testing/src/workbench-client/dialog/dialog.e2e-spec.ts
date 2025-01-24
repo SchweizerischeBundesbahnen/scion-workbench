@@ -203,7 +203,7 @@ test.describe('Workbench Dialog', () => {
 
       // Drag dialog opener view into peripheral area.
       const dragHandle = await dialogOpenerView.view.tab.startDrag();
-      await dragHandle.dragToGrid('workbench', {region: 'east'});
+      await dragHandle.dragToEdge('east');
       await dragHandle.drop();
 
       // Open the dialog.

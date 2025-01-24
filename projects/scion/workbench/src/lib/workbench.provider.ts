@@ -30,7 +30,7 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
  * or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows,
  * enabling users to work on content in parallel.
  *
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
  *
  * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
  * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support

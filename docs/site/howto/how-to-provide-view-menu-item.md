@@ -13,7 +13,7 @@ Menu items can be contributed declaratively from an HTML template or registered 
 Declaring a menu item in the HTML template of a workbench view adds it to that view only. To add it to every view, declare it outside a view context, such as in `app.component.html`, or register it programmatically.
 
 #### Contribute a menu item via HTML template
-Add a `<ng-template>` to an HTML template and decorate it with the `wbViewMenuItem` directive. The template content is used as the menu item content. The menu item shares the lifecycle of the containing component.
+Add a `<ng-template>` to an HTML template and decorate it with the `wbViewMenuItem` directive. The template content will be used as the menu item content. The menu item shares the lifecycle of its embedding context.
 
 ```html
 <ng-template wbViewMenuItem [accelerator]="['ctrl', 'b']" (action)="..." let-view>

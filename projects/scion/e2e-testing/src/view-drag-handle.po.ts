@@ -8,8 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DomRect, fromRect} from './helper/testing.util';
+import {DomRect, fromRect, throwError} from './helper/testing.util';
 import {Locator, Mouse, Page} from '@playwright/test';
+import {PartId} from '@scion/workbench';
 
 /**
  * Reference to the drag handle of a view to control drag and drop.
@@ -48,37 +49,89 @@ export class ViewDrageHandlePO {
 
   /**
    * Drags this tab to the specified region in the specified part.
+   *
+   * @param partId - Specifies the part to drag the tab into.
+   * @param options - Controls the drag operation.
+   * @param options.region - Specifies into which region of the part to drag the view.
+   * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position. Defaults to `true`, starting from the center of the part.
+   * @param options.orElse - If `false` and the drop zone cannot be located, returns `false` instead of throwing an error.
    */
-  public async dragToPart(partId: string, options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; steps?: number}): Promise<void> {
-    const steps = options.steps ?? 100;
-
-    // 1. Activate drop zones by dragging the drag handle over the part.
-    const targetBounds = fromRect(await this._page.locator(`wb-part[data-partid="${partId}"]`).locator('div.e2e-active-view').boundingBox());
-    await this._mouse.move(targetBounds.hcenter, targetBounds.vcenter, {steps});
-
-    // 2. Move the drag handle over the specified region.
-    if (options.region !== 'center') {
-      const dropZoneLocator = this._page.locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-view-drop-zone.e2e-${options.region}.e2e-part`);
-      await this.moveMouseToRegion(dropZoneLocator, options.region, {steps});
+  public async dragToPart(partId: PartId, options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; dragFromCenter?: false; orElse?: false}): Promise<boolean> {
+    if (options.dragFromCenter ?? true) {
+      const partBounds = fromRect(await this._page.locator(`wb-part[data-partid="${partId}"]`).boundingBox());
+      await this.dragTo({x: partBounds.hcenter, y: partBounds.vcenter});
     }
+
+    return this.dragToRegion(options.region, {
+      dropZoneLocator: this._page.locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-part-drop-zone[data-partid="${partId}"]`),
+      orElse: options.orElse,
+    });
   }
 
   /**
-   * Drags this tab to the specified region of specified grid.
+   * Drags this tab to the specified edge of the workbench.
+   *
+   * @param region - Specifies into which region of the workbench to drag the view.
+   * @param options - Controls the drag operation.
+   * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position. Defaults to `true`, starting from the center.
+   * @param options.orElse - If `false` and the drop zone cannot be located, returns `false` instead of throwing an error.
    */
-  public async dragToGrid(grid: 'workbench' | 'mainArea', options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; steps?: number}): Promise<void> {
-    const steps = options.steps ?? 100;
-
-    // 1. Activate drop zones by dragging the drag handle over the grid.
-    const targetBounds = fromRect(await this._page.locator(grid === 'mainArea' ? 'wb-main-area-layout' : 'wb-workbench-layout').boundingBox());
-    await this._mouse.move(targetBounds.hcenter, targetBounds.vcenter, {steps});
-
-    // 2. Move the drag handle over the specified region.
-    if (options.region !== 'center') {
-      const dropZoneCssClass = grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
-      const dropZoneLocator = this._page.locator(`div.e2e-view-drop-zone.e2e-${options.region}.${dropZoneCssClass}`);
-      await this.moveMouseToRegion(dropZoneLocator, options.region, {steps});
+  public async dragToEdge(region: 'north' | 'east' | 'south' | 'west', options?: {dragFromCenter?: false; orElse?: false}): Promise<boolean> {
+    if (options?.dragFromCenter ?? true) {
+      const workbenchBounds = fromRect(await this._page.locator('wb-workbench-layout').boundingBox());
+      await this.dragTo({x: workbenchBounds.hcenter, y: workbenchBounds.vcenter});
     }
+
+    return this.dragToRegion(region, {
+      dropZoneLocator: this._page.locator('wb-workbench-layout').locator('div.e2e-edge-drop-zone'),
+      orElse: options?.orElse,
+    });
+  }
+
+  private async dragToRegion(region: 'north' | 'east' | 'south' | 'west' | 'center', options: {dropZoneLocator: Locator; orElse?: false}): Promise<boolean> {
+    const dropZoneLocator = options.dropZoneLocator;
+
+    // Move the drag handle over the specified region.
+    const {top, right, bottom, left} = fromRect(await dropZoneLocator.boundingBox());
+    switch (region) {
+      case 'north':
+        while ((await dropZoneLocator.getAttribute('data-region')) !== 'north' && this._y > top) {
+          await this.dragTo({deltaY: -5, deltaX: 0}, {steps: 1});
+        }
+        break;
+      case 'south':
+        while ((await dropZoneLocator.getAttribute('data-region')) !== 'south' && this._y < bottom) {
+          await this.dragTo({deltaY: 5, deltaX: 0}, {steps: 1});
+        }
+        break;
+      case 'west':
+        while ((await dropZoneLocator.getAttribute('data-region')) !== 'west' && this._x > left) {
+          await this.dragTo({deltaY: 0, deltaX: -5}, {steps: 1});
+        }
+        break;
+      case 'east':
+        while ((await dropZoneLocator.getAttribute('data-region')) !== 'east' && this._x < right) {
+          await this.dragTo({deltaY: 0, deltaX: 5}, {steps: 1});
+        }
+        break;
+    }
+
+    // Simulate an extra 'dragover' event as Playwright does not continuously trigger 'dragover' events when not moving the pointer.
+    await this.dragTo({deltaY: 0, deltaX: 0}, {steps: 1});
+
+    // Check if activated the requested region.
+    if (await dropZoneLocator.getAttribute('data-region') !== region) {
+      return options.orElse ?? throwError(`[PageObjectError] Failed to locate drop zone '${region}'.`);
+    }
+
+    // Verify drop placeholder to render.
+    const dropZoneId = await dropZoneLocator.getAttribute('data-id');
+    const dropPlaceholder = this._page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
+    if (!await dropPlaceholder.isVisible()) {
+      return options.orElse ?? throwError(`[PageObjectError] Failed to locate drop zone '${region}'.`);
+    }
+
+    return true;
   }
 
   /**
@@ -103,44 +156,15 @@ export class ViewDrageHandlePO {
   }
 
   /**
-   * Gets the specified CSS property of the drag image.
+   * Gets the specified CSS property of the drag image or specified target.
    */
-  public getCssPropertyValue(property: string): Promise<string> {
-    return this.locator.evaluate((dragImage: HTMLElement, property: string) => {
+  public getCssPropertyValue(property: string, options?: {target?: 'drag-image' | 'close-button'}): Promise<string> {
+    const target = options?.target ?? 'drag-image';
+    const locator = target === 'drag-image' ? this.locator : this.locator.locator('button.e2e-close');
+
+    return locator.evaluate((dragImage: HTMLElement, property: string) => {
       return getComputedStyle(dragImage).getPropertyValue(property);
     }, property);
-  }
-
-  /**
-   * Moves the mouse over the specified region of given element.
-   */
-  private async moveMouseToRegion(locator: Locator, region: 'north' | 'east' | 'south' | 'west' | 'center', options: {steps: number}): Promise<void> {
-    const {top, right, bottom, left, hcenter, vcenter} = fromRect(await locator.boundingBox());
-    const steps = options.steps;
-    const mouse = this._mouse;
-
-    switch (region) {
-      case 'north':
-        // Moves the mouse to the bottom edge, just one pixel inside the drop zone
-        await mouse.move(hcenter, bottom - 1, {steps});
-        break;
-      case 'south':
-        // Moves the mouse to the top edge, just one pixel inside the drop zone
-        await mouse.move(hcenter, top + 1, {steps});
-        break;
-      case 'west':
-        // Moves the mouse to the right edge, just one pixel inside the drop zone
-        await mouse.move(right - 1, vcenter, {steps});
-        break;
-      case 'east':
-        // Moves the mouse to the left edge, just one pixel inside the drop zone
-        await mouse.move(left + 1, vcenter, {steps});
-        break;
-      case 'center':
-        // Moves the mouse to the center of the drop zone.
-        await mouse.move(hcenter, vcenter, {steps});
-        break;
-    }
   }
 }
 

@@ -45,12 +45,12 @@ export class WorkbenchAuxiliaryRouteInstaller {
           .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
           .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
         // Register wildcard route to display "Page Not Found".
-        {
+        ...config.canMatchNotFoundPage?.length ? [{
           path: '**',
           loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
           data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
           canMatch: config.canMatchNotFoundPage,
-        },
+        }] : [],
         // Register wildcard route to display blank page.
         {
           path: '**',
@@ -98,8 +98,9 @@ export class WorkbenchAuxiliaryRouteInstaller {
  */
 export interface AuxiliaryRouteConfig {
   /**
-   * Specifies "CanMatch" guard(s) to install on the wildcard route (`**`),
-   * selected by the router if no route matches the requested URL.
+   * Specifies `canMatch` guard(s) to activate the wildcard route ("**").
+   *
+   * If not specified or empty, does not register the wildcard route ("**").
    */
   canMatchNotFoundPage?: Array<CanMatchFn>;
 }

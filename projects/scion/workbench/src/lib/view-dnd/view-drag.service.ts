@@ -12,13 +12,12 @@ import {computed, effect, inject, Injectable, Injector, NgZone, OnDestroy, untra
 import {BehaviorSubject, EMPTY, fromEvent, merge, mergeMap, mergeWith, MonoTypeOperatorFunction, Observable, Observer, Subject, switchMap, TeardownLogic} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
-import {UrlSegment} from '@angular/router';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
-import {ViewId} from '../view/workbench-view.model';
+import {ViewId, WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
-import {NavigationData} from '../routing/routing.model';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Coordinates cross application drag and drop of views.
@@ -33,7 +32,7 @@ export class ViewDragService implements OnDestroy {
   private readonly _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
   private readonly _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
   private readonly _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
-  private readonly _tabbarDragOver$ = new BehaviorSubject<string /* partId */ | false>(false);
+  private readonly _tabbarDragOver$ = new BehaviorSubject<PartId | false>(false);
   private readonly _viewMoved$ = new Subject<ViewMoveEvent>();
 
   /**
@@ -51,7 +50,7 @@ export class ViewDragService implements OnDestroy {
    *
    * Upon subscription, emits the current dragover state, and then each time the state changes. The observable never completes.
    */
-  public readonly tabbarDragOver$: Observable<string | false> = this._tabbarDragOver$;
+  public readonly tabbarDragOver$: Observable<PartId | false> = this._tabbarDragOver$;
 
   /**
    * Provides the drag data of the current drag operation. Is `null` if no drag operation is in progress.
@@ -72,14 +71,14 @@ export class ViewDragService implements OnDestroy {
   /**
    * Signals start dragging a tab over specified tabbar (dragenter).
    */
-  public signalTabbarDragEnter(partId: string): void {
+  public signalTabbarDragEnter(partId: PartId): void {
     this._tabbarDragOver$.next(partId);
   }
 
   /**
    * Signals end dragging a tab over specified tabbar (dragleave).
    */
-  public signalTabbarDragLeave(partId: string): void {
+  public signalTabbarDragLeave(partId: PartId): void {
     if (this._tabbarDragOver$.value === partId) {
       this._tabbarDragOver$.next(false);
     }
@@ -95,7 +94,7 @@ export class ViewDragService implements OnDestroy {
   /**
    * Indicates if dragging a tab over a tabbar, returning the id of the part being dragged over, or `false` if not dragging over a tabbar.
    */
-  public get isDragOverTabbar(): string | false {
+  public get isDragOverTabbar(): PartId | false {
     return this._tabbarDragOver$.value;
   }
 
@@ -207,7 +206,7 @@ export class ViewDragService implements OnDestroy {
        * Resets `dragEnterCount` on `dragend` to prevent inconsistent state if `dragend` should not be triggered.
        */
       function resetOnDragEnd<T>(): MonoTypeOperatorFunction<T> {
-        return mergeWith(fromEvent<DragEvent>(target, 'dragend')
+        return mergeWith(fromEvent<DragEvent>(target, 'dragend', options ?? {})
           .pipe(mergeMap(() => {
             dragEnterCount = 0;
             return EMPTY;
@@ -290,12 +289,10 @@ export interface ViewDragData {
   alternativeViewId?: string;
   viewTitle: string | null;
   viewHeading: string | null;
-  viewUrlSegments: UrlSegment[];
-  navigationHint?: string;
-  navigationData?: NavigationData;
+  navigation?: Omit<WorkbenchViewNavigation, 'id' | 'state'>;
   viewClosable: boolean;
   viewDirty: boolean;
-  partId: string;
+  partId: PartId;
   viewTabWidth: number;
   viewTabHeight: number;
   workbenchId: string;
@@ -325,11 +322,9 @@ export interface ViewMoveEvent {
  */
 export interface ViewMoveEventSource {
   viewId: ViewId;
-  partId: string;
-  navigationHint?: string;
-  navigationData?: NavigationData;
+  partId: PartId;
+  navigation?: Omit<WorkbenchViewNavigation, 'id' | 'state'>;
   alternativeViewId?: string;
-  viewUrlSegments: UrlSegment[];
   workbenchId: string;
   classList?: ClassListMap;
 }
@@ -349,7 +344,7 @@ export interface ViewMoveEventTarget {
    *
    * Note: Property is ignored when moving the view to a new window.
    */
-  elementId?: string;
+  elementId?: PartId | string;
   /**
    * Region of {@link elementId} where to add the view (in a new part).
    *
@@ -373,9 +368,9 @@ export interface ViewMoveEventTarget {
    */
   newPart?: {
     /**
-     * Identity of the new part. If not set, assigns a UUID.
+     * Identity of the new part. If not set, assigns a random id.
      */
-    id?: string;
+    id?: PartId;
     /**
      * Proportional size of the part relative to the reference part.
      * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.

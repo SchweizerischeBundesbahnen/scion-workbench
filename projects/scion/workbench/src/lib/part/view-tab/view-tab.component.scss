@@ -1,4 +1,5 @@
 @use '../../../../design/workbench-constants';
+@use '../../common/workbench-mixins';
 
 /**
  * IMPORTANT: THIS CSS FILE IS ALSO USED BY `ViewTabDragImageComponent`
@@ -22,14 +23,17 @@
 
   &.active {
     cursor: default;
-    color: var(--sci-workbench-tab-active-text-color);
     border-left-color: var(--sci-workbench-tab-border-color);
     border-right-color: var(--sci-workbench-tab-border-color);
     border-top-color: var(--sci-workbench-tab-border-color);
     background-color: var(--sci-workbench-view-background-color);
 
-    wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+    @include workbench-mixins.peripheral-workbench-parts-selector {
       background-color: var(--sci-workbench-view-peripheral-background-color);
+    }
+
+    > div.content {
+      color: var(--sci-workbench-tab-active-text-color);
     }
 
     &.part-active > div.content {
@@ -94,7 +98,7 @@
       box-shadow: inset 0 0 0 1px var(--sci-workbench-tab-border-color);
       box-sizing: content-box;
 
-      wb-workbench:has(wb-main-area-layout) wb-part:not(.main-area) & {
+      @include workbench-mixins.peripheral-workbench-parts-selector {
         border-color: var(--sci-workbench-view-peripheral-background-color);
       }
     }

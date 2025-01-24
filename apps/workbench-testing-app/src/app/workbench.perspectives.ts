@@ -9,11 +9,12 @@
  */
 
 import {Route, Routes, ROUTES, UrlSegment} from '@angular/router';
-import {canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
+import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
 import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
-import {SkeletonNavigationData} from './sample-view/sample-view.component';
+import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
 import {SettingsService} from './settings.service';
+import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
 
 /**
  * Keys to associate data with a perspective.
@@ -39,7 +40,7 @@ export const Perspectives = {
     return [
       {
         id: 'blank',
-        layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
+        layout: factory => factory.addPart(MAIN_AREA),
       },
       {
         id: 'perspective-1',
@@ -60,9 +61,9 @@ export const Perspectives = {
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
       ...WorkbenchStartupQueryParams.perspectives().map(perspective => ({
         id: perspective,
-        layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
+        layout: factory => factory.addPart(MAIN_AREA),
         data: {[PerspectiveData.label]: perspective.toUpperCase()},
-      })),
+      } satisfies WorkbenchPerspectiveDefinition)),
     ];
   },
 
@@ -75,8 +76,12 @@ export const Perspectives = {
         provide: ROUTES,
         multi: true,
         useValue: [
+          // Sample View
           {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
           {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+          // Sample Part
+          {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
+          {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./part-page/part-page.component')},
         ]  satisfies Routes,
       },
     ]);
@@ -94,19 +99,19 @@ function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .addView('sample-view-2', {partId: 'left'})
     .addView('sample-view-3', {partId: 'top-right'})
     .addView('sample-view-4', {partId: 'top-right'})
-    .addView('sample-view-5', {partId: 'bottom-right'})
+    .addView('sample-view-5', {partId: 'bottom'})
     .addView('sample-view-6', {partId: 'bottom'})
     .addView('sample-view-7', {partId: 'bottom'})
-    .addView('sample-view-8', {partId: 'bottom'})
-    .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-3', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-4', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-5', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-8', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .activateView('sample-view-8');
+    .navigatePart('top-right', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+    .navigatePart('bottom-right', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-3', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-4', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-5', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .activateView('sample-view-7');
 }
 
 function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -126,15 +131,15 @@ function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .addView('sample-view-8', {partId: 'bottom'})
     .addView('sample-view-9', {partId: 'bottom'})
     .addView('sample-view-10', {partId: 'bottom'})
-    .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-3', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-4', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-5', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-8', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies SkeletonNavigationData})
-    .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies SkeletonNavigationData})
+    .navigateView('sample-view-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-2', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-3', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-4', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-5', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-6', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-7', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-8', [], {hint: 'sample-view', data: {style: 'list', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
+    .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
     .activateView('sample-view-6');
 }

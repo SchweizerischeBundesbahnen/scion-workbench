@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,8 +19,12 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {ViewId} from '@scion/workbench';
+import {PartId, ViewId} from '@scion/workbench';
+import {WorkbenchAccessor} from './workbench-accessor';
 
+/**
+ * Central point to interact with the testing app in end-to-end tests.
+ */
 export class AppPO {
 
   private _workbenchStartupQueryParams = new URLSearchParams();
@@ -30,9 +34,9 @@ export class AppPO {
    */
   public readonly header = new AppHeaderPO(this.page.locator('app-header'));
   /**
-   * Locates the 'wb-workbench' element.
+   * Locates the workbench root element `<wb-workbench>`.
    */
-  public readonly workbench = this.page.locator('wb-workbench');
+  public readonly workbenchRoot = this.page.locator('wb-workbench');
 
   /**
    * Locates workbench notifications.
@@ -43,6 +47,11 @@ export class AppPO {
    * Locates workbench dialogs.
    */
   public readonly dialogs = this.page.locator('wb-dialog');
+
+  /**
+   * Enables programmatic interaction with the Workbench API.
+   */
+  public readonly workbench = new WorkbenchAccessor(this.page);
 
   constructor(public readonly page: Page) {
   }
@@ -63,16 +72,34 @@ export class AppPO {
     }
 
     this._workbenchStartupQueryParams = new URLSearchParams();
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options?.launcher ?? 'LAZY');
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${(options?.microfrontendSupport ?? true) === false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${options?.confirmStartup ?? false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${options?.simulateSlowCapabilityLookup ?? false}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${(options?.perspectives ?? []).join(';')}`);
-    this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options?.dialogModalityScope ?? 'workbench');
+    if (options?.launcher) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options.launcher);
+    }
+    if (!(options?.microfrontendSupport ?? true)) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${true}`);
+    }
+    if (options?.confirmStartup) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${true}`);
+    }
+    if (options?.simulateSlowCapabilityLookup) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${true}`);
+    }
+    if (options?.perspectives?.length) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${options.perspectives.join(';')}`);
+    }
+    if (options?.dialogModalityScope) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options?.dialogModalityScope);
+    }
+    if (options?.mainAreaInitialPartId) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
+    }
 
     const featureQueryParams = new URLSearchParams();
-    if (options?.stickyStartViewTab !== undefined) {
-      featureQueryParams.append('stickyStartViewTab', `${options.stickyStartViewTab}`);
+    if (options?.stickyViewTab) {
+      featureQueryParams.append('stickyViewTab', `${true}`);
+    }
+    if (options?.useLegacyStartPage) {
+      featureQueryParams.append('useLegacyStartPage', `${true}`);
     }
 
     // Perform navigation.
@@ -136,10 +163,10 @@ export class AppPO {
    */
   public activePart(locateBy: {inMainArea: boolean}): PartPO {
     if (locateBy.inMainArea) {
-      return new PartPO(this.page.locator('wb-part.e2e-main-area.active'));
+      return new PartPO(this.page.locator('wb-part[data-context="main-area"].active'));
     }
     else {
-      return new PartPO(this.page.locator('wb-part:not(.e2e-main-area).active'));
+      return new PartPO(this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]).active'));
     }
   }
 
@@ -148,9 +175,19 @@ export class AppPO {
    *
    * @param locateBy - Specifies how to locate the part.
    * @param locateBy.partId - Identifies the part by its id
+   * @param locateBy.cssClass - Identifies the part by its CSS class
    */
-  public part(locateBy: {partId: string}): PartPO {
-    return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"]`));
+  public part(locateBy: {partId?: PartId; cssClass?: string}): PartPO {
+    if (locateBy.partId !== undefined && locateBy.cssClass !== undefined) {
+      return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"].${locateBy.cssClass}`));
+    }
+    else if (locateBy.partId !== undefined) {
+      return new PartPO(this.page.locator(`wb-part[data-partid="${locateBy.partId}"]`));
+    }
+    else if (locateBy.cssClass !== undefined) {
+      return new PartPO(this.page.locator(`wb-part.${locateBy.cssClass}`));
+    }
+    throw Error(`[PartLocateError] Missing required locator. Either 'partId' or 'cssClass', or both must be set.`);
   }
 
   /**
@@ -162,10 +199,10 @@ export class AppPO {
   public views(locateBy?: {inMainArea?: boolean; cssClass?: string}): Locator {
     const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy?.cssClass}` : ':scope';
     if (locateBy?.inMainArea === true) {
-      return this.page.locator('wb-part.e2e-main-area wb-view-tab').locator(locateByCssClass);
+      return this.page.locator('wb-part[data-context="main-area"] wb-view-tab').locator(locateByCssClass);
     }
     if (locateBy?.inMainArea === false) {
-      return this.page.locator('wb-part:not(.e2e-main-area) wb-view-tab').locator(locateByCssClass);
+      return this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]) wb-view-tab').locator(locateByCssClass);
     }
     else {
       return this.page.locator('wb-view-tab').locator(locateByCssClass);
@@ -183,19 +220,19 @@ export class AppPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
-      const partLocator = this.page.locator('wb-part', {has: viewTabLocator});
+      const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.viewId !== undefined) {
       const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"]`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
-      const partLocator = this.page.locator('wb-part', {has: viewTabLocator});
+      const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view.${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab.${locateBy.cssClass}`);
-      const partLocator: Locator = this.page.locator('wb-part', {has: viewTabLocator});
+      const partLocator: Locator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
@@ -213,7 +250,7 @@ export class AppPO {
    * Returns bounding box of the 'wb-workbench' element.
    */
   public async workbenchBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.workbench.boundingBox());
+    return fromRect(await this.workbenchRoot.boundingBox());
   }
 
   /**
@@ -321,21 +358,39 @@ export class AppPO {
   }
 
   /**
-   * Tests if specified drop zone is active, i.e., present in the DOM and armed for pointed events.
+   * Gets the active drop zone when dragging a view to the workbench edge.
    */
-  public async isDropZoneActive(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<boolean> {
-    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
-    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
-    return await dropZoneLocator.count() > 0 && await dropZoneLocator.evaluate((element: HTMLElement) => getComputedStyle(element).pointerEvents) !== 'none';
+  public async getActiveEdgeDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
+    const dropZone = this.page.locator('div.e2e-edge-drop-zone');
+    if (!await dropZone.isVisible()) {
+      return null;
+    }
+
+    const dropZoneId = await dropZone.getAttribute('data-id');
+    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
+    if (!await dropPlaceholder.isVisible()) {
+      return null;
+    }
+
+    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
   }
 
   /**
-   * Returns the bounding box of the specified drop zone.
+   * Gets the active drop zone when dragging a view over the desktop.
    */
-  public async getDropZoneBoundingBox(target: {grid: 'workbench' | 'mainArea'; region: 'north' | 'east' | 'south' | 'west' | 'center'}): Promise<DomRect> {
-    const dropZoneCssClass = target.grid === 'mainArea' ? 'e2e-main-area-grid' : 'e2e-workbench-grid';
-    const dropZoneLocator = this.page.locator(`div.e2e-view-drop-zone.e2e-${target.region}.${dropZoneCssClass}`);
-    return fromRect(await dropZoneLocator.boundingBox());
+  public async getActiveDesktopDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
+    const dropZone = this.page.locator('div.e2e-desktop-drop-zone');
+    if (!await dropZone.isVisible()) {
+      return null;
+    }
+
+    const dropZoneId = await dropZone.getAttribute('data-id');
+    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
+    if (!await dropPlaceholder.isVisible()) {
+      return null;
+    }
+
+    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
   }
 
   /**
@@ -343,7 +398,7 @@ export class AppPO {
    */
   public async setDesignToken(name: string, value: string): Promise<void> {
     const pageFunction = (workbenchElement: HTMLElement, token: {name: string; value: string}): void => workbenchElement.style.setProperty(token.name, token.value);
-    await this.workbench.evaluate(pageFunction, {name, value});
+    await this.workbenchRoot.evaluate(pageFunction, {name, value});
   }
 
   /**
@@ -364,7 +419,7 @@ export class AppPO {
    * Tests if the layout has a main area.
    */
   public hasMainArea(): Promise<boolean> {
-    return this.workbench.locator('wb-main-area-layout').isVisible();
+    return this.workbenchRoot.locator('wb-part[data-partid="part.main-area"]').isVisible();
   }
 
   /**
@@ -397,28 +452,27 @@ export class AppPO {
 }
 
 /**
- * Configures options to start the testing app.
+ * Options to control the startup of the testing app.
  */
 export interface Options {
   /**
-   * Specifies the URL to load into the browser. If not set, defaults to the `baseURL` as specified in `playwright.config.ts`.
+   * Specifies the URL to load into the browser. Defaults to the `baseURL` as specified in `playwright.config.ts`.
    */
   url?: string;
   /**
-   * Controls launching of the testing app. By default, if not specified, starts the workbench lazy.
+   * Controls launching of the testing app. Defaults to 'LAZY'.
    */
   launcher?: 'APP_INITIALIZER' | 'LAZY';
   /**
-   * Controls if to enable microfrontend support. By default, if not specified, microfrontend support is enabled.
+   * Controls if to enable microfrontend support. Defaults to `true`.
    */
   microfrontendSupport?: boolean;
   /**
-   * Controls whether the start view tab should always be opened when no other tabs are open, e.g., on startup, or when closing all views.
-   * By default, if not specified, this feature is turned off.
+   * Controls if to open the start page view when no other view is opened, e.g., on startup, or when closing all views. Defaults to `false`.
    */
-  stickyStartViewTab?: boolean;
+  stickyViewTab?: boolean;
   /**
-   * Allows pausing the workbench startup by displaying an alert dialog that the user must confirm in order to continue the workbench startup.
+   * Pauses the workbench startup by displaying an alert dialog that the user must confirm in order to continue the workbench startup.
    */
   confirmStartup?: boolean;
   /**
@@ -430,13 +484,23 @@ export interface Options {
    */
   perspectives?: string[];
   /**
-   * Controls the scope of application-modal workbench dialogs. By default, if not specified, workbench scope will be used.
+   * Controls the scope of application-modal workbench dialogs. Defaults to `workbench`.
    */
   dialogModalityScope?: 'workbench' | 'viewport';
+  /**
+   * Controls the identity of the initial part in the main area. Defaults to a UUID.
+   */
+  mainAreaInitialPartId?: PartId;
   /**
    * Specifies data to be in local storage.
    */
   localStorage?: {[key: string]: string};
+  /**
+   * Controls if to use the legacy start page (via empty path route) instead of the desktop.
+   *
+   * @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support.
+   */
+  useLegacyStartPage?: boolean;
 }
 
 /**
@@ -472,4 +536,9 @@ export enum WorkenchStartupQueryParams {
    * Query param to set the scope for application-modal dialogs.
    */
   DIALOG_MODALITY_SCOPE = 'dialogModalityScope',
+
+  /**
+   * Query param to control the identity of the initial part in the main area.
+   */
+  MAIN_AREA_INITIAL_PART_ID = 'mainAreaInitialPartId',
 }

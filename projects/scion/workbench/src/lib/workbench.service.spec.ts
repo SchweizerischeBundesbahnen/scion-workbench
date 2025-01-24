@@ -64,11 +64,11 @@ describe('Workbench Service', () => {
             perspectives: [
               {
                 id: 'perspective-1',
-                layout: factory => factory.addPart('main'),
+                layout: factory => factory.addPart('part.part'),
               },
               {
                 id: 'perspective-2',
-                layout: factory => factory.addPart('main'),
+                layout: factory => factory.addPart('part.part'),
               },
             ],
           },

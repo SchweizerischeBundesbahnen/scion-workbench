@@ -14,7 +14,7 @@ import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
-import {WorkbenchPart} from '../workbench-part.model';
+import {PartId, WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
 import {toSignal} from '@angular/core/rxjs-interop';
@@ -60,7 +60,7 @@ export class ViewListComponent implements OnInit {
   }
 
   @HostBinding('attr.data-partid')
-  public get partId(): string {
+  public get partId(): PartId {
     return this._part.id;
   }
 

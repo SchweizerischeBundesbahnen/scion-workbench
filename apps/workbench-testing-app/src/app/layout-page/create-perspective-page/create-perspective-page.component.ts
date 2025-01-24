@@ -8,20 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, computed, inject, Signal} from '@angular/core';
 import {AddPartsComponent, PartDescriptor} from '../tables/add-parts/add-parts.component';
 import {AddViewsComponent, ViewDescriptor} from '../tables/add-views/add-views.component';
 import {NavigateViewsComponent, NavigationDescriptor} from '../tables/navigate-views/navigate-views.component';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SettingsService} from '../../settings.service';
-import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchService} from '@scion/workbench';
+import {WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchLayoutFn, WorkbenchPart, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {Observable} from 'rxjs';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {AsyncPipe} from '@angular/common';
+import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-create-perspective-page',
@@ -36,7 +35,7 @@ import {AsyncPipe} from '@angular/common';
     SciFormFieldComponent,
     SciCheckboxComponent,
     SciKeyValueFieldComponent,
-    AsyncPipe,
+    NavigatePartsComponent,
   ],
 })
 export default class CreatePerspectivePageComponent {
@@ -47,20 +46,45 @@ export default class CreatePerspectivePageComponent {
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([], Validators.required),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
+    partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
   });
 
   protected registerError: string | false | undefined;
-  protected partProposals$: Observable<string[]>;
-  protected viewProposals$: Observable<string[]>;
+  protected partProposals: Signal<string[]>;
+  protected viewProposals: Signal<string[]>;
 
   constructor(private _formBuilder: NonNullableFormBuilder,
               private _settingsService: SettingsService,
               private _workbenchService: WorkbenchService) {
-    this.partProposals$ = this.form.controls.parts.valueChanges
-      .pipe(mapArray(part => part.id), filterArray(partId => !!partId));
-    this.viewProposals$ = this.form.controls.views.valueChanges
-      .pipe(mapArray(view => view.id), filterArray(viewId => !!viewId));
+    this.partProposals = this.computePartProposals();
+    this.viewProposals = this.computeViewProposals();
+  }
+
+  private computePartProposals(): Signal<string[]> {
+    const partsFromUI = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
+    const workbenchService = inject(WorkbenchService);
+
+    return computed(() => new Array<WorkbenchPart | PartDescriptor>()
+      .concat(workbenchService.parts())
+      .concat(partsFromUI())
+      .map(part => part.id)
+      .filter(Boolean)
+      .reduce((acc, partId) => acc.includes(partId) ? acc : acc.concat(partId), new Array<string>()),
+    );
+  }
+
+  private computeViewProposals(): Signal<string[]> {
+    const viewsFromUI = toSignal(this.form.controls.views.valueChanges, {initialValue: []});
+    const workbenchService = inject(WorkbenchService);
+
+    return computed(() => new Array<WorkbenchView | ViewDescriptor>()
+      .concat(workbenchService.views())
+      .concat(viewsFromUI())
+      .map(view => view.id)
+      .filter(Boolean)
+      .reduce((acc, viewId) => acc.includes(viewId) ? acc : acc.concat(viewId), new Array<string>()),
+    );
   }
 
   protected async onRegister(): Promise<void> {
@@ -84,6 +108,7 @@ export default class CreatePerspectivePageComponent {
     // Capture form values, since the `layout` function is evaluated independently of the form life-cycle
     const [initialPart, ...parts] = this.form.controls.parts.value;
     const views = this.form.controls.views.value;
+    const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
@@ -112,7 +137,17 @@ export default class CreatePerspectivePageComponent {
         });
       }
 
-      // Add navigations.
+      // Add part navigations.
+      for (const partNavigation of partNavigations) {
+        layout = layout.navigatePart(partNavigation.id, partNavigation.commands, {
+          hint: partNavigation.extras?.hint,
+          data: partNavigation.extras?.data,
+          state: partNavigation.extras?.state,
+          cssClass: partNavigation.extras?.cssClass,
+        });
+      }
+
+      // Add view navigations.
       for (const viewNavigation of viewNavigations) {
         layout = layout.navigateView(viewNavigation.id, viewNavigation.commands, {
           hint: viewNavigation.extras?.hint,

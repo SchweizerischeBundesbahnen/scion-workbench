@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
-import {WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
+import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService as WorkbenchClientPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
@@ -48,7 +48,7 @@ export default class StartPageComponent {
   private _filterField!: SciFilterFieldComponent;
 
   @HostBinding('attr.data-partid')
-  public partId: string | undefined;
+  public partId: PartId | undefined;
 
   public filterControl = this._formBuilder.control('');
   public workbenchViewRoutes$: Observable<Routes>;
@@ -68,27 +68,27 @@ export default class StartPageComponent {
               private _cd: ChangeDetectorRef,
               router: Router,
               workbenchConfig: WorkbenchConfig) {
-    // Read workbench views to be pinned to the start page.
+    // Read views to be pinned to the desktop.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(filterArray(route => {
         if ((!route.outlet || route.outlet === PRIMARY_OUTLET)) {
-          return route.data?.['pinToStartPage'] === true;
+          return route.data?.['pinToDesktop'] === true;
         }
         return false;
       }));
 
     if (workbenchConfig.microfrontendPlatform) {
-      // Read microfrontend views to be pinned to the start page.
+      // Read microfrontend views to be pinned to the desktop.
       this.microfrontendViewCapabilities$ = this._manifestService!.lookupCapabilities$<WorkbenchViewCapability>({type: WorkbenchCapabilities.View})
         .pipe(
-          filterArray(viewCapability => 'pinToStartPage' in viewCapability.properties && !!viewCapability.properties['pinToStartPage']),
+          filterArray(viewCapability => 'pinToDesktop' in viewCapability.properties && !!viewCapability.properties['pinToDesktop']),
           filterArray(viewCapability => !isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );
-      // Read test capabilities to be pinned to the start page.
+      // Read test capabilities to be pinned to the desktop.
       this.testCapabilities$ = this._manifestService!.lookupCapabilities$()
         .pipe(
-          filterArray(capability => !!capability.properties && 'pinToStartPage' in capability.properties && !!capability.properties['pinToStartPage']),
+          filterArray(capability => !!capability.properties && 'pinToDesktop' in capability.properties && !!capability.properties['pinToDesktop']),
           filterArray(viewCapability => isTestCapability(viewCapability)),
           sortArray((a, b) => a.metadata!.appSymbolicName.localeCompare(b.metadata!.appSymbolicName)),
         );

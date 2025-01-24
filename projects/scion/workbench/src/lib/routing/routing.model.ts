@@ -12,18 +12,17 @@ import {NavigationExtras, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
-import {WorkbenchPopupDiff} from './workbench-popup-differ';
-import {WorkbenchDialogDiff} from './workbench-dialog-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
-import {WorkbenchMessageBoxDiff} from './workbench-message-box-differ';
-import {WorkbenchViewOutletDiff} from './workbench-view-outlet-differ';
+import {WorkbenchOutletDiff} from './workbench-outlet-differ';
+import {WorkbenchOutlet} from '../workbench.constants';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Options to control the navigation.
  */
 export interface WorkbenchNavigationExtras extends NavigationExtras {
   /**
-   * Controls where to open the view. Default is `auto`.
+   * Controls where to open the view. Defaults to `auto`.
    *
    * One of:
    * - 'auto':   Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
@@ -32,46 +31,61 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    */
   target?: ViewId | string | 'blank' | 'auto';
   /**
-   * Controls which part to navigate views in.
+   * Controls in which part to navigate views.
    *
-   * If target is `blank`, opens the view in the specified part.
-   * If target is `auto`, navigates matching views in the specified part, or opens a new view in that part otherwise.
+   * If {@link target} is `blank`, opens the view in the specified part.
+   * If {@link target} is `auto`, navigates matching views in the specified part, or opens a new view in that part otherwise.
    *
-   * If the specified part is not in the layout, opens the view in the active part, with the active part of the main area taking precedence.
+   * If the specified part is not in the layout, opens the view in the active part, with the active part of the main area, if any, taking precedence.
    */
-  partId?: string;
+  partId?: PartId | string;
   /**
-   * Sets a hint to control navigation, e.g., for use in a `CanMatch` guard to differentiate between routes with an identical path.
+   * Allows differentiation between routes with identical paths.
    *
-   * For example, views of the initial layout or a perspective are usually navigated to the empty path route to avoid cluttering the URL,
-   * requiring a navigation hint to differentiate between the routes. See {@link canMatchWorkbenchView} for an example.
-   *
+   * Multiple views can navigate to the same path but still resolve to different routes, e.g., the empty path route to maintain a clean URL.
    * Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
    *
+   * Example route config matching routes based on the hint passed to the navigation:
+   * ```ts
+   * import {canMatchWorkbenchView} from '@scion/workbench';
+   *
+   * const routes = [
+   *   {
+   *     path: '',
+   *     component: View1Component,
+   *     canMatch: [canMatchWorkbenchView('hint-1')], // matches navigations with hint 'hint-1'
+   *   },
+   *   {
+   *     path: '',
+   *     component: View2Component,
+   *     canMatch: [canMatchWorkbenchView('hint-2')], // matches navigations with hint 'hint-2'
+   *   },
+   * ];
+   * ```
    * @see canMatchWorkbenchView
    */
   hint?: string;
   /**
-   * Instructs the router to activate the view. Default is `true`.
+   * Instructs the router to activate the view. Defaults to `true`.
    */
   activate?: boolean;
   /**
-   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
+   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Defaults to after the active view.
    */
   position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**
-   * Associates data with a view navigation.
+   * Associates data with the navigation.
    *
-   * Unlike matrix parameters, navigation data is stored in the layout and not added to the path, allowing data to be passed to empty path navigations.
+   * Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to empty path navigations.
    *
-   * Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigationData}.
+   * Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigation.data}.
    */
   data?: NavigationData;
   /**
-   * Passes state to a view navigation.
+   * Passes state to the navigation.
    *
-   * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
-   * State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
+   * State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
+   * State can be read from {@link WorkbenchView.navigation.state} or from the browser's session history via `history.state`.
    */
   state?: NavigationState;
   /**
@@ -103,25 +117,17 @@ export interface WorkbenchNavigationContext {
    */
   previousLayout: ɵWorkbenchLayout | null;
   /**
-   * Workbench layout elements added or removed by the current navigation.
+   * Parts and views added or removed by the current navigation.
+   *
+   * This diff is based on the layout elements. Do not use it to update auxiliary route registrations as not available during initial navigation.
    */
   layoutDiff: WorkbenchLayoutDiff;
   /**
-   * View auxiliary routes to register or unregister by the current navigation.
+   * Outlets added or removed by the current navigation.
+   *
+   * This diff is based on the outlets in the URL and layout elements. Use it to update auxiliary route registrations.
    */
-  viewOutletDiff: WorkbenchViewOutletDiff;
-  /**
-   * Popups added or removed by the current navigation.
-   */
-  popupDiff: WorkbenchPopupDiff;
-  /**
-   * Dialogs added or removed by the current navigation.
-   */
-  dialogDiff: WorkbenchDialogDiff;
-  /**
-   * Message boxes added or removed by the current navigation.
-   */
-  messageBoxDiff: WorkbenchMessageBoxDiff;
+  outletDiff: WorkbenchOutletDiff;
 
   /**
    * Reverts changes made during the navigation if it fails or is cancelled.
@@ -161,27 +167,24 @@ export interface WorkbenchNavigationContext {
 export type Commands = any[];
 
 /**
- * URL segments of views contained in the workbench layout.
+ * URL segments of workbench elements contained in the workbench layout.
  */
-export type ViewOutlets = {[viewId: ViewId]: UrlSegment[]};
+export type Outlets = {[outlet: WorkbenchOutlet]: UrlSegment[]};
 
 /**
- * States associated with view navigations.
+ * State associated with a navigation.
  */
-export type NavigationStates = {[viewId: ViewId]: NavigationState};
+export type NavigationStates = {[outlet: WorkbenchOutlet]: NavigationState};
 
 /**
- * State passed to a view navigation.
+ * State passed to a navigation.
  *
- * State is not persistent, unlike {@link data}, it is only added to the browser's session history to support back/forward browser navigation.
- * State can be read from {@link WorkbenchView.navigationState} or from the browser's session history via `history.state`.
+ * State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
  */
 export type NavigationState = {[key: string]: unknown};
 
 /**
- * Data associated with a view navigation.
- *
- * Data can be read from {@link WorkbenchView.navigationData}. Data must be JSON serializable.
+ * Data associated with a navigation. Data must be JSON serializable.
  */
 export type NavigationData = {[key: string]: unknown};
 
@@ -194,7 +197,7 @@ export type NavigationData = {[key: string]: unknown};
  * The function can call `inject` to get any required dependencies.
  *
  * ## Workbench Layout
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
  *
  * ## Example
  * The following example adds a part to the left of the main area, inserts a view and navigates it.

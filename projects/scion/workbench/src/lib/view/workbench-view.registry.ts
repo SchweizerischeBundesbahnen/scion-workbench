@@ -11,13 +11,14 @@
 import {InjectionToken} from '@angular/core';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
+import {ViewId} from './workbench-view.model';
 
 /**
  * Registry for {@link WorkbenchView} model objects.
  */
-export const WORKBENCH_VIEW_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<string, ɵWorkbenchView>>('WORKBENCH_VIEW_REGISTRY', {
+export const WORKBENCH_VIEW_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<ViewId, ɵWorkbenchView>>('WORKBENCH_VIEW_REGISTRY', {
   providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<string, ɵWorkbenchView>({
+  factory: () => new WorkbenchObjectRegistry<ViewId, ɵWorkbenchView>({
     keyFn: view => view.id,
     nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
     onUnregister: view => view.destroy(),

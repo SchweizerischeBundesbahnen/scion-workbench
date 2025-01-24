@@ -12,7 +12,7 @@ import {Locator} from '@playwright/test';
 import {SciKeyValuePO} from '../../@scion/components.internal/key-value.po';
 import {DialogPO} from '../../dialog.po';
 import {WorkbenchDialogPagePO} from './workbench-dialog-page.po';
-import {NavigationData, NavigationState, ViewId} from '@scion/workbench';
+import {NavigationData, NavigationState, PartId, ViewId} from '@scion/workbench';
 import {Data, Params} from '@angular/router';
 
 /**
@@ -34,8 +34,9 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
 
     return {
       viewId: await this.locator.locator('span.e2e-view-id').innerText() as ViewId,
-      alternativeId: await this.locator.locator('span.e2e-alternative-view-id').innerText(),
-      partId: await this.locator.locator('span.e2e-part-id').innerText(),
+      alternativeViewId: await this.locator.locator('span.e2e-alternative-view-id').innerText(),
+      partId: await this.locator.locator('span.e2e-part-id').innerText() as PartId,
+      alternativePartId: await this.locator.locator('span.e2e-alternative-part-id').innerText(),
       title: await this.locator.locator('input.e2e-title').inputValue(),
       heading: await this.locator.locator('input.e2e-heading').inputValue(),
       urlSegments: await this.locator.locator('span.e2e-url-segments').innerText(),
@@ -58,8 +59,9 @@ export class ViewInfoDialogPO implements WorkbenchDialogPagePO {
 
 export interface ViewInfo {
   viewId: ViewId;
-  alternativeId: string;
-  partId: string;
+  alternativeViewId: string;
+  partId: PartId;
+  alternativePartId: string;
   title: string;
   heading: string;
   urlSegments: string;

@@ -50,7 +50,7 @@ export class AngularZoneTestPagePO implements MicrofrontendViewPagePO {
         path: 'test-pages/angular-zone-test-page',
         cssClass: 'e2e-test-angular-zone',
         title: 'Angular Zone Test Page',
-        pinToStartPage: true,
+        pinToDesktop: true,
       },
     });
 

@@ -97,7 +97,7 @@ export interface WorkbenchPerspectiveDefinition {
  * The function can call `inject` to get any required dependencies.
  *
  * ## Workbench Layout
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. A part is a stack of views. Content is displayed in views.
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
  *
  * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
  * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
@@ -109,7 +109,7 @@ export interface WorkbenchPerspectiveDefinition {
  * Next, add views to the layout, specifying to which part to add the views.
  * The final step is to navigate the views. A view can be navigated to any route.
  *
- * To avoid cluttering the initial URL, we recommend navigating the views of the initial layout to empty path routes and using a navigation hint to differentiate.
+ * To maintain a clean URL, we recommend navigating the parts and views of the initial layout to empty path routes and using a navigation hint to differentiate.
  *
  * ## Example
  * The following example defines a layout with a main area and three parts in the peripheral area:
@@ -203,10 +203,10 @@ export interface MPerspectiveLayout {
      */
     workbenchGrid: string;
     /**
-     * @see WorkbenchLayoutSerializer.serializeViewOutlets
-     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
      */
-    viewOutlets: string;
+    outlets: string;
   };
   /**
    * Layout personalized by the user.
@@ -218,9 +218,9 @@ export interface MPerspectiveLayout {
      */
     workbenchGrid: string;
     /**
-     * @see WorkbenchLayoutSerializer.serializeViewOutlets
-     * @see WorkbenchLayoutSerializer.deserializeViewOutlets
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
      */
-    viewOutlets: string;
+    outlets: string;
   };
 }

@@ -21,6 +21,7 @@ import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
+import {provideMainAreaInitialPartId} from './workbench/main-area-initial-part-id.provider';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideWorkbench(workbenchConfig),
     provideConfirmWorkbenchStartupInitializer(),
     provideThrottleCapabilityLookupInterceptor(),
+    provideMainAreaInitialPartId(),
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
     provideNotificationPage(),
