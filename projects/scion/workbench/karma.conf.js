@@ -53,8 +53,14 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     autoWatch: true,
     browsers: [
-      process.env.HEADLESS ? 'ChromeHeadless' : 'Chrome',
+      process.env.HEADLESS ? 'HeadlessChrome' : 'Chrome',
     ],
+    customLaunchers: {
+      HeadlessChrome: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
     singleRun: !!process.env.HEADLESS,
     restartOnFileChange: true,
   });
