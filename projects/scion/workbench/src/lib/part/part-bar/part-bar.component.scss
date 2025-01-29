@@ -22,18 +22,20 @@
     flex: initial;
   }
 
-  > wb-part-action-bar.start {
-    flex: none;
-    padding-left: var(--sci-workbench-part-bar-actions-padding-inline);
+  > div.actions {
+    flex: initial; // allow to shrink
+    display: flex;
+    align-items: center;
+    gap: var(--sci-workbench-part-bar-actions-gap);
+    padding-inline: var(--sci-workbench-part-bar-actions-padding-inline);
+
+    > wb-part-action {
+      flex: initial; // allow to shrink
+    }
   }
 
   > div.filler {
     flex: auto;
-  }
-
-  > wb-part-action-bar.end {
-    flex: none;
-    padding-right: var(--sci-workbench-part-bar-actions-padding-inline);
   }
 
   > wb-view-list-button {

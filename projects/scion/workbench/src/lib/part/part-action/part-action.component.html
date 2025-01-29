@@ -1,0 +1,6 @@
+@if (action() | wbInstanceof:TemplatePartAction; as action) {
+  <ng-container *ngTemplateOutlet="action.template; context: action.context; injector: action.injector"/>
+}
+@if (action() | wbInstanceof:ComponentPartAction; as action) {
+  <ng-container *ngComponentOutlet="action.component; inputs: action.inputs; injector: action.injector"/>
+}

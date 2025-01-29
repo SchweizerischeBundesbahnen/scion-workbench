@@ -7,9 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal, untracked} from '@angular/core';
+import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {WorkbenchPartAction} from '../workbench.model';
+import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
@@ -33,7 +33,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
-  private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>;
 
   public readonly alternativeId: string | undefined;
@@ -50,7 +49,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) {
     this.alternativeId = layout.part({partId: this.id}).alternativeId;
     this._partComponent = options.component;
-    this.actions = this.findPartActions();
+    this.actions = this.computePartActions();
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
@@ -160,9 +159,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /**
-   * Finds actions matching this part.
+   * Computes actions matching this part.
    */
-  private findPartActions(): Signal<WorkbenchPartAction[]> {
+  private computePartActions(): Signal<WorkbenchPartAction[]> {
     const injector = Injector.create({
       parent: inject(Injector),
       providers: [
@@ -171,14 +170,25 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       ],
     });
 
+    // Use a differ to avoid re-creating every action on registration or change.
+    const differ = inject(IterableDiffers).find([]).create<WorkbenchPartActionFn>();
+    const partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
+    const partActions = new Map<WorkbenchPartActionFn, Signal<WorkbenchPartAction | null>>();
+
     return computed(() => {
-      // Filter actions by calling `canMatch`, if any.
-      return this._partActionRegistry.objects().filter(action => {
-        // - Run function in injection context for `canMatch` function to inject dependencies.
-        // - Run function in a reactive context to track signals.
-        return runInInjectionContext(injector, () => action.canMatch?.(this) ?? true);
-      });
+      const changes = differ.diff(partActionRegistry.objects());
+      changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => runInInjectionContext(injector, () => constructAction(this, fn)))));
+      changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
+      return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
     });
+
+    function constructAction(part: WorkbenchPart, factoryFn: WorkbenchPartActionFn): WorkbenchPartAction | null {
+      const action: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null = factoryFn(part);
+      if (action instanceof TemplateRef || typeof action === 'function') {
+        return {content: action};
+      }
+      return action;
+    }
   }
 
   /**

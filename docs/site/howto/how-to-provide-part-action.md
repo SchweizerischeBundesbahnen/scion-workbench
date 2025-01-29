@@ -3,78 +3,150 @@
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
 | --- | --- | --- | --- | --- |
 
-## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
+## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Part
 
 Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
 
 ### How to add a part action
 Actions can be added declaratively in an HTML template or via `WorkbenchService`.
 
-Actions are context-sensitive:
-- Declaring an action in a part's template displays it only in that part.
-- Declaring an action in a view's template displays it only in that view.
-
-To contribute an action based on other conditions, declare it as a child of `<wb-workbench>` or register it via `WorkbenchService`.
-
-#### Contribute an action via HTML template
-Add the directive `wbPartAction` to an `<ng-template>`. The template content will be used as the action content. The action shares the lifecycle of its embedding context.
+#### Add a part action via HTML template
+Add an `<ng-template>` and decorate it with the `wbPartAction` directive. The template content will be used as the action content. The action shares the lifecycle of its embedding context.
 
 ```html
 <ng-template wbPartAction>
-  <button [wbRouterLink]="'/path/to/view'">
-    Open View
-  </button>
+  ...
 </ng-template>
 ```
 
-#### Contribute an action via WorkbenchService
-As an alternative to modeling an action in HTML templates, actions can be contributed using the `WorkbenchService.registerPartAction` method. The content is specified in the form of a CDK portal, i.e., a component portal or a template portal.
+Part actions are context-sensitive:
+- Declaring the action in a part's template displays it only in that part.
+- Declaring the action in a view's template displays it only when that view is active.
+- Declaring the action outside a part and view context, such as within `<wb-workbench>`, displays it in every part.
+
+A predicate can be used to match a specific context, such as a particular part or condition.
+
+```html
+<ng-template wbPartAction [canMatch]="canMatch">
+  ...
+</ng-template>
+```
+
+The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
+
+```ts
+import {Component} from '@angular/core';
+import {WorkbenchPart} from '@scion/workbench';
+
+@Component({...})
+class ActionComponent {
+  canMatch = (part: WorkbenchPart): boolean => part.isInMainArea; // matches parts in the main area
+}
+```
+
+The `WorkbenchPart` is available as the default template variable (`let-part`).
+
+```html
+<ng-template wbPartAction let-part>
+  ...
+</ng-template>
+```
+
+#### Add a part action via WorkbenchService
+Part actions can also be added using a factory function and registered via `WorkbenchService.registerPartAction`. The content can be a component or a template.
 
 ```ts
 import {inject} from '@angular/core';
 import {WorkbenchService} from '@scion/workbench';
-import {ComponentPortal} from '@angular/cdk/portal';
 
-inject(WorkbenchService).registerPartAction({portal: new ComponentPortal(YourComponent)});
+inject(WorkbenchService).registerPartAction(() => ActionComponent);
 ```
 
-#### Use a condition to control contribution 
-The action can be configured with a `canMatch` function to match a specific context, such as a particular part or condition. Defaults to any context.
-
-```html
-<wb-workbench>
-  <ng-template wbPartAction [canMatch]="canMatch">
-    <button [wbRouterLink]="'/path/to/view'">
-      Open View
-    </button>
-  </ng-template>
-</wb-workbench>
-```
-
-The following function contributes the action only to parts in the perspective 'MyPerspective' located in the main area.
+The function is called per part. Returning the action adds it to the part, returning `null` skips it.
 
 ```ts
 import {inject} from '@angular/core';
-import {CanMatchPartFn, WorkbenchPart, WorkbenchService} from '@scion/workbench';
+import {WorkbenchService} from '@scion/workbench';
 
-const canMatch: CanMatchPartFn = (part: WorkbenchPart): boolean => {
-  if (inject(WorkbenchService).activePerspective()?.id === 'MyPerspective') {
-    return false;
-  }
-  if (!part.isInMainArea) {
-    return false;
-  }
-  return true;
-};
+inject(WorkbenchService).registerPartAction(part => {
+  return part.isInMainArea ? ActionComponent : null; // matches parts in the main area
+});
+```
+For more control, return an object literal. The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
+
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchService} from '@scion/workbench';
+
+inject(WorkbenchService).registerPartAction(() => {
+  return {
+    content: ActionComponent,
+    align: 'start',
+  };
+});
 ```
 
-#### Control alignment
-By default, actions are aligned to the start, which can be changed using the `align` property.
+Data can be passed to the component or template as inputs:
+```ts
+import {inject} from '@angular/core';
+import {WorkbenchService} from '@scion/workbench';
 
+inject(WorkbenchService).registerPartAction(() => {
+  return {
+    content: ActionComponent,
+    inputs: {
+      icon: 'icon',
+    },
+  };
+});
+```
+
+If using a component, inputs are available as input properties.
+```ts
+@Component({...})
+class ActionComponent {
+  icon = input.required<string>();
+}
+```
+
+If using a template, inputs are available for binding via local template let declarations.
 ```html
-<ng-template wbPartAction align="end">
+<ng-template let-icon="icon">
   ...
 </ng-template>
+```
+
+The component and template can inject the `WorkbenchPart`, either through dependency injection or default template-local variable (`let-part`).
+
+```ts
+@Component({...})
+class ActionComponent {
+  part = inject(WorkbenchPart);
+}
+```
+
+```html
+<ng-template let-part>
+  ...
+</ng-template>
+```
+
+A custom injector can be configured, giving control over the objects available for injection.
+```ts
+import {inject, Injector} from '@angular/core';
+import {WorkbenchService} from '@scion/workbench';
+
+inject(WorkbenchService).registerPartAction(() => {
+  return {
+    content: ActionComponent,
+    injector: Injector.create({
+      parent: inject(Injector),
+      providers: [
+        {provide: DI_TOKEN, useValue: 'value'},
+      ],
+    }),
+  };
+});
 ```
 
 

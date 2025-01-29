@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, effect, ElementRef, HostBinding, inject, Injector, OnDestroy, OnInit, untracked} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnInit, untracked} from '@angular/core';
 import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
@@ -41,13 +41,12 @@ import {PartId} from './workbench-part.model';
     SciViewportComponent,
   ],
 })
-export class PartComponent implements OnInit, OnDestroy {
+export class PartComponent implements OnInit {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _injector = inject(Injector);
-  private readonly _logger = inject(Logger);
   private readonly _cd = inject(ChangeDetectorRef);
 
   protected readonly part = inject(ɵWorkbenchPart);
@@ -74,7 +73,7 @@ export class PartComponent implements OnInit, OnDestroy {
   }
 
   constructor() {
-    this._logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
+    this.installComponentLifecycleLogger();
     this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
     this.addHostCssClasses();
@@ -146,7 +145,9 @@ export class PartComponent implements OnInit, OnDestroy {
     synchronizeCssClasses(host, this.part.classList.asList);
   }
 
-  public ngOnDestroy(): void {
-    this._logger.debug(() => `Destroying PartComponent [partId=${this.partId}]'`, LoggerNames.LIFECYCLE);
+  private installComponentLifecycleLogger(): void {
+    const logger = inject(Logger);
+    logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying PartComponent [partId=${this.partId}]'`, LoggerNames.LIFECYCLE));
   }
 }

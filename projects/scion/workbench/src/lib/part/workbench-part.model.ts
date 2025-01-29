@@ -60,7 +60,7 @@ export abstract class WorkbenchPart {
   public abstract readonly viewIds: Signal<ViewId[]>;
 
   /**
-   * Actions matching this part and its active view.
+   * Actions associated with this part.
    */
   public abstract readonly actions: Signal<WorkbenchPartAction[]>;
 

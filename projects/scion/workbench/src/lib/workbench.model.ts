@@ -9,8 +9,9 @@
  */
 
 import {Observable} from 'rxjs';
-import {ComponentPortal, TemplatePortal} from '@angular/cdk/portal';
+import {ComponentPortal, ComponentType, TemplatePortal} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
+import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
 
 /**
@@ -64,7 +65,7 @@ export interface CanCloseRef {
 }
 
 /**
- * Describes an action contributed to a part.
+ * Represents an action of a {@link WorkbenchPart}.
  *
  * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
  */
@@ -72,22 +73,49 @@ export interface WorkbenchPartAction {
   /**
    * Specifies the content of the action.
    *
-   * Use a {@link ComponentPortal} to render a component, or a {@link TemplatePortal} to render a template.
+   * Use a {@link ComponentType} to render a component, or a {@link TemplateRef} to render a template.
+   *
+   * The component and template can inject the {@link WorkbenchPart}, either through dependency injection or default template-local variable (`let-part`).
    */
-  portal: TemplatePortal<void> | ComponentPortal<unknown>;
+  content: ComponentType<unknown> | TemplateRef<unknown>;
   /**
-   * Controls where to place this action in the part bar.
+   * Optional data to pass to the component or template.
+   *
+   * If using a component, inputs are available as input properties.
+   *
+   * ```ts
+   * @Component({...})
+   * class ActionComponent {
+   *   someInput = input.required<string>();
+   * }
+   * ```
+   *
+   * If using a template, inputs are available for binding via local template let declarations.
+   *
+   * ```html
+   * <ng-template let-input="someInput">
+   *   ...
+   * </ng-template>
+   * ```
+   */
+  inputs?: {[name: string]: unknown};
+  /**
+   * Sets the injector for the instantiation of the component or template, giving control over the objects available for injection.
+   *
+   * ```ts
+   * Injector.create({
+   *   parent: ...,
+   *   providers: [
+   *    {provide: <TOKEN>, useValue: <VALUE>}
+   *   ],
+   * })
+   * ```
+   */
+  injector?: Injector;
+  /**
+   * Controls where to place this action in the part bar. Defaults to `start`.
    */
   align?: 'start' | 'end';
-  /**
-   * Predicate to match a specific context, such as a particular part or condition. Defaults to any context.
-   *
-   * The function:
-   * - Can call `inject` to get any required dependencies, such as the contextual part.
-   * - Runs in a reactive context, re-evaluating when tracked signals change.
-   *   To execute code outside this reactive context, use Angular's `untracked` function.
-   */
-  canMatch?: CanMatchPartFn;
   /**
    * Specifies CSS class(es) to add to the action, e.g., to locate the action in tests.
    */
@@ -95,14 +123,16 @@ export interface WorkbenchPartAction {
 }
 
 /**
- * The signature of a function used as a `canMatch` condition for a part.
+ * Signature of a function to contribute an action to a {@link WorkbenchPart}.
  *
  * The function:
+ * - Can return a component or template, or an object literal for more control.
+ * - Is called per part. Returning the action adds it to the part, returning `null` skips it.
  * - Can call `inject` to get any required dependencies.
- * - Runs in a reactive context, re-evaluating when tracked signals change.
- *   To execute code outside this reactive context, use Angular's `untracked` function.
+ * - Runs in a reactive context and is called again when tracked signals change.
+ *   Use Angular's `untracked` function to execute code outside this reactive context.
  */
-export type CanMatchPartFn = (part: WorkbenchPart) => boolean;
+export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null;
 
 /**
  * Factory function to create a {@link WorkbenchMenuItem}.

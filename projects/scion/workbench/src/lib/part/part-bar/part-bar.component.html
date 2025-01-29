@@ -3,13 +3,25 @@
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
-<!-- Actions -->
+<!-- Start Actions -->
 @if (startActions().length) {
-  <wb-part-action-bar [actions]="startActions()" class="start"/>
+  <div class="actions">
+    @for (action of startActions(); track action) {
+      <wb-part-action [action]="action" [ngClass]="action.cssClass" data-align="start"/>
+    }
+  </div>
 }
+
+<!-- Filler -->
 <div class="filler" #filler></div>
+
+<!-- End Actions -->
 @if (endActions().length) {
-  <wb-part-action-bar [actions]="endActions()" class="end"/>
+  <div class="actions">
+    @for (action of endActions(); track action) {
+      <wb-part-action [action]="action" [ngClass]="action.cssClass" data-align="end"/>
+    }
+  </div>
 }
 
 <!-- View List Dropdown -->

@@ -16,7 +16,7 @@ import {Pipe, PipeTransform, Type} from '@angular/core';
 @Pipe({name: 'wbInstanceof', standalone: true})
 export class InstanceofPipe implements PipeTransform {
 
-  public transform<T>(object: any | undefined, type: Type<T>): T | null {
+  public transform<T>(object: unknown | undefined, type: Type<T>): T | null {
     return object instanceof type ? object : null;
   }
 }

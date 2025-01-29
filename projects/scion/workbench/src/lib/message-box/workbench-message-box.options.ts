@@ -67,8 +67,7 @@ export interface WorkbenchMessageBoxOptions {
    * This property only applies to a message box opened with a component, not a plain text message.
    *
    * ```ts
-   * @Input()
-   * public someInput: string;
+   * public someInput = input.required<string>();
    * ```
    */
   inputs?: {[name: string]: unknown};
