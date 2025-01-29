@@ -11,7 +11,14 @@
     &::part(content) {
       display: flex;
       padding-left: var(--ɵpart-bar-indent-left);
-      padding-right: var(--ɵpart-bar-indent-right);
+
+      // Pseudo-element to apply right padding, as setting it directly on ::part(content) has no effect on viewport overflow.
+      // Otherwise, the last view tab, if active and using rounded tab corners, would be cropped on viewport overflow.
+      &:after {
+        flex: none;
+        width: var(--ɵpart-bar-indent-right);
+        content: '';
+      }
     }
 
     > wb-view-tab {
@@ -67,8 +74,8 @@
   }
 
   // Do not set right indent if the tabbar has no (visible) tabs, such as when dragging the last tab out of the tabbar.
-  &:not(.drag-over) > sci-viewport:not(:has(wb-view-tab:not(.drag-source)))::part(content) {
-    padding-right: 0;
+  &:not(.drag-over) > sci-viewport:not(:has(wb-view-tab:not(.drag-source)))::part(content):after {
+    display: none;
   }
 
   // Animate shifting tabs during drag and drop.
