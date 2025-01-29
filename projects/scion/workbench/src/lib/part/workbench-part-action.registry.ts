@@ -8,16 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WorkbenchPartAction} from '../workbench.model';
+import {WorkbenchPartActionFn} from '../workbench.model';
 import {InjectionToken} from '@angular/core';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 
 /**
- * Registry for {@link WorkbenchPartAction} model objects.
+ * Registry for {@link WorkbenchPartAction} factory functions.
  */
-export const WORKBENCH_PART_ACTION_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<WorkbenchPartAction, WorkbenchPartAction>>('WORKBENCH_PART_ACTION_REGISTRY', {
+export const WORKBENCH_PART_ACTION_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<WorkbenchPartActionFn, WorkbenchPartActionFn>>('WORKBENCH_PART_ACTION_REGISTRY', {
   providedIn: 'root',
-  factory: () => new WorkbenchObjectRegistry<WorkbenchPartAction, WorkbenchPartAction>({
-    nullObjectErrorFn: (action: WorkbenchPartAction) => Error(`[NullPartActionError] Part Action '${JSON.stringify(action)}' not found.`),
-  }),
+  factory: () => new WorkbenchObjectRegistry<WorkbenchPartActionFn, WorkbenchPartActionFn>(),
 });

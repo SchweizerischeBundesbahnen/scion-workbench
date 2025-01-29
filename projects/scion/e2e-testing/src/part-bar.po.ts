@@ -51,7 +51,7 @@ export class PartBarPO {
    * Gets the handle to the specified part action.
    */
   public action(locateBy: {cssClass: string}): PartActionPO {
-    return new PartActionPO(this.locator.locator('wb-part-action-bar').locator(`div.e2e-part-action.${locateBy.cssClass}`));
+    return new PartActionPO(this.locator.locator(`wb-part-action.${locateBy.cssClass}`));
   }
 
   /**

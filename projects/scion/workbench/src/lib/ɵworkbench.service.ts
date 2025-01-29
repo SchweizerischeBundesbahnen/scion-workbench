@@ -10,7 +10,7 @@
 
 import {assertNotInReactiveContext, computed, inject, Injectable, Signal} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
+import {WorkbenchMenuItemFactoryFn, WorkbenchPartActionFn, WorkbenchTheme} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
@@ -99,11 +99,11 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public registerPartAction(action: WorkbenchPartAction): Disposable {
+  public registerPartAction(fn: WorkbenchPartActionFn): Disposable {
     assertNotInReactiveContext(this.registerPartAction, 'Call WorkbenchService.registerPartAction() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    this._partActionRegistry.register(action, action);
+    this._partActionRegistry.register(fn, fn);
     return {
-      dispose: () => this._partActionRegistry.unregister(action),
+      dispose: () => this._partActionRegistry.unregister(fn),
     };
   }
 

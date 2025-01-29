@@ -11,10 +11,11 @@
 import {Component, computed, ElementRef, HostListener, inject, InjectionToken, Signal, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {PartActionBarComponent} from '../part-action-bar/part-action-bar.component';
+import {PartActionComponent} from '../part-action/part-action.component';
 import {ViewListButtonComponent} from '../view-list-button/view-list-button.component';
 import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
+import {NgClass} from '@angular/common';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -28,8 +29,9 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
   standalone: true,
   imports: [
     ViewTabBarComponent,
-    PartActionBarComponent,
+    PartActionComponent,
     ViewListButtonComponent,
+    NgClass,
   ],
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef<HTMLElement>).nativeElement},

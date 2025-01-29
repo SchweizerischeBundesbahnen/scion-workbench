@@ -21,8 +21,7 @@ export interface WorkbenchDialogOptions {
    *
    * **Example:**
    * ```ts
-   * @Input()
-   * public someInput: string;
+   * public someInput = input.required<string>();
    * ```
    */
   inputs?: {[name: string]: unknown};

@@ -8,17 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, InjectionToken, Injector} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
-import {ComponentPortal} from '@angular/cdk/portal';
 import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {Arrays} from '@scion/toolkit/util';
 import {SettingsService} from '../../settings.service';
 import {CssClassComponent} from '../../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {Arrays} from '@scion/toolkit/util';
 
 @Component({
   selector: 'app-register-part-action-page',
@@ -56,32 +55,29 @@ export default class RegisterPartActionPageComponent {
 
   public onRegister(): void {
     this.registerError = undefined;
-    // Capture form values, since the `canMatch` function is evaluated independently of the form life-cycle
+    // Capture form values because the action will be constructed asynchronously.
     const canMatchPartIds = undefinedIfEmpty(this.form.controls.canMatch.controls.part.value.split(/\s+/).filter(Boolean));
     const canMatchViewIds = undefinedIfEmpty(this.form.controls.canMatch.controls.view.value.split(/\s+/).filter(Boolean));
     const canMatchGrid = this.form.controls.canMatch.controls.grid.value || undefined;
+    const content = this.form.controls.content.value;
+    const align = this.form.controls.align.value || undefined;
+    const cssClass = this.form.controls.cssClass.value || undefined;
+
+    const matchesContext = (part: WorkbenchPart): boolean => {
+      if (canMatchPartIds && !Arrays.coerce(canMatchPartIds).includes(part.id)) {
+        return false;
+      }
+      if (canMatchViewIds && (!part.activeViewId() || !Arrays.coerce(canMatchViewIds).includes(part.activeViewId()!))) {
+        return false;
+      }
+      if (canMatchGrid && canMatchGrid !== (part.isInMainArea ? 'mainArea' : 'workbench')) {
+        return false;
+      }
+      return true;
+    };
+
     try {
-      this.workbenchService.registerPartAction({
-        portal: new ComponentPortal(TextComponent, undefined, Injector.create({
-          providers: [
-            {provide: TextComponent.TEXT, useValue: this.form.controls.content.value},
-          ],
-        })),
-        align: this.form.controls.align.value || undefined,
-        canMatch: ((part: WorkbenchPart) => {
-          if (canMatchPartIds && !Arrays.coerce(canMatchPartIds).includes(part.id)) {
-            return false;
-          }
-          if (canMatchViewIds && (!part.activeViewId() || !Arrays.coerce(canMatchViewIds).includes(part.activeViewId()!))) {
-            return false;
-          }
-          if (canMatchGrid && canMatchGrid !== (part.isInMainArea ? 'mainArea' : 'workbench')) {
-            return false;
-          }
-          return true;
-        }),
-        cssClass: this.form.controls.cssClass.value,
-      });
+      this.workbenchService.registerPartAction(part => matchesContext(part) ? {content: TextComponent, inputs: {text: content}, align, cssClass} : null);
       this.registerError = false;
       this.resetForm();
     }
@@ -99,12 +95,10 @@ export default class RegisterPartActionPageComponent {
 
 @Component({
   selector: 'app-text',
-  template: '{{text}}',
+  template: '{{text()}}',
   standalone: true,
 })
 class TextComponent {
 
-  public static readonly TEXT = new InjectionToken<string>('TEXT');
-
-  public readonly text = inject(TextComponent.TEXT);
+  public readonly text = input.required<string>();
 }

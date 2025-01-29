@@ -9,7 +9,7 @@
  */
 
 import {Disposable} from './common/disposable';
-import {WorkbenchMenuItemFactoryFn, WorkbenchPartAction, WorkbenchTheme} from './workbench.model';
+import {WorkbenchMenuItemFactoryFn, WorkbenchPartActionFn, WorkbenchTheme} from './workbench.model';
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {PartId, WorkbenchPart} from './part/workbench-part.model';
@@ -117,22 +117,29 @@ export abstract class WorkbenchService {
   public abstract closeViews(...viewIds: ViewId[]): Promise<boolean>;
 
   /**
-   * Contributes an action to a {@link WorkbenchPart}.
+   * Registers a factory function to contribute an action to a {@link WorkbenchPart}.
    *
    * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
    *
-   * Alternatively, actions can be provided declaratively in HTML templates. See the {@link WorkbenchPartAction} directive for more information.
+   * The function:
+   * - Can return a component or template, or an object literal for an object literal for more control.
+   * - Is called per part. Returning the action adds it to the part, returning `null` skips it.
+   * - Can call `inject` to get any required dependencies.
+   * - Runs in a reactive context and is called again when tracked signals change.
+   *   Use Angular's untracked function to execute code outside this reactive context.
    *
-   * Example:
+   * Alternatively to registering a function, actions can be provided declaratively in HTML templates using the {@link WorkbenchPartActionDirective}.
+   *
    * ```html
-   * <ng-template wbPartAction>
+   * <ng-template wbPartAction let-part>
    *   ...
    * </ng-template>
    * ```
    *
-   * @return handle to unregister the part action.
+   * @param fn - function to contribute an action.
+   * @return handle to unregister the action.
    */
-  public abstract registerPartAction(action: WorkbenchPartAction): Disposable;
+  public abstract registerPartAction(fn: WorkbenchPartActionFn): Disposable;
 
   /**
    * Contributes a menu item to a view's context menu.

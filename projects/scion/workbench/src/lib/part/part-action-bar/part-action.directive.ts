@@ -8,13 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, Input, OnDestroy, OnInit, Optional, TemplateRef} from '@angular/core';
-import {Disposable} from '../../common/disposable';
+import {DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {TemplatePortal} from '@angular/cdk/portal';
 import {WorkbenchPart} from '../workbench-part.model';
-import {CanMatchPartFn} from '../../workbench.model';
 
 /**
  * Directive to add an action to a part.
@@ -22,79 +19,90 @@ import {CanMatchPartFn} from '../../workbench.model';
  * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
  *
  * Usage:
- * Add this directive to an `<ng-template>`. The template content will be used as the action content.
- * The action shares the lifecycle of its embedding context.
+ * Add this directive to an `<ng-template>`. The template content will be used as the action content. The action shares the lifecycle of its embedding context.
  *
  * ```html
  * <ng-template wbPartAction>
- *   <button wbRouterLink="/path/to/view" [wbRouterLinkExtras]="{target: 'blank'}" class="material-icons">
- *     add
- *   </button>
+ *   ...
  * </ng-template>
  * ```
  *
- * Actions are context-sensitive:
+ * The {@link WorkbenchPart} is available as the default template variable (`let-part`).
+ *
+ * ```html
+ * <ng-template wbPartAction let-part>
+ *   ...
+ * </ng-template>
+ * ```
+ *
+ * Part actions are context-sensitive:
  * - Declaring the action in a part's template displays it only in that part.
- * - Declaring the action in a view's template displays it only in that view.
+ * - Declaring the action in a view's template displays it only when that view is active.
+ * - Declaring the action outside a part and view context, such as within `<wb-workbench>`, displays it in every part.
  *
- * To contribute the action based on other conditions, declare it as a child of `<wb-workbench>` or register it via `WorkbenchService`.
+ * A predicate can be used to match a specific context, such as a particular part or condition.
  *
- * Use a `canMatch` function to match a specific context, such as a particular part or condition. Defaults to any context.
+ * ```html
+ * <ng-template wbPartAction [canMatch]="...">
+ *   ...
+ * </ng-template>
+ * ```
+ *
+ * Alternatively, actions can be added using a factory function and registered via {@link WorkbenchService.registerPartAction}.
  */
 @Directive({selector: 'ng-template[wbPartAction]', standalone: true})
-export class WorkbenchPartActionDirective implements OnInit, OnDestroy {
-
-  private _action: Disposable | undefined;
+export class WorkbenchPartActionDirective {
 
   /**
    * Specifies where to place this action in the part bar. Defaults to `start`.
    */
-  @Input()
-  public align: 'start' | 'end' = 'start';
+  public readonly align = input<'start' | 'end' | undefined>();
 
   /**
    * Predicate to match a specific context, such as a particular part or condition. Defaults to any context.
    *
    * The function:
-   * - Can call `inject` to get any required dependencies, such as the contextual part.
-   * - Runs in a reactive context, re-evaluating when tracked signals change.
-   *   To execute code outside this reactive context, use Angular's `untracked` function.
+   * - Can call `inject` to get any required dependencies.
+   * - Runs in a reactive context and is called again when tracked signals change.
+   *   Use Angular's `untracked` function to execute code outside this reactive context.
    */
-  @Input()
-  public canMatch?: CanMatchPartFn;
+  public readonly canMatch = input<(part: WorkbenchPart) => boolean>();
 
   /**
    * Specifies CSS class(es) to add to the action, e.g., to locate the action in tests.
    */
-  @Input()
-  public cssClass?: string | string[] | undefined;
+  public readonly cssClass = input<string | string[] | undefined>();
 
-  constructor(private _template: TemplateRef<void>,
-              private _workbenchService: WorkbenchService,
-              @Optional() private _part: WorkbenchPart,
-              @Optional() private _view: WorkbenchView) {
+  constructor() {
+    this.registerPartAction();
   }
 
-  public ngOnInit(): void {
-    this._action = this._workbenchService.registerPartAction({
-      portal: new TemplatePortal(this._template, null!),
-      align: this.align,
-      canMatch: ((part: WorkbenchPart) => this.matchesContextualView(part) && (this.canMatch?.(part) ?? true)),
-      cssClass: this.cssClass,
+  private registerPartAction(): void {
+    const template = inject(TemplateRef<void>);
+    const workbenchService = inject(WorkbenchService);
+    const context = {
+      view: inject(WorkbenchView, {optional: true}),
+      part: inject(WorkbenchPart, {optional: true}),
+    };
+
+    const action = workbenchService.registerPartAction((part: WorkbenchPart) => {
+      if (context.part && context.part.id !== part.id) {
+        return null;
+      }
+      if (context.view && context.view.id !== part.activeViewId()) {
+        return null;
+      }
+      if (this.canMatch() && !this.canMatch()!(part)) {
+        return null;
+      }
+
+      return {
+        content: template,
+        align: this.align(),
+        cssClass: this.cssClass(),
+      };
     });
-  }
 
-  private matchesContextualView(part: WorkbenchPart): boolean {
-    if (this._part && part.id !== this._part.id) {
-      return false;
-    }
-    if (this._view && part.activeViewId() !== this._view.id) {
-      return false;
-    }
-    return true;
-  }
-
-  public ngOnDestroy(): void {
-    this._action?.dispose();
+    inject(DestroyRef).onDestroy(() => action.dispose());
   }
 }
