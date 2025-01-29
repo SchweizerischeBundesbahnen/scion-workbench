@@ -235,7 +235,7 @@ export class WorkbenchUrlObserver {
 
     layoutDiff.addedParts.forEach(partId => {
       this._logger.debug(() => `Constructing ɵWorkbenchPart [partId=${partId}]`, LoggerNames.LIFECYCLE);
-      this._partRegistry.register(this.createWorkbenchPart(partId, layout));
+      this._partRegistry.register(partId, this.createWorkbenchPart(partId, layout));
       navigationContext.registerUndoAction(() => this._partRegistry.unregister(partId));
     });
   }
@@ -261,7 +261,7 @@ export class WorkbenchUrlObserver {
 
     layoutDiff.addedViews.forEach(viewId => {
       this._logger.debug(() => `Constructing ɵWorkbenchView [viewId=${viewId}]`, LoggerNames.LIFECYCLE);
-      this._viewRegistry.register(this.createWorkbenchView(viewId, layout));
+      this._viewRegistry.register(viewId, this.createWorkbenchView(viewId, layout));
       navigationContext.registerUndoAction(() => this._viewRegistry.unregister(viewId));
     });
   }

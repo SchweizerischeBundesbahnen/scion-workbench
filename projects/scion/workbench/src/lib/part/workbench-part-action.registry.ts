@@ -10,7 +10,6 @@
 
 import {WorkbenchPartAction} from '../workbench.model';
 import {InjectionToken} from '@angular/core';
-import {identity} from 'rxjs';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 
 /**
@@ -19,7 +18,6 @@ import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
 export const WORKBENCH_PART_ACTION_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<WorkbenchPartAction, WorkbenchPartAction>>('WORKBENCH_PART_ACTION_REGISTRY', {
   providedIn: 'root',
   factory: () => new WorkbenchObjectRegistry<WorkbenchPartAction, WorkbenchPartAction>({
-    keyFn: identity,
     nullObjectErrorFn: (action: WorkbenchPartAction) => Error(`[NullPartActionError] Part Action '${JSON.stringify(action)}' not found.`),
   }),
 });

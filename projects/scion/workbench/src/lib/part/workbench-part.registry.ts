@@ -19,7 +19,6 @@ import {PartId} from './workbench-part.model';
 export const WORKBENCH_PART_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<PartId, ɵWorkbenchPart>>('WORKBENCH_PART_REGISTRY', {
   providedIn: 'root',
   factory: () => new WorkbenchObjectRegistry<PartId, ɵWorkbenchPart>({
-    keyFn: part => part.id,
     nullObjectErrorFn: partId => Error(`[NullPartError] Part '${partId}' not found.`),
     onUnregister: part => part.destroy(),
   }),

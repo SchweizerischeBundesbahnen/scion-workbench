@@ -19,7 +19,6 @@ import {ViewId} from './workbench-view.model';
 export const WORKBENCH_VIEW_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<ViewId, ɵWorkbenchView>>('WORKBENCH_VIEW_REGISTRY', {
   providedIn: 'root',
   factory: () => new WorkbenchObjectRegistry<ViewId, ɵWorkbenchView>({
-    keyFn: view => view.id,
     nullObjectErrorFn: viewId => Error(`[NullViewError] View '${viewId}' not found.`),
     onUnregister: view => view.destroy(),
   }),

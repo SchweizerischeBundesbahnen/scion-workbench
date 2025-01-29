@@ -18,7 +18,6 @@ import {ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 export const WORKBENCH_PERSPECTIVE_REGISTRY = new InjectionToken<WorkbenchObjectRegistry<string, ɵWorkbenchPerspective>>('WORKBENCH_PERSPECTIVE_REGISTRY', {
   providedIn: 'root',
   factory: () => new WorkbenchObjectRegistry<string, ɵWorkbenchPerspective>({
-    keyFn: perspective => perspective.id,
     nullObjectErrorFn: perspectiveId => Error(`[NullPerspectiveError] Perspective '${perspectiveId}' not found.`),
     onUnregister: perspective => perspective.destroy(),
   }),

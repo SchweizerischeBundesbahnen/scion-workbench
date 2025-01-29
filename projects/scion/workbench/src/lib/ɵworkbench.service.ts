@@ -101,7 +101,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   /** @inheritDoc */
   public registerPartAction(action: WorkbenchPartAction): Disposable {
     assertNotInReactiveContext(this.registerPartAction, 'Call WorkbenchService.registerPartAction() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    this._partActionRegistry.register(action);
+    this._partActionRegistry.register(action, action);
     return {
       dispose: () => this._partActionRegistry.unregister(action),
     };

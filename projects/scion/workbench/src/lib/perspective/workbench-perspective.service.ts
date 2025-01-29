@@ -88,7 +88,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       return;
     }
 
-    this._perspectiveRegistry.register(this.createPerspective(definition));
+    this._perspectiveRegistry.register(perspectiveId, this.createPerspective(definition));
   }
 
   private createPerspective(definition: WorkbenchPerspectiveDefinition): ɵWorkbenchPerspective {
