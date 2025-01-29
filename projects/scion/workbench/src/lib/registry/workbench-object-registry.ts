@@ -18,7 +18,6 @@ export class WorkbenchObjectRegistry<KEY, T> {
   private readonly _objects = signal<T[]>([]);
   private readonly _objectsById = new Map<KEY, T>();
 
-  private readonly _keyFn: (object: T) => KEY;
   private readonly _nullObjectErrorFn: (key: KEY) => Error;
   private readonly _onUnregister: ((object: T) => void) | undefined;
 
@@ -30,25 +29,22 @@ export class WorkbenchObjectRegistry<KEY, T> {
    * This registry must be constructed within an injection context. Destroying the injection context will also destroy the registry,
    * invoking the specified `onUnregister` function for each object in the registry.
    *
-   * @param config - Controls the creation of the registry.
-   * @param config.keyFn - Function to extract the key of an object.
+   * @param config - Configures the registry.
    * @param config.nullObjectErrorFn - Function to provide an error when looking up an object not contained in the registry.
    * @param config.onUnregister - Function invoked when an object is unregistered.
    */
-  constructor(config: {keyFn: (object: T) => KEY; nullObjectErrorFn?: (key: KEY) => Error; onUnregister?: (object: T) => void}) {
-    this._keyFn = config.keyFn;
-    this._nullObjectErrorFn = config.nullObjectErrorFn ?? ((key: KEY) => Error(`[NullObjectError] Object '${key}' not found.`));
-    this._onUnregister = config.onUnregister;
+  constructor(config?: {nullObjectErrorFn?: (key: KEY) => Error; onUnregister?: (object: T) => void}) {
+    this._nullObjectErrorFn = config?.nullObjectErrorFn ?? ((key: KEY) => Error(`[NullObjectError] Object '${key}' not found.`));
+    this._onUnregister = config?.onUnregister;
 
     // Clear registry when the current injection context is destroyed.
     inject(DestroyRef).onDestroy(() => this.clear());
   }
 
   /**
-   * Registers given object, replacing any previously registered object with the same key.
+   * Registers an object under given key, replacing any previously registered object with the same key.
    */
-  public register(object: T): void {
-    const key = this._keyFn(object);
+  public register(key: KEY, object: T): void {
     const prevObject = this._objectsById.get(key);
 
     // Add to Map.
