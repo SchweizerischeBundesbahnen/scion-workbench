@@ -180,7 +180,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => runInInjectionContext(injector, () => constructAction(this, fn)))));
       changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
       return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
-    });
+    }, {equal: (a, b) => Arrays.isEqual(a, b)});
 
     function constructAction(part: WorkbenchPart, factoryFn: WorkbenchPartActionFn): WorkbenchPartAction | null {
       const action: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null = factoryFn(part);

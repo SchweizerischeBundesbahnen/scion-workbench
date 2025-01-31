@@ -171,6 +171,28 @@ describe('PartAction', () => {
     expect(actionConstructCount['part.right']).toEqual({action1: 2, action2: 1, action3: 1});
   });
 
+  it('should signal only when actions of a part change', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory.addPart('part.part'),
+        }),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitForInitialWorkbenchLayout();
+
+    const part = TestBed.inject(WorkbenchService).getPart('part.part')!;
+    const actionsRef = part.actions();
+
+    // Register action that matches no part.
+    TestBed.inject(WorkbenchService).registerPartAction(() => null);
+
+    // Expect no signal change.
+    expect(part.actions()).toBe(actionsRef);
+  });
+
   it('should re-construct action when tracked signals change', async () => {
     TestBed.configureTestingModule({
       providers: [
@@ -257,12 +279,6 @@ describe('PartAction', () => {
     await fixture.whenStable();
 
     // Expect default alignment.
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).not.toBeNull();
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).toBeNull();
-
-    // Align action to the right.
-    align.set('end');
-    await fixture.whenStable();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).toBeNull();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).not.toBeNull();
 
@@ -271,6 +287,12 @@ describe('PartAction', () => {
     await fixture.whenStable();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).not.toBeNull();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).toBeNull();
+
+    // Align action to the right.
+    align.set('end');
+    await fixture.whenStable();
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).toBeNull();
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).not.toBeNull();
   });
 
   it(`should run factory function in the part's injection context`, async () => {

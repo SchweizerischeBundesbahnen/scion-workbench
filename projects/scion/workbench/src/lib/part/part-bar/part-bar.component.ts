@@ -44,8 +44,8 @@ export class PartBarComponent {
   private readonly _fillerElement = viewChild.required<ElementRef<HTMLElement>>('filler');
 
   protected readonly part = inject(ɵWorkbenchPart);
-  protected readonly startActions = computed(() => this.part.actions().filter(action => action.align !== 'end'));
-  protected readonly endActions = computed(() => this.part.actions().filter(action => action.align === 'end'));
+  protected readonly startActions = computed(() => this.part.actions().filter(action => action.align === 'start'));
+  protected readonly endActions = computed(() => this.part.actions().filter(action => action.align !== 'start'));
   protected readonly maxViewTabBarWidth: Signal<number>;
 
   constructor() {

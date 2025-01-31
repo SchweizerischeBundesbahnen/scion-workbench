@@ -113,7 +113,7 @@ export interface WorkbenchPartAction {
    */
   injector?: Injector;
   /**
-   * Controls where to place this action in the part bar. Defaults to `start`.
+   * Controls where to place this action in the part bar. Defaults to `end`.
    */
   align?: 'start' | 'end';
   /**
