@@ -54,7 +54,7 @@ import {WorkbenchPart} from '../workbench-part.model';
 export class WorkbenchPartActionDirective {
 
   /**
-   * Specifies where to place this action in the part bar. Defaults to `start`.
+   * Specifies where to place this action in the part bar. Defaults to `end`.
    */
   public readonly align = input<'start' | 'end' | undefined>();
 

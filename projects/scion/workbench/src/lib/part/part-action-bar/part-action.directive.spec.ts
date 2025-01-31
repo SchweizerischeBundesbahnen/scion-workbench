@@ -276,12 +276,6 @@ describe('PartActionDirective', () => {
     const view = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
 
     // Expect default alignment.
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).not.toBeNull();
-    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).toBeNull();
-
-    // Align action to the right.
-    view.getComponent<SpecViewComponent>()!.align.set('end');
-    await fixture.whenStable();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).toBeNull();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).not.toBeNull();
 
@@ -290,6 +284,12 @@ describe('PartActionDirective', () => {
     await fixture.whenStable();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).not.toBeNull();
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).toBeNull();
+
+    // Align action to the right.
+    view.getComponent<SpecViewComponent>()!.align.set('end');
+    await fixture.whenStable();
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="start"].testee'))).toBeNull();
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.part"] wb-part-action[data-align="end"].testee'))).not.toBeNull();
   });
 
   it('should contribute to view', async () => {
