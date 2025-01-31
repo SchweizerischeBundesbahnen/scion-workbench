@@ -39,8 +39,10 @@ export abstract class WorkbenchConfig {
 
   /**
    * Controls which built-in menu items to display in the view context menu.
+   *
+   * Set to `false` to exclude all built-in menu items.
    */
-  public abstract viewMenuItems?: ViewMenuItemsConfig;
+  public abstract viewMenuItems?: ViewMenuItemsConfig | false;
 
   /**
    * Configures the workbench startup.
@@ -151,24 +153,29 @@ export abstract class WorkbenchConfig {
  * Configuration of built-in menu items in the view's context menu.
  *
  * Each property represents a menu item, allowing customization of visibility, text, accelerators, and more.
+ *
+ * Set a built-in menu item to `false` to exclude it.
  */
 export interface ViewMenuItemsConfig {
-  close?: MenuItemConfig;
-  closeOthers?: MenuItemConfig;
-  closeAll?: MenuItemConfig;
-  closeToTheRight?: MenuItemConfig;
-  closeToTheLeft?: MenuItemConfig;
-  moveUp?: MenuItemConfig;
-  moveRight?: MenuItemConfig;
-  moveDown?: MenuItemConfig;
-  moveLeft?: MenuItemConfig;
-  moveToNewWindow?: MenuItemConfig;
+  close?: MenuItemConfig | false;
+  closeOthers?: MenuItemConfig | false;
+  closeAll?: MenuItemConfig | false;
+  closeToTheRight?: MenuItemConfig | false;
+  closeToTheLeft?: MenuItemConfig | false;
+  moveUp?: MenuItemConfig | false;
+  moveRight?: MenuItemConfig | false;
+  moveDown?: MenuItemConfig | false;
+  moveLeft?: MenuItemConfig | false;
+  moveToNewWindow?: MenuItemConfig | false;
 }
 
 /**
  * Configures a built-in menu item.
  */
 export interface MenuItemConfig {
+  /**
+   * @deprecated since version 19.0.0-beta.2. Set to `false` in {@link ViewMenuItemsConfig} to exclude the menu item. API will be removed in version 21.
+   */
   visible?: boolean;
   /**
    * Specifies the text of this menu item.

@@ -1,0 +1,6 @@
+@if (menuItem() | wbInstanceof:TemplateMenuItem; as menuItem) {
+  <ng-container *ngTemplateOutlet="menuItem.template; context: menuItem.context; injector: menuItem.injector"/>
+}
+@if (menuItem() | wbInstanceof:ComponentMenuItem; as menuItem) {
+  <ng-container *ngComponentOutlet="menuItem.component; inputs: menuItem.inputs; injector: menuItem.injector"/>
+}

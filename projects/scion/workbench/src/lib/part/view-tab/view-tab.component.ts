@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
 import {fromEvent, merge, withLatestFrom} from 'rxjs';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {map, switchMap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
@@ -22,7 +22,7 @@ import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {subscribeIn} from '@scion/toolkit/operators';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
@@ -79,7 +79,7 @@ export class ViewTabComponent {
   constructor() {
     this.installMaximizeListener();
     this.addHostCssClasses();
-    this.installViewMenuItemAccelerators();
+    this.installMenuItemAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
   }
 
@@ -200,13 +200,12 @@ export class ViewTabComponent {
     synchronizeCssClasses(host, computed(() => this.view().classList.asList()));
   }
 
-  private installViewMenuItemAccelerators(): void {
-    toObservable(this.view)
-      .pipe(
-        switchMap(view => this._viewContextMenuService.installMenuItemAccelerators$(this.host, view)),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
+  private installMenuItemAccelerators(): void {
+    effect(onCleanup => {
+      const view = this.view();
+      const subscription = this._viewContextMenuService.installMenuItemAccelerators(this.host, view);
+      onCleanup(() => subscription.unsubscribe());
+    });
   }
 
   private createViewTabContentPortal(): Signal<ComponentPortal<unknown>> {

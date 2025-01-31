@@ -8,19 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, combineLatest, firstValueFrom, Observable} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
-import {map} from 'rxjs/operators';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
-import {Disposable} from '../common/disposable';
-import {CanClose, CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn} from '../workbench.model';
+import {CanClose, CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../workbench.model';
 import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
+import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
@@ -36,8 +33,9 @@ import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {Observables} from '@scion/toolkit/util';
+import {Arrays, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
+import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -53,7 +51,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _logger = inject(Logger);
 
-  private readonly _menuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
 
   private readonly _title = signal<string | null>(null);
@@ -80,21 +77,15 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly active = signal<boolean>(false);
-  public readonly menuItems$: Observable<WorkbenchMenuItem[]>;
+  public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
   constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout, options: {component: ComponentType<ViewComponent>}) {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
-    this.menuItems$ = combineLatest([this._menuItemProviders$, this._workbenchService.viewMenuItemProviders$])
-      .pipe(
-        map(([localMenuItemProviders, globalMenuItemProviders]) => localMenuItemProviders.concat(globalMenuItemProviders)),
-        mapArray(menuItemFactoryFn => menuItemFactoryFn(this)),
-        filterArray((menuItem: WorkbenchMenuItem | null): menuItem is WorkbenchMenuItem => menuItem !== null),
-      );
-
     this.portal = this.createPortal(options.component);
+    this.menuItems = this.computeMenuItems();
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
@@ -338,18 +329,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     return this._canCloseFn ?? (typeof this.getComponent<CanClose>()?.canClose === 'function' ? this._classBasedCanCloseGuard : undefined);
   }
 
-  /** @inheritDoc */
-  public registerMenuItem(menuItem: WorkbenchMenuItem): Disposable {
-    assertNotInReactiveContext(this.registerMenuItem, 'Call WorkbenchView.registerMenuItem() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    const factoryFn = (): WorkbenchMenuItem => menuItem;
-    this._menuItemProviders$.next(this._menuItemProviders$.value.concat(factoryFn));
-    return {
-      dispose: (): void => {
-        this._menuItemProviders$.next(this._menuItemProviders$.value.filter(it => it !== factoryFn));
-      },
-    };
-  }
-
   /**
    * Reference to the handle's injector. The injector will be destroyed when closing the view.
    */
@@ -413,6 +392,36 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         return true;
       }
     };
+  }
+
+  /**
+   * Computes menu items matching this view.
+   */
+  private computeMenuItems(): Signal<WorkbenchMenuItem[]> {
+    const injector = inject(Injector);
+
+    // Use a differ to avoid re-creating every menu item on registration or change.
+    const differ = inject(IterableDiffers).find([]).create<WorkbenchViewMenuItemFn>();
+    const menuItemRegistry = inject(WORKBENCH_VIEW_MENU_ITEM_REGISTRY);
+    const menuItems = new Map<WorkbenchViewMenuItemFn, Signal<WorkbenchMenuItem | null>>();
+
+    return computed(() => {
+      const changes = differ.diff(menuItemRegistry.objects());
+      changes?.forEachAddedItem(({item: fn}) => menuItems.set(fn, computed(() => runInInjectionContext(constructInjector(this, this.part()), () => fn(this)))));
+      changes?.forEachRemovedItem(({item: fn}) => menuItems.delete(fn));
+      return Array.from(menuItems.values()).map(menuItem => menuItem()).filter(menuItem => !!menuItem);
+    }, {equal: (a, b) => Arrays.isEqual(a, b)});
+
+    function constructInjector(view: ɵWorkbenchView, part: ɵWorkbenchPart): Injector {
+      return Injector.create({
+        parent: injector,
+        providers: [
+          provideViewContext(view),
+          {provide: ɵWorkbenchPart, useValue: part},
+          {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+        ],
+      });
+    }
   }
 
   /**

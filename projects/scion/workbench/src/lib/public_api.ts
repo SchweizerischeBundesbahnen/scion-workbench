@@ -12,7 +12,7 @@ export {WorkbenchConfig, MenuItemConfig, ViewMenuItemsConfig} from './workbench-
 export {provideWorkbench} from './workbench.provider';
 export {WorkbenchService} from './workbench.service';
 export {WORKBENCH_ID} from './workbench-id';
-export {WorkbenchPartAction, WorkbenchPartActionFn, WorkbenchTheme, WorkbenchMenuItem, WorkbenchMenuItemFactoryFn, CanClose, CanCloseFn, CanCloseRef} from './workbench.model';
+export {WorkbenchPartAction, WorkbenchPartActionFn, WorkbenchMenuItem, WorkbenchViewMenuItemFn, WorkbenchTheme, CanClose, CanCloseFn, CanCloseRef} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
 export {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from './workbench.constants';
 

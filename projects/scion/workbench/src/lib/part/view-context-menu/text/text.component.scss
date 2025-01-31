@@ -1,0 +1,6 @@
+@use '../../../common/workbench-mixins';
+
+:host {
+  display: block;
+  @include workbench-mixins.ellipsis-on-overflow();
+}

@@ -9,7 +9,7 @@
  */
 
 import {Disposable} from './common/disposable';
-import {WorkbenchMenuItemFactoryFn, WorkbenchPartActionFn, WorkbenchTheme} from './workbench.model';
+import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {PartId, WorkbenchPart} from './part/workbench-part.model';
@@ -142,24 +142,28 @@ export abstract class WorkbenchService {
   public abstract registerPartAction(fn: WorkbenchPartActionFn): Disposable;
 
   /**
-   * Contributes a menu item to a view's context menu.
+   * Registers a factory function to contribute a menu item to the context menu of a {@link WorkbenchView}.
    *
-   * ---
-   * As an alternative to programmatic registration, menu items can be contributed declaratively from an HTML template.
-   * Declaring a menu item in the HTML template of a workbench view adds it to that view only. To add it to every view,
-   * declare it outside a view context, such as in `app.component.html`, or register it programmatically.
-   * Refer to {@link WorkbenchViewMenuItemDirective} for more information.
+   * Right-clicking on a view tab opens a context menu to interact with the view and its content.
    *
-   * Example:
+   * The function:
+   * - Is called per view. Returning the menu item adds it to the context menu of the view, returning `null` skips it.
+   * - Can call `inject` to get any required dependencies.
+   * - Runs in a reactive context and is called again when tracked signals change.
+   *   Use Angular's `untracked` function to execute code outside this reactive context.
+   *
+   * Alternatively to registering a function, menu items can be provided declaratively in HTML templates using the {@link WorkbenchViewMenuItemDirective}.
+   *
    * ```html
-   * <ng-template wbViewMenuItem [accelerator]="['ctrl', 'b']" (action)="..." let-view>
+   * <ng-template wbViewMenuItem (action)="..." let-view>
    *   ...
    * </ng-template>
    * ```
    *
+   * @param fn - function to contribute a menu item.
    * @return handle to unregister the menu item.
    */
-  public abstract registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable;
+  public abstract registerViewMenuItem(fn: WorkbenchViewMenuItemFn): Disposable;
 
   /**
    * Switches the theme of the workbench.

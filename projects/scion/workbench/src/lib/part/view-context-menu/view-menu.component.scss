@@ -1,5 +1,3 @@
-@use '../../common/workbench-mixins';
-
 :host {
   display: flex;
   flex-direction: column;
@@ -20,9 +18,8 @@
     position: relative; // positioning context for separator pseudo element
     user-select: none;
 
-    > div.text {
+    > wb-menu-item {
       flex: auto;
-      @include workbench-mixins.ellipsis-on-overflow();
     }
 
     > div.accelerator {

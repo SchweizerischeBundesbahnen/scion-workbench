@@ -9,8 +9,7 @@
  */
 
 import {assertNotInReactiveContext, computed, inject, Injectable, Signal} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
-import {WorkbenchMenuItemFactoryFn, WorkbenchPartActionFn, WorkbenchTheme} from './workbench.model';
+import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
@@ -29,6 +28,7 @@ import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {throwError} from './common/throw-error.util';
 import {PartId} from './part/workbench-part.model';
+import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -37,6 +37,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   private readonly _perspectiveRegistry = inject(WORKBENCH_PERSPECTIVE_REGISTRY);
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
+  private readonly _viewMenuItemRegistry = inject(WORKBENCH_VIEW_MENU_ITEM_REGISTRY);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
   private readonly _layoutService = inject(WorkbenchLayoutService);
@@ -48,7 +49,6 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly theme: Signal<WorkbenchTheme | null>;
   public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
-  public readonly viewMenuItemProviders$ = new BehaviorSubject<WorkbenchMenuItemFactoryFn[]>([]);
 
   constructor() {
     this.layout = computed(() => this._layoutService.layout() ?? throwError('[NullLayoutError] Workbench layout not created yet.'));
@@ -108,13 +108,11 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public registerViewMenuItem(factoryFn: WorkbenchMenuItemFactoryFn): Disposable {
+  public registerViewMenuItem(fn: WorkbenchViewMenuItemFn): Disposable {
     assertNotInReactiveContext(this.registerViewMenuItem, 'Call WorkbenchService.registerViewMenuItem() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    this.viewMenuItemProviders$.next(this.viewMenuItemProviders$.value.concat(factoryFn));
+    this._viewMenuItemRegistry.register(fn, fn);
     return {
-      dispose: (): void => {
-        this.viewMenuItemProviders$.next(this.viewMenuItemProviders$.value.filter(it => it !== factoryFn));
-      },
+      dispose: () => this._viewMenuItemRegistry.unregister(fn),
     };
   }
 

@@ -11,7 +11,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
 /**
- * Formats given keyboard accelerator to be displayed to the user.
+ * Formats given keyboard accelerator for display to the user.
  */
 @Pipe({name: 'wbFormatAccelerator', standalone: true})
 export class WbFormatAcceleratorPipe implements PipeTransform {
