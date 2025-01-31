@@ -8,6 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchViewMenuItemDirective} from './view-context-menu/view-menu.directive';
+export {WorkbenchViewMenuItemDirective} from './view-context-menu/view-menu-item.directive';
 export {WorkbenchPartActionDirective} from './part-action-bar/part-action.directive';
 export {WorkbenchPart, WorkbenchPartNavigation, PartId} from './workbench-part.model';

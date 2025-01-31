@@ -9,7 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
-import {ComponentPortal, ComponentType, TemplatePortal} from '@angular/cdk/portal';
+import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchView} from './view/workbench-view.model';
 import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
@@ -123,6 +123,80 @@ export interface WorkbenchPartAction {
 }
 
 /**
+ * Represents a menu item contained in the context menu of a {@link WorkbenchView}.
+ *
+ * Right-clicking on a view tab opens a context menu to interact with the view and its content.
+ */
+export interface WorkbenchMenuItem {
+  /**
+   * Specifies the content of the menu item.
+   *
+   * Use a {@link ComponentType} to render a component, or a {@link TemplateRef} to render a template.
+   *
+   * The component and template can inject the {@link WorkbenchView}, either through dependency injection or default template-local variable (`let-view`).
+   */
+  content: ComponentType<unknown> | TemplateRef<unknown>;
+  /**
+   * Optional data to pass to the component or template.
+   *
+   * If using a component, inputs are available as input properties.
+   *
+   * ```ts
+   * @Component({...})
+   * class MenuItemComponent {
+   *   someInput = input.required<string>();
+   * }
+   * ```
+   *
+   * If using a template, inputs are available for binding via local template let declarations.
+   *
+   * ```html
+   * <ng-template let-input="someInput">
+   *   ...
+   * </ng-template>
+   * ```
+   */
+  inputs?: {[name: string]: unknown};
+  /**
+   * Sets the injector for the instantiation of the component or template, giving control over the objects available for injection.
+   *
+   * ```ts
+   * Injector.create({
+   *   parent: ...,
+   *   providers: [
+   *    {provide: <TOKEN>, useValue: <VALUE>}
+   *   ],
+   * })
+   * ```
+   */
+  injector?: Injector;
+  /**
+   * Function invoked when the menu item is clicked.
+   *
+   * The function can call `inject` to get any required dependencies.
+   */
+  onAction: () => void;
+  /**
+   * Binds keyboard accelerator(s) to the menu item, e.g., ['ctrl', 'alt', 1].
+   *
+   * Supported modifiers are 'ctrl', 'shift', 'alt' and 'meta'.
+   */
+  accelerator?: string[];
+  /**
+   * Enables grouping of menu items.
+   */
+  group?: string;
+  /**
+   * Controls if the menu item is disabled. Defaults to `false`.
+   */
+  disabled?: boolean;
+  /**
+   * Specifies CSS class(es) to add to the menu item, e.g., to locate the menu item in tests.
+   */
+  cssClass?: string | string[];
+}
+
+/**
  * Signature of a function to contribute an action to a {@link WorkbenchPart}.
  *
  * The function:
@@ -135,45 +209,15 @@ export interface WorkbenchPartAction {
 export type WorkbenchPartActionFn = (part: WorkbenchPart) => WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null;
 
 /**
- * Factory function to create a {@link WorkbenchMenuItem}.
+ * Signature of a function to contribute a menu item to the context menu of a {@link WorkbenchView}.
  *
- * The function will be invoked when opening a view's context menu. Use the passed view handle to decide whether to display the menu item.
+ * The function:
+ * - Is called per view. Returning the menu item adds it to the context menu of the view, returning `null` skips it.
+ * - Can call `inject` to get any required dependencies.
+ * - Runs in a reactive context and is called again when tracked signals change.
+ *   Use Angular's `untracked` function to execute code outside this reactive context.
  */
-export type WorkbenchMenuItemFactoryFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
-
-/**
- * Menu item in a menu or context menu.
- */
-export interface WorkbenchMenuItem {
-  /**
-   * Specifies the content of the menu item.
-   */
-  portal: TemplatePortal | ComponentPortal<any>;
-  /**
-   * Specifies the callback triggered when clicking this menu item.
-   *
-   * The function can call `inject` to get any required dependencies.
-   */
-  onAction: () => void;
-  /**
-   * Allows the user to interact with the menu item using keys on the keyboard, e.g., ['ctrl', 'alt', 1].
-   *
-   * Supported modifiers are 'ctrl', 'shift', 'alt' and 'meta'.
-   */
-  accelerator?: string[];
-  /**
-   * Allows grouping menu items of the same group.
-   */
-  group?: string;
-  /**
-   * Allows disabling the menu item based on a condition.
-   */
-  isDisabled?: () => boolean;
-  /**
-   * Specifies CSS class(es) to add to the menu item, e.g., to locate the menu item in tests.
-   */
-  cssClass?: string | string[];
-}
+export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem | null;
 
 /**
  * Information about a workbench theme.

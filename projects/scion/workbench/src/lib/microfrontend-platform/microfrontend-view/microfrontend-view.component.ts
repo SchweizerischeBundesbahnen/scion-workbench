@@ -8,25 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, Signal, untracked, viewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
-import {combineLatest, firstValueFrom, Observable, of, Subject, switchMap} from 'rxjs';
+import {firstValueFrom, Observable, Subject, switchMap} from 'rxjs';
 import {first, map, takeUntil} from 'rxjs/operators';
 import {ManifestService, mapToBody, MessageClient, MessageHeaders, MicrofrontendPlatformConfig, OutletRouter, ResponseStatusCodes, SciRouterOutletElement, TopicMessage} from '@scion/microfrontend-platform';
 import {ManifestObjectCache} from '../manifest-object-cache.service';
 import {WorkbenchViewCapability, ɵMicrofrontendRouteParams, ɵVIEW_ID_CONTEXT_KEY, ɵViewParamsUpdateCommand, ɵWorkbenchCommands} from '@scion/workbench-client';
-import {Dictionaries, Maps} from '@scion/toolkit/util';
+import {Arrays, Dictionaries, Maps} from '@scion/toolkit/util';
 import {Logger, LoggerNames} from '../../logging';
 import {CanCloseRef} from '../../workbench.model';
 import {IFRAME_OVERLAY_HOST} from '../../workbench-element-references';
 import {serializeExecution} from '../../common/operators';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
-import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
 import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
-import {AsyncPipe, NgClass, NgComponentOutlet} from '@angular/common';
+import {NgClass, NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
@@ -47,7 +46,6 @@ import {WorkbenchView} from '../../view/workbench-view.model';
   standalone: true,
   imports: [
     NgClass,
-    AsyncPipe,
     ContentAsOverlayComponent,
     NgComponentOutlet,
     GlassPaneDirective,
@@ -76,7 +74,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   private _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
   private _unsubscribeParamsUpdater$ = new Subject<void>();
   private _universalKeystrokes = [
-    'keydown.escape', // allows closing notifications
+    ['escape'], // allows closing notifications
   ];
 
   protected view = inject(ɵWorkbenchView);
@@ -84,7 +82,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   /** Splash to display until the microfrontend signals readiness. */
   protected splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   /** Keystrokes which to bubble across iframe boundaries from embedded content. */
-  protected keystrokesToBubble$: Observable<string[]>;
+  protected keystrokesToBubble: Signal<string[]>;
   /** Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash. */
   protected isWorkbenchDrag = false;
   /** Configures iframe projection. */
@@ -95,8 +93,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
   constructor() {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
-    this.keystrokesToBubble$ = combineLatest([this.viewContextMenuKeystrokes$(), of(this._universalKeystrokes)])
-      .pipe(map(keystrokes => new Array<string>().concat(...keystrokes)));
+    this.keystrokesToBubble = this.computeKeyStrokesToBubble();
     this.installWorkbenchDragDetector();
     this.installViewActivePublisher();
     this.installPartIdPublisher();
@@ -107,7 +104,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this._routerOutletElement().nativeElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id);
     this.propagateWorkbenchTheme();
-    this.installMenuItemAccelerators$();
+    this.installMenuItemAccelerators();
     this.installNavigator();
   }
 
@@ -176,13 +173,12 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
     return this._manifestObjectCache.observeCapability$(capabilityId);
   }
 
-  private installMenuItemAccelerators$(): void {
+  private installMenuItemAccelerators(): void {
     // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
     // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
     // menu of this view do not work, so we install the accelerators on the router outlet as well.
-    this._viewContextMenuService.installMenuItemAccelerators$(this._routerOutletElement().nativeElement, this.view)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe();
+    const subscription = this._viewContextMenuService.installMenuItemAccelerators(this._routerOutletElement().nativeElement, this.view);
+    this._destroyRef.onDestroy(() => subscription.unsubscribe());
   }
 
   /**
@@ -293,16 +289,20 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Upon subscription, emits the keystrokes registered with menu items of this view's context menu,
-   * and then continuously when they change. The observable never completes.
+   * Computes keystrokes to bubble through the iframe boundary.
    */
-  private viewContextMenuKeystrokes$(): Observable<string[]> {
-    return this.view.menuItems$
-      .pipe(
-        filterArray(menuItem => !!menuItem.accelerator),
-        mapArray(menuItem => menuItem.accelerator!.map(accelerator => {
+  private computeKeyStrokesToBubble(): Signal<string[]> {
+    return computed(() => {
+      const accelerators = [
+        ...this._universalKeystrokes,
+        ...this.view.menuItems().map(menuItem => menuItem.accelerator ?? []),
+      ];
+
+      return accelerators
+        .filter(accelerator => accelerator.length)
+        .map(accelerator => accelerator.map(segment => {
           // Normalize keystrokes according to `SciRouterOutletElement#keystrokes`
-          switch (accelerator) {
+          switch (segment) {
             case 'ctrl':
               return 'control';
             case '.':
@@ -310,11 +310,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
             case ' ':
               return 'space';
             default:
-              return accelerator;
+              return segment;
           }
-        })),
-        mapArray(accelerator => ['keydown'].concat(accelerator).join('.')),
-      );
+        }))
+        .map(accelerator => `keydown.${accelerator.join('.')}{preventDefault=true}`);
+    }, {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: false})});
   }
 
   /**

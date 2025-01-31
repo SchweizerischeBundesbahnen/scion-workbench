@@ -8,23 +8,20 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ElementRef, inject, Injectable, Injector, NgZone, runInInjectionContext} from '@angular/core';
+import {inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, signal, Signal} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {filter, map, switchMap, takeUntil} from 'rxjs/operators';
-import {firstValueFrom, fromEvent, Observable, Subject, TeardownLogic} from 'rxjs';
-import {coerceElement} from '@angular/cdk/coercion';
-import {TEXT, TextComponent} from '../view-context-menu/text.component';
+import {fromEvent, Subscription} from 'rxjs';
 import {MenuItemConfig, WorkbenchConfig} from '../../workbench-config';
 import {WorkbenchService} from '../../workbench.service';
-import {filterArray, observeIn} from '@scion/toolkit/operators';
-import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {provideViewContext} from '../../view/view-context-provider';
 import {Arrays} from '@scion/toolkit/util';
+import {TextComponent} from './text/text.component';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -45,17 +42,28 @@ export class ViewMenuService {
   private readonly _workbenchConfig = inject(WorkbenchConfig);
 
   constructor() {
-    // Registers built-in menu items added to the context menu of every view tab.
-    this.registerCloseMenuItem();
-    this.registerCloseOtherTabsMenuItem();
-    this.registerCloseAllTabsMenuItem();
-    this.registerCloseRightTabsMenuItem();
-    this.registerCloseLeftTabsMenuItem();
-    this.registerMoveRightMenuItem();
-    this.registerMoveLeftMenuItem();
-    this.registerMoveUpMenuItem();
-    this.registerMoveDownMenuItem();
-    this.registerMoveToNewWindowMenuItem();
+    this.registerBuiltInMenuItems();
+  }
+
+  /**
+   * Registers built-in menu items added to the context menu of every view tab.
+   */
+  private registerBuiltInMenuItems(): void {
+    const config = this._workbenchConfig.viewMenuItems ?? {};
+    if (config === false) {
+      return;
+    }
+
+    this.registerCloseMenuItem(config.close ?? {});
+    this.registerCloseOtherTabsMenuItem(config.closeOthers ?? {});
+    this.registerCloseAllTabsMenuItem(config.closeAll ?? {});
+    this.registerCloseRightTabsMenuItem(config.closeToTheRight ?? {});
+    this.registerCloseLeftTabsMenuItem(config.closeToTheLeft ?? {});
+    this.registerMoveRightMenuItem(config.moveRight ?? {});
+    this.registerMoveLeftMenuItem(config.moveLeft ?? {});
+    this.registerMoveUpMenuItem(config.moveUp ?? {});
+    this.registerMoveDownMenuItem(config.moveDown ?? {});
+    this.registerMoveToNewWindowMenuItem(config.moveToNewWindow ?? {});
   }
 
   /**
@@ -65,10 +73,9 @@ export class ViewMenuService {
    */
   public async showMenu(location: Point, viewId: ViewId): Promise<boolean> {
     const view = this._viewRegistry.get(viewId);
-    const menuItems = await firstValueFrom(view.menuItems$);
 
     // Do not show the menu if there are no menu items registered.
-    if (menuItems.length === 0) {
+    if (!view.menuItems().length) {
       return false;
     }
 
@@ -95,265 +102,202 @@ export class ViewMenuService {
   }
 
   /**
-   * Upon subscription, installs keyboard accelerators of the menu items registered in {@link WorkbenchView}.
+   * Subscribes to keyboard events for menu items of given {@link WorkbenchView}.
+   *
+   * @return subscription to unsubscribe from keyboard events.
    */
-  public installMenuItemAccelerators$(target: ElementRef<HTMLElement> | HTMLElement, view: ɵWorkbenchView): Observable<void> {
-    return new Observable((): TeardownLogic => {
-      const unsubscribe$ = new Subject<void>();
+  public installMenuItemAccelerators(target: HTMLElement, view: WorkbenchView): Subscription {
+    return fromEvent<KeyboardEvent>(target, 'keydown')
+      .pipe(subscribeIn(fn => this._zone.runOutsideAngular(fn)))
+      .subscribe(event => {
+        const menuItems = findMatchingMenuItems(view.menuItems(), event);
+        if (!menuItems.length) {
+          return;
+        }
 
-      view.menuItems$
-        .pipe(
-          observeIn(fn => this._zone.runOutsideAngular(fn)),
-          // Skip menu items which have no accelerator configured.
-          filterArray((menuItem: WorkbenchMenuItem) => !!menuItem.accelerator?.length),
-          filter(menuItems => menuItems.length > 0),
-          // Subscribe for keyboard events.
-          switchMap((menuItems: WorkbenchMenuItem[]): Observable<{event: KeyboardEvent; menuItems: WorkbenchMenuItem[]}> => {
-            return fromEvent<KeyboardEvent>(coerceElement(target), 'keydown').pipe(map(event => ({event, menuItems})));
-          }),
-          map(({event, menuItems}) => ({
-            event,
-            menuItems: menuItems
-              .filter(menuItem => !menuItem.isDisabled?.())
-              .filter(menuItem => {
-                const accelerator = menuItem.accelerator!;
-                const key = accelerator.at(-1)!;
-                const modifierKeys = accelerator.slice(0, -1);
+        runInInjectionContext(this._injector, () => this._zone.run(() => {
+          menuItems.forEach(menuItem => menuItem.onAction());
+        }));
 
-                // Compare key.
-                if (event.key?.toLowerCase() !== key.toLowerCase()) {
-                  return false;
-                }
-                // Compare modifiers.
-                if (!Arrays.isEqual(modifierKeys, getModifierState(event), {exactOrder: false})) {
-                  return false;
-                }
-                return true;
-              }),
-          })),
-          filter(({menuItems}) => menuItems.length > 0),
-          observeIn(fn => this._zone.run(fn)),
-          takeUntil(unsubscribe$),
-        )
-        .subscribe(({event, menuItems}) => {
-          event.preventDefault();
-          event.stopPropagation();
-          runInInjectionContext(this._injector, () => {
-            menuItems.forEach(menuItem => menuItem.onAction());
-          });
+        event.preventDefault();
+        event.stopPropagation();
+      });
+
+    /**
+     * Finds menu items that match the given keyboard event.
+     */
+    function findMatchingMenuItems(menuItems: WorkbenchMenuItem[], event: KeyboardEvent): WorkbenchMenuItem[] {
+      const eventKey = event.key?.toLowerCase();
+      const eventModifierKeys = getModifierState(event);
+
+      return menuItems
+        .filter(menuItem => !menuItem.disabled)
+        .filter(menuItem => {
+          const accelerator = menuItem.accelerator;
+          if (!accelerator?.length) {
+            return false;
+          }
+
+          const key = accelerator.at(-1)!.toLocaleLowerCase();
+          const modifierKeys = accelerator.slice(0, -1);
+          return key === eventKey && Arrays.isEqual(modifierKeys, eventModifierKeys, {exactOrder: false});
         });
-
-      return (): void => unsubscribe$.next();
-    });
+    }
   }
 
-  private registerCloseMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close', group: 'close', accelerator: ['ctrl', 'k'], cssClass: 'e2e-close'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.close;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return ({
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: (): boolean => !view.closable(),
-        onAction: (): void => void view.close().then(),
-      });
-    });
+  private registerCloseMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Close');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        accelerator: config.accelerator ?? ['ctrl', 'k'],
+        group: config.group ?? 'close',
+        cssClass: config.cssClass ?? 'e2e-close',
+        disabled: !view.closable(),
+        onAction: () => void view.close(),
+      }));
+    }
   }
 
-  private registerCloseOtherTabsMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close other tabs', group: 'close', accelerator: ['ctrl', 'shift', 'k'], cssClass: ' e2e-close-other-tabs'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeOthers;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return ({
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first() && view.last(),
-        onAction: (): void => void view.close('other-views').then(),
-      });
-    });
+  private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Close other tabs');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        accelerator: config.accelerator ?? ['ctrl', 'shift', 'k'],
+        group: config.group ?? 'close',
+        cssClass: config.cssClass ?? 'e2e-close-other-tabs',
+        disabled: view.first() && view.last(),
+        onAction: () => void view.close('other-views'),
+      }));
+    }
   }
 
-  private registerCloseAllTabsMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close all tabs', group: 'close', accelerator: ['ctrl', 'shift', 'alt', 'k'], cssClass: 'e2e-close-all-tabs'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeAll;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return ({
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        onAction: (): void => void view.close('all-views').then(),
-      });
-    });
+  private registerCloseAllTabsMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Close all tabs');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        accelerator: config.accelerator ?? ['ctrl', 'shift', 'alt', 'k'],
+        group: config.group ?? 'close',
+        cssClass: config.cssClass ?? 'e2e-close-all-tabs',
+        onAction: () => void view.close('all-views'),
+      }));
+    }
   }
 
-  private registerCloseRightTabsMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the right', group: 'close', cssClass: 'e2e-close-right-tabs'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeToTheRight;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: (): boolean => view.last(),
-        onAction: (): void => void view.close('views-to-the-right').then(),
-      };
-    });
+  private registerCloseRightTabsMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Close tabs to the right');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        group: config.group ?? 'close',
+        cssClass: config.cssClass ?? 'e2e-close-right-tabs',
+        disabled: view.last(),
+        onAction: () => void view.close('views-to-the-right'),
+      }));
+    }
   }
 
-  private registerCloseLeftTabsMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Close tabs to the left', group: 'close', cssClass: 'e2e-close-left-tabs'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.closeToTheLeft;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: (): boolean => view.first(),
-        onAction: (): void => void view.close('views-to-the-left').then(),
-      };
-    });
+  private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Close tabs to the left');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        group: config.group ?? 'close',
+        cssClass: config.cssClass ?? 'e2e-close-left-tabs',
+        disabled: view.first(),
+        onAction: () => void view.close('views-to-the-left'),
+      }));
+    }
   }
 
-  private registerMoveRightMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move right', group: 'move', accelerator: ['ctrl', 'alt', 'end'], cssClass: 'e2e-move-right'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveRight;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: () => view.first() && view.last(),
+  private registerMoveRightMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Move right');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        accelerator: ['ctrl', 'alt', 'end'],
+        group: config.group ?? 'move',
+        cssClass: config.cssClass ?? 'e2e-move-right',
+        disabled: view.first() && view.last(),
         onAction: () => view.move(view.part().id, {region: 'east'}),
-      };
-    });
+      }));
+    }
   }
 
-  private registerMoveLeftMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move left', group: 'move', cssClass: 'e2e-move-left'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveLeft;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: () => view.first() && view.last(),
+  private registerMoveLeftMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Move left');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        group: config.group ?? 'move',
+        cssClass: config.cssClass ?? 'e2e-move-left',
+        disabled: view.first() && view.last(),
         onAction: () => view.move(view.part().id, {region: 'west'}),
-      };
-    });
+      }));
+    }
   }
 
-  private registerMoveUpMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move up', group: 'move', cssClass: 'e2e-move-up'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveUp;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: () => view.first() && view.last(),
+  private registerMoveUpMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Move up');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        group: config.group ?? 'move',
+        cssClass: config.cssClass ?? 'e2e-move-up',
+        disabled: view.first() && view.last(),
         onAction: () => view.move(view.part().id, {region: 'north'}),
-      };
-    });
+      }));
+    }
   }
 
-  private registerMoveDownMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move down', group: 'move', cssClass: 'e2e-move-down'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveDown;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
-        isDisabled: () => view.first() && view.last(),
+  private registerMoveDownMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Move down');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        group: config.group ?? 'move',
+        cssClass: config.cssClass ?? 'e2e-move-down',
+        disabled: view.first() && view.last(),
         onAction: () => view.move(view.part().id, {region: 'south'}),
-      };
-    });
+      }));
+    }
   }
 
-  private registerMoveToNewWindowMenuItem(): void {
-    const defaults: MenuItemConfig = {visible: true, text: 'Move to new window', group: 'open', cssClass: 'e2e-move-to-new-window'};
-    const appConfig: MenuItemConfig | undefined = this._workbenchConfig.viewMenuItems?.moveToNewWindow;
-    const config = {...defaults, ...appConfig};
-
-    config.visible && this._workbenchService.registerViewMenuItem((view: WorkbenchView): WorkbenchMenuItem => {
-      const injector = Injector.create({
-        parent: Injector.NULL,
-        providers: [{provide: TEXT, useValue: config.text}],
-      });
-      return {
-        portal: new ComponentPortal(TextComponent, null, injector),
-        accelerator: config.accelerator,
-        group: config.group,
-        cssClass: config.cssClass,
+  private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false): void {
+    if (isEnabled(config)) {
+      const text = toTextSignal(config.text ?? 'Move to new window');
+      this._workbenchService.registerViewMenuItem(view => ({
+        content: TextComponent,
+        inputs: {text: text()},
+        group: config.group ?? 'open',
+        cssClass: config.cssClass ?? 'e2e-move-to-new-window',
         onAction: () => view.move('new-window'),
-      };
-    });
+      }));
+    }
   }
+}
+
+/**
+ * Tests if given built-in menu item is enabled for display.
+ */
+function isEnabled(config: MenuItemConfig | false): config is MenuItemConfig {
+  return config && (config.visible ?? true);
+}
+
+function toTextSignal(value: string | (() => string | Signal<string>)): Signal<string> {
+  const text = typeof value === 'function' ? value() : value;
+  return isSignal(text) ? text : signal(text);
 }
 
 /**

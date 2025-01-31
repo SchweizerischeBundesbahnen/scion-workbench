@@ -1,5 +1,4 @@
 import {UrlSegment} from '@angular/router';
-import {Disposable} from '../common/disposable';
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
@@ -126,6 +125,11 @@ export abstract class WorkbenchView {
   public abstract readonly scrolledIntoView: Signal<boolean>;
 
   /**
+   * Menu items associated with this view.
+   */
+  public abstract readonly menuItems: Signal<WorkbenchMenuItem[]>;
+
+  /**
    * Indicates whether this view is destroyed.
    */
   public abstract readonly destroyed: boolean;
@@ -212,26 +216,6 @@ export abstract class WorkbenchView {
    * @returns Reference to the `CanClose` guard, which can be used to unregister the guard.
    */
   public abstract canClose(canClose: CanCloseFn): CanCloseRef;
-
-  /**
-   * Contributes a menu item to this view's context menu.
-   *
-   * ---
-   * As an alternative to programmatic registration, menu items can be contributed declaratively from an HTML template.
-   * Declaring a menu item in the HTML template of a workbench view adds it to that view only. To add it to every view,
-   * declare it outside a view context, such as in `app.component.html`, or register it programmatically.
-   * Refer to {@link WorkbenchViewMenuItemDirective} for more information.
-   *
-   * Example:
-   * ```html
-   * <ng-template wbViewMenuItem [accelerator]="['ctrl', 'b']" (action)="..." let-view>
-   *   ...
-   * </ng-template>
-   * ```
-   *
-   * @return handle to unregister the menu item.
-   */
-  public abstract registerMenuItem(menuItem: WorkbenchMenuItem): Disposable;
 }
 
 /**

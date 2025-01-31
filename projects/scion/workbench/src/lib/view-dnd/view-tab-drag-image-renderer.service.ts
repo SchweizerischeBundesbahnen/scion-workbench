@@ -220,6 +220,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly last = signal(true).asReadonly();
   public readonly position = signal(0).asReadonly();
   public readonly scrolledIntoView = signal(true).asReadonly();
+  public readonly menuItems = signal([]);
 
   constructor(dragData: ViewDragData) {
     this.id = dragData.viewId;
