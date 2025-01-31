@@ -60,7 +60,7 @@ Older versions are no longer supported.
 [link-workbench-download]: https://www.npmjs.com/package/@scion/workbench
 [link-workbench-client-download]: https://www.npmjs.com/package/@scion/workbench-client
 [link-github-actions-workflow]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions
-[link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/workflows/Continuous%20Integration%20and%20Delivery/badge.svg?branch=master&event=push
+[link-github-actions-workflow:status]: https://github.com/SchweizerischeBundesbahnen/scion-workbench/actions/workflows/workflow.yml/badge.svg
 
 [link-overview]: /docs/site/overview.md
 [link-microfrontend-integration]: /docs/site/microfrontend-integration.md
