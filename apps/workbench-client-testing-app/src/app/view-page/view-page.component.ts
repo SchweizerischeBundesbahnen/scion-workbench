@@ -123,11 +123,11 @@ export default class ViewPageComponent {
 
     if (selfNavigationGroup.controls.navigatePerParam.value) {
       Object.entries(params).forEach(([paramName, paramValue]) => {
-        this._router.navigate({}, {params: {[paramName]: paramValue}, paramsHandling: paramsHandling || undefined}).then();
+        this._router.navigate({}, {params: {[paramName]: paramValue}, paramsHandling: paramsHandling || undefined});
       });
     }
     else {
-      this._router.navigate({}, {params, paramsHandling: paramsHandling || undefined}).then();
+      this._router.navigate({}, {params, paramsHandling: paramsHandling || undefined});
     }
   }
 

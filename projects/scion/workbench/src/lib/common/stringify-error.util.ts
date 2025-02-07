@@ -15,5 +15,5 @@ export function stringifyError(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  return `${error}`;
+  return `${error}`; // eslint-disable-line @typescript-eslint/restrict-template-expressions
 }

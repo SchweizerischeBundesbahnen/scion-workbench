@@ -87,7 +87,7 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
       params: this.params,
       pushStateToSessionHistoryStack: false,
       showSplash: this.capability.properties.showSplash,
-    }).then();
+    });
   }
 
   /**
@@ -145,6 +145,6 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.dialog.id}).then(); // Clear the outlet.
+    this._outletRouter.navigate(null, {outlet: this.dialog.id}); // Clear the outlet.
   }
 }

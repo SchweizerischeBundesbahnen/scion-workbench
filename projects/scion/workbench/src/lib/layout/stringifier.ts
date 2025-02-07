@@ -28,7 +28,7 @@ export function stringify(data: unknown, options?: {exclusions?: Array<string | 
 
   return JSON.stringify(data, (key, value) => {
     if (key === '') { // root node
-      return sort ? sortProperties(value) : value;
+      return sort ? sortProperties(value) : value as unknown;
     }
 
     // Remove object(s) from the stack if finished their serialization.
@@ -44,14 +44,14 @@ export function stringify(data: unknown, options?: {exclusions?: Array<string | 
 
     // Push object to stack if type of object.
     if (!exclude && typeof value === 'object' && value !== null) {
-      objectStack.push({key, value, fieldsToSerialize: new Set(Object.keys(value))});
+      objectStack.push({key, value, fieldsToSerialize: new Set(Object.keys(value as object))});
     }
 
     if (exclude) {
       return undefined;
     }
 
-    return sort ? sortProperties(value) : value;
+    return sort ? sortProperties(value) : value as unknown;
   });
 }
 
@@ -66,10 +66,10 @@ function sortProperties(value: unknown): unknown {
   const unsorted = value as Record<string, unknown>;
   return Object.keys(unsorted)
     .sort()
-    .reduce((sorted, key) => {
+    .reduce<Record<string, unknown>>((sorted, key) => {
       sorted[key] = unsorted[key];
       return sorted;
-    }, {} as Record<string, unknown>);
+    }, {});
 }
 
 /**

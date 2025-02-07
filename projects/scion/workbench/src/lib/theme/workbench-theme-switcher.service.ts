@@ -36,7 +36,7 @@ export class WorkbenchThemeSwitcher {
 
   constructor(private _workbenchStorage: WorkbenchStorage) {
     this.theme = this.detectTheme();
-    this.activateThemeFromStorage().then();
+    void this.activateThemeFromStorage();
   }
 
   /**

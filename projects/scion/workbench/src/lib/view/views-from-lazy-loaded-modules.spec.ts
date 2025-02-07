@@ -61,22 +61,22 @@ describe('Views', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
 
     // Navigate to view 'feature-a/view-1'
-    TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-1']).then();
+    void TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-1']);
     advance(fixture);
     expect(fixture).toShow(FeatureA_View1_Component, '(1)');
 
     // Navigate to view 'feature-a/view-2'
-    TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-2']).then();
+    void TestBed.inject(WorkbenchRouter).navigate(['feature-a', 'view-2']);
     advance(fixture);
     expect(fixture).toShow(FeatureA_View2_Component, '(2)');
 
     // Navigate to view 'feature-b/view-1'
-    TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-1']).then();
+    void TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-1']);
     advance(fixture);
     expect(fixture).toShow(FeatureB_View1_Component, '(3)');
 
     // Navigate to view 'feature-b/view-2'
-    TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-2']).then();
+    void TestBed.inject(WorkbenchRouter).navigate(['feature-b', 'view-2']);
     advance(fixture);
     expect(fixture).toShow(FeatureB_View2_Component, '(4)');
 

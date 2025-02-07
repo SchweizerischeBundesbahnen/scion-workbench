@@ -75,7 +75,7 @@ export class ViewTabDragImageComponent {
   }
 
   private createViewTabContentPortal(): ComponentPortal<unknown> {
-    const componentType = this._workbenchConfig.viewTabComponent || ViewTabContentComponent;
+    const componentType = this._workbenchConfig.viewTabComponent ?? ViewTabContentComponent;
     return new ComponentPortal(componentType, null, this._injector);
   }
 

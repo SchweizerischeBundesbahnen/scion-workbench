@@ -63,13 +63,10 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Load the microfrontend platform config.
     const microfrontendPlatformConfig: Mutable<MicrofrontendPlatformConfig> = this.config = await this._microfrontendPlatformConfigLoader.load();
-    if (!microfrontendPlatformConfig) {
-      throw Error('[WorkbenchStartupError] Missing required Microfrontend Platform configuration. Did you forget to return the config in your loader?');
-    }
 
     // Disable scope check to read private capabilities, e.g., required for microfrontend view routing.
     microfrontendPlatformConfig.host = {
-      ...microfrontendPlatformConfig.host,
+      ...microfrontendPlatformConfig.host, // eslint-disable-line @typescript-eslint/no-misused-spread
       scopeCheckDisabled: true,
     };
 
@@ -141,7 +138,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
   }
 
   public ngOnDestroy(): void {
-    MicrofrontendPlatform.destroy().then();
+    void MicrofrontendPlatform.destroy();
   }
 }
 

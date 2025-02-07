@@ -11,6 +11,8 @@
 import {Capability} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 
+type EmptyQualifier = Record<PropertyKey, never>;
+
 /**
  * Represents the built-in notification for displaying a plain text message to the user.
  *
@@ -18,6 +20,6 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
  */
 export interface WorkbenchNotificationCapability extends Capability {
 
-  qualifier: {};
+  qualifier: EmptyQualifier;
   type: WorkbenchCapabilities.Notification;
 }

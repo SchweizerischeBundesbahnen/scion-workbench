@@ -87,7 +87,7 @@ export class PopupService {
       return this._zone.run(() => this.open(config));
     }
 
-    const align = config.align || 'north';
+    const align = config.align ?? 'north';
     const contextualView = this.resolveContextualView(config);
     const popup = this.createPopup(config, {view: contextualView});
     const popupDestroyRef = popup.injector.get(DestroyRef);
@@ -127,16 +127,16 @@ export class PopupService {
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
-      parent: config.componentConstructOptions?.injector || this._environmentInjector,
+      parent: config.componentConstructOptions?.injector ?? this._environmentInjector,
       providers: [
         {provide: ɵPopup, useValue: popup},
         {provide: Popup, useExisting: ɵPopup},
         provideViewContext(contextualView),
-        ...[config.componentConstructOptions?.providers || []],
+        ...[config.componentConstructOptions?.providers ?? []],
       ],
     }));
     const componentRef = overlayRef.attach(popupPortal);
-    const popupElement: HTMLElement = componentRef.location.nativeElement;
+    const popupElement = componentRef.location.nativeElement as HTMLElement;
 
     // Make the popup focusable and request the focus.
     popupElement.setAttribute('tabindex', '-1');
@@ -269,7 +269,7 @@ export class PopupService {
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
-    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
+    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement as HTMLElement | undefined ?? document.documentElement, {injector});
 
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       const anchor = coerceElement(config.anchor) as HTMLElement;
@@ -329,35 +329,35 @@ export class PopupService {
  */
 function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
   const xy = origin as Point;
-  if (xy.x !== undefined && xy.y !== undefined) {
+  if (xy.x !== undefined && xy.y !== undefined) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
     return {
       x: relativeTo.x + xy.x,
       y: relativeTo.y + xy.y,
     };
   }
   const topLeft = origin as TopLeftPoint;
-  if (topLeft.top !== undefined && topLeft.left !== undefined) {
+  if (topLeft.top !== undefined && topLeft.left !== undefined) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
     return {
       x: relativeTo.x + topLeft.left,
       y: relativeTo.y + topLeft.top,
     };
   }
   const topRight = origin as TopRightPoint;
-  if (topRight.top !== undefined && topRight.right !== undefined) {
+  if (topRight.top !== undefined && topRight.right !== undefined) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
     return {
       x: relativeTo.x + (relativeTo.width - topRight.right),
       y: relativeTo.y + topRight.top,
     };
   }
   const bottomLeft = origin as BottomLeftPoint;
-  if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
+  if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
     return {
       x: relativeTo.x + bottomLeft.left,
       y: relativeTo.y + (relativeTo.height - bottomLeft.bottom),
     };
   }
   const bottomRight = origin as BottomRightPoint;
-  if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
+  if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
     return {
       x: relativeTo.x + (relativeTo.width - bottomRight.right),
       y: relativeTo.y + (relativeTo.height - bottomRight.bottom),

@@ -50,10 +50,10 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
   private minWidth: number | undefined;
   private maxWidth: number | undefined;
 
-  @Input('wbResizableEnabled') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input('wbResizableEnabled')
   public enabled = true;
 
-  @Output('wbResizableResize') // eslint-disable-line @angular-eslint/no-output-rename
+  @Output('wbResizableResize')
   public wbResize = new EventEmitter<WbResizeEvent>();
 
   constructor(host: ElementRef<HTMLElement>, private _workbenchLayoutService: WorkbenchLayoutService) {

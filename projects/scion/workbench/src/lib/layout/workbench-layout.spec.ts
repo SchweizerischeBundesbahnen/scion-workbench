@@ -2293,7 +2293,7 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Capture model objects. The ids should not change when serializing and deserializing the layout.
-    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().workbenchGrid!.root;
+    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().workbenchGrid.root;
     const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().mainAreaGrid!.root;
     const view100 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.100'});
     const view101 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.101'});
@@ -2395,7 +2395,7 @@ describe('WorkbenchLayout', () => {
             id: 'part.bottom',
             views: [
               {id: 'view.102', navigation: {id: view102.navigation!.id}},
-              {id: 'view.103', navigation: {id: ANYTHING}},
+              {id: 'view.103', navigation: {id: ANYTHING as string}},
             ],
             activeViewId: 'view.102',
           }),
@@ -2449,7 +2449,7 @@ describe('WorkbenchLayout', () => {
             id: 'part.bottom',
             views: [
               {id: 'view.102', navigation: {id: view102.navigation!.id}},
-              {id: 'view.103', navigation: {id: ANYTHING}},
+              {id: 'view.103', navigation: {id: ANYTHING as string}},
             ],
             activeViewId: 'view.102',
           }),
@@ -2533,7 +2533,7 @@ describe('WorkbenchLayout', () => {
             ratio: .5,
             child1: new MPart({
               alternativeId: 'part',
-              navigation: {id: ANYTHING},
+              navigation: {id: ANYTHING as string},
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -2541,7 +2541,7 @@ describe('WorkbenchLayout', () => {
           }),
           child2: new MPart({
             alternativeId: 'part',
-            navigation: {id: ANYTHING},
+            navigation: {id: ANYTHING as string},
           }),
         }),
       },
@@ -2588,7 +2588,7 @@ function createComplexMainAreaLayout(): WorkbenchLayout {
  * Installs a {@link SpyObj} for {@link PartActivationInstantProvider}.
  */
 function installPartActivationInstantProviderSpyObj(): jasmine.SpyObj<PartActivationInstantProvider> {
-  const spyObj = jasmine.createSpyObj('PartActivationInstantProvider', ['getActivationInstant']);
+  const spyObj = jasmine.createSpyObj<PartActivationInstantProvider>('PartActivationInstantProvider', ['getActivationInstant']);
   TestBed.overrideProvider(PartActivationInstantProvider, {useValue: spyObj});
   return spyObj;
 }
@@ -2597,7 +2597,7 @@ function installPartActivationInstantProviderSpyObj(): jasmine.SpyObj<PartActiva
  * Installs a {@link SpyObj} for {@link ViewActivationInstantProvider}.
  */
 function installViewActivationInstantProviderSpyObj(): jasmine.SpyObj<ViewActivationInstantProvider> {
-  const spyObj = jasmine.createSpyObj('ViewActivationInstantProvider', ['getActivationInstant']);
+  const spyObj = jasmine.createSpyObj<ViewActivationInstantProvider>('ViewActivationInstantProvider', ['getActivationInstant']);
   TestBed.overrideProvider(ViewActivationInstantProvider, {useValue: spyObj});
   return spyObj;
 }

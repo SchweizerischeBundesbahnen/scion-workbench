@@ -20,7 +20,7 @@ export const WorkbenchNavigationalStates = {
    * Returns workbench-specific state associated with given navigation, or `null` if the navigation was not performed through the workbench router.
    */
   fromNavigation: (navigation: Navigation): WorkbenchNavigationalState | null => {
-    return navigation.extras?.state?.[WORKBENCH_NAVIGATION_STATE_KEY] ?? null;
+    return navigation.extras.state?.[WORKBENCH_NAVIGATION_STATE_KEY] as WorkbenchNavigationalState | undefined ?? null;
   },
 
   /**

@@ -18,7 +18,8 @@ import {PartId} from '../../../part/workbench-part.model';
  * See https://blog.thoughtram.io/angular/2016/12/27/angular-2-advance-testing-with-custom-matchers.html
  */
 declare const global: any;
-export const expect: (actual: any) => CustomMatchers<any> = (typeof window === 'undefined' ? global : window).expect;
+
+export const expect = (typeof window === 'undefined' ? global : window).expect as (actual: any) => CustomMatchers<any>; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
 
 /**
  * Provides Jasmine and project specific custom matchers.

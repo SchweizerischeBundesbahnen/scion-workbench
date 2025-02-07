@@ -85,7 +85,7 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
       params: this.params,
       pushStateToSessionHistoryStack: false,
       showSplash: this.capability.properties.showSplash,
-    }).then();
+    });
   }
 
   /**
@@ -123,6 +123,6 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.outletName}).then(); // Clear the outlet.
+    this._outletRouter.navigate(null, {outlet: this.outletName}); // Clear the outlet.
   }
 }

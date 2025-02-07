@@ -103,7 +103,7 @@ export default class StartPageComponent {
     this._workbenchRouter.navigate([path], {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
-    }).then();
+    });
   }
 
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
@@ -111,7 +111,7 @@ export default class StartPageComponent {
     this._workbenchClientRouter!.navigate(viewCapability.qualifier, {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
-    }).then();
+    });
   }
 
   public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {

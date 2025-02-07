@@ -31,10 +31,10 @@ export class MovableDirective implements OnInit {
   private _x = 0;
   private _y = 0;
 
-  @Input({alias: 'wbHandle', required: true}) // eslint-disable-line @angular-eslint/no-input-rename
+  @Input({alias: 'wbHandle', required: true})
   public wbHandleElement!: HTMLElement;
 
-  @Output('wbMovableMove') // eslint-disable-line @angular-eslint/no-output-rename
+  @Output('wbMovableMove')
   public wbMove = new EventEmitter<WbMoveEvent>();
 
   constructor(host: ElementRef<HTMLElement>,
@@ -96,7 +96,7 @@ export class MovableDirective implements OnInit {
             break;
           }
           case 'touchstart': {
-            this.onMoveStart(event.touchEvent?.touches[0]);
+            this.onMoveStart(event.touchEvent.touches[0]);
             break;
           }
           case 'mousemove': {

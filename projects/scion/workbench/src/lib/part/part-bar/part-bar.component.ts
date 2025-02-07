@@ -55,7 +55,7 @@ export class PartBarComponent {
   @HostListener('dblclick', ['$event'])
   protected onDoubleClick(event: MouseEvent): void {
     if (this.part.isInMainArea) {
-      this._router.navigate(layout => layout.toggleMaximized()).then();
+      void this._router.navigate(layout => layout.toggleMaximized());
     }
     event.stopPropagation();
   }

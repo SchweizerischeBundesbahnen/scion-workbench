@@ -34,7 +34,7 @@ export class RecordComponent implements ControlValueAccessor {
 
   protected formControl = this._formBuilder.control<string>('');
 
-  @Input('class') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input('class')
   public cssClass: string | undefined;
 
   constructor(private _formBuilder: NonNullableFormBuilder) {

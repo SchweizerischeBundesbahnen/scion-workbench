@@ -97,7 +97,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       params: this._popupContext.params,
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
-    }).then();
+    });
   }
 
   public onFocusWithin(event: Event): void {
@@ -126,6 +126,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.popup.id}).then();
+    this._outletRouter.navigate(null, {outlet: this.popup.id});
   }
 }

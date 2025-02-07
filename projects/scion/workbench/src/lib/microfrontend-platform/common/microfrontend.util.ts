@@ -78,6 +78,6 @@ function substituteNamedParameters(value: string | null | undefined, params?: Ma
     if (paramValue === undefined) {
       return acc;
     }
-    return acc.replaceAll(`:${paramKey}`, `${paramValue}`);
+    return acc.replaceAll(`:${paramKey}`, `${paramValue}`); // eslint-disable-line @typescript-eslint/no-base-to-string, @typescript-eslint/restrict-template-expressions
   }, value);
 }

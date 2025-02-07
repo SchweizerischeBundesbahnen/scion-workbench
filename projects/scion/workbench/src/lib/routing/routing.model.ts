@@ -164,7 +164,7 @@ export interface WorkbenchNavigationContext {
  * - Alternative syntax using a combined segment:
  *   ['path/to/view', {param1: 'value1', param2: 'value2'}]
  */
-export type Commands = any[];
+export type Commands = unknown[];
 
 /**
  * URL segments of workbench elements contained in the workbench layout.

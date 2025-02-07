@@ -66,7 +66,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     this.setDialogProperties();
     this.createOutletInjector();
-    this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
+    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
       if (!success) {
         this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
@@ -109,7 +109,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   }
 
   public ngOnDestroy(): void {
-    this.navigate(null).then(); // Remove the outlet from the URL
+    this.navigate(null); // Remove the outlet from the URL
   }
 }
 
@@ -123,19 +123,19 @@ function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapabilit
       const dialog = inject(ɵWorkbenchDialog);
       const propertyChange$ = new Subject<'title'>();
 
-      return new class<R = unknown> implements WorkbenchClientDialog<R> {
+      return new class<R = unknown> implements WorkbenchClientDialog<R> { // eslint-disable-line @stylistic/keyword-spacing
         public readonly capability = capability;
         public readonly params = params;
 
         public setTitle(title: string | Observable<string>): void {
-          propertyChange$.next('title');
-
           Observables.coerce(title)
             .pipe(
-              takeUntil(propertyChange$.pipe(filter(prop => prop === 'title'))),
               takeUntilDestroyed(dialog.injector.get(DestroyRef)),
+              takeUntil(propertyChange$.pipe(filter(prop => prop === 'title'))), // eslint-disable-line @typescript-eslint/no-unnecessary-condition
             )
             .subscribe(title => dialog.title = title);
+
+          propertyChange$.next('title');
         }
 
         public close(result?: R | Error): void {
@@ -145,7 +145,7 @@ function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapabilit
         public signalReady(): void {
           // nothing to do since not an iframe-based microfrontend
         }
-      };
+      }();
     },
   };
 }

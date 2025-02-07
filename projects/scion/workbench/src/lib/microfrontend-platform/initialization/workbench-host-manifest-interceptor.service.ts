@@ -13,12 +13,12 @@ export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor
 
   public intercept(hostManifest: Manifest): void {
     hostManifest.intentions = [
-      ...hostManifest.intentions || [],
+      ...hostManifest.intentions ?? [],
       providePerspectiveIntention(),
       provideViewIntention(),
     ];
     hostManifest.capabilities = [
-      ...hostManifest.capabilities || [],
+      ...hostManifest.capabilities ?? [],
       provideBuiltInTextMessageBoxCapability(),
       provideBuiltInTextNotificationCapability(),
     ];

@@ -12,7 +12,6 @@ import {Component, HostBinding, inject, Injector, OnInit, Provider, ViewChild} f
 import {ɵPopup} from './popup.config';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
-import {noop} from 'rxjs';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 
@@ -96,7 +95,7 @@ export class PopupComponent implements OnInit {
     // popup is closed by losing focus. Otherwise, the newly focused element that caused the loss of focus and thus
     // the closing of the popup would immediately become unfocused again. This behavior could only be observed when
     // the popup loses focus by clicking on an element in a microfrontend.
-    this._cdkTrapFocus.focusTrap.focusInitialElementWhenReady().then(noop);
+    void this._cdkTrapFocus.focusTrap.focusInitialElementWhenReady();
   }
 }
 

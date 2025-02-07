@@ -186,7 +186,7 @@ export class HeaderComponent {
     this.lightThemeActiveFormControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(lightTheme => {
-        this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark').then();
+        this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark');
       });
   }
 
@@ -203,7 +203,7 @@ export class HeaderComponent {
         onAction: () => {
           this._settingsService.toggle('displaySkeletons');
           // Perform navigation for Angular to evaluate `CanMatch` guards.
-          inject(Router).navigate([{outlets: {}}], {skipLocationChange: true}).then();
+          inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
         },
       }),
       new MenuItem({

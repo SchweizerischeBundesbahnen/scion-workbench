@@ -99,7 +99,7 @@ export class WorkbenchOutletDiff {
   }
 
   public toString(): string {
-    return `${new Array<string>()
+    return new Array<string>()
       .concat(this.addedViewOutlets.length ? `addedViewOutlets=[${this.addedViewOutlets}]` : [])
       .concat(this.removedViewOutlets.length ? `removedViewOutlets=[${this.removedViewOutlets}]` : [])
 
@@ -114,7 +114,7 @@ export class WorkbenchOutletDiff {
 
       .concat(this.addedMessageBoxOutlets.length ? `addedMessageBoxOutlets=[${this.addedMessageBoxOutlets}]` : [])
       .concat(this.removedMessageBoxOutlets.length ? `removedMessageBoxOutlets=[${this.removedMessageBoxOutlets}]` : [])
-      .join(', ')}`;
+      .join(', ');
   }
 }
 

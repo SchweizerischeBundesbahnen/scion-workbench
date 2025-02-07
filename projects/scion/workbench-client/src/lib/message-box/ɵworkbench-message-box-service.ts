@@ -44,7 +44,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
     const action$ = Beans.get(IntentClient).request$<string>(intent, body)
       .pipe(
         mapToBody(),
-        catchError(error => throwError(() => error instanceof RequestError ? error.message : error)),
+        catchError((error: unknown) => throwError(() => error instanceof RequestError ? error.message : error)),
       );
     return firstValueFrom(action$);
   }

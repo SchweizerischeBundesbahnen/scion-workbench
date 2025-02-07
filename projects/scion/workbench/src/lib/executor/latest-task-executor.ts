@@ -52,7 +52,7 @@ export class LatestTaskExecutor {
     this._latestTask = undefined;
 
     this._executing = true;
-    task().finally(() => {
+    void task().finally(() => {
       this._executing = false;
       this.executeLatestTask();
     });

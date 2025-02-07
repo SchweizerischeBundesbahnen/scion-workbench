@@ -697,11 +697,11 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open view-modal message box.
-    TestBed.inject(WorkbenchMessageBoxService).open('Message', {
+    void TestBed.inject(WorkbenchMessageBoxService).open('Message', {
       modality: 'view',
       context: {viewId: 'view.100'},
       cssClass: 'message-box',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the message box).
@@ -750,10 +750,10 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open application-modal message box.
-    TestBed.inject(WorkbenchMessageBoxService).open('Message', {
+    void TestBed.inject(WorkbenchMessageBoxService).open('Message', {
       modality: 'application',
       cssClass: 'message-box',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the message box).
@@ -802,11 +802,11 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open view-modal dialog.
-    TestBed.inject(WorkbenchDialogService).open(TestComponent, {
+    void TestBed.inject(WorkbenchDialogService).open(TestComponent, {
       modality: 'view',
       context: {viewId: 'view.100'},
       cssClass: 'dialog',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the dialog).
@@ -855,10 +855,10 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open application-modal dialog.
-    TestBed.inject(WorkbenchDialogService).open(TestComponent, {
+    void TestBed.inject(WorkbenchDialogService).open(TestComponent, {
       modality: 'application',
       cssClass: 'dialog',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the dialog).
@@ -1132,7 +1132,7 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args)); // eslint-disable-line @typescript-eslint/no-unsafe-argument
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -1185,7 +1185,7 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args)); // eslint-disable-line @typescript-eslint/no-unsafe-argument
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -1235,7 +1235,7 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args)); // eslint-disable-line @typescript-eslint/no-unsafe-argument
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -1281,10 +1281,10 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args)); // eslint-disable-line @typescript-eslint/no-unsafe-argument
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId!}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1335,10 +1335,10 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args)); // eslint-disable-line @typescript-eslint/no-unsafe-argument
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId!}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1965,7 +1965,7 @@ describe('View', () => {
       expect(componentInstanceView3).toBeInstanceOf(SpecView3Component);
       expect(componentInstanceView3.titleReadInConstructor).toEqual('Title View 3');
       expect(componentInstanceView3.headingReadInConstructor).toEqual('Heading View 3');
-      expect(componentInstanceView3.navigationReadInConstructor ).toEqual(jasmine.objectContaining({data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3'}));
+      expect(componentInstanceView3.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3'}));
       expect(componentInstanceView3.navigationCssClassReadInConstructor).toEqual(['view-3']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView2.titleReadInDestroy).toEqual('Title View 2');
@@ -2937,38 +2937,38 @@ class SpecView2Component extends SpecViewComponent {
 }
 
 function setDesignToken(fixture: ComponentFixture<unknown>, name: string, value: string): void {
-  const workbenchElement = (fixture.debugElement.nativeElement as HTMLElement);
+  const workbenchElement = fixture.debugElement.nativeElement as HTMLElement;
   workbenchElement.style.setProperty(name, value);
 }
 
 function getViewTitle(fixture: ComponentFixture<unknown>, viewId: ViewId): string | null {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('span.e2e-title'))?.nativeElement?.innerText?.trim() ?? null;
+  return (viewTabElement.query(By.css('span.e2e-title'))?.nativeElement as HTMLElement).innerText?.trim() ?? null; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 }
 
 function getViewHeading(fixture: ComponentFixture<unknown>, viewId: ViewId): string | null {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('span.e2e-heading'))?.nativeElement.innerText?.trim() ?? null;
+  return (viewTabElement.query(By.css('span.e2e-heading'))?.nativeElement as HTMLElement).innerText?.trim() ?? null;// eslint-disable-line @typescript-eslint/no-unnecessary-condition
 }
 
 function isViewHeadingVisible(fixture: ComponentFixture<unknown>, viewId: ViewId): boolean {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
   const headingElement = viewTabElement.query(By.css('span.e2e-heading'));
-  return headingElement !== null && getComputedStyle(headingElement.nativeElement).display !== 'none';
+  return headingElement !== null && getComputedStyle(headingElement.nativeElement as HTMLElement).display !== 'none'; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 }
 
 function isViewDirty(fixture: ComponentFixture<unknown>, viewId: ViewId): boolean {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('span.e2e-dirty')) !== null;
+  return viewTabElement.query(By.css('span.e2e-dirty')) !== null; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 }
 
 function getViewCssClass(fixture: ComponentFixture<unknown>, viewId: ViewId): string[] | null {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement ? Object.keys(viewTabElement.classes) : null;
+  return viewTabElement ? Object.keys(viewTabElement.classes) : null; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 }
 
 function getComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T | null {
-  return fixture.debugElement.query(By.directive(type)).componentInstance;
+  return fixture.debugElement.query(By.directive(type)).componentInstance as T | null;
 }
 
 function getDialog(cssClass: string): WorkbenchDialog {

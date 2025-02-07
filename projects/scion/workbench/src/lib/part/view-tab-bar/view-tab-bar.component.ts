@@ -69,7 +69,7 @@ export class ViewTabBarComponent implements OnDestroy {
    */
   public readonly maxWidth = input.required<number>();
 
-  private readonly _host = inject(ElementRef<HTMLElement>).nativeElement;
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _partBarElement = inject(PART_BAR_ELEMENT);
   private readonly _viewportChange$ = new Subject<void>();
   private readonly _workbenchId = inject(WORKBENCH_ID);
@@ -169,7 +169,7 @@ export class ViewTabBarComponent implements OnDestroy {
     // Unset drag state only on cancel, not on drop, to prevent tabs from temporarily reverting to their pre-drag state. Drag state is reset in `onTabMoved` after a drop.
     if (event.dataTransfer!.dropEffect === 'none') {
       // Reactivate the drag source view on cancel.
-      this.dragSourceViewTab()?.view().activate({skipLocationChange: true}).then();
+      void this.dragSourceViewTab()?.view().activate({skipLocationChange: true});
       // Unset drag state.
       this.unsetDragState();
     }
@@ -236,7 +236,7 @@ export class ViewTabBarComponent implements OnDestroy {
     if (this.dragSourceViewTab()?.active) {
       timer(0)
         .pipe(takeUntil(fromEvent(window, 'dragend')))
-        .subscribe(() => this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab()!.viewId), {skipLocationChange: true}));
+        .subscribe(() => void this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab()!.viewId), {skipLocationChange: true}));
     }
 
     // Clean up drag state.
@@ -310,7 +310,7 @@ export class ViewTabBarComponent implements OnDestroy {
   /**
    * Locates the tab before which the dragged tab is to be inserted when it is dropped. Dragging beyond the last tab returns `end`.
    */
-  private computeDropTarget(event: DragEvent, dragDistanceX = 0): ViewTabComponent | 'end' {
+  private computeDropTarget(event: DragEvent, dragDistanceX: number = 0): ViewTabComponent | 'end' {
     const dragImage = this._viewTabDragImageRenderer.calculateDragImageRect(this._dragData!, event);
     const viewTabs = this._viewTabs().filter(viewTab => viewTab !== this.dragSourceViewTab());
 
@@ -505,7 +505,7 @@ export class ViewTabBarComponent implements OnDestroy {
             this.onTabbarDragLeave(event);
             break;
           case 'drop':
-            this.onTabbarDrop().then();
+            void this.onTabbarDrop();
             break;
         }
       });
@@ -544,7 +544,7 @@ export class ViewTabBarComponent implements OnDestroy {
    * Emits on {@link _viewportChange$} when the viewport size or scroll position changes.
    */
   private installViewportChangeTracker(): void {
-    const viewportSize = dimension(computed(() => this._viewportComponentElement().nativeElement));
+    const viewportSize = dimension(computed(() => this._viewportComponentElement().nativeElement as HTMLElement));
     const viewportClientSize = dimension(computed(() => this._viewportComponent().viewportClientElement));
     const zone = inject(NgZone);
 

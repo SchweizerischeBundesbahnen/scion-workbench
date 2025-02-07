@@ -50,7 +50,7 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
   }
 
   private async consumeDialogIntent(message: IntentMessage<WorkbenchDialogOptions>): Promise<void> {
-    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
 
     try {
       const result = await this.openDialog(message);

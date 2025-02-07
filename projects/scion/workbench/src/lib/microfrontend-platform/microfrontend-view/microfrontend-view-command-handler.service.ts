@@ -93,7 +93,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.close().then();
+        view.close();
       });
     });
   }

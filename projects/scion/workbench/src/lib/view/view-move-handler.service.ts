@@ -76,7 +76,7 @@ export class ViewMoveHandler {
       if (addToNewPart) {
         const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
         return layout
-          .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region!), ratio: event.target.newPart?.ratio}, {structural: false})
+          .addPart(newPartId, {relativeTo: event.target.elementId, align: coerceAlignProperty(region), ratio: event.target.newPart?.ratio}, {structural: false})
           .addView(newViewId, {partId: newPartId, activateView: true, activatePart: true, cssClass: event.source.classList?.get('layout')})
           .modify(layout => event.source.navigation ? layout.navigateView(newViewId, commands, {hint: event.source.navigation.hint, cssClass: event.source.classList?.get('navigation'), data: event.source.navigation.data}) : layout);
       }
@@ -151,7 +151,7 @@ export class ViewMoveHandler {
         takeUntilDestroyed(),
       )
       .subscribe(event => {
-        this.onViewMove(event).finally(() => viewDragService.signalViewMoved(event));
+        void this.onViewMove(event).finally(() => viewDragService.signalViewMoved(event));
       });
   }
 }

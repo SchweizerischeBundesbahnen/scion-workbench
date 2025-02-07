@@ -57,7 +57,7 @@ export const MicrofrontendViewRoutes = {
       }
 
       // Test if navigating a view.
-      const outlet = route.data?.[WorkbenchRouteData.ɵoutlet];
+      const outlet = route.data?.[WorkbenchRouteData.ɵoutlet] as string | undefined | null;
       if (!Routing.isViewOutlet(outlet)) {
         return null;
       }
@@ -65,7 +65,7 @@ export const MicrofrontendViewRoutes = {
       const {layout} = injector.get(ɵWorkbenchRouter).getCurrentNavigationContext();
       const navigationState = layout.navigationState({outlet});
       const transientParams = navigationState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
-      const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);
+      const posParams = Object.entries(transientParams).map(([name, value]: [string, string]) => [name, new UrlSegment(value, {})]);
 
       return {
         consumed: segments,
@@ -112,7 +112,7 @@ export const MicrofrontendViewRoutes = {
   splitParams: (params: Params, capability: WorkbenchViewCapability): {urlParams: Params; transientParams: Params} => {
     const transientParamNames = new Set(capability.params?.filter(param => param.transient).map(param => param.name));
 
-    return Object.entries(params).reduce((groups, [name, value]) => {
+    return Object.entries(params).reduce((groups, [name, value]: [string, unknown]) => {
       if (transientParamNames.has(name)) {
         groups.transientParams[name] = value;
       }

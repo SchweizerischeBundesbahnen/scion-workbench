@@ -87,7 +87,7 @@ export class ɵWorkbenchPopup<R = unknown> implements WorkbenchPopup {
     this.capability = this._context.capability;
     this.params = this._context.params;
     this.referrer = this._context.referrer;
-    this.requestFocus().then();
+    void this.requestFocus();
   }
 
   /**
@@ -101,19 +101,19 @@ export class ɵWorkbenchPopup<R = unknown> implements WorkbenchPopup {
    * @inheritDoc
    */
   public setResult(result?: R): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupResultTopic(this._context.popupId), result).then();
+    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupResultTopic(this._context.popupId), result);
   }
 
   /**
    * @inheritDoc
    */
-  public async close(result?: R | Error): Promise<void> {
+  public close(result?: R | Error): void {
     if (result instanceof Error) {
       const headers = new Map().set(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR, true);
-      Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result.message, {headers}).then();
+      void Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result.message, {headers});
     }
     else {
-      Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result).then();
+      void Beans.get(MessageClient).publish(ɵWorkbenchCommands.popupCloseTopic(this._context.popupId), result);
     }
   }
 

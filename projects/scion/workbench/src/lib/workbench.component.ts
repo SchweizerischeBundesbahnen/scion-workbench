@@ -68,7 +68,7 @@ export class WorkbenchComponent {
    */
   private startWorkbench(): void {
     if (!this.workbenchStartup.isStarted()) {
-      this._workbenchLauncher.launch().catch(error => this._logger.error('Failed to start SCION Workbench', error));
+      this._workbenchLauncher.launch().catch((error: unknown) => this._logger.error('Failed to start SCION Workbench', error));
     }
   }
 

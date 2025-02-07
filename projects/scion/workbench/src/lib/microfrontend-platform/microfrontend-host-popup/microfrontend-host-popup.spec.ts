@@ -11,7 +11,7 @@
 import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
-import {firstValueFrom, noop, Subject} from 'rxjs';
+import {firstValueFrom, Subject} from 'rxjs';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
@@ -68,11 +68,11 @@ describe('Microfrontend Host Popup', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in host popup 1.
-    TestBed.inject(WorkbenchPopupService).open({component: 'popup-1'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}}).then(noop);
+    void TestBed.inject(WorkbenchPopupService).open({component: 'popup-1'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
     await waitUntilStable();
 
     // Start parallel navigation in host popup 2.
-    TestBed.inject(WorkbenchPopupService).open({component: 'popup-2'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}}).then(noop);
+    void TestBed.inject(WorkbenchPopupService).open({component: 'popup-2'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.
@@ -124,11 +124,11 @@ describe('Microfrontend Host Popup', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in a host popup.
-    TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}}).then(noop);
+    void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
     await waitUntilStable();
 
     // Start parallel navigation in a view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view']).then(noop);
+    void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.
@@ -180,11 +180,11 @@ describe('Microfrontend Host Popup', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in a view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view']).then(noop);
+    void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
     await waitUntilStable();
 
     // Start parallel navigation in a host popup.
-    TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}}).then(noop);
+    void TestBed.inject(WorkbenchPopupService).open({component: 'popup'}, {anchor: {top: 0, left: 0}, closeStrategy: {onFocusLost: false}});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.

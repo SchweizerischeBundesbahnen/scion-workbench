@@ -33,7 +33,7 @@ describe('Dialog', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(TestComponent, {cssClass: 'testee'}).then();
+    void TestBed.inject(WorkbenchDialogService).open(TestComponent, {cssClass: 'testee'});
     await waitUntilStable();
 
     // Get reference to the dialog injector.
@@ -68,14 +68,14 @@ describe('Dialog', () => {
     // Create custom injector.
     const diToken = new InjectionToken('token');
     const injector = Injector.create({
-      parent: TestBed.inject(EnvironmentInjector),
+      parent: void TestBed.inject(EnvironmentInjector),
       providers: [
         {provide: diToken, useValue: 'value'},
       ],
     });
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {cssClass: 'testee', injector}).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {cssClass: 'testee', injector});
     await waitUntilStable();
 
     // Expect DI token to be found.
@@ -103,7 +103,7 @@ describe('Dialog', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -136,7 +136,7 @@ describe('Dialog', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -184,10 +184,10 @@ describe('Dialog', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -224,10 +224,10 @@ describe('Dialog', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -276,10 +276,10 @@ describe('Dialog', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -328,10 +328,10 @@ describe('Dialog', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open dialog.
-    TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent).then();
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
     await waitUntilStable();
 
     // Expect dialog to show.
@@ -359,5 +359,5 @@ function getDialog(locator: {cssClass: string}): ɵWorkbenchDialog {
 }
 
 function getDialogComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {
-  return fixture.debugElement.parent!.query(By.css('wb-dialog')).query(By.directive(type)).componentInstance;
+  return fixture.debugElement.parent!.query(By.css('wb-dialog')).query(By.directive(type)).componentInstance as T;
 }

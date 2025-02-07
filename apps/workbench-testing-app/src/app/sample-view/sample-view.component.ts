@@ -102,7 +102,7 @@ export default class SampleViewComponent {
       relativeTo: this._route,
       replaceUrl: true,
       activate: this.view.active(),
-    }).then();
+    });
   }
 }
 

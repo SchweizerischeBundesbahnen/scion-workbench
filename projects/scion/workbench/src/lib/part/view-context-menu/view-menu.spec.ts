@@ -415,7 +415,7 @@ describe('View Menu', () => {
     // Register menu item.
     TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
       content: SpecMenuItemComponent,
-      onAction: () => inject(WorkbenchView).close(),
+      onAction: () => void inject(WorkbenchView).close(),
       disabled: disabled(),
       cssClass: 'testee',
     }));

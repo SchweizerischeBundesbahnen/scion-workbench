@@ -69,15 +69,15 @@ export class WorkbenchLayoutSerializer {
     const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
 
     // Parse the JSON.
-    const grid: MPartGrid = JSON.parse(migratedJsonGrid, (key, value) => {
+    const grid = JSON.parse(migratedJsonGrid, (key, value) => {
       if (MPart.isMPart(value)) {
         return new MPart(value); // create a class object from the object literal
       }
       if (MTreeNode.isMTreeNode(value)) {
         return new MTreeNode(value); // create a class object from the object literal
       }
-      return value;
-    });
+      return value as unknown;
+    }) as MPartGrid;
 
     // Link parent tree nodes
     (function linkParentNodes(node: MTreeNode | MPart, parent: MTreeNode | undefined): void {

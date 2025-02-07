@@ -14,7 +14,7 @@ import {Injectable} from '@angular/core';
  * Set of log levels to control logging output.
  */
 export enum LogLevel {
-  DEBUG, INFO, WARN, ERROR
+  DEBUG, INFO, WARN, ERROR,
 }
 
 /**

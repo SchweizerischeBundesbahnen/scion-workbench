@@ -45,12 +45,14 @@ export class WorkbenchAuxiliaryRouteInstaller {
           .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
           .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
         // Register wildcard route to display "Page Not Found".
-        ...config.canMatchNotFoundPage?.length ? [{
-          path: '**',
-          loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
-          data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
-          canMatch: config.canMatchNotFoundPage,
-        }] : [],
+        ...config.canMatchNotFoundPage?.length ?
+          [{
+            path: '**',
+            loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
+            data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
+            canMatch: config.canMatchNotFoundPage,
+          }] :
+          [],
         // Register wildcard route to display blank page.
         {
           path: '**',

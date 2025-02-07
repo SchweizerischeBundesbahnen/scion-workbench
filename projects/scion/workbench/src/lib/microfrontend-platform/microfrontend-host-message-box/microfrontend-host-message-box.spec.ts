@@ -11,7 +11,7 @@
 import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
-import {firstValueFrom, noop, Subject} from 'rxjs';
+import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
@@ -68,11 +68,11 @@ describe('Microfrontend Host Message Box', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in host message box 1.
-    TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-1'}).then(noop);
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-1'});
     await waitUntilStable();
 
     // Start parallel navigation in host message box 2.
-    TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-2'}).then(noop);
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-2'});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.
@@ -124,11 +124,11 @@ describe('Microfrontend Host Message Box', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in a host message-box.
-    TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'}).then(noop);
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'});
     await waitUntilStable();
 
     // Start parallel navigation in a view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view']).then(noop);
+    void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.
@@ -180,11 +180,11 @@ describe('Microfrontend Host Message Box', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in a view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view']).then(noop);
+    void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
     await waitUntilStable();
 
     // Start parallel navigation in a host message-box.
-    TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'}).then(noop);
+    void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.

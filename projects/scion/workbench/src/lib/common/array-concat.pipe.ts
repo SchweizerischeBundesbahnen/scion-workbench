@@ -11,7 +11,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 
 /**
- * Concats the given arrays.
+ * Concatenates the given arrays.
  *
  * Usage: `array | wbConcatArray:array1:array2:array3`
  */
@@ -19,6 +19,6 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class ArrayConcatPipe implements PipeTransform {
 
   public transform(input: string[], ...arrays: string[][]): string[] {
-    return (arrays || []).reduce((acc, array) => acc.concat(array), input);
+    return (arrays).reduce((acc, array) => acc.concat(array), input);
   }
 }

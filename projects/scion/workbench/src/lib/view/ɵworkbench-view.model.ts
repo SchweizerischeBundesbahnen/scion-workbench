@@ -164,7 +164,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get title(): Signal<string | null> {
+  public get title(): Signal<string | null> { // eslint-disable-line @typescript-eslint/related-getter-setter-pairs
     return this._title;
   }
 
@@ -174,7 +174,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get heading(): Signal<string | null> {
+  public get heading(): Signal<string | null> { // eslint-disable-line @typescript-eslint/related-getter-setter-pairs
     return this._heading;
   }
 
@@ -184,7 +184,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get dirty(): Signal<boolean> {
+  public get dirty(): Signal<boolean> { // eslint-disable-line @typescript-eslint/related-getter-setter-pairs
     return this._dirty;
   }
 
@@ -194,7 +194,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get scrolledIntoView(): Signal<boolean> {
+  public get scrolledIntoView(): Signal<boolean> { // eslint-disable-line @typescript-eslint/related-getter-setter-pairs
     return this._scrolledIntoView;
   }
 
@@ -208,7 +208,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get cssClass(): Signal<string[]> {
+  public get cssClass(): Signal<string[]> { // eslint-disable-line @typescript-eslint/related-getter-setter-pairs
     return this.classList.application;
   }
 
@@ -218,7 +218,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get closable(): Signal<boolean> {
+  public get closable(): Signal<boolean> { // eslint-disable-line @typescript-eslint/related-getter-setter-pairs
     return this._closableComputed;
   }
 
@@ -243,7 +243,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   /** @inheritDoc */
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
     assertNotInReactiveContext(this.close, 'Call WorkbenchView.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    switch (target || 'self') {
+    switch (target ?? 'self') {
       case 'self': {
         return this._workbenchService.closeViews(this.id);
       }

@@ -10,7 +10,6 @@
 
 import {ViewMoveEventTarget} from './view-drag.service';
 import {MPart, MPartGrid} from '../layout/workbench-layout.model';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Provides helper functions for dragging a view to a grid.
@@ -35,10 +34,7 @@ export const GridDropTargets = {
         if (grid.root instanceof MPart) {
           return {elementId: grid.root.id, workbenchId};
         }
-        if (grid.activePartId) {
-          return {elementId: grid.activePartId, workbenchId};
-        }
-        return {elementId: WorkbenchLayouts.collectParts(grid.root)[0].id, workbenchId};
+        return {elementId: grid.activePartId, workbenchId};
       }
       default: {
         return {

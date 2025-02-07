@@ -57,7 +57,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 })
 export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
-  private _host = inject(ElementRef<HTMLElement>);
+  private _host = inject(ElementRef).nativeElement as HTMLElement;
   private _route = inject(ActivatedRoute);
   private _outletRouter = inject(OutletRouter);
   private _manifestService = inject(ManifestService);
@@ -144,9 +144,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
     // When navigating to another view capability of the same app, wait until transported the params to the microfrontend before loading the
     // new microfrontend into the iframe, allowing the currently loaded microfrontend to clean up subscriptions.
-    if (prevCapability
-      && prevCapability.metadata!.appSymbolicName === capability.metadata!.appSymbolicName
-      && prevCapability.metadata!.id !== capability.metadata!.id) {
+    if (prevCapability &&
+      prevCapability.metadata!.appSymbolicName === capability.metadata!.appSymbolicName &&
+      prevCapability.metadata!.id !== capability.metadata!.id) {
       await this.waitForCapabilityParam(capability.metadata!.id);
     }
 
@@ -187,10 +187,10 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   private installParamsUpdater(viewCapability: WorkbenchViewCapability): void {
     this._unsubscribeParamsUpdater$.next();
     const subscription = this._messageClient.observe$<ɵViewParamsUpdateCommand>(ɵWorkbenchCommands.viewParamsUpdateTopic(this.view.id, viewCapability.metadata!.id))
-      .pipe(takeUntil(this._unsubscribeParamsUpdater$), takeUntilDestroyed(this._destroyRef))
-      .subscribe(async (request: TopicMessage<ɵViewParamsUpdateCommand>) => { // eslint-disable-line rxjs/no-async-subscribe
+      .pipe(takeUntilDestroyed(this._destroyRef), takeUntil(this._unsubscribeParamsUpdater$))
+      .subscribe(async (request: TopicMessage<ɵViewParamsUpdateCommand>) => { // eslint-disable-line @smarttools/rxjs/no-async-subscribe, @typescript-eslint/no-misused-promises
         // We DO NOT navigate if the subscription was closed, e.g., because closed the view or navigated to another capability.
-        const replyTo = request.headers.get(MessageHeaders.ReplyTo);
+        const replyTo = request.headers.get(MessageHeaders.ReplyTo) as string;
 
         try {
           const success = await this._workbenchRouter.navigate(layout => {
@@ -237,7 +237,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
       const active = this.view.active();
       untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
-        this._messageClient.publish(commandTopic, active, {retain: true}).then();
+        void this._messageClient.publish(commandTopic, active, {retain: true});
       });
     }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
@@ -247,7 +247,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
       const part = this.view.part();
       untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewPartIdTopic(this.view.id);
-        this._messageClient.publish(commandTopic, part.id, {retain: true}).then();
+        void this._messageClient.publish(commandTopic, part.id, {retain: true});
       });
     }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
@@ -284,7 +284,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
     if (focusWithin) {
-      this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+      this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
   }
 
@@ -331,10 +331,10 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
   private unload(): void {
     // Delete retained messages to free resources.
-    this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true}).then();
-    this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true}).then();
-    this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true}).then();
-    this._outletRouter.navigate(null, {outlet: this.view.id}).then();
+    void this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true});
+    void this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true});
+    void this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true});
+    void this._outletRouter.navigate(null, {outlet: this.view.id});
     this.view.unregisterAdapter(MicrofrontendWorkbenchView);
   }
 

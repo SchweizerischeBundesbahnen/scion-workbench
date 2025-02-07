@@ -53,11 +53,11 @@ describe('Lazily loaded view', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
 
     // Open 'feature/view'
-    TestBed.inject(WorkbenchRouter).navigate(['/feature/view']).then();
+    void TestBed.inject(WorkbenchRouter).navigate(['/feature/view']);
     advance(fixture);
 
     // Verify injection token
-    const viewComponent: Feature_View_Component = fixture.debugElement.query(By.directive(Feature_View_Component)).componentInstance;
+    const viewComponent = fixture.debugElement.query(By.directive(Feature_View_Component)).componentInstance as Feature_View_Component;
     expect(viewComponent.featureService).not.withContext('(3)').toBeNull();
     expect(viewComponent.featureService).not.withContext('(4)').toBeUndefined();
 
@@ -80,11 +80,11 @@ describe('Lazily loaded view', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
 
     // Open 'feature/view'
-    TestBed.inject(WorkbenchRouter).navigate(['/feature/view']).then();
+    void TestBed.inject(WorkbenchRouter).navigate(['/feature/view']);
     advance(fixture);
 
     // Verify injection token
-    const viewComponent: Feature_View_Component = fixture.debugElement.query(By.directive(Feature_View_Component)).componentInstance;
+    const viewComponent = fixture.debugElement.query(By.directive(Feature_View_Component)).componentInstance as Feature_View_Component;
     expect(viewComponent.injectedValue).withContext('(2)').toEqual('child-injector-value');
 
     discardPeriodicTasks();

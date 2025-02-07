@@ -34,7 +34,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
     const closeResult$ = Beans.get(IntentClient).request$<R>(intent, body)
       .pipe(
         mapToBody(),
-        catchError(error => throwError(() => error instanceof RequestError ? error.message : error)),
+        catchError((error: unknown) => throwError(() => error instanceof RequestError ? error.message : error)),
       );
     return firstValueFrom(closeResult$, {defaultValue: undefined});
   }

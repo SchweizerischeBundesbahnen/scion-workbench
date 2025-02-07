@@ -51,17 +51,17 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 
           // Expect debug element to represent `WorkbenchLayoutComponent` element.
           if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${actual?.componentInstance?.constructor?.name}.`);
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${(actual.componentInstance as object).constructor.name}.`);
           }
 
           // Assert model.
           assertWorkbenchLayoutModel(expected, TestBed.inject(WorkbenchLayoutService).layout()!, util);
           // Assert DOM.
-          assertWorkbenchLayoutDOM(expected, debugElement.nativeElement);
+          assertWorkbenchLayoutDOM(expected, debugElement.nativeElement as HTMLElement);
           return pass();
         }
         catch (error: unknown) {
-          return fail(error instanceof Error ? error.message : `${error}`);
+          return fail(error instanceof Error ? error.message : `${error}`); // eslint-disable-line @typescript-eslint/restrict-template-expressions
         }
 
         function pass(): CustomMatcherResult {
@@ -126,11 +126,8 @@ function assertGridElementDOM(expectedModelElement: MTreeNode | MPart, actualEle
   else if (expectedModelElement.type === 'MTreeNode') {
     assertMTreeNodeDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
   }
-  else if (expectedModelElement.type === 'MPart') {
-    assertMPartDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
-  }
   else {
-    throw Error(`[CustomMatcherError] Unsupported expected value. The matcher 'toEqualWorkbenchLayout' expects a 'MTreeNode' or 'MPart' as the expected value, but is ${JSON.stringify(expectedModelElement)}`);
+    assertMPartDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
   }
 }
 
@@ -138,43 +135,44 @@ function assertGridElementDOM(expectedModelElement: MTreeNode | MPart, actualEle
  * Performs a recursive assertion of the DOM structure starting with the expected tree node.
  */
 function assertMTreeNodeDOM(expectedTreeNode: MTreeNode, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
-  const nodeId = actualElement.getAttribute('data-nodeid');
+  let element: Element | null = actualElement;
+  const nodeId = element.getAttribute('data-nodeid');
   if (!nodeId) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1 as _MTreeNode | _MPart);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2 as _MTreeNode | _MPart);
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {
-    actualElement = actualElement.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`)!;
-    if (!actualElement) {
+    element = element.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`);
+    if (!element) {
       throw Error(`[DOMAssertError]: Expected element 'sci-sashbox[data-nodeid="${nodeId}"]' to be in the DOM, but is not. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
     }
   }
   else {
-    if (actualElement.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`)) {
+    if (element.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`)) {
       throw Error(`[DOMAssertError]: Expected element 'wb-grid-element' not to contain a 'sci-sashbox' because having a single visible child. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
     }
   }
 
   // Assert sash of child 1.
   if (child1Visible) {
-    const actualChild1Element = actualElement.querySelector(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-1`);
+    const actualChild1Element = element.querySelector(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-1`);
     if (!actualChild1Element) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-1' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-1' to be in the DOM, but is not. [${expectedTreeNode.child1.type}=${JSON.stringify(expectedTreeNode.child1)}]`);
     }
-    assertGridElementDOM(expectedTreeNode.child1!, actualChild1Element, expectedWorkbenchLayout);
+    assertGridElementDOM(expectedTreeNode.child1, actualChild1Element, expectedWorkbenchLayout);
   }
 
   // Assert sash of child 2.
   if (child2Visible) {
-    const actualChild2Element = actualElement.querySelector(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-2`);
+    const actualChild2Element = element.querySelector(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-2`);
     if (!actualChild2Element) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-2' to be in the DOM, but is not. [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-2' to be in the DOM, but is not. [${expectedTreeNode.child2.type}=${JSON.stringify(expectedTreeNode.child2)}]`);
     }
-    assertGridElementDOM(expectedTreeNode.child2!, actualChild2Element, expectedWorkbenchLayout);
+    assertGridElementDOM(expectedTreeNode.child2, actualChild2Element, expectedWorkbenchLayout);
   }
 }
 
@@ -217,7 +215,7 @@ function assertMPartDOM(expectedPart: MPart, actualElement: Element, expectedWor
   }
 
   // Assert views
-  if (expectedPart.views) {
+  if (expectedPart.views.length) {
     const expectedViewIds = expectedPart.views.map(view => view.id);
     const actualViewIds = new Array<string>();
     const viewTabElements = actualPartElement.querySelectorAll('wb-part-bar wb-view-tab');
@@ -239,11 +237,11 @@ function objectContainingRecursive<T>(object: T): ObjectContaining<T> | T {
     return jasmine.anything();
   }
   else if (typeof object === 'object' && object !== null) {
-    const workingCopy = {...object} as Record<string, any>;
+    const workingCopy = {...object} as Record<string, unknown>;
     Object.entries(workingCopy).forEach(([key, value]) => {
       workingCopy[key] = objectContainingRecursive(value);
     });
-    return jasmine.objectContaining<T>(workingCopy);
+    return jasmine.objectContaining<unknown>(workingCopy);
   }
   return object;
 }
@@ -252,7 +250,7 @@ function objectContainingRecursive<T>(object: T): ObjectContaining<T> | T {
  * Delegates to the Jasmine `toEqual` matcher to be used in custom matchers.
  */
 function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFailOutput?: string): CustomMatcherResult {
-  const toEqualMatcher: CustomMatcher = (jasmine as any).matchers.toEqual(util);
+  const toEqualMatcher = (jasmine as any).matchers.toEqual(util) as CustomMatcher; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
   const result = toEqualMatcher.compare(actual, expected);
   if (!result.pass && expectationFailOutput) {
     result.message = `${result.message} [${expectationFailOutput}]`;
@@ -324,4 +322,4 @@ export class MPart extends _MPart {
  *
  * We cannot use {@link jasmine.anything} matcher because the expected layout is also used to assert the layout representation in the DOM.
  */
-export const ANYTHING = {} as any;
+export const ANYTHING = {} as unknown;

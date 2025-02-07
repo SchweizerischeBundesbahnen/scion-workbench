@@ -78,8 +78,8 @@ export class WorkbenchPopupService {
       },
     };
     const popupOriginReporter = this.observePopupOrigin$(config)
-      .pipe(finalize(() => Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), undefined, {retain: true})))
-      .subscribe(origin => Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true}));
+      .pipe(finalize(() => void Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), undefined, {retain: true})))
+      .subscribe(origin => void Beans.get(MessageClient).publish<PopupOrigin>(ɵWorkbenchCommands.popupOriginTopic(popupCommand.popupId), origin, {retain: true}));
 
     try {
       const params = Maps.coerce(config.params);
@@ -105,7 +105,7 @@ export class WorkbenchPopupService {
       return fromBoundingClientRect$(config.anchor as HTMLElement).pipe(pluckPopupOrigin());
     }
     else {
-      return concat(Observables.coerce(config.anchor), NEVER).pipe(pluckPopupOrigin());
+      return concat(Observables.coerce(config.anchor as DOMRect), NEVER).pipe(pluckPopupOrigin());
     }
   }
 }
@@ -113,6 +113,6 @@ export class WorkbenchPopupService {
 /**
  * Extracts properties from {@link PopupOrigin}, allowing to pass, for example, a {@link MouseEvent}.
  */
-function pluckPopupOrigin(): OperatorFunction<any, PopupOrigin> {
+function pluckPopupOrigin(): OperatorFunction<DOMRect, PopupOrigin> {
   return map(rect => ({x: rect.x, y: rect.y, top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width, height: rect.height}));
 }

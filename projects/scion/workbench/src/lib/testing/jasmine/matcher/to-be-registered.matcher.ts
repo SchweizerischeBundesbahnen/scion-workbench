@@ -68,4 +68,3 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
     };
   },
 };
-

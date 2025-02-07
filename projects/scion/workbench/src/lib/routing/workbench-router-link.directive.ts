@@ -10,7 +10,7 @@
 
 import {ChangeDetectorRef, Directive, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, Optional, SimpleChanges} from '@angular/core';
 import {WorkbenchRouter} from './workbench-router.service';
-import {mergeWith, noop, Subject} from 'rxjs';
+import {mergeWith, Subject} from 'rxjs';
 import {LocationStrategy} from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
@@ -57,9 +57,9 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
     this._commands = (commands ? (Array.isArray(commands) ? commands : [commands]) : []);
   }
 
-  @Input('wbRouterLinkExtras') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input('wbRouterLinkExtras')
   public set extras(extras: Omit<WorkbenchNavigationExtras, 'close'> | undefined) {
-    this._extras = extras || {};
+    this._extras = extras ?? {};
   }
 
   constructor(private _workbenchRouter: WorkbenchRouter,
@@ -67,7 +67,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
               private _route: ActivatedRoute,
               private _locationStrategy: LocationStrategy,
               private _cd: ChangeDetectorRef,
-              host: ElementRef,
+              host: ElementRef<HTMLElement>,
               @Optional() private _view: WorkbenchView | null) {
     if (host.nativeElement.tagName === 'A') {
       this.installHrefUpdater();
@@ -81,7 +81,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
     }
 
     const extras = this.computeNavigationExtras(ctrlKey, metaKey);
-    this._workbenchRouter.navigate(this._commands, extras).then(noop);
+    void this._workbenchRouter.navigate(this._commands, extras);
     return false;
   }
 

@@ -40,6 +40,6 @@ export default class PopupPositionTestPageComponent {
     this._popupService.open<string>({
       component: BlankTestPageComponent,
       anchor: this._openButton()!,
-    }).then();
+    });
   }
 }

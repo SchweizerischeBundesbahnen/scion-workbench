@@ -143,7 +143,7 @@ export interface WorkbenchInitializer {
  * Runs workbench initializers associated with the given DI token. Initializer functions can call `inject` to get any required dependencies.
  */
 export async function runWorkbenchInitializers(token: InjectionToken<any>, injector: Injector): Promise<void> {
-  const initializers: Array<WorkbenchInitializer | Function | undefined | any> | null = injector.get(token, undefined, {optional: true}); // eslint-disable-line @typescript-eslint/ban-types
+  const initializers = injector.get(token, undefined, {optional: true}) as Array<WorkbenchInitializer | Function | undefined> | null; // eslint-disable-line @typescript-eslint/no-unsafe-function-type
   if (!initializers?.length) {
     return;
   }
@@ -151,7 +151,7 @@ export async function runWorkbenchInitializers(token: InjectionToken<any>, injec
   // Invoke and await initializer functions.
   await Promise.all(initializers.reduce((acc, initializer) => {
     if (typeof initializer === 'function') {
-      return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), initializer));
+      return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), initializer as () => Promise<unknown>));
     }
     else if (typeof initializer?.init === 'function') {
       return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), () => initializer.init()));

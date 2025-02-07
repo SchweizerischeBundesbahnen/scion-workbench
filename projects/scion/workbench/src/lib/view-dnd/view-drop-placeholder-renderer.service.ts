@@ -62,7 +62,7 @@ export class ViewDropPlaceholderRenderer {
 
   private createDropPlaceholder(): HTMLElement {
     return createElement('div', {
-      parent: this._dropPlaceholderOverlayHost()!.element.nativeElement,
+      parent: this._dropPlaceholderOverlayHost()!.element.nativeElement as HTMLElement,
       cssClass: 'e2e-drop-placeholder',
       style: {
         'position': 'fixed',

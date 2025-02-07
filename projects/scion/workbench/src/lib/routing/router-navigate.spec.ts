@@ -18,7 +18,7 @@ import {advance, clickElement, styleFixture, waitForInitialWorkbenchLayout, wait
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.directive';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {firstValueFrom, noop, Subject} from 'rxjs';
+import {firstValueFrom, Subject} from 'rxjs';
 
 /**
  * Test setup:
@@ -74,7 +74,7 @@ describe('Router', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Navigate to entry component of feature A
-    workbenchRouter.navigate(['feature-a']).then();
+    void workbenchRouter.navigate(['feature-a']);
     advance(fixture);
     expect(fixture).toShow(FeatureA_EntryComponent, '1');
 
@@ -254,37 +254,37 @@ describe('Router', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Open /feature-a/view-1
-    workbenchRouter.navigate(['feature-a']).then();
+    void workbenchRouter.navigate(['feature-a']);
     advance(fixture);
     expect(fixture).toShow(FeatureA_EntryComponent, '1a');
 
     // Close /feature-a/view-1
-    workbenchRouter.navigate(['feature-a'], {close: true}).then();
+    void workbenchRouter.navigate(['feature-a'], {close: true});
     advance(fixture);
     expect(fixture).not.toShow(FeatureA_View1Component, '1b');
 
     // Open /feature-a/view-1
-    workbenchRouter.navigate(['feature-a/view-1']).then();
+    void workbenchRouter.navigate(['feature-a/view-1']);
     advance(fixture);
     expect(fixture).toShow(FeatureA_View1Component, '2a');
 
     // Close /feature-a/view-1
-    workbenchRouter.navigate(['feature-a/view-1'], {close: true}).then();
+    void workbenchRouter.navigate(['feature-a/view-1'], {close: true});
     advance(fixture);
     expect(fixture).not.toShow(FeatureA_View1Component, '2b');
 
     // Open /feature-a/feature-b/view-1
-    workbenchRouter.navigate(['feature-a/feature-b/view-1']).then();
+    void workbenchRouter.navigate(['feature-a/feature-b/view-1']);
     advance(fixture);
     expect(fixture).toShow(FeatureB_View1Component, '3a');
 
     // Close /feature-a/feature-b/view-1
-    workbenchRouter.navigate(['feature-a/feature-b/view-1'], {close: true}).then();
+    void workbenchRouter.navigate(['feature-a/feature-b/view-1'], {close: true});
     advance(fixture);
     expect(fixture).not.toShow(FeatureB_View1Component, '3b');
 
     // Close not present view
-    workbenchRouter.navigate(['a/b/c'], {close: true}).then();
+    void workbenchRouter.navigate(['a/b/c'], {close: true});
 
     discardPeriodicTasks();
   }));
@@ -314,11 +314,11 @@ describe('Router', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Start navigation in view 1.
-    workbenchRouter.navigate(['path/to/view/1'], {target: 'view.1'}).then(noop);
+    void workbenchRouter.navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
 
     // Start parallel navigation in view 2.
-    workbenchRouter.navigate(['path/to/view/2'], {target: 'view.2'}).then(noop);
+    void workbenchRouter.navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.

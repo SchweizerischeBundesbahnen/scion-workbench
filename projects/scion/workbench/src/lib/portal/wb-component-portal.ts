@@ -41,7 +41,7 @@ export class WbComponentPortal<T = any> {
       elementInjector: Injector.create({
         name: 'WbComponentPortalInjector',
         parent: elementInjector,
-        providers: this._options?.providers || [],
+        providers: this._options?.providers ?? [],
       }),
       environmentInjector: elementInjector.get(EnvironmentInjector),
     });
@@ -54,7 +54,7 @@ export class WbComponentPortal<T = any> {
    */
   public createComponentFromInjectionContext(injectionContext: Injector): void {
     if (this.isConstructed) {
-      throw Error(`[PortalConstructError] Component already constructed. [component=${this._componentType}]`);
+      throw Error(`[PortalConstructError] Component already constructed. [component=${this._componentType.toString()}]`);
     }
     this._componentRef = this.createComponent(injectionContext);
     // Trigger change detection to complete the initialization of the component, necessary for components detached from the Angular component tree.
@@ -78,13 +78,13 @@ export class WbComponentPortal<T = any> {
     }
 
     this._viewContainerRef = viewContainerRef;
-    this._componentRef = this._componentRef || this.createComponent(this._viewContainerRef.injector);
+    this._componentRef = this._componentRef ?? this.createComponent(this._viewContainerRef.injector);
     this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef);
 
     this._componentRef.changeDetectorRef.reattach();
     this._viewContainerRef.insert(this._componentRef.hostView);
     this._attached.set(true);
-    (this._componentRef.instance as OnAttach)?.onAttach();
+    (this._componentRef.instance as OnAttach | undefined)?.onAttach();
   }
 
   /**
@@ -100,7 +100,7 @@ export class WbComponentPortal<T = any> {
     }
 
     this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._componentRef);
-    (this._componentRef!.instance as OnDetach)?.onDetach();
+    (this._componentRef!.instance as OnDetach | undefined)?.onDetach();
     const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
     this._viewContainerRef!.detach(index);
     this._componentRef!.changeDetectorRef.detach();

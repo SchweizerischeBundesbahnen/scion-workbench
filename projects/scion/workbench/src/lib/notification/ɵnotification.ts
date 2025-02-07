@@ -15,7 +15,7 @@ import {Notification} from './notification';
 import {NotificationConfig} from './notification.config';
 import {TextNotificationComponent} from './text-notification.component';
 
-export class ɵNotification<T = any> implements Notification<T> {
+export class ɵNotification<T = unknown> implements Notification<T> {
 
   public readonly input: T;
   public readonly title$: BehaviorSubject<string | undefined | Observable<string>>;
@@ -29,13 +29,13 @@ export class ɵNotification<T = any> implements Notification<T> {
     this.severity$ = new BehaviorSubject(this.config.severity ?? 'info');
     this.duration$ = new BehaviorSubject(this.config.duration ?? 'medium');
     this.cssClass$ = new BehaviorSubject(Arrays.coerce(this.config.cssClass));
-    if (this.config.content === undefined || typeof this.config.content === 'string') {
+    if (typeof this.config.content === 'string') {
       this.component = TextNotificationComponent;
-      this.input = this.config.content as any;
+      this.input = this.config.content as T;
     }
     else {
       this.component = this.config.content;
-      this.input = this.config.componentInput;
+      this.input = this.config.componentInput as T;
     }
   }
 

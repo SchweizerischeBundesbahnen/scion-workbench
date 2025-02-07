@@ -187,11 +187,11 @@ describe('WorkbenchPerspectiveStorage', () => {
     storage.enableThrottling();
 
     // Modify the layout in quick succession.
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.1'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.2'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.3'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.4'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.5'}).then();
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.1'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.2'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.3'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.4'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.5'});
     await waitUntilStable();
 
     // The first write is still in progress (because writes are throttled), blocking subsequent writes (serial execution).

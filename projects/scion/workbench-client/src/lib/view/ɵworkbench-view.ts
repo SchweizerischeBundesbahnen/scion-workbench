@@ -59,7 +59,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
     this.capability$ = this.params$
       .pipe(
-        map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID)),
+        map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string),
         lookupViewCapabilityAndShareReplay(),
         decorateObservable(),
         takeUntil(this._beforeUnload$),
@@ -101,7 +101,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       });
 
     // Signal view properties available.
-    this.whenProperties = firstValueFrom(combineLatest([this.partId$, this.params$])).then();
+    this.whenProperties = firstValueFrom(combineLatest([this.partId$, this.params$]));
   }
 
   /** @inheritDoc */
@@ -159,7 +159,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   /** @inheritDoc */
   public close(): void {
-    Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.id)).then();
+    void Beans.get(MessageClient).publish(ɵWorkbenchCommands.viewCloseTopic(this.id));
   }
 
   /** @inheritDoc */

@@ -41,7 +41,7 @@ export class MessageBoxFooterComponent {
   public preferredSizeChange = new EventEmitter<number>();
 
   constructor() {
-    this.emitPreferredSize().then();
+    void this.emitPreferredSize();
   }
 
   protected insertionSortOrderFn = (): number => 0;
@@ -58,7 +58,7 @@ export class MessageBoxFooterComponent {
   }
 
   private async emitPreferredSize(): Promise<void> {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    const host = inject(ElementRef).nativeElement as HTMLElement;
     host.classList.add('calculating-min-width');
     try {
       // Wait for the CSS class to take effect, then wait an animation frame to avoid the error: "ResizeObserver loop completed with undelivered notifications".

@@ -34,7 +34,7 @@ export class GlassPaneDirective implements OnDestroy, AfterViewInit {
   private _options = inject(GLASS_PANE_OPTIONS, {optional: true, host: true}) ?? undefined;
 
   constructor(private _injector: Injector) {
-    this._targetElement = coerceElement(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
+    this._targetElement = coerceElement<HTMLElement>(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
     this.ensureHostElementPositioned();
   }
 
@@ -81,8 +81,8 @@ class GlassPane {
         ...options?.attributes,
       },
       style: {
-        position: 'absolute',
-        inset: 0,
+        'position': 'absolute',
+        'inset': 0,
         'pointer-events': 'auto',
       },
     });

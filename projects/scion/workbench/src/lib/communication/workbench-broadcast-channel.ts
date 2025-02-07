@@ -49,4 +49,3 @@ export class WorkbenchBroadcastChannel<T> {
     this._localBrowsingContextEvent$.complete();
   }
 }
-

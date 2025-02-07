@@ -32,7 +32,7 @@ describe('WorkbenchViewRegistry', () => {
     // Listen to view changes (before routing).
     const captor = new Array<string[]>();
     TestBed.runInInjectionContext(() => effect(() => {
-      captor.push(TestBed.inject(WORKBENCH_VIEW_REGISTRY).objects().map(view => view.part()?.id ?? 'NULL_PART'));
+      captor.push(TestBed.inject(WORKBENCH_VIEW_REGISTRY).objects().map(view => view.part().id));
     }));
     TestBed.flushEffects();
     expect(captor).toEqual([[]]);

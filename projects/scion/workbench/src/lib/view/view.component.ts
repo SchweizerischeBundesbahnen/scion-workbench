@@ -93,7 +93,7 @@ export class ViewComponent implements OnAttach, OnDetach {
   }
 
   private installMenuItemAccelerators(): void {
-    const subscription = inject(ViewMenuService).installMenuItemAccelerators(inject(ElementRef<HTMLElement>).nativeElement, this._view);
+    const subscription = inject(ViewMenuService).installMenuItemAccelerators(inject(ElementRef).nativeElement as HTMLElement, this._view);
     inject(DestroyRef).onDestroy(() => subscription.unsubscribe());
   }
 
@@ -106,7 +106,7 @@ export class ViewComponent implements OnAttach, OnDetach {
   }
 
   private addHostCssClasses(): void {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    const host = inject(ElementRef).nativeElement as HTMLElement;
     synchronizeCssClasses(host, this._view.classList.asList);
   }
 

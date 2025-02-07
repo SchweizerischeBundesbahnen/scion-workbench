@@ -63,7 +63,7 @@ export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     this.setSizeProperties();
     this.createOutletInjector();
-    this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
+    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
       if (!success) {
         this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
@@ -100,7 +100,7 @@ export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
   }
 
   public ngOnDestroy(): void {
-    this.navigate(null).then(); // Remove the outlet from the URL
+    void this.navigate(null); // Remove the outlet from the URL
   }
 }
 
@@ -119,7 +119,7 @@ export function provideWorkbenchClientMessageBoxHandle(capability: WorkbenchMess
         public signalReady(): void {
           // nothing to do since not an iframe-based microfrontend
         }
-      };
+      }();
     },
   };
 }

@@ -144,7 +144,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    */
   private ensureActiveView(layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     return layout.parts()
-      .filter(part => part.views?.length)
+      .filter(part => part.views.length)
       .reduce((acc, part) => part.activeViewId ? acc : acc.activateView(part.views[0].id), layout);
   }
 

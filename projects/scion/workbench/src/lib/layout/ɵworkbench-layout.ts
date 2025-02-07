@@ -534,16 +534,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     // Remove the part.
-    const siblingElement = (part.parent!.child1 === part ? part.parent!.child2 : part.parent!.child1);
-    if (!part.parent!.parent) {
+    const parentPart = part.parent!;
+    const siblingElement = (parentPart.child1 === part ? parentPart.child2 : parentPart.child1);
+    if (!parentPart.parent) {
       grid.root = siblingElement;
       grid.root.parent = undefined;
     }
-    else if (part.parent!.parent.child1 === part.parent) {
-      part.parent!.parent.child1 = siblingElement;
+    else if (parentPart.parent.child1 === part.parent) {
+      parentPart.parent.child1 = siblingElement;
     }
     else {
-      part.parent!.parent.child2 = siblingElement;
+      parentPart.parent.child2 = siblingElement;
     }
 
     // Remove the part outlet.
@@ -566,7 +567,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
           const activationInstantPart1 = this._partActivationInstantProvider.getActivationInstant(part1.id);
           const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
           return activationInstantPart2 - activationInstantPart1;
-        })[0];
+        }).at(0);
       grid.activePartId = activePart!.id;
     }
   }
@@ -737,12 +738,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     part.views.splice(part.views.indexOf(view), 1);
 
     // Remove outlet.
-    if (options?.removeOutlet ?? true) {
+    if (options.removeOutlet ?? true) {
       this._outlets.delete(view.id);
     }
 
     // Remove navigation state.
-    if (options?.removeNavigationState ?? true) {
+    if (options.removeNavigationState ?? true) {
       this._navigationStates.delete(view.id);
     }
 
@@ -783,7 +784,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private __activateAdjacentView(view: MView, options?: {activatePart?: boolean}): void {
     const part = this.part({viewId: view.id});
     const viewIndex = part.views.indexOf(view);
-    part.activeViewId = (part.views[viewIndex - 1] || part.views[viewIndex + 1])?.id; // is `undefined` if it is the last view of the part
+    part.activeViewId = (part.views.at(viewIndex - 1) ?? part.views.at(viewIndex + 1))?.id; // is `undefined` if it is the last view of the part
 
     // Activate the part.
     if (options?.activatePart) {
@@ -915,7 +916,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       visitParts(this._grids[options.grid]!.root);
     }
     else {
-      for (const grid of Object.values(this._grids)) {
+      for (const grid of Object.values(this._grids) as Array<MPartGrid | undefined>) {
         if (grid && !visitParts(grid.root)) {
           break;
         }
@@ -1143,7 +1144,7 @@ function matchesPartId(id: PartId | string, part: MPart): boolean {
  * Stringifies the given filter to be used in error messages.
  */
 function stringifyFilter(filter: {[property: string]: unknown}): string {
-  return Object.entries(filter).map(([key, value]) => `${key}=${value}`).join(', ');
+  return Object.entries(filter).map(([key, value]) => `${key}=${value}`).join(', '); // eslint-disable-line @typescript-eslint/restrict-template-expressions
 }
 
 /**

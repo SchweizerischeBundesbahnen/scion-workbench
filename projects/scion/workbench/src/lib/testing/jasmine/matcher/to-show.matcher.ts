@@ -22,8 +22,8 @@ export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
     return {
       compare(element: any, expected: Type<unknown> | Predicate<DebugElement>, failOutput: string | undefined): CustomMatcherResult {
         const predicate = isPredicate(expected) ? expected : By.directive(expected);
-        const found = !!coerceDebugElement(element).query(predicate);
-        return found ? pass() : fail(`Expected ${isPredicate(expected) ? `${expected}` : expected.name} to show`);
+        const found = !!coerceDebugElement(element).query(predicate) as boolean;
+        return found ? pass() : fail(`Expected ${isPredicate(expected) ? `${expected}` : expected.name} to show`); // eslint-disable-line @typescript-eslint/restrict-template-expressions
 
         function pass(): CustomMatcherResult {
           return {pass: true};

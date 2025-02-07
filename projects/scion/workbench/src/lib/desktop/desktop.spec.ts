@@ -171,7 +171,7 @@ describe('Desktop', () => {
       fixture.debugElement.query(By.css('div.desktop')).nativeElement.style.height = '5000px';
 
       // Expect desktop not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport')).nativeElement).height).toEqual('500px');
+      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport')).nativeElement as HTMLElement).height).toEqual('500px');
     });
 
     /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
@@ -198,7 +198,7 @@ describe('Desktop', () => {
       fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
 
       // Expect desktop not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport')).nativeElement).height).toEqual('500px');
+      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-part[data-partid="part.main-area"] > sci-viewport')).nativeElement as HTMLElement).height).toEqual('500px');
     });
   });
 
@@ -348,7 +348,7 @@ describe('Desktop', () => {
       fixture.debugElement.query(By.css('div.desktop')).nativeElement.style.height = '5000px';
 
       // Expect desktop not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-workbench-layout > sci-viewport')).nativeElement).height).toEqual('500px');
+      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-workbench-layout > sci-viewport')).nativeElement as HTMLElement).height).toEqual('500px');
     });
 
     /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
@@ -375,7 +375,7 @@ describe('Desktop', () => {
       fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
 
       // Expect desktop not to exceed 500px
-      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-workbench-layout > sci-viewport')).nativeElement).height).toEqual('500px');
+      expect(getComputedStyle(fixture.debugElement.query(By.css('wb-workbench-layout > sci-viewport')).nativeElement as HTMLElement).height).toEqual('500px');
     });
   });
 });

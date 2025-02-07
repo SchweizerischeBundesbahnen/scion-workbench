@@ -34,7 +34,7 @@ export class WorkbenchObjectRegistry<KEY, T> {
    * @param config.onUnregister - Function invoked when an object is unregistered.
    */
   constructor(config?: {nullObjectErrorFn?: (key: KEY) => Error; onUnregister?: (object: T) => void}) {
-    this._nullObjectErrorFn = config?.nullObjectErrorFn ?? ((key: KEY) => Error(`[NullObjectError] Object '${key}' not found.`));
+    this._nullObjectErrorFn = config?.nullObjectErrorFn ?? ((key: KEY) => Error(`[NullObjectError] Object '${key}' not found.`)); // eslint-disable-line @typescript-eslint/restrict-template-expressions
     this._onUnregister = config?.onUnregister;
 
     // Clear registry when the current injection context is destroyed.

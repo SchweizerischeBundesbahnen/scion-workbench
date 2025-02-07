@@ -59,7 +59,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     });
 
     // Perform navigation in the named router outlet.
-    this.navigate(path, {outletName: this.outletName, params}).then(success => {
+    void this.navigate(path, {outletName: this.outletName, params}).then(success => {
       if (!success) {
         popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
@@ -78,7 +78,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.navigate(null, {outletName: this.outletName}).then(); // Remove the outlet from the URL
+    void this.navigate(null, {outletName: this.outletName}); // Remove the outlet from the URL
   }
 }
 
@@ -91,7 +91,7 @@ function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvid
     useFactory: (): WorkbenchPopup => {
       const popup = inject(Popup);
 
-      return new class<R = unknown> implements WorkbenchPopup {
+      return new class<R = unknown> implements WorkbenchPopup { // eslint-disable-line @stylistic/keyword-spacing
         public readonly capability = popupContext.capability;
         public readonly params = popupContext.params;
         public readonly referrer = popupContext.referrer;
@@ -107,7 +107,7 @@ function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvid
         public signalReady(): void {
           // nothing to do since not an iframe-based microfrontend
         }
-      };
+      }();
     },
   };
 }

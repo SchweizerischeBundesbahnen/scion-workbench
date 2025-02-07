@@ -34,7 +34,7 @@ describe('WorkbenchProvider', () => {
 
     // Load lazy route to provide workbench from child environment.
     expect(() => {
-      TestBed.inject(Router).navigate(['lazy']).then();
+      void TestBed.inject(Router).navigate(['lazy']);
       tick();
     }).toThrowError(/ProvideWorkbenchError/);
   }));
