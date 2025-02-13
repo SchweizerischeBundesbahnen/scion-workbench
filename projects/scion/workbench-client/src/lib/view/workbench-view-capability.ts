@@ -86,7 +86,7 @@ export interface WorkbenchViewCapability extends Capability {
      */
     heading?: string;
     /**
-     * Specifies if to display a close button in the view tab. Default is `true`.
+     * Specifies if to display a close button in the view tab. Defaults to `true`.
      */
     closable?: boolean;
     /**

@@ -15,6 +15,6 @@ export class TextNotificationComponent {
   public text: string | undefined;
 
   constructor(notification: Notification) {
-    this.text = notification.input;
+    this.text = notification.input as string | undefined;
   }
 }

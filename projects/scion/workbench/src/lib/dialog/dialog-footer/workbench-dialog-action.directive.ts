@@ -33,7 +33,7 @@ export class WorkbenchDialogActionDirective implements OnDestroy {
   private _action: Disposable | undefined;
 
   /**
-   * Specifies where to place this action in the dialog footer. Default is `end`.
+   * Specifies where to place this action in the dialog footer. Defaults to `end`.
    */
   @Input()
   public align: 'start' | 'end' = 'end';

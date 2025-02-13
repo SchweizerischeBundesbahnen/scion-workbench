@@ -113,7 +113,7 @@ export class AddViewsComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnChange(fn: any): void {
+  public registerOnChange(fn: (value: ViewDescriptor[]) => void): void {
     this._cvaChangeFn = fn;
   }
 
@@ -121,7 +121,7 @@ export class AddViewsComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
 

@@ -64,8 +64,8 @@ export class MTreeNode {
   /**
    * Tests if the given object is a {@link MTreeNode}.
    */
-  public static isMTreeNode(object: any): object is MTreeNode {
-    return object && (object as MTreeNode).type === 'MTreeNode';
+  public static isMTreeNode(object: unknown): object is MTreeNode {
+    return !!object && (object as Partial<MTreeNode>).type === 'MTreeNode';
   }
 }
 
@@ -103,8 +103,8 @@ export class MPart {
   /**
    * Tests if the given object is a {@link MPart}.
    */
-  public static isMPart(object: any): object is MPart {
-    return object && (object as MPart).type === 'MPart';
+  public static isMPart(object: unknown): object is MPart {
+    return !!object && (object as Partial<MPart>).type === 'MPart';
   }
 }
 

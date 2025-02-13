@@ -110,7 +110,7 @@ export class ViewTabPO {
     const contextMenu = await this.openContextMenu();
 
     // Wait for the specified window to open; must be invoked prior to opening the window.
-    const newPagePredicate = async (page: Page): Promise<boolean> => (await getPerspectiveId(page)).match(/anonymous\..+/) !== null;
+    const newPagePredicate = async (page: Page): Promise<boolean> => (/anonymous\..+/.exec((await getPerspectiveId(page)))) !== null;
     const [newPage] = await Promise.all([
       this.locator.page().waitForEvent('popup', {predicate: newPagePredicate}),
       contextMenu.menuItems.moveToNewWindow.click(),

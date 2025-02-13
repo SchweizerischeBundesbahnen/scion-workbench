@@ -32,7 +32,7 @@ export class WorkbenchDialogFooterDirective implements OnDestroy {
 
   /**
    * Specifies if to display a visual separator between the dialog content and this footer.
-   * Default is `true`.
+   * Defaults to `true`.
    */
   @Input({transform: booleanAttribute})
   public divider?: boolean;

@@ -46,7 +46,7 @@ export class SettingsService {
    * Observes given setting. Upon subscription, emits the current setting, and then emits continuously when the setting changes.
    */
   public observe$(setting: Setting): Observable<boolean> {
-    return this._sessionStorage.observe$<boolean>(SETTINGS[setting].storageKey, {emitIfAbsent: true})
+    return this._sessionStorage.observe$<boolean | undefined>(SETTINGS[setting].storageKey, {emitIfAbsent: true})
       .pipe(map(enabled => enabled ?? SETTINGS[setting].default));
   }
 }

@@ -34,7 +34,7 @@ export interface NotificationConfig {
    * Consider using a component when displaying structured content. You can pass data to the component using the
    * {@link componentInput} property or by providing a custom injector in {@link componentConstructOptions.injector}.
    */
-  content: string | ComponentType<any>;
+  content: string | ComponentType<unknown>;
 
   /**
    * If using a component as the notification content, optionally instruct Angular how to construct the component.
@@ -69,7 +69,7 @@ export interface NotificationConfig {
    * Optional data to pass to the notification component. In the component, you can inject the notification handle {@link Notification} to
    * read input data. Use only in combination with a custom notification component, has no effect otherwise.
    */
-  componentInput?: any;
+  componentInput?: unknown;
 
   /**
    * Specifies the severity of the notification. Defaults to `info`.

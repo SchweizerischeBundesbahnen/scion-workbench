@@ -103,7 +103,7 @@ export class WorkbenchLauncher {
 
     switch (this._state) {
       case StartupState.Stopped: {
-        this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [launcher=${this._injector.get(ApplicationInitStatus).done ? 'LAZY' : 'APP_INITIALIZER'}]`, LoggerNames.LIFECYCLE);
+        this._logger.debug(() => `Starting Workbench. Waiting for workbench initializers to complete. [launcher=${this._injector.get(ApplicationInitStatus).done as boolean ? 'LAZY' : 'APP_INITIALIZER'}]`, LoggerNames.LIFECYCLE);
         this._state = StartupState.Starting;
         await runWorkbenchInitializers(WORKBENCH_PRE_STARTUP, this._injector);
         await runWorkbenchInitializers(WORKBENCH_STARTUP, this._injector);
@@ -117,15 +117,12 @@ export class WorkbenchLauncher {
       case StartupState.Started: {
         return this._startup.whenStarted;
       }
-      default: {
-        throw Error(`[WorkbenchStartupError] Illegal startup state: ${this._state}`);
-      }
     }
   }
 }
 
 enum StartupState {
-  Stopped, Starting, Started
+  Stopped, Starting, Started,
 }
 
 /**

@@ -29,7 +29,7 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
   private readonly _tabbar: SciTabbarPO;
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-layout-page');
     this._tabbar = new SciTabbarPO(this.locator.locator('sci-tabbar'));
   }

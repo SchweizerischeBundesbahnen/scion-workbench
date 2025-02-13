@@ -29,7 +29,7 @@ export class MicrofrontendPerspectiveIntentHandler implements IntentInterceptor 
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.Perspective) {
-      return this.consumePerspectiveIntent(intentMessage);
+      return this.consumePerspectiveIntent(intentMessage as IntentMessage<void>);
     }
     else {
       return next.handle(intentMessage);
@@ -37,7 +37,7 @@ export class MicrofrontendPerspectiveIntentHandler implements IntentInterceptor 
   }
 
   private async consumePerspectiveIntent(message: IntentMessage<void>): Promise<void> {
-    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
     const success = await this.switchPerspective(message);
     if (replyTo) {
       await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});

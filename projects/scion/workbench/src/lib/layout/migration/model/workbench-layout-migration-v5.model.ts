@@ -44,5 +44,8 @@ export interface MViewV5 {
   };
 }
 
+export interface NavigationDataV5 {
+  [key: string]: unknown;
+}
+
 export type ViewIdV5 = `view.${number}`;
-export type NavigationDataV5 = {[key: string]: unknown};

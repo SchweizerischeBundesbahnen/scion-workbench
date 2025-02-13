@@ -19,21 +19,6 @@ jobs:
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
       - if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
-  lint:
-    name: 'Linting'
-    needs: install
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: 'Restoring NPM modules from cache'
-        uses: actions/cache@v4
-        with:
-          path: ./node_modules
-          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npm run lint
   build-libs:
     name: 'Building Libs'
     needs: install
@@ -82,6 +67,31 @@ jobs:
         with:
           name: workbench-client-api
           path: dist/workbench-client-api
+  lint:
+    name: 'Linting'
+    needs: build-libs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: 'Downloading dist/scion/workbench'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-dist
+          path: dist/scion/workbench
+      - name: 'Downloading dist/scion/workbench-client'
+        uses: actions/download-artifact@v4
+        with:
+          name: workbench-client-dist
+          path: dist/scion/workbench-client
+      - name: 'Restoring NPM modules from cache'
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      - run: npm run lint
   build-apps:
     name: 'Building Apps'
     needs: build-libs

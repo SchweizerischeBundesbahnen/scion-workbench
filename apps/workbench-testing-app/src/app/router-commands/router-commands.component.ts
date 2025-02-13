@@ -9,7 +9,7 @@
  */
 
 import {Component, forwardRef} from '@angular/core';
-import {PRIMARY_OUTLET, Router, Routes} from '@angular/router';
+import {PRIMARY_OUTLET, Router, Routes, UrlSegmentGroup} from '@angular/router';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {Commands} from '@scion/workbench';
@@ -57,7 +57,7 @@ export class RouterCommandsComponent implements ControlValueAccessor {
     }
 
     const urlTree = this._router.parseUrl(value);
-    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET];
+    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
     if (!segmentGroup) {
       return []; // path syntax error
     }
@@ -80,7 +80,7 @@ export class RouterCommandsComponent implements ControlValueAccessor {
   }
 
   private stringify(commands: Commands | null | undefined): string {
-    if (!commands || !commands.length) {
+    if (!commands?.length) {
       return '';
     }
 
@@ -100,7 +100,7 @@ export class RouterCommandsComponent implements ControlValueAccessor {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnChange(fn: any): void {
+  public registerOnChange(fn: (commands: Commands) => void): void {
     this._cvaChangeFn = fn;
   }
 
@@ -108,7 +108,7 @@ export class RouterCommandsComponent implements ControlValueAccessor {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
 }

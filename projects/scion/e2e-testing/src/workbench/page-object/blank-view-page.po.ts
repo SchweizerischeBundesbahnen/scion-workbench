@@ -23,7 +23,7 @@ export class BlankViewPagePO implements WorkbenchViewPagePO {
   public readonly locator: Locator;
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('wb-blank');
   }
 }

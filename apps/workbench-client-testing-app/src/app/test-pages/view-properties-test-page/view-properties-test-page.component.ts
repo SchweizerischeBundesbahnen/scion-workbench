@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {booleanAttribute, Component} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench-client';
 import {from, map, mergeMap, Observable} from 'rxjs';
-import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
 @Component({
   selector: 'app-view-properties-test-page',
@@ -23,8 +22,8 @@ export default class ViewPropertiesTestPageComponent {
   constructor(private _view: WorkbenchView) {
     this._view.setTitle(this.observeParam$('title'));
     this._view.setHeading(this.observeParam$('heading'));
-    this._view.markDirty(this.observeParam$('dirty').pipe(map(coerceBooleanProperty)));
-    this._view.setClosable(this.observeParam$('closable').pipe(map(coerceBooleanProperty)));
+    this._view.markDirty(this.observeParam$('dirty').pipe(map(booleanAttribute)));
+    this._view.setClosable(this.observeParam$('closable').pipe(map(booleanAttribute)));
   }
 
   private observeParam$(param: string): Observable<string> {
@@ -36,4 +35,3 @@ export default class ViewPropertiesTestPageComponent {
       );
   }
 }
-

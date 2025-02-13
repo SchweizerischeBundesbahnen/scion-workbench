@@ -96,8 +96,8 @@ export default class PopupOpenerPageComponent {
       anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton.nativeElement : this._popupOrigin$,
       align: this.form.controls.align.value || undefined,
       closeStrategy: undefinedIfEmpty<CloseStrategy>({
-        onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value ?? undefined,
-        onEscape: this.form.controls.closeStrategy.controls.onEscape.value ?? undefined,
+        onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,
+        onEscape: this.form.controls.closeStrategy.controls.onEscape.value,
       }),
       cssClass: this.form.controls.cssClass.value,
       context: {
@@ -105,7 +105,7 @@ export default class PopupOpenerPageComponent {
       },
     })
       .then(result => this.returnValue = result)
-      .catch(error => this.popupError = stringifyError(error) || 'Popup was closed with an error');
+      .catch((error: unknown) => this.popupError = stringifyError(error) || 'Popup was closed with an error');
   }
 
   private observePopupOrigin$(): Observable<PopupOrigin> {

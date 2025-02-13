@@ -26,7 +26,7 @@ export function stringify(data: unknown, options?: {exclusions?: Array<string | 
   const objectStack = new Array<ObjectValue>();
   const compiledExclusions = exclusions.map(exclusion => new CompiledExclusion(exclusion));
 
-  return JSON.stringify(data, (key, value) => {
+  return JSON.stringify(data, (key: string, value: unknown) => {
     if (key === '') { // root node
       return sort ? sortProperties(value) : value;
     }

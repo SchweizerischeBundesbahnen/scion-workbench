@@ -26,7 +26,7 @@ export class NotificationOpenerPagePO implements WorkbenchViewPagePO {
   public readonly error: Locator;
 
   constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-notification-opener-page');
     this.error = this.locator.locator('output.e2e-notification-open-error');
   }

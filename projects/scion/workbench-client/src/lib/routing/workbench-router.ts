@@ -15,6 +15,7 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 import {Dictionaries, Dictionary, Maps} from '@scion/toolkit/util';
 import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {lastValueFrom} from 'rxjs';
+import {Empty} from '../utility-types';
 
 /**
  * Enables navigation of workbench views.
@@ -43,7 +44,7 @@ export class WorkbenchRouter {
    * @param  extras - Options to control navigation.
    * @return Promise that resolves to `true` on successful navigation, or `false` otherwise.
    */
-  public async navigate(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<boolean> {
+  public async navigate(qualifier: Qualifier | Empty<Qualifier>, extras?: WorkbenchNavigationExtras): Promise<boolean> {
     if (this.isSelfNavigation(qualifier)) {
       return this.updateViewParams(extras);
     }
@@ -52,10 +53,10 @@ export class WorkbenchRouter {
     }
   }
 
-  private async issueViewIntent(qualifier: Qualifier | {}, extras?: WorkbenchNavigationExtras): Promise<boolean> {
+  private async issueViewIntent(qualifier: Qualifier, extras?: WorkbenchNavigationExtras): Promise<boolean> {
     const navigationExtras: WorkbenchNavigationExtras = {
       ...extras,
-      params: undefined,         // included in the intent
+      params: undefined, // included in the intent
       paramsHandling: undefined, // only applicable for self-navigation
     };
     const navigate$ = Beans.get(IntentClient).request$<boolean>({type: WorkbenchCapabilities.View, qualifier, params: Maps.coerce(extras?.params)}, navigationExtras);
@@ -68,7 +69,7 @@ export class WorkbenchRouter {
   }
 
   private async updateViewParams(extras?: WorkbenchNavigationExtras): Promise<boolean> {
-    const viewCapabilityId = Beans.get(WorkbenchView).snapshot.params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID);
+    const viewCapabilityId = Beans.get(WorkbenchView).snapshot.params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string | undefined;
     if (viewCapabilityId === undefined) {
       return false; // Params cannot be updated until the loading of the view is completed
     }
@@ -86,8 +87,8 @@ export class WorkbenchRouter {
     }
   }
 
-  private isSelfNavigation(qualifier: Qualifier | {}): boolean {
-    if (!qualifier || Object.keys(qualifier).length === 0) {
+  private isSelfNavigation(qualifier: Qualifier | Empty<Qualifier>): boolean {
+    if (Object.keys(qualifier).length === 0) {
       if (!Beans.opt(WorkbenchView)) {
         throw Error('[NavigateError] Self-navigation is supported only if in the context of a view.');
       }
@@ -124,7 +125,7 @@ export interface WorkbenchNavigationExtras {
    */
   paramsHandling?: 'merge' | 'replace';
   /**
-   * Controls where to open the view. Default is `auto`.
+   * Controls where to open the view. Defaults to `auto`.
    *
    * One of:
    * - 'auto':   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
@@ -142,7 +143,7 @@ export interface WorkbenchNavigationExtras {
    */
   partId?: string;
   /**
-   * Instructs the router to activate the view. Default is `true`.
+   * Instructs the router to activate the view. Defaults to `true`.
    */
   activate?: boolean;
   /**
@@ -154,7 +155,7 @@ export interface WorkbenchNavigationExtras {
    */
   close?: boolean;
   /**
-   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Default is after the active view.
+   * Specifies where to insert the view into the tab bar. Has no effect if navigating an existing view. Defaults to after the active view.
    */
   position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view';
   /**

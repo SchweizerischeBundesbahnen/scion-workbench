@@ -17,7 +17,7 @@ import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCap
 export default class ActivatorModule {
 
   constructor(private _manifestService: ManifestService, @Inject(APP_IDENTITY) symbolicName: string) {
-    this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
+    void this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
   }
 
   private async registerManifestObjects(appSymbolicName: string): Promise<void> {

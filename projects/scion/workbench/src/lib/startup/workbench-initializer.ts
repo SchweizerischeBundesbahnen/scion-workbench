@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentInjector, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
+import {InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -21,7 +21,7 @@ import {EnvironmentInjector, InjectionToken, Injector, runInInjectionContext} fr
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('WORKBENCH_STARTUP');
+export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('WORKBENCH_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -34,7 +34,7 @@ export const WORKBENCH_STARTUP = new InjectionToken<WorkbenchInitializer | (() =
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('WORKBENCH_PRE_STARTUP');
+export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('WORKBENCH_PRE_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -50,7 +50,7 @@ export const WORKBENCH_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | (
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('MICROFRONTEND_PLATFORM_PRE_STARTUP');
+export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('MICROFRONTEND_PLATFORM_PRE_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -66,7 +66,7 @@ export const MICROFRONTEND_PLATFORM_PRE_STARTUP = new InjectionToken<WorkbenchIn
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('MICROFRONTEND_PLATFORM_POST_STARTUP');
+export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('MICROFRONTEND_PLATFORM_POST_STARTUP');
 
 /**
  * The SCION Workbench defines a number of injection tokens (also called DI tokens) as hooks into the workbench's startup process.
@@ -79,7 +79,25 @@ export const MICROFRONTEND_PLATFORM_POST_STARTUP = new InjectionToken<WorkbenchI
  * {@link WorkbenchInitializer} and returns a Promise, the workbench waits for the Promise to be resolved before proceeding with the startup.
  * Initializers can call `inject` to get any required dependencies. Initializers associated with the same DI token may run in parallel.
  */
-export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializer | (() => void | Promise<void>) | object>('WORKBENCH_POST_STARTUP');
+export const WORKBENCH_POST_STARTUP = new InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>('WORKBENCH_POST_STARTUP');
+
+/**
+ * The signature of a function to hook into the startup of the SCION Workbench.
+ *
+ * If the function returns a Promise, the workbench startup does not complete until the Promise is resolved.
+ * Functions associated with the same DI token run in parallel. The function can call `inject` to get any
+ * required dependencies.
+ *
+ * Following DI tokens are available as hooks into the workbench's startup process, listed in the order in which they are injected and
+ * executed.
+ *
+ * - {@link WORKBENCH_PRE_STARTUP}
+ * - {@link WORKBENCH_STARTUP}
+ * - {@link WORKBENCH_POST_STARTUP}
+ * - {@link MICROFRONTEND_PLATFORM_PRE_STARTUP}
+ * - {@link MICROFRONTEND_PLATFORM_POST_STARTUP}
+ */
+export type WorkbenchInitializerFn = () => void | Promise<void>;
 
 /**
  * Allows initializing the application during workbench startup.
@@ -142,20 +160,16 @@ export interface WorkbenchInitializer {
 /**
  * Runs workbench initializers associated with the given DI token. Initializer functions can call `inject` to get any required dependencies.
  */
-export async function runWorkbenchInitializers(token: InjectionToken<any>, injector: Injector): Promise<void> {
-  const initializers: Array<WorkbenchInitializer | Function | undefined | any> | null = injector.get(token, undefined, {optional: true}); // eslint-disable-line @typescript-eslint/ban-types
-  if (!initializers?.length) {
+export async function runWorkbenchInitializers(token: InjectionToken<WorkbenchInitializerFn | WorkbenchInitializer | object>, injector: Injector): Promise<void> {
+  const initializers = injector.get(token, [], {optional: true}) as Array<WorkbenchInitializerFn | WorkbenchInitializer | object>;
+  if (!initializers.length) {
     return;
   }
 
-  // Invoke and await initializer functions.
-  await Promise.all(initializers.reduce((acc, initializer) => {
-    if (typeof initializer === 'function') {
-      return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), initializer));
-    }
-    else if (typeof initializer?.init === 'function') {
-      return acc.concat(runInInjectionContext(injector.get(EnvironmentInjector), () => initializer.init()));
-    }
-    return acc;
-  }, new Array<Promise<unknown>>()));
+  // Run and await initializer functions.
+  await Promise.all(initializers
+    .filter((initializer): initializer is WorkbenchInitializerFn | WorkbenchInitializer => typeof initializer === 'function' || typeof (initializer as Partial<WorkbenchInitializer>).init === 'function')
+    .reduce((acc, initializer) => runInInjectionContext(injector, () => {
+      return acc.concat(typeof initializer === 'function' ? initializer() : initializer.init());
+    }), new Array<void | Promise<void>>()));
 }

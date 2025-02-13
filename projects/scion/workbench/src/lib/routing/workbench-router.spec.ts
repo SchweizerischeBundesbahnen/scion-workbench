@@ -18,11 +18,11 @@ import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {throwError} from '../common/throw-error.util';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
+import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 
 describe('WorkbenchRouter', () => {
 
@@ -411,7 +411,7 @@ describe('WorkbenchRouter', () => {
           child1: new MPart({
             id: 'part.101',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
           child2: new MPart({
             id: MAIN_AREA,
@@ -435,7 +435,7 @@ describe('WorkbenchRouter', () => {
           child1: new MPart({
             id: 'part.101',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
           child2: new MPart({
             id: MAIN_AREA,
@@ -465,7 +465,7 @@ describe('WorkbenchRouter', () => {
             child1: new MPart({
               id: 'part.101',
               views: [],
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -475,7 +475,7 @@ describe('WorkbenchRouter', () => {
           child2: new MPart({
             id: 'part.102',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },
@@ -502,7 +502,7 @@ describe('WorkbenchRouter', () => {
             child1: new MPart({
               id: 'part.101',
               views: [],
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -512,7 +512,7 @@ describe('WorkbenchRouter', () => {
           child2: new MPart({
             id: 'part.102',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },
@@ -539,7 +539,7 @@ describe('WorkbenchRouter', () => {
               child1: new MPart({
                 id: 'part.101',
                 views: [],
-                navigation: {id: ANYTHING},
+                navigation: {id: any()},
               }),
               child2: new MPart({
                 id: MAIN_AREA,
@@ -549,13 +549,13 @@ describe('WorkbenchRouter', () => {
             child2: new MPart({
               id: 'part.102',
               views: [],
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
           }),
           child2: new MPart({
             id: 'part.103',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },
@@ -598,7 +598,7 @@ describe('WorkbenchRouter', () => {
           child1: new MPart({
             id: 'part.101',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
           child2: new MPart({
             id: MAIN_AREA,
@@ -623,7 +623,7 @@ describe('WorkbenchRouter', () => {
           child1: new MPart({
             id: 'part.101',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
           child2: new MPart({
             id: MAIN_AREA,
@@ -653,7 +653,7 @@ describe('WorkbenchRouter', () => {
             child1: new MPart({
               id: 'part.101',
               views: [],
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -663,7 +663,7 @@ describe('WorkbenchRouter', () => {
           child2: new MPart({
             id: 'part.102',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },
@@ -691,7 +691,7 @@ describe('WorkbenchRouter', () => {
             child1: new MPart({
               id: 'part.101',
               views: [],
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
             child2: new MPart({
               id: MAIN_AREA,
@@ -701,7 +701,7 @@ describe('WorkbenchRouter', () => {
           child2: new MPart({
             id: 'part.102',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },
@@ -728,7 +728,7 @@ describe('WorkbenchRouter', () => {
               child1: new MPart({
                 id: 'part.101',
                 views: [],
-                navigation: {id: ANYTHING},
+                navigation: {id: any()},
               }),
               child2: new MPart({
                 id: MAIN_AREA,
@@ -738,13 +738,13 @@ describe('WorkbenchRouter', () => {
             child2: new MPart({
               id: 'part.102',
               views: [],
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
           }),
           child2: new MPart({
             id: 'part.103',
             views: [],
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },

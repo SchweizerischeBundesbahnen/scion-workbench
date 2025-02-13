@@ -81,9 +81,9 @@ export default class ModifyLayoutPageComponent {
   protected async onModify(): Promise<void> {
     this.modifyError = undefined;
     this.navigate()
-      .then(success => success ? Promise.resolve() : Promise.reject('Modification failed'))
+      .then(success => success ? Promise.resolve() : Promise.reject(Error('Modification failed')))
       .then(() => this.resetForm())
-      .catch(error => this.modifyError = stringifyError(error));
+      .catch((error: unknown) => this.modifyError = stringifyError(error));
   }
 
   private navigate(): Promise<boolean> {
@@ -91,9 +91,9 @@ export default class ModifyLayoutPageComponent {
       // Add parts.
       for (const part of this.form.controls.parts.value) {
         layout = layout.addPart(part.id, {
-          relativeTo: part.relativeTo!.relativeTo,
-          align: part.relativeTo!.align!,
-          ratio: part.relativeTo!.ratio!,
+          relativeTo: part.relativeTo.relativeTo,
+          align: part.relativeTo.align!,
+          ratio: part.relativeTo.ratio!,
         }, {activate: part.options?.activate});
       }
 

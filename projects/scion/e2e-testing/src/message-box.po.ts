@@ -39,7 +39,7 @@ export class MessageBoxPO {
   public async getActions(): Promise<{[key: string]: string}> {
     const actions = new Map<string, string>();
     for (const locator of await this.actions.all()) {
-      const action = await locator.getAttribute('data-action') || '?';
+      const action = await locator.getAttribute('data-action') ?? '?';
       const label = await locator.innerText();
       actions.set(action, label);
     }

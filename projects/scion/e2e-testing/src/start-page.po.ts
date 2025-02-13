@@ -29,7 +29,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
 
   constructor(private _appPO: AppPO, locateBy?: {viewId?: ViewId; cssClass?: string}) {
     if (locateBy?.viewId || locateBy?.cssClass) {
-      this._view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+      this._view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
       this.locator = this._view.locator.locator('app-start-page');
     }
     else {

@@ -24,7 +24,7 @@ export async function hasCssClass(element: Locator, cssClass: string): Promise<b
  * Returns CSS classes on given element.
  */
 export async function getCssClasses(element: Locator): Promise<string[]> {
-  return (await element.getAttribute('class'))?.split(/\s+/) || [];
+  return (await element.getAttribute('class'))?.split(/\s+/) ?? [];
 }
 
 /**
@@ -85,11 +85,11 @@ export async function retryOnError<T>(fn: () => Promise<T>, options?: {timeout?:
   const interval = options?.interval ?? 100;
   const t0 = Date.now();
 
-  while (true) { // eslint-disable-line no-constant-condition
+  while (true) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
     try {
       return await fn();
     }
-    catch (error: unknown) {
+    catch (error) {
       if (Date.now() - t0 > timeout) {
         throw error;
       }
@@ -137,7 +137,7 @@ export function coerceArray<T>(value: T | T[] | undefined | null): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
-export function coerceMap<V>(value: Record<string, V> | Map<string, V>): Map<string, V> {
+export function coerceMap<V>(value: Record<string, V> | Map<string, V> | undefined | null): Map<string, V> {
   if (value instanceof Map) {
     return value;
   }
@@ -168,11 +168,11 @@ export function withoutUndefinedEntries<T>(object: Record<string, T>): Record<st
  */
 export async function getPerspectiveId(page: Page): Promise<string> {
   const windowName = await page.evaluate((): string => window.name);
-  const match = windowName.match(/^scion\.workbench\.perspective\.(?<perspective>.+)$/);
+  const match = /^scion\.workbench\.perspective\.(?<perspective>.+)$/.exec(windowName);
   if (!match) {
     throw Error('[IllegalStateError] No perspective active in page.');
   }
-  return match?.groups!['perspective'];
+  return match.groups!.perspective;
 }
 
 /**
@@ -196,17 +196,17 @@ export interface DomRect {
  */
 export function commandsToPath(commands: Commands): string {
   return commands
-    .reduce((path, command) => {
+    .reduce((path: string[], command: unknown) => {
       if (typeof command === 'string') {
         return path.concat(command);
       }
       else if (!path.length) {
-        return path.concat(`.;${toMatrixNotation(command)}`); // Note that matrix parameters in the first segment are only supported in combination with a `relativeTo`.
+        return path.concat(`.;${toMatrixNotation(command as Record<string, unknown>)}`); // Note that matrix parameters in the first segment are only supported in combination with a `relativeTo`.
       }
       else {
-        return path.concat(`${path.pop()};${toMatrixNotation(command)}`);
+        return path.concat(`${path.pop()};${toMatrixNotation(command as Record<string, unknown>)}`);
       }
-    }, [])
+    }, new Array<string>())
     .join('/');
 }
 

@@ -10,7 +10,7 @@
 
 import {coerceArray, DomRect, fromRect, rejectWhenAttached} from '../../helper/testing.util';
 import {AppPO} from '../../app.po';
-import {BottomLeftPoint, BottomRightPoint, PopupOrigin, PopupSize, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench';
+import {BottomLeftPoint, BottomRightPoint, PopupSize, TopLeftPoint, TopRightPoint, ViewId} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
 import {Locator} from '@playwright/test';
@@ -67,12 +67,7 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
     await this.locator.locator('select.e2e-popup-component').selectOption(component);
   }
 
-  public async enterPosition(position: 'element'): Promise<void>;
-  public async enterPosition(position: TopLeftPoint): Promise<void>;
-  public async enterPosition(position: TopRightPoint): Promise<void>;
-  public async enterPosition(position: BottomLeftPoint): Promise<void>;
-  public async enterPosition(position: BottomRightPoint): Promise<void>;
-  public async enterPosition(position: 'element' | PopupOrigin): Promise<void> {
+  public async enterPosition(position: 'element' | TopLeftPoint | TopRightPoint | BottomLeftPoint | BottomRightPoint): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-anchor'));
     await accordion.expand();
     try {
@@ -80,28 +75,28 @@ export class PopupOpenerPagePO implements WorkbenchViewPagePO {
         await this.locator.locator('select.e2e-position').selectOption('element');
         return;
       }
-      const topLeft = position as TopLeftPoint;
+      const topLeft = position as Partial<TopLeftPoint>;
       if (topLeft.top !== undefined && topLeft.left !== undefined) {
         await this.locator.locator('select.e2e-position').selectOption('top-left');
         await this.locator.locator('input.e2e-position-vertical').fill(`${topLeft.top}`);
         await this.locator.locator('input.e2e-position-horizontal').fill(`${topLeft.left}`);
         return;
       }
-      const topRight = position as TopRightPoint;
+      const topRight = position as Partial<TopRightPoint>;
       if (topRight.top !== undefined && topRight.right !== undefined) {
         await this.locator.locator('select.e2e-position').selectOption('top-right');
         await this.locator.locator('input.e2e-position-vertical').fill(`${topRight.top}`);
         await this.locator.locator('input.e2e-position-horizontal').fill(`${topRight.right}`);
         return;
       }
-      const bottomLeft = position as BottomLeftPoint;
+      const bottomLeft = position as Partial<BottomLeftPoint>;
       if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
         await this.locator.locator('select.e2e-position').selectOption('bottom-left');
         await this.locator.locator('input.e2e-position-vertical').fill(`${bottomLeft.bottom}`);
         await this.locator.locator('input.e2e-position-horizontal').fill(`${bottomLeft.left}`);
         return;
       }
-      const bottomRight = position as BottomRightPoint;
+      const bottomRight = position as Partial<BottomRightPoint>;
       if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
         await this.locator.locator('select.e2e-position').selectOption('bottom-right');
         await this.locator.locator('input.e2e-position-vertical').fill(`${bottomRight.bottom}`);

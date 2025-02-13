@@ -41,7 +41,7 @@ describe('Objects.entries', () => {
 describe('Objects.withoutUndefinedEntries', () => {
 
   it('should preserve data type', () => {
-    type Type = {key1?: string; key2?: string; key3?: string};
+    type Type = {key1?: string; key2?: string; key3?: string}; // eslint-disable-line @typescript-eslint/consistent-type-definitions
     const object: Type = {key1: 'value1', key2: undefined, key3: 'value3'};
     expect(Objects.withoutUndefinedEntries(object)).toEqual({key1: 'value1', key3: 'value3'});
   });

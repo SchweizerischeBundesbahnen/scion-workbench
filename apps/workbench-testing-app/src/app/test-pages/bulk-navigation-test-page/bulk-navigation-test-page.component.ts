@@ -36,14 +36,14 @@ export default class BulkNavigationTestPageComponent {
   }
 
   public onNavigate(): void {
-    const viewCount = this.form.controls.viewCount.value ?? 0;
+    const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
-      this.navigateToViewPage().then();
+      void this.navigateToViewPage();
     }
   }
 
   public async onNavigateAwait(): Promise<void> {
-    const viewCount = this.form.controls.viewCount.value ?? 0;
+    const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
       await this.navigateToViewPage();
     }

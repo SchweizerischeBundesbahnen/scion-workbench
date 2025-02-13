@@ -21,7 +21,7 @@ import {WorkbenchInitializer} from '../startup/workbench-initializer';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class ManifestObjectCache implements WorkbenchInitializer {
 
-  private _capabilities$ = new BehaviorSubject<Map<string, Capability>>(new Map());
+  private _capabilities$ = new BehaviorSubject(new Map<string, Capability>());
 
   constructor(private _manifestService: ManifestService) {
     this.installCapabilityLookup();
@@ -44,11 +44,11 @@ export class ManifestObjectCache implements WorkbenchInitializer {
   public getCapability<T extends Capability = Capability>(capabilityId: string): T;
   public getCapability<T extends Capability = Capability>(capabilityId: string, options: {orElse: null}): T | null;
   public getCapability<T extends Capability = Capability>(capabilityId: string, options?: {orElse: null}): T | null {
-    const capability = this._capabilities$.value.get(capabilityId);
+    const capability = this._capabilities$.value.get(capabilityId) as T | undefined;
     if (!capability && !options) {
       throw Error(`[NullCapabilityError] No capability found with id '${capabilityId}'.`);
     }
-    return capability as T ?? null;
+    return capability ?? null;
   }
 
   /**
@@ -69,7 +69,7 @@ export class ManifestObjectCache implements WorkbenchInitializer {
     this._manifestService.lookupCapabilities$()
       .pipe(takeUntilDestroyed())
       .subscribe(capabilities => {
-        this._capabilities$.next(capabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map()));
+        this._capabilities$.next(capabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, Capability>()));
       });
   }
 }

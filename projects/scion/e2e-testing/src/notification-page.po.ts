@@ -26,9 +26,9 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
     this.input = this.locator.locator('output.e2e-input');
   }
 
-  public async getInputAsKeyValueObject(): Promise<Record<string, any>> {
+  public async getInputAsKeyValueObject(): Promise<Record<string, unknown>> {
     const rawContent = await this.input.innerText();
-    const dictionary: Record<string, any> = {};
+    const dictionary: Record<string, unknown> = {};
 
     // Sample Map content:
     // {"$implicit" => undefined}
@@ -42,8 +42,8 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
 
     let match: RegExpExecArray | null;
     while (match = mapEntryRegex.exec(rawContent)) { // eslint-disable-line no-cond-assign
-      const key = match.groups!['key'];
-      const value = match.groups!['value'];
+      const key = match.groups!.key;
+      const value = match.groups!.value;
       dictionary[key] = value === 'undefined' ? undefined : JSON.parse(value);
     }
     return dictionary;
@@ -65,4 +65,3 @@ export class NotificationPagePO implements WorkbenchNotificationPagePO {
     await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
   }
 }
-

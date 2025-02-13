@@ -17,6 +17,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {NotificationPageComponent} from '../notification-page/notification-page.component';
 import {CssClassComponent} from '../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -57,7 +58,7 @@ export default class NotificationOpenerPageComponent {
       this._notificationService.notify({
         title: this.restoreLineBreaks(this.form.controls.title.value) || undefined,
         content: this.isUseComponent() ? this.parseComponentFromUI() : this.restoreLineBreaks(this.form.controls.content.value),
-        componentInput: (this.isUseComponent() ? this.form.controls.componentInput.value : undefined) || undefined,
+        componentInput: (this.isUseComponent() ? undefinedIfEmpty(this.form.controls.componentInput.value) : undefined),
         severity: this.form.controls.severity.value || undefined,
         duration: this.parseDurationFromUI(),
         group: this.form.controls.group.value || undefined,

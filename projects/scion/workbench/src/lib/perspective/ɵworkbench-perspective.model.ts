@@ -23,6 +23,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
+import {Objects} from '../common/objects.util';
 
 /**
  * @inheritDoc
@@ -110,13 +111,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       this._perspectiveLayout = this._perspectiveViewConflictResolver.resolve(currentLayout, this._perspectiveLayout);
 
       // Add outlets contained in the main area.
-      Object.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([outlet, segments]) => {
+      Objects.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([outlet, segments]) => {
         outlets.set(outlet, segments);
       });
     }
 
     // Add outlets contained in this perspective.
-    Object.entries(this._perspectiveLayout.outlets()).forEach(([outlet, segments]) => {
+    Objects.entries(this._perspectiveLayout.outlets()).forEach(([outlet, segments]) => {
       outlets.set(outlet, segments);
     });
 
@@ -144,7 +145,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    */
   private ensureActiveView(layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     return layout.parts()
-      .filter(part => part.views?.length)
+      .filter(part => part.views.length)
       .reduce((acc, part) => part.activeViewId ? acc : acc.activateView(part.views[0].id), layout);
   }
 

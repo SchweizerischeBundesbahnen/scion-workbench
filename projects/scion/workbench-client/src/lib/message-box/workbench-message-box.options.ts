@@ -44,7 +44,7 @@ export interface WorkbenchMessageBoxOptions {
   };
 
   /**
-   * Specifies the severity of the message. Default is `info`.
+   * Specifies the severity of the message. Defaults to `info`.
    */
   severity?: 'info' | 'warn' | 'error';
 
@@ -61,7 +61,7 @@ export interface WorkbenchMessageBoxOptions {
   modality?: 'application' | 'view';
 
   /**
-   * Specifies if the user can select text displayed in the message box. Default is `false`.
+   * Specifies if the user can select text displayed in the message box. Defaults to `false`.
    */
   contentSelectable?: boolean;
 

@@ -1,5 +1,5 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchNotificationCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
-import {Manifest} from '@scion/microfrontend-platform';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {Capability, Manifest} from '@scion/microfrontend-platform';
 
 /**
  * Represents the manifest of the Workbench Host App.
@@ -16,7 +16,7 @@ export const workbenchManifest: Manifest = {
         {name: 'param2', required: false},
       ],
       description: 'Allows interacting with a notification.',
-    } satisfies WorkbenchNotificationCapability,
+    } satisfies Capability,
     // TODO [#271]: Remove this popup capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Popup,

@@ -100,18 +100,18 @@ export default class StartPageComponent {
 
   public onViewOpen(path: string, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
-    this._workbenchRouter.navigate([path], {
+    void this._workbenchRouter.navigate([path], {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
-    }).then();
+    });
   }
 
   public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
-    this._workbenchClientRouter!.navigate(viewCapability.qualifier, {
+    void this._workbenchClientRouter!.navigate(viewCapability.qualifier, {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
       activate: !event.ctrlKey,
-    }).then();
+    });
   }
 
   public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
@@ -123,7 +123,7 @@ export default class StartPageComponent {
         break;
       }
       case WorkbenchCapabilities.Popup: {
-        await this._workbenchClientPopupService!.open(testCapability.qualifier!, {anchor: event});
+        await this._workbenchClientPopupService!.open(testCapability.qualifier!, {anchor: event.target as HTMLElement});
         break;
       }
       default: {
@@ -167,15 +167,15 @@ export default class StartPageComponent {
   }
 
   public selectViewCapabilityText = (viewCapability: WorkbenchViewCapability): string | undefined => {
-    return viewCapability.properties!.title;
+    return viewCapability.properties.title;
   };
 
   public selectTestCapabilityText = (testCapability: Capability): string | undefined => {
-    return testCapability.properties?.['cssClass'];
+    return testCapability.properties?.['cssClass'] as string | undefined;
   };
 
   public selectViewRouteText = (route: Route): string | undefined => {
-    return route.data?.[WorkbenchRouteData.title];
+    return route.data?.[WorkbenchRouteData.title] as string | undefined;
   };
 }
 

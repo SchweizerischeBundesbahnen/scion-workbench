@@ -91,13 +91,13 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     // Navigate to the microfrontend.
     const application = this._manifestService.getApplication(this.popupCapability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
-    this._outletRouter.navigate(this.popupCapability.properties.path, {
+    void this._outletRouter.navigate(this.popupCapability.properties.path, {
       outlet: this.popup.id,
       relativeTo: application.baseUrl,
       params: this._popupContext.params,
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
-    }).then();
+    });
   }
 
   public onFocusWithin(event: Event): void {
@@ -126,6 +126,6 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.popup.id}).then();
+    void this._outletRouter.navigate(null, {outlet: this.popup.id});
   }
 }

@@ -95,14 +95,14 @@ export default class SampleViewComponent {
       return;
     }
 
-    this._workbenchRouter.navigate([], {
+    void this._workbenchRouter.navigate([], {
       hint: this.view.navigation()?.hint,
       target: this.view.id,
       data,
       relativeTo: this._route,
       replaceUrl: true,
       activate: this.view.active(),
-    }).then();
+    });
   }
 }
 

@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Injector} from '@angular/core';
+import {Component, Injector, numberAttribute} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
-import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {NgTemplateOutlet} from '@angular/common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -89,9 +88,9 @@ export default class RouterPageComponent {
   protected onRouterNavigate(): void {
     this.navigateError = undefined;
     this._wbRouter.navigate(this.form.controls.commands.value, this.extras)
-      .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))
+      .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())
-      .catch(error => this.navigateError = stringifyError(error));
+      .catch((error: unknown) => this.navigateError = stringifyError(error));
   }
 
   protected onRouterLinkNavigate(): void {
@@ -124,12 +123,12 @@ export default class RouterPageComponent {
   }
 }
 
-function coercePosition(value: any): number | 'start' | 'end' | undefined {
+function coercePosition(value: unknown): number | 'start' | 'end' | 'before-active-view' | 'after-active-view' | undefined {
   if (value === '') {
     return undefined;
   }
   if (value === 'start' || value === 'end' || value === 'before-active-view' || value === 'after-active-view' || value === undefined) {
     return value;
   }
-  return coerceNumberProperty(value);
+  return numberAttribute(value);
 }

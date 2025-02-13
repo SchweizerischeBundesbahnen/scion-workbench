@@ -34,7 +34,7 @@ export interface WorkbenchLayout {
    * @param id - The id of the part to add.  Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
    * @param options - Controls how to add the part to the layout.
-   * @param options.activate - Controls whether to activate the part. Default is `false`.
+   * @param options.activate - Controls whether to activate the part. Defaults to `false`.
    * @return a copy of this layout with the part added.
    */
   addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
@@ -98,9 +98,9 @@ export interface WorkbenchLayout {
    * @param id - The id of the view to add.
    * @param options - Controls how to add the view to the layout.
    * @param options.partId - References the part to which to add the view.
-   * @param options.position - Specifies the position where to insert the view. The position is zero-based. Default is `end`.
-   * @param options.activateView - Controls whether to activate the view. Default is `false`.
-   * @param options.activatePart - Controls whether to activate the part that contains the view. Default is `false`.
+   * @param options.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
+   * @param options.activateView - Controls whether to activate the view. Defaults to `false`.
+   * @param options.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
    * @return a copy of this layout with the view added.
    */
   addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
@@ -182,9 +182,9 @@ export interface WorkbenchLayout {
    * @param id - The id of the view to be moved.
    * @param targetPartId - The id of the part to which to move the view.
    * @param options - Controls moving of the view.
-   * @param options.position - Specifies the position where to move the view in the target part. The position is zero-based. Default is `end` when moving the view to a different part.
-   * @param options.activateView - Controls if to activate the view. Default is `false`.
-   * @param options.activatePart - Controls if to activate the target part. Default is `false`.
+   * @param options.position - Specifies the position where to move the view in the target part. The position is zero-based. Defaults to `end` when moving the view to a different part.
+   * @param options.activateView - Controls if to activate the view. Defaults to `false`.
+   * @param options.activatePart - Controls if to activate the target part. Defaults to `false`.
    * @return a copy of this layout with the view moved.
    */
   moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout;
@@ -194,7 +194,7 @@ export interface WorkbenchLayout {
    *
    * @param id - The id of the view which to activate.
    * @param options - Controls view activation.
-   * @param options.activatePart - Controls whether to activate the part that contains the view. Default is `false`.
+   * @param options.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
    * @return a copy of this layout with the view activated.
    */
   activateView(id: string, options?: {activatePart?: boolean}): WorkbenchLayout;

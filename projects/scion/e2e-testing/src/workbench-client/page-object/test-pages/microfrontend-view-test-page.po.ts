@@ -22,8 +22,8 @@ export class MicrofrontendViewTestPagePO implements MicrofrontendViewPagePO {
   public readonly outlet: SciRouterOutletPO;
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-microfrontend-test-page');
   }
 }

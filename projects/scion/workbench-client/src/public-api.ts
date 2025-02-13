@@ -46,3 +46,4 @@ export {WorkbenchNotificationConfig} from './lib/notification/workbench-notifica
 export {WorkbenchThemeMonitor, WorkbenchTheme} from './lib/theme/workbench-theme-monitor';
 export {ɵTHEME_CONTEXT_KEY} from './lib/theme/ɵworkbench-theme-monitor';
 export {WorkbenchPerspectiveCapability, WorkbenchPerspectivePart, WorkbenchPerspectiveView, MAIN_AREA} from './lib/perspective/workbench-perspective-capability';
+export {Empty} from './lib/utility-types';

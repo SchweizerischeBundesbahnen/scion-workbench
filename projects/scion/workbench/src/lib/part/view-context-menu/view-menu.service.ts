@@ -127,7 +127,7 @@ export class ViewMenuService {
      * Finds menu items that match the given keyboard event.
      */
     function findMatchingMenuItems(menuItems: WorkbenchMenuItem[], event: KeyboardEvent): WorkbenchMenuItem[] {
-      const eventKey = event.key?.toLowerCase();
+      const eventKey = (event.key as string | undefined)?.toLowerCase(); // `event.key` can be `undefined`, for example, when selecting an option from an input element's datalist.
       const eventModifierKeys = getModifierState(event);
 
       return menuItems

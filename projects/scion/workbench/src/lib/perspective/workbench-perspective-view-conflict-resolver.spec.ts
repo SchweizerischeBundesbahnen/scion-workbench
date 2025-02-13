@@ -86,4 +86,3 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] wb-view[data-viewid="view.2"] spec-test-component')).nativeElement.innerText).toEqual('a');
   });
 });
-

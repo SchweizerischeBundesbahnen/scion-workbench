@@ -39,15 +39,15 @@ export class LegacyMessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
 
   public async open(options?: WorkbenchMessageBoxLegacyOptions): Promise<void> {
     if (options?.content) {
-      await this.locator.locator('input.e2e-content').fill(options.content);
+      await this.locator.locator('input.e2e-content').fill(options.content as string);
     }
 
     if (options?.title) {
-      await this.locator.locator('input.e2e-title').fill(options?.title);
+      await this.locator.locator('input.e2e-title').fill(options.title);
     }
 
     if (options?.cssClass) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
+      await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
     }
 
     await this.locator.locator('button.e2e-open').click();

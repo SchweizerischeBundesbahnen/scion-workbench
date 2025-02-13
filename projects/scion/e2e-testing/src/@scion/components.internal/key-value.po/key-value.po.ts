@@ -23,7 +23,7 @@ export class SciKeyValuePO {
    */
   public async readEntries(): Promise<Record<string, string>> {
     if (!await this._sciKeyValueLocator.isVisible()) {
-      throw Error(`No element found using locator for 'SciKeyValuePO': ${this._sciKeyValueLocator.toString()}`);
+      throw Error(`No element found using locator for 'SciKeyValuePO': ${this._sciKeyValueLocator}`);
     }
 
     const keysLocator = this._sciKeyValueLocator.locator('.e2e-key');

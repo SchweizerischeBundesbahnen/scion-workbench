@@ -51,6 +51,6 @@ export default class UnregisterWorkbenchCapabilityPageComponent {
         this.unregistered = true;
         this.form.reset();
       })
-      .catch(error => this.unregisterError = stringifyError(error));
+      .catch((error: unknown) => this.unregisterError = stringifyError(error));
   }
 }

@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, inject, OnDestroy, Signal, untracked} from '@angular/core';
+import {booleanAttribute, Component, effect, inject, OnDestroy, Signal, untracked} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
-import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDesktopDirective, WorkbenchDialogService, WorkbenchPart, WorkbenchPartActionDirective, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView, WorkbenchViewMenuItemDirective} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
@@ -57,7 +56,7 @@ export class WorkbenchComponent implements OnDestroy {
   };
 
   protected onMoveView(view: WorkbenchView): void {
-    this._dialogService.open(ViewMoveDialogTestPageComponent, {
+    void this._dialogService.open(ViewMoveDialogTestPageComponent, {
       inputs: {view},
       cssClass: 'e2e-move-view',
       context: {viewId: view.id},
@@ -65,7 +64,7 @@ export class WorkbenchComponent implements OnDestroy {
   }
 
   protected onShowViewInfo(view: WorkbenchView): void {
-    this._dialogService.open(ViewInfoDialogComponent, {
+    void this._dialogService.open(ViewInfoDialogComponent, {
       inputs: {view},
       cssClass: 'e2e-view-info',
     });
@@ -88,7 +87,7 @@ export class WorkbenchComponent implements OnDestroy {
    */
   private readQueryParamFlag(param: string): Signal<boolean> {
     const route = inject(ActivatedRoute);
-    const flag$ = route.queryParamMap.pipe(map(params => coerceBooleanProperty(params.get(param))));
+    const flag$ = route.queryParamMap.pipe(map(params => booleanAttribute(params.get(param))));
     return toSignal(flag$, {requireSync: true});
   }
 

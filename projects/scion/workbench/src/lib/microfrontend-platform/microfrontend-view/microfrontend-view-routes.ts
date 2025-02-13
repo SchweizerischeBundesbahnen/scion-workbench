@@ -57,15 +57,17 @@ export const MicrofrontendViewRoutes = {
       }
 
       // Test if navigating a view.
-      const outlet = route.data?.[WorkbenchRouteData.ɵoutlet];
+      const outlet = route.data?.[WorkbenchRouteData.ɵoutlet] as string | undefined;
       if (!Routing.isViewOutlet(outlet)) {
         return null;
       }
 
       const {layout} = injector.get(ɵWorkbenchRouter).getCurrentNavigationContext();
       const navigationState = layout.navigationState({outlet});
-      const transientParams = navigationState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {};
-      const posParams = Object.entries(transientParams).map(([name, value]) => [name, new UrlSegment(value, {})]);
+      const transientParams = (navigationState[MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS] ?? {}) as Params;
+      // Pass transient parameters as positional parameters so they are available in `ActivatedRoute.params`.
+      // Note that we use an undocumented feature of `UrlMatcher` by passing an object instead of a string as the path of `UrlSegment`.
+      const posParams = Object.entries(transientParams).map<[string, UrlSegment]>(([name, value]) => [name, new UrlSegment(value as string, {})]);
 
       return {
         consumed: segments,
@@ -112,7 +114,7 @@ export const MicrofrontendViewRoutes = {
   splitParams: (params: Params, capability: WorkbenchViewCapability): {urlParams: Params; transientParams: Params} => {
     const transientParamNames = new Set(capability.params?.filter(param => param.transient).map(param => param.name));
 
-    return Object.entries(params).reduce((groups, [name, value]) => {
+    return Object.entries(params).reduce((groups, [name, value]: [string, unknown]) => {
       if (transientParamNames.has(name)) {
         groups.transientParams[name] = value;
       }

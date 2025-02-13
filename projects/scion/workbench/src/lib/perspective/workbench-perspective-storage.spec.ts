@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
@@ -105,7 +105,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         root: new MTreeNode({
           child1: new MPart({
             id: 'part.left',
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
           child2: new MTreeNode({
             child1: new MTreeNode({
@@ -187,11 +187,11 @@ describe('WorkbenchPerspectiveStorage', () => {
     storage.enableThrottling();
 
     // Modify the layout in quick succession.
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.1'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.2'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.3'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.4'}).then();
-    workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.5'}).then();
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.1'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.2'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.3'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.4'});
+    void workbenchRouter.navigate(['view'], {partId: 'part.part', target: 'view.5'});
     await waitUntilStable();
 
     // The first write is still in progress (because writes are throttled), blocking subsequent writes (serial execution).
@@ -269,7 +269,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           }),
           child2: new MPart({
             id: 'part.right',
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
             views: [],
           }),
         }),
@@ -300,13 +300,13 @@ describe('WorkbenchPerspectiveStorage', () => {
             }),
             child2: new MPart({
               id: 'part.right',
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
               views: [],
             }),
           }),
           child2: new MPart({
             id: 'part.bottom',
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
             views: [],
           }),
         }),
@@ -334,7 +334,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           }),
           child2: new MPart({
             id: 'part.right',
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
             views: [],
           }),
         }),
@@ -392,7 +392,7 @@ describe('WorkbenchPerspectiveStorage', () => {
           }),
           child2: new MPart({
             id: 'part.bottom',
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
             views: [],
           }),
         }),

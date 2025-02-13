@@ -21,7 +21,7 @@ import {UID} from '../../common/uid.util';
 export class WorkbenchLayoutMigrationV7 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const partGridV6: MPartGridV6 = JSON.parse(json);
+    const partGridV6 = JSON.parse(json) as MPartGridV6;
     const oldActivePartId = partGridV6.activePartId;
     const newActivePartId = migratePartId(oldActivePartId);
 

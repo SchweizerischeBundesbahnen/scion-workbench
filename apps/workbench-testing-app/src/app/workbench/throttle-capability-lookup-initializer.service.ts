@@ -31,7 +31,7 @@ class ThrottleCapabilityLookupInitializer implements WorkbenchInitializer {
 class CapabilityLookupMessageInterceptor implements MessageInterceptor {
 
   public async intercept(message: TopicMessage, next: Handler<TopicMessage>): Promise<void> {
-    const requestor: string = message.headers.get(MessageHeaders.AppSymbolicName);
+    const requestor = message.headers.get(MessageHeaders.AppSymbolicName) as string;
 
     if (message.topic === 'ɵLOOKUP_CAPABILITIES' && requestor.startsWith('workbench-client-testing-app')) {
       console.log(`Delaying the lookup of capabilities for ${requestor} by 2000ms.`, message);

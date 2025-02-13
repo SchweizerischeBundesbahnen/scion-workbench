@@ -319,7 +319,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     }
     else {
       const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
-      const hostElement = computed(() => this.context.view ? this.context.view.portal.componentRef.location.nativeElement : workbenchElementRef()?.element.nativeElement);
+      const hostElement = computed(() => (this.context.view ? this.context.view.portal.componentRef.location.nativeElement : workbenchElementRef()?.element.nativeElement) as HTMLElement);
       const hostBounds = boundingClientRect(hostElement);
       const viewDragService = inject(ViewDragService);
 

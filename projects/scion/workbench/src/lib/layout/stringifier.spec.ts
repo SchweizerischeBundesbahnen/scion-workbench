@@ -1074,7 +1074,7 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given));
+    const deserialized = JSON.parse(stringify(given)) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['c', 'b', 'a']);
     expect(Object.keys(deserialized.b)).toEqual(['c', 'b', 'a']);
   });
@@ -1090,7 +1090,7 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given, {sort: true}));
+    const deserialized = JSON.parse(stringify(given, {sort: true})) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['a', 'b', 'c']);
     expect(Object.keys(deserialized.b)).toEqual(['a', 'b', 'c']);
   });
@@ -1102,7 +1102,7 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given, {sort: true}));
+    const deserialized = JSON.parse(stringify(given, {sort: true})) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['a', 'b', 'c']);
     expect(deserialized.b).toEqual(['c', 'b', 'a']);
   });
@@ -1114,9 +1114,9 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given, {sort: true}));
+    const deserialized = JSON.parse(stringify(given, {sort: true})) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['a', 'b', 'c']);
-    expect(deserialized.b).toEqual({});
+    expect<unknown>(deserialized.b).toEqual({});
   });
 
   it('should not sort Set', async () => {
@@ -1126,9 +1126,9 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given, {sort: true}));
+    const deserialized = JSON.parse(stringify(given, {sort: true})) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['a', 'b', 'c']);
-    expect(deserialized.b).toEqual({});
+    expect<unknown>(deserialized.b).toEqual({});
   });
 
   it('should not sort `null`', async () => {
@@ -1138,7 +1138,7 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given, {sort: true}));
+    const deserialized = JSON.parse(stringify(given, {sort: true})) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['a', 'b', 'c']);
     expect(deserialized.b).toEqual(null);
   });
@@ -1150,7 +1150,7 @@ describe('Stringifier (property order)', () => {
       a: 'a',
     };
 
-    const deserialized = JSON.parse(stringify(given, {sort: true}));
+    const deserialized = JSON.parse(stringify(given, {sort: true})) as typeof given;
     expect(Object.keys(deserialized)).toEqual(['a', 'c']);
     expect(deserialized.b).toEqual(undefined);
   });

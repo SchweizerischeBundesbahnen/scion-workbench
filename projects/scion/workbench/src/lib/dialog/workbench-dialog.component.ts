@@ -80,7 +80,7 @@ export class WorkbenchDialogComponent implements OnInit {
 
   @HostBinding('style.--ɵdialog-min-height')
   protected get minHeight(): string | undefined {
-    return this.dialog.size.minHeight() || this._headerHeight;
+    return this.dialog.size.minHeight() ?? this._headerHeight;
   }
 
   @HostBinding('style.--ɵdialog-height')
@@ -95,7 +95,7 @@ export class WorkbenchDialogComponent implements OnInit {
 
   @HostBinding('style.--ɵdialog-min-width')
   protected get minWidth(): string | undefined {
-    return this.dialog.size.minWidth() || '100px';
+    return this.dialog.size.minWidth() ?? '100px';
   }
 
   @HostBinding('style.--ɵdialog-width')
@@ -137,7 +137,7 @@ export class WorkbenchDialogComponent implements OnInit {
   }
 
   private addHostCssClasses(): void {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    const host = inject(ElementRef).nativeElement as HTMLElement;
     synchronizeCssClasses(host, this.dialog.cssClass);
   }
 
@@ -185,8 +185,8 @@ export class WorkbenchDialogComponent implements OnInit {
     fromMutation$(this._dialogElement.nativeElement, {subtree: true, childList: true})
       .pipe(
         startWith(undefined as void),
-        takeUntil(this._activeElement$.pipe(filter(Boolean))),
         takeUntilDestroyed(this._destroyRef),
+        takeUntil(this._activeElement$.pipe(filter(Boolean))),
       )
       .subscribe(() => {
         this.focus();

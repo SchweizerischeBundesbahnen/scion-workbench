@@ -57,7 +57,8 @@
             "lintFilePatterns": [
               "projects/scion/workbench/**/*.ts",
               "projects/scion/workbench/**/*.html"
-            ]
+            ],
+            "eslintConfig": "projects/scion/workbench/eslint.config.js"
           }
         }
       }
@@ -97,7 +98,8 @@
             "lintFilePatterns": [
               "projects/scion/workbench-client/**/*.ts",
               "projects/scion/workbench-client/**/*.html"
-            ]
+            ],
+            "eslintConfig": "projects/scion/workbench-client/eslint.config.js"
           }
         }
       }
@@ -192,7 +194,8 @@
             "lintFilePatterns": [
               "apps/workbench-getting-started-app/**/*.ts",
               "apps/workbench-getting-started-app/**/*.html"
-            ]
+            ],
+            "eslintConfig": "apps/workbench-getting-started-app/eslint.config.js"
           }
         }
       }
@@ -445,7 +448,8 @@
             "lintFilePatterns": [
               "apps/workbench-testing-app/**/*.ts",
               "apps/workbench-testing-app/**/*.html"
-            ]
+            ],
+            "eslintConfig": "apps/workbench-testing-app/eslint.config.js"
           }
         }
       }
@@ -589,7 +593,8 @@
             "lintFilePatterns": [
               "apps/workbench-client-testing-app/**/*.ts",
               "apps/workbench-client-testing-app/**/*.html"
-            ]
+            ],
+            "eslintConfig": "apps/workbench-client-testing-app/eslint.config.js"
           }
         }
       }
@@ -603,7 +608,8 @@
           "options": {
             "lintFilePatterns": [
               "projects/scion/e2e-testing/**/*.ts"
-            ]
+            ],
+            "eslintConfig": "projects/scion/e2e-testing/eslint.config.js"
           }
         }
       }

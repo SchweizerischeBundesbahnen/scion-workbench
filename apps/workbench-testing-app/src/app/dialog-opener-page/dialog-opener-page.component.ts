@@ -87,7 +87,7 @@ export default class DialogOpenerPageComponent {
       },
     })
       .then(result => this.returnValue = result)
-      .catch(error => this.dialogError = stringifyError(error) || 'Workbench Dialog was closed with an error');
+      .catch((error: unknown) => this.dialogError = stringifyError(error) || 'Workbench Dialog was closed with an error');
   }
 
   private parseComponentFromUI(): Type<DialogPageComponent | BlankTestPageComponent | DialogOpenerPageComponent> {

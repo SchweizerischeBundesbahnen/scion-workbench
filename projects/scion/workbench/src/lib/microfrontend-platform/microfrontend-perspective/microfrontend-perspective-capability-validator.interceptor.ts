@@ -25,14 +25,19 @@ export class MicrofrontendPerspectiveCapabilityValidator implements CapabilityIn
       return capability;
     }
 
-    const perspectiveCapability = capability as WorkbenchPerspectiveCapability;
+    const perspectiveCapability = capability as Partial<WorkbenchPerspectiveCapability>;
     // Assert the perspective capability to have a qualifier set.
     if (!Object.keys(perspectiveCapability.qualifier ?? {}).length) {
       throw Error(`[NullQualifierError] Perspective capability requires a qualifier [capability=${JSON.stringify(perspectiveCapability)}]`);
     }
 
+    // Assert the perspective capability to have a "properties" section.
+    if (!perspectiveCapability.properties) {
+      throw Error(`[NullPropertiesError] Perspective capability requires a "properties" section [application="${perspectiveCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(perspectiveCapability.qualifier)}"]`);
+    }
+
     // Assert the perspective capability to have a layout set.
-    if (!perspectiveCapability.properties?.layout) {
+    if (!perspectiveCapability.properties.layout as unknown) {
       throw Error(`[NullLayoutError] Perspective capability requires a layout [application="${perspectiveCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(perspectiveCapability.qualifier)}"]`);
     }
 

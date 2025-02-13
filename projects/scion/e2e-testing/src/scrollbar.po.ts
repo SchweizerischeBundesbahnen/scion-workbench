@@ -20,7 +20,7 @@ export class ScrollbarPO {
   }
 
   public async scroll(distance: number): Promise<void> {
-    const thumbBoundingBox = fromRect(await this._thumbHandle.boundingBox())!;
+    const thumbBoundingBox = fromRect(await this._thumbHandle.boundingBox());
     const mouse = this.locator.page().mouse;
 
     // Move mouse to thumb.

@@ -85,7 +85,7 @@ export class ViewListComponent implements OnInit {
   }
 
   public onActivateView(view: WorkbenchView): void {
-    view.activate().then();
+    void view.activate();
     this._overlayRef.dispose();
   }
 

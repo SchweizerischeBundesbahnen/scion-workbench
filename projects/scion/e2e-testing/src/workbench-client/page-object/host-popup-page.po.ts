@@ -41,7 +41,7 @@ export class HostPopupPagePO implements WorkbenchPopupPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText());
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText()) as WorkbenchPopupCapability;
     }
     finally {
       await accordion.collapse();

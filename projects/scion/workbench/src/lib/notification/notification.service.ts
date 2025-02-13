@@ -57,7 +57,7 @@ export class NotificationService {
   public notify(notification: string | NotificationConfig): void {
     assertNotInReactiveContext(this.notify, 'Call NotificationService.notify() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
-    // Ensure to run in Angular zone to display the notification even when called from outside of the Angular zone, e.g. from an error handler.
+    // Ensure to run in Angular zone to display the notification even when called from outside the Angular zone, e.g. from an error handler.
     if (!NgZone.isInAngularZone()) {
       this._zone.run(() => this.notify(notification));
       return;

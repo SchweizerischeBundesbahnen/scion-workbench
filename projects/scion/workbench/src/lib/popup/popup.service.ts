@@ -27,8 +27,8 @@ import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-int
 import {provideViewContext} from '../view/view-context-provider';
 import {UUID} from '@scion/toolkit/uuid';
 import {boundingClientRect} from '@scion/components/dimension';
-import {coerceElement} from '@angular/cdk/coercion';
 import {clamp} from '../common/math.util';
+import {coerceElement} from '@angular/cdk/coercion';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
@@ -36,12 +36,10 @@ const WEST: ConnectedPosition = {originX: 'start', originY: 'center', overlayX: 
 const EAST: ConnectedPosition = {originX: 'end', originY: 'center', overlayX: 'start', overlayY: 'center', panelClass: 'wb-east'};
 
 /**
- * Allows displaying a component in a workbench popup.
+ * Enables the display of a component in a popup.
  *
- * A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor,
- * which can be either a coordinate or an HTML element. The popup moves when the anchor moves.
- *
- * Unlike views, popups are not part of the persistent Workbench navigation, meaning that popups do not survive a page reload.
+ * A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor and
+ * moves when the anchor moves. Unlike a dialog, the popup closes on focus loss.
  */
 @Injectable({providedIn: 'root'})
 export class PopupService {
@@ -55,39 +53,31 @@ export class PopupService {
   private readonly _view = inject(ɵWorkbenchView, {optional: true});
 
   /**
-   * Displays the specified component in a popup.
+   * Opens a popup with the specified component and options.
    *
-   * To position the popup, provide either a coordinate or an element to serve as the popup anchor.
+   * The anchor is used to position the popup based on its preferred alignment:
+   * - Using an element: The popup opens and sticks to the element.
+   * - Using coordinates: The popup opens and sticks relative to the view or page bounds.
    *
-   * If you use an element as the popup anchor, the popup also moves when the anchor element moves. If you use a coordinate
-   * and open the popup in the context of a view, the popup opens relative to the bounds of that view. Otherwise, it
-   * is positioned relative to the page viewport. If you move or resize the view or the page, the popup will also be moved
-   * depending on the pair of coordinates used.
+   * If the popup is opened within a view, it only displays if the view is active and closes when the view is closed.
    *
-   * By setting the alignment of the popup, you can control the region where to open the popup relative to its anchor.
+   * By default, the popup closes on focus loss or when pressing the escape key.
    *
-   * Optionally, you can pass data to the popup component. The component can inject the popup handle {@link Popup} to
+   * Pass data to the popup via {@link PopupConfig#input}. The component can inject the popup handle {@link Popup} to
    * read input data or to close the popup.
    *
-   * By default, the popup will close on focus loss, or when the user hits the escape key.
-   *
-   * If opening the popup in the context of a view, the popup is bound to the lifecycle of the view, that is, the popup
-   * is displayed only if the view is active and is closed when the view is closed.
-   *
-   * @param   config - Controls popup behavior
-   * @returns a promise that:
-   *          - resolves to the result if closed with a result
-   *          - resolves to `undefined` if closed without a result
+   * @param config - Controls popup behavior
+   * @returns Promise that resolves to the popup result, if any, or that rejects if the popup couldn't be opened or was closed with an error.
    */
   public async open<R>(config: PopupConfig): Promise<R | undefined> {
     assertNotInReactiveContext(this.open, 'Call WorkbenchPopupService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
-    // Ensure to run in Angular zone to display the popup even when called from outside of the Angular zone.
+    // Ensure to run in Angular zone to display the popup even when called from outside the Angular zone.
     if (!NgZone.isInAngularZone()) {
       return this._zone.run(() => this.open(config));
     }
 
-    const align = config.align || 'north';
+    const align = config.align ?? 'north';
     const contextualView = this.resolveContextualView(config);
     const popup = this.createPopup(config, {view: contextualView});
     const popupDestroyRef = popup.injector.get(DestroyRef);
@@ -127,16 +117,16 @@ export class PopupService {
     // Construct the popup component and attach it to the DOM.
     const overlayRef = this._overlay.create(overlayConfig);
     const popupPortal = new ComponentPortal(PopupComponent, null, Injector.create({
-      parent: config.componentConstructOptions?.injector || this._environmentInjector,
+      parent: config.componentConstructOptions?.injector ?? this._environmentInjector,
       providers: [
         {provide: ɵPopup, useValue: popup},
         {provide: Popup, useExisting: ɵPopup},
         provideViewContext(contextualView),
-        ...[config.componentConstructOptions?.providers || []],
+        ...[config.componentConstructOptions?.providers ?? []],
       ],
     }));
     const componentRef = overlayRef.attach(popupPortal);
-    const popupElement: HTMLElement = componentRef.location.nativeElement;
+    const popupElement = componentRef.location.nativeElement as HTMLElement;
 
     // Make the popup focusable and request the focus.
     popupElement.setAttribute('tabindex', '-1');
@@ -269,7 +259,7 @@ export class PopupService {
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
-    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement ?? document.documentElement, {injector});
+    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement as HTMLElement | undefined ?? document.documentElement, {injector});
 
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       const anchor = coerceElement(config.anchor) as HTMLElement;
@@ -328,35 +318,35 @@ export class PopupService {
  * Maps given view coordinates to absolute page coordinates.
  */
 function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
-  const xy = origin as Point;
+  const xy = origin as Partial<Point>;
   if (xy.x !== undefined && xy.y !== undefined) {
     return {
       x: relativeTo.x + xy.x,
       y: relativeTo.y + xy.y,
     };
   }
-  const topLeft = origin as TopLeftPoint;
+  const topLeft = origin as Partial<TopLeftPoint>;
   if (topLeft.top !== undefined && topLeft.left !== undefined) {
     return {
       x: relativeTo.x + topLeft.left,
       y: relativeTo.y + topLeft.top,
     };
   }
-  const topRight = origin as TopRightPoint;
+  const topRight = origin as Partial<TopRightPoint>;
   if (topRight.top !== undefined && topRight.right !== undefined) {
     return {
       x: relativeTo.x + (relativeTo.width - topRight.right),
       y: relativeTo.y + topRight.top,
     };
   }
-  const bottomLeft = origin as BottomLeftPoint;
+  const bottomLeft = origin as Partial<BottomLeftPoint>;
   if (bottomLeft.bottom !== undefined && bottomLeft.left !== undefined) {
     return {
       x: relativeTo.x + bottomLeft.left,
       y: relativeTo.y + (relativeTo.height - bottomLeft.bottom),
     };
   }
-  const bottomRight = origin as BottomRightPoint;
+  const bottomRight = origin as Partial<BottomRightPoint>;
   if (bottomRight.bottom !== undefined && bottomRight.right !== undefined) {
     return {
       x: relativeTo.x + (relativeTo.width - bottomRight.right),

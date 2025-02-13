@@ -46,7 +46,7 @@ import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapability
 export default class RegisterWorkbenchCapabilityPageComponent {
 
   public form = this._formBuilder.group({
-    type: this._formBuilder.control('', Validators.required),
+    type: this._formBuilder.control<WorkbenchCapabilities | ''>('', Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     requiredParams: this._formBuilder.control(''),
     optionalParams: this._formBuilder.control(''),
@@ -145,7 +145,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
         this.form.reset();
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
-      .catch(error => this.registerError = stringifyError(error));
+      .catch((error: unknown) => this.registerError = stringifyError(error));
   }
 
   private readPerspectiveCapabilityFromUI(): WorkbenchPerspectiveCapability {
@@ -166,7 +166,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
   private readViewCapabilityFromUI(): WorkbenchViewCapability & {properties: {pinToDesktop: boolean}} {
     const requiredParams: ViewParamDefinition[] = this.form.controls.requiredParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: true}));
     const optionalParams: ViewParamDefinition[] = this.form.controls.optionalParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false}));
-    const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value?.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
+    const transientParams: ViewParamDefinition[] = this.form.controls.transientParams.value.split(/,\s*/).filter(Boolean).map(param => ({name: param, required: false, transient: true}));
     return {
       type: WorkbenchCapabilities.View,
       qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!,
@@ -177,7 +177,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: parseTypedString(this.form.controls.viewProperties.controls.path.value), // allow `undefined` to test capability validation
+        path: parseTypedString(this.form.controls.viewProperties.controls.path.value)!, // allow `undefined` to test capability validation
         title: this.form.controls.viewProperties.controls.title.value || undefined,
         heading: this.form.controls.viewProperties.controls.heading.value || undefined,
         cssClass: this.form.controls.viewProperties.controls.cssClass.value,
@@ -200,7 +200,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: parseTypedString(this.form.controls.popupProperties.controls.path.value), // allow `undefined` to test capability validation
+        path: parseTypedString(this.form.controls.popupProperties.controls.path.value)!, // allow `undefined` to test capability validation
         size: undefinedIfEmpty<PopupSize>({
           width: this.form.controls.popupProperties.controls.size.controls.width.value || undefined,
           height: this.form.controls.popupProperties.controls.size.controls.height.value || undefined,
@@ -228,7 +228,7 @@ export default class RegisterWorkbenchCapabilityPageComponent {
       ],
       private: this.form.controls.private.value,
       properties: {
-        path: parseTypedString(this.form.controls.dialogProperties.controls.path.value), // allow `undefined` to test capability validation
+        path: parseTypedString(this.form.controls.dialogProperties.controls.path.value)!, // allow `undefined` to test capability validation
         size: undefinedIfEmpty<WorkbenchDialogSize>({
           width: parseTypedString(this.form.controls.dialogProperties.controls.size.controls.width.value)!, // allow `undefined` to test capability validation
           height: parseTypedString(this.form.controls.dialogProperties.controls.size.controls.height.value)!, // allow `undefined` to test capability validation

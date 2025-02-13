@@ -43,7 +43,7 @@ export class WorkbenchPerspectiveSerializer {
     const [json, version] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
     const serializedVersion = Number.isNaN(Number(version)) ? 1 : Number(version);
     const migrated = this._workbenchPerspectiveMigrator.migrate(json, {from: serializedVersion, to: WORKBENCH_PERSPECTIVE_LAYOUT_VERSION});
-    return JSON.parse(migrated);
+    return JSON.parse(migrated) as MPerspectiveLayout;
   }
 }
 

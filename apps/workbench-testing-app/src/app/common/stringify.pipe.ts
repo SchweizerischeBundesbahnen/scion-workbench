@@ -16,7 +16,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 @Pipe({name: 'appStringify', standalone: true})
 export class StringifyPipe implements PipeTransform {
 
-  public transform(object: any): string {
+  public transform(object: unknown): string {
     if (object === null) {
       return `null`;
     }
@@ -33,7 +33,7 @@ export class StringifyPipe implements PipeTransform {
       return object.toString();
     }
     if (object instanceof Map) {
-      return Array.from(object)
+      return Array.from<string[]>(object)
         .sort(([key1], [key2]) => key1.localeCompare(key2))
         .map(([key, value]) => `{"${key}" => ${JSON.stringify(value)}}`)
         .join('\n')
@@ -41,10 +41,7 @@ export class StringifyPipe implements PipeTransform {
     }
 
     try {
-      const json = JSON.stringify(object);
-      if (json !== undefined) {
-        return json;
-      }
+      return JSON.stringify(object);
     }
     catch {
       // noop

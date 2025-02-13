@@ -39,9 +39,10 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.MessageBox) {
+      const messageBoxIntentMessage = intentMessage as IntentMessage<WorkbenchMessageBoxOptions>;
       // Do not block the call until the message box is closed.
       // Otherwise, the caller may receive a timeout error if not closing the message box before delivery confirmation expires.
-      this.consumeMessageBoxIntent(intentMessage).catch(error => this._logger.error('[MessageBoxOpenError] Failed to open message box.', LoggerNames.MICROFRONTEND, intentMessage, error));
+      this.consumeMessageBoxIntent(messageBoxIntentMessage).catch((error: unknown) => this._logger.error('[MessageBoxOpenError] Failed to open message box.', LoggerNames.MICROFRONTEND, intentMessage, error));
       // Swallow the intent and do not pass it to other interceptors or handlers down the chain.
       return Promise.resolve();
     }
@@ -51,7 +52,7 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
   }
 
   private async consumeMessageBoxIntent(message: IntentMessage<WorkbenchMessageBoxOptions>): Promise<void> {
-    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
 
     try {
       const result = await this.openMessageBox(message);
@@ -81,7 +82,7 @@ export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
       severity: options.severity,
       modality: options.modality,
       contentSelectable: options.contentSelectable,
-      cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(options.cssClass)),
+      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(options.cssClass)),
       context: options.context,
     });
   }

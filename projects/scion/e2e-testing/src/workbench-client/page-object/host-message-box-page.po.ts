@@ -35,7 +35,7 @@ export class HostMessageBoxPagePO implements WorkbenchMessageBoxPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-message-box-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-message-box-capability').innerText());
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-message-box-capability').innerText()) as WorkbenchMessageBoxCapability;
     }
     finally {
       await accordion.collapse();

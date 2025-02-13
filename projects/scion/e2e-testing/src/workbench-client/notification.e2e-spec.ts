@@ -343,14 +343,13 @@ test.describe('Workbench Notification', () => {
 
       await expectNotification(notificationPage).toBeVisible();
       await expect.poll(() => notificationPage.getInputAsKeyValueObject()).toMatchObject({
-          'component': 'notification-page', // qualifier
-          '$implicit': 'Notification', // content
-          'param1': 'PARAM 1', // params
-          'param2': 'PARAM 2', // params
-          'ɵAPP_SYMBOLIC_NAME': 'workbench-client-testing-app1', // headers
-          'ɵREPLY_TO': expect.any(String),
-        },
-      );
+        'component': 'notification-page', // qualifier
+        '$implicit': 'Notification', // content
+        'param1': 'PARAM 1', // params
+        'param2': 'PARAM 2', // params
+        'ɵAPP_SYMBOLIC_NAME': 'workbench-client-testing-app1', // headers
+        'ɵREPLY_TO': expect.any(String),
+      });
     });
 
     test('should allow controlling notification settings', async ({appPO, microfrontendNavigator}) => {

@@ -46,11 +46,12 @@ describe('Workbench', () => {
     }));
 
     // Align workbench element with page viewport.
-    fixture.debugElement.nativeElement.style.position = 'absolute';
-    fixture.debugElement.nativeElement.style.inset = '0';
+    const element = fixture.debugElement.nativeElement as HTMLElement;
+    element.style.position = 'absolute';
+    element.style.inset = '0';
 
     // Expect workbench element to fill page viewport.
-    expect(getComputedStyle(fixture.debugElement.nativeElement)).toEqual(jasmine.objectContaining({
+    expect(getComputedStyle(element)).toEqual(jasmine.objectContaining({
       width: `${document.documentElement.clientWidth}px`,
       height: `${document.documentElement.clientHeight}px`,
     }));
@@ -78,11 +79,12 @@ describe('Workbench', () => {
     }));
 
     // Align workbench element with page viewport.
-    fixture.debugElement.nativeElement.style.position = 'absolute';
-    fixture.debugElement.nativeElement.style.inset = '0';
+    const element = fixture.debugElement.nativeElement as HTMLElement;
+    element.style.position = 'absolute';
+    element.style.inset = '0';
 
     // Expect workbench element to fill page viewport.
-    expect(getComputedStyle(fixture.debugElement.nativeElement)).toEqual(jasmine.objectContaining({
+    expect(getComputedStyle(element)).toEqual(jasmine.objectContaining({
       width: `${document.documentElement.clientWidth}px`,
       height: `${document.documentElement.clientHeight}px`,
     }));

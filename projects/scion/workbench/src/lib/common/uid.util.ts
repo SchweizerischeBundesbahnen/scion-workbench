@@ -21,5 +21,3 @@ export const UID = {
     return UUID.randomUUID().substring(0, 8);
   },
 };
-
-

@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
-import {NgZone, Type} from '@angular/core';
+import {DebugElement, NgZone, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {animationFrameScheduler, exhaustMap, firstValueFrom, timer} from 'rxjs';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -65,8 +65,9 @@ export async function waitForCondition(predicate: () => Promise<boolean>): Promi
  * Gives the fixture a height of 500px and a background color.
  */
 export function styleFixture<T>(fixture: ComponentFixture<T>): ComponentFixture<T> {
-  fixture.debugElement.nativeElement.style.height = '500px';
-  fixture.debugElement.nativeElement.style.background = 'lightgray';
+  const element = fixture.debugElement.nativeElement as HTMLElement;
+  element.style.height = '500px';
+  element.style.background = 'lightgray';
   return fixture;
 }
 
@@ -76,17 +77,17 @@ export function styleFixture<T>(fixture: ComponentFixture<T>): ComponentFixture<
 export function clickElement(appFixture: ComponentFixture<any>, viewType: Type<any>, elementSelector: string, failureMessage?: string): void {
   const failSuffix = failureMessage ? ` [${failureMessage}]` : '';
 
-  const viewDebugElement = appFixture.debugElement.query(By.directive(viewType));
+  const viewDebugElement = appFixture.debugElement.query(By.directive(viewType)) as DebugElement | null;
   if (!viewDebugElement) {
     throw Error(`View not showing [${viewType.name}]${failSuffix}`);
   }
 
-  const linkDebugElement = viewDebugElement.query(By.css(elementSelector));
+  const linkDebugElement = viewDebugElement.query(By.css(elementSelector)) as DebugElement | null;
   if (!linkDebugElement) {
     throw Error(`Element not showing [${elementSelector}]${failSuffix}`);
   }
 
-  linkDebugElement.nativeElement.click();
+  (linkDebugElement.nativeElement as HTMLElement).click();
   advance(appFixture);
 }
 

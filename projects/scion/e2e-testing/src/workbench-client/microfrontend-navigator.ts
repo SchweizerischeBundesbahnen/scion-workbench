@@ -21,8 +21,8 @@ import {MessagingPagePO} from './page-object/messaging-page.po';
 import {Capability, Intention} from '@scion/microfrontend-platform';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 
-export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
-  new(...args: any[]): T;
+export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/no-unsafe-function-type
+  new(...args: any[]): T; // eslint-disable-line @typescript-eslint/prefer-function-type
 }
 
 /**
@@ -157,7 +157,7 @@ export class MicrofrontendNavigator {
   public async unregisterCapability(app: 'app1' | 'app2', id: string): Promise<void> {
     const unregisterCapabilityPage = await this.openInNewTab(UnregisterWorkbenchCapabilityPagePO, app);
     try {
-      return await unregisterCapabilityPage.unregisterCapability(id);
+      await unregisterCapabilityPage.unregisterCapability(id);
     }
     finally {
       await unregisterCapabilityPage.view.tab.close();

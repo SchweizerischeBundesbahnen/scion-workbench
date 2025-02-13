@@ -128,7 +128,7 @@ export class PartComponent implements OnInit {
    * Activates this part when it gains focus.
    */
   private activatePartOnFocusIn(): void {
-    const host = inject(ElementRef).nativeElement;
+    const host = inject(ElementRef).nativeElement as HTMLElement;
 
     toObservable(this.part.active)
       .pipe(
@@ -136,12 +136,12 @@ export class PartComponent implements OnInit {
         takeUntilDestroyed(),
       )
       .subscribe(() => {
-        this.part.activate().then();
+        void this.part.activate();
       });
   }
 
   private addHostCssClasses(): void {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    const host = inject(ElementRef).nativeElement as HTMLElement;
     synchronizeCssClasses(host, this.part.classList.asList);
   }
 

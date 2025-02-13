@@ -23,6 +23,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
+import {Objects} from '../../../common/objects.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -51,16 +52,16 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 
           // Expect debug element to represent `WorkbenchLayoutComponent` element.
           if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${actual?.componentInstance?.constructor?.name}.`);
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${(actual.componentInstance as object).constructor.name}.`);
           }
 
           // Assert model.
           assertWorkbenchLayoutModel(expected, TestBed.inject(WorkbenchLayoutService).layout()!, util);
           // Assert DOM.
-          assertWorkbenchLayoutDOM(expected, debugElement.nativeElement);
+          assertWorkbenchLayoutDOM(expected, debugElement.nativeElement as HTMLElement);
           return pass();
         }
-        catch (error: unknown) {
+        catch (error) {
           return fail(error instanceof Error ? error.message : `${error}`);
         }
 
@@ -123,14 +124,16 @@ function assertGridElementDOM(expectedModelElement: MTreeNode | MPart, actualEle
   else if (actualElement.tagName.toLowerCase() !== 'wb-grid-element') {
     throw Error(`[DOMAssertError] Expected element to have name 'wb-grid-element', but is '${actualElement.tagName}'. [${expectedModelElement.type}=${JSON.stringify(expectedModelElement)}]`);
   }
-  else if (expectedModelElement.type === 'MTreeNode') {
-    assertMTreeNodeDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
-  }
-  else if (expectedModelElement.type === 'MPart') {
-    assertMPartDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
-  }
-  else {
-    throw Error(`[CustomMatcherError] Unsupported expected value. The matcher 'toEqualWorkbenchLayout' expects a 'MTreeNode' or 'MPart' as the expected value, but is ${JSON.stringify(expectedModelElement)}`);
+
+  switch (expectedModelElement.type) {
+    case 'MTreeNode': {
+      assertMTreeNodeDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
+      break;
+    }
+    case 'MPart': {
+      assertMPartDOM(expectedModelElement, actualElement, expectedWorkbenchLayout);
+      break;
+    }
   }
 }
 
@@ -143,15 +146,16 @@ function assertMTreeNodeDOM(expectedTreeNode: MTreeNode, actualElement: Element,
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1 as _MTreeNode | _MPart);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2 as _MTreeNode | _MPart);
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {
-    actualElement = actualElement.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`)!;
-    if (!actualElement) {
+    const sashboxElement = actualElement.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`);
+    if (!sashboxElement) {
       throw Error(`[DOMAssertError]: Expected element 'sci-sashbox[data-nodeid="${nodeId}"]' to be in the DOM, but is not. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
     }
+    actualElement = sashboxElement;
   }
   else {
     if (actualElement.querySelector(`sci-sashbox[data-nodeid="${nodeId}"]`)) {
@@ -163,25 +167,25 @@ function assertMTreeNodeDOM(expectedTreeNode: MTreeNode, actualElement: Element,
   if (child1Visible) {
     const actualChild1Element = actualElement.querySelector(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-1`);
     if (!actualChild1Element) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-1' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-1' to be in the DOM, but is not. [${expectedTreeNode.child1.type}=${JSON.stringify(expectedTreeNode.child1)}]`);
     }
-    assertGridElementDOM(expectedTreeNode.child1!, actualChild1Element, expectedWorkbenchLayout);
+    assertGridElementDOM(expectedTreeNode.child1, actualChild1Element, expectedWorkbenchLayout);
   }
 
   // Assert sash of child 2.
   if (child2Visible) {
     const actualChild2Element = actualElement.querySelector(`wb-grid-element[data-parentnodeid="${nodeId}"].sash-2`);
     if (!actualChild2Element) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-2' to be in the DOM, but is not. [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-grid-element[data-parentnodeid="${nodeId}"].sash-2' to be in the DOM, but is not. [${expectedTreeNode.child2.type}=${JSON.stringify(expectedTreeNode.child2)}]`);
     }
-    assertGridElementDOM(expectedTreeNode.child2!, actualChild2Element, expectedWorkbenchLayout);
+    assertGridElementDOM(expectedTreeNode.child2, actualChild2Element, expectedWorkbenchLayout);
   }
 }
 
 /**
  * Performs a recursive assertion of the DOM structure starting with the expected part.
  */
-function assertMPartDOM(expectedPart: MPart, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
+function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, expectedWorkbenchLayout: ExpectedWorkbenchLayout): void {
   const partId = actualElement.getAttribute('data-partid');
   if (partId !== expectedPart.id) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}]`);
@@ -239,11 +243,11 @@ function objectContainingRecursive<T>(object: T): ObjectContaining<T> | T {
     return jasmine.anything();
   }
   else if (typeof object === 'object' && object !== null) {
-    const workingCopy = {...object} as Record<string, any>;
-    Object.entries(workingCopy).forEach(([key, value]) => {
-      workingCopy[key] = objectContainingRecursive(value);
+    const workingCopy = {...object};
+    Objects.entries(workingCopy).forEach(([key, value]) => {
+      workingCopy[key] = objectContainingRecursive(value) as typeof value;
     });
-    return jasmine.objectContaining<T>(workingCopy);
+    return jasmine.objectContaining(workingCopy);
   }
   return object;
 }
@@ -252,7 +256,7 @@ function objectContainingRecursive<T>(object: T): ObjectContaining<T> | T {
  * Delegates to the Jasmine `toEqual` matcher to be used in custom matchers.
  */
 function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFailOutput?: string): CustomMatcherResult {
-  const toEqualMatcher: CustomMatcher = (jasmine as any).matchers.toEqual(util);
+  const toEqualMatcher = (jasmine as any).matchers.toEqual(util) as CustomMatcher; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
   const result = toEqualMatcher.compare(actual, expected);
   if (!result.pass && expectationFailOutput) {
     result.message = `${result.message} [${expectationFailOutput}]`;
@@ -320,8 +324,15 @@ export class MPart extends _MPart {
 }
 
 /**
+ * Constant used by the {@link #any} matcher to identify properties matching any value except `null` and `undefined`.
+ */
+const ANYTHING = {};
+
+/**
  * Use in {@link CustomMatchers.toEqualWorkbenchLayout} to match any value not `null` and `undefined` for a layout property.
  *
  * We cannot use {@link jasmine.anything} matcher because the expected layout is also used to assert the layout representation in the DOM.
  */
-export const ANYTHING = {} as any;
+export function any<T>(): T {
+  return ANYTHING as T;
+}

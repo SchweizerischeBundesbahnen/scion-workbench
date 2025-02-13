@@ -21,7 +21,7 @@ export class AngularRouterTestPagePO implements WorkbenchViewPagePO {
   public readonly view: ViewPO;
 
   constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-angular-router-test-page');
   }
 

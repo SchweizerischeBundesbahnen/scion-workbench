@@ -22,7 +22,7 @@ export const toShowCustomMatcher: jasmine.CustomMatcherFactories = {
     return {
       compare(element: any, expected: Type<unknown> | Predicate<DebugElement>, failOutput: string | undefined): CustomMatcherResult {
         const predicate = isPredicate(expected) ? expected : By.directive(expected);
-        const found = !!coerceDebugElement(element).query(predicate);
+        const found = coerceDebugElement(element).query(predicate) as DebugElement | null !== null;
         return found ? pass() : fail(`Expected ${isPredicate(expected) ? `${expected}` : expected.name} to show`);
 
         function pass(): CustomMatcherResult {

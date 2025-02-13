@@ -11,7 +11,7 @@ export function createElement(tag: string, options: ElementCreateOptions): HTMLE
   options.cssClass && element.classList.add(...Arrays.coerce(options.cssClass));
   options.attributes && setAttribute(element, options.attributes);
   options.text && (element.innerText = options.text);
-  options.parent && options.parent.appendChild(element);
+  options.parent?.appendChild(element);
   return element;
 }
 
@@ -93,7 +93,7 @@ export function unsetCssClass(element: HTMLElement | ElementRef<HTMLElement>, ..
  */
 export function getCssTranslation(element: Element): {translateX: string | 'none'; translateY: string | 'none'} {
   const transformStyle = getComputedStyle(element).getPropertyValue('transform');
-  if (transformStyle === 'none' || transformStyle === undefined) {
+  if (transformStyle === 'none') {
     return {
       translateX: 'none',
       translateY: 'none',

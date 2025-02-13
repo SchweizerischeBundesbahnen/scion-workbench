@@ -6,7 +6,7 @@ import {Arrays} from '@scion/toolkit/util';
  *
  * Throws an error if not of the given type, or if `null` or `undefined`.
  */
-export function assertType(object: any, assert: {toBeOneOf: Type<any>[] | Type<any>}): void {
+export function assertType(object: unknown, assert: {toBeOneOf: Type<any>[] | Type<any>}): void {
   if (object === null) {
     throw Error(`[AssertError] Object must not be 'null'.`);
   }

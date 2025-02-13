@@ -23,7 +23,7 @@ import {UID} from '../../common/uid.util';
 export class WorkbenchLayoutMigrationV5 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const partGridV4: MPartGridV4 = JSON.parse(json);
+    const partGridV4 = JSON.parse(json) as MPartGridV4;
 
     // Migrate the grid.
     const partGridV5: MPartGridV5 = {

@@ -35,9 +35,9 @@ export default class AngularZoneTestPageComponent {
 
   public tests = {
     workbenchView: {
-      capability: new TestCaseModel(model => this.testWorkbenchViewCapability(model)),
-      params: new TestCaseModel(model => this.testWorkbenchViewParams(model)),
-      active: new TestCaseModel(model => this.testWorkbenchViewActive(model)),
+      capability: new TestCaseModel(model => void this.testWorkbenchViewCapability(model)),
+      params: new TestCaseModel(model => void this.testWorkbenchViewParams(model)),
+      active: new TestCaseModel(model => void this.testWorkbenchViewActive(model)),
     },
   };
 

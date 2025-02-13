@@ -39,21 +39,21 @@ export default class BulkNavigationTestPageComponent {
   }
 
   public onNavigate(): void {
-    const viewCount = this.form.controls.viewCount.value ?? 0;
+    const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
-      this.navigateToViewPage().then();
+      void this.navigateToViewPage();
     }
   }
 
   public async onNavigateAwait(): Promise<void> {
-    const viewCount = this.form.controls.viewCount.value ?? 0;
+    const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
       await this.navigateToViewPage();
     }
   }
 
   private navigateToViewPage(): Promise<boolean> {
-    return this._router.navigate({component: 'view', app: this._appSymbolicName.split('-').pop()}, {
+    return this._router.navigate({component: 'view', app: this._appSymbolicName.split('-').pop()!}, {
       target: 'blank',
       cssClass: this.form.controls.cssClass.value,
     });

@@ -61,7 +61,7 @@ export default class RegisterPartActionPageComponent {
     const canMatchGrid = this.form.controls.canMatch.controls.grid.value || undefined;
     const content = this.form.controls.content.value;
     const align = this.form.controls.align.value || undefined;
-    const cssClass = this.form.controls.cssClass.value || undefined;
+    const cssClass = this.form.controls.cssClass.value;
 
     const matchesContext = (part: WorkbenchPart): boolean => {
       if (canMatchPartIds && !Arrays.coerce(canMatchPartIds).includes(part.id)) {
@@ -81,7 +81,7 @@ export default class RegisterPartActionPageComponent {
       this.registerError = false;
       this.resetForm();
     }
-    catch (error: unknown) {
+    catch (error) {
       this.registerError = stringifyError(error);
     }
   }

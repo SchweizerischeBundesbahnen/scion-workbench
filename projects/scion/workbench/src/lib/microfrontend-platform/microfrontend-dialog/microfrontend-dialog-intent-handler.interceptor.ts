@@ -38,9 +38,10 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.Dialog) {
+      const dialogIntentMessage = intentMessage as IntentMessage<WorkbenchDialogOptions>;
       // Do not block the call until the dialog is closed.
       // Otherwise, the caller may receive a timeout error if not closing the dialog before delivery confirmation expires.
-      this.consumeDialogIntent(intentMessage).catch(error => this._logger.error('[DialogOpenError] Failed to open dialog.', LoggerNames.MICROFRONTEND, intentMessage, error));
+      this.consumeDialogIntent(dialogIntentMessage).catch((error: unknown) => this._logger.error('[DialogOpenError] Failed to open dialog.', LoggerNames.MICROFRONTEND, intentMessage, error));
       // Swallow the intent and do not pass it to other interceptors or handlers down the chain.
       return Promise.resolve();
     }
@@ -50,7 +51,7 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
   }
 
   private async consumeDialogIntent(message: IntentMessage<WorkbenchDialogOptions>): Promise<void> {
-    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
 
     try {
       const result = await this.openDialog(message);
@@ -78,7 +79,7 @@ export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
       modality: options.modality,
       context: options.context,
       animate: options.animate,
-      cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(options.cssClass)),
+      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(options.cssClass)),
     });
   }
 }

@@ -25,10 +25,15 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
       return capability;
     }
 
-    const messageBoxCapability = capability as WorkbenchMessageBoxCapability;
+    const messageBoxCapability = capability as Partial<WorkbenchMessageBoxCapability>;
+
+    // Assert capability to have a "properties" section.
+    if (!messageBoxCapability.properties) {
+      throw Error(`[NullPropertiesError] MessageBox capability requires a "properties" section [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
+    }
 
     // Assert capability to have a path.
-    const path = messageBoxCapability.properties?.path;
+    const path = messageBoxCapability.properties.path as unknown;
     if (path === undefined || path === null) {
       throw Error(`[NullPathError] MessageBox capability requires a path to the microfrontend in its properties [application="${messageBoxCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(messageBoxCapability.qualifier)}"]`);
     }
@@ -38,10 +43,10 @@ export class MicrofrontendMessageBoxCapabilityValidator implements CapabilityInt
       throw Error(`[NullQualifierError] MessageBox capability requires a qualifier [capability=${JSON.stringify(messageBoxCapability)}]`);
     }
 
-    return messageBoxCapability;
+    return capability;
   }
 }
 
-function isBuiltInTextMessageBoxCapability(capability: WorkbenchMessageBoxCapability): boolean {
-  return capability.properties[TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY] === TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY;
+function isBuiltInTextMessageBoxCapability(capability: Partial<WorkbenchMessageBoxCapability>): boolean {
+  return capability.properties?.[TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY_PROPERTY] === TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY;
 }

@@ -18,6 +18,7 @@ import {RouterCommandsComponent} from '../../../router-commands/router-commands.
 import {CssClassComponent} from '../../../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {RecordComponent} from '../../../record/record.component';
+import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
 
 @Component({
   selector: 'app-navigate-parts',
@@ -66,7 +67,7 @@ export class NavigatePartsComponent implements ControlValueAccessor, Validator {
           id: navigationFormGroup.controls.id.value,
           commands: navigationFormGroup.controls.commands.value,
           extras: ({
-            hint: navigationFormGroup.controls.extras.controls.hint.value || undefined,
+            hint: undefinedIfEmpty(navigationFormGroup.controls.extras.controls.hint.value),
             data: navigationFormGroup.controls.extras.controls.data.value,
             state: navigationFormGroup.controls.extras.controls.state.value,
             cssClass: navigationFormGroup.controls.extras.controls.cssClass.value,
@@ -114,7 +115,7 @@ export class NavigatePartsComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnChange(fn: any): void {
+  public registerOnChange(fn: (value: NavigationDescriptor[]) => void): void {
     this._cvaChangeFn = fn;
   }
 
@@ -122,7 +123,7 @@ export class NavigatePartsComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
 
