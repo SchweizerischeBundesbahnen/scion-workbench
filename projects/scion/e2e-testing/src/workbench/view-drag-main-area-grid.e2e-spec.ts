@@ -47,7 +47,7 @@ test.describe('View Drag Main Area', () => {
 
       // Expect test view to be moved to the west of the main area.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MPart({
             id: MAIN_AREA,
           }),
@@ -109,7 +109,7 @@ test.describe('View Drag Main Area', () => {
 
       // Expect test view to be moved to the east of the main area.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MPart({
             id: MAIN_AREA,
           }),
@@ -171,7 +171,7 @@ test.describe('View Drag Main Area', () => {
 
       // Expect test view to be moved to the south of the main area.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MPart({
             id: MAIN_AREA,
           }),

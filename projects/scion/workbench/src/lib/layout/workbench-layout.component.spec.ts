@@ -65,7 +65,7 @@ describe('WorkbenchLayout Component', () => {
 
     // Assert initial workbench layout
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
@@ -89,7 +89,7 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect the layout not to be discarded.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
@@ -113,7 +113,7 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect the layout to be changed.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
@@ -3093,7 +3093,7 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect DOM not to be updated.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {
@@ -3108,7 +3108,7 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect DOM to be updated.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {

@@ -71,7 +71,7 @@ export class MainAreaPartComponent {
   private readonly _logger = inject(Logger);
 
   protected readonly part = inject(ɵWorkbenchPart);
-  protected readonly mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.mainAreaGrid!);
+  protected readonly mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.grids.mainArea!);
   protected readonly desktop = inject(DESKTOP);
 
   protected onViewDrop(event: WbViewDropEvent): void {

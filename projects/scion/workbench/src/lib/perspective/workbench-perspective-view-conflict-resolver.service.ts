@@ -28,7 +28,7 @@ export class WorkbenchPerspectiveViewConflictResolver {
    * @return layout of the perspective with conflicts resolved.
    */
   public resolve(currentLayout: ɵWorkbenchLayout, perspectiveLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
-    const perspectiveViewIds = perspectiveLayout.views({grid: 'workbench'}).map(view => view.id);
+    const perspectiveViewIds = perspectiveLayout.views({grid: 'main'}).map(view => view.id);
     const mainAreaViewIds = currentLayout.views({grid: 'mainArea'}).map(view => view.id);
 
     // Test if there are conflicts.

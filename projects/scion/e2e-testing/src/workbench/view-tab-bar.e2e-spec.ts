@@ -123,7 +123,7 @@ test.describe('View Tabbar', () => {
 
     // Expect view.7 (new view) to be opened to the right of the active view.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'part.left',
@@ -151,7 +151,7 @@ test.describe('View Tabbar', () => {
 
     // Expect view.8 (new view) to be opened to the right of the active view.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'part.left',
@@ -193,7 +193,7 @@ test.describe('View Tabbar', () => {
 
     // Expect view.5 to be opened to the right of the active view.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'part.left',
@@ -231,7 +231,7 @@ test.describe('View Tabbar', () => {
 
     // Expect view.2 to be activated.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({
           id: 'part.part',
           views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.4'}],
@@ -261,7 +261,7 @@ test.describe('View Tabbar', () => {
 
     // Expect tab order not to be changed.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({
           id: 'part.part',
           views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}],
@@ -293,7 +293,7 @@ test.describe('View Tabbar', () => {
 
     // Expect views not to be changed.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({
           id: 'part.part',
           views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}, {id: 'view.4'}],

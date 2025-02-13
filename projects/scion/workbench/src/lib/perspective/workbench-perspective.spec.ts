@@ -73,7 +73,7 @@ describe('Workbench Perspective', () => {
     expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {
@@ -98,7 +98,7 @@ describe('Workbench Perspective', () => {
     expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -141,7 +141,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -188,7 +188,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.top'}),
           child2: new MPart({id: 'part.bottom'}),
@@ -242,7 +242,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.top'}),
           child2: new MPart({id: 'part.bottom'}),
@@ -284,7 +284,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -326,7 +326,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -517,7 +517,7 @@ describe('Workbench Perspective', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: MAIN_AREA}),
@@ -554,7 +554,7 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
@@ -570,7 +570,7 @@ describe('Workbench Perspective', () => {
 
     // empty-path view should be opened in the active part (right) of the workbench grid
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
@@ -603,7 +603,7 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'part.right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),

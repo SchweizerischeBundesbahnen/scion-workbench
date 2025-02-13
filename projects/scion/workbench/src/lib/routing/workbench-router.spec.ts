@@ -405,7 +405,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           child1: new MPart({
@@ -429,7 +429,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           child1: new MPart({
@@ -458,7 +458,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             direction: 'row',
@@ -495,7 +495,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             direction: 'row',
@@ -531,7 +531,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({
@@ -592,7 +592,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           child1: new MPart({
@@ -617,7 +617,7 @@ describe('WorkbenchRouter', () => {
     await expectAsync(navigation2).toBeRejectedWithError('navigation error');
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           child1: new MPart({
@@ -646,7 +646,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             direction: 'row',
@@ -684,7 +684,7 @@ describe('WorkbenchRouter', () => {
     await expectAsync(navigation3).toBeRejectedWithError('navigation error');
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             direction: 'row',
@@ -720,7 +720,7 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({

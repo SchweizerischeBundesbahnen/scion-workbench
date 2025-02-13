@@ -45,7 +45,7 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective to be restored from the storage
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -88,7 +88,7 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective to be restored from the storage
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,

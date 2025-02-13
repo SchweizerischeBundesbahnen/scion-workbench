@@ -71,7 +71,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
       mainAreaGrid: {
         root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
       },
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
           child2: new MPart({id: MAIN_AREA}),

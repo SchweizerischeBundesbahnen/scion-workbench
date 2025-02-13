@@ -83,11 +83,11 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: ÉµWorkbenchLayout, util: MatchersUtil): void {
   const actualLayout: ExpectedWorkbenchLayout = {
     perspectiveId: actual.perspectiveId,
-    mainAreaGrid: actual.mainAreaGrid ?? undefined,
-    workbenchGrid: actual.workbenchGrid,
+    mainAreaGrid: actual.grids.mainArea ?? undefined,
+    mainGrid: actual.grids.main,
     maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
-    outlets: actual.outlets(),
+    outlets: actual.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}),
   };
   const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
@@ -102,8 +102,8 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
  */
 function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualElement: Element): void {
   // Assert the workbench grid plus the main area grid if expected.
-  if (expected.workbenchGrid) {
-    assertGridElementDOM(expected.workbenchGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
+  if (expected.mainGrid) {
+    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
   }
   // Assert only the main area grid, but not the workbench grid since not expected.
   else if (expected.mainAreaGrid) {
@@ -270,9 +270,9 @@ function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFail
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Asserts specified workbench grid, if set.
+   * Asserts specified main grid, if set.
    */
-  workbenchGrid?: MPartGrid;
+  mainGrid?: MPartGrid;
   /**
    * Asserts specified main area grid, if set.
    */

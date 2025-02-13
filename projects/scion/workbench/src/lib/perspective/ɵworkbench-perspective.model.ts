@@ -24,6 +24,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
 import {WorkbenchStartup} from '../startup/workbench-launcher.service';
 import {Objects} from '../common/objects.util';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * @inheritDoc
@@ -105,26 +106,29 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     const outlets = new Map<string, UrlSegment[]>();
 
     // Add outlets of the main area and resolve conflicts if any.
-    if (currentLayout.hasPart(MAIN_AREA, {grid: 'workbench'}) && this._perspectiveLayout.hasPart(MAIN_AREA, {grid: 'workbench'})) {
+    if (currentLayout.hasPart(MAIN_AREA, {grid: 'main'}) && this._perspectiveLayout.hasPart(MAIN_AREA, {grid: 'main'})) {
       // Detect and resolve id clashes between views defined by this perspective and views contained in the main area,
       // assigning views of this perspective a new identity.
       this._perspectiveLayout = this._perspectiveViewConflictResolver.resolve(currentLayout, this._perspectiveLayout);
 
       // Add outlets contained in the main area.
-      Objects.entries(currentLayout.outlets({grid: 'mainArea'})).forEach(([outlet, segments]) => {
+      Objects.entries(currentLayout.outlets({mainAreaGrid: true})).forEach(([outlet, segments]) => {
         outlets.set(outlet, segments);
       });
     }
 
     // Add outlets contained in this perspective.
-    Objects.entries(this._perspectiveLayout.outlets()).forEach(([outlet, segments]) => {
+    Objects.entries(this._perspectiveLayout.outlets({mainGrid: true, activityGrids: true})).forEach(([outlet, segments]) => {
       outlets.set(outlet, segments);
     });
 
     // Create the layout for this perspective.
     return this._workbenchLayoutFactory.create({
-      workbenchGrid: this._perspectiveLayout.workbenchGrid,
-      mainAreaGrid: currentLayout.mainAreaGrid,
+      grids: {
+        ...this._perspectiveLayout.grids,
+        mainArea: currentLayout.grids.mainArea,
+      },
+      activityLayout: this._perspectiveLayout.activityLayout,
       perspectiveId: this.id,
       outlets: Object.fromEntries(outlets),
       navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of parts and views in the main area; navigation state of parts and views outside the main area cannot be restored since not persisted.
@@ -167,25 +171,27 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
   /**
    * Loads the layout of this perspective from storage, applying necessary migrations if the layout is outdated.
-   * Returns `null` if not stored or could not be deserialized.
+   * Returns `undefined` if not stored or could not be deserialized.
    */
-  private async loadPerspectiveLayout(): Promise<ɵWorkbenchLayout | null> {
+  private async loadPerspectiveLayout(): Promise<ɵWorkbenchLayout | undefined> {
     if (this.transient) {
-      return this._perspectiveLayout ?? null;
+      return this._perspectiveLayout;
     }
 
     const perspectiveLayout = await this._workbenchPerspectiveStorageService.loadPerspectiveLayout(this.id);
     if (!perspectiveLayout) {
-      return null;
+      return undefined;
     }
 
     return this._workbenchGridMerger.merge({
       local: this._workbenchLayoutFactory.create({
-        workbenchGrid: perspectiveLayout.userLayout.workbenchGrid,
+        grids: perspectiveLayout.userLayout.grids,
+        activityLayout: perspectiveLayout.userLayout.activityLayout,
         outlets: perspectiveLayout.userLayout.outlets,
       }),
       base: this._workbenchLayoutFactory.create({
-        workbenchGrid: perspectiveLayout.referenceLayout.workbenchGrid,
+        grids: perspectiveLayout.referenceLayout.grids,
+        activityLayout: perspectiveLayout.referenceLayout.activityLayout,
         outlets: perspectiveLayout.referenceLayout.outlets,
       }),
       remote: this._initialPerspectiveLayout!,
@@ -200,8 +206,12 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private async storePerspectiveLayout(currentLayout: ɵWorkbenchLayout): Promise<void> {
     // Memoize the layout of this perspective.
     this._perspectiveLayout = this._workbenchLayoutFactory.create({
-      workbenchGrid: currentLayout.workbenchGrid,
-      outlets: currentLayout.outlets({grid: 'workbench'}),
+      grids: {
+        main: currentLayout.grids.main,
+        ...WorkbenchLayouts.pickActivityGrids(currentLayout.grids),
+      },
+      activityLayout: currentLayout.activityLayout,
+      outlets: currentLayout.outlets({mainGrid: true, activityGrids: true}),
     });
 
     // Do not store the layout if a transient perspective.
@@ -214,12 +224,20 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
     await this._workbenchPerspectiveStorageService.storePerspectiveLayout(this.id, {
       referenceLayout: {
-        workbenchGrid: serializedReferenceLayout.workbenchGrid,
-        outlets: serializedReferenceLayout.workbenchOutlets,
+        grids: {
+          main: serializedReferenceLayout.grids.main,
+          ...WorkbenchLayouts.pickActivityGrids(serializedReferenceLayout.grids),
+        },
+        activityLayout: serializedReferenceLayout.activityLayout,
+        outlets: serializedReferenceLayout.outlets({mainGrid: true, activityGrids: true}),
       },
       userLayout: {
-        workbenchGrid: serializedUserLayout.workbenchGrid,
-        outlets: serializedUserLayout.workbenchOutlets,
+        grids: {
+          main: serializedUserLayout.grids.main,
+          ...WorkbenchLayouts.pickActivityGrids(serializedUserLayout.grids),
+        },
+        activityLayout: serializedUserLayout.activityLayout,
+        outlets: serializedUserLayout.outlets({mainGrid: true, activityGrids: true}),
       },
     });
   }

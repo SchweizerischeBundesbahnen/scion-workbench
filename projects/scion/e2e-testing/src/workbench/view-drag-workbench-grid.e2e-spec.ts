@@ -42,7 +42,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Expect test view to be moved to the west of the workbench grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .2,
@@ -95,7 +95,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Expect test view to be moved to the west of the workbench grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .2,
@@ -159,7 +159,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Expect test view to be moved to the east of the workbench grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .8,
@@ -212,7 +212,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Expect test view to be moved to the east of the workbench grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MTreeNode({
             direction: 'row',
             ratio: .8,
@@ -279,7 +279,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Expect test view to be moved to the south of the workbench grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .8,
@@ -335,7 +335,7 @@ test.describe('View Drag Workbench Grid', () => {
 
       // Expect test view to be moved to the south of the workbench grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MTreeNode({
             direction: 'column',
             ratio: .8,

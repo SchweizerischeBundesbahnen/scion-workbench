@@ -48,4 +48,22 @@ export const Objects = {
   toMatrixNotation: (object: Record<string, unknown> | null | undefined): string => {
     return Object.entries(object ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
   },
+  /**
+   * Compares the two objects for shallow equality.
+   */
+  isEqual: (a: unknown, b: unknown): boolean => {
+    if (a === b) {
+      return true;
+    }
+
+    if (!a || !b) {
+      return false;
+    }
+
+    if (Object.keys(a).length !== Object.keys(b).length) {
+      return false;
+    }
+
+    return Object.entries(a).every(([key, value]) => (b as Record<string, unknown>)[key] === value);
+  },
 } as const;

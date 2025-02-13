@@ -15,6 +15,7 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
+import {ComponentDescriptor} from './workbench.model';
 
 /**
  * Configuration of the SCION Workbench.
@@ -131,6 +132,11 @@ export abstract class WorkbenchConfig {
      */
     modalityScope?: 'workbench' | 'viewport';
   };
+
+  public abstract textProvider?: (key: string) => string | Signal<string>;
+
+  // consider MaterialIconProvder as default provider
+  public abstract iconProvider?: (icon: string) => ComponentType<unknown> | ComponentDescriptor;
 
   /**
    * Configures logging for the workbench.

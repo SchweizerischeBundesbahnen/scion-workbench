@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, NavigationState, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {Commands, DockingArea, NavigationData, NavigationState, PartId, PartExtras, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -37,15 +37,30 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this;
   }
 
-  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout;
+  public addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean} | PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+    if ((reference as DockingArea).dockTo) {
+      return this.addPartToDockingArea(id, reference as DockingArea, extras as PartExtras & {cssClass?: string | string[]});
+    }
+    else {
+      return this.addPartRelativeToPart(id, reference as ReferencePart, extras as {activate?: boolean});
+    }
+  }
+
+  private addPartRelativeToPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout {
     this.parts.push({
       id,
       relativeTo: relativeTo.relativeTo,
       align: relativeTo.align,
       ratio: relativeTo.ratio,
-      activate: options?.activate,
+      activate: extras?.activate,
     });
     return this;
+  }
+
+  private addPartToDockingArea(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+    throw Error('[PageObjectError] Operation `WorkbenchLayout.addPart` is not supported.');
   }
 
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout {

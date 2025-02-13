@@ -25,6 +25,7 @@ import {Objects} from '../common/objects.util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ViewId} from '../view/workbench-view.model';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -94,7 +95,9 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Perform the navigation.
-      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
+      const currentOutlets = currentLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true});
+      const newOutlets = newLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true});
+      const commands: Commands = computeNavigationCommands(currentOutlets, newOutlets);
       if (!await this._angularRouterMutex.submit(() => this._router.navigate(commands, extras))) {
         return null;
       }
@@ -166,7 +169,9 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
       extras = createNavigationExtras({newLayout, currentLayout}, extras);
 
       // Create the new URL tree.
-      const commands: Commands = computeNavigationCommands(currentLayout.outlets(), newLayout.outlets());
+      const currentOutlets = currentLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true});
+      const newOutlets = newLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true});
+      const commands: Commands = computeNavigationCommands(currentOutlets, newOutlets);
       return this._router.createUrlTree(commands, extras);
     });
   }
@@ -303,7 +308,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
       if (extras.partId && layout.hasPart(extras.partId)) {
         return extras.partId;
       }
-      return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'workbench'}).id;
+      return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'main'}).id;
     })();
 
     return layout
@@ -345,7 +350,7 @@ function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavig
  */
 function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentLayout?: ɵWorkbenchLayout | undefined}, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
   const {newLayout, currentLayout} = layouts;
-  const {workbenchGrid, mainAreaGrid} = newLayout.serialize({excludeViewMarkedForRemoval: true});
+  const newLayoutSerialized = newLayout.serialize({excludeViewMarkedForRemoval: true, undefinedIfEmpty: true});
 
   // IMPORTANT: Update `ɵWorkbenchLayout.equals` function when adding new state properties.
 
@@ -357,7 +362,11 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
     relativeTo: null,
     // Associate workbench-specific state with the navigation.
     state: WorkbenchNavigationalStates.create({
-      workbenchGrid: workbenchGrid,
+      grids: {
+        main: newLayoutSerialized.grids.main,
+        ...WorkbenchLayouts.pickActivityGrids(newLayoutSerialized.grids),
+      },
+      activityLayout: newLayoutSerialized.activityLayout,
       // Fall back to the current layout's perspective if not specified by the new layout,
       // e.g., the navigator provides a new layout to replace the current layout.
       perspectiveId: newLayout.perspectiveId ?? currentLayout?.perspectiveId,
@@ -365,7 +374,7 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
       navigationStates: newLayout.navigationStates(),
     }),
     // Add the main area as query parameter.
-    queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: mainAreaGrid},
+    queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: newLayoutSerialized.grids.mainArea},
     // Merge with existing query params unless specified an explicit strategy, e.g., for migrating an outdated layout URL.
     // Note that `null` is a valid strategy for clearing existing query params, so do not use the nullish coalescing operator (??).
     queryParamsHandling: Defined.orElse(extras?.queryParamsHandling, 'merge'),

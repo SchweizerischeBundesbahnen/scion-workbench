@@ -33,8 +33,8 @@ export async function toEqualWorkbenchLayout(locator: Locator, expected: Expecte
  */
 async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator: Locator): Promise<void> {
   // Assert the workbench grid plus the main area grid if expected.
-  if (expected.workbenchGrid) {
-    await assertGridElement(expected.workbenchGrid.root, locator.locator('wb-workbench-layout > wb-grid-element:not([data-parentnodeid])'), expected);
+  if (expected.mainGrid) {
+    await assertGridElement(expected.mainGrid.root, locator.locator('wb-workbench-layout > wb-grid-element:not([data-parentnodeid])'), expected);
   }
   // Assert only the main area grid, but not the workbench grid since not expected.
   else if (expected.mainAreaGrid) {
@@ -49,8 +49,8 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
     await throwIfPresent(locator.locator(`wb-workbench-layout wb-part[data-partid="part.main-area"] wb-part:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
   }
   // Assert active part of the workbench grid.
-  if (expected.workbenchGrid?.activePartId) {
-    const activePartId = expected.workbenchGrid.activePartId;
+  if (expected.mainGrid?.activePartId) {
+    const activePartId = expected.mainGrid.activePartId;
     const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="${activePartId}"]:not([data-context="main-area"]).active`);
     await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the workbench grid, but is not.`));
     await throwIfPresent(locator.locator(`wb-workbench-layout wb-part:not([data-partid="${activePartId}"]):not([data-context="main-area"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the workbench grid, but is not.`));
@@ -311,9 +311,9 @@ function isEqualArray(array1: Array<unknown>, array2: Array<unknown>): boolean {
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Specifies the expected workbench grid. If not set, does not assert the workbench grid.
+   * Specifies the expected grid of the workbench. If not set, does not assert the workbench grid.
    */
-  workbenchGrid?: MPartGrid;
+  mainGrid?: MPartGrid;
   /**
    * Specifies the expected main area grid. If not set, does not assert the main area grid.
    */

@@ -1405,7 +1405,7 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -1424,7 +1424,7 @@ test.describe('Workbench Router', () => {
 
     // THEN: Expect the workbench layout to be restored.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -1453,7 +1453,7 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -1485,7 +1485,7 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the main area.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {

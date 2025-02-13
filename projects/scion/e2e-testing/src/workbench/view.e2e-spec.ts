@@ -1010,7 +1010,7 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .8,

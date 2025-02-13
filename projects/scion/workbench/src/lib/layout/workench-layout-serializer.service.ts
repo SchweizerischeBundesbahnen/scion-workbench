@@ -20,9 +20,12 @@ import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration
 import {Exclusion, stringify} from './stringifier';
 import {WorkbenchOutlet} from '../workbench.constants';
 import {WorkbenchLayoutMigrationV7} from './migration/workbench-layout-migration-v7.service';
+import {WorkbenchGrids} from './workbench-grids.model';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
+ *
+ * TODO [activity] Rename to WorkbenchGridSerializer
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutSerializer {
@@ -35,29 +38,35 @@ export class WorkbenchLayoutSerializer {
     .registerMigration(6, inject(WorkbenchLayoutMigrationV7));
 
   /**
-   * Serializes the given grid into a URL-safe base64 string.
+   * Serializes given grids into a URL-safe base64 string.
    *
-   * @param grid - Specifies the grid to be serialized.
-   * @param flags - Controls how to serialize the grid.
+   * @param grids - Specifies the grids to serialize.
+   * @param flags - Controls how to serialize the grids.
    */
-  public serializeGrid(grid: MPartGrid, flags?: GridSerializationFlags): string;
-  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): null | string;
-  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): string | null {
-    if (grid === null || grid === undefined) {
-      return null;
-    }
+  public serializeGrids(grids: WorkbenchGrids, flags?: GridSerializationFlags): WorkbenchGrids<string> {
+    return Object.fromEntries(Object.entries(grids).reduce((acc, [gridName, grid]) => {
+      if (grid === undefined) {
+        return acc;
+      }
 
-    const json = stringify(grid, {
-      exclusions: new Array<string | Exclusion>()
-        .concat('**/parent')
-        .concat('migrated')
-        .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
-        .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
-        .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
-        .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
-      sort: flags?.sort,
-    });
-    return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
+      if (flags?.undefinedIfEmpty && grid.root instanceof MPart && !grid.root.views.length && !grid.root.navigation && !grid.root.structural) {
+        return acc;
+      }
+
+      const json = stringify(grid, {
+        exclusions: new Array<string | Exclusion>()
+          .concat('**/parent')
+          .concat('migrated')
+          .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
+          .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
+          .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
+          .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
+        sort: flags?.sort,
+      });
+      const serialized = window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
+
+      return acc.set(gridName, serialized);
+    }, new Map()));
   }
 
   /**
@@ -173,4 +182,9 @@ export interface GridSerializationFlags {
    * Stable sort order is required to compare the initial grid with the user-modified grid to detect layout changes.
    */
   sort?: true;
+
+  /**
+   * TODO [activity] Be more concrete.
+   */
+  undefinedIfEmpty?: true;
 }
