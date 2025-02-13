@@ -34,7 +34,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
     NgClass,
   ],
   providers: [
-    {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef<HTMLElement>).nativeElement},
+    {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},
   ],
 })
 export class PartBarComponent {
@@ -55,7 +55,7 @@ export class PartBarComponent {
   @HostListener('dblclick', ['$event'])
   protected onDoubleClick(event: MouseEvent): void {
     if (this.part.isInMainArea) {
-      this._router.navigate(layout => layout.toggleMaximized()).then();
+      void this._router.navigate(layout => layout.toggleMaximized());
     }
     event.stopPropagation();
   }

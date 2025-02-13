@@ -20,14 +20,14 @@ import {WorkbenchConfig} from '../workbench-config';
 export class ɵLogger implements Logger {
 
   // TODO [Angular 20] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens.
-  private readonly _logAppenders = inject(LogAppender, {optional: true}) as unknown as LogAppender[];
+  private readonly _logAppenders = inject(LogAppender, {optional: true}) as unknown as LogAppender[] | null ?? [];
 
   private readonly _logLevel: Signal<LogLevel>;
 
   constructor() {
     const defaultLogLevel = inject(WorkbenchConfig, {optional: true})?.logging?.logLevel ?? LogLevel.INFO;
     const logLevel = queryParam('loglevel');
-    this._logLevel = computed(() => (logLevel() ? LogLevel[logLevel()!.toUpperCase() as keyof typeof LogLevel] : defaultLogLevel) ?? defaultLogLevel);
+    this._logLevel = computed(() => parseLogLevel(logLevel()) ?? defaultLogLevel);
   }
 
   /** @inheritDoc */
@@ -56,7 +56,7 @@ export class ɵLogger implements Logger {
   }
 
   private log(event: LogEvent): void {
-    if (!this._logAppenders?.length) {
+    if (!this._logAppenders.length) {
       return;
     }
 
@@ -84,10 +84,17 @@ function queryParam(queryParam: string): Signal<string | null> {
 }
 
 /**
+ * Parses the given log level string into a {@link LogLevel} enum.
+ */
+function parseLogLevel(logLevel: string | null): LogLevel | undefined {
+  return logLevel ? LogLevel[logLevel.toUpperCase() as keyof typeof LogLevel] as LogLevel | undefined : undefined;
+}
+
+/**
  * Coerces the given arguments to a {@link LogEvent}.
  */
 function coerceLogEvent(level: LogLevel, message: string | (() => string), args: any[]): LogEvent {
-  const messageSupplier: () => string = typeof message === 'function' ? message : (() => message);
+  const messageSupplier: () => string = typeof message === 'function' ? message : () => message;
   if (args[0] instanceof LoggerName) {
     return {level, messageSupplier, logger: args[0].toString(), args: args.slice(1)};
   }

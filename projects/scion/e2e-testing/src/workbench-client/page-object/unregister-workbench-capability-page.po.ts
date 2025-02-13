@@ -59,4 +59,3 @@ export class UnregisterWorkbenchCapabilityPagePO implements MicrofrontendViewPag
     await this.locator.locator('button.e2e-unregister').click();
   }
 }
-

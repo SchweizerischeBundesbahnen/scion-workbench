@@ -28,7 +28,7 @@ export class PartPagePO {
   public readonly part: PartPO;
 
   constructor(appPO: AppPO, locateBy: {partId?: PartId; cssClass?: string}) {
-    this.part = appPO.part({partId: locateBy?.partId, cssClass: locateBy?.cssClass});
+    this.part = appPO.part({partId: locateBy.partId, cssClass: locateBy.cssClass});
     this.locator = this.part.locator.locator(PartPagePO.selector);
   }
 

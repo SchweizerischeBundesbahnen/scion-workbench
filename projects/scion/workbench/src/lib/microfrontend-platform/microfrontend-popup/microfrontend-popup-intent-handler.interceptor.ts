@@ -44,9 +44,10 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.Popup) {
+      const popupIntentMessage = intentMessage as IntentMessage<ɵWorkbenchPopupCommand>;
       // Do not block the call until the popup is closed.
       // Otherwise, the caller may receive a timeout error if not closing the popup before delivery confirmation expires.
-      this.consumePopupIntent(intentMessage).catch(error => this._logger.error('[PopupOpenError] Failed to open popup.', LoggerNames.MICROFRONTEND, intentMessage, error));
+      this.consumePopupIntent(popupIntentMessage).catch((error: unknown) => this._logger.error('[PopupOpenError] Failed to open popup.', LoggerNames.MICROFRONTEND, intentMessage, error));
       return Promise.resolve();
     }
     else {
@@ -56,7 +57,7 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
 
   private async consumePopupIntent(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<void> {
     const popupId = message.body!.popupId;
-    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
 
     // Ignore subsequent intents if a popup is already open, as it would lead to the first popup being closed.
     if (this._openedPopups.has(popupId)) {
@@ -82,7 +83,7 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
   /**
    * Opens the microfrontend declared by the resolved capability in a popup.
    */
-  private async openPopup(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<any> {
+  private async openPopup(message: IntentMessage<ɵWorkbenchPopupCommand>): Promise<unknown> {
     const command = message.body!;
     const capability = message.capability as WorkbenchPopupCapability;
     const isHostProvider = capability.metadata!.appSymbolicName === Beans.get(APP_IDENTITY);
@@ -106,12 +107,12 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
       anchor: this.observePopupOrigin$(command),
       context: command.context,
       align: command.align,
-      size: capability.properties?.size,
+      size: capability.properties.size,
       closeStrategy: isHostProvider ? command.closeStrategy : {
         ...command.closeStrategy,
         onFocusLost: false, // Closing the popup on focus loss is handled in {MicrofrontendPopupComponent}
       },
-      cssClass: Arrays.coerce(capability.properties?.cssClass).concat(Arrays.coerce(command.cssClass)),
+      cssClass: Arrays.coerce(capability.properties.cssClass).concat(Arrays.coerce(command.cssClass)),
     });
   }
 

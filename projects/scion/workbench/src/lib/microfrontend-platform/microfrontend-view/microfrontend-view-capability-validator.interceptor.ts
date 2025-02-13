@@ -24,14 +24,19 @@ export class MicrofrontendViewCapabilityValidator implements CapabilityIntercept
       return capability;
     }
 
-    const viewCapability = capability as WorkbenchViewCapability;
+    const viewCapability = capability as Partial<WorkbenchViewCapability>;
     // Assert the view capability to have a qualifier set.
     if (!Object.keys(viewCapability.qualifier ?? {}).length) {
       throw Error(`[NullQualifierError] View capability requires a qualifier [capability=${JSON.stringify(viewCapability)}]`);
     }
 
+    // Assert the view capability to have a "properties" section.
+    if (!viewCapability.properties) {
+      throw Error(`[NullPropertiesError] View capability requires a "properties" section [application="${viewCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(viewCapability.qualifier)}"]`);
+    }
+
     // Assert the view capability to have a path set.
-    const path = viewCapability.properties?.path;
+    const path = viewCapability.properties.path as unknown;
     if (path === undefined || path === null) {
       throw Error(`[NullPathError] View capability requires a path to the microfrontend in its properties [application="${viewCapability.metadata!.appSymbolicName}", capability="${Objects.toMatrixNotation(viewCapability.qualifier)}"]`);
     }

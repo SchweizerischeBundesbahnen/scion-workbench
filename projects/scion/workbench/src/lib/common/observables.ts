@@ -82,16 +82,22 @@ export function fromMoveHandle$(handle: HTMLElement): Observable<HandleMoveEvent
 }
 
 /**
- * Event emitted when moving the handle.
- */
-export type HandleMoveEvent = MouseMoveEvent | TouchMoveEvent;
-
-/**
  * Event emitted when moving the handle by mouse.
  */
-export type MouseMoveEvent = {type: 'mousestart' | 'mousemove' | 'mouseend'; mouseEvent: MouseEvent};
+export interface MouseMoveEvent {
+  type: 'mousestart' | 'mousemove' | 'mouseend';
+  mouseEvent: MouseEvent;
+}
 
 /**
  * Event emitted when moving the handle by touch gesture.
  */
-export type TouchMoveEvent = {type: 'touchstart' | 'touchmove' | 'touchend'; touchEvent: TouchEvent};
+export interface TouchMoveEvent {
+  type: 'touchstart' | 'touchmove' | 'touchend';
+  touchEvent: TouchEvent;
+}
+
+/**
+ * Event emitted when moving the handle.
+ */
+export type HandleMoveEvent = MouseMoveEvent | TouchMoveEvent;

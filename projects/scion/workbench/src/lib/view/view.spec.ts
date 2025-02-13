@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {Component, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
+import {booleanAttribute, Component, DebugElement, DestroyRef, Directive, effect, inject, Injector, OnDestroy, OnInit, Type} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
@@ -21,7 +21,6 @@ import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
@@ -697,11 +696,11 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open view-modal message box.
-    TestBed.inject(WorkbenchMessageBoxService).open('Message', {
+    void TestBed.inject(WorkbenchMessageBoxService).open('Message', {
       modality: 'view',
       context: {viewId: 'view.100'},
       cssClass: 'message-box',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the message box).
@@ -750,10 +749,10 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open application-modal message box.
-    TestBed.inject(WorkbenchMessageBoxService).open('Message', {
+    void TestBed.inject(WorkbenchMessageBoxService).open('Message', {
       modality: 'application',
       cssClass: 'message-box',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the message box).
@@ -802,11 +801,11 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open view-modal dialog.
-    TestBed.inject(WorkbenchDialogService).open(TestComponent, {
+    void TestBed.inject(WorkbenchDialogService).open(TestComponent, {
       modality: 'view',
       context: {viewId: 'view.100'},
       cssClass: 'dialog',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the dialog).
@@ -855,10 +854,10 @@ describe('View', () => {
     const view = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100');
 
     // Open application-modal dialog.
-    TestBed.inject(WorkbenchDialogService).open(TestComponent, {
+    void TestBed.inject(WorkbenchDialogService).open(TestComponent, {
       modality: 'application',
       cssClass: 'dialog',
-    }).then();
+    });
     await waitUntilStable();
 
     // Try to close the view (prevented by the dialog).
@@ -1132,7 +1131,7 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -1185,7 +1184,7 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -1235,7 +1234,7 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -1281,10 +1280,10 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId!}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1335,10 +1334,10 @@ describe('View', () => {
 
     // Spy console.
     const errors = new Array<any>();
-    spyOn(console, 'error').and.callThrough().and.callFake(args => errors.push(...args));
+    spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId!}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1965,7 +1964,7 @@ describe('View', () => {
       expect(componentInstanceView3).toBeInstanceOf(SpecView3Component);
       expect(componentInstanceView3.titleReadInConstructor).toEqual('Title View 3');
       expect(componentInstanceView3.headingReadInConstructor).toEqual('Heading View 3');
-      expect(componentInstanceView3.navigationReadInConstructor ).toEqual(jasmine.objectContaining({data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3'}));
+      expect(componentInstanceView3.navigationReadInConstructor).toEqual(jasmine.objectContaining({data: {data: 'view-3'}, state: {state: 'view-3'}, hint: 'view-3'}));
       expect(componentInstanceView3.navigationCssClassReadInConstructor).toEqual(['view-3']);
       // Expect properties not to be changed until destroyed previous component.
       expect(componentInstanceView2.titleReadInDestroy).toEqual('Title View 2');
@@ -2898,7 +2897,7 @@ class SpecViewComponent implements OnDestroy {
       this.view.heading = params.get('heading');
     }
     if (params.has('dirty')) {
-      this.view.dirty = coerceBooleanProperty(params.get('dirty'));
+      this.view.dirty = booleanAttribute(params.get('dirty'));
     }
     if (params.has('cssClass')) {
       this.view.cssClass = params.get('cssClass')!;
@@ -2937,38 +2936,40 @@ class SpecView2Component extends SpecViewComponent {
 }
 
 function setDesignToken(fixture: ComponentFixture<unknown>, name: string, value: string): void {
-  const workbenchElement = (fixture.debugElement.nativeElement as HTMLElement);
+  const workbenchElement = fixture.debugElement.nativeElement as HTMLElement;
   workbenchElement.style.setProperty(name, value);
 }
 
 function getViewTitle(fixture: ComponentFixture<unknown>, viewId: ViewId): string | null {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('span.e2e-title'))?.nativeElement?.innerText?.trim() ?? null;
+  const titleElement = viewTabElement.query(By.css('span.e2e-title')) as DebugElement | null;
+  return titleElement ? (titleElement.nativeElement as HTMLElement).innerText.trim() : null;
 }
 
 function getViewHeading(fixture: ComponentFixture<unknown>, viewId: ViewId): string | null {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('span.e2e-heading'))?.nativeElement.innerText?.trim() ?? null;
+  const headingElement = viewTabElement.query(By.css('span.e2e-heading')) as DebugElement | null;
+  return headingElement ? (headingElement.nativeElement as HTMLElement).innerText.trim() : null;
 }
 
 function isViewHeadingVisible(fixture: ComponentFixture<unknown>, viewId: ViewId): boolean {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  const headingElement = viewTabElement.query(By.css('span.e2e-heading'));
-  return headingElement !== null && getComputedStyle(headingElement.nativeElement).display !== 'none';
+  const headingElement = viewTabElement.query(By.css('span.e2e-heading')) as DebugElement | null;
+  return headingElement !== null && getComputedStyle(headingElement.nativeElement as HTMLElement).display !== 'none';
 }
 
 function isViewDirty(fixture: ComponentFixture<unknown>, viewId: ViewId): boolean {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement.query(By.css('span.e2e-dirty')) !== null;
+  return viewTabElement.query(By.css('span.e2e-dirty')) as DebugElement | null !== null;
 }
 
-function getViewCssClass(fixture: ComponentFixture<unknown>, viewId: ViewId): string[] | null {
+function getViewCssClass(fixture: ComponentFixture<unknown>, viewId: ViewId): string[] {
   const viewTabElement = fixture.debugElement.query(By.css(`wb-view-tab[data-viewid="${viewId}"]`));
-  return viewTabElement ? Object.keys(viewTabElement.classes) : null;
+  return Object.keys(viewTabElement.classes);
 }
 
-function getComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T | null {
-  return fixture.debugElement.query(By.directive(type)).componentInstance;
+function getComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {
+  return fixture.debugElement.query(By.directive(type)).componentInstance as T;
 }
 
 function getDialog(cssClass: string): WorkbenchDialog {

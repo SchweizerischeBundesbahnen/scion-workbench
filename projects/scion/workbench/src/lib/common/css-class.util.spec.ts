@@ -26,7 +26,7 @@ describe('CssClass.synchronizeCssClasses', () => {
       public staticCssClass = true;
 
       constructor() {
-        const host = inject(ElementRef<HTMLElement>).nativeElement;
+        const host = inject(ElementRef).nativeElement as HTMLElement;
         synchronizeCssClasses(host, this.cssClasses);
       }
     }

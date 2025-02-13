@@ -34,8 +34,8 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
   public readonly path: Locator;
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
-    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
+    this.outlet = new SciRouterOutletPO(appPO, {name: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.outlet.frameLocator.locator('app-view-page');
     this.viewId = this.locator.locator('span.e2e-view-id');
     this.partId = this.locator.locator('span.e2e-part-id');
@@ -55,7 +55,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     const accordion = new SciAccordionPO(capabilityAccordionLocator);
     await accordion.expand();
     try {
-      return JSON.parse(await this.locator.locator('div.e2e-view-capability').innerText());
+      return JSON.parse(await this.locator.locator('div.e2e-view-capability').innerText()) as WorkbenchViewCapability;
     }
     finally {
       await accordion.collapse();
@@ -99,7 +99,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return this.locator.locator('span.e2e-route-fragment').innerText();
+      return await this.locator.locator('span.e2e-route-fragment').innerText();
     }
     finally {
       await accordion.collapse();
@@ -162,7 +162,7 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
       const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-accordion.e2e-self-navigation').locator('sci-key-value-field.e2e-params'));
       await keyValueField.clear();
       await keyValueField.addEntries(params);
-      await this.locator.locator('sci-accordion.e2e-self-navigation').locator('select.e2e-param-handling').selectOption(options?.paramsHandling || '');
+      await this.locator.locator('sci-accordion.e2e-self-navigation').locator('select.e2e-param-handling').selectOption(options?.paramsHandling ?? '');
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-navigate-per-param')).toggle(options?.navigatePerParam ?? false);
       await this.locator.locator('sci-accordion.e2e-self-navigation').locator('button.e2e-navigate-self').click();
     }

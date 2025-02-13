@@ -22,7 +22,7 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
 export class WorkbenchLayoutMigrationV6 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const partGridV5: MPartGridV5 = JSON.parse(json);
+    const partGridV5 = JSON.parse(json) as MPartGridV5;
 
     // Migrate the grid.
     const partGridV6: MPartGridV6 = {
@@ -56,7 +56,7 @@ export class WorkbenchLayoutMigrationV6 implements WorkbenchMigration {
 
     function migrateView(viewV5: MViewV5): MViewV6 {
       const viewV6: MViewV6 = {...viewV5};
-      delete (viewV6 as Record<keyof MViewV5, unknown>)['uid'];
+      delete (viewV6 as Record<keyof MViewV5, unknown>).uid;
       return viewV6;
     }
   }

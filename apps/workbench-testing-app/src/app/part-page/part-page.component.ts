@@ -66,7 +66,7 @@ export default class PartPageComponent {
     const partActions = toSignal(this.form.controls.partActions.valueChanges, {initialValue: this.form.controls.partActions.value});
     return computed(() => {
       try {
-        return Arrays.coerce(JSON.parse(partActions() || '[]'));
+        return Arrays.coerce(JSON.parse(partActions() || '[]') as WorkbenchPartActionDescriptor[]);
       }
       catch {
         return [];

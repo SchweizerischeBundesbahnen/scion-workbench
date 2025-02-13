@@ -164,29 +164,37 @@ export interface WorkbenchNavigationContext {
  * - Alternative syntax using a combined segment:
  *   ['path/to/view', {param1: 'value1', param2: 'value2'}]
  */
-export type Commands = any[];
+export type Commands = unknown[];
 
 /**
  * URL segments of workbench elements contained in the workbench layout.
  */
-export type Outlets = {[outlet: WorkbenchOutlet]: UrlSegment[]};
+export interface Outlets {
+  [outlet: WorkbenchOutlet]: UrlSegment[];
+}
 
 /**
  * State associated with a navigation.
  */
-export type NavigationStates = {[outlet: WorkbenchOutlet]: NavigationState};
+export interface NavigationStates {
+  [outlet: WorkbenchOutlet]: NavigationState;
+}
 
 /**
  * State passed to a navigation.
  *
  * State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
  */
-export type NavigationState = {[key: string]: unknown};
+export interface NavigationState {
+  [key: string]: unknown;
+}
 
 /**
  * Data associated with a navigation. Data must be JSON serializable.
  */
-export type NavigationData = {[key: string]: unknown};
+export interface NavigationData {
+  [key: string]: unknown;
+}
 
 /**
  * Signature of a function to modify the workbench layout.

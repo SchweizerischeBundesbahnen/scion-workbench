@@ -20,7 +20,7 @@ export class NavigationTestPagePO implements WorkbenchViewPagePO {
   public readonly view: ViewPO;
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-navigation-test-page');
   }
 }

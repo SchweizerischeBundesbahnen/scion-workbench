@@ -20,13 +20,13 @@ import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-dec
 import {WorkbenchConfig} from '../workbench-config';
 import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
 import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler.service';
-import {MicrofrontendViewIntentHandler} from './routing/microfrontend-view-intent-handler.interceptor';
+import {MicrofrontendViewIntentHandler} from './microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
 import {CanMatchFn, Route, ROUTES} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
-import {MicrofrontendViewRoutes} from './routing/microfrontend-view-routes';
-import {MicrofrontendViewCapabilityValidator} from './routing/microfrontend-view-capability-validator.interceptor';
+import {MicrofrontendViewRoutes} from './microfrontend-view/microfrontend-view-routes';
+import {MicrofrontendViewCapabilityValidator} from './microfrontend-view/microfrontend-view-capability-validator.interceptor';
 import {StableCapabilityIdAssigner} from './stable-capability-id-assigner.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from './microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
 import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';

@@ -261,15 +261,14 @@ describe('Routing.parseOutlets', () => {
 
     // Add view outlets view.101 and view.103 to the URL.
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => {
-        const activeMainAreaPart = layout.activePart({grid: 'mainArea'})!;
-        return layout
-          .addView('view.101', {partId: activeMainAreaPart.id})
-          .addView('view.102', {partId: activeMainAreaPart.id})
-          .addView('view.103', {partId: activeMainAreaPart.id})
-          .navigateView('view.101', ['path/to/view/101'])
-          .navigateView('view.103', ['path/to/view/103', {param1: 'value1', param2: 'value2'}]);
-      },
-    );
+      const activeMainAreaPart = layout.activePart({grid: 'mainArea'})!;
+      return layout
+        .addView('view.101', {partId: activeMainAreaPart.id})
+        .addView('view.102', {partId: activeMainAreaPart.id})
+        .addView('view.103', {partId: activeMainAreaPart.id})
+        .navigateView('view.101', ['path/to/view/101'])
+        .navigateView('view.103', ['path/to/view/103', {param1: 'value1', param2: 'value2'}]);
+    });
 
     // Add part outlets part.left and part.right to the URL.
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
@@ -984,7 +983,7 @@ describe('Routing.activatedRoute$', () => {
     public route: string;
 
     constructor() {
-      this.route = inject(ActivatedRoute).snapshot.data['route'];
+      this.route = inject(ActivatedRoute).snapshot.data['route'] as string;
       const logMessasge = `Component.construct [activatedRoute.data.route=${this.route}]`;
       logs.emitOnAlways.push(logMessasge);
       logs.emitOnRouteChange.push(logMessasge);

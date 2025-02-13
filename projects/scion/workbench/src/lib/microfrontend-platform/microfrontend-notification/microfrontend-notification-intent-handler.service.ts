@@ -30,7 +30,7 @@ export class MicrofrontendNotificationIntentHandler {
       logger.debug(() => 'Showing notification', LoggerNames.MICROFRONTEND, config);
       notificationService.notify({
         title: config?.title,
-        content: config?.content,
+        content: config?.content ? config.content as string : '',
         severity: config?.severity,
         duration: config?.duration,
         group: config?.group,

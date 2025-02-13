@@ -32,35 +32,35 @@ export class ViewDropZoneDirective implements OnInit {
   /**
    * Specifies the regions where views can be dropped. Defaults to every region.
    */
-  public regions = input<DropZoneRegion>(undefined, {alias: 'wbViewDropZoneRegions'}); // eslint-disable-line @angular-eslint/no-input-rename
+  public regions = input<DropZoneRegion>(undefined, {alias: 'wbViewDropZoneRegions'});
 
   /**
    * Specifies CSS class(es) to add to the drop zone.
    */
-  public cssClass = input<string | string[] | undefined>(undefined, {alias: 'wbViewDropZoneCssClass'}); // eslint-disable-line @angular-eslint/no-input-rename
+  public cssClass = input<string | string[] | undefined>(undefined, {alias: 'wbViewDropZoneCssClass'});
 
   /**
    * Specifies attribute(s) to add to the drop zone.
    */
-  public attributes = input<{[name: string]: unknown}>(undefined, {alias: 'wbViewDropZoneAttributes'}); // eslint-disable-line @angular-eslint/no-input-rename
+  public attributes = input<{[name: string]: unknown}>(undefined, {alias: 'wbViewDropZoneAttributes'});
 
   /**
    * Specifies the size of a drop zone region, either as percentage value [0,1] or absolute pixel value.
    */
-  public dropRegionSize = input(.5, {alias: 'wbViewDropZoneRegionSize'}); // eslint-disable-line @angular-eslint/no-input-rename
+  public dropRegionSize = input(.5, {alias: 'wbViewDropZoneRegionSize'});
 
   /**
    * Specifies the size of the visual placeholder when dragging a view over a drop region.
    * Can be a percentage value [0,1] or absolute pixel value. Defaults to {@link dropRegionSize}.
    */
-  public dropPlaceholderSize = input<number>(undefined, {alias: 'wbViewDropZonePlaceholderSize'}); // eslint-disable-line @angular-eslint/no-input-rename
+  public dropPlaceholderSize = input<number>(undefined, {alias: 'wbViewDropZonePlaceholderSize'});
 
   /**
    * Notifies when dropping a view.
    */
-  public viewDrop = output<WbViewDropEvent>({alias: 'wbViewDropZoneDrop'}); // eslint-disable-line @angular-eslint/no-output-rename
+  public viewDrop = output<WbViewDropEvent>({alias: 'wbViewDropZoneDrop'});
 
-  private readonly _host = inject(ElementRef<HTMLElement>).nativeElement;
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _viewDropPlaceholderRenderer = inject(ViewDropPlaceholderRenderer);
   private readonly _zone = inject(NgZone);
@@ -294,7 +294,7 @@ export class ViewDropZoneDirective implements OnInit {
 
   private ensureHostElementPositioned(): void {
     if (getComputedStyle(this._host).position === 'static') {
-      setStyle(this._host, {'position': 'relative'});
+      setStyle(this._host, {position: 'relative'});
     }
   }
 }

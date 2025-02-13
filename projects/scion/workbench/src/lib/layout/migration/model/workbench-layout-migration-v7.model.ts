@@ -44,6 +44,9 @@ export interface MViewV7 {
   };
 }
 
+export interface NavigationDataV7 {
+  [key: string]: unknown;
+}
+
 export type PartIdV7 = `part.${string}`;
 export type ViewIdV7 = `view.${number}`;
-export type NavigationDataV7 = {[key: string]: unknown};

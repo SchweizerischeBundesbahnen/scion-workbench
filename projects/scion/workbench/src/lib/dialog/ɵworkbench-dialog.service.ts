@@ -77,7 +77,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
     // Construct the handle in an injection context that shares the dialog's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
     const dialogId = UUID.randomUUID();
     const dialogEnvironmentInjector = createEnvironmentInjector([provideViewContext(options.contextualView)], this._environmentInjector, `Workbench Dialog ${dialogId}`);
-    return runInInjectionContext(dialogEnvironmentInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, options ?? {}));
+    return runInInjectionContext(dialogEnvironmentInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, options));
   }
 
   /**

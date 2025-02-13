@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Optional} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchDialog, WorkbenchMessageBox, WorkbenchPopup, WorkbenchView} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {MessageClient} from '@scion/microfrontend-platform';
@@ -24,14 +24,16 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class SignalReadyTestPageComponent {
 
-  constructor(@Optional() view: WorkbenchView,
-              @Optional() popup: WorkbenchPopup,
-              @Optional() dialog: WorkbenchDialog,
-              @Optional() messageBox: WorkbenchMessageBox) {
+  constructor() {
+    const view = inject(WorkbenchView, {optional: true});
+    const popup = inject(WorkbenchPopup, {optional: true});
+    const dialog = inject(WorkbenchDialog, {optional: true});
+    const messageBox = inject(WorkbenchMessageBox, {optional: true});
+
     this.installReadySignaler(view ?? popup ?? dialog ?? messageBox);
   }
 
-  private installReadySignaler(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | undefined): void {
+  private installReadySignaler(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | WorkbenchMessageBox | null): void {
     if (!handle) {
       return;
     }
@@ -41,6 +43,6 @@ export default class SignalReadyTestPageComponent {
   }
 }
 
-function isView(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog): handle is WorkbenchView {
-  return (handle as WorkbenchView).id !== undefined;
+function isView(handle: WorkbenchView | WorkbenchPopup | WorkbenchDialog | WorkbenchMessageBox): handle is WorkbenchView {
+  return !!(handle as Partial<WorkbenchView>).id?.startsWith('view.');
 }

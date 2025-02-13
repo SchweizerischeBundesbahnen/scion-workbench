@@ -65,17 +65,17 @@ export default class MessageBoxOpenerPageComponent {
     this.openError = undefined;
     this.closeAction = undefined;
 
-    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
+    const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier);
     if (qualifier) {
       this._messageBoxService.open(qualifier, this.readOptions())
         .then(closeAction => this.closeAction = closeAction)
-        .catch(error => this.openError = stringifyError(error));
+        .catch((error: unknown) => this.openError = stringifyError(error));
     }
     else {
       const message = this.form.controls.message.value.replace(/\\n/g, '\n'); // restore line breaks as sanitized by the user agent;
       this._messageBoxService.open(message, this.readOptions())
         .then(closeAction => this.closeAction = closeAction)
-        .catch(error => this.openError = stringifyError(error));
+        .catch((error: unknown) => this.openError = stringifyError(error));
     }
   }
 

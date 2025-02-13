@@ -55,13 +55,13 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
     }
 
     if (options?.title) {
-      await this.locator.locator('input.e2e-title').fill(options?.title);
+      await this.locator.locator('input.e2e-title').fill(options.title);
     }
 
     if (options?.actions) {
       const keyValueField = new SciKeyValueFieldPO(this.locator.locator('sci-key-value-field.e2e-actions'));
       await keyValueField.clear();
-      await keyValueField.addEntries(options?.actions);
+      await keyValueField.addEntries(options.actions);
     }
 
     if (options?.severity) {
@@ -69,7 +69,7 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
     }
 
     if (options?.modality) {
-      await this.locator.locator('select.e2e-modality').selectOption(options?.modality);
+      await this.locator.locator('select.e2e-modality').selectOption(options.modality);
     }
 
     if (options?.context?.viewId) {
@@ -77,11 +77,11 @@ export class MessageBoxOpenerPagePO implements MicrofrontendViewPagePO {
     }
 
     if (options?.contentSelectable) {
-      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(options?.contentSelectable);
+      await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-content-selectable')).toggle(options.contentSelectable);
     }
 
     if (options?.cssClass) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(options?.cssClass).join(' '));
+      await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
     }
 
     await this.locator.locator('button.e2e-open').click();

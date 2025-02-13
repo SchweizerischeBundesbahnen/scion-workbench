@@ -45,9 +45,6 @@ export class FocusTestPagePO implements WorkbenchViewPagePO, WorkbenchDialogPage
       case 'last-field': {
         return this.lastField.click({timeout: options?.timeout});
       }
-      default: {
-        throw Error(`[PageObjectError] Specified field not found: ${field}`);
-      }
     }
   }
 

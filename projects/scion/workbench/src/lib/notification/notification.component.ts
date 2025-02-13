@@ -74,8 +74,8 @@ export class NotificationComponent implements OnChanges {
 
   private createPortal(notification: ɵNotification): ComponentPortal<any> {
     const componentConstructOptions = notification.config.componentConstructOptions;
-    return new ComponentPortal(notification.component, componentConstructOptions?.viewContainerRef || null, Injector.create({
-      parent: notification.config.componentConstructOptions?.injector || this._injector,
+    return new ComponentPortal(notification.component, componentConstructOptions?.viewContainerRef ?? null, Injector.create({
+      parent: notification.config.componentConstructOptions?.injector ?? this._injector,
       providers: [
         {provide: Notification, useValue: notification},
       ],
@@ -108,8 +108,8 @@ export class NotificationComponent implements OnChanges {
               return EMPTY;
           }
         }),
-        takeUntil(this._closeTimerChange$),
         takeUntilDestroyed(this._destroyRef),
+        takeUntil(this._closeTimerChange$),
       )
       .subscribe(() => {
         this.closeNotification.emit();

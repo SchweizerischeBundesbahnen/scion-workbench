@@ -34,7 +34,7 @@ export class RecordComponent implements ControlValueAccessor {
 
   protected formControl = this._formBuilder.control<string>('');
 
-  @Input('class') // eslint-disable-line @angular-eslint/no-input-rename
+  @Input('class')
   public cssClass: string | undefined;
 
   constructor(private _formBuilder: NonNullableFormBuilder) {
@@ -74,7 +74,7 @@ export class RecordComponent implements ControlValueAccessor {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnChange(fn: any): void {
+  public registerOnChange(fn: (record: Record<string, string> | undefined) => void): void {
     this._cvaChangeFn = fn;
   }
 
@@ -82,7 +82,7 @@ export class RecordComponent implements ControlValueAccessor {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
 }

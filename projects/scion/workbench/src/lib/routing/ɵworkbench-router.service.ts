@@ -76,7 +76,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 
       // Let the navigator compute the new workbench layout.
       const currentLayout = this._workbenchLayoutService.layout()!;
-      let newLayout: ɵWorkbenchLayout | null = await runInInjectionContext(this._injector, () => navigateFn(currentLayout)) as ɵWorkbenchLayout;
+      let newLayout = await runInInjectionContext(this._injector, () => navigateFn(currentLayout));
       if (!newLayout) {
         return null;
       }
@@ -203,7 +203,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
         try {
           const close = await view.canCloseGuard!();
           if (close && view.navigation()?.id === navigationId) {
-            return this.navigate(layout => layout.removeView(view.id, {force: true}));
+            return await this.navigate(layout => layout.removeView(view.id, {force: true}));
           }
           return true;
         }

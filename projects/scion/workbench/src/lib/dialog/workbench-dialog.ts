@@ -31,7 +31,7 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract readonly size: WorkbenchDialogSize;
 
   /**
-   * Controls if to apply a padding to the content of the dialog. Default is `true`.
+   * Controls if to apply a padding to the content of the dialog. Defaults to `true`.
    *
    * This setting does not affect the padding of the dialog header and footer.
    *
@@ -41,13 +41,13 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract set padding(padding: boolean);
 
   /**
-   * Specifies if to display a close button in the dialog header. Default is `true`.
+   * Specifies if to display a close button in the dialog header. Defaults to `true`.
    */
   public abstract get closable(): Signal<boolean>;
   public abstract set closable(closable: boolean);
 
   /**
-   * Specifies if the user can resize the dialog. Default is `true`.
+   * Specifies if the user can resize the dialog. Defaults to `true`.
    */
   public abstract get resizable(): Signal<boolean>;
   public abstract set resizable(resizable: boolean);

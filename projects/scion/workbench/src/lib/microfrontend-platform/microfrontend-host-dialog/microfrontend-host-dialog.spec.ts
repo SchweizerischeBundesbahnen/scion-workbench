@@ -11,7 +11,7 @@
 import {TestBed} from '@angular/core/testing';
 import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
-import {firstValueFrom, noop, Subject} from 'rxjs';
+import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
@@ -68,11 +68,11 @@ describe('Microfrontend Host Dialog', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in host dialog 1.
-    TestBed.inject(WorkbenchDialogService).open({component: 'dialog-1'}).then(noop);
+    void TestBed.inject(WorkbenchDialogService).open({component: 'dialog-1'});
     await waitUntilStable();
 
     // Start paralell navigation in host dialog 2.
-    TestBed.inject(WorkbenchDialogService).open({component: 'dialog-2'}).then(noop);
+    void TestBed.inject(WorkbenchDialogService).open({component: 'dialog-2'});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.
@@ -124,11 +124,11 @@ describe('Microfrontend Host Dialog', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in a host dialog.
-    TestBed.inject(WorkbenchDialogService).open({component: 'dialog'}).then(noop);
+    void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'});
     await waitUntilStable();
 
     // Start parallel navigation in a view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view']).then(noop);
+    void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.
@@ -180,11 +180,11 @@ describe('Microfrontend Host Dialog', () => {
     await waitForInitialWorkbenchLayout();
 
     // Start navigation in a view.
-    TestBed.inject(WorkbenchRouter).navigate(['path/to/view']).then(noop);
+    void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);
     await waitUntilStable();
 
     // Start parallel navigation in a host dialog.
-    TestBed.inject(WorkbenchDialogService).open({component: 'dialog'}).then(noop);
+    void TestBed.inject(WorkbenchDialogService).open({component: 'dialog'});
     await waitUntilStable();
 
     // First navigation should be blocked by the canActivate guard.

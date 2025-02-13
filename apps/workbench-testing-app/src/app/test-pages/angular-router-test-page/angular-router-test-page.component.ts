@@ -51,9 +51,9 @@ export default class AngularRouterTestPageComponent {
 
     this.navigateError = undefined;
     this._router.navigate(commands)
-      .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))
+      .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())
-      .catch(error => this.navigateError = stringifyError(error));
+      .catch((error: unknown) => this.navigateError = stringifyError(error));
   }
 
   private resetForm(): void {

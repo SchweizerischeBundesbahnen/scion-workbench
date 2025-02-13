@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -60,11 +60,11 @@ describe('WorkbenchGridMerger', () => {
             ratio: .5,
             child1: new MPart({
               id: 'part.left',
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
             child2: new MPart({
               id: 'part.left-bottom',
-              navigation: {id: ANYTHING},
+              navigation: {id: any()},
             }),
           }),
           child2: new MTreeNode({
@@ -76,14 +76,14 @@ describe('WorkbenchGridMerger', () => {
               child1: new MPart({
                 id: 'part.topLeft',
                 views: [
-                  {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
-                  {id: 'view.100', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                  {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
                 ],
               }),
               child2: new MPart({
                 id: 'part.bottomLeft',
                 views: [
-                  {id: 'view.3', navigation: {id: ANYTHING, hint: 'hint-3'}},
+                  {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
                 ],
               }),
             }),
@@ -145,14 +145,14 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'part.topLeft',
               views: [
-                {id: 'view.2', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'part.bottomLeft',
               views: [
-                {id: 'view.3', navigation: {id: ANYTHING, hint: 'hint-3'}},
-                {id: 'view.100', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
+                {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
               ],
             }),
           }),
@@ -202,13 +202,13 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'part.topLeft',
               views: [
-                {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'part.bottomLeft',
               views: [
-                {id: 'view.2', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
               ],
             }),
           }),
@@ -258,13 +258,13 @@ describe('WorkbenchGridMerger', () => {
             child1: new MPart({
               id: 'part.topLeft',
               views: [
-                {id: 'view.1', navigation: {id: ANYTHING}}, // additional assertion below to assert the hint not to be present
+                {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
               ],
             }),
             child2: new MPart({
               id: 'part.bottomLeft',
               views: [
-                {id: 'view.2', navigation: {id: ANYTHING, hint: 'hint-2b'}},
+                {id: 'view.2', navigation: {id: any(), hint: 'hint-2b'}},
               ],
             }),
           }),
@@ -303,7 +303,7 @@ describe('WorkbenchGridMerger', () => {
           ratio: .25,
           child1: new MPart({
             id: 'part.left',
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
           child2: new MPart({id: MAIN_AREA}),
         }),
@@ -340,7 +340,7 @@ describe('WorkbenchGridMerger', () => {
           }),
           child2: new MPart({
             id: MAIN_AREA,
-            navigation: {id: ANYTHING},
+            navigation: {id: any()},
           }),
         }),
       },

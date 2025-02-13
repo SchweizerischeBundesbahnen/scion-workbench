@@ -18,8 +18,8 @@ import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {WorkbenchLayout, WorkbenchLayoutFn} from '@scion/workbench';
 
-export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/ban-types
-  new(...args: any[]): T;
+export interface Type<T> extends Function { // eslint-disable-line @typescript-eslint/no-unsafe-function-type
+  new(...args: any[]): T; // eslint-disable-line @typescript-eslint/prefer-function-type
 }
 
 /**
@@ -59,7 +59,7 @@ export class WorkbenchNavigator {
    */
   public openInNewTab(page: Type<ViewPagePO>): Promise<ViewPagePO>;
 
-  public async openInNewTab(page: Type<any>): Promise<any> {
+  public async openInNewTab(page: Type<unknown>): Promise<unknown> {
     const startPage = await this._appPO.openNewViewTab();
     const viewId = await startPage.view.getViewId();
 

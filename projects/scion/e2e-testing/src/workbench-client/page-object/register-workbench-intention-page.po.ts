@@ -70,4 +70,3 @@ export class RegisterWorkbenchIntentionPagePO implements MicrofrontendViewPagePO
     await this.locator.locator('button.e2e-register').click();
   }
 }
-

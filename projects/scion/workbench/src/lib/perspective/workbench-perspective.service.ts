@@ -56,7 +56,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     }
     // Register default perspective if no perspective is registered.
     else if (this._perspectiveRegistry.isEmpty()) {
-      await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: ((factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA))});
+      await this.registerPerspective({id: DEFAULT_WORKBENCH_PERSPECTIVE_ID, layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA)});
     }
   }
 
@@ -102,7 +102,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    *
    * @param id - Specifies the id of the perspective to activate.
    * @param options - Controls activation of the perspective.
-   * @param options.storePerspectiveAsActive - Controls if to store the perspective as the active perspective. Default is `true`.
+   * @param options.storePerspectiveAsActive - Controls if to store the perspective as the active perspective. Defaults to `true`.
    * @return `true` if activated the perspective, otherwise `false`.
    */
   public async switchPerspective(id: string, options?: {storePerspectiveAsActive?: boolean}): Promise<boolean> {
@@ -138,7 +138,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     // Switching perspective blocks until the initial navigation has been performed. By default, Angular performs
     // the initial navigation after running app initializers. Therefore, do not await perspective activation when
     // starting the workbench during app initialization. Otherwise, Angular would never complete app initialization.
-    if (this._applicationInitStatus.done) {
+    if (this._applicationInitStatus.done as boolean) {
       await activation;
     }
   }

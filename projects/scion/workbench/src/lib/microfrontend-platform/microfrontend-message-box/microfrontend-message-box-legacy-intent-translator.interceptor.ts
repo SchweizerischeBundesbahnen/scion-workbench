@@ -26,5 +26,5 @@ export class MicrofrontendMessageBoxLegacyIntentTranslator implements IntentInte
  * sent by workbench clients older than version v1.0.0-beta.23.
  */
 function hasLegacyContent(intentMessage: IntentMessage<WorkbenchMessageBoxLegacyOptions>): boolean {
-  return !intentMessage.intent.params?.get(eMESSAGE_BOX_MESSAGE_PARAM) && intentMessage.body?.content;
+  return !intentMessage.intent.params?.get(eMESSAGE_BOX_MESSAGE_PARAM) && !!intentMessage.body?.content;
 }

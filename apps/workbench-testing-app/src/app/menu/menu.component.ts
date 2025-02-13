@@ -54,7 +54,7 @@ export class MenuComponent implements OnInit {
       return;
     }
 
-    runInInjectionContext(this._injector, () => menuItem.onAction());
+    runInInjectionContext(this._injector, () => void menuItem.onAction());
     this.closeMenu();
   }
 

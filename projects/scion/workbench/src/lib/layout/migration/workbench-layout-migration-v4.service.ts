@@ -22,7 +22,7 @@ import {MPartGridV4, MPartV4, MTreeNodeV4, MViewV4} from './model/workbench-layo
 export class WorkbenchLayoutMigrationV4 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const partGridV3: MPartGridV3 = JSON.parse(json);
+    const partGridV3 = JSON.parse(json) as MPartGridV3;
 
     // Migrate the grid.
     const partGridV4: MPartGridV4 = {

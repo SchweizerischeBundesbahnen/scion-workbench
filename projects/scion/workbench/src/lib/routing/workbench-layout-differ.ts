@@ -60,11 +60,11 @@ export class WorkbenchLayoutDiff {
   }
 
   public toString(): string {
-    return `${new Array<string>()
+    return new Array<string>()
       .concat(this.addedParts.length ? `addedParts=[${this.addedParts}]` : [])
       .concat(this.removedParts.length ? `removedParts=[${this.removedParts}]` : [])
       .concat(this.addedViews.length ? `addedViews=[${this.addedViews}]` : [])
       .concat(this.removedViews.length ? `removedViews=[${this.removedViews}]` : [])
-      .join(', ')}`;
+      .join(', ');
   }
 }

@@ -37,7 +37,7 @@ export class NotificationPageComponent {
   public form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
-    duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | number | undefined>(undefined),
+    duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | string | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
@@ -75,9 +75,9 @@ export class NotificationPageComponent {
       });
   }
 
-  private parseDurationFromUI(duration: 'short' | 'medium' | 'long' | 'infinite' | any): 'short' | 'medium' | 'long' | 'infinite' | number {
+  private parseDurationFromUI(duration: 'short' | 'medium' | 'long' | 'infinite' | string): 'short' | 'medium' | 'long' | 'infinite' | number {
     if (isNaN(Number(duration))) {
-      return duration;
+      return duration as 'short' | 'medium' | 'long' | 'infinite';
     }
     return Number(duration);
   }

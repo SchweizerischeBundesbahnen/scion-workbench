@@ -29,7 +29,7 @@ export default class SizeTestPageComponent {
   protected sizes = signal<string[]>([]);
 
   constructor() {
-    boundingClientRect$(inject(ElementRef<HTMLElement>))
+    boundingClientRect$(inject(ElementRef) as ElementRef<HTMLElement>)
       .pipe(takeUntilDestroyed())
       .subscribe(({x, y, width, height}) => {
         this.sizes.update(array => array.concat(`x=${Math.floor(x)}, y=${Math.floor(y)}, width=${width}, height=${height}`));

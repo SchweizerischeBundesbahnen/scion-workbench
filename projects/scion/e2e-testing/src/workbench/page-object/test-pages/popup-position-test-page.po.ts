@@ -26,7 +26,7 @@ export class PopupPositionTestPagePO implements WorkbenchViewPagePO {
   public readonly marginLeft: Locator;
 
   constructor(appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-popup-position-test-page');
     this.openButton = this.locator.locator('button.e2e-open');
     this.marginTop = this.locator.locator('input.e2e-margin-top');

@@ -7,8 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {PartId} from '@scion/workbench';
+import {booleanAttribute} from '@angular/core';
 
 /**
  * Provides query parameters to instrument the startup of the workbench testing app.
@@ -68,21 +68,21 @@ export const WorkbenchStartupQueryParams = {
    * Reads the query param to set the workbench launching strategy.
    */
   launcher: (): 'APP_INITIALIZER' | 'LAZY' | undefined => {
-    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM) as 'APP_INITIALIZER' | 'LAZY' ?? undefined;
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.LAUNCHER_QUERY_PARAM) as 'APP_INITIALIZER' | 'LAZY' | null ?? undefined;
   },
 
   /**
    * Reads the query param to set the scope for workbench application-modal dialogs.
    */
   dialogModalityScope: (): 'workbench' | 'viewport' | undefined => {
-    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.DIALOG_MODALITY_SCOPE) as 'workbench' | 'viewport' ?? undefined;
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.DIALOG_MODALITY_SCOPE) as 'workbench' | 'viewport' | null ?? undefined;
   },
 
   /**
    * Reads the query param to decide if to run the workbench standalone, or to start it with microfrontend support enabled.
    */
   standalone: (): boolean => {
-    return coerceBooleanProperty(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM));
+    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM));
   },
 
   /**
@@ -96,20 +96,20 @@ export const WorkbenchStartupQueryParams = {
    * Reads the query param if to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
    */
   confirmStartup: (): boolean => {
-    return coerceBooleanProperty(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.CONFIRM_STARTUP_QUERY_PARAM));
+    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.CONFIRM_STARTUP_QUERY_PARAM));
   },
 
   /**
    * Reads the query param if to throttle capability lookups to simulate slow capability retrievals.
    */
   simulateSlowCapabilityLookup: (): boolean => {
-    return coerceBooleanProperty(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP));
+    return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP));
   },
 
   /**
    * Reads the query param to control the identity of the initial part in the main area.
    */
   mainAreaInitialPartId: (): PartId | undefined => {
-    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID) as PartId ?? undefined;
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID) as PartId | null ?? undefined;
   },
 } as const;

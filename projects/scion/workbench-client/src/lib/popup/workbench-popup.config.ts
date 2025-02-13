@@ -22,23 +22,18 @@ export interface WorkbenchPopupConfig {
   /**
    * Controls where to open the popup.
    *
-   * Provide either a coordinate or an element to serve as the popup anchor. The align setting can be used to control
-   * the region where to open the popup relative to the anchor.
+   * Can be an HTML element or coordinates:
+   * - Using an element: The popup opens and sticks to the element.
+   * - Using coordinates: The popup opens and sticks relative to the view or page bounds.
    *
-   * If you use an element as the popup anchor, the popup also moves when the anchor element moves. If you use a coordinate
-   * and open the popup in the context of a view, the popup opens relative to the bounds of that view. Otherwise, it
-   * is positioned relative to the page viewport. If you move or resize the view or the page, the popup will also be moved
-   * depending on the pair of coordinates used.
+   * Supported coordinate pairs:
+   * - x/y: Relative to the top/left corner of the view or page.
+   * - top/left: Same as x/y.
+   * - top/right: Relative to the top/right corner.
+   * - bottom/left: Relative to the bottom/left corner.
+   * - bottom/right: Relative to the bottom/right corner.
    *
-   * The following coordinate pairs are supported:
-   * - x/y: relative to the "top/left" corner of the view or page viewport
-   * - top/left: equivalent to passing a "x/y" coordinate
-   * - top/right: relative to the "top/right" corner of the view or page viewport
-   * - bottom/left: relative to the "bottom/left" corner of the view or page viewport
-   * - bottom/right: relative to the "bottom/right" corner of the view or page viewport
-   *
-   * Positioning the popup using coordinates allows to pass an Observable to update the popup position. Note that the popup
-   * will not display until the Observable emits the first coordinate.
+   * Coordinates can be updated using an Observable. The popup displays when the Observable emits the first coordinate.
    */
   anchor: Element | PopupOrigin | Observable<PopupOrigin>;
   /**

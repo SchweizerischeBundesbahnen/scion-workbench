@@ -243,7 +243,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   /** @inheritDoc */
   public close(target?: 'self' | 'all-views' | 'other-views' | 'views-to-the-right' | 'views-to-the-left'): Promise<boolean> {
     assertNotInReactiveContext(this.close, 'Call WorkbenchView.close() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    switch (target || 'self') {
+    switch (target ?? 'self') {
       case 'self': {
         return this._workbenchService.closeViews(this.id);
       }

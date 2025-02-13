@@ -33,7 +33,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
-  private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>;
+  private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
 
   public readonly alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
@@ -46,7 +46,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
 
-  constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) {
+  constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
     this.alternativeId = layout.part({partId: this.id}).alternativeId;
     this._partComponent = options.component;
     this.actions = this.computePartActions();
@@ -58,7 +58,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   /**
    * Constructs the portal using the given injection context.
    */
-  public createPortalFromInjectionContext(injectionContext: Injector): ComponentPortal<PartComponent | MainAreaPartComponent> {
+  public createPortalFromInjectionContext(injectionContext: Injector): ComponentPortal<PartComponent | MainAreaPartComponent> { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
     const injector = Injector.create({
       parent: injectionContext,
       providers: [
@@ -240,9 +240,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 /**
  * Represents a pseudo-type for the actual {@link PartComponent} which must not be referenced in order to avoid import cycles.
  */
-type PartComponent = any;
+type PartComponent = unknown;
 
 /**
  * Represents a pseudo-type for the actual {@link MainAreaPartComponent} which must not be referenced in order to avoid import cycles.
  */
-type MainAreaPartComponent = any;
+type MainAreaPartComponent = unknown;

@@ -67,7 +67,7 @@ export class WorkbenchUrlObserver {
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
     const context = this.createWorkbenchNavigationContext(event.url);
-    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff.toString()}, outletDiff=${context.outletDiff.toString()}]`);
+    this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff}, outletDiff=${context.outletDiff}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
     this.registerAddedOutletAuxiliaryRoutes();
     this.registerAddedWorkbenchParts();
@@ -308,7 +308,7 @@ export class WorkbenchUrlObserver {
     const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
     if (layout.mainAreaGrid?.migrated) {
       // Update the URL with the migrated URL and clear existing query params, for example, if the layout query parameter has been renamed.
-      this._workbenchRouter.navigate(layout => layout, {queryParamsHandling: null, replaceUrl: true}).then();
+      void this._workbenchRouter.navigate(layout => layout, {queryParamsHandling: null, replaceUrl: true});
     }
   }
 

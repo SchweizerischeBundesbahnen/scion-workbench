@@ -20,25 +20,21 @@ export class ConsoleAppender implements LogAppender {
   public onLogMessage(event: LogEvent): void {
     switch (event.level) {
       case LogLevel.DEBUG: {
-        this.hasConsole('debug') && console.debug(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
+        console.debug(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
         break;
       }
       case LogLevel.WARN: {
-        this.hasConsole('warn') && console.warn(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
+        console.warn(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
         break;
       }
       case LogLevel.ERROR: {
-        this.hasConsole('error') && console.error(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
+        console.error(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
         break;
       }
       default: {
-        this.hasConsole('log') && console.log(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
+        console.log(...[`[${event.logger}] ${event.messageSupplier()}`].concat(event.args));
         break;
       }
     }
-  }
-
-  private hasConsole(severity: 'debug' | 'warn' | 'log' | 'error'): boolean {
-    return console && typeof console[severity] === 'function';
   }
 }

@@ -123,11 +123,11 @@ export default class ViewPageComponent {
 
     if (selfNavigationGroup.controls.navigatePerParam.value) {
       Object.entries(params).forEach(([paramName, paramValue]) => {
-        this._router.navigate({}, {params: {[paramName]: paramValue}, paramsHandling: paramsHandling || undefined}).then();
+        void this._router.navigate({}, {params: {[paramName]: paramValue}, paramsHandling: paramsHandling || undefined});
       });
     }
     else {
-      this._router.navigate({}, {params, paramsHandling: paramsHandling || undefined}).then();
+      void this._router.navigate({}, {params, paramsHandling: paramsHandling || undefined});
     }
   }
 
@@ -185,7 +185,7 @@ export default class ViewPageComponent {
   private setInitialTitleFromParams(): void {
     const params = this.view.snapshot.params;
     if (params.has('initialTitle')) {
-      this.view.setTitle(params.get('initialTitle'));
+      this.view.setTitle(params.get('initialTitle') as string);
       // Restore title observer
       this.view.setTitle(this.form.controls.title.valueChanges);
     }

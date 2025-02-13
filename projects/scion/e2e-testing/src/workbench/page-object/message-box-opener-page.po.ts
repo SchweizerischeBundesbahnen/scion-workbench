@@ -29,7 +29,7 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
   private readonly _openButton: Locator;
 
   constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
-    this.view = this._appPO.view({viewId: locateBy?.viewId, cssClass: locateBy?.cssClass});
+    this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});
     this.locator = this.view.locator.locator('app-message-box-opener-page');
     this.closeAction = this.locator.locator('output.e2e-close-action');
     this.error = this.locator.locator('output.e2e-message-box-error');
@@ -46,9 +46,9 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
       throw Error('[PageObjectError] PageObject does not support the option `context`.');
     }
 
-    const componentMatch = content.match(/^component:(?<component>.+)$/);
+    const componentMatch = /^component:(?<component>.+)$/.exec(content);
     if (componentMatch) {
-      await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!['component']!);
+      await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!.component);
     }
     else {
       await this.locator.locator('input.e2e-message').fill(content);

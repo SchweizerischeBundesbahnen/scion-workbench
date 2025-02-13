@@ -24,7 +24,7 @@ import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {ViewMenuService} from '../../part/view-context-menu/view-menu.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {stringifyError} from '../../common/stringify-error.util';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
+import {MicrofrontendViewRoutes} from './microfrontend-view-routes';
 import {NgClass, NgComponentOutlet} from '@angular/common';
 import {ContentAsOverlayComponent, ContentAsOverlayConfig} from '../../content-projection/content-as-overlay.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -57,7 +57,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 })
 export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
-  private _host = inject(ElementRef<HTMLElement>);
+  private _host = inject(ElementRef).nativeElement as HTMLElement;
   private _route = inject(ActivatedRoute);
   private _outletRouter = inject(OutletRouter);
   private _manifestService = inject(ManifestService);
@@ -111,7 +111,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   private installNavigator(): void {
     this._route.params
       .pipe(
-        switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]).pipe(map(capability => ({capability, params})))),
+        switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string).pipe(map(capability => ({capability, params})))),
         serializeExecution(({capability, params}) => this.onNavigate(this.capability, capability, params)),
         takeUntilDestroyed(this._destroyRef),
       )
@@ -144,9 +144,9 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
     // When navigating to another view capability of the same app, wait until transported the params to the microfrontend before loading the
     // new microfrontend into the iframe, allowing the currently loaded microfrontend to clean up subscriptions.
-    if (prevCapability
-      && prevCapability.metadata!.appSymbolicName === capability.metadata!.appSymbolicName
-      && prevCapability.metadata!.id !== capability.metadata!.id) {
+    if (prevCapability &&
+      prevCapability.metadata!.appSymbolicName === capability.metadata!.appSymbolicName &&
+      prevCapability.metadata!.id !== capability.metadata!.id) {
       await this.waitForCapabilityParam(capability.metadata!.id);
     }
 
@@ -187,37 +187,31 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   private installParamsUpdater(viewCapability: WorkbenchViewCapability): void {
     this._unsubscribeParamsUpdater$.next();
     const subscription = this._messageClient.observe$<ɵViewParamsUpdateCommand>(ɵWorkbenchCommands.viewParamsUpdateTopic(this.view.id, viewCapability.metadata!.id))
-      .pipe(takeUntil(this._unsubscribeParamsUpdater$), takeUntilDestroyed(this._destroyRef))
-      .subscribe(async (request: TopicMessage<ɵViewParamsUpdateCommand>) => { // eslint-disable-line rxjs/no-async-subscribe
-        // We DO NOT navigate if the subscription was closed, e.g., because closed the view or navigated to another capability.
-        const replyTo = request.headers.get(MessageHeaders.ReplyTo);
+      .pipe(takeUntilDestroyed(this._destroyRef), takeUntil(this._unsubscribeParamsUpdater$))
+      .subscribe((request: TopicMessage<ɵViewParamsUpdateCommand>) => {
+        const replyTo = request.headers.get(MessageHeaders.ReplyTo) as string;
 
-        try {
-          const success = await this._workbenchRouter.navigate(layout => {
-            // Cancel pending navigation if the subscription was closed, e.g., because closed the view or navigated to another capability
-            if (subscription.closed) {
-              return null;
-            }
+        void this._workbenchRouter.navigate(layout => {
+          // Cancel navigation if the subscription was closed in the meantime, e.g., because closed the view or navigated to another capability.
+          if (subscription.closed) {
+            return null;
+          }
 
-            const paramsHandling = request.body!.paramsHandling;
-            const currentParams = this._route.snapshot.params;
-            const newParams = Dictionaries.coerce(request.body!.params); // coerce params for backward compatibility
-            const mergedParams = Objects.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
-            const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
+          const paramsHandling = request.body!.paramsHandling;
+          const currentParams = this._route.snapshot.params;
+          const newParams = Dictionaries.coerce(request.body!.params); // coerce params for backward compatibility
+          const mergedParams = Objects.withoutUndefinedEntries(paramsHandling === 'merge' ? {...currentParams, ...newParams} : newParams);
+          const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(mergedParams, viewCapability);
 
-            return layout.navigateView(this.view.id, [urlParams], {
-              relativeTo: this._route,
-              state: Objects.withoutUndefinedEntries({
-                [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
-              }),
-            });
+          return layout.navigateView(this.view.id, [urlParams], {
+            relativeTo: this._route,
+            state: Objects.withoutUndefinedEntries({
+              [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,
+            }),
           });
-
-          await this._messageClient.publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
-        }
-        catch (error) {
-          await this._messageClient.publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)});
-        }
+        })
+          .then(success => this._messageClient.publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)}))
+          .catch((error: unknown) => this._messageClient.publish(replyTo, stringifyError(error), {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.ERROR)}));
       });
   }
 
@@ -237,7 +231,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
       const active = this.view.active();
       untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
-        this._messageClient.publish(commandTopic, active, {retain: true}).then();
+        void this._messageClient.publish(commandTopic, active, {retain: true});
       });
     }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
@@ -247,7 +241,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
       const part = this.view.part();
       untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewPartIdTopic(this.view.id);
-        this._messageClient.publish(commandTopic, part.id, {retain: true}).then();
+        void this._messageClient.publish(commandTopic, part.id, {retain: true});
       });
     }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
@@ -284,7 +278,7 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
   protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
     if (focusWithin) {
-      this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+      this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
   }
 
@@ -331,10 +325,10 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
 
   private unload(): void {
     // Delete retained messages to free resources.
-    this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true}).then();
-    this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true}).then();
-    this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true}).then();
-    this._outletRouter.navigate(null, {outlet: this.view.id}).then();
+    void this._messageClient.publish(ɵWorkbenchCommands.viewActiveTopic(this.view.id), undefined, {retain: true});
+    void this._messageClient.publish(ɵWorkbenchCommands.viewParamsTopic(this.view.id), undefined, {retain: true});
+    void this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true});
+    void this._outletRouter.navigate(null, {outlet: this.view.id});
     this.view.unregisterAdapter(MicrofrontendWorkbenchView);
   }
 

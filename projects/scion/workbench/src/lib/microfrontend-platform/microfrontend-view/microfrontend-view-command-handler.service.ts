@@ -42,10 +42,10 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the title of a view.
    */
   private installViewTitleCommandHandler(): Subscription {
-    return this._messageClient.onMessage(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
+    return this._messageClient.onMessage<string>(ɵWorkbenchCommands.viewTitleTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.title = message.body;
+        view.title = message.body!;
       });
     });
   }
@@ -54,10 +54,10 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the heading of a view.
    */
   private installViewHeadingCommandHandler(): Subscription {
-    return this._messageClient.onMessage(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
+    return this._messageClient.onMessage<string>(ɵWorkbenchCommands.viewHeadingTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.heading = message.body;
+        view.heading = message.body!;
       });
     });
   }
@@ -66,10 +66,10 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the dirty state of a view.
    */
   private installViewDirtyCommandHandler(): Subscription {
-    return this._messageClient.onMessage(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
+    return this._messageClient.onMessage<boolean>(ɵWorkbenchCommands.viewDirtyTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.dirty = message.body;
+        view.dirty = message.body!;
       });
     });
   }
@@ -78,10 +78,10 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    * Handles commands to update the closable property of a view.
    */
   private installViewClosableCommandHandler(): Subscription {
-    return this._messageClient.onMessage(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
+    return this._messageClient.onMessage<boolean>(ɵWorkbenchCommands.viewClosableTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.closable = message.body;
+        view.closable = message.body!;
       });
     });
   }
@@ -93,7 +93,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
     return this._messageClient.onMessage(ɵWorkbenchCommands.viewCloseTopic(':viewId'), message => {
       const viewId = message.params!.get('viewId') as ViewId;
       this.runIfPrivileged(viewId, message, view => {
-        view.close().then();
+        void view.close();
       });
     });
   }
@@ -104,7 +104,7 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
    */
   private runIfPrivileged(viewId: ViewId, message: Message, runnable: (view: WorkbenchView) => void): void {
     const view = this._viewRegistry.get(viewId);
-    const sender = message.headers.get(MessageHeaders.AppSymbolicName);
+    const sender = message.headers.get(MessageHeaders.AppSymbolicName) as string;
     if (view.adapt(MicrofrontendWorkbenchView)?.capability.metadata!.appSymbolicName === sender) {
       runnable(view);
     }

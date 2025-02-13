@@ -32,7 +32,7 @@ export class WorkbenchDialogHeaderDirective implements OnDestroy {
 
   /**
    * Specifies if to display a visual separator between this header and the dialog content.
-   * Default is `true`.
+   * Defaults to `true`.
    */
   @Input({transform: booleanAttribute})
   public divider?: boolean;

@@ -92,7 +92,7 @@ export default class CreatePerspectivePageComponent {
     try {
       await this._workbenchService.registerPerspective({
         id: this.form.controls.id.value,
-        transient: this.form.controls.transient.value || undefined,
+        transient: this.form.controls.transient.value ? true : undefined,
         data: SciKeyValueFieldComponent.toDictionary(this.form.controls.data) ?? undefined,
         layout: this.createLayout(),
       });
@@ -120,9 +120,9 @@ export default class CreatePerspectivePageComponent {
       // Add other parts.
       for (const part of parts) {
         layout = layout.addPart(part.id, {
-          relativeTo: part.relativeTo!.relativeTo,
-          align: part.relativeTo!.align!,
-          ratio: part.relativeTo!.ratio,
+          relativeTo: part.relativeTo.relativeTo,
+          align: part.relativeTo.align!,
+          ratio: part.relativeTo.ratio,
         }, {activate: part.options?.activate});
       }
 

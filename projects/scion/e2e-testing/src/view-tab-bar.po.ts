@@ -23,7 +23,7 @@ export class ViewTabBarPO {
    * Gets the view ids of the tabs in display order.
    */
   public async getViewIds(locateBy?: {cssClass?: string; visible?: true}): Promise<string[]> {
-    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy?.cssClass}` : ':scope';
+    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
     const viewIds = [];
     for (const viewTabLocator of await this.locator.locator('wb-view-tab').locator(locateByCssClass).all()) {
       if (locateBy?.visible && !await viewTabLocator.isVisible()) {

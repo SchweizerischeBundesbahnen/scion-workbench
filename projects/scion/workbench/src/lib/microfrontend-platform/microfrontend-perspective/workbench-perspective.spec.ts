@@ -49,6 +49,21 @@ describe('Workbench Perspective', () => {
     await expectAsync(result).toBeRejectedWithError(/NullQualifierError/);
   });
 
+  it('should error if not having properties', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({microfrontendPlatform: {applications: []}}),
+      ],
+    });
+    await TestBed.inject(WorkbenchLauncher).launch();
+
+    const result = TestBed.inject(ManifestService).registerCapability({
+      type: WorkbenchCapabilities.Perspective,
+      qualifier: {perspective: 'testee'},
+    });
+    await expectAsync(result).toBeRejectedWithError(/NullPropertiesError/);
+  });
+
   it('should error if not having a layout', async () => {
     TestBed.configureTestingModule({
       providers: [
@@ -60,6 +75,7 @@ describe('Workbench Perspective', () => {
     const result = TestBed.inject(ManifestService).registerCapability({
       type: WorkbenchCapabilities.Perspective,
       qualifier: {perspective: 'testee'},
+      properties: {},
     });
     await expectAsync(result).toBeRejectedWithError(/NullLayoutError/);
   });

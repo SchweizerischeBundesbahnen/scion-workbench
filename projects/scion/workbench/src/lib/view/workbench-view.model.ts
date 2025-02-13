@@ -94,7 +94,7 @@ export abstract class WorkbenchView {
   public abstract set dirty(dirty: boolean);
 
   /**
-   * Controls whether the view can be closed. Default is `true`.
+   * Controls whether the view can be closed. Defaults to `true`.
    */
   public abstract get closable(): Signal<boolean>;
   public abstract set closable(closable: boolean);

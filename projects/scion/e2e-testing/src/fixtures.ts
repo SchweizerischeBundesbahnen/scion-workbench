@@ -20,7 +20,7 @@ import {test as playwrightTest} from '@playwright/test';
  *
  * @see https://playwright.dev/docs/test-fixtures
  */
-export type TestFixtures = {
+export interface TestFixtures {
   /**
    * Central PO to interact with the workbench.
    */
@@ -41,7 +41,7 @@ export type TestFixtures = {
    * Provides dialogs (e.g. alerts) opened during test execution.
    */
   browserDialogs: BrowserDialogs;
-};
+}
 
 export const test = playwrightTest.extend<TestFixtures>({
   appPO: async ({page}, use) => {

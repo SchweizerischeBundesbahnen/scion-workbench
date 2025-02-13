@@ -9,4 +9,4 @@
  */
 
 export {WorkbenchLauncher, WorkbenchStartup} from './workbench-launcher.service';
-export {WorkbenchInitializer, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_POST_STARTUP} from './workbench-initializer';
+export {WorkbenchInitializer, WorkbenchInitializerFn, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_POST_STARTUP} from './workbench-initializer';

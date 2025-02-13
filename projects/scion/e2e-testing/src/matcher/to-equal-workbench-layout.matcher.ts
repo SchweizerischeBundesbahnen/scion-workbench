@@ -23,7 +23,7 @@ export async function toEqualWorkbenchLayout(locator: Locator, expected: Expecte
     await retryOnError(() => assertWorkbenchLayout(expected, locator));
     return {pass: true, message: () => 'passed'};
   }
-  catch (error: unknown) {
+  catch (error) {
     return {pass: false, message: () => error instanceof Error ? error.message : `${error}`};
   }
 }
@@ -90,7 +90,7 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
     await throwIfAbsent(gridElementLocator, () => Error(`[DOMAssertError] Expected element '${sashboxSelector}' to be in the DOM, but is not. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${gridElementLocator}]`));
   }
   else {
-    const sashboxLocator = gridElementLocator.locator(`${sashboxSelector}`);
+    const sashboxLocator = gridElementLocator.locator(sashboxSelector);
     await throwIfPresent(sashboxLocator, () => Error(`[DOMAssertError] Expected element 'wb-grid-element' not to contain a 'sci-sashbox' because having a single child. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${sashboxLocator}]`));
   }
 
@@ -99,7 +99,7 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
   const child1Locator = gridElementLocator.locator(child1Selector);
   if (expectedTreeNode.child1) {
     await throwIfAbsent(child1Locator, () => Error(`[DOMAssertError] Expected element '${child1Selector}' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`));
-    await assertGridElement(expectedTreeNode.child1!, child1Locator, expectedWorkbenchLayout);
+    await assertGridElement(expectedTreeNode.child1, child1Locator, expectedWorkbenchLayout);
   }
   else {
     await throwIfPresent(child1Locator, () => Error(`[DOMAssertError] Expected element '${child1Selector}' not to be in the DOM, but is. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`));
@@ -110,14 +110,14 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
   const child2Locator = gridElementLocator.locator(child2Selector);
   if (expectedTreeNode.child2) {
     await throwIfAbsent(child2Locator, () => Error(`[DOMAssertError] Expected element '${child2Selector}' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child2Locator}]`));
-    await assertGridElement(expectedTreeNode.child2!, child2Locator, expectedWorkbenchLayout);
+    await assertGridElement(expectedTreeNode.child2, child2Locator, expectedWorkbenchLayout);
   }
   else {
     await throwIfPresent(child2Locator, () => Error(`[DOMAssertError] Expected element '${child2Selector}' not to be in the DOM, but is. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child2Locator}]`));
   }
 
   // Assert sash bounding box.
-  await assertSashBoundingBox({...expectedTreeNode, nodeId}, gridElementLocator);
+  await assertSashBoundingBox({...expectedTreeNode, nodeId}, gridElementLocator); // eslint-disable-line @typescript-eslint/no-misused-spread
 }
 
 /**
@@ -173,53 +173,57 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
 
   const gridElementBoundingBox = (await gridElementLocator.boundingBox())!;
   if (expectedTreeNode.child1 && expectedTreeNode.child2) {
-    if (expectedTreeNode.direction === 'row') {
-      // Expect bounding box of sash 1.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child1Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x,
-          y: gridElementBoundingBox.y,
-          width: gridElementBoundingBox.width * expectedTreeNode.ratio,
-          height: gridElementBoundingBox.height,
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
-      });
-      // Expect bounding box of sash 2.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child2Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x + (gridElementBoundingBox.width * expectedTreeNode.ratio),
-          y: gridElementBoundingBox.y,
-          width: gridElementBoundingBox.width * (1 - expectedTreeNode.ratio),
-          height: gridElementBoundingBox.height,
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child2Locator}]`,
-      });
-    }
-    else if (expectedTreeNode.direction === 'column') {
-      // Expect bounding box of sash 1.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child1Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x,
-          y: gridElementBoundingBox.y,
-          width: gridElementBoundingBox.width,
-          height: gridElementBoundingBox.height * expectedTreeNode.ratio,
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
-      });
-      // Expect bounding box of sash 2.
-      await throwIfBoundingBoxNotCloseTo({
-        actual: await child2Locator.boundingBox(),
-        expected: {
-          x: gridElementBoundingBox.x,
-          y: gridElementBoundingBox.y + (gridElementBoundingBox.height * expectedTreeNode.ratio),
-          width: gridElementBoundingBox.width,
-          height: gridElementBoundingBox.height * (1 - expectedTreeNode.ratio),
-        },
-        context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child1Locator}]`,
-      });
+    switch (expectedTreeNode.direction) {
+      case 'row': {
+        // Expect bounding box of sash 1.
+        await throwIfBoundingBoxNotCloseTo({
+          actual: await child1Locator.boundingBox(),
+          expected: {
+            x: gridElementBoundingBox.x,
+            y: gridElementBoundingBox.y,
+            width: gridElementBoundingBox.width * expectedTreeNode.ratio,
+            height: gridElementBoundingBox.height,
+          },
+          context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
+        });
+        // Expect bounding box of sash 2.
+        await throwIfBoundingBoxNotCloseTo({
+          actual: await child2Locator.boundingBox(),
+          expected: {
+            x: gridElementBoundingBox.x + (gridElementBoundingBox.width * expectedTreeNode.ratio),
+            y: gridElementBoundingBox.y,
+            width: gridElementBoundingBox.width * (1 - expectedTreeNode.ratio),
+            height: gridElementBoundingBox.height,
+          },
+          context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child2Locator}]`,
+        });
+        break;
+      }
+      case 'column': {
+        // Expect bounding box of sash 1.
+        await throwIfBoundingBoxNotCloseTo({
+          actual: await child1Locator.boundingBox(),
+          expected: {
+            x: gridElementBoundingBox.x,
+            y: gridElementBoundingBox.y,
+            width: gridElementBoundingBox.width,
+            height: gridElementBoundingBox.height * expectedTreeNode.ratio,
+          },
+          context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`,
+        });
+        // Expect bounding box of sash 2.
+        await throwIfBoundingBoxNotCloseTo({
+          actual: await child2Locator.boundingBox(),
+          expected: {
+            x: gridElementBoundingBox.x,
+            y: gridElementBoundingBox.y + (gridElementBoundingBox.height * expectedTreeNode.ratio),
+            width: gridElementBoundingBox.width,
+            height: gridElementBoundingBox.height * (1 - expectedTreeNode.ratio),
+          },
+          context: () => `Did you set direction and ratio of the expected tree node correctly? [${expectedTreeNode.child2!.type}=${JSON.stringify(expectedTreeNode.child2)}, locator=${child1Locator}]`,
+        });
+        break;
+      }
     }
   }
   else if (expectedTreeNode.child1) {
@@ -273,7 +277,7 @@ async function throwIfAbsent(locator: Locator, error: () => Error): Promise<void
  */
 async function throwIfBoundingBoxNotCloseTo(args: {actual: BoundingBox | null | undefined; expected: BoundingBox; context: () => string}): Promise<void> {
   const {actual, expected, context} = args;
-  const actualBounds = actual || {width: 0, height: 0, x: 0, y: 0};
+  const actualBounds = actual ?? {width: 0, height: 0, x: 0, y: 0};
 
   if (actualBounds.width < (expected.width - 1) || actualBounds.width > (expected.width + 1)) {
     throw Error(`[DOMAssertError] Expected element width '${actualBounds.width}' to be close to ${expected.width}, but was not. ${context()}`);
@@ -295,9 +299,6 @@ async function throwIfBoundingBoxNotCloseTo(args: {actual: BoundingBox | null | 
 function isEqualArray(array1: Array<unknown>, array2: Array<unknown>): boolean {
   if (array1 === array2) {
     return true;
-  }
-  if (!array1 || !array2) {
-    return false;
   }
   if (array1.length !== array2.length) {
     return false;

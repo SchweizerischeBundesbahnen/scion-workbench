@@ -17,7 +17,7 @@ import {ConsoleAppender} from './console-appender.service';
  * Provides a set of DI providers for installing workbench logging.
  */
 export function provideLogging(workbenchConfig: WorkbenchConfig): EnvironmentProviders {
-  const logAppenders: Type<LogAppender>[] = workbenchConfig.logging?.logAppenders || [ConsoleAppender];
+  const logAppenders: Type<LogAppender>[] = workbenchConfig.logging?.logAppenders ?? [ConsoleAppender];
   return makeEnvironmentProviders([
     logAppenders.map((logAppender: Type<LogAppender>): Provider => ({
       provide: LogAppender,

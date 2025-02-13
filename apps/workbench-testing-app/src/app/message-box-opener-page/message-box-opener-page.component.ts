@@ -60,13 +60,13 @@ export default class MessageBoxOpenerPageComponent {
 
     await this.openMessageBox()
       .then(closeAction => this.closeAction = closeAction)
-      .catch(error => this.messageBoxError = stringifyError(error));
+      .catch((error: unknown) => this.messageBoxError = stringifyError(error));
   }
 
   private openMessageBox(): Promise<string> {
     const options: WorkbenchMessageBoxOptions = {
       title: this.restoreLineBreaks(this.form.controls.options.controls.title.value) || undefined,
-      actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.actions) || undefined,
+      actions: SciKeyValueFieldComponent.toDictionary(this.form.controls.options.controls.actions) ?? undefined,
       severity: this.form.controls.options.controls.severity.value || undefined,
       modality: this.form.controls.options.controls.modality.value || undefined,
       contentSelectable: this.form.controls.options.controls.contentSelectable.value || undefined,

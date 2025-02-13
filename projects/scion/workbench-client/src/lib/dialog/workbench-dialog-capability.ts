@@ -93,11 +93,11 @@ export interface WorkbenchDialogCapability extends Capability {
      */
     title?: string;
     /**
-     * Specifies if to display a close button in the dialog header. Default is `true`.
+     * Specifies if to display a close button in the dialog header. Defaults to `true`.
      */
     closable?: boolean;
     /**
-     * Specifies if the user can resize the dialog. Default is `true`.
+     * Specifies if the user can resize the dialog. Defaults to `true`.
      */
     resizable?: boolean;
     /**

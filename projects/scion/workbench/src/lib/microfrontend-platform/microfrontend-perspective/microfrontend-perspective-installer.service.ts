@@ -17,7 +17,7 @@ import {WorkbenchLayout} from '../../layout/workbench-layout';
 import {WorkbenchLayoutFn} from '../../perspective/workbench-perspective.model';
 import {firstValueFrom} from 'rxjs';
 import {WorkbenchLayoutFactory} from '../../layout/workbench-layout.factory';
-import {MicrofrontendViewRoutes} from '../routing/microfrontend-view-routes';
+import {MicrofrontendViewRoutes} from '../microfrontend-view/microfrontend-view-routes';
 import {Logger, LoggerNames} from '../../logging';
 import {filterArray} from '@scion/toolkit/operators';
 import {Objects} from '../../common/objects.util';
@@ -41,7 +41,7 @@ export class MicrofrontendPerspectiveInstaller {
       .pipe(takeUntilDestroyed())
       .subscribe(perspectiveCapabilities => {
         const changes = differ.diff(perspectiveCapabilities);
-        changes?.forEachAddedItem(({item: perspectiveCapability}) => this.registerPerspective(perspectiveCapability));
+        changes?.forEachAddedItem(({item: perspectiveCapability}) => void this.registerPerspective(perspectiveCapability));
       });
   }
 
@@ -50,7 +50,7 @@ export class MicrofrontendPerspectiveInstaller {
       id: perspectiveCapability.metadata!.id,
       layout: this.createLayout(perspectiveCapability),
       data: {
-        ...perspectiveCapability.properties?.data,
+        ...perspectiveCapability.properties.data,
         [WorkbenchPerspectiveData.capability]: perspectiveCapability,
       },
     });

@@ -258,14 +258,14 @@ describe('View Menu', () => {
     const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
 
     // Expect initial inputs.
-    const menuItemComponent1 = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+    const menuItemComponent1 = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
     expect(menuItemComponent1.input1()).toEqual('value 1');
     expect(menuItemComponent1.input2()).toEqual('value 2');
 
     // Change input.
     input1.set('value 3');
     await fixture.whenStable();
-    const menuItemComponent2 = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+    const menuItemComponent2 = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
     expect(menuItemComponent2).not.toBe(menuItemComponent1);
     expect(menuItemComponent2.input1()).toEqual('value 3');
     expect(menuItemComponent2.input2()).toEqual('value 2');
@@ -273,7 +273,7 @@ describe('View Menu', () => {
     // Change input.
     input2.set('value 4');
     await fixture.whenStable();
-    const menuItemComponent3 = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+    const menuItemComponent3 = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
     expect(menuItemComponent3).not.toBe(menuItemComponent2);
     expect(menuItemComponent3.input1()).toEqual('value 3');
     expect(menuItemComponent3.input2()).toEqual('value 4');
@@ -415,7 +415,7 @@ describe('View Menu', () => {
     // Register menu item.
     TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
       content: SpecMenuItemComponent,
-      onAction: () => inject(WorkbenchView).close(),
+      onAction: () => void inject(WorkbenchView).close(),
       disabled: disabled(),
       cssClass: 'testee',
     }));
@@ -429,7 +429,7 @@ describe('View Menu', () => {
     await fixture.whenStable();
 
     // Expect menu item to be disabled.
-    expect((getMenuItem(contextMenu, {cssClass: 'testee'}).nativeElement as HTMLButtonElement).disabled).toBeTrue();
+    expect((getMenuItem(contextMenu, {cssClass: 'testee'})!.nativeElement as HTMLButtonElement).disabled).toBeTrue();
 
     // Click menu item.
     await clickMenuItem(contextMenu, {cssClass: 'testee'});
@@ -440,7 +440,7 @@ describe('View Menu', () => {
     await fixture.whenStable();
 
     // Expect menu item to be enabled.
-    expect((getMenuItem(contextMenu, {cssClass: 'testee'}).nativeElement as HTMLButtonElement).disabled).toBeFalse();
+    expect((getMenuItem(contextMenu, {cssClass: 'testee'})!.nativeElement as HTMLButtonElement).disabled).toBeFalse();
 
     // Click menu item.
     await clickMenuItem(contextMenu, {cssClass: 'testee'});
@@ -623,7 +623,7 @@ describe('View Menu', () => {
 
       // Open context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
-      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
 
       // Expect DI token to be available.
       expect(menuItemComponent.injector.get(diToken)).toEqual('value');
@@ -689,7 +689,7 @@ describe('View Menu', () => {
 
       // Open context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
-      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
 
       // Expect WorkbenchView to be passed as default local template variable.
       expect(menuItemComponent.defaultLocalTemplateVariable()).toBe(TestBed.inject(WorkbenchService).getView('view.100'));
@@ -786,7 +786,7 @@ describe('View Menu', () => {
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
 
       // Expect menu item to render.
-      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
       expect(menuItemComponent.input1()).toEqual('value 1');
       expect(menuItemComponent.input2()).toEqual('value 2');
     });
@@ -836,7 +836,7 @@ describe('View Menu', () => {
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
 
       // Expect DI token to be available.
-      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
       expect(menuItemComponent.injector.get(diToken)).toEqual('value');
 
       // Expect view can be injected.
@@ -879,7 +879,7 @@ describe('View Menu', () => {
 
       // Open context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
-      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent});
+      const menuItemComponent = getMenuItemComponent(contextMenu, {cssClass: 'testee', component: SpecMenuItemComponent})!;
 
       // Expect WorkbenchPart can be injected.
       expect(menuItemComponent.injector.get(WorkbenchPart)).toBe(TestBed.inject(WorkbenchService).getPart('part.part'));
@@ -1151,20 +1151,20 @@ async function openViewContextMenu(fixture: ComponentFixture<unknown>, locator: 
   return fixture.debugElement.parent!.query(By.css('div.cdk-overlay-pane wb-view-menu'));
 }
 
-function getMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): DebugElement {
+function getMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): DebugElement | null {
   return contextMenu.query(By.css(`button.menu-item.${locator.cssClass}`));
 }
 
 function getMenuItemText(contextMenu: DebugElement, locator: {cssClass: string}): string | null {
-  return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).nativeElement.innerText ?? null;
+  return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).nativeElement.innerText as string | undefined ?? null;
 }
 
-function getMenuItemComponent<T>(contextMenu: DebugElement, locator: {cssClass: string; component: ComponentType<T>}): T {
-  return getMenuItem(contextMenu, locator).query(By.css('wb-menu-item')).query(By.directive(locator.component)).componentInstance;
+function getMenuItemComponent<T>(contextMenu: DebugElement, locator: {cssClass: string; component: ComponentType<T>}): T | null {
+  return getMenuItem(contextMenu, locator)?.query(By.css('wb-menu-item')).query(By.directive(locator.component)).componentInstance as T | undefined ?? null;
 }
 
 async function clickMenuItem(contextMenu: DebugElement, locator: {cssClass: string}): Promise<void> {
-  const menuItem = getMenuItem(contextMenu, locator);
+  const menuItem = getMenuItem(contextMenu, locator)!;
   menuItem.nativeElement.dispatchEvent(new MouseEvent('click'));
   await waitUntilStable();
 }

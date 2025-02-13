@@ -18,15 +18,22 @@ export const Objects = {
   /**
    * Like {@link Object.keys}, but preserving the data type of keys.
    */
-  keys: <T>(object: T): Array<keyof T> => {
-    return Object.keys(object as Record<keyof T, unknown>) as Array<keyof T>;
+  keys: <T, P extends keyof T>(object: T): P[] => {
+    return Object.keys(object as Record<P, unknown>) as Array<P>;
   },
 
   /**
-   * Like {@link Object.entries}, but preserving the data type of keys.
+   * Like {@link Object.values}, but preserving the data type of values and supporting optional properties.
    */
-  entries: <V, K = string>(object: Record<string, V> | ArrayLike<V>): Array<[K, V]> => {
-    return Object.entries(object) as Array<[K, V]>;
+  values: <T, P extends keyof T>(object: T): Array<T[P]> => {
+    return Object.values(object as Record<P, T[P]>);
+  },
+
+  /**
+   * Like {@link Object.entries}, but preserving the data type of keys and supporting optional properties.
+   */
+  entries: <T, P extends keyof T>(object: T): Array<[P, T[P]]> => {
+    return Object.entries(object as Record<P, T[P]>) as Array<[P, T[P]]>;
   },
 
   /**

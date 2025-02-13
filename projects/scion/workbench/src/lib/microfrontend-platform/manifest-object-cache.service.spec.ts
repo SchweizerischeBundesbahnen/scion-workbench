@@ -76,7 +76,7 @@ describe('ManifestObjectCache', () => {
           }
           return capability;
         }
-      },
+      }(),
       multi: true,
     });
 

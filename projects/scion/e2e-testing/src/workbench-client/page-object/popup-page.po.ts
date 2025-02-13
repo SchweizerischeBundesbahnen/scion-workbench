@@ -44,7 +44,7 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-popup-capability'));
     await accordion.expand();
     try {
-      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText());
+      return JSON.parse(await accordion.itemLocator().locator('div.e2e-popup-capability').innerText()) as WorkbenchPopupCapability;
     }
     finally {
       await accordion.collapse();
@@ -88,7 +88,7 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-route-fragment'));
     await accordion.expand();
     try {
-      return accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
+      return await accordion.itemLocator().locator('span.e2e-route-fragment').innerText();
     }
     finally {
       await accordion.collapse();

@@ -17,7 +17,7 @@ import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Arrays, Dictionaries} from '@scion/toolkit/util';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
+import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Objects} from '../../common/objects.util';
 
 /**
@@ -38,7 +38,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
    */
   public intercept(intentMessage: IntentMessage, next: Handler<IntentMessage>): Promise<void> {
     if (intentMessage.intent.type === WorkbenchCapabilities.View) {
-      return this.consumeViewIntent(intentMessage);
+      return this.consumeViewIntent(intentMessage as IntentMessage<WorkbenchNavigationExtras | undefined>);
     }
     else {
       return next.handle(intentMessage);
@@ -46,7 +46,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
   }
 
   private async consumeViewIntent(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<void> {
-    const replyTo = message.headers.get(MessageHeaders.ReplyTo);
+    const replyTo = message.headers.get(MessageHeaders.ReplyTo) as string;
     const success = await this.navigate(message);
     await Beans.get(MessageClient).publish(replyTo, success, {headers: new Map().set(MessageHeaders.Status, ResponseStatusCodes.TERMINAL)});
   }
@@ -122,7 +122,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
         // Test whether all "navigational" params match.
         return requiredParams.every(name => {
-          const intentParamValue = intentMessage.intent.params!.get(name);
+          const intentParamValue = intentMessage.intent.params!.get(name) as unknown;
           return (matchWildcardParams && intentParamValue === '*') || intentParamValue === microfrontendWorkbenchView.params[name];
         });
       })

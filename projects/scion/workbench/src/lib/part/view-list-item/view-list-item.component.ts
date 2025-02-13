@@ -48,11 +48,11 @@ export class ViewListItemComponent {
   }
 
   public onClose(): void {
-    this.view.close().then();
+    void this.view.close();
   }
 
   private createViewTabContentPortal(): ComponentPortal<unknown> {
-    const componentType = this._workbenchConfig.viewTabComponent || ViewTabContentComponent;
+    const componentType = this._workbenchConfig.viewTabComponent ?? ViewTabContentComponent;
     return new ComponentPortal(componentType, null, Injector.create({
       parent: this._injector,
       providers: [

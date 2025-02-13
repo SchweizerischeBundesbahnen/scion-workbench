@@ -43,6 +43,6 @@ export class PublishMesagePageComponent {
         this.publishError = false;
         this.form.reset();
       })
-      .catch(error => this.publishError = stringifyError(error));
+      .catch((error: unknown) => this.publishError = stringifyError(error));
   }
 }

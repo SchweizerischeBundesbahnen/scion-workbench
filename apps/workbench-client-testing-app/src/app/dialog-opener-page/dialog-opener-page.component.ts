@@ -71,7 +71,7 @@ export default class DialogOpenerPageComponent {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
     this._dialogService.open<string>(qualifier, this.readOptions())
       .then(result => this.returnValue = result)
-      .catch(error => this.dialogError = stringifyError(error) || 'Dialog was closed with an error');
+      .catch((error: unknown) => this.dialogError = stringifyError(error) || 'Dialog was closed with an error');
   }
 
   /**

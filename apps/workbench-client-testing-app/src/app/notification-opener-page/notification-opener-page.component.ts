@@ -66,7 +66,7 @@ export default class NotificationOpenerPageComponent {
       group: this.form.controls.group.value || undefined,
       cssClass: this.form.controls.cssClass.value,
     }, qualifier ?? undefined)
-      .catch(error => this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened');
+      .catch((error: unknown) => this.notificationOpenError = stringifyError(error) || 'Workbench Notification could not be opened');
   }
 
   private parseDurationFromUI(): 'short' | 'medium' | 'long' | 'infinite' | number | undefined {

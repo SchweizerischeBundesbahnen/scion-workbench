@@ -30,7 +30,7 @@ class NotificationPageIntentHandler {
   }
 }
 
-function addNotificationCount(prevInput: Map<string, any>, currInput: Map<string, any>): Map<string, any> {
+function addNotificationCount(prevInput: Map<string, number>, currInput: Map<string, number>): Map<string, number> {
   const count = prevInput.get('count') ?? 1;
   return new Map(currInput).set('count', count + 1);
 }

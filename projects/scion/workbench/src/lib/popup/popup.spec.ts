@@ -28,7 +28,7 @@ describe('Popup', () => {
     await waitForInitialWorkbenchLayout();
 
     // Open popup.
-    TestBed.inject(PopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}}).then();
+    void TestBed.inject(PopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
     await waitUntilStable();
 
     // Get reference to the popup injector.
@@ -71,14 +71,14 @@ describe('Popup', () => {
     });
 
     // Open popup.
-    TestBed.inject(PopupService).open({
+    void TestBed.inject(PopupService).open({
       component: SpecPopupComponent,
       anchor: {x: 0, y: 0},
       componentConstructOptions: {
         injector,
         providers: [{provide: diToken2, useValue: 'value 2'}],
       },
-    }).then();
+    });
     await waitUntilStable();
 
     // Expect DI token to be found.
@@ -89,5 +89,5 @@ describe('Popup', () => {
 });
 
 function getPopupComponent<T>(fixture: ComponentFixture<unknown>, type: Type<T>): T {
-  return fixture.debugElement.parent!.query(By.css('div.wb-popup')).query(By.directive(type)).componentInstance;
+  return fixture.debugElement.parent!.query(By.css('div.wb-popup')).query(By.directive(type)).componentInstance as T;
 }

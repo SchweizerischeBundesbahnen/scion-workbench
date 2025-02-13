@@ -32,7 +32,7 @@ export class TextMessagePO implements WorkbenchMessageBoxPagePO {
     await this.text.dblclick();
     const selection: string | undefined = await this.locator.page().evaluate(() => window.getSelection()?.toString());
 
-    return selection?.length && text.includes(selection) || false;
+    return !!selection?.length && text.includes(selection);
   }
 
   public async getBoundingBox(): Promise<DomRect> {

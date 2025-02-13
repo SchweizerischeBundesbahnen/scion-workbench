@@ -59,7 +59,7 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     });
 
     // Perform navigation in the named router outlet.
-    this.navigate(path, {outletName: this.outletName, params}).then(success => {
+    void this.navigate(path, {outletName: this.outletName, params}).then(success => {
       if (!success) {
         popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
@@ -72,13 +72,13 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
   private navigate(path: string | null, extras: {outletName: string; params?: Map<string, any>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras.params);
 
-    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path!)) : null);
+    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 
   public ngOnDestroy(): void {
-    this.navigate(null, {outletName: this.outletName}).then(); // Remove the outlet from the URL
+    void this.navigate(null, {outletName: this.outletName}); // Remove the outlet from the URL
   }
 }
 
@@ -91,23 +91,23 @@ function provideWorkbenchPopupHandle(popupContext: ɵPopupContext): StaticProvid
     useFactory: (): WorkbenchPopup => {
       const popup = inject(Popup);
 
-      return new class<R = unknown> implements WorkbenchPopup {
+      return new class implements WorkbenchPopup {
         public readonly capability = popupContext.capability;
         public readonly params = popupContext.params;
         public readonly referrer = popupContext.referrer;
 
-        public setResult(result?: R): void {
+        public setResult(result?: unknown): void {
           popup.setResult(result);
         }
 
-        public close(result?: R | Error): void {
+        public close(result?: unknown | Error): void {
           popup.close(result);
         }
 
         public signalReady(): void {
           // nothing to do since not an iframe-based microfrontend
         }
-      };
+      }();
     },
   };
 }

@@ -15,7 +15,7 @@ import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
-import {MicrofrontendViewIntentHandler} from '../routing/microfrontend-view-intent-handler.interceptor';
+import {MicrofrontendViewIntentHandler} from '../microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
 import {MicrofrontendPopupIntentHandler} from '../microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {MicrofrontendPopupCapabilityValidator} from '../microfrontend-popup/microfrontend-popup-capability-validator.interceptor';
@@ -23,7 +23,7 @@ import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificatio
 import {MicrofrontendMessageBoxIntentHandler} from '../microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendDialogIntentHandler} from '../microfrontend-dialog/microfrontend-dialog-intent-handler.interceptor';
 import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
-import {MicrofrontendViewCapabilityValidator} from '../routing/microfrontend-view-capability-validator.interceptor';
+import {MicrofrontendViewCapabilityValidator} from '../microfrontend-view/microfrontend-view-capability-validator.interceptor';
 import {StableCapabilityIdAssigner} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from '../microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
@@ -63,13 +63,10 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
 
     // Load the microfrontend platform config.
     const microfrontendPlatformConfig: Mutable<MicrofrontendPlatformConfig> = this.config = await this._microfrontendPlatformConfigLoader.load();
-    if (!microfrontendPlatformConfig) {
-      throw Error('[WorkbenchStartupError] Missing required Microfrontend Platform configuration. Did you forget to return the config in your loader?');
-    }
 
     // Disable scope check to read private capabilities, e.g., required for microfrontend view routing.
     microfrontendPlatformConfig.host = {
-      ...microfrontendPlatformConfig.host,
+      ...microfrontendPlatformConfig.host, // eslint-disable-line @typescript-eslint/no-misused-spread
       scopeCheckDisabled: true,
     };
 
@@ -141,7 +138,7 @@ export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, O
   }
 
   public ngOnDestroy(): void {
-    MicrofrontendPlatform.destroy().then();
+    void MicrofrontendPlatform.destroy();
   }
 }
 

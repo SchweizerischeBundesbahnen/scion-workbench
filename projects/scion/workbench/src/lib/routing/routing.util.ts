@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlTree} from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
 import {DIALOG_ID_PREFIX, DialogOutlet, MESSAGE_BOX_ID_PREFIX, MessageBoxOutlet, PART_ID_PREFIX, PartOutlet, POPUP_ID_PREFIX, PopupOutlet, VIEW_ID_PREFIX, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
 import {inject} from '@angular/core';
@@ -24,13 +24,13 @@ export const Routing = {
    * Converts given URL segments into an array of commands that can be passed to the Angular router for navigation.
    */
   segmentsToCommands: (segments: UrlSegment[]): Commands => {
-    const commands = new Array<any>();
+    const commands = new Array<unknown>();
 
     segments.forEach(segment => {
       if (segment.path) {
         commands.push(segment.path);
       }
-      if (segment.parameters && Object.keys(segment.parameters).length) {
+      if (Object.keys(segment.parameters).length) {
         commands.push(segment.parameters);
       }
     });
@@ -46,7 +46,7 @@ export const Routing = {
   commandsToSegments: (commands: Commands, options?: {relativeTo?: ActivatedRoute | null}): UrlSegment[] => {
     // Ignore `relativeTo` for absolute commands.
     const isAbsolutePath = typeof commands[0] === 'string' && commands[0].startsWith('/');
-    const relativeTo = isAbsolutePath ? null : (options?.relativeTo || null);
+    const relativeTo = isAbsolutePath ? null : (options?.relativeTo ?? null);
 
     // Angular throws the error 'NG04003: Root segment cannot have matrix parameters' when passing an empty path command
     // followed by a matrix params object, but not when passing matrix params as the first command. For consistency, when
@@ -56,7 +56,8 @@ export const Routing = {
     }
 
     const urlTree = inject(Router).createUrlTree(commands, {relativeTo});
-    return urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET]?.segments ?? [];
+    const segmentGroup = urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
+    return segmentGroup?.segments ?? [];
   },
 
   /**
@@ -66,11 +67,11 @@ export const Routing = {
    */
   pathToCommands: (path: string): Commands => {
     const urlTree = inject(Router).parseUrl(path);
-    const segments = urlTree.root.children[PRIMARY_OUTLET]?.segments;
-    if (!segments) {
+    const segmentGroup = urlTree.root.children[PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
+    if (!segmentGroup?.segments) {
       throw Error(`[RouterError] Cannot match any routes for path '${path}'.`);
     }
-    return Routing.segmentsToCommands(segments);
+    return Routing.segmentsToCommands(segmentGroup.segments);
   },
 
   /**
@@ -96,7 +97,7 @@ export const Routing = {
    * Looks for requested data on given route, or its parent route(s) if not found.
    */
   lookupRouteData: <T>(activatedRoute: ActivatedRouteSnapshot, dataKey: string): T | undefined => {
-    return activatedRoute.pathFromRoot.reduceRight((resolvedData, route) => resolvedData ?? route.data[dataKey], undefined);
+    return activatedRoute.pathFromRoot.reduceRight<T | undefined>((resolvedData, route) => resolvedData ?? route.data[dataKey] as T | undefined, undefined);
   },
 
   /**
@@ -251,19 +252,19 @@ function parseOutlets(url: UrlTree, filter: {view?: true; part?: true; dialog?: 
 function parseOutlets(url: UrlTree, filter: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
   const outlets = new Map<WorkbenchOutlet, UrlSegment[]>();
   Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
-    if (filter?.view && Routing.isViewOutlet(outlet)) {
+    if (filter.view && Routing.isViewOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter?.part && Routing.isPartOutlet(outlet)) {
+    if (filter.part && Routing.isPartOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter?.dialog && Routing.isDialogOutlet(outlet)) {
+    if (filter.dialog && Routing.isDialogOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter?.popup && Routing.isPopupOutlet(outlet)) {
+    if (filter.popup && Routing.isPopupOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter?.messagebox && Routing.isMessageBoxOutlet(outlet)) {
+    if (filter.messagebox && Routing.isMessageBoxOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
   });

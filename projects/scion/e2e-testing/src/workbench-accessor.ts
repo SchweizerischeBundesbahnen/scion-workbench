@@ -21,14 +21,14 @@ export class WorkbenchAccessor {
 
   public closeViews(...viewIds: ViewId[]): Promise<boolean> {
     return this._page.evaluate((viewIds: ViewId[]) => {
-      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
       return workbenchService.closeViews(...viewIds);
     }, viewIds);
   }
 
   public parts(): Promise<Array<Pick<WorkbenchPart, 'id' | 'alternativeId'>>> {
     return this._page.evaluate(() => {
-      const workbenchService = (window as unknown as Record<string, unknown>)['__workbenchService'] as WorkbenchService;
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
       return workbenchService.parts().map(part => ({id: part.id, alternativeId: part.alternativeId}));
     });
   }

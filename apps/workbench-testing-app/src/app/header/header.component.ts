@@ -59,19 +59,18 @@ export class HeaderComponent {
 
   protected onMenuOpen(event: MouseEvent): void {
     this._menuService.openMenu(event, [
-        ...this.contributePerspectiveMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeLoggerMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeViewMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeStartupMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeNavigationMenuItems(),
-        new MenuItemSeparator(),
-        ...this.contributeSettingsMenuItems(),
-      ],
-    );
+      ...this.contributePerspectiveMenuItems(),
+      new MenuItemSeparator(),
+      ...this.contributeLoggerMenuItems(),
+      new MenuItemSeparator(),
+      ...this.contributeViewMenuItems(),
+      new MenuItemSeparator(),
+      ...this.contributeStartupMenuItems(),
+      new MenuItemSeparator(),
+      ...this.contributeNavigationMenuItems(),
+      new MenuItemSeparator(),
+      ...this.contributeSettingsMenuItems(),
+    ]);
   }
 
   private contributePerspectiveMenuItems(): MenuItem[] {
@@ -186,7 +185,7 @@ export class HeaderComponent {
     this.lightThemeActiveFormControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(lightTheme => {
-        this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark').then();
+        void this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark');
       });
   }
 
@@ -203,7 +202,7 @@ export class HeaderComponent {
         onAction: () => {
           this._settingsService.toggle('displaySkeletons');
           // Perform navigation for Angular to evaluate `CanMatch` guards.
-          inject(Router).navigate([{outlets: {}}], {skipLocationChange: true}).then();
+          void inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
         },
       }),
       new MenuItem({

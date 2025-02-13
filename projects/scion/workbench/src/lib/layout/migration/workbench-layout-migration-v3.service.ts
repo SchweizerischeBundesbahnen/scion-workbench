@@ -27,7 +27,7 @@ export class WorkbenchLayoutMigrationV3 implements WorkbenchMigration {
   }
 
   public migrate(json: string): string {
-    const partGridV2: MPartGridV2 = JSON.parse(json);
+    const partGridV2 = JSON.parse(json) as MPartGridV2;
 
     // Consider the ids of views contained in the URL as already used.
     // Otherwise, when migrating the main area and using a view id already present in the perspective,

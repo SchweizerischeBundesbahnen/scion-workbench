@@ -8,16 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, numberAttribute} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {coerceNumberProperty} from '@angular/cdk/coercion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {parseTypedObject} from '../common/parse-typed-value.util';
 import {CssClassComponent} from '../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {stringifyError} from '../common/stringify-error.util';
 
 @Component({
   selector: 'app-router-page',
@@ -67,13 +67,13 @@ export default class RouterPageComponent {
       target: this.form.controls.target.value || undefined,
       partId: this.form.controls.partId.value || undefined,
       position: coercePosition(this.form.controls.position.value),
-      params: params || undefined,
+      params: params ?? undefined,
       cssClass: this.form.controls.cssClass.value,
     };
     await this._router.navigate(qualifier, extras)
-      .then(success => success ? Promise.resolve() : Promise.reject('Navigation failed'))
+      .then(success => success ? Promise.resolve() : Promise.reject(Error('Navigation failed')))
       .then(() => this.resetForm())
-      .catch(error => this.navigateError = error);
+      .catch((error: unknown) => this.navigateError = stringifyError(error));
   }
 
   private resetForm(): void {
@@ -83,12 +83,12 @@ export default class RouterPageComponent {
   }
 }
 
-function coercePosition(value: any): number | 'start' | 'end' | undefined {
+function coercePosition(value: unknown): number | 'start' | 'end' | 'before-active-view' | 'after-active-view' | undefined {
   if (value === '') {
     return undefined;
   }
   if (value === 'start' || value === 'end' || value === 'before-active-view' || value === 'after-active-view' || value === undefined) {
     return value;
   }
-  return coerceNumberProperty(value);
+  return numberAttribute(value);
 }

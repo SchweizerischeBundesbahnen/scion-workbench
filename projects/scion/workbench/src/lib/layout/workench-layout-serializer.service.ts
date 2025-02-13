@@ -69,7 +69,7 @@ export class WorkbenchLayoutSerializer {
     const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
 
     // Parse the JSON.
-    const grid: MPartGrid = JSON.parse(migratedJsonGrid, (key, value) => {
+    const grid = JSON.parse(migratedJsonGrid, (key: string, value: unknown) => {
       if (MPart.isMPart(value)) {
         return new MPart(value); // create a class object from the object literal
       }
@@ -77,7 +77,7 @@ export class WorkbenchLayoutSerializer {
         return new MTreeNode(value); // create a class object from the object literal
       }
       return value;
-    });
+    }) as MPartGrid;
 
     // Link parent tree nodes
     (function linkParentNodes(node: MTreeNode | MPart, parent: MTreeNode | undefined): void {
@@ -106,7 +106,7 @@ export class WorkbenchLayoutSerializer {
    * Deserializes the given outlets.
    */
   public deserializeOutlets(serialized: string): Outlets {
-    const outlets: {[outlet: WorkbenchOutlet]: MUrlSegment[]} = JSON.parse(serialized);
+    const outlets = JSON.parse(serialized) as {[outlet: WorkbenchOutlet]: MUrlSegment[]};
 
     return Object.fromEntries(Object.entries(outlets)
       .map(([outlet, segments]: [string, MUrlSegment[]]): [string, UrlSegment[]] => {

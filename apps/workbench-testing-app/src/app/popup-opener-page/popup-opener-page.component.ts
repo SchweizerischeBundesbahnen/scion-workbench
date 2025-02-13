@@ -113,7 +113,7 @@ export default class PopupOpenerPageComponent {
       },
     })
       .then(result => this.returnValue = result)
-      .catch(error => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
+      .catch((error: unknown) => this.popupError = stringifyError(error) || 'Workbench Popup was closed with an error');
   }
 
   private parsePopupComponentInput(): Type<PopupPageComponent | FocusTestPageComponent | BlankTestPageComponent> {

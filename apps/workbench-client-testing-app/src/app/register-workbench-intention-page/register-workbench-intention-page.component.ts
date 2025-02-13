@@ -59,6 +59,6 @@ export default class RegisterWorkbenchIntentionPageComponent {
         this.form.reset();
         this.form.setControl('qualifier', this._formBuilder.array<FormGroup<KeyValueEntry>>([]));
       })
-      .catch(error => this.registerError = stringifyError(error));
+      .catch((error: unknown) => this.registerError = stringifyError(error));
   }
 }

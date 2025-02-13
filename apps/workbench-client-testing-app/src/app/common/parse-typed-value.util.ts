@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion';
+import {booleanAttribute, numberAttribute} from '@angular/core';
 
 /**
  * Parses a typed string to its actual type.
@@ -22,29 +22,29 @@ import {coerceBooleanProperty, coerceNumberProperty} from '@angular/cdk/coercion
  * - '<json>{"key": "value"}</json>' => {"key": "value"}
  * - 'value' => 'value'
  */
-export function parseTypedString(value: string | undefined | null): any {
+export function parseTypedString<T = unknown>(value: string | undefined | null): T | undefined | null {
   if (value === '<undefined>' || value === undefined) {
     return undefined;
   }
   else if (value === '<null>' || value === null) {
     return null;
   }
-  const paramMatch = value.match(/<(?<type>.+)>(?<value>.+)<\/\k<type>>/);
+  const paramMatch = /<(?<type>.+)>(?<value>.+)<\/\k<type>>/.exec(value);
   switch (paramMatch?.groups!['type']) {
     case 'number': {
-      return coerceNumberProperty(paramMatch.groups['value']);
+      return numberAttribute(paramMatch.groups['value']) as T;
     }
     case 'boolean': {
-      return coerceBooleanProperty(paramMatch.groups['value']);
+      return booleanAttribute(paramMatch.groups['value']) as T;
     }
     case 'string': {
-      return paramMatch.groups['value'];
+      return paramMatch.groups['value'] as T;
     }
     case 'json': {
-      return JSON.parse(paramMatch.groups['value']);
+      return JSON.parse(paramMatch.groups['value']) as T;
     }
     default: {
-      return value;
+      return value as T;
     }
   }
 }

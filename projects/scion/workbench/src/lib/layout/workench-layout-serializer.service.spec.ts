@@ -13,7 +13,7 @@ import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵMPartGrid} from './workbench-layout.model';
 import {MAIN_AREA} from './workbench-layout';
-import {ANYTHING, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 
 describe('WorkbenchLayoutSerializer', () => {
 
@@ -178,17 +178,17 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(layout).toEqualWorkbenchLayout({
       workbenchGrid: {
         root: new MTreeNode({
-          id: ANYTHING,
+          id: any(),
           direction: 'row',
           ratio: .25,
           child1: new MPart({
             id: leftPart.id,
             alternativeId: 'left',
-            views: [{id: 'view.2'}, {id: 'view.3', navigation: {id: ANYTHING, hint: 'test-view'}}],
+            views: [{id: 'view.2'}, {id: 'view.3', navigation: {id: any(), hint: 'test-view'}}],
             activeViewId: 'view.2',
           }),
           child2: new MTreeNode({
-            id: ANYTHING,
+            id: any(),
             direction: 'row',
             ratio: .75,
             child1: new MPart({
@@ -197,7 +197,7 @@ describe('WorkbenchLayoutSerializer', () => {
             child2: new MPart({
               id: rightPart.id,
               alternativeId: 'right',
-              views: [{id: 'view.4', navigation: {id: ANYTHING}}],
+              views: [{id: 'view.4', navigation: {id: any()}}],
               activeViewId: 'view.4',
             }),
           }),
@@ -206,19 +206,19 @@ describe('WorkbenchLayoutSerializer', () => {
       },
       mainAreaGrid: {
         root: new MTreeNode({
-          id: ANYTHING,
+          id: any(),
           direction: 'column',
           ratio: .5,
           child1: new MPart({
             id: _6f09e6e2.id,
             alternativeId: _6f09e6e2.alternativeId,
-            views: [{id: 'view.1', navigation: {id: ANYTHING}}],
+            views: [{id: 'view.1', navigation: {id: any()}}],
             activeViewId: 'view.1',
           }),
           child2: new MPart({
             id: _1d94dcb6Part.id,
             alternativeId: _1d94dcb6Part.alternativeId,
-            views: [{id: 'view.5', navigation: {id: ANYTHING}}],
+            views: [{id: 'view.5', navigation: {id: any()}}],
             activeViewId: 'view.5',
           }),
         }),

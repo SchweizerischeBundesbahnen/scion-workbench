@@ -8,10 +8,9 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, HostListener, Input, OnDestroy, Output, ViewChild} from '@angular/core';
+import {booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, HostListener, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {noop} from 'rxjs';
-import {coerceBooleanProperty} from '@angular/cdk/coercion';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
@@ -32,7 +31,7 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
 
-  private _cvaChangeFn: (value: any) => void = noop;
+  private _cvaChangeFn: (value: string) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
   public readonly id = UUID.randomUUID();
@@ -52,7 +51,7 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
 
   @Input()
   public set disabled(disabled: boolean | string | undefined | null) {
-    coerceBooleanProperty(disabled) ? this.formControl.disable() : this.formControl.enable();
+    booleanAttribute(disabled) ? this.formControl.disable() : this.formControl.enable();
   }
 
   public get disabled(): boolean {
@@ -77,9 +76,9 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
   }
 
   /* @docs-private */
-  public formControl: FormControl;
+  public formControl: FormControl<string>;
 
-  constructor(private _host: ElementRef,
+  constructor(private _host: ElementRef<HTMLElement>,
               private _focusManager: FocusMonitor,
               private _cd: ChangeDetectorRef) {
     this.formControl = new FormControl('', {updateOn: 'change', nonNullable: true});
@@ -113,7 +112,7 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnChange(fn: any): void {
+  public registerOnChange(fn: (value: string) => void): void {
     this._cvaChangeFn = fn;
   }
 
@@ -121,7 +120,7 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
 
@@ -138,8 +137,8 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public writeValue(value: any): void {
-    this.formControl.setValue(value, {emitEvent: false});
+  public writeValue(value: string | null | undefined): void {
+    this.formControl.setValue(value ?? '', {emitEvent: false});
     this._cd.markForCheck();
   }
 

@@ -30,6 +30,6 @@ export class PartPortalPipe implements PipeTransform {
       return null;
     }
 
-    return this._partRegistry.get(partId).createPortalFromInjectionContext(this._injector);
+    return this._partRegistry.get(partId).createPortalFromInjectionContext(this._injector) as ComponentPortal<PartComponent | MainAreaPartComponent>;
   }
 }

@@ -23,7 +23,7 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
 export class WorkbenchPerspectiveMigrationV2 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const perspectiveDataV1: PerspectiveDataV1 = JSON.parse(json);
+    const perspectiveDataV1 = JSON.parse(json) as PerspectiveDataV1;
     const perspectiveLayoutV2: MPerspectiveLayoutV2 = {
       userLayout: {
         workbenchGrid: perspectiveDataV1.workbenchGrid,
@@ -54,7 +54,7 @@ function commandsToSegments(commands: Commands): MUrlSegmentV2[] {
       segments.push({path: command, parameters: {}});
     }
     else {
-      segments.at(-1)!.parameters = command;
+      segments.at(-1)!.parameters = command as Record<string, string>;
     }
   });
 

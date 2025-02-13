@@ -22,7 +22,7 @@ import {throwError} from '../../common/throw-error.util';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Observables} from '@scion/toolkit/util';
-import {filter, takeUntil} from 'rxjs/operators';
+import {takeUntil} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
@@ -66,7 +66,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     this.setDialogProperties();
     this.createOutletInjector();
-    this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
+    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
       if (!success) {
         this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
@@ -79,7 +79,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
     path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
-    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path!)) : null);
+    const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);
     const commands: Commands = [{outlets: {[this.outletName]: outletCommands}}];
     return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
@@ -109,7 +109,7 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   }
 
   public ngOnDestroy(): void {
-    this.navigate(null).then(); // Remove the outlet from the URL
+    void this.navigate(null); // Remove the outlet from the URL
   }
 }
 
@@ -121,31 +121,31 @@ function provideWorkbenchClientDialogHandle(capability: WorkbenchDialogCapabilit
     provide: WorkbenchClientDialog,
     useFactory: (): WorkbenchClientDialog => {
       const dialog = inject(ɵWorkbenchDialog);
-      const propertyChange$ = new Subject<'title'>();
+      const titleChange$ = new Subject<void>();
 
-      return new class<R = unknown> implements WorkbenchClientDialog<R> {
+      return new class implements WorkbenchClientDialog {
         public readonly capability = capability;
         public readonly params = params;
 
         public setTitle(title: string | Observable<string>): void {
-          propertyChange$.next('title');
+          titleChange$.next();
 
           Observables.coerce(title)
             .pipe(
-              takeUntil(propertyChange$.pipe(filter(prop => prop === 'title'))),
               takeUntilDestroyed(dialog.injector.get(DestroyRef)),
+              takeUntil(titleChange$),
             )
             .subscribe(title => dialog.title = title);
         }
 
-        public close(result?: R | Error): void {
+        public close(result?: unknown | Error): void {
           dialog.close(result);
         }
 
         public signalReady(): void {
           // nothing to do since not an iframe-based microfrontend
         }
-      };
+      }();
     },
   };
 }

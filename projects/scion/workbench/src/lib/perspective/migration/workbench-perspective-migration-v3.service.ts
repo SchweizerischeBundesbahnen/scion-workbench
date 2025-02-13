@@ -22,7 +22,7 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
 export class WorkbenchPerspectiveMigrationV3 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const perspectiveLayoutV2: MPerspectiveLayoutV2 = JSON.parse(json);
+    const perspectiveLayoutV2 = JSON.parse(json) as MPerspectiveLayoutV2;
     const perspectiveLayoutV3: MPerspectiveLayoutV3 = {
       userLayout: {
         workbenchGrid: perspectiveLayoutV2.userLayout.workbenchGrid,

@@ -52,8 +52,8 @@ export class ViewTabComponent {
   private readonly _viewContextMenuService = inject(ViewMenuService);
   private readonly _injector = inject(Injector);
 
-  public readonly host = inject(ElementRef<HTMLElement>).nativeElement;
-  public readonly view = input.required({alias: 'viewId', transform: ((viewId: ViewId) => this._viewRegistry.get(viewId))}); // eslint-disable-line @angular-eslint/no-input-rename
+  public readonly host = inject(ElementRef).nativeElement as HTMLElement;
+  public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
   public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
@@ -100,18 +100,18 @@ export class ViewTabComponent {
 
   @HostListener('click')
   public onClick(): void {
-    this.view().activate().then();
+    void this.view().activate();
   }
 
   public onClose(event: Event): void {
     event.stopPropagation(); // prevent the view from being activated
-    this.view().close().then();
+    void this.view().close();
   }
 
   @HostListener('mousedown', ['$event'])
   public onMousedown(event: MouseEvent): void {
     if (event.buttons === AUXILARY_MOUSE_BUTTON) {
-      this.view().close().then();
+      void this.view().close();
       event.stopPropagation();
       event.preventDefault();
     }
@@ -119,7 +119,7 @@ export class ViewTabComponent {
 
   @HostListener('contextmenu', ['$event'])
   public onContextmenu(event: MouseEvent): void {
-    this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id).then();
+    void this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
     event.stopPropagation();
     event.preventDefault();
   }
@@ -159,7 +159,7 @@ export class ViewTabComponent {
     });
 
     if (!view.active()) {
-      view.activate().then();
+      void view.activate();
     }
   }
 
@@ -190,13 +190,13 @@ export class ViewTabComponent {
       .subscribe(([event, enabled]) => {
         event.stopPropagation(); // prevent `PartBarComponent` handling the dblclick event which would undo maximization/minimization
         if (enabled && this.view().part().isInMainArea) {
-          this._router.navigate(layout => layout.toggleMaximized()).then();
+          void this._router.navigate(layout => layout.toggleMaximized());
         }
       });
   }
 
   private addHostCssClasses(): void {
-    const host = inject(ElementRef<HTMLElement>).nativeElement;
+    const host = inject(ElementRef).nativeElement as HTMLElement;
     synchronizeCssClasses(host, computed(() => this.view().classList.asList()));
   }
 
@@ -210,7 +210,7 @@ export class ViewTabComponent {
 
   private createViewTabContentPortal(): Signal<ComponentPortal<unknown>> {
     return computed(() => {
-      const componentType = this._workbenchConfig.viewTabComponent || ViewTabContentComponent;
+      const componentType = this._workbenchConfig.viewTabComponent ?? ViewTabContentComponent;
       return new ComponentPortal(componentType, null, Injector.create({
         parent: this._injector,
         providers: [

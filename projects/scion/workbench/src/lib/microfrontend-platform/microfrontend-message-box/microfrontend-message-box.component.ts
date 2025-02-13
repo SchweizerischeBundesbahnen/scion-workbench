@@ -79,13 +79,13 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
   private navigate(): void {
     const application = this._manifestService.getApplication(this.capability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench message box [app=${this.capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${this.capability.properties.path}].`, LoggerNames.MICROFRONTEND, this.params, this.capability);
-    this._outletRouter.navigate(this.capability.properties.path, {
+    void this._outletRouter.navigate(this.capability.properties.path, {
       outlet: this.outletName,
       relativeTo: application.baseUrl,
       params: this.params,
       pushStateToSessionHistoryStack: false,
       showSplash: this.capability.properties.showSplash,
-    }).then();
+    });
   }
 
   /**
@@ -123,6 +123,6 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this._outletRouter.navigate(null, {outlet: this.outletName}).then(); // Clear the outlet.
+    void this._outletRouter.navigate(null, {outlet: this.outletName}); // Clear the outlet.
   }
 }

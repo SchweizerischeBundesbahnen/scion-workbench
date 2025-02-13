@@ -5,8 +5,14 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Popup
 
-A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor,
-which can be either a coordinate or an HTML element. The popup moves when the anchor moves. By default, the popup closes on focus loss, or when the user hits the escape key. If opening a popup in the context of a view, the popup is bound to the lifecycle of the view, that is, the popup is displayed only if the view is active and is closed when the view is closed.
+A popup is a visual workbench component for displaying content above other content. It is positioned relative to an anchor and
+moves when the anchor moves. By default, the popup closes on focus loss or when pressing the escape key.
+
+The anchor is used to position the popup based on its preferred alignment:
+- Using an element: The popup opens and sticks to the element.
+- Using coordinates: The popup opens and sticks relative to the view or page bounds.
+
+If the popup is opened within a view, it only displays if the view is active and closes when the view is closed.
 
 ### How to open a popup
 To open a popup, inject `PopupService` and invoke the `open` method, passing a `PopupConfig` options object to control the appearance of the popup.
@@ -24,14 +30,17 @@ const result = await popupService.open({
 });
 ```
 
-To interact with the popup in the popup component, inject the popup handle `Popup`, e.g., to read input passed to the popup or to close the popup, optionally passing a result to the popup opener.
+To interact with the popup, the popup component can inject the popup handle `Popup`, e.g., to read input passed to the popup or to close the popup, optionally passing a result to the popup opener.
 
-
-```typescript
+```ts
 import {inject} from '@angular/core';
 import {Popup} from '@scion/workbench';
 
+// Close the popup
 inject(Popup).close();
+
+// Read data passed to the popup
+inject(Popup).input;
 ```
 
 [menu-how-to]: /docs/site/howto/how-to.md

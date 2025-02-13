@@ -76,19 +76,19 @@ export class AppPO {
       this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options.launcher);
     }
     if (!(options?.microfrontendSupport ?? true)) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, `${true}`);
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, String(true));
     }
     if (options?.confirmStartup) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, `${true}`);
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, String(true));
     }
     if (options?.simulateSlowCapabilityLookup) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, `${true}`);
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, String(true));
     }
     if (options?.perspectives?.length) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, `${options.perspectives.join(';')}`);
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, options.perspectives.join(';'));
     }
     if (options?.dialogModalityScope) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options?.dialogModalityScope);
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options.dialogModalityScope);
     }
     if (options?.mainAreaInitialPartId) {
       this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
@@ -96,10 +96,10 @@ export class AppPO {
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyViewTab) {
-      featureQueryParams.append('stickyViewTab', `${true}`);
+      featureQueryParams.append('stickyViewTab', String(true));
     }
     if (options?.useLegacyStartPage) {
-      featureQueryParams.append('useLegacyStartPage', `${true}`);
+      featureQueryParams.append('useLegacyStartPage', String(true));
     }
 
     // Perform navigation.
@@ -197,7 +197,7 @@ export class AppPO {
    * @param locateBy.inMainArea - Controls whether to locate views contained in the main area (`true`), not contained in the main area (`false`), or both (not specified).
    */
   public views(locateBy?: {inMainArea?: boolean; cssClass?: string}): Locator {
-    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy?.cssClass}` : ':scope';
+    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
     if (locateBy?.inMainArea === true) {
       return this.page.locator('wb-part[data-context="main-area"] wb-view-tab').locator(locateByCssClass);
     }

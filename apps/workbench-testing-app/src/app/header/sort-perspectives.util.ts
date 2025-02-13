@@ -15,7 +15,7 @@ import {PerspectiveData} from '../workbench.perspectives';
  * Sorts perspectives by display text, with non-microfrontend perspectives preceding microfrontend perspectives.
  */
 export function sortPerspectives(perspectives: WorkbenchPerspective[]): WorkbenchPerspective[] {
-  if (!perspectives?.length) {
+  if (!perspectives.length) {
     return [];
   }
 
@@ -35,5 +35,5 @@ function isMicrofrontendPerspective(perspective: WorkbenchPerspective): boolean 
 }
 
 function getLabel(perspective: WorkbenchPerspective): string {
-  return perspective.data[PerspectiveData.label] as string ?? '';
+  return perspective.data[PerspectiveData.label] as string | undefined ?? '';
 }

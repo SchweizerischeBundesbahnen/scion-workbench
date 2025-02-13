@@ -110,8 +110,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return outlets matching the filter criteria.
    */
   public outlets(findBy?: {grid?: keyof Grids}): Outlets {
-    const partOutlets = this.parts({grid: findBy?.grid}).filter(part => this._outlets.has(part.id)).map(part => [part.id, this._outlets.get(part.id)!]);
-    const viewOutlets = this.views({grid: findBy?.grid}).filter(view => this._outlets.has(view.id)).map(view => [view.id, this._outlets.get(view.id)!]);
+    const partOutlets = this.parts({grid: findBy?.grid}).filter(part => this._outlets.has(part.id)).map<[PartId, UrlSegment[]]>(part => [part.id, this._outlets.get(part.id)!]);
+    const viewOutlets = this.views({grid: findBy?.grid}).filter(view => this._outlets.has(view.id)).map<[ViewId, UrlSegment[]]>(view => [view.id, this._outlets.get(view.id)!]);
     return Object.fromEntries([...partOutlets, ...viewOutlets]);
   }
 
@@ -123,8 +123,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return state matching the filter criteria.
    */
   public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
-    const partStates = this.parts({grid: findBy?.grid}).filter(part => this._navigationStates.has(part.id)).map(part => [part.id, this._navigationStates.get(part.id)!]);
-    const viewStates = this.views({grid: findBy?.grid}).filter(view => this._navigationStates.has(view.id)).map(view => [view.id, this._navigationStates.get(view.id)!]);
+    const partStates = this.parts({grid: findBy?.grid}).filter(part => this._navigationStates.has(part.id)).map<[PartId, NavigationState]>(part => [part.id, this._navigationStates.get(part.id)!]);
+    const viewStates = this.views({grid: findBy?.grid}).filter(view => this._navigationStates.has(view.id)).map<[ViewId, NavigationState]>(view => [view.id, this._navigationStates.get(view.id)!]);
     return Object.fromEntries([...partStates, ...viewStates]);
   }
 
@@ -227,7 +227,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param relativeTo - @inheritDoc
    * @param options - @inheritDoc
    * @param options.activate - @inheritDoc
-   * @param options.structural - Specifies if this is a structural part. A structural part will not be removed when removing its last view. Default is `true`.
+   * @param options.structural - Specifies if this is a structural part. A structural part will not be removed when removing its last view. Defaults to `true`.
    */
   public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
     const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
@@ -385,7 +385,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *
    * @param id - The id of the view to activate its adjacent view.
    * @param options - Controls view activation.
-   * @param options.activatePart - Controls if to activate the part. Default is `false`.
+   * @param options.activatePart - Controls if to activate the part. Defaults to `false`.
    * @return a copy of this layout with the adjacent view activated.
    */
   public activateAdjacentView(id: string, options?: {activatePart?: boolean}): ɵWorkbenchLayout {
@@ -534,16 +534,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     // Remove the part.
-    const siblingElement = (part.parent!.child1 === part ? part.parent!.child2 : part.parent!.child1);
-    if (!part.parent!.parent) {
+    const parentPart = part.parent!;
+    const siblingElement = (parentPart.child1 === part ? parentPart.child2 : parentPart.child1);
+    if (!parentPart.parent) {
       grid.root = siblingElement;
       grid.root.parent = undefined;
     }
-    else if (part.parent!.parent.child1 === part.parent) {
-      part.parent!.parent.child1 = siblingElement;
+    else if (parentPart.parent.child1 === part.parent) {
+      parentPart.parent.child1 = siblingElement;
     }
     else {
-      part.parent!.parent.child2 = siblingElement;
+      parentPart.parent.child2 = siblingElement;
     }
 
     // Remove the part outlet.
@@ -560,14 +561,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // If the removed part was the active part, make the last used part the active part.
     if (grid.activePartId === part.id) {
-      const activePart = parts
+      const [activePart] = parts
         .filter(mPart => mPart.id !== part.id)
         .sort((part1, part2) => {
           const activationInstantPart1 = this._partActivationInstantProvider.getActivationInstant(part1.id);
           const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
           return activationInstantPart2 - activationInstantPart1;
-        })[0];
-      grid.activePartId = activePart!.id;
+        });
+      grid.activePartId = activePart.id;
     }
   }
 
@@ -737,12 +738,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     part.views.splice(part.views.indexOf(view), 1);
 
     // Remove outlet.
-    if (options?.removeOutlet ?? true) {
+    if (options.removeOutlet ?? true) {
       this._outlets.delete(view.id);
     }
 
     // Remove navigation state.
-    if (options?.removeNavigationState ?? true) {
+    if (options.removeNavigationState ?? true) {
       this._navigationStates.delete(view.id);
     }
 
@@ -783,7 +784,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private __activateAdjacentView(view: MView, options?: {activatePart?: boolean}): void {
     const part = this.part({viewId: view.id});
     const viewIndex = part.views.indexOf(view);
-    part.activeViewId = (part.views[viewIndex - 1] || part.views[viewIndex + 1])?.id; // is `undefined` if it is the last view of the part
+    part.activeViewId = ((part.views[viewIndex - 1] ?? part.views[viewIndex + 1]) as MView | undefined)?.id; // is `undefined` if it is the last view of the part
 
     // Activate the part.
     if (options?.activatePart) {
@@ -915,7 +916,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       visitParts(this._grids[options.grid]!.root);
     }
     else {
-      for (const grid of Object.values(this._grids)) {
+      for (const grid of Objects.values(this._grids)) {
         if (grid && !visitParts(grid.root)) {
           break;
         }
