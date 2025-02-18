@@ -1,0 +1,21 @@
+@if (activityLayout(); as activityLayout) {
+  @if (side() === 'left') {
+    <wb-activity-group [group]="activityLayout.toolbars.leftTop"/>
+    <!-- separator-->
+    @if (activityLayout.toolbars.leftTop.activities.length && activityLayout.toolbars.leftBottom.activities.length) {
+      <div class="separator"></div>
+    }
+    <wb-activity-group [group]="activityLayout.toolbars.leftBottom"/>
+    <div class="filler"></div>
+    <wb-activity-group [group]="activityLayout.toolbars.bottomLeft"/>
+  } @else {
+    <wb-activity-group [group]="activityLayout.toolbars.rightTop"/>
+    <!-- separator-->
+    @if (activityLayout.toolbars.rightTop.activities.length && activityLayout.toolbars.rightBottom.activities.length) {
+      <div class="separator"></div>
+    }
+    <wb-activity-group [group]="activityLayout.toolbars.rightBottom"/>
+    <div class="filler"></div>
+    <wb-activity-group [group]="activityLayout.toolbars.bottomRight"/>
+  }
+}

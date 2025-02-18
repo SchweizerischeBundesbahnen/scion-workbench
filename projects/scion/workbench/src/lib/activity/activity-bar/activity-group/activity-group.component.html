@@ -1,0 +1,9 @@
+@for (activity of group().activities; track activity.id) {
+  @let isActive = group().activeActivityId === activity.id;
+  <span sciMaterialIcon
+        class="activity-item"
+        [class.active]="isActive"
+        (click)="toggleActivity(activity.id, !isActive)">
+    {{activity.icon}}
+  </span>
+}

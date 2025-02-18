@@ -1,0 +1,49 @@
+@if (activityLayout(); as activityLayout) {
+  @switch (area()) {
+    @case ("left") {
+      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onSashEndLeftPanel($event)">
+        @if (activityLayout.toolbars.leftTop.activeActivityId) {
+          <ng-template sciSash [size]="leftPanelSashSize()[0]">
+            <wb-activity-grid [activityId]="activityLayout.toolbars.leftTop.activeActivityId"/>
+          </ng-template>
+        }
+
+        @if (activityLayout.toolbars.leftBottom.activeActivityId) {
+          <ng-template sciSash [size]="leftPanelSashSize()[1]">
+            <wb-activity-grid [activityId]="activityLayout.toolbars.leftBottom.activeActivityId"/>
+          </ng-template>
+        }
+      </sci-sashbox>
+    }
+    @case ("right") {
+      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onSashEndRightPanel($event)">
+        @if (activityLayout.toolbars.rightTop.activeActivityId) {
+          <ng-template sciSash [size]="rightPanelSashSize()[0]">
+            <wb-activity-grid [activityId]="activityLayout.toolbars.rightTop.activeActivityId"/>
+          </ng-template>
+        }
+
+        @if (activityLayout.toolbars.rightBottom.activeActivityId) {
+          <ng-template sciSash [size]="rightPanelSashSize()[1]">
+            <wb-activity-grid [activityId]="activityLayout.toolbars.rightBottom.activeActivityId"/>
+          </ng-template>
+        }
+      </sci-sashbox>
+    }
+    @case ("bottom") {
+      <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd)="onSashEndBottomPanel($event)">
+        @if (activityLayout.toolbars.bottomLeft.activeActivityId) {
+          <ng-template sciSash [size]="bottomPanelSashSize()[0]">
+            <wb-activity-grid [activityId]="activityLayout.toolbars.bottomLeft.activeActivityId"/>
+          </ng-template>
+        }
+
+        @if (activityLayout.toolbars.bottomRight.activeActivityId) {
+          <ng-template sciSash [size]="bottomPanelSashSize()[1]">
+            <wb-activity-grid [activityId]="activityLayout.toolbars.bottomRight.activeActivityId"/>
+          </ng-template>
+        }
+      </sci-sashbox>
+    }
+  }
+}

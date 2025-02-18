@@ -1,0 +1,19 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .25em;
+
+  > span.activity-item {
+    padding: .125em;
+    border-radius: var(--sci-corner);
+
+    &:hover {
+      background-color: var(--sci-color-background-secondary-selected);
+    }
+
+    &.active {
+      background-color: var(--sci-color-background-secondary-selected);
+    }
+  }
+}

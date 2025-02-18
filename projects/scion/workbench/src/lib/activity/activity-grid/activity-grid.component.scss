@@ -1,0 +1,8 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > wb-grid-element {
+    flex: 1 1 0; // set flex-basis to 0 to not exceed available vertical space
+  }
+}

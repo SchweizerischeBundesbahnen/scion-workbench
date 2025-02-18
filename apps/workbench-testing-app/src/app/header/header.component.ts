@@ -70,7 +70,9 @@ export class HeaderComponent {
       ...this.contributeNavigationMenuItems(),
       new MenuItemSeparator(),
       ...this.contributeSettingsMenuItems(),
-    ]);
+    new MenuItemSeparator(),
+        ...this.contributeLayoutMenuItems(),
+      ]);
   }
 
   private contributePerspectiveMenuItems(): MenuItem[] {
@@ -210,6 +212,16 @@ export class HeaderComponent {
         cssClass: 'e2e-log-angular-change-detection-cycles',
         checked: this._settingsService.isEnabled('logAngularChangeDetectionCycles'),
         onAction: () => this._settingsService.toggle('logAngularChangeDetectionCycles'),
+      }),
+    ];
+  }
+
+  private contributeLayoutMenuItems(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Widescreen Layout',
+        checked: this.workbenchService.widescreen(),
+        onAction: () => this.workbenchService.switchWidescreenLayout(!this.workbenchService.widescreen()),
       }),
     ];
   }

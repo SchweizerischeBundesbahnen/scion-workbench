@@ -177,6 +177,12 @@ export interface GridSerializationFlags {
    */
   assignStablePartIdentifier?: true;
   /**
+   * Assigns each activity a stable id based on its position in the activity layout.
+   *
+   * Stable activity identifiers are required to compare the initial activity layout with the user-modified activity layout to detect layout changes.
+   */
+  assignStableActivityIdentifier?: true;
+  /**
    * Controls if to sort the fields of the grid by name. Defaults to `false`.
    *
    * Stable sort order is required to compare the initial grid with the user-modified grid to detect layout changes.

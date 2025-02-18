@@ -27,6 +27,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
  */
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
+  public activities = new Array<ActivityDescriptor>();
   public parts = new Array<PartDescriptor>();
   public views = new Array<ViewDescriptor>();
   public partNavigations = new Array<PartNavigationDescriptor>();
@@ -41,14 +42,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
   public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean} | PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
     if ((reference as DockingArea).dockTo) {
-      return this.addPartToDockingArea(id, reference as DockingArea, extras as PartExtras & {cssClass?: string | string[]});
+      return this.addActivity(id, reference as DockingArea, extras as PartExtras & {cssClass?: string | string[]});
     }
     else {
-      return this.addPartRelativeToPart(id, reference as ReferencePart, extras as {activate?: boolean});
+      return this._addPart(id, reference as ReferencePart, extras as {activate?: boolean});
     }
   }
 
-  private addPartRelativeToPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout {
+  private _addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout {
     this.parts.push({
       id,
       relativeTo: relativeTo.relativeTo,
@@ -59,8 +60,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this;
   }
 
-  private addPartToDockingArea(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.addPart` is not supported.');
+  private addActivity(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+    this.activities.push({
+      id,
+      dockTo: dockTo.dockTo,
+      icon: extras.icon,
+      label: extras.label,
+      tooltip: extras.tooltip
+    });
+    return this;
   }
 
   public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout {
@@ -130,6 +138,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public modify(modifyFn: (layout: WorkbenchLayout) => WorkbenchLayout): WorkbenchLayout {
     throw Error('[PageObjectError] Operation `WorkbenchLayout.modify` is not supported.');
   }
+}
+
+/**
+ * Represents an activity to add to the layout.
+ */
+export interface ActivityDescriptor {
+  id: string;
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+  icon: string;
+  label: string | `%${string}`;
+  tooltip?: string | `%${string}`;
 }
 
 /**

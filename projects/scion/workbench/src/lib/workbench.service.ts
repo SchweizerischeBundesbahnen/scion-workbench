@@ -181,4 +181,8 @@ export abstract class WorkbenchService {
    * Provides the current workbench theme, if any.
    */
   public abstract readonly theme: Signal<WorkbenchTheme | null>;
+
+  public abstract switchWidescreenLayout(enabled: boolean): Promise<void>;
+
+  public abstract readonly widescreen: Signal<boolean>;
 }

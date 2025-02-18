@@ -29,15 +29,15 @@ export interface MActivityLayout {
   };
   panels: {
     left: {
-      width?: number;
+      width?: string;
       ratio?: number;
     };
     right: {
-      width?: number;
+      width?: string;
       ratio?: number;
     };
     bottom: {
-      height?: number;
+      height?: string;
       ratio?: number;
     };
   };

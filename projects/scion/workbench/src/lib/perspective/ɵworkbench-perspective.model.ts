@@ -185,12 +185,19 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
     return this._workbenchGridMerger.merge({
       local: this._workbenchLayoutFactory.create({
-        grids: perspectiveLayout.userLayout.grids,
+        grids: {
+          main: perspectiveLayout.userLayout.grids.main,
+          ...WorkbenchLayouts.pickActivityGrids(perspectiveLayout.userLayout.grids),
+        },
+        // grids: perspectiveLayout.userLayout.grids,
         activityLayout: perspectiveLayout.userLayout.activityLayout,
         outlets: perspectiveLayout.userLayout.outlets,
       }),
       base: this._workbenchLayoutFactory.create({
-        grids: perspectiveLayout.referenceLayout.grids,
+        grids: {
+          main: perspectiveLayout.referenceLayout.grids.main,
+          ...WorkbenchLayouts.pickActivityGrids(perspectiveLayout.referenceLayout.grids),
+        },
         activityLayout: perspectiveLayout.referenceLayout.activityLayout,
         outlets: perspectiveLayout.referenceLayout.outlets,
       }),

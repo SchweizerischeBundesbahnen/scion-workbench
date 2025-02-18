@@ -25,7 +25,7 @@ import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
 import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
-import {ActivityId, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
+import {ActivityId, MActivity, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
 import {WorkbenchActivityLayoutSerializer} from './workench-activity-layout-serializer.service';
 import {Objects} from '../common/objects.util';
 import {WorkbenchGrids} from './workbench-grids.model';
@@ -312,6 +312,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return workingCopy;
   }
 
+  public activateActivity(id: ActivityId): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.getActivityGroupById(id).activeActivityId = id;
+    return workingCopy;
+  }
+
+  public deactivateActivity(id: ActivityId): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.getActivityGroupById(id).activeActivityId = undefined;
+    return workingCopy;
+  }
+
   /**
    * Finds a view based on the specified filter. If not found, by default, throws an error unless setting the `orElseNull` option.
    *
@@ -466,6 +478,58 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return workingCopy;
   }
 
+  public setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__setActivityPanelSize(panel, size);
+    return workingCopy;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): void {
+    if (size < 0) {
+      throw Error(`[LayoutModifyError] Size for '${panel}' activity panel must not be less than 0, but was '${size}'.`);
+    }
+    switch (panel) {
+      case "left":
+        this._activityLayout.panels.left.width = `${size}px`;
+        break;
+      case "right":
+        this._activityLayout.panels.right.width = `${size}px`;
+        break;
+      case "bottom":
+        this._activityLayout.panels.bottom.height = `${size}px`;
+        break;
+    }
+  }
+
+  public setActivityPanelRatio(panel: 'left' | 'right' | 'bottom', ratio: number): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__setActivityPanelRatio(panel, ratio);
+    return workingCopy;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __setActivityPanelRatio(panel: 'left' | 'right' | 'bottom', ratio: number): void {
+    if (ratio < 0 || ratio > 1) {
+      throw Error(`[LayoutModifyError] Ratio for node '${panel}' activity panel must be in the closed interval [0,1], but was '${ratio}'.`);
+    }
+    switch (panel) {
+      case "left":
+        this._activityLayout.panels.left.ratio = ratio;
+        break;
+      case "right":
+        this._activityLayout.panels.right.ratio = ratio;
+        break;
+      case "bottom":
+        this._activityLayout.panels.bottom.ratio = ratio;
+        break;
+    }
+  }
+
   /**
    * Serializes this layout into a URL-safe base64 string.
    */
@@ -477,9 +541,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workingCopy.__assignStablePartIdentifier();
     }
 
+    // Check if to assign each activity a stable id based on its position in the activity layout.
+    if (flags?.assignStableActivityIdentifier) {
+      workingCopy.__assignStableActivityIdentifier();
+    }
+
     return {
-      grids: this._gridSerializer.serializeGrids(this._grids, flags),
-      activityLayout: this._activityLayoutSerializer.serializeActivityLayout(this._activityLayout),
+      grids: this._gridSerializer.serializeGrids(workingCopy._grids, flags),
+      activityLayout: this._activityLayoutSerializer.serializeActivityLayout(workingCopy._activityLayout),
       outlets: (selector: {mainGrid?: true; mainAreaGrid?: true; activityGrids?: true}): string => {
         return this._gridSerializer.serializeOutlets(workingCopy.outlets({
           mainGrid: selector.mainGrid,
@@ -518,6 +587,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   public computeNextViewId(): ViewId {
     return WorkbenchLayouts.computeNextViewId(this.views().map(view => view.id));
+  }
+
+  private activities(): MActivity[] {
+    return [
+      ...this._activityLayout.toolbars.leftTop.activities,
+      ...this._activityLayout.toolbars.leftBottom.activities,
+      ...this._activityLayout.toolbars.rightTop.activities,
+      ...this._activityLayout.toolbars.rightBottom.activities,
+      ...this._activityLayout.toolbars.bottomLeft.activities,
+      ...this._activityLayout.toolbars.bottomRight.activities,
+    ];
   }
 
   /**
@@ -697,8 +777,36 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
+  private __renameActivity(activity: MActivity, newActivityId: ActivityId): void {
+    // if (this.hasPart(newActivityId)) {
+    //   throw Error(`[PartRenameError] Part id must be unique. The layout already contains a part with the id '${newActivityId}'.`);
+    // }
+
+    // TODO [activity] need to rename grids?
+    const grid = this.grids[activity.id];
+    this._grids[newActivityId] = {...grid};
+    delete this.grids[activity.id];
+
+    const group = this.getActivityGroupById(activity.id);
+    if (group.activeActivityId === activity.id) {
+      group.activeActivityId = newActivityId;
+    }
+
+    activity.id = newActivityId;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
   private __assignStablePartIdentifier(): void {
     this.parts().forEach((part, index) => this.__renamePart(part, `${PART_ID_PREFIX}${index + 1}`));
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __assignStableActivityIdentifier(): void {
+    this.activities().forEach((activity, index) => this.__renameActivity(activity, `${ACTIVITY_ID_PREFIX}${index + 1}`))
   }
 
   /**
@@ -872,7 +980,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __activatePart(part: MPart): void {
-    this.grid({element: part}).activePartId = part.id;
+    const grid = this.grid({element: part});
+    const gridName = this.gridNames.find(gridName => this._grids[gridName] === grid);
+    grid.activePartId = part.id;
+    if (isActivityId(gridName)) {
+      this.getActivityGroupById(gridName).activeActivityId = gridName;
+    }
   }
 
   /**
@@ -1009,13 +1122,36 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
   }
 
+  private getActivityGroupById(activityId: ActivityId): MActivityGroup {
+    if (this._activityLayout.toolbars.leftTop.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.leftTop;
+    }
+    if (this._activityLayout.toolbars.leftBottom.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.leftBottom;
+    }
+    if (this._activityLayout.toolbars.rightTop.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.rightTop;
+    }
+    if (this._activityLayout.toolbars.rightBottom.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.rightBottom;
+    }
+    if (this._activityLayout.toolbars.bottomLeft.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.bottomLeft;
+    }
+    if (this._activityLayout.toolbars.bottomRight.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.bottomRight;
+    }
+    throw Error(`[NullActivityGroupError] No activity group found with activity id '${activityId}'.`);
+  }
+
   /**
    * Creates a copy of this layout.
    */
   private workingCopy(): ɵWorkbenchLayout {
+    const activityLayout1 = this._activityLayoutSerializer.serializeActivityLayout(this._activityLayout);
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
       grids: this._gridSerializer.serializeGrids(this._grids),
-      activityLayout: this._activityLayoutSerializer.serializeActivityLayout(this._activityLayout),
+      activityLayout: activityLayout1,
       perspectiveId: this.perspectiveId,
       outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),

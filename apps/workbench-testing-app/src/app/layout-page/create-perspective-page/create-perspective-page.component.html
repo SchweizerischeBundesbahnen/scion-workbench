@@ -12,6 +12,11 @@
   </section>
 
   <section>
+    <header>Parts (Activities)</header>
+    <app-add-activities [formControl]="form.controls.activities"/>
+  </section>
+
+  <section>
     <header>Parts</header>
     <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals()" [requiresInitialPart]="true"/>
   </section>

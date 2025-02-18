@@ -15,7 +15,7 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
+import {WorkbenchMainGridComponent} from '../layout/main-grid/workbench-main-grid.component';
 import {WorkbenchService} from '../workbench.service';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
@@ -55,7 +55,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in part 'left-top'
@@ -176,7 +176,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
     await waitForInitialWorkbenchLayout();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -246,7 +246,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1.
@@ -368,7 +368,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in perspective-1

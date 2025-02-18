@@ -282,7 +282,15 @@ export interface MPerspectiveLayout {
 
 
 
-
+```html
+<wb-workbench>
+  <activity-bar></activity-bar>
+    <main>
+      
+    </main>
+  <activity-bar></activity-bar>
+</wb-workbench>
+```
 
 
 

@@ -13,7 +13,7 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
-import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
+import {WorkbenchMainGridComponent} from '../../../layout/main-grid/workbench-main-grid.component';
 import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
@@ -44,15 +44,15 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
             return pass();
           }
 
-          // Resolve debug element for `WorkbenchLayoutComponent`.
+          // Resolve debug element for `WorkbenchMainGridComponent`.
           let debugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            debugElement = debugElement.query(By.directive(WorkbenchLayoutComponent));
+          if (!(debugElement.componentInstance instanceof WorkbenchMainGridComponent)) {
+            debugElement = debugElement.query(By.directive(WorkbenchMainGridComponent));
           }
 
-          // Expect debug element to represent `WorkbenchLayoutComponent` element.
-          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${(actual.componentInstance as object).constructor.name}.`);
+          // Expect debug element to represent `WorkbenchMainGridComponent` element.
+          if (!(debugElement.componentInstance instanceof WorkbenchMainGridComponent)) {
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchMainGridComponent' (or a parent), but was ${actual?.componentInstance?.constructor?.name}.`);
           }
 
           // Assert model.

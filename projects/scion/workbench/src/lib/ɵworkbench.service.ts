@@ -29,6 +29,7 @@ import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {throwError} from './common/throw-error.util';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
+import {WorkbenchWidescreenLayoutSwitcher} from './activity/workbench-widescreen-layout-switcher.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -42,12 +43,14 @@ export class ɵWorkbenchService implements WorkbenchService {
   private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
   private readonly _layoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchThemeSwitcher = inject(WorkbenchThemeSwitcher);
+  private readonly _workbenchWidescreenLayoutSwitcher = inject(WorkbenchWidescreenLayoutSwitcher);
 
   public readonly layout: Signal<ɵWorkbenchLayout>;
   public readonly perspectives: Signal<ɵWorkbenchPerspective[]>;
   public readonly parts: Signal<ɵWorkbenchPart[]>;
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly theme: Signal<WorkbenchTheme | null>;
+  public readonly widescreen: Signal<boolean>;
   public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
 
   constructor() {
@@ -56,6 +59,7 @@ export class ɵWorkbenchService implements WorkbenchService {
     this.parts = this._partRegistry.objects;
     this.views = this._viewRegistry.objects;
     this.theme = this._workbenchThemeSwitcher.theme;
+    this.widescreen = this._workbenchWidescreenLayoutSwitcher.widescreen;
     this.activePerspective = this._perspectiveService.activePerspective;
   }
 
@@ -120,5 +124,11 @@ export class ɵWorkbenchService implements WorkbenchService {
   public switchTheme(theme: string): Promise<void> {
     assertNotInReactiveContext(this.switchTheme, 'Call WorkbenchService.switchTheme() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     return this._workbenchThemeSwitcher.switchTheme(theme);
+  }
+
+  /** @inheritDoc */
+  public switchWidescreenLayout(enabled: boolean): Promise<void> {
+    assertNotInReactiveContext(this.switchWidescreenLayout, 'Call WorkbenchService.switchWidescreenLayout() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    return this._workbenchWidescreenLayoutSwitcher.toggleWidescreenLayout(enabled);
   }
 }

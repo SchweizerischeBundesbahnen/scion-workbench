@@ -24,7 +24,7 @@ export class WorkbenchGridMerger {
    */
   public merge(grids: {local: ɵWorkbenchLayout; remote: ɵWorkbenchLayout; base: ɵWorkbenchLayout}): ɵWorkbenchLayout {
     // TODO [activity] Consider not to reset the whole layout when adding/removing an activity.
-    if (!grids.base.equals(grids.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, sort: true})) {
+    if (!grids.base.equals(grids.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, assignStableActivityIdentifier: true, sort: true})) {
       return grids.remote;
     }
 
