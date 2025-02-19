@@ -52,7 +52,7 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 
           // Expect debug element to represent `WorkbenchMainGridComponent` element.
           if (!(debugElement.componentInstance instanceof WorkbenchMainGridComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchMainGridComponent' (or a parent), but was ${actual?.componentInstance?.constructor?.name}.`);
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchMainGridComponent' (or a parent), but was ${actual.componentInstance?.constructor?.name}.`); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           }
 
           // Assert model.

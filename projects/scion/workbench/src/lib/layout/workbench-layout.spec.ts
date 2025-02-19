@@ -31,7 +31,7 @@ describe('WorkbenchLayout', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 
-  it('should allow adding views', () => {
+  fit('should allow adding views', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.A')
       .addView('view.1', {partId: 'part.A'})

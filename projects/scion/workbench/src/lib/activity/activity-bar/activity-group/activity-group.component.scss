@@ -4,7 +4,10 @@
   align-items: center;
   gap: .25em;
 
-  > span.activity-item {
+  > button.activity-item {
+    all: unset;
+    height: 24px;
+    width: 24px;
     padding: .125em;
     border-radius: var(--sci-corner);
 

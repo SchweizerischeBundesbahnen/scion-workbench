@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2024 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -111,7 +111,7 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnChange(fn: any): void {
+  public registerOnChange(fn: (value: ActivityDescriptor[]) => void): void {
     this._cvaChangeFn = fn;
   }
 
@@ -119,7 +119,7 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
    * Method implemented as part of `ControlValueAccessor` to work with Angular forms API
    * @docs-private
    */
-  public registerOnTouched(fn: any): void {
+  public registerOnTouched(fn: () => void): void {
     this._cvaTouchedFn = fn;
   }
 

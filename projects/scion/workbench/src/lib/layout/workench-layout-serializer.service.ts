@@ -44,7 +44,7 @@ export class WorkbenchLayoutSerializer {
    * @param flags - Controls how to serialize the grids.
    */
   public serializeGrids(grids: WorkbenchGrids, flags?: GridSerializationFlags): WorkbenchGrids<string> {
-    return Object.fromEntries(Object.entries(grids).reduce((acc, [gridName, grid]) => {
+    const entries = Object.entries(grids).reduce((acc, [gridName, grid]: [string, ɵMPartGrid | undefined]) => {
       if (grid === undefined) {
         return acc;
       }
@@ -66,7 +66,8 @@ export class WorkbenchLayoutSerializer {
       const serialized = window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
 
       return acc.set(gridName, serialized);
-    }, new Map()));
+    }, new Map<string, string>());
+    return Object.fromEntries(entries) as unknown as WorkbenchGrids<string>;
   }
 
   /**

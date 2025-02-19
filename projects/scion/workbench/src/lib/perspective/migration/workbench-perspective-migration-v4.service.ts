@@ -22,7 +22,7 @@ import {MPerspectiveLayoutV4} from './model/workbench-perspective-migration-v4.m
 export class WorkbenchPerspectiveMigrationV4 implements WorkbenchMigration {
 
   public migrate(json: string): string {
-    const perspectiveLayoutV3: MPerspectiveLayoutV3 = JSON.parse(json);
+    const perspectiveLayoutV3 = JSON.parse(json) as MPerspectiveLayoutV3;
     const perspectiveLayoutV4: MPerspectiveLayoutV4 = {
       userLayout: {
         grids: {

@@ -1,9 +1,17 @@
 @for (activity of group().activities; track activity.id) {
   @let isActive = group().activeActivityId === activity.id;
-  <span sciMaterialIcon
-        class="activity-item"
-        [class.active]="isActive"
-        (click)="toggleActivity(activity.id, !isActive)">
+  <button class="activity-item e2e-activity-item"
+          [class.active]="isActive"
+          (click)="toggleActivity(activity.id, !isActive)">
+    <span sciMaterialIcon>
     {{activity.icon}}
-  </span>
+    </span>
+  </button>
+
+  <!--  <button sciMaterialIcon-->
+    <!--        class="activity-item"-->
+    <!--        [class.active]="isActive"-->
+    <!--        (click)="toggleActivity(activity.id, !isActive)">-->
+    <!--    {{activity.icon}}-->
+    <!--  </button>-->
 }

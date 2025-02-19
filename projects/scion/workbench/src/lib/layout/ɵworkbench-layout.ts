@@ -269,7 +269,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const workingCopy = this.workingCopy();
 
-    if ((reference as DockingArea).dockTo) {
+    if ((reference as Partial<DockingArea>).dockTo) {
       workingCopy.__addActivity(partId, reference as DockingArea, {...extras, alternativeId} as PartExtras & {cssClass?: string | string[]; alternativeId?: string});
     }
     else {
@@ -492,13 +492,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[LayoutModifyError] Size for '${panel}' activity panel must not be less than 0, but was '${size}'.`);
     }
     switch (panel) {
-      case "left":
+      case 'left':
         this._activityLayout.panels.left.width = `${size}px`;
         break;
-      case "right":
+      case 'right':
         this._activityLayout.panels.right.width = `${size}px`;
         break;
-      case "bottom":
+      case 'bottom':
         this._activityLayout.panels.bottom.height = `${size}px`;
         break;
     }
@@ -518,13 +518,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[LayoutModifyError] Ratio for node '${panel}' activity panel must be in the closed interval [0,1], but was '${ratio}'.`);
     }
     switch (panel) {
-      case "left":
+      case 'left':
         this._activityLayout.panels.left.ratio = ratio;
         break;
-      case "right":
+      case 'right':
         this._activityLayout.panels.right.ratio = ratio;
         break;
-      case "bottom":
+      case 'bottom':
         this._activityLayout.panels.bottom.ratio = ratio;
         break;
     }
@@ -654,7 +654,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     const activityId = WorkbenchLayouts.computeActivityId();
     this._grids[activityId] = {
-      root: new MPart({id, alternativeId: extras?.alternativeId, structural: true, views: []}), // TODO [activity] still required to be structural?,
+      root: new MPart({id, alternativeId: extras.alternativeId, structural: true, views: []}), // TODO [activity] still required to be structural?,
       activePartId: id,
     };
 
@@ -785,7 +785,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     // TODO [activity] need to rename grids?
     const grid = this.grids[activity.id];
     this._grids[newActivityId] = {...grid};
-    delete this.grids[activity.id];
+    delete this.grids[activity.id]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
 
     const group = this.getActivityGroupById(activity.id);
     if (group.activeActivityId === activity.id) {
@@ -806,7 +806,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __assignStableActivityIdentifier(): void {
-    this.activities().forEach((activity, index) => this.__renameActivity(activity, `${ACTIVITY_ID_PREFIX}${index + 1}`))
+    this.activities().forEach((activity, index) => this.__renameActivity(activity, `${ACTIVITY_ID_PREFIX}${index + 1}`));
   }
 
   /**
@@ -1228,7 +1228,7 @@ function coerceMPartGrid(grid: string | MPartGrid | undefined, options?: {defaul
 
 function coerceMActivityLayout(layout: string | MActivityLayout | undefined, options: {default: () => MActivityLayout}): MActivityLayout {
   if (!layout) {
-    return options?.default();
+    return options.default();
   }
   if (typeof layout === 'object') {
     return layout;

@@ -70,9 +70,9 @@ export class HeaderComponent {
       ...this.contributeNavigationMenuItems(),
       new MenuItemSeparator(),
       ...this.contributeSettingsMenuItems(),
-    new MenuItemSeparator(),
-        ...this.contributeLayoutMenuItems(),
-      ]);
+      new MenuItemSeparator(),
+      ...this.contributeLayoutMenuItems(),
+    ]);
   }
 
   private contributePerspectiveMenuItems(): MenuItem[] {

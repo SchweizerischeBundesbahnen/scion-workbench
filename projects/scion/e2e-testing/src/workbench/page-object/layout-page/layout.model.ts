@@ -41,7 +41,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout;
   public addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
   public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean} | PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
-    if ((reference as DockingArea).dockTo) {
+    if ((reference as Partial<DockingArea>).dockTo) {
       return this.addActivity(id, reference as DockingArea, extras as PartExtras & {cssClass?: string | string[]});
     }
     else {
@@ -66,7 +66,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       dockTo: dockTo.dockTo,
       icon: extras.icon,
       label: extras.label,
-      tooltip: extras.tooltip
+      tooltip: extras.tooltip,
     });
     return this;
   }
