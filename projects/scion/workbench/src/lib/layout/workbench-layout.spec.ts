@@ -31,7 +31,7 @@ describe('WorkbenchLayout', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 
-  fit('should allow adding views', () => {
+  it('should allow adding views', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.A')
       .addView('view.1', {partId: 'part.A'})
@@ -214,7 +214,7 @@ describe('WorkbenchLayout', () => {
       },
     });
 
-    expect((workbenchLayout as ɵWorkbenchLayout).grids.mainArea).toBeNull();
+    expect((workbenchLayout as ɵWorkbenchLayout).grids.mainArea).toBeUndefined();
   });
 
   /**
@@ -730,13 +730,18 @@ describe('WorkbenchLayout', () => {
    * | C  |   |
    * +----+---+
    */
-  fit('should be immutable', () => {
+  it('should be immutable', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.A'});
 
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.B', {relativeTo: 'part.A', align: 'left'})
-      .addPart('part.C', {relativeTo: 'part.B', align: 'bottom'});
+      .addPart('part.C', {relativeTo: 'part.B', align: 'bottom'})
+      .addView('view.101', {partId: 'part.C'})
+      .navigatePart('part.A', ['path/to/part/a'])
+      .navigatePart('part.B', ['path/to/part/b'])
+      .navigatePart('part.C', ['path/to/part/c'])
+      .navigateView('view.101', ['path/to/view/1']);
 
     const serializedWorkbenchLayout = workbenchLayout.serialize();
 
@@ -745,9 +750,16 @@ describe('WorkbenchLayout', () => {
       .addPart('part.X', {relativeTo: 'part.A', align: 'right'})
       .addPart('part.Y', {relativeTo: 'part.X', align: 'bottom'})
       .addPart('part.Z', {relativeTo: 'part.Y', align: 'bottom'})
+      .addView('view.102', {partId: 'part.C'})
+      .navigatePart('part.X', ['path/to/part/x'])
+      .navigatePart('part.Y', ['path/to/part/y'])
+      .navigatePart('part.Z', ['path/to/part/z'])
+      .navigateView('view.102', ['path/to/view/2'])
       .removePart('part.Z');
 
-    expect(workbenchLayout.serialize()).toEqual(serializedWorkbenchLayout);
+    expect(workbenchLayout.serialize().grids).toEqual(serializedWorkbenchLayout.grids);
+    expect(workbenchLayout.serialize().activityLayout).toEqual(serializedWorkbenchLayout.activityLayout);
+    expect(workbenchLayout.serialize().outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})).toEqual(serializedWorkbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}));
   });
 
   /**
