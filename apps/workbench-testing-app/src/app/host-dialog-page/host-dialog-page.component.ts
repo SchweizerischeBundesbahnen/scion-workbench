@@ -31,7 +31,6 @@ import {WorkbenchDialogActionDirective} from '@scion/workbench';
   selector: 'app-host-dialog-page',
   templateUrl: './host-dialog-page.component.html',
   styleUrls: ['./host-dialog-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     JsonPipe,

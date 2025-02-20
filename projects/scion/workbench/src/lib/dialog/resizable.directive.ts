@@ -28,7 +28,7 @@ const HANDLE_SIZE = 6;
  * - must be positioned, either relative or absolute
  * - must be horizontally centered in its layout
  */
-@Directive({selector: '[wbResizable]', standalone: true})
+@Directive({selector: '[wbResizable]'})
 export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
 
   private readonly _host: HTMLElement;

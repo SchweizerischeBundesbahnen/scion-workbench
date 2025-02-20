@@ -115,6 +115,6 @@ export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('ɵWO
 /**
  * Component to display if the outlet has not yet been navigated or no navigation information is available.
  */
-@Component({selector: 'wb-blank', template: '', standalone: true})
+@Component({selector: 'wb-blank', template: ''})
 export class BlankComponent {
 }

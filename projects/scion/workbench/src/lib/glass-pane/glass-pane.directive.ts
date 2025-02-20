@@ -26,7 +26,7 @@ import {Arrays} from '@scion/toolkit/util';
  * - {@link GLASS_PANE_TARGET_ELEMENT}: Controls the HTML element to block. Defaults to the directive's host element if not set.
  * - {@link GLASS_PANE_OPTIONS}: Configures the glass pane.
  */
-@Directive({selector: '[wbGlassPane]', standalone: true})
+@Directive({selector: '[wbGlassPane]'})
 export class GlassPaneDirective implements OnDestroy, AfterViewInit {
 
   private readonly _targetElement: HTMLElement;

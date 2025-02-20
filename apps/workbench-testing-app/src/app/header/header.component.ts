@@ -27,7 +27,6 @@ import {sortPerspectives} from './sort-perspectives.util';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciMaterialIconDirective,

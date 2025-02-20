@@ -29,7 +29,6 @@ import {Microfrontends} from '../common/microfrontend.util';
   selector: 'wb-microfrontend-popup',
   styleUrls: ['./microfrontend-popup.component.scss'],
   templateUrl: './microfrontend-popup.component.html',
-  standalone: true,
   imports: [NgClass, NgComponentOutlet],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })

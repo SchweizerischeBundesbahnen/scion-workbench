@@ -20,7 +20,6 @@ import {DialogActionFilterPipe} from './dialog-action-filter.pipe';
   selector: 'wb-dialog-footer',
   templateUrl: './dialog-footer.component.html',
   styleUrls: ['./dialog-footer.component.scss'],
-  standalone: true,
   imports: [
     NgTemplateOutlet,
     NullIfEmptyPipe,

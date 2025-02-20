@@ -24,7 +24,6 @@ import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
   selector: 'app-navigate-parts',
   templateUrl: './navigate-parts.component.html',
   styleUrls: ['./navigate-parts.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciMaterialIconDirective,

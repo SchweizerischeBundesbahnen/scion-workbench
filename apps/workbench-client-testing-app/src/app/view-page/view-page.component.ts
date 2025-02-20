@@ -32,7 +32,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   selector: 'app-view-page',
   templateUrl: './view-page.component.html',
   styleUrls: ['./view-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     JsonPipe,

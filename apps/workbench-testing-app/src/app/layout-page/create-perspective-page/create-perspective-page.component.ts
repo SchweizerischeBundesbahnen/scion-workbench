@@ -26,7 +26,6 @@ import {toSignal} from '@angular/core/rxjs-interop';
   selector: 'app-create-perspective-page',
   templateUrl: './create-perspective-page.component.html',
   styleUrls: ['./create-perspective-page.component.scss'],
-  standalone: true,
   imports: [
     AddPartsComponent,
     AddViewsComponent,

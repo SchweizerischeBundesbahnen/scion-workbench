@@ -23,7 +23,6 @@ import {stringifyError} from '../common/stringify-error.util';
   selector: 'app-router-page',
   templateUrl: './router-page.component.html',
   styleUrls: ['./router-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

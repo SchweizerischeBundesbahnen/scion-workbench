@@ -20,7 +20,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-signal-ready-test-page',
   template: '',
-  standalone: true,
 })
 export default class SignalReadyTestPageComponent {
 

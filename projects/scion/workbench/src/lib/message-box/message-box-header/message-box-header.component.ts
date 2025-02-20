@@ -13,7 +13,6 @@ import {Component, HostBinding, Input} from '@angular/core';
   selector: 'wb-message-box-header',
   templateUrl: './message-box-header.component.html',
   styleUrls: ['./message-box-header.component.scss'],
-  standalone: true,
 })
 export class MessageBoxHeaderComponent {
 

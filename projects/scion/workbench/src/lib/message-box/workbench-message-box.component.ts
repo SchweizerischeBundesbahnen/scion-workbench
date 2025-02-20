@@ -31,7 +31,6 @@ import {SciDimensionDirective} from '@scion/components/dimension';
   selector: 'wb-message-box',
   templateUrl: './workbench-message-box.component.html',
   styleUrls: ['./workbench-message-box.component.scss'],
-  standalone: true,
   imports: [
     NgComponentOutlet,
     SciDimensionDirective,

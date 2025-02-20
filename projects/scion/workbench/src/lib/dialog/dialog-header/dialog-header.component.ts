@@ -18,7 +18,6 @@ import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
   selector: 'wb-dialog-header',
   templateUrl: './dialog-header.component.html',
   styleUrls: ['./dialog-header.component.scss'],
-  standalone: true,
 })
 export class DialogHeaderComponent {
 

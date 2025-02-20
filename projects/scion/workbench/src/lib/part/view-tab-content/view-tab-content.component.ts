@@ -16,7 +16,6 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
   selector: 'wb-view-tab-content',
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
-  standalone: true,
 })
 export class ViewTabContentComponent {
 

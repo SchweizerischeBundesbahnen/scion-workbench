@@ -22,7 +22,6 @@ import StartPageComponent from '../start-page/start-page.component';
   selector: 'app-workbench',
   styleUrls: ['./workbench.component.scss'],
   templateUrl: './workbench.component.html',
-  standalone: true,
   imports: [
     SciMaterialIconDirective,
     ScionWorkbenchComponent,

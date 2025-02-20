@@ -23,7 +23,6 @@ import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.co
   selector: 'app-modify-layout-page',
   templateUrl: './modify-layout-page.component.html',
   styleUrls: ['./modify-layout-page.component.scss'],
-  standalone: true,
   imports: [
     AddPartsComponent,
     AddViewsComponent,

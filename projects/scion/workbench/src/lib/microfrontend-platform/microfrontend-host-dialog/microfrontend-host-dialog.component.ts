@@ -37,7 +37,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'wb-microfrontend-host-dialog',
   styleUrls: ['./microfrontend-host-dialog.component.scss'],
   templateUrl: './microfrontend-host-dialog.component.html',
-  standalone: true,
   imports: [
     RouterOutlet,
     NgTemplateOutlet,

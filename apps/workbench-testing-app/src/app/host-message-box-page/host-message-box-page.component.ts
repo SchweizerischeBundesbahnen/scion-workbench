@@ -27,7 +27,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   selector: 'app-host-message-box-page',
   templateUrl: './host-message-box-page.component.html',
   styleUrls: ['./host-message-box-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     JsonPipe,

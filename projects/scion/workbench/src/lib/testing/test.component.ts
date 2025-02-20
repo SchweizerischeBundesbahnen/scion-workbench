@@ -25,7 +25,6 @@ import {ViewId, WorkbenchView} from '../view/workbench-view.model';
       <input class="component-state"/>
     }
   `,
-  standalone: true,
 })
 export default class _TestComponent {
 

@@ -15,7 +15,6 @@ import {noop} from 'rxjs';
 @Component({
   selector: 'app-blocking-can-close-test-page',
   template: 'Blocking CanClose Test Page',
-  standalone: true,
 })
 export default class BlockingCanCloseTestPageComponent {
 

@@ -19,7 +19,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-view-move-dialog-test-page',
   templateUrl: './view-move-dialog-test-page.component.html',
   styleUrls: ['./view-move-dialog-test-page.component.scss'],
-  standalone: true,
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,

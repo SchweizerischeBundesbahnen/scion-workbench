@@ -17,7 +17,6 @@ import {WorkbenchView} from '@scion/workbench';
 @Component({
   selector: 'app-lifecycle-logger-test-page',
   template: 'Lifecycle Logger Test Page',
-  standalone: true,
 })
 export default class LifecycleLoggerTestPageComponent {
 

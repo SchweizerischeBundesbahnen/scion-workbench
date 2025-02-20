@@ -449,7 +449,6 @@ describe('Workbench Perspective', () => {
           display: grid;
         }
       `,
-      standalone: true,
       imports: [WorkbenchComponent, WorkbenchDesktopDirective],
     })
     class SpecRootComponent {

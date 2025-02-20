@@ -20,7 +20,6 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
   selector: 'app-register-workbench-intention-page',
   templateUrl: './register-workbench-intention-page.component.html',
   styleUrls: ['./register-workbench-intention-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

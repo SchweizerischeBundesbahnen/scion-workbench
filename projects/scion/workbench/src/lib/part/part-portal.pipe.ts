@@ -19,7 +19,7 @@ import {PartId} from './workbench-part.model';
  * Constructs the portal for the given part in the calling injection context,
  * or throws an error if the part is not registered.
  */
-@Pipe({name: 'wbPartPortal', standalone: true})
+@Pipe({name: 'wbPartPortal'})
 export class PartPortalPipe implements PipeTransform {
 
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);

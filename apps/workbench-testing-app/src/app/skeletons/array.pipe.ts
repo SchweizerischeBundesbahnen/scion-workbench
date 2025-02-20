@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Creates an array of passed length.
  */
-@Pipe({name: 'appArray', standalone: true})
+@Pipe({name: 'appArray'})
 export class ArrayPipe implements PipeTransform {
 
   public transform(number: number): Iterable<number> {

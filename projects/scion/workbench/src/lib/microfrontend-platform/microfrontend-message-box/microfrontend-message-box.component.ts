@@ -29,7 +29,6 @@ import {Microfrontends} from '../common/microfrontend.util';
   selector: 'wb-microfrontend-message-box',
   styleUrls: ['./microfrontend-message-box.component.scss'],
   templateUrl: './microfrontend-message-box.component.html',
-  standalone: true,
   imports: [
     NgComponentOutlet,
   ],

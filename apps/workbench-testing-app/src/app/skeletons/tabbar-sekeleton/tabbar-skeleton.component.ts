@@ -19,7 +19,6 @@ import {ArrayPipe} from '../array.pipe';
   selector: 'app-tabbar-skeleton',
   templateUrl: './tabbar-skeleton.component.html',
   styleUrls: ['./tabbar-skeleton.component.scss'],
-  standalone: true,
   imports: [
     ArrayPipe,
   ],

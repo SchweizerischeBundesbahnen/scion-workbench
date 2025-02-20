@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Joins given items by given separator, applying given project function if specified.
  */
-@Pipe({name: 'appJoin', standalone: true})
+@Pipe({name: 'appJoin'})
 export class JoinPipe implements PipeTransform {
 
   public transform<T>(items: T[] | null | undefined, separator: string, projectFn?: (value: T) => string): string {

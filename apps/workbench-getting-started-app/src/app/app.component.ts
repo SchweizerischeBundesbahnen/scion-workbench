@@ -15,7 +15,6 @@ import {WorkbenchComponent} from '@scion/workbench';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  standalone: true,
   imports: [WorkbenchComponent],
 })
 export class AppComponent {

@@ -18,7 +18,6 @@ import {stringifyError} from '../../common/stringify-error.util';
   selector: 'app-publish-message-page',
   templateUrl: './publish-message-page.component.html',
   styleUrls: ['./publish-message-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

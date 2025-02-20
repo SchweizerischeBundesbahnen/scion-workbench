@@ -56,7 +56,6 @@ import {PART_BAR_ELEMENT} from '../part-bar/part-bar.component';
   selector: 'wb-view-tab-bar',
   templateUrl: './view-tab-bar.component.html',
   styleUrls: ['./view-tab-bar.component.scss'],
-  standalone: true,
   imports: [
     SciViewportComponent,
     ViewTabComponent,

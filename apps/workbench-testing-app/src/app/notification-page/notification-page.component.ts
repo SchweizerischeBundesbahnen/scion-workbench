@@ -23,7 +23,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-notification-page',
   templateUrl: './notification-page.component.html',
   styleUrls: ['./notification-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     StringifyPipe,

@@ -23,7 +23,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   selector: 'app-dialog-opener-page',
   templateUrl: './dialog-opener-page.component.html',
   styleUrls: ['./dialog-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

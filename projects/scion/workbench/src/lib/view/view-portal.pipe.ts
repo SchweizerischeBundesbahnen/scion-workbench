@@ -17,7 +17,7 @@ import {ViewId} from './workbench-view.model';
 /**
  * Resolves the portal for the given view, or throws an error if the view is not registered.
  */
-@Pipe({name: 'wbViewPortal', standalone: true})
+@Pipe({name: 'wbViewPortal'})
 export class ViewPortalPipe implements PipeTransform {
 
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);

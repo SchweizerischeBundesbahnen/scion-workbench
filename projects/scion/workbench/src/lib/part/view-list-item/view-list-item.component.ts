@@ -22,7 +22,6 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
   templateUrl: './view-list-item.component.html',
   styleUrls: ['./view-list-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     PortalModule,
   ],

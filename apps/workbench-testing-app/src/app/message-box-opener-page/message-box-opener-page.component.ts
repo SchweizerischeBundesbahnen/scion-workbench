@@ -22,7 +22,6 @@ import {CssClassComponent} from '../css-class/css-class.component';
   selector: 'app-message-box-opener-page',
   templateUrl: './message-box-opener-page.component.html',
   styleUrls: ['./message-box-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
