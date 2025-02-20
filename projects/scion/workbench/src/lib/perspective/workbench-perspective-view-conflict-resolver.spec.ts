@@ -17,9 +17,9 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchService} from '../workbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {GridComponent} from '../layout/grid/grid.component';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
+import {WorkbenchComponent} from '../workbench.component';
 
 describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
@@ -47,7 +47,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(GridComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1

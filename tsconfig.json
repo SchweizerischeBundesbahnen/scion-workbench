@@ -58,9 +58,9 @@
 //          //      "@scion/toolkit/*": [
 //          //        "./src-lib/@scion/toolkit/*/src/public_api"
 //          //      ],
-//                "@scion/components/*": [
-//                  "./src-lib/@scion/components/*/src/public_api"
-//                ],
+//          //      "@scion/components/*": [
+//          //        "./src-lib/@scion/components/*/src/public_api"
+//          //      ],
 //          //      "@scion/components.internal/*": [
 //          //        "./src-lib/@scion/components.internal/*/src/public_api"
 //          //      ],

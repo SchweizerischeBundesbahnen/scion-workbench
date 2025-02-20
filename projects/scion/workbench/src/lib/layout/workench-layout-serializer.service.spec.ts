@@ -172,10 +172,10 @@ describe('WorkbenchLayoutSerializer', () => {
       },
     });
 
-    const [leftPart] = layout.parts({id: 'left'});
-    const [rightPart] = layout.parts({id: 'right'});
-    const [_1d94dcb6Part] = layout.parts({id: '1d94dcb6-76b6-47eb-b300-39448993d36b'});
-    const [_6f09e6e2] = layout.parts({id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'});
+    const [leftPart] = layout.parts({id: 'left'}, {throwIfEmpty: true});
+    const [rightPart] = layout.parts({id: 'right'}, {throwIfEmpty: true});
+    const [_1d94dcb6Part] = layout.parts({id: '1d94dcb6-76b6-47eb-b300-39448993d36b'}, {throwIfEmpty: true});
+    const [_6f09e6e2] = layout.parts({id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'}, {throwIfEmpty: true});
 
     expect(layout).toEqualWorkbenchLayout({
       mainGrid: {

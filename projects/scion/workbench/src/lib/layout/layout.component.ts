@@ -12,7 +12,7 @@ import {Component, computed, inject, input} from '@angular/core';
 import {ActivityBarComponent} from '../activity/activity-bar/activity-bar.component';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
-import {WorkbenchActivityPanelComponent} from '../activity/activity-panel/workbench-activity-panel.component';
+import {ActivityPanelComponent} from '../activity/activity-panel/activity-panel.component';
 import {GridComponent} from './grid/grid.component';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
@@ -37,7 +37,7 @@ import {WORKBENCH_ID} from '../workbench-id';
     ActivityBarComponent,
     SciSashDirective,
     SciSashboxComponent,
-    WorkbenchActivityPanelComponent,
+    ActivityPanelComponent,
     GridComponent,
     NgTemplateOutlet,
     GridElementIfVisiblePipe,

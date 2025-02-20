@@ -13,7 +13,6 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
-import {GridComponent} from '../../../layout/grid/grid.component';
 import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
@@ -24,6 +23,7 @@ import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {Objects} from '../../../common/objects.util';
+import {WorkbenchComponent} from '../../../workbench.component';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -44,15 +44,15 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
             return pass();
           }
 
-          // Resolve debug element for `WorkbenchMainGridComponent`.
+          // Resolve debug element for `WorkbenchComponent`.
           let debugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-          if (!(debugElement.componentInstance instanceof GridComponent)) {
-            debugElement = debugElement.query(By.directive(GridComponent));
+          if (!(debugElement.componentInstance instanceof WorkbenchComponent)) {
+            debugElement = debugElement.query(By.directive(WorkbenchComponent));
           }
 
-          // Expect debug element to represent `WorkbenchMainGridComponent` element.
-          if (!(debugElement.componentInstance instanceof GridComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchMainGridComponent' (or a parent), but was ${actual.componentInstance?.constructor?.name}.`); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+          // Expect debug element to represent `WorkbenchComponent` element.
+          if (!(debugElement.componentInstance instanceof WorkbenchComponent)) {
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchComponent' (or a parent), but was ${actual.componentInstance?.constructor?.name}.`); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           }
 
           // Assert model.
@@ -103,7 +103,7 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: �
 function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualElement: Element): void {
   // Assert the workbench grid plus the main area grid if expected.
   if (expected.mainGrid) {
-    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
+    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] > wb-grid-element:not([data-parentnodeid])'), expected);
   }
   // Assert only the main area grid, but not the workbench grid since not expected.
   else if (expected.mainAreaGrid) {

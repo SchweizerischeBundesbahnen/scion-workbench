@@ -208,6 +208,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return parts matching the filter criteria.
    */
   public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
+  public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MPart, ...MPart[]];
   public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
   public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
     const parts = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
@@ -337,7 +338,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public view(findBy: {viewId: ViewId}): MView;
   public view(findBy: {viewId: ViewId}, options: {orElse: null}): MView | null;
   public view(findBy: {viewId: ViewId}, options?: {orElse: null}): MView | null {
-    const view = this.views({id: findBy.viewId}).at(0);
+    const [view] = this.views({id: findBy.viewId});
     if (!view && !options) {
       throw Error(`[NullViewError] No view found with id '${findBy.viewId}'.`);
     }
@@ -359,6 +360,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple views are found.
    * @return views matching the filter criteria.
    */
+  public views(findBy: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MView];
+  public views(findBy: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MView, ...MView[]];
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[];
   public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
     const views = this.parts({id: findBy?.partId, grid: findBy?.grid})
       .flatMap(part => part.views)
@@ -1049,12 +1053,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return Element matching the filter criteria.
    */
   private findTreeElement<T extends MTreeNode | MPart>(findBy: {id: string}): T {
-    const element = this.findTreeElements((element: MTreeNode | MPart): element is T => {
+    const [element] = this.findTreeElements((element: MTreeNode | MPart): element is T => {
       if (element instanceof MPart) {
         return matchesPartId(findBy.id, element);
       }
       return element.id === findBy.id;
-    }, {findFirst: true}).at(0);
+    }, {findFirst: true});
 
     if (!element) {
       throw Error(`[NullElementError] No element found with id '${findBy.id}'.`);

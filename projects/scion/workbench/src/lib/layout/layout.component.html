@@ -93,9 +93,9 @@
 <!-- Main Grid -->
 <ng-template #main_grid>
   @if (mainGrid().root | wbGridElementIfVisible; as root) {
-    <wb-grid [grid]="mainGrid()" (viewDrop)="onViewDrop($event)"/>
+    <wb-grid [grid]="mainGrid()" (viewDrop)="onViewDrop($event)" data-grid="main"/>
   } @else {
-    <sci-viewport class="desktop"
+    <sci-viewport class="desktop e2e-desktop"
                   wbViewDropZone
                   [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
                   [wbViewDropZoneCssClass]="'e2e-desktop-drop-zone'"

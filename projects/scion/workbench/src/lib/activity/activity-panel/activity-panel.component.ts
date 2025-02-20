@@ -16,8 +16,8 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 
 @Component({
   selector: 'wb-activity-panel',
-  templateUrl: './workbench-activity-panel.component.html',
-  styleUrls: ['./workbench-activity-panel.component.scss'],
+  templateUrl: './activity-panel.component.html',
+  styleUrls: ['./activity-panel.component.scss'],
   standalone: true,
   imports: [
     SciSashboxComponent,
@@ -25,7 +25,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
     GridComponent,
   ],
 })
-export class WorkbenchActivityPanelComponent {
+export class ActivityPanelComponent {
 
   public readonly panel = input.required<'left' | 'right' | 'bottom'>();
 

@@ -46,7 +46,7 @@ export default class CreatePerspectivePageComponent {
     id: this._formBuilder.control('', Validators.required),
     transient: this._formBuilder.control<boolean | undefined>(undefined),
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    activities: this._formBuilder.control<ActivityDescriptor[]>([], Validators.required),
+    activities: this._formBuilder.control<ActivityDescriptor[]>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([], Validators.required),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
