@@ -34,9 +34,9 @@ export class WorkbenchActivityPanelComponent {
 
   protected readonly activityLayout = computed(() => this._workbenchLayoutService.layout()!.activityLayout);
   protected readonly grids = computed(() => this._workbenchLayoutService.layout()!.grids);
-  protected readonly leftPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout()?.panels.left.ratio ?? 0.5));
-  protected readonly rightPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout()?.panels.right.ratio ?? 0.5));
-  protected readonly bottomPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout()?.panels.bottom.ratio ?? 0.5));
+  protected readonly leftPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout().panels.left.ratio ?? 0.5));
+  protected readonly rightPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout().panels.right.ratio ?? 0.5));
+  protected readonly bottomPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout().panels.bottom.ratio ?? 0.5));
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);

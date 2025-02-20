@@ -15,7 +15,6 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {GridComponent} from '../layout/grid/grid.component';
 import {WorkbenchService} from '../workbench.service';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
@@ -24,6 +23,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchStorage} from '../storage/workbench-storage';
 import {Maps} from '@scion/toolkit/util';
 import {firstValueFrom, Subject} from 'rxjs';
+import {WorkbenchComponent} from '@scion/workbench';
 
 describe('WorkbenchPerspectiveStorage', () => {
 
@@ -55,7 +55,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(GridComponent));
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in part 'left-top'
@@ -176,7 +176,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(GridComponent));
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -246,7 +246,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(GridComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1.
@@ -368,7 +368,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(GridComponent));
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in perspective-1

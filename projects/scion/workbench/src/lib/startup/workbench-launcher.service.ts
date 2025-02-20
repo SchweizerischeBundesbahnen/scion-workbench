@@ -146,11 +146,6 @@ export class WorkbenchStartup {
     return !!layout && this._workbenchInitializersDone();
   });
 
-  /* @internal */
-  public notifyWorkbenchInitializersDone(): void {
-    this._workbenchInitializersDone.set(true);
-  }
-
   /**
    * Promise that resolves when the workbench has completed the startup.
    */
@@ -161,7 +156,12 @@ export class WorkbenchStartup {
         effectRef.destroy();
       }
     }, {injector: this._injector});
-  })
+  });
+
+  /* @internal */
+  public notifyWorkbenchInitializersDone(): void {
+    this._workbenchInitializersDone.set(true);
+  }
 }
 
 /**
