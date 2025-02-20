@@ -74,8 +74,9 @@ export class GridElementComponent implements OnChanges {
     this._workbenchLayoutService.signalResizing(true);
   }
 
+  // TODO [activity] Change to object literal instead of array
   public onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
-    const ratio = sashSize1 / (sashSize1 + sashSize2);
+    const ratio = sashSize1! / (sashSize1! + sashSize2!);
     this._workbenchLayoutService.signalResizing(false);
     void this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio));
   }

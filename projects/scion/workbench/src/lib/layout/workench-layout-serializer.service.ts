@@ -76,7 +76,7 @@ export class WorkbenchLayoutSerializer {
   public deserializeGrid(serialized: string): ɵMPartGrid {
     const [jsonGrid, jsonGridVersion] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
     const gridVersion = Number.isNaN(Number(jsonGridVersion)) ? 1 : Number(jsonGridVersion);
-    const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
+    const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid!, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
 
     // Parse the JSON.
     const grid = JSON.parse(migratedJsonGrid, (key: string, value: unknown) => {

@@ -24,9 +24,9 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
 import {DESKTOP} from '../workbench-element-references';
-import {WORKBENCH_ID} from '@scion/workbench';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {Logger} from '../logging';
+import {WORKBENCH_ID} from '../workbench-id';
 
 @Component({
   selector: 'wb-layout',
@@ -77,19 +77,19 @@ export class LayoutComponent {
     this._workbenchLayoutService.signalResizing(false);
 
     if (this.leftActivityPanel() && this.rightActivityPanel()) {
-      const [leftSashSize, _mainSashSize, rightSashSize] = sashSizes;
+      const [leftSashSize, _mainSashSize, rightSashSize] = sashSizes; // eslint-disable-line @typescript-eslint/no-unused-vars
       void this._workbenchRouter.navigate(layout => layout
-        .setActivityPanelSize('left', leftSashSize)
-        .setActivityPanelSize('right', rightSashSize),
+        .setActivityPanelSize('left', leftSashSize!)
+        .setActivityPanelSize('right', rightSashSize!),
       );
     }
     else if (this.leftActivityPanel()) {
       const [leftSashSize] = sashSizes;
-      void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('left', leftSashSize));
+      void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('left', leftSashSize!));
     }
     else if (this.rightActivityPanel()) {
-      const [_leftSashSize, _mainSashSize, rightSashSize] = sashSizes;
-      void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('left', rightSashSize));
+      const [_leftSashSize, _mainSashSize, rightSashSize] = sashSizes; // eslint-disable-line @typescript-eslint/no-unused-vars
+      void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('left', rightSashSize!));
     }
     // void this._workbenchRouter.navigate(layout => layout
     //   .setActivityPanelSize('left', leftPanelSize)
@@ -99,7 +99,7 @@ export class LayoutComponent {
 
   protected onVerticalSashEnd([_mainContentSize, bottomPanelSize]: number[]): void {
     this._workbenchLayoutService.signalResizing(false);
-    void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('bottom', bottomPanelSize));
+    void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('bottom', bottomPanelSize!));
   }
 
   protected onViewDrop(event: WbViewDropEvent): void {

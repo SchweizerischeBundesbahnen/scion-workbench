@@ -109,7 +109,7 @@ export default class CreatePerspectivePageComponent {
 
   private createLayout(): WorkbenchLayoutFn {
     // Capture form values, since the `layout` function is evaluated independently of the form life-cycle
-    const [initialPart, ...parts] = this.form.controls.parts.value;
+    const [initialPart, ...parts] = this.form.controls.parts.value as [PartDescriptor, ...PartDescriptor[]];
     const activities = this.form.controls.activities.value;
     const views = this.form.controls.views.value;
     const partNavigations = this.form.controls.partNavigations.value;

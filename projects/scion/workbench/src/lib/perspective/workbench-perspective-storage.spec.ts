@@ -23,7 +23,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchStorage} from '../storage/workbench-storage';
 import {Maps} from '@scion/toolkit/util';
 import {firstValueFrom, Subject} from 'rxjs';
-import {WorkbenchComponent} from '@scion/workbench';
+import {WorkbenchComponent} from '../workbench.component';
 
 describe('WorkbenchPerspectiveStorage', () => {
 

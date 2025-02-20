@@ -56,8 +56,11 @@ export const Routing = {
     }
 
     const urlTree = inject(Router).createUrlTree(commands, {relativeTo});
-    const segmentGroup = urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
-    return segmentGroup?.segments ?? [];
+    // vorher
+    return urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET]?.segments ?? [];
+    // nachher
+    // const segmentGroup = urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
+    // return segmentGroup?.segments ?? [];
   },
 
   /**

@@ -37,12 +37,12 @@ export class UrlSegmentMatcher {
 
     return segments.every((segment, index) => {
       const checkMatrixParams = this._flags.matchMatrixParams;
-      const checkPath = !this._flags.matchWildcardPath || this._pattern[index].path !== '*';
+      const checkPath = !this._flags.matchWildcardPath || this._pattern[index]!.path !== '*';
 
-      if (checkPath && segment.path !== this._pattern[index].path) {
+      if (checkPath && segment.path !== this._pattern[index]!.path) {
         return false;
       }
-      if (checkMatrixParams && !Objects.isEqual(segment.parameters, this._pattern[index].parameters)) {
+      if (checkMatrixParams && !Objects.isEqual(segment.parameters, this._pattern[index]!.parameters)) {
         return false;
       }
       return true;

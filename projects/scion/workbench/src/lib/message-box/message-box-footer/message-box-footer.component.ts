@@ -54,7 +54,7 @@ export class MessageBoxFooterComponent {
     const actionButtons = this._actionButtons.toArray();
     const actionButtonCount = actionButtons.length;
     const newIndex = (direction === 'left' ? index - 1 : index + 1);
-    actionButtons[((newIndex + actionButtonCount) % actionButtonCount)].nativeElement.focus();
+    actionButtons[((newIndex + actionButtonCount) % actionButtonCount)]!.nativeElement.focus();
   }
 
   private async emitPreferredSize(): Promise<void> {

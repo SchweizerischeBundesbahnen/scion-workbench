@@ -132,7 +132,7 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
       throw Error('[NullPerspectiveError] No perspective found to activate.');
     }
 
-    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.objects()[0].id;
+    const perspectiveId = await this.determineInitialPerspective() ?? this._perspectiveRegistry.objects()[0]!.id;
     const activation = this.switchPerspective(perspectiveId, {storePerspectiveAsActive: false});
 
     // Switching perspective blocks until the initial navigation has been performed. By default, Angular performs

@@ -37,7 +37,7 @@ export class WorkbenchActivityLayoutSerializer {
   public deserializeActivityLayout(serialized: string): MActivityLayout {
     const [jsonLayout, jsonLayoutVersion] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
     const layoutVersion = Number.isNaN(Number(jsonLayoutVersion)) ? 1 : Number(jsonLayoutVersion);
-    const migratedJsonLayout = this._layoutMigrator.migrate(jsonLayout, {from: layoutVersion, to: WORKBENCH_ACTIVITY_LAYOUT_VERSION});
+    const migratedJsonLayout = this._layoutMigrator.migrate(jsonLayout!, {from: layoutVersion, to: WORKBENCH_ACTIVITY_LAYOUT_VERSION});
     return JSON.parse(migratedJsonLayout) as MActivityLayout;
   }
 }

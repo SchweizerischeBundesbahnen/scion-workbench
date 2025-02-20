@@ -7,7 +7,7 @@
 @if (element | wbInstanceof:MTreeNode; as treeNode) {
   @if (children.length === 1) {
     <!-- Node with a single visible child. -->
-    <wb-grid-element [element]="children[0].element"/>
+    <wb-grid-element [element]="children[0]!.element"/>
   }
   @if (children.length > 1) {
     <!-- Node with multiple visible children. -->

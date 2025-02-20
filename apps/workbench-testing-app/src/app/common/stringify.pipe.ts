@@ -34,7 +34,7 @@ export class StringifyPipe implements PipeTransform {
     }
     if (object instanceof Map) {
       return Array.from<string[]>(object)
-        .sort(([key1], [key2]) => key1.localeCompare(key2))
+        .sort(([key1], [key2]) => key1!.localeCompare(key2!))
         .map(([key, value]) => `{"${key}" => ${JSON.stringify(value)}}`)
         .join('\n')
         .trim();

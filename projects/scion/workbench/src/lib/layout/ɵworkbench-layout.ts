@@ -111,6 +111,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Tests if given activity is contained in this layout.
+   */
+  public hasActivity(id: ActivityId): boolean {
+    // TODO [activity] consider also check activity layout
+    return !!this._grids[id];
+  }
+
+  /**
    * Finds the URL of outlets based on the specified filter.
    *
    * @param selector - Defines the search scope.
@@ -199,7 +207,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple parts are found.
    * @return parts matching the filter criteria.
    */
-  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
+  public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
+  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
+  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
     const parts = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
       if (!(element instanceof MPart)) {
         return false;
@@ -327,7 +337,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public view(findBy: {viewId: ViewId}): MView;
   public view(findBy: {viewId: ViewId}, options: {orElse: null}): MView | null;
   public view(findBy: {viewId: ViewId}, options?: {orElse: null}): MView | null {
-    const [view] = this.views({id: findBy.viewId});
+    const view = this.views({id: findBy.viewId}).at(0);
     if (!view && !options) {
       throw Error(`[NullViewError] No view found with id '${findBy.viewId}'.`);
     }
@@ -349,7 +359,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple views are found.
    * @return views matching the filter criteria.
    */
-  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
     const views = this.parts({id: findBy?.partId, grid: findBy?.grid})
       .flatMap(part => part.views)
       .filter(view => {
@@ -701,7 +711,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
           const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
           return activationInstantPart2 - activationInstantPart1;
         });
-      grid.activePartId = activePart.id;
+      grid.activePartId = activePart!.id;
     }
   }
 
@@ -765,12 +775,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __renameActivity(activity: MActivity, newActivityId: ActivityId): void {
-    // if (this.hasPart(newActivityId)) {
-    //   throw Error(`[PartRenameError] Part id must be unique. The layout already contains a part with the id '${newActivityId}'.`);
-    // }
+    if (this.hasActivity(newActivityId)) {
+      throw Error(`[ActivityRenameError] Activity id must be unique. The layout already contains an activity with the id '${newActivityId}'.`);
+    }
 
-    // TODO [activity] need to rename grids?
     const grid = this.grids[activity.id];
+    if (!grid) {
+      throw Error(`[ActivityRenameError] No grid found for activity with the id '${activity.id}'.`);
+    }
+
     this._grids[newActivityId] = {...grid};
     delete this.grids[activity.id]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
 
@@ -1036,12 +1049,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return Element matching the filter criteria.
    */
   private findTreeElement<T extends MTreeNode | MPart>(findBy: {id: string}): T {
-    const [element] = this.findTreeElements((element: MTreeNode | MPart): element is T => {
+    const element = this.findTreeElements((element: MTreeNode | MPart): element is T => {
       if (element instanceof MPart) {
         return matchesPartId(findBy.id, element);
       }
       return element.id === findBy.id;
-    }, {findFirst: true});
+    }, {findFirst: true}).at(0);
 
     if (!element) {
       throw Error(`[NullElementError] No element found with id '${findBy.id}'.`);
@@ -1058,11 +1071,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.grid - Searches for an element contained in the specified grid.
    * @return Elements matching the filter criteria.
    */
-  private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; grid?: keyof WorkbenchGrids}): T[] {
-    if (options?.grid && !this._grids[options.grid]) {
-      return [];
-    }
-
+  private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}): T[] {
     const result: T[] = [];
 
     function visitParts(node: MTreeNode | MPart): boolean {
@@ -1079,14 +1088,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       return true;
     }
 
-    if (options?.grid) {
-      visitParts(this._grids[options.grid]!.root);
-    }
-    else {
-      for (const grid of Objects.values(this._grids)) {
-        if (grid && !visitParts(grid.root)) {
-          break;
-        }
+    const gridFilter = options?.grid ? new Set<keyof WorkbenchGrids>(Arrays.coerce(options.grid)) : null;
+    for (const [gridName, grid] of Objects.entries(this._grids)) {
+      if (!grid) {
+        continue;
+      }
+      if (gridFilter && !gridFilter.has(gridName)) {
+        continue;
+      }
+      if (!visitParts(grid.root)) {
+        break;
       }
     }
 
@@ -1113,6 +1124,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
   }
 
+  // TODO [activity] Consider merging with 'getActivityGroup'
   private getActivityGroupById(activityId: ActivityId): MActivityGroup {
     if (this._activityLayout.toolbars.leftTop.activities.find(activity => activity.id === activityId)) {
       return this._activityLayout.toolbars.leftTop;

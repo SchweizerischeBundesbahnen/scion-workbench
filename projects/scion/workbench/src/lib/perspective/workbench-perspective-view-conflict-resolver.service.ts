@@ -30,10 +30,7 @@ export class WorkbenchPerspectiveViewConflictResolver {
    */
   public resolve(currentLayout: ɵWorkbenchLayout, perspectiveLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     const activityGrids = WorkbenchLayouts.pickActivityGrids(perspectiveLayout.grids);
-    const activityViewIds = Objects.entries(activityGrids)
-      .reduce((acc, [gridName]) => {
-        return acc.concat(perspectiveLayout.views({grid: gridName}).map(view => view.id));
-      }, new Array<ViewId>());
+    const activityViewIds = perspectiveLayout.views({grid: Objects.keys(activityGrids)}).map(view => view.id);
     const mainViewIds = perspectiveLayout.views({grid: 'main'}).map(view => view.id);
     const mainAreaViewIds = currentLayout.views({grid: 'mainArea'}).map(view => view.id);
 

@@ -35,14 +35,14 @@ export class ChartSkeletonComponent {
   protected active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   constructor() {
-    this.chartType = signal(chartTypes[Skeletons.random(0, chartTypes.length - 1)]);
+    this.chartType = signal(chartTypes[Skeletons.random(0, chartTypes.length - 1)]!);
     this.chart.setDataSeries(this.generateDataSeries({n: 250, maxValue: 50}));
   }
 
   @HostListener('click')
   public onReload(): void {
     // Select next chart type.
-    this.chartType.set(chartTypes[(chartTypes.indexOf(this.chartType()) + 1) % chartTypes.length]);
+    this.chartType.set(chartTypes[(chartTypes.indexOf(this.chartType()) + 1) % chartTypes.length]!);
     // Update the chart with a new data series.
     this.chart.setDataSeries(this.generateDataSeries({n: 250, maxValue: 50}));
   }
