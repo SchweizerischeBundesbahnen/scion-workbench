@@ -27,7 +27,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     AsyncPipe,
     PortalModule,

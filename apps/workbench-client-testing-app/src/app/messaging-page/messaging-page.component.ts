@@ -18,7 +18,6 @@ import {PublishIntentPageComponent} from './publish-intent-page/publish-intent-p
   selector: 'app-messaging-page',
   templateUrl: './messaging-page.component.html',
   styleUrls: ['./messaging-page.component.scss'],
-  standalone: true,
   imports: [
     SciTabDirective,
     SciTabbarComponent,

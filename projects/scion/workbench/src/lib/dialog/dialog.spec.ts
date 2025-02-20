@@ -56,7 +56,6 @@ describe('Dialog', () => {
     @Component({
       selector: 'spec-dialog',
       template: '',
-      standalone: true,
     })
     class SpecDialogComponent {
       public injector = inject(Injector);
@@ -93,7 +92,6 @@ describe('Dialog', () => {
       template: `
         <input class="spec-input">
       `,
-      standalone: true,
     })
     class SpecDialogComponent {
     }
@@ -125,7 +123,6 @@ describe('Dialog', () => {
           <input class="spec-input">
         }
       `,
-      standalone: true,
     })
     class SpecDialogComponent {
       public showInputField = false;
@@ -163,7 +160,6 @@ describe('Dialog', () => {
     @Component({
       selector: 'spec-dialog',
       template: `Testee`,
-      standalone: true,
     })
     class SpecDialogComponent {
       constructor(public dialog: WorkbenchDialog) {
@@ -211,7 +207,6 @@ describe('Dialog', () => {
           </ng-template>
         }
       `,
-      standalone: true,
       imports: [WorkbenchDialogHeaderDirective],
     })
     class SpecDialogComponent {
@@ -263,7 +258,6 @@ describe('Dialog', () => {
           </ng-template>
         }
       `,
-      standalone: true,
       imports: [WorkbenchDialogFooterDirective],
     })
     class SpecDialogComponent {
@@ -315,7 +309,6 @@ describe('Dialog', () => {
           </ng-template>
         }
       `,
-      standalone: true,
       imports: [WorkbenchDialogActionDirective],
     })
     class SpecDialogComponent {

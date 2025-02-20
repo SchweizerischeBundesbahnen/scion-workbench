@@ -24,7 +24,6 @@ import {RouterOutlet} from '@angular/router';
 @Component({
   templateUrl: './empty-outlet.component.html',
   styleUrls: ['./empty-outlet.component.scss'],
-  standalone: true,
   imports: [RouterOutlet],
 })
 export class ɵEmptyOutletComponent {

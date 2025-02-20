@@ -205,7 +205,6 @@ describe('Microfrontend Host Message Box', () => {
 @Component({
   selector: 'spec-message-box-1',
   template: '',
-  standalone: true,
 })
 class SpecMessageBox1Component {
 }
@@ -213,7 +212,6 @@ class SpecMessageBox1Component {
 @Component({
   selector: 'spec-message-box-2',
   template: '',
-  standalone: true,
 })
 class SpecMessageBox2Component {
 }
@@ -221,7 +219,6 @@ class SpecMessageBox2Component {
 @Component({
   selector: 'spec-view',
   template: '',
-  standalone: true,
 })
 class SpecViewComponent {
 }

@@ -16,7 +16,6 @@ import {SciThrobberComponent} from '@scion/components/throbber';
   templateUrl: './microfrontend-splash.component.html',
   styleUrls: ['./microfrontend-splash.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [SciThrobberComponent],
 })
 export class MicrofrontendSplashComponent {

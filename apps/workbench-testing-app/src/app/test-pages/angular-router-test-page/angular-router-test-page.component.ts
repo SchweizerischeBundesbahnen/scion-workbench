@@ -21,7 +21,6 @@ import {Commands} from '@scion/workbench';
   selector: 'app-angular-router-test-page',
   templateUrl: './angular-router-test-page.component.html',
   styleUrls: ['./angular-router-test-page.component.scss'],
-  standalone: true,
   imports: [
     SciFormFieldComponent,
     RouterCommandsComponent,

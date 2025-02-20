@@ -25,7 +25,6 @@ import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
   templateUrl: './notification-list.component.html',
   styleUrls: ['./notification-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     AsyncPipe,
     NgClass,

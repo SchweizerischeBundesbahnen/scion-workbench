@@ -21,7 +21,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   selector: 'app-popup-page',
   templateUrl: './popup-page.component.html',
   styleUrls: ['./popup-page.component.scss'],
-  standalone: true,
   imports: [
     FormsModule,
     SciViewportComponent,

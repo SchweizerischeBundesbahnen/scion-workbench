@@ -34,7 +34,6 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
   selector: 'app-popup-opener-page',
   templateUrl: './popup-opener-page.component.html',
   styleUrls: ['./popup-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

@@ -26,7 +26,6 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
   selector: 'wb-part-bar',
   templateUrl: './part-bar.component.html',
   styleUrls: ['./part-bar.component.scss'],
-  standalone: true,
   imports: [
     ViewTabBarComponent,
     PartActionComponent,

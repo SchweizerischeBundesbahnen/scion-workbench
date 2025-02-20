@@ -205,7 +205,6 @@ describe('Microfrontend Host Dialog', () => {
 @Component({
   selector: 'spec-dialog-1',
   template: '',
-  standalone: true,
 })
 class SpecDialog1Component {
 }
@@ -213,7 +212,6 @@ class SpecDialog1Component {
 @Component({
   selector: 'spec-dialog-2',
   template: '',
-  standalone: true,
 })
 class SpecDialog2Component {
 }
@@ -221,7 +219,6 @@ class SpecDialog2Component {
 @Component({
   selector: 'spec-view',
   template: '',
-  standalone: true,
 })
 class SpecViewComponent {
 }

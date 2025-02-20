@@ -31,7 +31,6 @@ export const ViewListComponentInputs = {
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     FilterFieldComponent,

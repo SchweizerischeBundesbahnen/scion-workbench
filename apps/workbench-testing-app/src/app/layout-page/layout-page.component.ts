@@ -18,7 +18,6 @@ import CreatePerspectivePageComponent from './create-perspective-page/create-per
   selector: 'app-layout-page',
   templateUrl: './layout-page.component.html',
   styleUrls: ['./layout-page.component.scss'],
-  standalone: true,
   imports: [
     SciTabbarComponent,
     SciTabDirective,

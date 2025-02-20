@@ -14,7 +14,7 @@ import {WorkbenchDialogActionDirective} from './workbench-dialog-action.directiv
 /**
  * Filters actions by specified alignment.
  */
-@Pipe({name: 'wbDialogActionFilter', standalone: true})
+@Pipe({name: 'wbDialogActionFilter'})
 export class DialogActionFilterPipe implements PipeTransform {
 
   public transform(actions: WorkbenchDialogActionDirective[] | null | undefined, align: 'start' | 'end'): WorkbenchDialogActionDirective[] {

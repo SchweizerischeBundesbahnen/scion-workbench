@@ -26,7 +26,6 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-part-page',
-  standalone: true,
   templateUrl: './part-page.component.html',
   styleUrl: './part-page.component.scss',
   imports: [

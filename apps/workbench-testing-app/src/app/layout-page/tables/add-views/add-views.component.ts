@@ -21,7 +21,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-add-views',
   templateUrl: './add-views.component.html',
   styleUrls: ['./add-views.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciCheckboxComponent,

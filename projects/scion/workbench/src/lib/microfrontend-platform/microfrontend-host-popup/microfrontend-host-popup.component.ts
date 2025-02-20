@@ -31,7 +31,6 @@ import {Objects} from '../../common/objects.util';
   selector: 'wb-microfrontend-host-popup',
   styleUrls: ['./microfrontend-host-popup.component.scss'],
   templateUrl: './microfrontend-host-popup.component.html',
-  standalone: true,
   imports: [
     RouterOutlet,
     NgTemplateOutlet,

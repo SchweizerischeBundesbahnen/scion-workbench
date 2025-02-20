@@ -17,7 +17,6 @@ import {DatePipe, formatDate} from '@angular/common';
   selector: 'app-todo',
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss',
-  standalone: true,
   imports: [
     DatePipe,
   ],

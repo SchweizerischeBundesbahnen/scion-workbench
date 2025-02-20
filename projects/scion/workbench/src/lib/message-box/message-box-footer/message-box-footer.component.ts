@@ -17,7 +17,6 @@ import {fromResize$} from '@scion/toolkit/observable';
   selector: 'wb-message-box-footer',
   templateUrl: './message-box-footer.component.html',
   styleUrls: ['./message-box-footer.component.scss'],
-  standalone: true,
   imports: [
     KeyValuePipe,
   ],

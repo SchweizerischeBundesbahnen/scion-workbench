@@ -37,7 +37,6 @@ import {boundingClientRect} from '@scion/components/dimension';
 @Component({
   selector: 'wb-content-as-overlay',
   templateUrl: './content-as-overlay.component.html',
-  standalone: true,
 })
 export class ContentAsOverlayComponent {
 

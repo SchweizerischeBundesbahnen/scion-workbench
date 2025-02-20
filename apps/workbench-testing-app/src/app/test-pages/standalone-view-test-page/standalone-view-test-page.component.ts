@@ -15,7 +15,6 @@ import {WorkbenchView} from '@scion/workbench';
   selector: 'app-standalone-view-test-page',
   templateUrl: './standalone-view-test-page.component.html',
   styleUrls: ['./standalone-view-test-page.component.scss'],
-  standalone: true,
 })
 export default class StandaloneViewTestPageComponent {
 

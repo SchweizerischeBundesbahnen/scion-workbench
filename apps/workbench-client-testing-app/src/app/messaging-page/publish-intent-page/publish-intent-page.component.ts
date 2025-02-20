@@ -19,7 +19,6 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
   selector: 'app-publish-intent-page',
   templateUrl: './publish-intent-page.component.html',
   styleUrls: ['./publish-intent-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

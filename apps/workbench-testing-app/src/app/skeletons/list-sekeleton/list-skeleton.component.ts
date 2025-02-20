@@ -19,7 +19,6 @@ import {SciViewportComponent} from '@scion/components/viewport';
   selector: 'app-list-skeleton',
   templateUrl: './list-skeleton.component.html',
   styleUrls: ['./list-skeleton.component.scss'],
-  standalone: true,
   imports: [
     ArrayPipe,
     SciViewportComponent,

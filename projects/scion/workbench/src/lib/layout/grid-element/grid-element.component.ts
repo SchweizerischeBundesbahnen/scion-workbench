@@ -32,7 +32,6 @@ import {PartId} from '../../part/workbench-part.model';
   selector: 'wb-grid-element',
   templateUrl: './grid-element.component.html',
   styleUrls: ['./grid-element.component.scss'],
-  standalone: true,
   imports: [
     InstanceofPipe,
     PortalModule,

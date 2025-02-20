@@ -16,7 +16,6 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'app-microfrontend-test-page',
   template: 'Microfrontend',
-  standalone: true,
 })
 export default class MicrofrontendTestPageComponent {
 }

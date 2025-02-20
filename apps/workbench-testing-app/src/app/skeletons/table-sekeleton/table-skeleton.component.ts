@@ -21,7 +21,6 @@ import {dimension} from '@scion/components/dimension';
   selector: 'app-table-skeleton',
   templateUrl: './table-skeleton.component.html',
   styleUrls: ['./table-skeleton.component.scss'],
-  standalone: true,
   imports: [
     ArrayPipe,
     ListSkeletonComponent,

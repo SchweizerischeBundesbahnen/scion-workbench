@@ -27,7 +27,6 @@ import {A11yModule} from '@angular/cdk/a11y';
   selector: 'app-dialog-page',
   templateUrl: './dialog-page.component.html',
   styleUrls: ['./dialog-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     JsonPipe,

@@ -18,7 +18,6 @@ describe('Popup', () => {
     @Component({
       selector: 'spec-popup',
       template: 'Popup',
-      standalone: true,
     })
     class SpecPopupComponent {
       public popup = inject(ɵPopup);
@@ -51,7 +50,6 @@ describe('Popup', () => {
     @Component({
       selector: 'spec-popup',
       template: 'Popup',
-      standalone: true,
     })
     class SpecPopupComponent {
       public injector = inject(Injector);

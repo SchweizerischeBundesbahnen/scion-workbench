@@ -29,7 +29,6 @@ import {Microfrontends} from '../common/microfrontend.util';
   selector: 'wb-microfrontend-dialog',
   styleUrls: ['./microfrontend-dialog.component.scss'],
   templateUrl: './microfrontend-dialog.component.html',
-  standalone: true,
   imports: [
     NgComponentOutlet,
   ],

@@ -32,7 +32,6 @@ import {Routing} from './routing/routing.util';
   selector: 'wb-workbench',
   templateUrl: './workbench.component.html',
   styleUrls: ['./workbench.component.scss'],
-  standalone: true,
   imports: [
     NgComponentOutlet,
     WorkbenchLayoutComponent,

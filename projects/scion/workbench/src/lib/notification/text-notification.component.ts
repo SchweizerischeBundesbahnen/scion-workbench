@@ -8,7 +8,6 @@ import {Notification} from './notification';
   selector: 'wb-text-notification',
   template: `{{text ?? ''}}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
 })
 export class TextNotificationComponent {
 

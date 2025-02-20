@@ -25,7 +25,6 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
   selector: 'wb-popup',
   templateUrl: './popup.component.html',
   styleUrls: ['./popup.component.scss'],
-  standalone: true,
   imports: [
     A11yModule,
     PortalModule,

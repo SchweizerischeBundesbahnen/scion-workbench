@@ -22,7 +22,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   selector: 'app-angular-zone-test-page',
   templateUrl: './angular-zone-test-page.component.html',
   styleUrls: ['./angular-zone-test-page.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,

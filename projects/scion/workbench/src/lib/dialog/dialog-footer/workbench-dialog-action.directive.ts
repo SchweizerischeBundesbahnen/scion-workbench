@@ -27,7 +27,7 @@ import {asapScheduler} from 'rxjs';
  * </ng-template>
  * ```
  */
-@Directive({selector: 'ng-template[wbDialogAction]', standalone: true})
+@Directive({selector: 'ng-template[wbDialogAction]'})
 export class WorkbenchDialogActionDirective implements OnDestroy {
 
   private _action: Disposable | undefined;

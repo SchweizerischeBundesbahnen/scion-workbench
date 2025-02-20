@@ -18,7 +18,6 @@ import {Arrays} from '@scion/toolkit/util';
   selector: 'app-css-class',
   templateUrl: './css-class.component.html',
   styleUrls: ['./css-class.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
   ],

@@ -21,7 +21,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'wb-text-message',
   styleUrls: ['./text-message.component.scss'],
   templateUrl: './text-message.component.html',
-  standalone: true,
 })
 export default class TextMessageComponent {
 

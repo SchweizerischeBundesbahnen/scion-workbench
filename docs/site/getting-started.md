@@ -120,7 +120,6 @@ In this step, we will create a component that displays a welcome message when no
           selector: 'app-welcome',
           templateUrl: './welcome.component.html',
           styleUrl: './welcome.component.scss',
-          standalone: true,
         })
     [+] export default class WelcomeComponent {
         }
@@ -177,7 +176,6 @@ In this step, we will create the TODO list and place it to the left of the main 
         @Component({
           selector: 'app-todos',
           templateUrl: './todos.component.html',
-          standalone: true,
           imports: [
     [+]     WorkbenchRouterLinkDirective,
           ],
@@ -288,7 +286,6 @@ In this step, we will create a component to open a TODO in a view in the main ar
           selector: 'app-todo',
           templateUrl: './todo.component.html',
           styleUrl: './todo.component.scss',
-          standalone: true,
           imports: [
     [+]     DatePipe,
           ],

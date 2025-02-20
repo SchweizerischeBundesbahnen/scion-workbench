@@ -25,7 +25,7 @@ import {asapScheduler} from 'rxjs';
  * </ng-template>
  * ```
  */
-@Directive({selector: 'ng-template[wbDialogFooter]', standalone: true})
+@Directive({selector: 'ng-template[wbDialogFooter]'})
 export class WorkbenchDialogFooterDirective implements OnDestroy {
 
   private _footer: Disposable | undefined;

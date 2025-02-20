@@ -130,7 +130,7 @@ describe('WorkbenchRouter', () => {
   it('should not display "Not Found" page when closing view', async () => {
     const log = new Array<string>();
 
-    @Component({selector: 'spec-view', template: 'View', standalone: true})
+    @Component({selector: 'spec-view', template: 'View'})
     class SpecViewComponent implements OnDestroy {
 
       constructor() {
@@ -142,7 +142,7 @@ describe('WorkbenchRouter', () => {
       }
     }
 
-    @Component({selector: 'spec-not-found-page', template: 'View', standalone: true})
+    @Component({selector: 'spec-not-found-page', template: 'View'})
     class PageNotFoundComponent implements OnDestroy {
 
       constructor() {
@@ -184,7 +184,7 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when view navigation is cancelled', async () => {
-    @Component({selector: 'spec-view', template: '{{view.id}}', standalone: true})
+    @Component({selector: 'spec-view', template: '{{view.id}}'})
     class SpecViewComponent {
       constructor(protected view: WorkbenchView) {
         view.title = view.id;
@@ -281,7 +281,7 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when view navigation fails', async () => {
-    @Component({selector: 'spec-view', template: '{{view.id}}', standalone: true})
+    @Component({selector: 'spec-view', template: '{{view.id}}'})
     class SpecViewComponent {
       constructor(protected view: WorkbenchView) {
         view.title = view.id;
@@ -377,7 +377,7 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when part navigation is cancelled', async () => {
-    @Component({selector: 'spec-view', template: 'testee', standalone: true})
+    @Component({selector: 'spec-view', template: 'testee'})
     class SpecTesteeComponent {
     }
 
@@ -564,7 +564,7 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when part navigation fails', async () => {
-    @Component({selector: 'spec-view', template: 'testee', standalone: true})
+    @Component({selector: 'spec-view', template: 'testee'})
     class SpecTesteeComponent {
     }
 

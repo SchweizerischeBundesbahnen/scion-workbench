@@ -26,7 +26,6 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
   selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss'],
-  standalone: true,
   imports: [
     NgClass,
     InstanceofPipe,

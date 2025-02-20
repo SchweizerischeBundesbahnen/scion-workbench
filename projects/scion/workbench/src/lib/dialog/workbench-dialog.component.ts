@@ -37,7 +37,6 @@ import {synchronizeCssClasses} from '../common/css-class.util';
   selector: 'wb-dialog',
   templateUrl: './workbench-dialog.component.html',
   styleUrls: ['./workbench-dialog.component.scss'],
-  standalone: true,
   imports: [
     NgComponentOutlet,
     NgTemplateOutlet,

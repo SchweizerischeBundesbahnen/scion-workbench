@@ -31,7 +31,6 @@ import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapability
   selector: 'app-register-workbench-capability-page',
   templateUrl: './register-workbench-capability-page.component.html',
   styleUrls: ['./register-workbench-capability-page.component.scss'],
-  standalone: true,
   imports: [
     JsonPipe,
     ReactiveFormsModule,

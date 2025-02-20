@@ -21,7 +21,6 @@ import {FormsModule} from '@angular/forms';
   selector: 'app-view-info-dialog',
   templateUrl: './view-info-dialog.component.html',
   styleUrls: ['./view-info-dialog.component.scss'],
-  standalone: true,
   imports: [
     SciFormFieldComponent,
     JoinPipe,

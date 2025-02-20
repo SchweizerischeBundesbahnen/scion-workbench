@@ -21,7 +21,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   selector: 'app-dialog-page',
   templateUrl: './dialog-page.component.html',
   styleUrls: ['./dialog-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

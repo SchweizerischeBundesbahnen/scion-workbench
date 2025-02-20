@@ -1109,7 +1109,6 @@ describe('View', () => {
           </ng-template>
         }
       `,
-      standalone: true,
       imports: [WorkbenchPartActionDirective],
     })
     class SpecViewComponent {
@@ -1160,7 +1159,6 @@ describe('View', () => {
     @Component({
       selector: 'spec-view',
       template: 'View',
-      standalone: true,
     })
     class SpecViewComponent {
       constructor(view: WorkbenchView) {
@@ -1206,7 +1204,6 @@ describe('View', () => {
     @Component({
       selector: 'spec-view',
       template: 'View',
-      standalone: true,
     })
     class SpecViewComponent implements OnInit {
 
@@ -1256,7 +1253,6 @@ describe('View', () => {
     @Component({
       selector: 'spec-view',
       template: 'View',
-      standalone: true,
     })
     class SpecViewComponent {
       constructor(view: WorkbenchView) {
@@ -1306,7 +1302,6 @@ describe('View', () => {
     @Component({
       selector: 'spec-view',
       template: 'View',
-      standalone: true,
     })
     class SpecViewComponent implements OnInit {
 
@@ -1843,31 +1838,31 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-1', template: 'View 1', standalone: true})
+      @Component({selector: 'spec-view-1', template: 'View 1'})
       class SpecView1Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-2', template: 'View 2', standalone: true})
+      @Component({selector: 'spec-view-2', template: 'View 2'})
       class SpecView2Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-3', template: 'View 3', standalone: true})
+      @Component({selector: 'spec-view-3', template: 'View 3'})
       class SpecView3Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-4', template: 'View 4', standalone: true})
+      @Component({selector: 'spec-view-4', template: 'View 4'})
       class SpecView4Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-5', template: 'View 5', standalone: true})
+      @Component({selector: 'spec-view-5', template: 'View 5'})
       class SpecView5Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-6', template: 'View 6', standalone: true})
+      @Component({selector: 'spec-view-6', template: 'View 6'})
       class SpecView6Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-7', template: 'View 7', standalone: true})
+      @Component({selector: 'spec-view-7', template: 'View 7'})
       class SpecView7Component extends AbstractSpecViewComponent {
       }
 
@@ -2069,11 +2064,11 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-1', template: 'View 1', standalone: true})
+      @Component({selector: 'spec-view-1', template: 'View 1'})
       class SpecView1Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-2', template: 'View 2', standalone: true})
+      @Component({selector: 'spec-view-2', template: 'View 2'})
       class SpecView2Component extends AbstractSpecViewComponent {
       }
 
@@ -2169,11 +2164,11 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-1', template: 'View 1', standalone: true})
+      @Component({selector: 'spec-view-1', template: 'View 1'})
       class SpecView1Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-2', template: 'View 2', standalone: true})
+      @Component({selector: 'spec-view-2', template: 'View 2'})
       class SpecView2Component extends AbstractSpecViewComponent {
       }
 
@@ -2265,11 +2260,11 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-1', template: 'View 1', standalone: true})
+      @Component({selector: 'spec-view-1', template: 'View 1'})
       class SpecView1Component extends AbstractSpecViewComponent {
       }
 
-      @Component({selector: 'spec-view-2', template: 'View 2', standalone: true})
+      @Component({selector: 'spec-view-2', template: 'View 2'})
       class SpecView2Component extends AbstractSpecViewComponent {
       }
 
@@ -2338,7 +2333,7 @@ describe('View', () => {
     });
 
     it('should observe navigation data', async () => {
-      @Component({selector: 'spec-view', template: 'View', standalone: true})
+      @Component({selector: 'spec-view', template: 'View'})
       class SpecViewComponent {
 
         public navigationDataCaptor = new Array<NavigationData | undefined>();
@@ -2385,7 +2380,7 @@ describe('View', () => {
     });
 
     it('should observe navigation state', async () => {
-      @Component({selector: 'spec-view', template: 'View', standalone: true})
+      @Component({selector: 'spec-view', template: 'View'})
       class SpecViewComponent {
 
         public navigationStateCaptor = new Array<NavigationState | undefined>();
@@ -2434,7 +2429,7 @@ describe('View', () => {
     it('should change detect inactive path-based view', async () => {
       const log = new Array<string>();
 
-      @Component({selector: 'spec-view-1', template: '{{view.title()}}', standalone: true})
+      @Component({selector: 'spec-view-1', template: '{{view.title()}}'})
       class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2448,7 +2443,7 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-2', template: '{{view.title()}}', standalone: true})
+      @Component({selector: 'spec-view-2', template: '{{view.title()}}'})
       class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2493,7 +2488,7 @@ describe('View', () => {
     it('should change detect inactive empty-path view', async () => {
       const log = new Array<string>();
 
-      @Component({selector: 'spec-view-1', template: '{{view.title()}}', standalone: true})
+      @Component({selector: 'spec-view-1', template: '{{view.title()}}'})
       class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2507,7 +2502,7 @@ describe('View', () => {
         }
       }
 
-      @Component({selector: 'spec-view-2', template: '{{view.title()}}', standalone: true})
+      @Component({selector: 'spec-view-2', template: '{{view.title()}}'})
       class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
         constructor(public view: WorkbenchView) {
@@ -2565,7 +2560,6 @@ describe('View', () => {
       @Component({
         selector: 'spec-view',
         template: '<div style="height: 2000px">Content</div>',
-        standalone: true,
       })
       class TestViewComponent {
         public viewport = inject(SciViewportComponent);
@@ -2617,7 +2611,6 @@ describe('View', () => {
       @Component({
         selector: 'spec-view',
         template: '<div style="height: 2000px">Content</div>',
-        standalone: true,
       })
       class TestViewComponent {
         public viewport = inject(SciViewportComponent);
@@ -2682,7 +2675,6 @@ describe('View', () => {
       @Component({
         selector: 'spec-view',
         template: '<div style="height: 2000px">Content</div>',
-        standalone: true,
       })
       class TestViewComponent {
         public viewport = inject(SciViewportComponent);
@@ -2741,7 +2733,6 @@ describe('View', () => {
       @Component({
         selector: 'spec-view',
         template: '<div style="height: 2000px">Content</div>',
-        standalone: true,
       })
       class TestViewComponent {
         public viewport = inject(SciViewportComponent);
@@ -2803,7 +2794,6 @@ describe('View', () => {
       @Component({
         selector: 'spec-view',
         template: '<div style="height: 2000px">Content</div>',
-        standalone: true,
       })
       class TestViewComponent {
         public viewport = inject(SciViewportComponent);
@@ -2877,7 +2867,6 @@ describe('View', () => {
 @Component({
   selector: 'spec-view',
   template: '{{onCheckForChanges()}}',
-  standalone: true,
 })
 class SpecViewComponent implements OnDestroy {
 
@@ -2922,7 +2911,6 @@ class SpecViewComponent implements OnDestroy {
 @Component({
   selector: 'spec-view-1',
   template: '{{onCheckForChanges()}}',
-  standalone: true,
 })
 class SpecView1Component extends SpecViewComponent {
 }
@@ -2930,7 +2918,6 @@ class SpecView1Component extends SpecViewComponent {
 @Component({
   selector: 'spec-view-2',
   template: '{{onCheckForChanges()}}',
-  standalone: true,
 })
 class SpecView2Component extends SpecViewComponent {
 }

@@ -50,7 +50,7 @@ import {WorkbenchPart} from '../workbench-part.model';
  *
  * Alternatively, actions can be added using a factory function and registered via {@link WorkbenchService.registerPartAction}.
  */
-@Directive({selector: 'ng-template[wbPartAction]', standalone: true})
+@Directive({selector: 'ng-template[wbPartAction]'})
 export class WorkbenchPartActionDirective {
 
   /**

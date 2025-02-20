@@ -22,7 +22,6 @@ import {WorkbenchView} from '@scion/workbench-client';
   selector: 'app-unregister-workbench-capability-page',
   templateUrl: './unregister-workbench-capability-page.component.html',
   styleUrls: ['./unregister-workbench-capability-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

@@ -15,7 +15,6 @@ import {from, map, mergeMap, Observable} from 'rxjs';
 @Component({
   selector: 'app-view-properties-test-page',
   template: '',
-  standalone: true,
 })
 export default class ViewPropertiesTestPageComponent {
 

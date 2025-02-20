@@ -15,7 +15,6 @@ import {TodoService} from '../todo.service';
 @Component({
   selector: 'app-todos',
   templateUrl: './todos.component.html',
-  standalone: true,
   imports: [
     WorkbenchRouterLinkDirective,
   ],

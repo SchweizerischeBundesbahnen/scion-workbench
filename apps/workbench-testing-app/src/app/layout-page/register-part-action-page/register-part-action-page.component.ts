@@ -23,7 +23,6 @@ import {Arrays} from '@scion/toolkit/util';
   selector: 'app-register-part-action-page',
   templateUrl: './register-part-action-page.component.html',
   styleUrls: ['./register-part-action-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -96,7 +95,6 @@ export default class RegisterPartActionPageComponent {
 @Component({
   selector: 'app-text',
   template: '{{text()}}',
-  standalone: true,
 })
 class TextComponent {
 

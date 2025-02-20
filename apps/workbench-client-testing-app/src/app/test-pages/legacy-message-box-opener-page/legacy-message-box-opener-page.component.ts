@@ -25,7 +25,6 @@ import {IntentClient, mapToBody} from '@scion/microfrontend-platform';
   selector: 'app-legacy-message-box-opener-page',
   templateUrl: './legacy-message-box-opener-page.component.html',
   styleUrls: ['./legacy-message-box-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

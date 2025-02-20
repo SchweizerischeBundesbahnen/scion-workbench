@@ -18,7 +18,6 @@ import {CssClassComponent} from '../../css-class/css-class.component';
   selector: 'app-bulk-navigation-test-page',
   templateUrl: './bulk-navigation-test-page.component.html',
   styleUrls: ['./bulk-navigation-test-page.component.scss'],
-  standalone: true,
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,

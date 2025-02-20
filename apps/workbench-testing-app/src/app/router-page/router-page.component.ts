@@ -27,7 +27,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-router-page',
   templateUrl: './router-page.component.html',
   styleUrls: ['./router-page.component.scss'],
-  standalone: true,
   imports: [
     NgTemplateOutlet,
     WorkbenchRouterLinkDirective,

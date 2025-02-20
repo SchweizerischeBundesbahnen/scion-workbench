@@ -17,7 +17,6 @@ import {Component} from '@angular/core';
   selector: 'app-input-field-skeleton',
   templateUrl: './input-field-skeleton.component.html',
   styleUrls: ['./input-field-skeleton.component.scss'],
-  standalone: true,
 })
 export class InputFieldSkeletonComponent {
 }

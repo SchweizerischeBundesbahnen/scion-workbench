@@ -20,7 +20,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'app-router-commands',
   templateUrl: './router-commands.component.html',
   styleUrls: ['./router-commands.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
   ],

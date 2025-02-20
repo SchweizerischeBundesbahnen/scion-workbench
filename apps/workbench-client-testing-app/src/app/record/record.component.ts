@@ -18,7 +18,6 @@ import {NgClass} from '@angular/common';
   selector: 'app-record',
   templateUrl: './record.component.html',
   styleUrls: ['./record.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     NgClass,

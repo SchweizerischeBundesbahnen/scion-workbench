@@ -31,7 +31,6 @@ import {MAIN_AREA} from '../../layout/workbench-layout';
     '../view-tab/view-tab.component.scss',
     './view-tab-drag-image.partial.component.scss',
   ],
-  standalone: true,
   imports: [
     PortalModule,
   ],

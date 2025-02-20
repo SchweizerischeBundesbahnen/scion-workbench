@@ -48,7 +48,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
  *
  * Alternatively, menu items can be added using a factory function and registered via {@link WorkbenchService.registerViewMenuItem}.
  */
-@Directive({selector: 'ng-template[wbViewMenuItem]', standalone: true})
+@Directive({selector: 'ng-template[wbViewMenuItem]'})
 export class WorkbenchViewMenuItemDirective {
 
   /**

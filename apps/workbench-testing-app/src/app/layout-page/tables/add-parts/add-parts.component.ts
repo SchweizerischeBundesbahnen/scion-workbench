@@ -21,7 +21,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-add-parts',
   templateUrl: './add-parts.component.html',
   styleUrls: ['./add-parts.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciCheckboxComponent,

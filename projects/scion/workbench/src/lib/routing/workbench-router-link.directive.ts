@@ -41,7 +41,7 @@ import {Defined} from '@scion/toolkit/util';
  * <a [wbRouterLink]="['/path/to/view']">Link</a>
  * ```
  */
-@Directive({selector: '[wbRouterLink]', standalone: true})
+@Directive({selector: '[wbRouterLink]'})
 export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
 
   private _commands: Commands = [];

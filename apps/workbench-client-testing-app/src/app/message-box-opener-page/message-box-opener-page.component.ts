@@ -23,7 +23,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'app-message-box-opener-page',
   templateUrl: './message-box-opener-page.component.html',
   styleUrls: ['./message-box-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

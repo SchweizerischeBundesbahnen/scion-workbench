@@ -43,7 +43,6 @@ import {WorkbenchView} from '../../view/workbench-view.model';
   selector: 'wb-microfrontend-view',
   styleUrls: ['./microfrontend-view.component.scss'],
   templateUrl: './microfrontend-view.component.html',
-  standalone: true,
   imports: [
     NgClass,
     ContentAsOverlayComponent,

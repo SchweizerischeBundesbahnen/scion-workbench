@@ -16,7 +16,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-navigation-test-page',
   template: 'NavigationTestPageComponent',
-  standalone: true,
 })
 export class NavigationTestPageComponent {
 

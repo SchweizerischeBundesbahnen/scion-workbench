@@ -23,7 +23,6 @@ import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
   selector: 'app-notification-opener-page',
   templateUrl: './notification-opener-page.component.html',
   styleUrls: ['./notification-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

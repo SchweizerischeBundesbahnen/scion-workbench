@@ -29,7 +29,6 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
   templateUrl: './start-page.component.html',
   styleUrls: ['./start-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     NgClass,
     AsyncPipe,

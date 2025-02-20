@@ -28,7 +28,6 @@ import {startWith} from 'rxjs/operators';
   selector: 'app-message-box-page',
   templateUrl: './message-box-page.component.html',
   styleUrls: ['./message-box-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     JsonPipe,

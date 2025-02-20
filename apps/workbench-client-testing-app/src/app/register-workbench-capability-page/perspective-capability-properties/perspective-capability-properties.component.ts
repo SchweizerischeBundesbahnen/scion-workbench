@@ -27,7 +27,6 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   selector: 'app-perspective-capability-properties',
   templateUrl: './perspective-capability-properties.component.html',
   styleUrls: ['./perspective-capability-properties.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,

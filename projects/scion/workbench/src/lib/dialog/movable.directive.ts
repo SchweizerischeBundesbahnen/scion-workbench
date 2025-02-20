@@ -22,7 +22,7 @@ import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
  * when moving it. The host must apply the changed position by updating
  * respective DOM properties.
  */
-@Directive({selector: '[wbMovable]', standalone: true})
+@Directive({selector: '[wbMovable]'})
 export class MovableDirective implements OnInit {
 
   private readonly _document = inject<Document>(DOCUMENT);

@@ -19,7 +19,6 @@ import {A11yModule} from '@angular/cdk/a11y';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     RouterOutlet,

@@ -33,7 +33,6 @@ import {setStyle} from '../../common/dom.util';
   selector: 'wb-microfrontend-host-message-box',
   styleUrls: ['./microfrontend-host-message-box.component.scss'],
   templateUrl: './microfrontend-host-message-box.component.html',
-  standalone: true,
   imports: [
     RouterOutlet,
     NgTemplateOutlet,

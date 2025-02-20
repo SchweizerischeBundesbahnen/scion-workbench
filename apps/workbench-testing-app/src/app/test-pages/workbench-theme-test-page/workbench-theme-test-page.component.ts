@@ -16,7 +16,6 @@ import {WorkbenchService} from '@scion/workbench';
   selector: 'app-workbench-theme-test-page',
   templateUrl: './workbench-theme-test-page.component.html',
   styleUrls: ['./workbench-theme-test-page.component.scss'],
-  standalone: true,
   imports: [
     SciFormFieldComponent,
   ],

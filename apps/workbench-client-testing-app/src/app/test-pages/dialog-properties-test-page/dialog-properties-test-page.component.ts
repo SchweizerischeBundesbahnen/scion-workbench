@@ -17,7 +17,6 @@ import {Subject} from 'rxjs';
   selector: 'app-dialog-properties-test-page',
   templateUrl: './dialog-properties-test-page.component.html',
   styleUrl: './dialog-properties-test-page.component.scss',
-  standalone: true,
   imports: [
     SciFormFieldComponent,
   ],
