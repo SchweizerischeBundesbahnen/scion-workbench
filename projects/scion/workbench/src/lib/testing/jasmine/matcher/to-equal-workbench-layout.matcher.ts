@@ -13,7 +13,7 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
-import {WorkbenchMainGridComponent} from '../../../layout/main-grid/workbench-main-grid.component';
+import {GridComponent} from '../../../layout/grid/grid.component';
 import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
@@ -46,12 +46,12 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 
           // Resolve debug element for `WorkbenchMainGridComponent`.
           let debugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-          if (!(debugElement.componentInstance instanceof WorkbenchMainGridComponent)) {
-            debugElement = debugElement.query(By.directive(WorkbenchMainGridComponent));
+          if (!(debugElement.componentInstance instanceof GridComponent)) {
+            debugElement = debugElement.query(By.directive(GridComponent));
           }
 
           // Expect debug element to represent `WorkbenchMainGridComponent` element.
-          if (!(debugElement.componentInstance instanceof WorkbenchMainGridComponent)) {
+          if (!(debugElement.componentInstance instanceof GridComponent)) {
             return fail(`Expected fixture or DebugElement to be 'WorkbenchMainGridComponent' (or a parent), but was ${actual.componentInstance?.constructor?.name}.`); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           }
 

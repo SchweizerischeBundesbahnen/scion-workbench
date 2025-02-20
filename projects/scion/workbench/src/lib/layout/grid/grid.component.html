@@ -1,0 +1,13 @@
+<wb-grid-element [element]="root()"
+                 wbViewDropZone
+                 [wbViewDropZoneRegionSize]="50"
+                 [wbViewDropZonePlaceholderSize]="50"
+                 [wbViewDropZoneRegions]="{
+                     north: false,
+                     south: root() | wbRequiresDropZone:'south',
+                     west: root() | wbRequiresDropZone:'west',
+                     east: root() | wbRequiresDropZone:'east',
+                     center: false,
+                   }"
+                 [wbViewDropZoneCssClass]="'e2e-edge-drop-zone'"
+                 (wbViewDropZoneDrop)="onViewDrop($event)"/>

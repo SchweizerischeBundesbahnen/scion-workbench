@@ -1,46 +1,46 @@
 @if (activityLayout(); as activityLayout) {
-  @switch (area()) {
-    @case ("left") {
+  @switch (panel()) {
+    @case ('left') {
       <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onSashEndLeftPanel($event)">
-        @if (activityLayout.toolbars.leftTop.activeActivityId) {
+        @if (activityLayout.toolbars.leftTop.activeActivityId; as activityId) {
           <ng-template sciSash [size]="leftPanelSashSize()[0]">
-            <wb-activity-grid [activityId]="activityLayout.toolbars.leftTop.activeActivityId"/>
+            <wb-grid [grid]="grids()[activityId]"/>
           </ng-template>
         }
 
-        @if (activityLayout.toolbars.leftBottom.activeActivityId) {
+        @if (activityLayout.toolbars.leftBottom.activeActivityId; as activityId) {
           <ng-template sciSash [size]="leftPanelSashSize()[1]">
-            <wb-activity-grid [activityId]="activityLayout.toolbars.leftBottom.activeActivityId"/>
+            <wb-grid [grid]="grids()[activityId]"/>
           </ng-template>
         }
       </sci-sashbox>
     }
-    @case ("right") {
+    @case ('right') {
       <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onSashEndRightPanel($event)">
-        @if (activityLayout.toolbars.rightTop.activeActivityId) {
+        @if (activityLayout.toolbars.rightTop.activeActivityId; as activityId) {
           <ng-template sciSash [size]="rightPanelSashSize()[0]">
-            <wb-activity-grid [activityId]="activityLayout.toolbars.rightTop.activeActivityId"/>
+            <wb-grid [grid]="grids()[activityId]"/>
           </ng-template>
         }
 
-        @if (activityLayout.toolbars.rightBottom.activeActivityId) {
+        @if (activityLayout.toolbars.rightBottom.activeActivityId; as activityId) {
           <ng-template sciSash [size]="rightPanelSashSize()[1]">
-            <wb-activity-grid [activityId]="activityLayout.toolbars.rightBottom.activeActivityId"/>
+            <wb-grid [grid]="grids()[activityId]"/>
           </ng-template>
         }
       </sci-sashbox>
     }
-    @case ("bottom") {
+    @case ('bottom') {
       <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd)="onSashEndBottomPanel($event)">
-        @if (activityLayout.toolbars.bottomLeft.activeActivityId) {
+        @if (activityLayout.toolbars.bottomLeft.activeActivityId; as activityId) {
           <ng-template sciSash [size]="bottomPanelSashSize()[0]">
-            <wb-activity-grid [activityId]="activityLayout.toolbars.bottomLeft.activeActivityId"/>
+            <wb-grid [grid]="grids()[activityId]"/>
           </ng-template>
         }
 
-        @if (activityLayout.toolbars.bottomRight.activeActivityId) {
+        @if (activityLayout.toolbars.bottomRight.activeActivityId; as activityId) {
           <ng-template sciSash [size]="bottomPanelSashSize()[1]">
-            <wb-activity-grid [activityId]="activityLayout.toolbars.bottomRight.activeActivityId"/>
+            <wb-grid [grid]="grids()[activityId]"/>
           </ng-template>
         }
       </sci-sashbox>

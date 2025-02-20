@@ -9,9 +9,10 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {APP_INITIALIZER, ApplicationInitStatus, assertNotInReactiveContext, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
+import {APP_INITIALIZER, ApplicationInitStatus, assertNotInReactiveContext, computed, effect, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 
 /**
  * Provides API to launch the SCION Workbench.
@@ -110,7 +111,7 @@ export class WorkbenchLauncher {
         this._state = StartupState.Started;
         await runWorkbenchInitializers(WORKBENCH_POST_STARTUP, this._injector);
         this._logger.debug(() => 'Workbench started.', LoggerNames.LIFECYCLE);
-        this._startup.notifyStarted();
+        this._startup.notifyWorkbenchInitializersDone();
         return this._startup.whenStarted;
       }
       case StartupState.Starting:
@@ -131,21 +132,36 @@ enum StartupState {
 @Injectable({providedIn: 'root'})
 export class WorkbenchStartup {
 
+  private _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private _workbenchInitializersDone = signal(false);
+  private _injector = inject(Injector);
+
   /**
    * Signals when the workbench completed startup.
+   *
+   * TODO [activity] Mention that th layout is available.
    */
-  public readonly isStarted = signal(false);
+  public readonly isStarted = computed(() => {
+    const layout = this._workbenchLayoutService.layout();
+    return !!layout && this._workbenchInitializersDone();
+  });
 
   /* @internal */
-  public notifyStarted!: () => void;
+  public notifyWorkbenchInitializersDone(): void {
+    this._workbenchInitializersDone.set(true);
+  }
 
   /**
    * Promise that resolves when the workbench has completed the startup.
    */
-  public readonly whenStarted = new Promise<true>(resolve => this.notifyStarted = () => {
-    this.isStarted.set(true);
-    resolve(true);
-  });
+  public readonly whenStarted = new Promise<true>(resolve => {
+    const effectRef = effect(() => {
+      if (this.isStarted()) {
+        resolve(true);
+        effectRef.destroy();
+      }
+    }, {injector: this._injector});
+  })
 }
 
 /**

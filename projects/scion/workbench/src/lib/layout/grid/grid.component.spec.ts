@@ -13,7 +13,7 @@ import {provideRouter, Router, RouterOutlet} from '@angular/router';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {toBeRegisteredCustomMatcher} from '../../testing/jasmine/matcher/to-be-registered.matcher';
-import {WorkbenchMainGridComponent} from './workbench-main-grid.component';
+import {GridComponent} from './grid.component';
 import {Component} from '@angular/core';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
@@ -141,7 +141,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // GIVEN four views (view.1, view.2, view.3, view.4).
@@ -261,7 +261,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -335,7 +335,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -409,7 +409,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -483,7 +483,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -557,7 +557,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -625,7 +625,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -779,7 +779,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -886,7 +886,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -993,7 +993,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1099,7 +1099,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1206,7 +1206,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1378,7 +1378,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1477,7 +1477,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1583,7 +1583,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1689,7 +1689,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1746,7 +1746,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -1807,7 +1807,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Add view 1
@@ -2172,7 +2172,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
@@ -2277,7 +2277,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
@@ -2377,7 +2377,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
@@ -2667,7 +2667,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
@@ -2808,7 +2808,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.
@@ -2949,7 +2949,7 @@ describe('WorkbenchLayout Component', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Create initial workbench layout.

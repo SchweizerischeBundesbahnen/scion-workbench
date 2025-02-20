@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,11 +9,10 @@
  */
 
 import {Component, computed, inject, input} from '@angular/core';
-import {MActivityLayout} from '../workbench-activity.model';
-import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
-import {ActivityGridComponent} from '../activity-grid/activity-grid.component';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
+import {GridComponent} from '../../layout/grid/grid.component';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 
 @Component({
   selector: 'wb-activity-panel',
@@ -23,17 +22,18 @@ import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
   imports: [
     SciSashboxComponent,
     SciSashDirective,
-    ActivityGridComponent,
+    GridComponent,
   ],
 })
 export class WorkbenchActivityPanelComponent {
 
-  public readonly area = input.required<'left' | 'right' | 'bottom'>();
+  public readonly panel = input.required<'left' | 'right' | 'bottom'>();
 
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
-  protected readonly activityLayout = computed((): MActivityLayout | undefined => this._workbenchLayoutService.layout()?.activityLayout);
+  protected readonly activityLayout = computed(() => this._workbenchLayoutService.layout()!.activityLayout);
+  protected readonly grids = computed(() => this._workbenchLayoutService.layout()!.grids);
   protected readonly leftPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout()?.panels.left.ratio ?? 0.5));
   protected readonly rightPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout()?.panels.right.ratio ?? 0.5));
   protected readonly bottomPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout()?.panels.bottom.ratio ?? 0.5));

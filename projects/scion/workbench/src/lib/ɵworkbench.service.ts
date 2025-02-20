@@ -50,7 +50,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly parts: Signal<ɵWorkbenchPart[]>;
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly theme: Signal<WorkbenchTheme | null>;
-  public readonly widescreen: Signal<boolean>;
+  public readonly widescreenModeEnabled: Signal<boolean>;
   public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
 
   constructor() {
@@ -59,7 +59,7 @@ export class ɵWorkbenchService implements WorkbenchService {
     this.parts = this._partRegistry.objects;
     this.views = this._viewRegistry.objects;
     this.theme = this._workbenchThemeSwitcher.theme;
-    this.widescreen = this._workbenchWidescreenLayoutSwitcher.widescreen;
+    this.widescreenModeEnabled = this._workbenchWidescreenLayoutSwitcher.widescreen;
     this.activePerspective = this._perspectiveService.activePerspective;
   }
 
@@ -127,8 +127,8 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public switchWidescreenLayout(enabled: boolean): Promise<void> {
-    assertNotInReactiveContext(this.switchWidescreenLayout, 'Call WorkbenchService.switchWidescreenLayout() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+  public enableWidescreenMode(enabled: boolean): Promise<void> {
+    assertNotInReactiveContext(this.enableWidescreenMode, 'Call WorkbenchService.switchWidescreenLayout() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     return this._workbenchWidescreenLayoutSwitcher.toggleWidescreenLayout(enabled);
   }
 }

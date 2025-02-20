@@ -1188,9 +1188,15 @@ function createDefaultActivityLayout(): MActivityLayout {
       showLabels: false,
     },
     panels: {
-      left: {},
-      right: {},
-      bottom: {},
+      left: {
+        width: '200px',
+      },
+      right: {
+        width: '200px',
+      },
+      bottom: {
+        height: '150px',
+      },
     },
   };
 }

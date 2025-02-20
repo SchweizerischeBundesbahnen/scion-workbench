@@ -182,7 +182,7 @@ export abstract class WorkbenchService {
    */
   public abstract readonly theme: Signal<WorkbenchTheme | null>;
 
-  public abstract switchWidescreenLayout(enabled: boolean): Promise<void>;
+  public abstract enableWidescreenMode(enabled: boolean): Promise<void>;
 
-  public abstract readonly widescreen: Signal<boolean>;
+  public abstract readonly widescreenModeEnabled: Signal<boolean>;
 }

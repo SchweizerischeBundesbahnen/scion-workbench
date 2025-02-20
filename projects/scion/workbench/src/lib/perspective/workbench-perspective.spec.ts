@@ -16,7 +16,7 @@ import {TestComponent, withComponentContent} from '../testing/test.component';
 import {By} from '@angular/platform-browser';
 import {Component, DestroyRef, inject, isSignal} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {WorkbenchMainGridComponent} from '../layout/main-grid/workbench-main-grid.component';
+import {GridComponent} from '../layout/grid/grid.component';
 import {firstValueFrom, Subject, timer} from 'rxjs';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
@@ -508,7 +508,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     // Delay activation of the perspective.
@@ -550,7 +550,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
@@ -599,7 +599,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchMainGridComponent));
+    const fixture = styleFixture(TestBed.createComponent(GridComponent));
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({

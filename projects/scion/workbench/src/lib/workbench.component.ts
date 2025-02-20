@@ -23,7 +23,8 @@ import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-ro
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Routing} from './routing/routing.util';
-import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
+import {LayoutComponent} from './layout/layout.component';
+import {ɵWorkbenchService} from './ɵworkbench.service';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -37,7 +38,7 @@ import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
     NgComponentOutlet,
     NotificationListComponent,
     GlassPaneDirective,
-    WorkbenchLayoutComponent,
+    LayoutComponent,
   ],
   viewProviders: [
     configureWorkbenchGlassPane(),
@@ -54,6 +55,7 @@ export class WorkbenchComponent {
   /** Splash to display during workbench startup. */
   protected splash = inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
   protected workbenchStartup = inject(WorkbenchStartup);
+  protected workbenchService = inject(ɵWorkbenchService);
 
   constructor() {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);

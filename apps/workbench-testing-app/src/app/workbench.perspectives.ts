@@ -15,6 +15,9 @@ import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/c
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
 import {SettingsService} from './settings.service';
 import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
+import {ProjectComponent} from './project/project.component';
+import {SearchComponent} from './search/search.component';
+import {BookmarkComponent} from './bookmark/bookmark.component';
 
 /**
  * Keys to associate data with a perspective.
@@ -89,6 +92,9 @@ export const Perspectives = {
           // Sample Part
           {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
           {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./part-page/part-page.component')},
+          {path: 'project', component: ProjectComponent},
+          {path: 'search', component: SearchComponent},
+          {path: 'bookmarks', component: BookmarkComponent},
         ] satisfies Routes,
       },
     ]);
@@ -131,9 +137,9 @@ function provideActivityPerspective1Layout(factory: WorkbenchLayoutFactory): Wor
     .addPart('notifications', {dockTo: 'right-top'}, {icon: 'notifications', label: 'Notifications'})
     .addPart('database', {dockTo: 'right-bottom'}, {icon: 'database', label: 'Database'})
     .addPart('error', {dockTo: 'bottom-right'}, {icon: 'error', label: 'Error'})
-    .navigatePart('project', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
-    .navigatePart('search', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
-    .navigatePart('bookmarks', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('project', ['project'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('search', ['search'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('bookmarks', ['bookmarks'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('terminal', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('notifications', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('database', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
@@ -147,6 +153,32 @@ function provideActivityPerspective1Layout(factory: WorkbenchLayoutFactory): Wor
     .activatePart('project')
     .activateView('terminal2', {activatePart: true});
 }
+// function provideActivityPerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+//   return factory
+//     .addPart(MAIN_AREA)
+//     .addPart('project', {dockTo: 'left-top'}, {icon: 'folder', label: 'Project'})
+//     .addPart('search', {dockTo: 'left-top'}, {icon: 'search', label: 'Search'})
+//     .addPart('bookmarks', {dockTo: 'left-bottom'}, {icon: 'bookmark', label: 'Bookmarks'})
+//     .addPart('terminal', {dockTo: 'bottom-left'}, {icon: 'terminal', label: 'Terminal'})
+//     .addPart('notifications', {dockTo: 'right-top'}, {icon: 'notifications', label: 'Notifications'})
+//     .addPart('database', {dockTo: 'right-bottom'}, {icon: 'database', label: 'Database'})
+//     .addPart('error', {dockTo: 'bottom-right'}, {icon: 'error', label: 'Error'})
+//     .navigatePart('project', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .navigatePart('search', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .navigatePart('bookmarks', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .navigatePart('terminal', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .navigatePart('notifications', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .navigatePart('database', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .navigatePart('error', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+//     .addView('terminal1', {partId: 'terminal'})
+//     .addView('terminal2', {partId: 'terminal'})
+//     .addView('terminal3', {partId: 'terminal'})
+//     .navigateView('terminal1', ['test-view'])
+//     .navigateView('terminal2', ['test-view'])
+//     .navigateView('terminal3', ['test-view'])
+//     .activatePart('project')
+//     .activateView('terminal2', {activatePart: true});
+// }
 
 function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory

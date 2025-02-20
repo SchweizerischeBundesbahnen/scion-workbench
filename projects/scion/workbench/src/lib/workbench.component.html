@@ -1,6 +1,6 @@
 @if (workbenchStartup.isStarted()) {
   <div class="stacking-context-barrier" wbGlassPane>
-    <wb-layout/>
+    <wb-layout [layout]="workbenchService.layout()"/>
 
     <!-- Achor to attach iframes of embedded microfrontends -->
     <ng-container #iframe_overlay_host/>

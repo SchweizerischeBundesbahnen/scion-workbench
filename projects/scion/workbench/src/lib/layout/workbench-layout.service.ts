@@ -28,6 +28,8 @@ export class WorkbenchLayoutService {
 
   /**
    * Provides the current {@link WorkbenchLayout}, or `null` until Angular has performed the initial navigation.
+   *
+   * TODO [activity] Look for usages where we do not have a layout -> try changing it to NOT null.
    */
   public layout = toSignal(this._layout$, {requireSync: true});
 

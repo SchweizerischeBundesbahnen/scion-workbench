@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input} from '@angular/core';
-import {ActivityId} from '../workbench-activity.model';
-import {GridElementComponent} from '../../layout/grid-element/grid-element.component';
-import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
-import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {MPartGrid} from '../../layout/workbench-layout.model';
+import {Component, computed, input, output} from '@angular/core';
+import {GridElementComponent} from '../grid-element/grid-element.component';
+import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
+import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
+import {MPartGrid} from '../workbench-layout.model';
 
 /**
  * Renders the layout of the workbench.
@@ -38,23 +37,24 @@ import {MPartGrid} from '../../layout/workbench-layout.model';
  *                                (left)        (right)
  */
 @Component({
-  selector: 'wb-activity-grid',
-  templateUrl: './activity-grid.component.html',
-  styleUrls: ['./activity-grid.component.scss'],
+  selector: 'wb-grid',
+  templateUrl: './grid.component.html',
+  styleUrls: ['./grid.component.scss'],
   standalone: true,
   imports: [
     GridElementComponent,
-    GridElementIfVisiblePipe,
+    ViewDropZoneDirective,
+    RequiresDropZonePipe,
   ],
 })
-export class ActivityGridComponent {
+export class GridComponent {
 
-  public readonly activityId = input.required<ActivityId>();
+  public readonly grid = input.required<MPartGrid>();
+  public readonly viewDrop = output<WbViewDropEvent>();
 
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  protected readonly root = computed(() => this.grid().root);
 
-  protected readonly grid = computed((): MPartGrid | undefined => {
-    const layout = this._workbenchLayoutService.layout();
-    return layout?.grids[this.activityId()];
-  });
+  protected onViewDrop(event: WbViewDropEvent): void {
+    this.viewDrop.emit(event);
+  }
 }
