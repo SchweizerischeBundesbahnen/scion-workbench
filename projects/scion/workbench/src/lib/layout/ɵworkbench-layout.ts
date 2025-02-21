@@ -1168,7 +1168,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 }
 
 /**
- * Creates the default workbench grid with a main area.
+ * Creates the default main grid with a main area.
  */
 function createDefaultMainGrid(): MPartGrid {
   return {

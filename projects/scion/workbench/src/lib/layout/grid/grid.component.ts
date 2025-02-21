@@ -8,13 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, input, output} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {GridElementComponent} from '../grid-element/grid-element.component';
 import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
 import {MPartGrid} from '../workbench-layout.model';
+import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
+import {WORKBENCH_ID} from '../../workbench-id';
+import {ViewDragService} from '../../view-dnd/view-drag.service';
 
 /**
+ * TODO [activity] Update doc.
+ *
+ *
  * Renders the layout of the workbench.
  *
  * The workbench layout is a grid of parts. It contains at least one part. A special part, the main area part, is not a stack of views
@@ -50,11 +56,52 @@ import {MPartGrid} from '../workbench-layout.model';
 export class GridComponent {
 
   public readonly grid = input.required<MPartGrid>();
-  public readonly viewDrop = output<WbViewDropEvent>();
+  public readonly gridDropZone = input<GridDropZoneConfig>();
+
+  private readonly _workbenchId = inject(WORKBENCH_ID);
+  private readonly _viewDragService = inject(ViewDragService);
 
   protected readonly root = computed(() => this.grid().root);
 
   protected onViewDrop(event: WbViewDropEvent): void {
-    this.viewDrop.emit(event);
+    this._viewDragService.dispatchViewMoveEvent({
+      source: {
+        workbenchId: event.dragData.workbenchId,
+        partId: event.dragData.partId,
+        viewId: event.dragData.viewId,
+        alternativeViewId: event.dragData.alternativeViewId,
+        navigation: event.dragData.navigation,
+        classList: event.dragData.classList,
+      },
+      target: GridDropTargets.resolve({
+        grid: this.grid(),
+        workbenchId: this._workbenchId,
+        dropRegion: event.dropRegion,
+      }),
+      dragData: event.dragData,
+    });
   }
+}
+
+/**
+ * Configures the drop zones of a grid.
+ */
+export interface GridDropZoneConfig {
+  /**
+   * Specifies the size of a drop zone region, either as percentage value [0,1] or absolute pixel value.
+   */
+  dropRegionSize?: number;
+  /**
+   * Specifies the size of the visual placeholder when dragging a view over a drop region.
+   * Can be a percentage value [0,1] or absolute pixel value. Defaults to {@link dropRegionSize}.
+   */
+  dropPlaceholderSize?: number;
+  /**
+   * Specifies CSS class(es) to add to the drop zones.
+   */
+  dropZoneCssClass?: string | string[] | undefined;
+  /**
+   * Specifies attribute(s) to add to the drop zones.
+   */
+  dropZoneAttributes?: {[name: string]: unknown};
 }

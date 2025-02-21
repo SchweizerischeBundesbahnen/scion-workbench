@@ -11,10 +11,8 @@
 import {Component, computed, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {GridElementComponent} from '../../layout/grid-element/grid-element.component';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
-import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
@@ -25,6 +23,7 @@ import {Logger} from '../../logging';
 import {MAIN_AREA} from '../../layout/workbench-layout';
 import {DESKTOP} from '../../workbench-element-references';
 import {NgTemplateOutlet} from '@angular/common';
+import {GridComponent} from '../../layout/grid/grid.component';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -53,9 +52,8 @@ import {NgTemplateOutlet} from '@angular/common';
   styleUrls: ['./main-area-part.component.scss'],
   standalone: true,
   imports: [
-    GridElementComponent,
+    GridComponent,
     ViewDropZoneDirective,
-    RequiresDropZonePipe,
     RouterOutlet,
     RouterOutletRootContextDirective,
     SciViewportComponent,
@@ -74,7 +72,7 @@ export class MainAreaPartComponent {
   protected readonly mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.grids.mainArea!);
   protected readonly desktop = inject(DESKTOP);
 
-  protected onViewDrop(event: WbViewDropEvent): void {
+  protected onDesktopViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,

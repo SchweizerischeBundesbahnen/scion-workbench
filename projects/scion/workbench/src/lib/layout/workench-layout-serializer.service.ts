@@ -191,7 +191,7 @@ export interface GridSerializationFlags {
   sort?: true;
 
   /**
-   * TODO [activity] Be more concrete.
+   * TODO [activity] Chose more specific name.
    */
   undefinedIfEmpty?: true;
 }

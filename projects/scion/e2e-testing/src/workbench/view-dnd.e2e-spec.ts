@@ -1100,65 +1100,65 @@ test.describe('View Drag & Drop', () => {
       await test.step('drag to the north', async () => {
         await dragHandle.dragTo({x: hcenter, y: top + 40});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the north/east', async () => {
         await dragHandle.dragTo({x: right - 40, y: top + 39});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('east');
 
         await dragHandle.dragTo({x: right - 40, y: top + 41});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('east');
       });
 
       await test.step('drag to the east', async () => {
         await dragHandle.dragTo({x: right - 40, y: vcenter});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('east');
       });
 
       await test.step('drag to the south/east', async () => {
         await dragHandle.dragTo({x: right - 40, y: bottom - 41});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('east');
 
         await dragHandle.dragTo({x: right - 40, y: bottom - 39});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('south');
       });
 
       await test.step('drag to the south', async () => {
         await dragHandle.dragTo({x: hcenter, y: bottom - 40});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('south');
       });
 
       await test.step('drag to the south/west', async () => {
         await dragHandle.dragTo({x: left + 40, y: bottom - 39});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('south');
 
         await dragHandle.dragTo({x: left + 40, y: bottom - 41});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
       });
 
       await test.step('drag to the west', async () => {
         await dragHandle.dragTo({x: left + 40, y: vcenter});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
       });
 
       await test.step('drag to the north/west', async () => {
         await dragHandle.dragTo({x: left + 40, y: top + 41});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
 
         await dragHandle.dragTo({x: left + 40, y: top + 39});
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
       });
     });
 
@@ -1203,7 +1203,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the vertical center of the left-top part, 10px to the right of its left edge', async () => {
         await dragHandle.dragTo({x: 10, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1211,7 +1211,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 75px to the right of the left edge of the left-top part', async () => {
         await dragHandle.dragTo({x: 75, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('west');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1219,7 +1219,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, to the middle of the left-top part', async () => {
         await dragHandle.dragTo({x: leftTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('center');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1227,7 +1227,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 25px to the left of the right edge of the left-top part', async () => {
         await dragHandle.dragTo({x: leftTopPartBounds.right - 25, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('east');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1235,7 +1235,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 25px to the right of the left main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.x + 25, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('west');
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1243,7 +1243,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 200px to the right of the left main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.x + 200, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('west');
@@ -1251,7 +1251,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, to the middle of the main area', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('center');
@@ -1259,7 +1259,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 200px to the left of the right main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.right - 200, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('east');
@@ -1267,7 +1267,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 75px to the left of the right main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.right - 75, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('east');
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1275,7 +1275,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the right, 25px to the left of the right main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.right - 25, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('east');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('east');
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1283,7 +1283,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 75px to the left of the right main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.right - 75, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('east');
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1291,7 +1291,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 200px to the left of the right main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.right - 200, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('east');
@@ -1299,7 +1299,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, to the middle of the main area', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('center');
@@ -1307,7 +1307,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 200px to the right of the left main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.x + 200, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toEqual('west');
@@ -1315,7 +1315,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 25px to the right of the left main area edge', async () => {
         await dragHandle.dragTo({x: midTopPartBounds.x + 25, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('west');
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1323,7 +1323,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 25px to the left of the right edge of the left-top part', async () => {
         await dragHandle.dragTo({x: leftTopPartBounds.right - 25, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('east');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1331,7 +1331,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, to the middle of the left-top part', async () => {
         await dragHandle.dragTo({x: leftTopPartBounds.hcenter, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('center');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1339,7 +1339,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 75px to the right of the left edge of the left-top part', async () => {
         await dragHandle.dragTo({x: 75, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
         await expect.poll(() => leftTopPart.getActiveDropZone()).toEqual('west');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1347,7 +1347,7 @@ test.describe('View Drag & Drop', () => {
 
       await test.step('drag to the left, 10px to the right of the left edge of the left-top part', async () => {
         await dragHandle.dragTo({x: 10, y: leftTopPartBounds.vcenter});
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
         await expect.poll(() => leftTopPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => midTopPart.getActiveDropZone()).toBeNull();
@@ -1387,63 +1387,63 @@ test.describe('View Drag & Drop', () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.top + 10});
         await expect.poll(() => rightPart.getActiveDropZone()).toEqual('north');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the bottom, to the middle of the right part', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.vcenter});
         await expect.poll(() => rightPart.getActiveDropZone()).toEqual('center');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the bottom, 125px to the top of the bottom edge', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 125});
         await expect.poll(() => rightPart.getActiveDropZone()).toEqual('south');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the bottom, 75px to the top of the bottom edge', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 75});
         await expect.poll(() => rightPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('south');
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the bottom, 25px to the top of the bottom edge', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 25});
         await expect.poll(() => rightPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('south');
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('south');
       });
 
       await test.step('drag to the top, 75px to the top of the bottom edge', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 75});
         await expect.poll(() => rightPart.getActiveDropZone()).toBeNull();
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toEqual('south');
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the top, 125px to the top of the bottom edge', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.bottom - 125});
         await expect.poll(() => rightPart.getActiveDropZone()).toEqual('south');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the top, to the middle of the right part', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.vcenter});
         await expect.poll(() => rightPart.getActiveDropZone()).toEqual('center');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
 
       await test.step('drag to the top, 10px to the bottom of the top edge of the right part', async () => {
         await dragHandle.dragTo({x: viewBounds.hcenter, y: viewBounds.top + 10});
         await expect.poll(() => rightPart.getActiveDropZone()).toEqual('north');
         await expect.poll(() => mainAreaPart.getActiveDropZone()).toBeNull();
-        await expect.poll(() => appPO.getActiveEdgeDropZone()).toBeNull();
+        await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toBeNull();
       });
     });
   });

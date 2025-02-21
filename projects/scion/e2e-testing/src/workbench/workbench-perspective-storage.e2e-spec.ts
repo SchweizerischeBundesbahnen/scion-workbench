@@ -19,10 +19,10 @@ import {expectPart} from '../matcher/part-matcher';
 
 test.describe('Workbench Perspective Storage', () => {
 
-  test('should restore workbench grid from storage', async ({appPO, workbenchNavigator}) => {
+  test('should restore main grid from storage', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-    // Add part and view to the workbench grid
+    // Add part and view to the main grid
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
       .addPart('part.right', {relativeTo: MAIN_AREA, align: 'right', ratio: .25})

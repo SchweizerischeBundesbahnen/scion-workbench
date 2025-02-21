@@ -20,7 +20,7 @@ import {expectView} from '../matcher/view-matcher';
 
 test.describe('Workbench View', () => {
 
-  test('should move a path-based view in the workbench grid to a new window', async ({appPO, workbenchNavigator}) => {
+  test('should move a path-based view in the main grid to a new window', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add two views to the peripheral area.
@@ -69,10 +69,10 @@ test.describe('Workbench View', () => {
     });
   });
 
-  test('should move an empty-path view in the workbench grid to a new window', async ({appPO, workbenchNavigator}) => {
+  test('should move an empty-path view in the main grid to a new window', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Define perspective with a view in the workbench grid.
+    // Define perspective with a view in the main grid.
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left', ratio: .25})
       .addView('view.101', {partId: 'part.left', activateView: true})
@@ -336,14 +336,14 @@ test.describe('Workbench View', () => {
     });
     await newAppRouterPage.view.tab.close();
 
-    // Move peripheral view to workbench grid.
+    // Move peripheral view to main grid.
     const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
     const peripheralViewId = await peripheralViewPage.getViewId();
     const dragHandle = await peripheralViewPage.tab.startDrag();
-    await dragHandle.dragToEdge('east');
+    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
-    // Expect peripheral view to be dragged to the workbench grid.
+    // Expect peripheral view to be dragged to the main grid.
     await expect(newWindow.appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainGrid: {
         root: new MTreeNode({
@@ -434,14 +434,14 @@ test.describe('Workbench View', () => {
     });
     await newAppRouterPage.view.tab.close();
 
-    // Move peripheral view to workbench grid.
+    // Move peripheral view to main grid.
     const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
     const peripheralViewId = await peripheralViewPage.getViewId();
     const dragHandle = await peripheralViewPage.tab.startDrag();
-    await dragHandle.dragToEdge('east');
+    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
-    // Expect peripheral view to be dragged to the workbench grid.
+    // Expect peripheral view to be dragged to the main grid.
     await expect(newWindow.appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainGrid: {
         root: new MTreeNode({
@@ -465,7 +465,7 @@ test.describe('Workbench View', () => {
     // Reload the new browser window.
     await newWindow.appPO.reload();
 
-    // Expect the layout of the workbench grid not to be restored.
+    // Expect the layout of the main grid not to be restored.
     await expect(newWindow.appPO.workbenchRoot).toEqualWorkbenchLayout({
       mainGrid: {
         root: new MPart({id: MAIN_AREA}),

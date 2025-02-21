@@ -19,7 +19,7 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {PartId, ViewId} from '@scion/workbench';
+import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
 
 /**
@@ -319,7 +319,7 @@ export class AppPO {
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
-    await this.page.locator('wb-workbench wb-workbench-layout').waitFor({state: 'visible'});
+    await this.page.locator('wb-workbench wb-layout').waitFor({state: 'visible'});
   }
 
   /**
@@ -358,10 +358,12 @@ export class AppPO {
   }
 
   /**
-   * Gets the active drop zone when dragging a view to the workbench edge.
+   * Gets the active drop zone of the specified grid.
+   *
+   * Drop zones of a grid are activated when dragging near the grid edge.
    */
-  public async getActiveEdgeDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
-    const dropZone = this.page.locator('div.e2e-edge-drop-zone');
+  public async getActiveGridDropZone(locateBy: {grid: 'main' | 'main-area' | ActivityId}): Promise<'north' | 'east' | 'south' | 'west' | null> {
+    const dropZone = this.page.locator('wb-layout').locator(`div.e2e-grid-drop-zone[data-grid="${locateBy.grid}"]`);
     if (!await dropZone.isVisible()) {
       return null;
     }

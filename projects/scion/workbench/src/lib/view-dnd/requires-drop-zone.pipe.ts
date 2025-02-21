@@ -28,7 +28,7 @@ export class RequiresDropZonePipe implements PipeTransform {
 
 function requiresDropZone(element: MTreeNode | MPart, region: 'north' | 'south' | 'east' | 'west'): boolean {
   if (element instanceof MPart) {
-    // Return `false` for every part except the main area part, allowing for dragging a first part to that side in the workbench grid.
+    // Return `false` for every part except the main area part, allowing for dragging a first view to the side of the main area grid.
     return element.id === MAIN_AREA;
   }
 

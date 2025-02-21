@@ -15,9 +15,9 @@ import {fromRect} from '../helper/testing.util';
 import {MAIN_AREA} from '../workbench.model';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 
-test.describe('View Drag Workbench Grid', () => {
+test.describe('View Drag Main Grid', () => {
 
-  test.describe('should allow dragging a view to the side of the workbench grid', () => {
+  test.describe('should allow dragging a view to the side of the main grid', () => {
 
     /**
      * +--------------------+    +----------+------------+
@@ -25,7 +25,7 @@ test.describe('View Drag Workbench Grid', () => {
      * | [view.1, view.101] |    | [view.1] | [view.101] |
      * +--------------------+    +----------+------------+
      */
-    test('should allow dragging a view to the west in the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the west in the main grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -34,13 +34,13 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.101', {partId: 'part.initial'}),
       );
 
-      // Move test view to the west of the workbench grid.
+      // Move test view to the west of the main grid.
       const dragHandle = await testView.view.tab.startDrag();
-      await dragHandle.dragToEdge('west');
+      await dragHandle.dragToGrid({grid: 'main', region: 'west'});
       await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
-      // Expect test view to be moved to the west of the workbench grid.
+      // Expect test view to be moved to the west of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainGrid: {
           root: new MTreeNode({
@@ -74,7 +74,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |  [view.103]   |                  |    |          |  [view.103]   |            |
      * +---------------+------------------+    +----------+---------------+------------+
      */
-    test('should allow dragging a view to the west in the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the west in the main grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -87,13 +87,13 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.103', {partId: 'part.left-bottom', activateView: true}),
       );
 
-      // Move test view to the west of the workbench grid.
+      // Move test view to the west of the main grid.
       const dragHandle = await testView.view.tab.startDrag();
-      await dragHandle.dragToEdge('west');
+      await dragHandle.dragToGrid({grid: 'main', region: 'west'});
       await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
-      // Expect test view to be moved to the west of the workbench grid.
+      // Expect test view to be moved to the west of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainGrid: {
           root: new MTreeNode({
@@ -142,7 +142,7 @@ test.describe('View Drag Workbench Grid', () => {
      * | [view.1, view.101] |    | [view.101] | [view.1] |
      * +--------------------+    +------------+----------+
      */
-    test('should allow dragging a view to the east in the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the east in the main grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -151,13 +151,13 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.101', {partId: 'part.initial'}),
       );
 
-      // Move test view to the east of the workbench grid.
+      // Move test view to the east of the main grid.
       const dragHandle = await testView.view.tab.startDrag();
-      await dragHandle.dragToEdge('east');
+      await dragHandle.dragToGrid({grid: 'main', region: 'east'});
       await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
-      // Expect test view to be moved to the east of the workbench grid.
+      // Expect test view to be moved to the east of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainGrid: {
           root: new MTreeNode({
@@ -191,7 +191,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |                  |  [view.103]  |    |             |  [view.103]  |          |
      * +------------------+--------------+    +-------------+--------------+----------+
      */
-    test('should allow dragging a view to the east in the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the east in the main grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -204,13 +204,13 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.103', {partId: 'part.right-bottom', activateView: true}),
       );
 
-      // Move test view to the east of the workbench grid.
+      // Move test view to the east of the main grid.
       const dragHandle = await testView.view.tab.startDrag();
-      await dragHandle.dragToEdge('east');
+      await dragHandle.dragToGrid({grid: 'main', region: 'east'});
       await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
-      // Expect test view to be moved to the east of the workbench grid.
+      // Expect test view to be moved to the east of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainGrid: {
           root: new MTreeNode({
@@ -262,7 +262,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |                    |    | [view.1]    |
      * +--------------------+    +-------------+
      */
-    test('should allow dragging a view to the south in the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the south in the main grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -271,13 +271,13 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.101', {partId: 'part.initial'}),
       );
 
-      // Move test view to the south of the workbench grid.
+      // Move test view to the south of the main grid.
       const dragHandle = await testView.view.tab.startDrag();
-      await dragHandle.dragToEdge('south');
+      await dragHandle.dragToGrid({grid: 'main', region: 'south'});
       await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
-      // Expect test view to be moved to the south of the workbench grid.
+      // Expect test view to be moved to the south of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainGrid: {
           root: new MTreeNode({
@@ -314,7 +314,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |  [view.102] |  [view.103]  |    |         [view.1]           |
      * +----------------------------+    +----------------------------+
      */
-    test('should allow dragging a view to the south in the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
+    test('should allow dragging a view to the south in the main grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -327,13 +327,13 @@ test.describe('View Drag Workbench Grid', () => {
         .addView('view.103', {partId: 'part.bottom-right', activateView: true}),
       );
 
-      // Move test view to the south of the workbench grid.
+      // Move test view to the south of the main grid.
       const dragHandle = await testView.view.tab.startDrag();
-      await dragHandle.dragToEdge('south');
+      await dragHandle.dragToGrid({grid: 'main', region: 'south'});
       await dragHandle.drop();
       const testViewInfo = await testView.view.getInfo();
 
-      // Expect test view to be moved to the south of the workbench grid.
+      // Expect test view to be moved to the south of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         mainGrid: {
           root: new MTreeNode({
@@ -384,7 +384,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |                   |            |
      * +-------------------+------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (1)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (1)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -396,10 +396,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(false);
     });
 
     /**
@@ -411,7 +411,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |     [view.102]    |
      * +-------------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (2)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (2)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -423,10 +423,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(true);
     });
 
     /**
@@ -438,7 +438,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |     [view.102]    |            |
      * +-------------------+------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (3)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (3)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -452,10 +452,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(false);
     });
 
     /**
@@ -467,7 +467,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |            |     [view.102]    |
      * +------------+-------------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (4)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (4)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -481,10 +481,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(true);
     });
 
     /**
@@ -499,7 +499,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |            [view.104]          |
      * +--------------------------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (5)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (5)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -515,10 +515,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(true);
     });
 
     /**
@@ -533,7 +533,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |            [view.104]        |            |
      * +------------------------------+------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (6)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (6)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -551,10 +551,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(false);
     });
 
     /**
@@ -566,7 +566,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |            |     [view.102]    |          |
      * +------------+-------------------+----------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (7)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (7)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -580,10 +580,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(true);
     });
 
     /**
@@ -595,7 +595,7 @@ test.describe('View Drag Workbench Grid', () => {
      * | <no views>  |                   |  [view.102]  |
      * +-------------+-------------------+--------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (8)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (8)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -610,10 +610,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(false);
     });
 
     /**
@@ -625,7 +625,7 @@ test.describe('View Drag Workbench Grid', () => {
      * |         <no views>              |
      * +---------------------------------+
      */
-    test('should NOT allow dragging a view to the north or a fully adjacent side of the workbench grid (9)', async ({appPO, workbenchNavigator}) => {
+    test('should NOT allow dragging a view to the north or a fully adjacent side of the main grid (9)', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
@@ -638,10 +638,10 @@ test.describe('View Drag Workbench Grid', () => {
       );
 
       const dragHandle = await testView.view.tab.startDrag();
-      await expect.poll(() => dragHandle.dragToEdge('north', {orElse: false})).toBe(false);
-      await expect.poll(() => dragHandle.dragToEdge('south', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('west', {orElse: false})).toBe(true);
-      await expect.poll(() => dragHandle.dragToEdge('east', {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'north'}, {orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'south'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {orElse: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'east'}, {orElse: false})).toBe(false);
     });
 
     /**
@@ -675,13 +675,13 @@ test.describe('View Drag Workbench Grid', () => {
       await dragHandle.dragTo({x: bottomTabbarBounds.hcenter, y: bottomTabbarBounds.vcenter});
 
       // Expect the drop zone not to be active if dragging over the tabbar.
-      await expect.poll(() => dragHandle.dragToEdge('west', {dragFromCenter: false, orElse: false})).toBe(false);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {dragFromCenter: false, orElse: false})).toBe(false);
 
       // Drag near to the bottom tabbar.
       await dragHandle.dragTo({x: bottomTabbarBounds.hcenter, y: bottomTabbarBounds.vcenter - 100});
 
       // Expect the drop zone to be active if not dragging over the tabbar.
-      await expect.poll(() => dragHandle.dragToEdge('west', {dragFromCenter: false})).toBe(true);
+      await expect.poll(() => dragHandle.dragToGrid({grid: 'main', region: 'west'}, {dragFromCenter: false})).toBe(true);
     });
 
     /**
@@ -716,7 +716,7 @@ test.describe('View Drag Workbench Grid', () => {
       await dragHandle.dragTo({x: 0, y: bottomTabbarBounds.vcenter});
 
       // Expect the drop zone to be active.
-      await expect.poll(() => appPO.getActiveEdgeDropZone()).toEqual('west');
+      await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
     });
   });
 });

@@ -480,7 +480,7 @@ describe('Workbench Perspective', () => {
   });
 
   /**
-   * Regression test for a bug where the workbench grid of the initial layout got replaced by the "default" grid deployed during the initial navigation,
+   * Regression test for a bug where the main grid of the initial layout got replaced by the "default" grid applied during the initial navigation,
    * resulting in only the main area being displayed.
    */
   it('should display the perspective also for asynchronous/slow initial navigation', async () => {
@@ -567,7 +567,7 @@ describe('Workbench Perspective', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['details/1']);
     await waitUntilStable();
 
-    // empty-path view should be opened in the active part (right) of the workbench grid
+    // empty-path view should be opened in the active part (right) of the main grid
     expect(fixture).toEqualWorkbenchLayout({
       mainGrid: {
         root: new MTreeNode({

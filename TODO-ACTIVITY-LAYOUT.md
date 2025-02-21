@@ -7,13 +7,27 @@
 [x] Activate activities in initial layout? -> activatePart
 [x] Test pages
 [x] View Conflict Resolver with activity grids OR make view ids random
-[] Part portal
+[] Maximize (hide activities)
+[] Prevent view drag to edge of main grid for layouts with activities
+[] Icon & Tooltip
+[] Testing App:
+  [] Drop Down for perspectives
+  [] Provide 2 Perspectives with activities
+[] @scion/components: Provide sash sizes as object literal instead of array
+[] Tests
+[] Documentation (JSDoc)
+[] HowTo
+
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
-[] Hidden
-[] Menu to add activities
+[] Part Portal (to not lose changes when closing activity)
+[] Part Title
+[] Hide Activities & menu to show activities
 [] Show Labels
+[] Minimize Part (-)
+
+## TODO Phase 3:
 [] Merger
 
 ## TO DISCUSS:
@@ -34,3 +48,11 @@
 
 ## BREAKING CHANGES:
 
+## THINKTANK
+[] How to open part in specific activity? User may have moved views to other (dynamic) part in that activity,
+   so the initial activity part is not visible anymore (still present because structural). However, the view should
+   then open in the currently active part of that activty.
+  -> Variante: addView('view.id', {partId: 'project'})
+     Falls Project Part nicht mehr sichtbar (weil keine View mehr drin), dann automatiscsher
+     Fallback auf active View dieses Grids.
+[] Part Actions: How to contribute a part action to a specific activity. (see RegisterPartActionPageComponent)

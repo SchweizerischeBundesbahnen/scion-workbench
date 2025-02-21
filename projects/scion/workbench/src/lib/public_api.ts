@@ -31,3 +31,4 @@ export * from './microfrontend-platform/public_api';
 export * from './startup/public_api';
 export * from './logging/public_api';
 export * from './storage/public_api';
+export * from './activity/public_api';

@@ -102,7 +102,7 @@ export class LayoutComponent {
     void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('bottom', bottomPanelSize!));
   }
 
-  protected onViewDrop(event: WbViewDropEvent): void {
+  protected onDesktopViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,

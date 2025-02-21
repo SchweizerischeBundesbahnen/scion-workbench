@@ -101,7 +101,7 @@ test.describe('View Drag Main Area', () => {
         .addView('view.102', {partId: 'part.bottom', activateView: true}),
       );
 
-      // Move test view to the east of the main area.
+      // Move test view to the east in the main area.
       const dragHandle = await testView.view.tab.startDrag();
       await dragHandle.dragToPart(MAIN_AREA, {region: 'east'});
       await dragHandle.drop();

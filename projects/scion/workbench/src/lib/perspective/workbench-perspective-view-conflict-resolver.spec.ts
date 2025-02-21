@@ -82,7 +82,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
     // Expect view in main area to have TestComponent mounted with content 'b'
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.initial"] wb-view[data-viewid="view.1"] spec-test-component')).nativeElement.innerText).toEqual('b');
 
-    // Expect view in workbench grid to have TestComponent mounted with content 'a'
+    // Expect view in main grid to have TestComponent mounted with content 'a'
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] wb-view[data-viewid="view.2"] spec-test-component')).nativeElement.innerText).toEqual('a');
   });
 });

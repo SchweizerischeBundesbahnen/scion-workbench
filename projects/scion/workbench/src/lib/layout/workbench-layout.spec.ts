@@ -107,7 +107,7 @@ describe('WorkbenchLayout', () => {
   });
 
   /**
-   * Workbench Grid:
+   * Main Grid:
    * +---------------+
    * |       A       |
    * +---------------+
@@ -145,7 +145,7 @@ describe('WorkbenchLayout', () => {
   });
 
   /**
-   * Workbench Grid:
+   * Main Grid:
    * +---------------+
    * |       A       |
    * +---------------+
@@ -183,7 +183,7 @@ describe('WorkbenchLayout', () => {
   });
 
   /**
-   * Workbench Grid:
+   * Main Grid:
    * +-------+
    * |   A   |
    * +-------+
@@ -537,7 +537,7 @@ describe('WorkbenchLayout', () => {
    * |         BOTTOM          |       |
    * +-------------------------+-------+
    */
-  it('should allow adding a new parts to the workbench grid', () => {
+  it('should allow adding a new parts to the main grid', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
     const workbenchLayout = createComplexMainAreaLayout()

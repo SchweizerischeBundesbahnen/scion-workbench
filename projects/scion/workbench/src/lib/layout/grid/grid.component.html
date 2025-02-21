@@ -1,7 +1,8 @@
+<!-- TODO [activity] Why is the drop zone not on the grid as host directive? -->
 <wb-grid-element [element]="root()"
                  wbViewDropZone
-                 [wbViewDropZoneRegionSize]="50"
-                 [wbViewDropZonePlaceholderSize]="50"
+                 [wbViewDropZoneRegionSize]="gridDropZone()?.dropRegionSize"
+                 [wbViewDropZonePlaceholderSize]="gridDropZone()?.dropPlaceholderSize"
                  [wbViewDropZoneRegions]="{
                      north: false,
                      south: root() | wbRequiresDropZone:'south',
@@ -9,5 +10,7 @@
                      east: root() | wbRequiresDropZone:'east',
                      center: false,
                    }"
-                 [wbViewDropZoneCssClass]="'e2e-edge-drop-zone'"
-                 (wbViewDropZoneDrop)="onViewDrop($event)"/>
+                 [wbViewDropZoneCssClass]="gridDropZone()?.dropZoneCssClass"
+                 [wbViewDropZoneAttributes]="gridDropZone()?.dropZoneAttributes"
+                 (wbViewDropZoneDrop)="onViewDrop($event)
+"/>

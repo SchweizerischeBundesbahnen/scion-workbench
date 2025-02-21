@@ -40,7 +40,7 @@ export const WorkbenchNavigationalStates = {
 export interface WorkbenchNavigationalState {
   grids: {
     /**
-     * Serialized workbench grid.
+     * Serialized main grid.
      */
     main: string;
     /**

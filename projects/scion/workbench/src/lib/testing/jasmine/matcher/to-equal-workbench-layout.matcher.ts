@@ -101,13 +101,13 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
  * Note: To pierce the shadow DOM and use the `:scope` selector, we use `Element.querySelector` instead of `DebugElement.query(By.css(...))`, i.e., to access the light DOM of sci-viewport.
  */
 function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualElement: Element): void {
-  // Assert the workbench grid plus the main area grid if expected.
+  // Assert the main grid plus the main area grid if expected.
   if (expected.mainGrid) {
-    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] > wb-grid-element:not([data-parentnodeid])'), expected);
+    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] > wb-grid-element'), expected);
   }
-  // Assert only the main area grid, but not the workbench grid since not expected.
+  // Assert only the main area grid, but not the main grid since not expected.
   else if (expected.mainAreaGrid) {
-    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-part[data-partid="part.main-area"] > wb-grid-element'), expected);
+    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] wb-part[data-partid="part.main-area"] > wb-grid[data-grid="main-area"] > wb-grid-element'), expected);
   }
 }
 
@@ -197,7 +197,7 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
       throw Error(`[DOMAssertError]: Expected element 'wb-part[data-partid="part.main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
     if (expectedWorkbenchLayout.mainAreaGrid) {
-      assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);
+      assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(':scope > wb-grid[data-grid="main-area"] > wb-grid-element'), expectedWorkbenchLayout);
     }
     return;
   }

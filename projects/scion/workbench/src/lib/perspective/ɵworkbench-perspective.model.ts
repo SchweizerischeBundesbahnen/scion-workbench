@@ -64,7 +64,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * Activates this perspective.
    */
   public async activate(): Promise<boolean> {
-    // Create the initial workbench grid when constructed for the first time.
+    // Create the initial main grid when constructed for the first time.
     this._initialPerspectiveLayout ??= await this.createInitialPerspectiveLayout();
 
     // Load the layout from the storage, if present, or use the initial layout otherwise.

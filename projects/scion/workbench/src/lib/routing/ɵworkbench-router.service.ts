@@ -45,8 +45,8 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 
   constructor() {
     // Instruct the Angular router to process navigations that do not change the current URL, i.e., when only updating navigation state.
-    // For example, the workbench grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
-    // the workbench grid would not be added to the browsing history stack.
+    // For example, the main grid is passed to the navigation as state, not as a query parameter. Without this flag set, changes to
+    // the main grid would not be added to the browsing history stack.
     // Although the `onSameUrlNavigation` flag can be set per navigation via the navigation extras, this is not sufficient because the
     // Angular router ignores it when navigating back and forth in the browsing history.
     // See Angular router.ts#setUpLocationChangeListener and router.ts#navigateToSyncWithBrowser
@@ -356,7 +356,7 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
 
   return {
     ...extras,
-    // Instruct the Angular router to process the navigation even if the URL does not change, e.g., when changing the workbench grid which is not contained in the URL.
+    // Instruct the Angular router to process the navigation even if the URL does not change, e.g., when changing the main grid which is not contained in the URL.
     onSameUrlNavigation: 'reload',
     // Unset `relativeTo` because commands are already normalized to their absolute form.
     relativeTo: null,
