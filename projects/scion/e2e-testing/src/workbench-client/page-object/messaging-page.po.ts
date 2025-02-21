@@ -24,9 +24,9 @@ import {SciKeyValueFieldPO} from '../../@scion/components.internal/key-value-fie
  */
 export class MessagingPagePO implements MicrofrontendViewPagePO {
 
-  public readonly locator: Locator;
   private readonly _tabbar: SciTabbarPO;
 
+  public readonly locator: Locator;
   public readonly view: ViewPO;
   public readonly outlet: SciRouterOutletPO;
 

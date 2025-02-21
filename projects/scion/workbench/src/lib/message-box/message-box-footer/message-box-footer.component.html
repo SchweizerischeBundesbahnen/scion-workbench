@@ -1,4 +1,4 @@
-@for (action of actions | keyvalue:insertionSortOrderFn; track action.key) {
+@for (action of actions() | keyvalue:insertionSortOrderFn; track action.key) {
   <button #action_button
           (click)="onAction(action.key)"
           (keydown.arrowLeft)="onArrowKey($index, 'left')"

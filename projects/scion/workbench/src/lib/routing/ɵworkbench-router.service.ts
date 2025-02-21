@@ -244,7 +244,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
 /**
  * Creates a navigation to navigate view(s) based on the provided array of commands and extras.
  */
-function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavigationExtras): ɵNavigateFn {
+export function createNavigationFromCommands(commands: Commands, extras: WorkbenchNavigationExtras): ɵNavigateFn {
   return (layout: ɵWorkbenchLayout): ɵWorkbenchLayout | null => {
     if (extras.close) {
       if (extras.target) {

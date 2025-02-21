@@ -64,13 +64,14 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    */
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly size: WorkbenchDialogSize = new ɵWorkbenchDialogSize();
+  public readonly blinking$ = new BehaviorSubject(false);
+  public readonly context = {
+    view: inject(ɵWorkbenchView, {optional: true}),
+  };
+
   public header: WorkbenchDialogHeaderDirective | undefined;
   public footer: WorkbenchDialogFooterDirective | undefined;
   public actions = new Array<WorkbenchDialogActionDirective>();
-  public blinking$ = new BehaviorSubject(false);
-  public context = {
-    view: inject(ɵWorkbenchView, {optional: true}),
-  };
 
   constructor(public id: string,
               public component: ComponentType<unknown>,

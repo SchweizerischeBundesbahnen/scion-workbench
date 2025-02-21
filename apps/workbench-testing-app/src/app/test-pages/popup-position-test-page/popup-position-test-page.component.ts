@@ -35,7 +35,7 @@ export default class PopupPositionTestPageComponent {
   private _popupService = inject(PopupService);
   private _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
 
-  public onOpen(): void {
+  protected onOpen(): void {
     void this._popupService.open<string>({
       component: BlankTestPageComponent,
       anchor: this._openButton(),

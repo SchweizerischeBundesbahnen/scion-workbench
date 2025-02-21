@@ -45,7 +45,7 @@ export class ContentAsOverlayComponent {
    *
    * A config input is used instead of separate input properties to support updating the config if detached from the Angular change detector.
    */
-  public config = input.required<ContentAsOverlayConfig>();
+  public readonly config = input.required<ContentAsOverlayConfig>();
 
   private readonly _template = viewChild.required(TemplateRef);
   private readonly _visible = computed(() => this.config().visible());

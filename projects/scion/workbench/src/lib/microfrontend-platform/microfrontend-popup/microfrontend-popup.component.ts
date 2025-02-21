@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
@@ -30,60 +30,43 @@ import {Microfrontends} from '../common/microfrontend.util';
   templateUrl: './microfrontend-popup.component.html',
   imports: [NgClass, NgComponentOutlet],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
+  host: {
+    '[class.workbench-drag]': 'workbenchLayoutService.dragging()',
+  },
 })
-export class MicrofrontendPopupComponent implements OnInit {
+export class MicrofrontendPopupComponent {
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
-  private readonly _manifestService = inject(ManifestService);
-  private readonly _messageClient = inject(MessageClient);
-  private readonly _destroyRef = inject(DestroyRef);
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _injector = inject(Injector);
   private readonly _logger = inject(Logger);
+  private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
-  protected readonly popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+  protected readonly popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
   protected readonly popupCapability = this.popupContext.capability;
-
-  /**
-   * Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash.
-   */
-  @HostBinding('class.workbench-drag')
-  protected isWorkbenchDrag = false;
-
-  @ViewChild('router_outlet', {static: true})
-  public routerOutletElement!: ElementRef<SciRouterOutletElement>;
+  protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
 
   constructor() {
-    this.installWorkbenchDragDetector();
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.popup.id}));
-  }
 
-  public ngOnInit(): void {
-    // Listen to popup close requests.
-    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupCloseTopic(this.popup.id))
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(closeRequest => {
-        this.popup.close(closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) ? new Error(closeRequest.body as string) : closeRequest.body);
-      });
-
-    // Listen to popup result requests.
-    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupResultTopic(this.popup.id))
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(result => this.popup.setResult(result.body));
-
-    // Make the popup context available to embedded content.
-    this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this.popupContext);
-
-    // Propagate workbench and color theme to the microfrontend.
+    this.installPopupResultListener();
+    this.installPopupCloseListener();
+    this.propagatePopupContext();
     this.propagateWorkbenchTheme();
 
-    // Navigate to the microfrontend.
-    const application = this._manifestService.getApplication(this.popupCapability.metadata!.appSymbolicName);
+    void this.navigate();
+
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.popup.id})); // Clear the outlet.
+  }
+
+  private async navigate(): Promise<void> {
+    const application = inject(ManifestService).getApplication(this.popupCapability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this.popupContext.params, this.popupCapability);
+
+    // Wait for the context to be set on the router outlet, as @scion/workbench-client expects it to be available on startup.
+    await Microfrontends.waitForContext(this._routerOutletElement, ɵPOPUP_CONTEXT);
+
     void this._outletRouter.navigate(this.popupCapability.properties.path, {
       outlet: this.popup.id,
       relativeTo: application.baseUrl,
@@ -91,6 +74,31 @@ export class MicrofrontendPopupComponent implements OnInit {
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
     });
+  }
+
+  /**
+   * Provides the popup context to embedded content.
+   */
+  private propagatePopupContext(): void {
+    effect(() => {
+      const routerOutletElement = this._routerOutletElement();
+
+      untracked(() => routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this.popupContext));
+    });
+  }
+
+  private installPopupResultListener(): void {
+    inject(MessageClient).observe$<unknown>(ɵWorkbenchCommands.popupResultTopic(this.popup.id))
+      .pipe(takeUntilDestroyed())
+      .subscribe(result => this.popup.setResult(result.body));
+  }
+
+  private installPopupCloseListener(): void {
+    inject(MessageClient).observe$<unknown>(ɵWorkbenchCommands.popupCloseTopic(this.popup.id))
+      .pipe(takeUntilDestroyed())
+      .subscribe(closeRequest => {
+        this.popup.close(closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) ? new Error(closeRequest.body as string) : closeRequest.body);
+      });
   }
 
   protected onFocusWithin(event: Event): void {
@@ -106,16 +114,8 @@ export class MicrofrontendPopupComponent implements OnInit {
     }
   }
 
-  /**
-   * Sets the {@link isWorkbenchDrag} property when a workbench drag operation is detected,
-   * such as when dragging a view or moving a sash.
-   */
-  private installWorkbenchDragDetector(): void {
-    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging());
-  }
-
   private propagateWorkbenchTheme(): void {
-    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
+    Microfrontends.propagateTheme(this._routerOutletElement);
   }
 
   private get popupContext(): ɵPopupContext {

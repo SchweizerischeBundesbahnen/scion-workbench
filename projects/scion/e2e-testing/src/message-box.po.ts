@@ -17,12 +17,12 @@ import {DomRect, fromRect} from './helper/testing.util';
  */
 export class MessageBoxPO {
 
+  private readonly _header: Locator;
+  private readonly _footer: Locator;
+
   public readonly locator: Locator;
   public readonly title: Locator;
   public readonly actions: Locator;
-
-  private readonly _header: Locator;
-  private readonly _footer: Locator;
 
   constructor(private _dialog: DialogPO) {
     this.locator = this._dialog.locator.locator('wb-message-box');

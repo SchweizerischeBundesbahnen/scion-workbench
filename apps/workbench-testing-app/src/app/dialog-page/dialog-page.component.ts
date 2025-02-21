@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Input} from '@angular/core';
+import {Component, HostBinding, inject, input} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
@@ -31,6 +31,8 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
   ],
 })
 export class DialogPageComponent {
+
+  public readonly input = input<string>();
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
@@ -61,9 +63,6 @@ export class DialogPageComponent {
     closeWithError: this._formBuilder.control(false),
     result: this._formBuilder.control(''),
   });
-
-  @Input()
-  public input: string | undefined;
 
   @HostBinding('style.--ɵapp-dialog-page-height')
   protected get height(): string | undefined {

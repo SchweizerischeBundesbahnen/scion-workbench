@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WORKBENCH_ID, WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
@@ -27,6 +27,8 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class ViewMoveDialogTestPageComponent {
 
+  public readonly view = input.required<WorkbenchView>();
+
   private readonly _formBuilder = inject(NonNullableFormBuilder);
   private readonly _dialog = inject(WorkbenchDialog);
 
@@ -38,9 +40,6 @@ export class ViewMoveDialogTestPageComponent {
     region: this._formBuilder.control<'north' | 'south' | 'west' | 'east' | ''>(''),
   });
 
-  @Input({required: true})
-  public view!: WorkbenchView;
-
   constructor() {
     this._dialog.title = 'Move view';
     this.requirePartIfMovingToExistingWindow();
@@ -48,10 +47,10 @@ export class ViewMoveDialogTestPageComponent {
 
   protected onOk(): void {
     if (this.form.controls.workbenchId.value === 'new-window') {
-      this.view.move('new-window');
+      this.view().move('new-window');
     }
     else {
-      this.view.move(this.form.controls.partId.value, {
+      this.view().move(this.form.controls.partId.value, {
         region: this.form.controls.region.value || undefined,
         workbenchId: this.form.controls.workbenchId.value || undefined,
       });

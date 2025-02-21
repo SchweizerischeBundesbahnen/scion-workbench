@@ -42,6 +42,7 @@ export class MenuComponent implements OnInit {
   protected readonly MenuItem = MenuItem;
 
   public ngOnInit(): void {
+    // Run in `ngOnInit` because the backdrop element is not available until initial change detection.
     fromEvent(this._overlayRef.backdropElement!, 'mousedown')
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(() => this.closeMenu());

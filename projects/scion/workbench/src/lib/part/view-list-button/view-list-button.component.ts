@@ -45,7 +45,7 @@ export class ViewListButtonComponent implements OnDestroy {
   }
 
   @HostListener('click')
-  public onClick(): void {
+  protected onClick(): void {
     const positionStrategy = this._overlay.position()
       .flexibleConnectedTo(this._host)
       .withFlexibleDimensions(false)

@@ -140,7 +140,7 @@ export class TestCaseModel {
   /**
    * Invoke from the template to run this test.
    */
-  public onTestClick(): void {
+  protected onTestClick(): void {
     this.emissions.length = 0;
     if (this.runInAngular) {
       this._zone.run(() => this._testFn(this));

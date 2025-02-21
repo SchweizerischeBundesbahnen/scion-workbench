@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
 import {createElement, getCssTranslation, setStyle} from '../common/dom.util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
@@ -29,21 +29,13 @@ const HANDLE_SIZE = 6;
  * - must be horizontally centered in its layout
  */
 @Directive({selector: '[wbResizable]'})
-export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
+export class ResizableDirective {
+
+  public readonly enabled = input(true, {alias: 'wbResizableEnabled'});
+  public readonly wbResize = output<WbResizeEvent>({alias: 'wbResizableResize'});
 
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
-
-  private _handles: {
-    top: ResizeHandle;
-    right: ResizeHandle;
-    bottom: ResizeHandle;
-    left: ResizeHandle;
-    topLeft: ResizeHandle;
-    topRight: ResizeHandle;
-    bottomRight: ResizeHandle;
-    bottomLeft: ResizeHandle;
-  } | undefined;
 
   private minHeight: number | undefined;
   private maxHeight: number | undefined;
@@ -51,68 +43,63 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
   private minWidth: number | undefined;
   private maxWidth: number | undefined;
 
-  @Input('wbResizableEnabled')
-  public enabled = true;
-
-  @Output('wbResizableResize')
-  public wbResize = new EventEmitter<WbResizeEvent>();
-
-  public ngOnInit(): void {
+  constructor() {
     this.ensureHostElementPositioned();
-    this.init();
-  }
-
-  public ngOnChanges(): void {
-    this.init();
-  }
-
-  private init(): void {
-    if (this.enabled && !this._handles) {
-      this.installHandles();
-    }
-    else if (!this.enabled && this._handles) {
-      this.uninstallHandles();
-    }
+    this.installResizeHandles();
   }
 
   /**
    * Installs handles for resizing the host at its edges and corners.
    */
-  private installHandles(): void {
+  private installResizeHandles(): void {
+    effect(onCleanup => {
+      if (this.enabled()) {
+        const handles = untracked(() => this.createResizeHandles());
+        onCleanup(() => handles.forEach(handle => handle.dispose()));
+      }
+    });
+  }
+
+  private createResizeHandles(): ResizeHandle[] {
     // Calculate offset to be flush with the component boundaries, not the content boundaries.
     const borderWidth = parseInt(getComputedStyle(this._host).borderWidth, 10);
     const justified = `-${borderWidth + HANDLE_SIZE / 2}px`;
 
-    this._handles = {
-      top: new ResizeHandle(this._host, {
+    return [
+      // top handle
+      new ResizeHandle(this._host, {
         cursor: 'ns-resize',
         left: justified, top: justified, right: justified, height: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
         onResize: event => this.onResizeTop(event),
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      right: new ResizeHandle(this._host, {
+      // right handle
+      new ResizeHandle(this._host, {
         cursor: 'ew-resize',
         top: justified, right: justified, bottom: justified, width: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
         onResize: event => this.onResizeRight(event),
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      bottom: new ResizeHandle(this._host, {
+      // bottom handle
+      new ResizeHandle(this._host, {
         cursor: 'ns-resize',
         left: justified, bottom: justified, right: justified, height: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
         onResize: event => this.onResizeBottom(event),
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      left: new ResizeHandle(this._host, {
+      // left handle
+      new ResizeHandle(this._host, {
         cursor: 'ew-resize',
         top: justified, left: justified, bottom: justified, width: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
         onResize: event => this.onResizeLeft(event),
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      topLeft: new ResizeHandle(this._host, {
+      // top-left handle
+      new ResizeHandle(this._host, {
         cursor: 'nwse-resize',
         top: justified, left: justified, width: `${HANDLE_SIZE}px`, height: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
@@ -122,7 +109,8 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
         },
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      topRight: new ResizeHandle(this._host, {
+      // top-right handle
+      new ResizeHandle(this._host, {
         cursor: 'nesw-resize',
         top: justified, right: justified, width: `${HANDLE_SIZE}px`, height: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
@@ -132,7 +120,8 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
         },
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      bottomRight: new ResizeHandle(this._host, {
+      // bottom-right handle
+      new ResizeHandle(this._host, {
         cursor: 'nwse-resize',
         bottom: justified, right: justified, width: `${HANDLE_SIZE}px`, height: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
@@ -142,7 +131,8 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
         },
         onResizeEnd: () => this.onResizeEnd(),
       }),
-      bottomLeft: new ResizeHandle(this._host, {
+      // bottom-left handle
+      new ResizeHandle(this._host, {
         cursor: 'nesw-resize',
         bottom: justified, left: justified, width: `${HANDLE_SIZE}px`, height: `${HANDLE_SIZE}px`,
         onResizeStart: () => this.onResizeStart(),
@@ -152,12 +142,7 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
         },
         onResizeEnd: () => this.onResizeEnd(),
       }),
-    };
-  }
-
-  private uninstallHandles(): void {
-    Object.values(this._handles!).forEach(handle => handle.dispose());
-    this._handles = undefined;
+    ];
   }
 
   /**
@@ -335,12 +320,6 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
   private ensureHostElementPositioned(): void {
     if (getComputedStyle(this._host).position === 'static') {
       setStyle(this._host, {'position': 'relative'});
-    }
-  }
-
-  public ngOnDestroy(): void {
-    if (this._handles) {
-      this.uninstallHandles();
     }
   }
 }

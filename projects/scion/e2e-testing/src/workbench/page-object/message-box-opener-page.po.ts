@@ -22,11 +22,12 @@ import {WorkbenchViewPagePO} from './workbench-view-page.po';
  */
 export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
 
+  private readonly _openButton: Locator;
+
   public readonly locator: Locator;
   public readonly closeAction: Locator;
   public readonly error: Locator;
   public readonly view: ViewPO;
-  private readonly _openButton: Locator;
 
   constructor(private _appPO: AppPO, locateBy: {viewId?: ViewId; cssClass?: string}) {
     this.view = this._appPO.view({viewId: locateBy.viewId, cssClass: locateBy.cssClass});

@@ -9,11 +9,13 @@
  */
 
 import {Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
-import {effect, inject} from '@angular/core';
+import {effect, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
 import {ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchTheme} from '../../workbench.model';
 import {Crypto} from '@scion/toolkit/crypto';
+import {coerceElement} from '@angular/cdk/coercion';
+import {first} from 'rxjs/operators';
 
 /**
  * Provides functions related to workbench themes.
@@ -23,21 +25,49 @@ export const Microfrontends = {
    * Propagates the workbench theme and color scheme via contextual data to the microfrontend displayed in the given router outlet,
    * ensuring consistent styling across microfrontends.
    *
-   * This method should be invoked in the component's injection context to stop propagation when the component is destroyed.
+   * This method must be passed an injector or called in an injection context. If used in a component, use the component's injector.
+   * Stops theme propagation when the injection context is destroyed.
    */
-  propagateTheme: (sciRouterOutletElement: SciRouterOutletElement): void => {
-    const workbenchService = inject(WorkbenchService);
+  propagateTheme: (routerOutletElement: Signal<SciRouterOutletElement | ElementRef<SciRouterOutletElement>>, options?: {injector?: Injector}): void => {
+    const injector = options?.injector ?? inject(Injector);
+
     effect(() => {
-      const theme = workbenchService.theme();
-      if (theme) {
-        sciRouterOutletElement.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
-        sciRouterOutletElement.setContextValue('color-scheme', theme.colorScheme);
-      }
-      else {
-        sciRouterOutletElement.removeContextValue(ɵTHEME_CONTEXT_KEY);
-        sciRouterOutletElement.removeContextValue('color-scheme');
-      }
-    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+      const routerOutlet = coerceElement(routerOutletElement());
+      const theme = injector.get(WorkbenchService).theme();
+
+      untracked(() => {
+        if (theme) {
+          routerOutlet.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
+          routerOutlet.setContextValue('color-scheme', theme.colorScheme);
+        }
+        else {
+          routerOutlet.removeContextValue(ɵTHEME_CONTEXT_KEY);
+          routerOutlet.removeContextValue('color-scheme');
+        }
+      });
+    }, {injector, forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+  },
+  /**
+   * Waits for contextual data to be available to embedded content.
+   *
+   * This method must be passed an injector or called in an injection context. If used in a component, use the component's injector.
+   * Stops waiting when the injection context is destroyed.
+   */
+  waitForContext: (routerOutletElement: Signal<SciRouterOutletElement | ElementRef<SciRouterOutletElement>>, name: string, options?: {injector?: Injector}): Promise<void> => {
+    const injector = options?.injector ?? inject(Injector);
+
+    return new Promise<void>(resolve => {
+      effect(onCleanup => {
+        const routerOutlet = coerceElement(routerOutletElement());
+
+        untracked(() => {
+          const subscription = routerOutlet.contextValues$
+            .pipe(first(context => context.has(name)))
+            .subscribe(() => resolve());
+          onCleanup(() => subscription.unsubscribe());
+        });
+      }, {injector, forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    });
   },
   /**
    * Creates a stable identifier for given capability.

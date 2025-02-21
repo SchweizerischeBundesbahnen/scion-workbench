@@ -96,7 +96,7 @@ export class PerspectiveCapabilityPropertiesComponent implements ControlValueAcc
     this.updatePartFields();
   }
 
-  public onAddView(partFormGroup: FormGroup<PartFormGroup>): void {
+  protected onAddView(partFormGroup: FormGroup<PartFormGroup>): void {
     const viewFormGroup = this.createViewFormGroup();
     partFormGroup.controls.views.push(viewFormGroup);
   }

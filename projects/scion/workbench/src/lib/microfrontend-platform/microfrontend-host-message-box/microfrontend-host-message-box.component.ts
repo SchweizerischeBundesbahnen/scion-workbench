@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, ElementRef, inject, Injector, Input, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, inject, Injector, input, runInInjectionContext, StaticProvider, untracked} from '@angular/core';
 import {WorkbenchMessageBox, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -38,7 +38,10 @@ import {setStyle} from '../../common/dom.util';
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostMessageBoxComponent implements OnInit {
+export class MicrofrontendHostMessageBoxComponent {
+
+  public readonly capability = input.required<WorkbenchMessageBoxCapability>();
+  public readonly params = input.required<Map<string, unknown>>();
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _dialog = inject(ɵWorkbenchDialog);
@@ -51,23 +54,26 @@ export class MicrofrontendHostMessageBoxComponent implements OnInit {
 
   protected outletInjector!: Injector;
 
-  @Input({required: true})
-  public capability!: WorkbenchMessageBoxCapability;
-
-  @Input({required: true})
-  public params!: Map<string, unknown>;
-
   constructor() {
+    this.setMessageBoxProperties();
+    this.createOutletInjector();
+    this.navigateCapability();
+
     inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
   }
 
-  public ngOnInit(): void {
-    this.setSizeProperties();
-    this.createOutletInjector();
-    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
-      if (!success) {
-        this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
-      }
+  private navigateCapability(): void {
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        void this.navigate(capability.properties.path, {params}).then(success => {
+          if (!success) {
+            this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+          }
+        });
+      });
     });
   }
 
@@ -83,20 +89,33 @@ export class MicrofrontendHostMessageBoxComponent implements OnInit {
   }
 
   private createOutletInjector(): void {
-    this.outletInjector = Injector.create({
-      parent: this._injector,
-      providers: [provideWorkbenchClientMessageBoxHandle(this.capability, this.params)],
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        this.outletInjector = Injector.create({
+          parent: this._injector,
+          providers: [provideWorkbenchClientMessageBoxHandle(capability, params)],
+        });
+      });
     });
   }
 
-  private setSizeProperties(): void {
-    setStyle(this._host, {
-      'width': this.capability.properties.size?.width ?? null,
-      'min-width': this.capability.properties.size?.minWidth ?? null,
-      'max-width': this.capability.properties.size?.maxWidth ?? null,
-      'height': this.capability.properties.size?.height ?? null,
-      'min-height': this.capability.properties.size?.minHeight ?? null,
-      'max-height': this.capability.properties.size?.maxHeight ?? null,
+  private setMessageBoxProperties(): void {
+    effect(() => {
+      const properties = this.capability().properties;
+
+      untracked(() => {
+        setStyle(this._host, {
+          'width': properties.size?.width ?? null,
+          'min-width': properties.size?.minWidth ?? null,
+          'max-width': properties.size?.maxWidth ?? null,
+          'height': properties.size?.height ?? null,
+          'min-height': properties.size?.minHeight ?? null,
+          'max-height': properties.size?.maxHeight ?? null,
+        });
+      });
     });
   }
 }

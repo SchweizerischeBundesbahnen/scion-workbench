@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {booleanAttribute, Directive, inject, Input, OnDestroy, TemplateRef} from '@angular/core';
+import {booleanAttribute, DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {Disposable} from '../../common/disposable';
 import {asapScheduler} from 'rxjs';
@@ -26,28 +26,24 @@ import {asapScheduler} from 'rxjs';
  * ```
  */
 @Directive({selector: 'ng-template[wbDialogHeader]'})
-export class WorkbenchDialogHeaderDirective implements OnDestroy {
-
-  public readonly template = inject(TemplateRef) as TemplateRef<void>;
-
-  private _header: Disposable | undefined;
+export class WorkbenchDialogHeaderDirective {
 
   /**
    * Specifies if to display a visual separator between this header and the dialog content.
    * Defaults to `true`.
    */
-  @Input({transform: booleanAttribute})
-  public divider?: boolean;
+  public readonly divider = input(undefined, {transform: booleanAttribute});
+  public readonly template = inject(TemplateRef) as TemplateRef<void>;
+
+  private _header: Disposable | undefined;
 
   constructor() {
     const dialog = inject(ɵWorkbenchDialog);
 
     // Defer registering header to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
     asapScheduler.schedule(() => this._header = dialog.registerHeader(this));
-  }
 
-  public ngOnDestroy(): void {
     // Defer disposing header to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => this._header?.dispose());
+    inject(DestroyRef).onDestroy(() => asapScheduler.schedule(() => this._header?.dispose()));
   }
 }

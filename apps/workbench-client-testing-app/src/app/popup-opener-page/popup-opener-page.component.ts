@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, viewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CloseStrategy, PopupOrigin, ViewId, WorkbenchPopupService, WorkbenchView} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
@@ -42,6 +42,7 @@ export default class PopupOpenerPageComponent {
 
   private readonly _popupService = inject(WorkbenchPopupService);
   private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
   private readonly _popupOrigin$: Observable<PopupOrigin>;
 
   protected readonly form = this._formBuilder.group({
@@ -75,9 +76,6 @@ export default class PopupOpenerPageComponent {
   protected popupError: string | undefined;
   protected returnValue: string | undefined;
 
-  @ViewChild('open_button', {static: true})
-  private _openButton!: ElementRef<HTMLButtonElement>;
-
   constructor() {
     inject(WorkbenchView).signalReady();
     this._popupOrigin$ = this.observePopupOrigin$();
@@ -92,7 +90,7 @@ export default class PopupOpenerPageComponent {
 
     await this._popupService.open<string>(qualifier, {
       params: params ?? undefined,
-      anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton.nativeElement : this._popupOrigin$,
+      anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton().nativeElement : this._popupOrigin$,
       align: this.form.controls.align.value || undefined,
       closeStrategy: undefinedIfEmpty<CloseStrategy>({
         onFocusLost: this.form.controls.closeStrategy.controls.onFocusLost.value,

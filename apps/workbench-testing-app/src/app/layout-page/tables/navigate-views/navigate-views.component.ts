@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject, Input} from '@angular/core';
+import {Component, forwardRef, inject, input} from '@angular/core';
 import {noop} from 'rxjs';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -38,6 +38,8 @@ import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
 })
 export class NavigateViewsComponent implements ControlValueAccessor, Validator {
 
+  public readonly viewProposals = input([], {transform: arrayAttribute});
+
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly viewList = `view-list-${UUID.randomUUID()}`;
@@ -57,9 +59,6 @@ export class NavigateViewsComponent implements ControlValueAccessor, Validator {
 
   private _cvaChangeFn: (value: NavigationDescriptor[]) => void = noop;
   private _cvaTouchedFn: () => void = noop;
-
-  @Input({transform: arrayAttribute})
-  public viewProposals: string[] = [];
 
   constructor() {
     this.form.valueChanges

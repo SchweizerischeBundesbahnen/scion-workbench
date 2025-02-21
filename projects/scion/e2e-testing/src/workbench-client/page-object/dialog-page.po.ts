@@ -26,9 +26,10 @@ import {DomRect, fromRect} from '../../helper/testing.util';
  */
 export class DialogPagePO implements MicrofrontendDialogPagePO {
 
+  private readonly _hasFocusLocator: Locator;
+
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  private readonly _hasFocusLocator: Locator;
 
   constructor(public dialog: DialogPO) {
     this.outlet = new SciRouterOutletPO(new AppPO(dialog.locator.page()), {locator: dialog.locator.locator('sci-router-outlet')});

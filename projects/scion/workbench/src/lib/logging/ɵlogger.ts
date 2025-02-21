@@ -21,7 +21,6 @@ export class ɵLogger implements Logger {
 
   // TODO [Angular 20] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens.
   private readonly _logAppenders = inject(LogAppender, {optional: true}) as unknown as LogAppender[] | null ?? [];
-
   private readonly _logLevel: Signal<LogLevel>;
 
   constructor() {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, inject, Input, TemplateRef, ViewContainerRef} from '@angular/core';
+import {DestroyRef, Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
 import {WbComponentPortal} from './wb-component-portal';
 
 /**
@@ -30,6 +30,8 @@ import {WbComponentPortal} from './wb-component-portal';
 @Directive({selector: 'ng-template[wbPortalOutlet]'})
 export class WorkbenchPortalOutletDirective {
 
+  public readonly portal = input.required<WbComponentPortal | null>({alias: 'wbPortalOutlet'});
+
   private readonly _viewContainerRef = inject(ViewContainerRef);
 
   private _portal: WbComponentPortal | null = null;
@@ -47,14 +49,23 @@ export class WorkbenchPortalOutletDirective {
     // See tests `workbench-ummount.e2e-spec`.
     this._viewContainerRef.createEmbeddedView(nullTemplate);
 
+    this.installPortal();
+
     inject(DestroyRef).onDestroy(() => this.detach());
   }
 
-  @Input({alias: 'wbPortalOutlet', required: true})
-  public set portal(portal: WbComponentPortal | null) {
-    this.detach();
-    this._portal = portal;
-    this.attach();
+  /**
+   * Attaches the portal, detaching the previous portal, if any.
+   */
+  private installPortal(): void {
+    effect(() => {
+      const portal = this.portal();
+      untracked(() => {
+        this.detach();
+        this._portal = portal;
+        this.attach();
+      });
+    });
   }
 
   private attach(): void {
