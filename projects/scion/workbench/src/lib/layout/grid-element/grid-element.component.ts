@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, effect, HostBinding, inject, input} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -40,7 +40,9 @@ import {PartId} from '../../part/workbench-part.model';
     SciSashDirective,
   ],
 })
-export class GridElementComponent implements OnChanges {
+export class GridElementComponent {
+
+  public readonly element = input.required<MTreeNode | MPart>();
 
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
@@ -59,14 +61,14 @@ export class GridElementComponent implements OnChanges {
   @HostBinding('attr.data-partid')
   protected partId: PartId | undefined;
 
-  @Input({required: true})
-  public element!: MTreeNode | MPart;
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
-    this.parentNodeId = this.element.parent?.id;
-    this.nodeId = this.element instanceof MTreeNode ? this.element.id : undefined;
-    this.partId = this.element instanceof MPart ? this.element.id : undefined;
+  constructor() {
+    effect(() => {
+      const element = this.element();
+      this.children = element instanceof MTreeNode ? this.computeChildren(element) : [];
+      this.parentNodeId = element.parent?.id;
+      this.nodeId = element instanceof MTreeNode ? element.id : undefined;
+      this.partId = element instanceof MPart ? element.id : undefined;
+    });
   }
 
   protected onSashStart(): void {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, runInInjectionContext, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
@@ -31,7 +31,7 @@ import {Microfrontends} from '../common/microfrontend.util';
   imports: [NgClass, NgComponentOutlet],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
-export class MicrofrontendPopupComponent implements OnInit {
+export class MicrofrontendPopupComponent {
 
   private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly _outletRouter = inject(OutletRouter);
@@ -42,6 +42,7 @@ export class MicrofrontendPopupComponent implements OnInit {
   private readonly _injector = inject(Injector);
   private readonly _logger = inject(Logger);
   private readonly _popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
+  private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
   private readonly _popupContext = this._popup.input!;
 
   /** Splash to display until the microfrontend signals readiness. */
@@ -56,35 +57,20 @@ export class MicrofrontendPopupComponent implements OnInit {
   @HostBinding('class.workbench-drag')
   protected isWorkbenchDrag = false;
 
-  @ViewChild('router_outlet', {static: true})
-  public routerOutletElement!: ElementRef<SciRouterOutletElement>;
-
   constructor() {
-    this.installWorkbenchDragDetector();
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.outletName}));
+
+    this.installPopupResultListener();
+    this.installPopupCloseListener();
+    this.installWorkbenchDragDetector();
+    this.propagatePopupContext();
+    this.propagateWorkbenchTheme();
+    this.navigate();
+
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.outletName})); // Clear the outlet.
   }
 
-  public ngOnInit(): void {
-    // Listen to popup close requests.
-    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupCloseTopic(this._popup.id))
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(closeRequest => {
-        this._popup.close(closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) ? new Error(closeRequest.body as string) : closeRequest.body);
-      });
-
-    // Listen to popup result requests.
-    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupResultTopic(this._popup.id))
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(result => this._popup.setResult(result.body));
-
-    // Make the popup context available to embedded content.
-    this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
-
-    // Propagate workbench and color theme to the microfrontend.
-    this.propagateWorkbenchTheme();
-
-    // Navigate to the microfrontend.
+  private navigate(): void {
     const application = this._manifestService.getApplication(this.popupCapability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
     void this._outletRouter.navigate(this.popupCapability.properties.path, {
@@ -94,6 +80,27 @@ export class MicrofrontendPopupComponent implements OnInit {
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
     });
+  }
+
+  private propagatePopupContext(): void {
+    effect(() => {
+      const routerOutletElement = this._routerOutletElement();
+      untracked(() => routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext));
+    });
+  }
+
+  private installPopupResultListener(): void {
+    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupResultTopic(this._popup.id))
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(result => this._popup.setResult(result.body));
+  }
+
+  private installPopupCloseListener(): void {
+    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.popupCloseTopic(this._popup.id))
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe(closeRequest => {
+        this._popup.close(closeRequest.headers.get(ɵWorkbenchPopupMessageHeaders.CLOSE_WITH_ERROR) ? new Error(closeRequest.body as string) : closeRequest.body);
+      });
   }
 
   protected onFocusWithin(event: Event): void {
@@ -118,6 +125,9 @@ export class MicrofrontendPopupComponent implements OnInit {
   }
 
   private propagateWorkbenchTheme(): void {
-    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
+    effect(() => {
+      const routerOutletElement = this._routerOutletElement().nativeElement;
+      untracked(() => runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(routerOutletElement)));
+    });
   }
 }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, ElementRef, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {DestroyRef, Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DOCUMENT} from '@angular/common';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -23,7 +23,10 @@ import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
  * respective DOM properties.
  */
 @Directive({selector: '[wbMovable]'})
-export class MovableDirective implements OnInit {
+export class MovableDirective {
+
+  public readonly wbHandleElement = input.required<HTMLElement>({alias: 'wbHandle'});
+  public readonly wbMove = output<WbMoveEvent>({alias: 'wbMovableMove'});
 
   private readonly _destroyRef = inject(DestroyRef);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
@@ -33,15 +36,14 @@ export class MovableDirective implements OnInit {
   private _x = 0;
   private _y = 0;
 
-  @Input({alias: 'wbHandle', required: true})
-  public wbHandleElement!: HTMLElement;
-
-  @Output('wbMovableMove')
-  public wbMove = new EventEmitter<WbMoveEvent>();
-
-  public ngOnInit(): void {
-    this.wbHandleElement.style.setProperty('cursor', 'move');
-    this.makeHandleMovable();
+  constructor() {
+    effect(() => {
+      const handle = this.wbHandleElement();
+      untracked(() => {
+        handle.style.setProperty('cursor', 'move');
+        this.makeHandleMovable(handle);
+      });
+    });
   }
 
   /**
@@ -77,10 +79,10 @@ export class MovableDirective implements OnInit {
     this._workbenchLayoutService.signalMoving(false);
   }
 
-  private makeHandleMovable(): void {
+  private makeHandleMovable(handle: HTMLElement): void {
     let prevBodyCursor: string | undefined;
 
-    fromMoveHandle$(this.wbHandleElement)
+    fromMoveHandle$(handle)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((event: HandleMoveEvent) => {
         switch (event.type) {

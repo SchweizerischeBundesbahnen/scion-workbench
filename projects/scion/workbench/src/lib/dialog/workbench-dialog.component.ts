@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, OnInit, Provider, ViewChild} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, Provider, untracked, viewChild} from '@angular/core';
 import {BehaviorSubject, fromEvent} from 'rxjs';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
@@ -57,25 +57,19 @@ import {synchronizeCssClasses} from '../common/css-class.util';
     configureDialogGlassPane(),
   ],
 })
-export class WorkbenchDialogComponent implements OnInit {
+export class WorkbenchDialogComponent {
 
   private readonly _zone = inject(NgZone);
   private readonly _destroyRef = inject(DestroyRef);
+  private readonly _cdkTrapFocus = viewChild.required(CdkTrapFocus);
+  private readonly _dialogElement = viewChild.required<ElementRef<HTMLElement>>('dialog_element');
 
-  /**
-   * Element of the dialog that has or last had focus.
-   */
+  /** Element of the dialog that has or last had focus */
   private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
 
   private _headerHeight: string | undefined;
-
-  @ViewChild(CdkTrapFocus, {static: true})
-  private _cdkTrapFocus!: CdkTrapFocus;
-
-  @ViewChild('dialog_element', {static: true})
-  private _dialogElement!: ElementRef<HTMLElement>;
 
   @HostBinding('style.--ɵdialog-transform-translate-x')
   protected transformTranslateX = 0;
@@ -126,9 +120,6 @@ export class WorkbenchDialogComponent implements OnInit {
   constructor() {
     this.setDialogOffset();
     this.addHostCssClasses();
-  }
-
-  public ngOnInit(): void {
     this.trackFocus();
     this.autoFocus();
   }
@@ -153,9 +144,9 @@ export class WorkbenchDialogComponent implements OnInit {
     if (activeElement) {
       activeElement.focus();
     }
-    else if (!this._cdkTrapFocus.focusTrap.focusFirstTabbableElement()) {
+    else if (!this._cdkTrapFocus().focusTrap.focusFirstTabbableElement()) {
       // Focus dialog element so that it can be closed via Escape keystroke.
-      this._dialogElement.nativeElement.focus();
+      this._dialogElement().nativeElement.focus();
     }
   }
 
@@ -163,19 +154,25 @@ export class WorkbenchDialogComponent implements OnInit {
    * Tracks the focus of the dialog.
    */
   private trackFocus(): void {
-    fromEvent<FocusEvent>(this._dialogElement.nativeElement, 'focusin')
-      .pipe(
-        subscribeIn(fn => this._zone.runOutsideAngular(fn)),
-        map(event => event.target instanceof HTMLElement ? event.target : undefined),
-        // The dialog is focused if it has no focusable element, so the dialog can be closed via Escape.
-        // However, in order not to cancel the autofocus, the dialog element must not be memoized as the
-        // active element. Otherwise, delayed content would not be focused.
-        filter(element => element !== this._dialogElement.nativeElement),
-        takeUntilDestroyed(this._destroyRef),
-      )
-      .subscribe(activeElement => {
-        this._activeElement$.next(activeElement);
+    effect(() => {
+      const dialogElement = this._dialogElement().nativeElement;
+
+      untracked(() => {
+        fromEvent<FocusEvent>(dialogElement, 'focusin')
+          .pipe(
+            subscribeIn(fn => this._zone.runOutsideAngular(fn)),
+            map(event => event.target instanceof HTMLElement ? event.target : undefined),
+            // The dialog is focused if it has no focusable element, so the dialog can be closed via Escape.
+            // However, in order not to cancel the autofocus, the dialog element must not be memoized as the
+            // active element. Otherwise, delayed content would not be focused.
+            filter(element => element !== dialogElement),
+            takeUntilDestroyed(this._destroyRef),
+          )
+          .subscribe(activeElement => {
+            this._activeElement$.next(activeElement);
+          });
       });
+    });
   }
 
   /**
@@ -185,15 +182,21 @@ export class WorkbenchDialogComponent implements OnInit {
    * focus, allowing delayed content to get focus.
    */
   private autoFocus(): void {
-    fromMutation$(this._dialogElement.nativeElement, {subtree: true, childList: true})
-      .pipe(
-        startWith(undefined as void),
-        takeUntilDestroyed(this._destroyRef),
-        takeUntil(this._activeElement$.pipe(filter(Boolean))),
-      )
-      .subscribe(() => {
-        this.focus();
+    effect(() => {
+      const dialogElement = this._dialogElement().nativeElement;
+
+      untracked(() => {
+        fromMutation$(dialogElement, {subtree: true, childList: true})
+          .pipe(
+            startWith(undefined as void),
+            takeUntilDestroyed(this._destroyRef),
+            takeUntil(this._activeElement$.pipe(filter(Boolean))),
+          )
+          .subscribe(() => {
+            this.focus();
+          });
       });
+    });
   }
 
   @HostListener('keydown.escape', ['$event'])

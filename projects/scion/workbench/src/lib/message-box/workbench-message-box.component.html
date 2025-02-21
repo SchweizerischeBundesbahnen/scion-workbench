@@ -1,18 +1,19 @@
 <ng-template wbDialogHeader [divider]="false">
-  <wb-message-box-header [title]="options?.title" [severity]="options?.severity ?? 'info'"/>
+  <wb-message-box-header [title]="options()?.title" [severity]="options()?.severity ?? 'info'"/>
 </ng-template>
 
-<div class="message e2e-message" [class.text]="message | wbTypeof:'string'" sciDimension (sciDimensionChange)="onContentDimensionChange($event)">
-  @if (message | wbTypeof:'string') {
-    {{message}}
+@let messageContent = message();
+<div class="message e2e-message" [class.text]="messageContent | wbTypeof:'string'" sciDimension (sciDimensionChange)="onContentDimensionChange($event)">
+  @if (messageContent| wbTypeof:'string') {
+    {{messageContent}}
   } @else {
-    <ng-container *ngComponentOutlet="message; inputs: options?.inputs"/>
+    <ng-container *ngComponentOutlet="messageContent; inputs: options()?.inputs"/>
   }
 </div>
 
 <ng-template wbDialogFooter>
-  <wb-message-box-footer [actions]="options?.actions ?? {ok: 'OK'}"
-                         [severity]="options?.severity ?? 'info'"
+  <wb-message-box-footer [actions]="options()?.actions ?? {ok: 'OK'}"
+                         [severity]="options()?.severity ?? 'info'"
                          (action)="onAction($event)"
                          (keydown.escape)="onEscape()"
                          (preferredSizeChange)="onFooterPreferredSizeChange($event)"/>

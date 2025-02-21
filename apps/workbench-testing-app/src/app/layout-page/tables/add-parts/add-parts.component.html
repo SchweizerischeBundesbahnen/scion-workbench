@@ -32,7 +32,7 @@
 </datalist>
 
 <datalist [attr.id]="relativeToList">
-  @for (part of partProposals; track part) {
+  @for (part of partProposals(); track part) {
     <option [value]="part">{{part}}</option>
   }
 </datalist>

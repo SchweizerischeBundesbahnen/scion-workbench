@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject, Input} from '@angular/core';
+import {Component, forwardRef, inject, input} from '@angular/core';
 import {noop} from 'rxjs';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -34,6 +34,8 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class AddViewsComponent implements ControlValueAccessor, Validator {
 
+  public readonly partProposals = input([], {transform: arrayAttribute});
+
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly partList = `part-list-${UUID.randomUUID()}`;
@@ -53,9 +55,6 @@ export class AddViewsComponent implements ControlValueAccessor, Validator {
 
   private _cvaChangeFn: (value: ViewDescriptor[]) => void = noop;
   private _cvaTouchedFn: () => void = noop;
-
-  @Input({transform: arrayAttribute})
-  public partProposals: string[] = [];
 
   constructor() {
     this.form.valueChanges

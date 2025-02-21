@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, HostListener, inject, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, effect, HostListener, inject, Injector, input, output, untracked} from '@angular/core';
 import {asapScheduler, EMPTY, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
@@ -33,7 +33,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     CoerceObservablePipe,
   ],
 })
-export class NotificationComponent implements OnChanges {
+export class NotificationComponent {
+
+  public readonly notification = input.required<ɵNotification>();
+  public readonly closeNotification = output<void>();
 
   private readonly _injector = inject(Injector);
   private readonly _destroyRef = inject(DestroyRef);
@@ -42,19 +45,22 @@ export class NotificationComponent implements OnChanges {
 
   protected portal: ComponentPortal<unknown> | undefined;
 
-  @Input({required: true})
-  public notification!: ɵNotification;
-
-  @Output()
-  public closeNotification = new EventEmitter<void>();
-
-  public ngOnChanges(changes: SimpleChanges): void {
+  constructor() {
     this.installAutoCloseTimer();
-    // Create the portal in a microtask for instant synchronization of notification properties with the user interface,
-    // for example, if they are set in the constructor of the notification component.
-    asapScheduler.schedule(() => {
-      this.portal = this.createPortal(this.notification);
-      this._cd.detectChanges();
+    this.scheduleCreatePortal();
+  }
+
+  private scheduleCreatePortal(): void {
+    effect(() => {
+      const notification = this.notification();
+      untracked(() => {
+        // Create the portal in a microtask for instant synchronization of notification properties with the user interface,
+        // for example, if they are set in the constructor of the notification component.
+        asapScheduler.schedule(() => {
+          this.portal = this.createPortal(notification);
+          this._cd.detectChanges();
+        });
+      });
     });
   }
 
@@ -84,33 +90,39 @@ export class NotificationComponent implements OnChanges {
    * An existing timer, if any, is cancelled.
    */
   private installAutoCloseTimer(): void {
-    this._closeTimerChange$.next();
+    effect(() => {
+      const notification = this.notification();
 
-    this.notification.duration$
-      .pipe(
-        switchMap(duration => {
-          switch (duration) {
-            case 'short':
-              return timer(7000);
-            case 'medium':
-              return timer(15000);
-            case 'long':
-              return timer(30000);
-            case 'infinite':
-              return EMPTY;
-            default:
-              if (typeof duration === 'number') {
-                return timer(duration * 1000);
+      untracked(() => {
+        this._closeTimerChange$.next();
+
+        notification.duration$
+          .pipe(
+            switchMap(duration => {
+              switch (duration) {
+                case 'short':
+                  return timer(7000);
+                case 'medium':
+                  return timer(15000);
+                case 'long':
+                  return timer(30000);
+                case 'infinite':
+                  return EMPTY;
+                default:
+                  if (typeof duration === 'number') {
+                    return timer(duration * 1000);
+                  }
+                  return EMPTY;
               }
-              return EMPTY;
-          }
-        }),
-        takeUntilDestroyed(this._destroyRef),
-        takeUntil(this._closeTimerChange$),
-      )
-      .subscribe(() => {
-        this.closeNotification.emit();
+            }),
+            takeUntilDestroyed(this._destroyRef),
+            takeUntil(this._closeTimerChange$),
+          )
+          .subscribe(() => {
+            this.closeNotification.emit();
+          });
       });
+    });
   }
 }
 

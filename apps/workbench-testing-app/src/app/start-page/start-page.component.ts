@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, viewChild} from '@angular/core';
 import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
@@ -51,15 +51,13 @@ export default class StartPageComponent {
   private readonly _workbenchService = inject(WorkbenchService);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _cd = inject(ChangeDetectorRef);
+  private readonly _filterField = viewChild.required(SciFilterFieldComponent);
 
   protected readonly WorkbenchRouteData = WorkbenchRouteData;
   protected readonly filterControl = inject(NonNullableFormBuilder).control('');
   protected readonly workbenchViewRoutes$: Observable<Routes>;
   protected readonly microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
   protected readonly testCapabilities$: Observable<Capability[]> | undefined;
-
-  @ViewChild(SciFilterFieldComponent)
-  private _filterField!: SciFilterFieldComponent;
 
   @HostBinding('attr.data-partid')
   protected partId: PartId | undefined;
@@ -135,7 +133,7 @@ export default class StartPageComponent {
 
   @HostListener('keydown', ['$event'])
   protected onKeyDown(event: KeyboardEvent): void {
-    this._filterField.focusAndApplyKeyboardEvent(event);
+    this._filterField().focusAndApplyKeyboardEvent(event);
   }
 
   /**

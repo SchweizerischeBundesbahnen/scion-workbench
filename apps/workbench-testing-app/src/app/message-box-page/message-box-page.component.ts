@@ -8,25 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 
 @Component({
   selector: 'app-message-box-page',
   templateUrl: './message-box-page.component.html',
   styleUrls: ['./message-box-page.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
   ],
 })
 export class MessageBoxPageComponent {
 
-  @Input()
-  public input: string | undefined;
-
-  @Input()
-  public param1: string | undefined;
-
-  @Input()
-  public param2: string | undefined;
+  public readonly input = input<string>();
+  public readonly param1 = input<string>();
+  public readonly param2 = input<string>();
 }

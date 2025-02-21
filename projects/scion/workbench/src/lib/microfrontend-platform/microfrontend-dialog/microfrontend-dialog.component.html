@@ -1,7 +1,7 @@
 <sci-router-outlet #router_outlet
                    [name]="dialog.id"
-                   [attr.data-capabilityid]="capability.metadata!.id"
-                   [attr.data-app]="capability.metadata!.appSymbolicName"
+                   [attr.data-capabilityid]="capability().metadata!.id"
+                   [attr.data-app]="capability().metadata!.appSymbolicName"
                    keystrokes="keydown.escape">
   <ng-container *ngComponentOutlet="splash"/>
 </sci-router-outlet>

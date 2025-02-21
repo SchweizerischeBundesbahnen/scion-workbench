@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, inject, Input} from '@angular/core';
+import {Component, forwardRef, inject, input} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -33,6 +33,9 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class AddPartsComponent implements ControlValueAccessor, Validator {
 
+  public readonly requiresInitialPart = input(false);
+  public readonly partProposals = input([], {transform: arrayAttribute});
+
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly MAIN_AREA = MAIN_AREA;
@@ -55,12 +58,6 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
 
   private _cvaChangeFn: (value: PartDescriptor[]) => void = noop;
   private _cvaTouchedFn: () => void = noop;
-
-  @Input()
-  public requiresInitialPart = false;
-
-  @Input({transform: arrayAttribute})
-  public partProposals: string[] = [];
 
   constructor() {
     this.form.valueChanges
@@ -93,7 +90,7 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
   }
 
   private addPart(part: PartDescriptor, options?: {emitEvent?: boolean}): void {
-    const isInitialPart = this.requiresInitialPart && this.form.controls.parts.length === 0;
+    const isInitialPart = this.requiresInitialPart() && this.form.controls.parts.length === 0;
     this.form.controls.parts.push(
       this._formBuilder.group({
         id: this._formBuilder.control<string>(part.id, Validators.required),
