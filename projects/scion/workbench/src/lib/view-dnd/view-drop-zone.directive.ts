@@ -32,33 +32,33 @@ export class ViewDropZoneDirective implements OnInit {
   /**
    * Specifies the regions where views can be dropped. Defaults to every region.
    */
-  public regions = input<DropZoneRegion>(undefined, {alias: 'wbViewDropZoneRegions'});
+  public readonly regions = input<DropZoneRegion>(undefined, {alias: 'wbViewDropZoneRegions'});
 
   /**
    * Specifies CSS class(es) to add to the drop zone.
    */
-  public cssClass = input<string | string[] | undefined>(undefined, {alias: 'wbViewDropZoneCssClass'});
+  public readonly cssClass = input<string | string[] | undefined>(undefined, {alias: 'wbViewDropZoneCssClass'});
 
   /**
    * Specifies attribute(s) to add to the drop zone.
    */
-  public attributes = input<{[name: string]: unknown}>(undefined, {alias: 'wbViewDropZoneAttributes'});
+  public readonly attributes = input<{[name: string]: unknown}>(undefined, {alias: 'wbViewDropZoneAttributes'});
 
   /**
    * Specifies the size of a drop zone region, either as percentage value [0,1] or absolute pixel value.
    */
-  public dropRegionSize = input(.5, {alias: 'wbViewDropZoneRegionSize'});
+  public readonly dropRegionSize = input(.5, {alias: 'wbViewDropZoneRegionSize'});
 
   /**
    * Specifies the size of the visual placeholder when dragging a view over a drop region.
    * Can be a percentage value [0,1] or absolute pixel value. Defaults to {@link dropRegionSize}.
    */
-  public dropPlaceholderSize = input<number>(undefined, {alias: 'wbViewDropZonePlaceholderSize'});
+  public readonly dropPlaceholderSize = input<number>(undefined, {alias: 'wbViewDropZonePlaceholderSize'});
 
   /**
    * Notifies when dropping a view.
    */
-  public viewDrop = output<WbViewDropEvent>({alias: 'wbViewDropZoneDrop'});
+  public readonly viewDrop = output<WbViewDropEvent>({alias: 'wbViewDropZoneDrop'});
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _viewDragService = inject(ViewDragService);

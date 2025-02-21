@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, HostBinding, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenchCommands, ɵWorkbenchDialogMessageHeaders} from '@scion/workbench-client';
@@ -32,93 +32,106 @@ import {Microfrontends} from '../common/microfrontend.util';
     NgComponentOutlet,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
+  host: {
+    '[class.workbench-drag]': 'workbenchLayoutService.dragging()',
+  },
 })
-export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
+export class MicrofrontendDialogComponent {
+
+  public readonly capability = input.required<WorkbenchDialogCapability>();
+  public readonly params = input.required<Map<string, unknown>>();
 
   private readonly _outletRouter = inject(OutletRouter);
-  private readonly _manifestService = inject(ManifestService);
-  private readonly _messageClient = inject(MessageClient);
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _injector = inject(Injector);
   private readonly _logger = inject(Logger);
+  private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
   /** Splash to display until the microfrontend signals readiness. */
-  protected splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
-
-  @Input({required: true})
-  public capability!: WorkbenchDialogCapability;
-
-  @Input({required: true})
-  public params!: Map<string, unknown>;
-
-  /**
-   * Indicates if a workbench drag operation is in progress, such as when dragging a view or moving a sash.
-   */
-  @HostBinding('class.workbench-drag')
-  protected isWorkbenchDrag = false;
-
-  @ViewChild('router_outlet', {static: true})
-  public routerOutletElement!: ElementRef<SciRouterOutletElement>;
+  protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+  protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendDialogComponent.', LoggerNames.MICROFRONTEND);
+
     this.installDialogTitleListener();
     this.installDialogCloseListener();
-    this.installWorkbenchDragDetector();
-  }
-
-  public ngOnInit(): void {
     this.setDialogProperties();
     this.propagateDialogContext();
     this.propagateWorkbenchTheme();
-    this.navigate();
+    this.installNavigator();
+
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.dialog.id})); // Clear the outlet.
   }
 
-  private navigate(): void {
-    const application = this._manifestService.getApplication(this.capability.metadata!.appSymbolicName);
-    this._logger.debug(() => `Loading microfrontend into workbench dialog [app=${this.capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${this.capability.properties.path}].`, LoggerNames.MICROFRONTEND, this.params, this.capability);
-    void this._outletRouter.navigate(this.capability.properties.path, {
-      outlet: this.dialog.id,
-      relativeTo: application.baseUrl,
-      params: this.params,
-      pushStateToSessionHistoryStack: false,
-      showSplash: this.capability.properties.showSplash,
+  private installNavigator(): void {
+    const manifestService = inject(ManifestService);
+    const injector = inject(Injector);
+
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      void untracked(async () => {
+        const application = manifestService.getApplication(capability.metadata!.appSymbolicName);
+        this._logger.debug(() => `Loading microfrontend into workbench dialog [app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${capability.properties.path}].`, LoggerNames.MICROFRONTEND, params, capability);
+
+        // Wait for the context to be set on the router outlet, as @scion/workbench-client expects it to be available on startup.
+        await Microfrontends.waitForContext(this._routerOutletElement, ɵDIALOG_CONTEXT, {injector});
+
+        void this._outletRouter.navigate(capability.properties.path, {
+          outlet: this.dialog.id,
+          relativeTo: application.baseUrl,
+          params: params,
+          pushStateToSessionHistoryStack: false,
+          showSplash: capability.properties.showSplash,
+        });
+      });
     });
   }
 
   /**
-   * Make the dialog context available to embedded content.
+   * Provides the dialog context to embedded content.
    */
   private propagateDialogContext(): void {
-    const context: ɵDialogContext = {
-      dialogId: this.dialog.id,
-      capability: this.capability,
-      params: this.params,
-    };
-    this.routerOutletElement.nativeElement.setContextValue(ɵDIALOG_CONTEXT, context);
+    effect(() => {
+      const context: ɵDialogContext = {
+        dialogId: this.dialog.id,
+        capability: this.capability(),
+        params: this.params(),
+      };
+      const routerOutletElement = this._routerOutletElement().nativeElement;
+
+      untracked(() => routerOutletElement.setContextValue(ɵDIALOG_CONTEXT, context));
+    });
   }
 
   private setDialogProperties(): void {
-    this.dialog.size.width = this.capability.properties.size!.width;
-    this.dialog.size.height = this.capability.properties.size!.height;
-    this.dialog.size.minWidth = this.capability.properties.size!.minWidth;
-    this.dialog.size.maxWidth = this.capability.properties.size!.maxWidth;
-    this.dialog.size.minHeight = this.capability.properties.size!.minHeight;
-    this.dialog.size.maxHeight = this.capability.properties.size!.maxHeight;
+    effect(() => {
+      const properties = this.capability().properties;
+      const params = this.params();
 
-    this.dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
-    this.dialog.closable = this.capability.properties.closable ?? true;
-    this.dialog.resizable = this.capability.properties.resizable ?? true;
-    this.dialog.padding = this.capability.properties.padding ?? false;
+      untracked(() => {
+        this.dialog.size.width = properties.size!.width;
+        this.dialog.size.height = properties.size!.height;
+        this.dialog.size.minWidth = properties.size!.minWidth;
+        this.dialog.size.maxWidth = properties.size!.maxWidth;
+        this.dialog.size.minHeight = properties.size!.minHeight;
+        this.dialog.size.maxHeight = properties.size!.maxHeight;
+
+        this.dialog.title = Microfrontends.substituteNamedParameters(properties.title, params);
+        this.dialog.closable = properties.closable ?? true;
+        this.dialog.resizable = properties.resizable ?? true;
+        this.dialog.padding = properties.padding ?? false;
+      });
+    });
   }
 
   private propagateWorkbenchTheme(): void {
-    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
+    Microfrontends.propagateTheme(this._routerOutletElement);
   }
 
   private installDialogCloseListener(): void {
-    this._messageClient.observe$<unknown>(ɵWorkbenchCommands.dialogCloseTopic(this.dialog.id))
+    inject(MessageClient).observe$<unknown>(ɵWorkbenchCommands.dialogCloseTopic(this.dialog.id))
       .pipe(takeUntilDestroyed())
       .subscribe(closeRequest => {
         this.dialog.close(closeRequest.headers.get(ɵWorkbenchDialogMessageHeaders.CLOSE_WITH_ERROR) ? new Error(closeRequest.body as string) : closeRequest.body);
@@ -126,22 +139,10 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
   }
 
   private installDialogTitleListener(): void {
-    this._messageClient.observe$<string>(ɵWorkbenchCommands.dialogTitleTopic(this.dialog.id))
+    inject(MessageClient).observe$<string>(ɵWorkbenchCommands.dialogTitleTopic(this.dialog.id))
       .pipe(takeUntilDestroyed())
       .subscribe(message => {
         this.dialog.title = message.body;
       });
-  }
-
-  /**
-   * Sets the {@link isWorkbenchDrag} property when a workbench drag operation is detected,
-   * such as when dragging a view or moving a sash.
-   */
-  private installWorkbenchDragDetector(): void {
-    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging());
-  }
-
-  public ngOnDestroy(): void {
-    void this._outletRouter.navigate(null, {outlet: this.dialog.id}); // Clear the outlet.
   }
 }

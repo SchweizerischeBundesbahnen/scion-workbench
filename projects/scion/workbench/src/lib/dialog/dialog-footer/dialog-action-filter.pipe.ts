@@ -18,6 +18,6 @@ import {WorkbenchDialogActionDirective} from './workbench-dialog-action.directiv
 export class DialogActionFilterPipe implements PipeTransform {
 
   public transform(actions: WorkbenchDialogActionDirective[] | null | undefined, align: 'start' | 'end'): WorkbenchDialogActionDirective[] {
-    return actions?.filter(action => action.align === align) ?? [];
+    return actions?.filter(action => action.align() === align) ?? [];
   }
 }

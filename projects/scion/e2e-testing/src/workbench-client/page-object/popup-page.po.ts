@@ -26,9 +26,10 @@ import {SciCheckboxPO} from '../../@scion/components.internal/checkbox.po';
  */
 export class PopupPagePO implements MicrofrontendPopupPagePO {
 
+  private readonly _hasFocusLocator: Locator;
+
   public readonly locator: Locator;
   public readonly outlet: SciRouterOutletPO;
-  private readonly _hasFocusLocator: Locator;
 
   constructor(public popup: PopupPO) {
     this.outlet = new SciRouterOutletPO(new AppPO(popup.locator.page()), {locator: popup.locator.locator('sci-router-outlet')});

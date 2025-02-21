@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, signal, Signal} from '@angular/core';
+import {effect, ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
@@ -22,6 +22,7 @@ import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {provideViewContext} from '../../view/view-context-provider';
 import {Arrays} from '@scion/toolkit/util';
 import {TextComponent} from './text/text.component';
+import {coerceElement} from '@angular/cdk/coercion';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -36,7 +37,6 @@ export class ViewMenuService {
 
   private readonly _overlay = inject(Overlay);
   private readonly _injector = inject(Injector);
-  private readonly _zone = inject(NgZone);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _workbenchService = inject(WorkbenchService);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
@@ -102,26 +102,45 @@ export class ViewMenuService {
   }
 
   /**
-   * Subscribes to keyboard events for menu items of given {@link WorkbenchView}.
+   * Subscribes to keyboard events for menu items of given {@link WorkbenchView} on specified element.
    *
-   * @return subscription to unsubscribe from keyboard events.
+   * This method must be passed an injector or called in an injection context. If used in a component, use the component's injector.
+   * Unsubscribes from keyboard events when the injection context is destroyed.
    */
-  public installMenuItemAccelerators(target: HTMLElement, view: WorkbenchView): Subscription {
-    return fromEvent<KeyboardEvent>(target, 'keydown')
-      .pipe(subscribeIn(fn => this._zone.runOutsideAngular(fn)))
-      .subscribe(event => {
-        const menuItems = findMatchingMenuItems(view.menuItems(), event);
-        if (!menuItems.length) {
-          return;
-        }
+  public installMenuAccelerators(elementLike: HTMLElement | ElementRef<HTMLElement> | Signal<HTMLElement | ElementRef<HTMLElement>>, viewLike: WorkbenchView | Signal<WorkbenchView>, options?: {injector?: Injector}): void {
+    const injector = options?.injector ?? inject(Injector);
+    const zone = injector.get(NgZone);
 
-        runInInjectionContext(this._injector, () => this._zone.run(() => {
-          menuItems.forEach(menuItem => menuItem.onAction());
-        }));
+    effect(onCleanup => {
+      const element = coerceElement(isSignal(elementLike) ? elementLike() : elementLike);
+      const view = isSignal(viewLike) ? viewLike() : viewLike;
 
-        event.preventDefault();
-        event.stopPropagation();
+      untracked(() => {
+        const subscription = installMenuAccelerators(element, view);
+        onCleanup(() => subscription.unsubscribe());
       });
+    }, {injector, forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+
+    /**
+     * Subscribes to keyboard events for menu items of given {@link WorkbenchView} on specified element.
+     */
+    function installMenuAccelerators(element: HTMLElement, view: WorkbenchView): Subscription {
+      return fromEvent<KeyboardEvent>(element, 'keydown')
+        .pipe(subscribeIn(fn => zone.runOutsideAngular(fn)))
+        .subscribe(event => {
+          const menuItems = findMatchingMenuItems(view.menuItems(), event);
+          if (!menuItems.length) {
+            return;
+          }
+
+          runInInjectionContext(injector, () => zone.run(() => {
+            menuItems.forEach(menuItem => menuItem.onAction());
+          }));
+
+          event.preventDefault();
+          event.stopPropagation();
+        });
+    }
 
     /**
      * Finds menu items that match the given keyboard event.

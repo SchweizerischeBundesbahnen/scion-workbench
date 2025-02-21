@@ -10,7 +10,7 @@
   <div class="dialog-box e2e-dialog-box" cdkTrapFocus>
     <header #header
             class="e2e-dialog-header"
-            [class.divider]="dialog.header?.divider ?? true"
+            [class.divider]="dialog.header?.divider() ?? true"
             sciDimension (sciDimensionChange)="onHeaderDimensionChange($event)">
       <ng-container *ngTemplateOutlet="dialog.header?.template ?? default_dialog_header"/>
     </header>
@@ -20,7 +20,7 @@
     </sci-viewport>
 
     @if (dialog.footer || dialog.actions.length) {
-      <footer class="e2e-dialog-footer" [class.divider]="dialog.footer?.divider ?? true">
+      <footer class="e2e-dialog-footer" [class.divider]="dialog.footer?.divider() ?? true">
         <ng-container *ngTemplateOutlet="dialog.footer?.template ?? default_dialog_footer"/>
       </footer>
     }

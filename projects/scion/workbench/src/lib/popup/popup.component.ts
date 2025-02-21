@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Injector, OnInit, Provider, ViewChild} from '@angular/core';
+import {Component, effect, HostBinding, inject, Injector, Provider, viewChild} from '@angular/core';
 import {ɵPopup} from './popup.config';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
@@ -37,14 +37,12 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
     configurePopupGlassPane(),
   ],
 })
-export class PopupComponent implements OnInit {
+export class PopupComponent {
 
   private readonly _popup = inject(ɵPopup);
+  private readonly _cdkTrapFocus = viewChild.required('focus_trap', {read: CdkTrapFocus});
 
   protected portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, inject(Injector));
-
-  @ViewChild('focus_trap', {static: true, read: CdkTrapFocus})
-  private _cdkTrapFocus!: CdkTrapFocus;
 
   @HostBinding('style.width')
   protected get popupWidth(): string | undefined {
@@ -86,13 +84,20 @@ export class PopupComponent implements OnInit {
     return this._popup.id;
   }
 
-  public ngOnInit(): void {
-    // [Angular 14] The initial focus must not be requested via `cdkTrapFocusAutoCapture` as this would restore
-    // focus to the previously focused element when the `FocusTrap` is destroyed. This behavior is unwanted if the
-    // popup is closed by losing focus. Otherwise, the newly focused element that caused the loss of focus and thus
-    // the closing of the popup would immediately become unfocused again. This behavior could only be observed when
-    // the popup loses focus by clicking on an element in a microfrontend.
-    void this._cdkTrapFocus.focusTrap.focusInitialElementWhenReady();
+  constructor() {
+    this.focusInitialElement();
+  }
+
+  private focusInitialElement(): void {
+    const effectRef = effect(() => {
+      // [Angular 14] The initial focus must not be requested via `cdkTrapFocusAutoCapture` as this would restore
+      // focus to the previously focused element when the `FocusTrap` is destroyed. This behavior is unwanted if the
+      // popup is closed by losing focus. Otherwise, the newly focused element that caused the loss of focus and thus
+      // the closing of the popup would immediately become unfocused again. This behavior could only be observed when
+      // the popup loses focus by clicking on an element in a microfrontend.
+      void this._cdkTrapFocus().focusTrap.focusInitialElementWhenReady();
+      effectRef.destroy();
+    });
   }
 }
 

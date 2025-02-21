@@ -63,7 +63,7 @@ export class ViewComponent implements OnAttach, OnDetach {
 
   constructor() {
     this.installComponentLifecycleLogger();
-    this.installMenuItemAccelerators();
+    this.installMenuAccelerators();
     this.installOnActivateView();
     this.addHostCssClasses();
   }
@@ -91,9 +91,8 @@ export class ViewComponent implements OnAttach, OnDetach {
     }
   }
 
-  private installMenuItemAccelerators(): void {
-    const subscription = inject(ViewMenuService).installMenuItemAccelerators(inject(ElementRef).nativeElement as HTMLElement, this._view);
-    inject(DestroyRef).onDestroy(() => subscription.unsubscribe());
+  private installMenuAccelerators(): void {
+    inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this._view);
   }
 
   private installOnActivateView(): void {

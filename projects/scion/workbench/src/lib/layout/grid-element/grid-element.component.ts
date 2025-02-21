@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, computed, inject, input, Signal, untracked} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -17,7 +17,6 @@ import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {WorkbenchLayouts} from '../workbench-layouts.util';
-import {PartId} from '../../part/workbench-part.model';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -39,8 +38,15 @@ import {PartId} from '../../part/workbench-part.model';
     SciSashboxComponent,
     SciSashDirective,
   ],
+  host: {
+    '[attr.data-parentnodeid]': 'element().parent?.id',
+    '[attr.data-nodeid]': 'nodeId()',
+    '[attr.data-partid]': 'partId()',
+  },
 })
-export class GridElementComponent implements OnChanges {
+export class GridElementComponent {
+
+  public readonly element = input.required<MTreeNode | MPart>();
 
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
@@ -48,26 +54,9 @@ export class GridElementComponent implements OnChanges {
   protected readonly MTreeNode = MTreeNode;
   protected readonly MPart = MPart;
 
-  protected children = new Array<ChildElement>();
-
-  @HostBinding('attr.data-parentnodeid')
-  protected parentNodeId: string | undefined;
-
-  @HostBinding('attr.data-nodeid')
-  protected nodeId: string | undefined;
-
-  @HostBinding('attr.data-partid')
-  protected partId: PartId | undefined;
-
-  @Input({required: true})
-  public element!: MTreeNode | MPart;
-
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
-    this.parentNodeId = this.element.parent?.id;
-    this.nodeId = this.element instanceof MTreeNode ? this.element.id : undefined;
-    this.partId = this.element instanceof MPart ? this.element.id : undefined;
-  }
+  protected readonly nodeId = computed(() => this.element() instanceof MTreeNode ? this.element().id : undefined);
+  protected readonly partId = computed(() => this.element() instanceof MPart ? this.element().id : undefined);
+  protected readonly children = this.computeChildren();
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);
@@ -79,24 +68,33 @@ export class GridElementComponent implements OnChanges {
     void this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio));
   }
 
-  private computeChildren(treeNode: MTreeNode): ChildElement[] {
-    const child1Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child1);
-    const child2Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child2);
+  private computeChildren(): Signal<ChildElement[]> {
+    return computed(() => {
+      const treeNode = this.element();
+      if (!(treeNode instanceof MTreeNode)) {
+        return [];
+      }
 
-    if (child1Visible && child2Visible) {
-      const [size1, size2] = calculateSashSizes(treeNode.ratio);
-      return [
-        {element: treeNode.child1, size: size1},
-        {element: treeNode.child2, size: size2},
-      ];
-    }
-    else if (child1Visible) {
-      return [{element: treeNode.child1}];
-    }
-    else if (child2Visible) {
-      return [{element: treeNode.child2}];
-    }
-    return [];
+      return untracked(() => {
+        const child1Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child1);
+        const child2Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child2);
+
+        if (child1Visible && child2Visible) {
+          const [size1, size2] = calculateSashSizes(treeNode.ratio);
+          return [
+            {element: treeNode.child1, size: size1},
+            {element: treeNode.child2, size: size2},
+          ];
+        }
+        else if (child1Visible) {
+          return [{element: treeNode.child1}];
+        }
+        else if (child2Visible) {
+          return [{element: treeNode.child2}];
+        }
+        return [];
+      });
+    });
   }
 }
 

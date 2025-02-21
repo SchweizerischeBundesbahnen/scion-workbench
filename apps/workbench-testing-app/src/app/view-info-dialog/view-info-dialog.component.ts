@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, input, Signal} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -21,6 +21,7 @@ import {FormsModule} from '@angular/forms';
   selector: 'app-view-info-dialog',
   templateUrl: './view-info-dialog.component.html',
   styleUrls: ['./view-info-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SciFormFieldComponent,
     JoinPipe,
@@ -30,7 +31,9 @@ import {FormsModule} from '@angular/forms';
     FormsModule,
   ],
 })
-export class ViewInfoDialogComponent implements OnInit {
+export class ViewInfoDialogComponent {
+
+  public readonly view = input.required<WorkbenchView>();
 
   private readonly _router = inject(Router);
   private readonly _dialog = inject(WorkbenchDialog);
@@ -38,23 +41,22 @@ export class ViewInfoDialogComponent implements OnInit {
   /**
    * Activated route, or `undefined` if not navigated yet.
    */
-  protected route: ActivatedRoute | undefined;
-
-  @Input({required: true})
-  public view!: WorkbenchView;
+  protected route = this.computeRoute();
 
   constructor() {
     this._dialog.title = 'View Info';
     this._dialog.size.minWidth = '32em';
   }
 
-  public ngOnInit(): void {
-    const route = this._router.routerState.root.children.find(route => route.outlet === this.view.id);
-    this.route = route && resolveEffectiveRoute(route);
-  }
-
   protected onClose(): void {
     this._dialog.close();
+  }
+
+  private computeRoute(): Signal<ActivatedRoute | undefined> {
+    return computed(() => {
+      const route = this._router.routerState.root.children.find(route => route.outlet === this.view().id);
+      return route && resolveEffectiveRoute(route);
+    });
   }
 }
 

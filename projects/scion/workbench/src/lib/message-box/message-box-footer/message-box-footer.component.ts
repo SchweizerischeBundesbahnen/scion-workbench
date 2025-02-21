@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, ElementRef, EventEmitter, HostBinding, inject, Input, Output, QueryList, ViewChildren} from '@angular/core';
+import {Component, ElementRef, inject, input, output, viewChildren} from '@angular/core';
 import {KeyValuePipe} from '@angular/common';
 import {observeOn} from 'rxjs/operators';
 import {animationFrameScheduler, firstValueFrom} from 'rxjs';
@@ -20,24 +20,18 @@ import {fromResize$} from '@scion/toolkit/observable';
   imports: [
     KeyValuePipe,
   ],
+  host: {
+    '[attr.data-severity]': 'severity()',
+  },
 })
 export class MessageBoxFooterComponent {
 
-  @ViewChildren('action_button')
-  private _actionButtons!: QueryList<ElementRef<HTMLElement>>;
+  public readonly actions = input.required<{[key: string]: string}>();
+  public readonly severity = input.required<'info' | 'warn' | 'error'>();
+  public readonly action = output<string>();
+  public readonly preferredSizeChange = output<number>();
 
-  @Input({required: true})
-  public actions!: {[key: string]: string};
-
-  @Input({required: true})
-  @HostBinding('attr.data-severity')
-  public severity!: 'info' | 'warn' | 'error';
-
-  @Output()
-  public action = new EventEmitter<string>();
-
-  @Output()
-  public preferredSizeChange = new EventEmitter<number>();
+  private readonly _actionButtons = viewChildren<ElementRef<HTMLElement>>('action_button');
 
   constructor() {
     void this.emitPreferredSize();
@@ -50,10 +44,9 @@ export class MessageBoxFooterComponent {
   }
 
   protected onArrowKey(index: number, direction: 'left' | 'right'): void {
-    const actionButtons = this._actionButtons.toArray();
-    const actionButtonCount = actionButtons.length;
+    const actionButtonCount = this._actionButtons().length;
     const newIndex = (direction === 'left' ? index - 1 : index + 1);
-    actionButtons[((newIndex + actionButtonCount) % actionButtonCount)].nativeElement.focus();
+    this._actionButtons()[(newIndex + actionButtonCount) % actionButtonCount].nativeElement.focus();
   }
 
   private async emitPreferredSize(): Promise<void> {

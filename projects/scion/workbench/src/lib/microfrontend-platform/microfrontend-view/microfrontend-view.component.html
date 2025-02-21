@@ -1,6 +1,6 @@
 <wb-content-as-overlay [config]="overlayConfig">
   <div class="microfrontend-view"
-       [class.workbench-drag]="isWorkbenchDrag"
+       [class.workbench-drag]="workbenchLayoutService.dragging()"
        [attr.data-viewid]="view.id"
        wbGlassPane>
     <sci-router-outlet #router_outlet

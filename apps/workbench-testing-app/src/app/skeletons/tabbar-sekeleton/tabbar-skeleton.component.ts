@@ -27,15 +27,15 @@ export class TabbarSkeletonComponent {
 
   private _active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
-  public tabs = input.required<number>();
-  public selectedTab = model.required<number>();
+  public readonly tabs = input.required<number>();
+  public readonly selectedTab = model.required<number>();
 
   @HostBinding('class.active')
-  public get active(): boolean {
+  protected get active(): boolean {
     return this._active();
   }
 
-  public onTabSelect(index: number): void {
+  protected onTabSelect(index: number): void {
     this.selectedTab.set(index);
   }
 }

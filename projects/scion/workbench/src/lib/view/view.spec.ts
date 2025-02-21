@@ -2885,7 +2885,7 @@ describe('View', () => {
   selector: 'spec-view',
   template: '{{onCheckForChanges()}}',
 })
-class SpecViewComponent implements OnDestroy {
+class SpecViewComponent {
 
   public destroyed = false;
   public checkedForChanges = false;
@@ -2913,13 +2913,11 @@ class SpecViewComponent implements OnDestroy {
       this.canCloseInjector = inject(Injector);
       return !this.preventClosing;
     });
+
+    inject(DestroyRef).onDestroy(() => this.destroyed = true);
   }
 
-  public ngOnDestroy(): void {
-    this.destroyed = true;
-  }
-
-  public onCheckForChanges(): boolean {
+  protected onCheckForChanges(): boolean {
     this.checkedForChanges = true;
     return true;
   }

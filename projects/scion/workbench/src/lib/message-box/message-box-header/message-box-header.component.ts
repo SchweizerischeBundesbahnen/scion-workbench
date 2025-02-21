@@ -7,19 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, HostBinding, Input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
   selector: 'wb-message-box-header',
   templateUrl: './message-box-header.component.html',
   styleUrls: ['./message-box-header.component.scss'],
+  host: {
+    '[attr.data-severity]': 'severity()',
+  },
 })
 export class MessageBoxHeaderComponent {
 
-  @Input()
-  public title?: string;
-
-  @Input({required: true})
-  @HostBinding('attr.data-severity')
-  public severity!: 'info' | 'warn' | 'error';
+  public readonly title = input<string>();
+  public readonly severity = input.required<'info' | 'warn' | 'error'>();
 }

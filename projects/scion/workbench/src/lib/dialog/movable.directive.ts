@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, ElementRef, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {getCssTranslation} from '../common/dom.util';
 import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
+import {Disposable} from '../common/disposable';
 
 /**
  * Enables moving the host element via mouse or touch gesture.
@@ -23,9 +23,11 @@ import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
  * respective DOM properties.
  */
 @Directive({selector: '[wbMovable]'})
-export class MovableDirective implements OnInit {
+export class MovableDirective {
 
-  private readonly _destroyRef = inject(DestroyRef);
+  public readonly wbHandleElement = input.required<HTMLElement>({alias: 'wbHandle'});
+  public readonly wbMove = output<WbMoveEvent>({alias: 'wbMovableMove'});
+
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _document = inject(DOCUMENT);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
@@ -33,15 +35,19 @@ export class MovableDirective implements OnInit {
   private _x = 0;
   private _y = 0;
 
-  @Input({alias: 'wbHandle', required: true})
-  public wbHandleElement!: HTMLElement;
+  constructor() {
+    this.installMoveHandle();
+  }
 
-  @Output('wbMovableMove')
-  public wbMove = new EventEmitter<WbMoveEvent>();
-
-  public ngOnInit(): void {
-    this.wbHandleElement.style.setProperty('cursor', 'move');
-    this.makeHandleMovable();
+  /**
+   * Installs a handle for moving the element.
+   */
+  private installMoveHandle(): void {
+    effect(onCleanup => {
+      const element = this.wbHandleElement();
+      const handle = untracked(() => this.createMoveHandle(element));
+      onCleanup(() => handle.dispose());
+    });
   }
 
   /**
@@ -77,11 +83,14 @@ export class MovableDirective implements OnInit {
     this._workbenchLayoutService.signalMoving(false);
   }
 
-  private makeHandleMovable(): void {
-    let prevBodyCursor: string | undefined;
+  private createMoveHandle(element: HTMLElement): Disposable {
+    // Apply 'move' cursor.
+    const prevHandleCursor = element.style.cursor;
+    element.style.setProperty('cursor', 'move');
 
-    fromMoveHandle$(this.wbHandleElement)
-      .pipe(takeUntilDestroyed(this._destroyRef))
+    // Subscribe to move events.
+    let prevBodyCursor: string | undefined;
+    const subscription = fromMoveHandle$(element)
       .subscribe((event: HandleMoveEvent) => {
         switch (event.type) {
           case 'mousestart': {
@@ -114,6 +123,13 @@ export class MovableDirective implements OnInit {
           }
         }
       });
+
+    return {
+      dispose: () => {
+        element.style.setProperty('cursor', prevHandleCursor);
+        subscription.unsubscribe();
+      },
+    };
   }
 }
 

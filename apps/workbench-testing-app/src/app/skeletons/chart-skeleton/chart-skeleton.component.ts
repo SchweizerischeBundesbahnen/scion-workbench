@@ -39,7 +39,7 @@ export class ChartSkeletonComponent {
   }
 
   @HostListener('click')
-  public onReload(): void {
+  protected onReload(): void {
     // Select next chart type.
     this.chartType.set(chartTypes[(chartTypes.indexOf(this.chartType()) + 1) % chartTypes.length]);
     // Update the chart with a new data series.

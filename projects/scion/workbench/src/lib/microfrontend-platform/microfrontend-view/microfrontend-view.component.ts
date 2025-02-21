@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, OnDestroy, OnInit, Provider, runInInjectionContext, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, Provider, Signal, untracked, viewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
 import {firstValueFrom, Observable, Subject, switchMap} from 'rxjs';
 import {first, map, takeUntil} from 'rxjs/operators';
@@ -54,57 +54,53 @@ import {WorkbenchView} from '../../view/workbench-view.model';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
-export class MicrofrontendViewComponent implements OnInit, OnDestroy {
+export class MicrofrontendViewComponent {
 
-  private _host = inject(ElementRef).nativeElement as HTMLElement;
-  private _route = inject(ActivatedRoute);
-  private _outletRouter = inject(OutletRouter);
-  private _manifestService = inject(ManifestService);
-  private _manifestObjectCache = inject(ManifestObjectCache);
-  private _messageClient = inject(MessageClient);
-  private _logger = inject(Logger);
-  private _viewContextMenuService = inject(ViewMenuService);
-  private _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private _workbenchRouter = inject(WorkbenchRouter);
-  private _injector = inject(Injector);
-  private _changeDetectorRef = inject(ChangeDetectorRef);
-  private _destroyRef = inject(DestroyRef);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _outletRouter = inject(OutletRouter);
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _manifestObjectCache = inject(ManifestObjectCache);
+  private readonly _messageClient = inject(MessageClient);
+  private readonly _logger = inject(Logger);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _injector = inject(Injector);
+  private readonly _changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly _destroyRef = inject(DestroyRef);
 
-  private _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
-  private _unsubscribeParamsUpdater$ = new Subject<void>();
-  private _universalKeystrokes = [
+  private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
+  private readonly _unsubscribeParamsUpdater$ = new Subject<void>();
+  private readonly _universalKeystrokes = [
     ['escape'], // allows closing notifications
   ];
 
-  protected view = inject(ɵWorkbenchView);
-  protected capability: WorkbenchViewCapability | null = null;
+  protected readonly view = inject(ɵWorkbenchView);
+  protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
   /** Splash to display until the microfrontend signals readiness. */
-  protected splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+  protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   /** Keystrokes which to bubble across iframe boundaries from embedded content. */
-  protected keystrokesToBubble: Signal<string[]>;
-  /** Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash. */
-  protected isWorkbenchDrag = false;
+  protected readonly keystrokesToBubble: Signal<string[]>;
   /** Configures iframe projection. */
-  protected overlayConfig: ContentAsOverlayConfig = {
+  protected readonly overlayConfig: ContentAsOverlayConfig = {
     location: inject(IFRAME_OVERLAY_HOST),
     visible: this.view.portal.attached,
   };
 
+  protected capability: WorkbenchViewCapability | null = null;
+
   constructor() {
     this._logger.debug(() => `Constructing MicrofrontendViewComponent. [viewId=${this.view.id}]`, LoggerNames.MICROFRONTEND_ROUTING);
     this.keystrokesToBubble = this.computeKeyStrokesToBubble();
-    this.installWorkbenchDragDetector();
     this.installViewActivePublisher();
     this.installPartIdPublisher();
     this.installCanCloseGuard(ɵWorkbenchCommands.canCloseTopic(this.view.id));
     this.installCanCloseGuard(ɵWorkbenchCommands.viewClosingTopic(this.view.id));
-  }
-
-  public ngOnInit(): void {
-    this._routerOutletElement().nativeElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id);
+    this.installMenuAccelerators();
     this.propagateWorkbenchTheme();
-    this.installMenuItemAccelerators();
+    this.propagateViewContext();
     this.installNavigator();
+
+    inject(DestroyRef).onDestroy(() => this.unload());
   }
 
   private installNavigator(): void {
@@ -112,9 +108,19 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap(params => this.fetchCapability$(params[ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID] as string).pipe(map(capability => ({capability, params})))),
         serializeExecution(({capability, params}) => this.onNavigate(this.capability, capability, params)),
-        takeUntilDestroyed(this._destroyRef),
+        takeUntilDestroyed(),
       )
       .subscribe();
+  }
+
+  /**
+   * Provides the view context to embedded content.
+   */
+  private propagateViewContext(): void {
+    effect(() => {
+      const routerOutletElement = this._routerOutletElement().nativeElement;
+      untracked(() => routerOutletElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id));
+    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
   }
 
   private async onNavigate(prevCapability: WorkbenchViewCapability | null, capability: WorkbenchViewCapability | null, params: Params): Promise<void> {
@@ -149,6 +155,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
       await this.waitForCapabilityParam(capability.metadata!.id);
     }
 
+    // Wait for the context to be set on the router outlet, as @scion/workbench-client expects it to be available on startup.
+    if (!prevCapability) {
+      await Microfrontends.waitForContext(this._routerOutletElement, ɵVIEW_ID_CONTEXT_KEY, {injector: this._injector});
+    }
+
     // Navigate to the microfrontend.
     const application = this._manifestService.getApplication(capability.metadata!.appSymbolicName);
     this._logger.debug(() => `Loading microfrontend into workbench view [viewId=${this.view.id}, app=${capability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(capability.properties.path)}].`, LoggerNames.MICROFRONTEND_ROUTING, params, capability);
@@ -172,12 +183,11 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
     return this._manifestObjectCache.observeCapability$(capabilityId);
   }
 
-  private installMenuItemAccelerators(): void {
+  private installMenuAccelerators(): void {
     // Since the iframe is added at a top-level location in the DOM, that is, not as a child element of this component,
     // the workbench view misses keyboard events from embedded content. As a result, menu item accelerators of the context
     // menu of this view do not work, so we install the accelerators on the router outlet as well.
-    const subscription = this._viewContextMenuService.installMenuItemAccelerators(this._routerOutletElement().nativeElement, this.view);
-    this._destroyRef.onDestroy(() => subscription.unsubscribe());
+    inject(ViewMenuService).installMenuAccelerators(this._routerOutletElement, this.view);
   }
 
   /**
@@ -310,16 +320,8 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
     }, {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: false})});
   }
 
-  /**
-   * Sets the {@link isWorkbenchDrag} property when a workbench drag operation is detected,
-   * such as when dragging a view or moving a sash.
-   */
-  private installWorkbenchDragDetector(): void {
-    effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging()); // Running as root effect is not necessary because the view is only target of a drag operation if active.
-  }
-
   private propagateWorkbenchTheme(): void {
-    runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this._routerOutletElement().nativeElement));
+    Microfrontends.propagateTheme(this._routerOutletElement);
   }
 
   private unload(): void {
@@ -329,10 +331,6 @@ export class MicrofrontendViewComponent implements OnInit, OnDestroy {
     void this._messageClient.publish(ɵWorkbenchCommands.viewPartIdTopic(this.view.id), undefined, {retain: true});
     void this._outletRouter.navigate(null, {outlet: this.view.id});
     this.view.unregisterAdapter(MicrofrontendWorkbenchView);
-  }
-
-  public ngOnDestroy(): void {
-    this.unload();
   }
 }
 

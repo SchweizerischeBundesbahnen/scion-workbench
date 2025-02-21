@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, inject, Injector, Input, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, effect, inject, Injector, input, runInInjectionContext, StaticProvider, untracked} from '@angular/core';
 import {WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -42,7 +42,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostDialogComponent implements OnInit {
+export class MicrofrontendHostDialogComponent {
+
+  public readonly capability = input.required<WorkbenchDialogCapability>();
+  public readonly params = input.required<Map<string, unknown>>();
 
   private readonly _dialog = inject(ɵWorkbenchDialog);
   private readonly _injector = inject(Injector);
@@ -54,23 +57,26 @@ export class MicrofrontendHostDialogComponent implements OnInit {
 
   protected outletInjector!: Injector;
 
-  @Input({required: true})
-  public capability!: WorkbenchDialogCapability;
-
-  @Input({required: true})
-  public params!: Map<string, unknown>;
-
   constructor() {
+    this.setDialogProperties();
+    this.createOutletInjector();
+    this.navigateCapability();
+
     inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
   }
 
-  public ngOnInit(): void {
-    this.setDialogProperties();
-    this.createOutletInjector();
-    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
-      if (!success) {
-        this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
-      }
+  private navigateCapability(): void {
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        void this.navigate(capability.properties.path, {params}).then(success => {
+          if (!success) {
+            this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+          }
+        });
+      });
     });
   }
 
@@ -86,27 +92,41 @@ export class MicrofrontendHostDialogComponent implements OnInit {
   }
 
   private createOutletInjector(): void {
-    this.outletInjector = Injector.create({
-      parent: this._injector,
-      providers: [provideWorkbenchClientDialogHandle(this.capability, this.params),
-        // Prevent injecting the dialog handle in host dialog component.
-        {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)},
-      ],
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        this.outletInjector = Injector.create({
+          parent: this._injector,
+          providers: [provideWorkbenchClientDialogHandle(capability, params),
+            // Prevent injecting the dialog handle in host dialog component.
+            {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)},
+          ],
+        });
+      });
     });
   }
 
   private setDialogProperties(): void {
-    this._dialog.size.width = this.capability.properties.size?.width;
-    this._dialog.size.height = this.capability.properties.size?.height;
-    this._dialog.size.minWidth = this.capability.properties.size?.minWidth;
-    this._dialog.size.maxWidth = this.capability.properties.size?.maxWidth;
-    this._dialog.size.minHeight = this.capability.properties.size?.minHeight;
-    this._dialog.size.maxHeight = this.capability.properties.size?.maxHeight;
+    effect(() => {
+      const properties = this.capability().properties;
+      const params = this.params();
 
-    this._dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
-    this._dialog.closable = this.capability.properties.closable ?? true;
-    this._dialog.resizable = this.capability.properties.resizable ?? true;
-    this._dialog.padding = this.capability.properties.padding ?? true;
+      untracked(() => {
+        this._dialog.size.width = properties.size?.width;
+        this._dialog.size.height = properties.size?.height;
+        this._dialog.size.minWidth = properties.size?.minWidth;
+        this._dialog.size.maxWidth = properties.size?.maxWidth;
+        this._dialog.size.minHeight = properties.size?.minHeight;
+        this._dialog.size.maxHeight = properties.size?.maxHeight;
+
+        this._dialog.title = Microfrontends.substituteNamedParameters(properties.title, params);
+        this._dialog.closable = properties.closable ?? true;
+        this._dialog.resizable = properties.resizable ?? true;
+        this._dialog.padding = properties.padding ?? true;
+      });
+    });
   }
 }
 

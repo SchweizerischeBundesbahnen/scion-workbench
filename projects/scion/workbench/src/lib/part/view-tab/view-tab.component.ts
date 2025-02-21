@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
+import {Component, computed, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
 import {fromEvent, merge, withLatestFrom} from 'rxjs';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {map} from 'rxjs/operators';
@@ -48,25 +48,26 @@ export class ViewTabComponent {
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _router = inject(ɵWorkbenchRouter);
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _viewContextMenuService = inject(ViewMenuService);
+  private readonly _viewMenuService = inject(ViewMenuService);
   private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef).nativeElement as HTMLElement;
   public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
-  public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
+  protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
+
   @HostBinding('attr.draggable')
-  public draggable = true;
+  protected draggable = true;
 
   @HostBinding('attr.tabindex')
-  public tabindex = -1; // make the view focusable to install view menu accelerators
+  protected tabindex = -1; // make the view focusable to install view menu accelerators
 
   /**
    * Indicates if dragging a view tab over this view tab's tabbar.
    */
   @HostBinding('class.drag-over-tabbar')
-  public get isDragOverTabbar(): boolean {
+  protected get isDragOverTabbar(): boolean {
     return this._viewDragService.isDragOverTabbar === this.view().part().id;
   }
 
@@ -78,7 +79,7 @@ export class ViewTabComponent {
   constructor() {
     this.installMaximizeListener();
     this.addHostCssClasses();
-    this.installMenuItemAccelerators();
+    this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
   }
 
@@ -88,27 +89,27 @@ export class ViewTabComponent {
   }
 
   @HostBinding('class.part-active')
-  public get partActive(): boolean {
+  protected get partActive(): boolean {
     return this.view().part().active();
   }
 
   @HostBinding('class.e2e-dirty')
-  public get dirty(): boolean {
+  protected get dirty(): boolean {
     return this.view().dirty();
   }
 
   @HostListener('click')
-  public onClick(): void {
+  protected onClick(): void {
     void this.view().activate();
   }
 
-  public onClose(event: Event): void {
+  protected onClose(event: Event): void {
     event.stopPropagation(); // prevent the view from being activated
     void this.view().close();
   }
 
   @HostListener('mousedown', ['$event'])
-  public onMousedown(event: MouseEvent): void {
+  protected onMousedown(event: MouseEvent): void {
     if (event.buttons === AUXILARY_MOUSE_BUTTON) {
       void this.view().close();
       event.stopPropagation();
@@ -117,14 +118,14 @@ export class ViewTabComponent {
   }
 
   @HostListener('contextmenu', ['$event'])
-  public onContextmenu(event: MouseEvent): void {
-    void this._viewContextMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
+  protected onContextmenu(event: MouseEvent): void {
+    void this._viewMenuService.showMenu({x: event.clientX, y: event.clientY}, this.view().id);
     event.stopPropagation();
     event.preventDefault();
   }
 
   @HostListener('dragstart', ['$event'])
-  public onDragStart(event: DragEvent): void {
+  protected onDragStart(event: DragEvent): void {
     if (!event.dataTransfer) {
       return;
     }
@@ -163,7 +164,7 @@ export class ViewTabComponent {
   }
 
   @HostListener('dragend')
-  public onDragEnd(): void {
+  protected onDragEnd(): void {
     this._viewDragService.unsetViewDragData();
   }
 
@@ -199,12 +200,8 @@ export class ViewTabComponent {
     synchronizeCssClasses(host, computed(() => this.view().classList.asList()));
   }
 
-  private installMenuItemAccelerators(): void {
-    effect(onCleanup => {
-      const view = this.view();
-      const subscription = this._viewContextMenuService.installMenuItemAccelerators(this.host, view);
-      onCleanup(() => subscription.unsubscribe());
-    });
+  private installMenuAccelerators(): void {
+    this._viewMenuService.installMenuAccelerators(this.host, this.view);
   }
 
   private createViewTabContentPortal(): Signal<ComponentPortal<unknown>> {

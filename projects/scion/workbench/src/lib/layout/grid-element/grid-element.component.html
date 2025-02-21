@@ -1,10 +1,12 @@
 <!-- MPart (leaf) -->
-@if (element | wbInstanceof:MPart; as part) {
+@if (element() | wbInstanceof:MPart; as part) {
   <ng-container [cdkPortalOutlet]="part.id | wbPartPortal"/>
 }
 
 <!-- MTreeNode -->
-@if (element | wbInstanceof:MTreeNode; as treeNode) {
+@if (element() | wbInstanceof:MTreeNode; as treeNode) {
+  @let children = this.children();
+
   @if (children.length === 1) {
     <!-- Node with a single visible child. -->
     <wb-grid-element [element]="children[0].element"/>

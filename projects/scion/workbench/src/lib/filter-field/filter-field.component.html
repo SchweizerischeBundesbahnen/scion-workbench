@@ -3,8 +3,8 @@
        [attr.id]="id"
        autocomplete="off"
        [formControl]="formControl"
-       [tabindex]="tabindex ?? 0"
-       [placeholder]="placeholder ?? ''">
+       [tabindex]="tabindex() ?? 0"
+       [placeholder]="placeholder() ?? ''">
 <button class="clear scion-workbench-icons" tabindex="-1" (click)="onClear()">
   clear
 </button>

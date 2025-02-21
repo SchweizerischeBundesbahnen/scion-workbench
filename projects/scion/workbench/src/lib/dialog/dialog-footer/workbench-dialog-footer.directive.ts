@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {booleanAttribute, Directive, inject, Input, OnDestroy, TemplateRef} from '@angular/core';
+import {booleanAttribute, DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {Disposable} from '../../common/disposable';
 import {asapScheduler} from 'rxjs';
@@ -26,28 +26,24 @@ import {asapScheduler} from 'rxjs';
  * ```
  */
 @Directive({selector: 'ng-template[wbDialogFooter]'})
-export class WorkbenchDialogFooterDirective implements OnDestroy {
-
-  public readonly template = inject(TemplateRef) as TemplateRef<void>;
-
-  private _footer: Disposable | undefined;
+export class WorkbenchDialogFooterDirective {
 
   /**
    * Specifies if to display a visual separator between the dialog content and this footer.
    * Defaults to `true`.
    */
-  @Input({transform: booleanAttribute})
-  public divider?: boolean;
+  public readonly divider = input(undefined, {transform: booleanAttribute});
+  public readonly template = inject(TemplateRef) as TemplateRef<void>;
+
+  private _footer: Disposable | undefined;
 
   constructor() {
     const dialog = inject(ɵWorkbenchDialog);
 
     // Defer registering footer to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
     asapScheduler.schedule(() => this._footer = dialog.registerFooter(this));
-  }
 
-  public ngOnDestroy(): void {
     // Defer disposing footer to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => this._footer?.dispose());
+    inject(DestroyRef).onDestroy(() => asapScheduler.schedule(() => this._footer?.dispose()));
   }
 }
