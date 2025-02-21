@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {APP_INITIALIZER, ApplicationInitStatus, assertNotInReactiveContext, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
+import {ApplicationInitStatus, assertNotInReactiveContext, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer, signal} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 
@@ -156,12 +156,7 @@ export function provideWorkbenchLauncher(workbenchConfig: WorkbenchConfig): Envi
     return [];
   }
 
-  return makeEnvironmentProviders([{
-    provide: APP_INITIALIZER,
-    useFactory: () => {
-      const launcher = inject(WorkbenchLauncher);
-      return () => launcher.launch();
-    },
-    multi: true,
-  }]);
+  return makeEnvironmentProviders([
+    provideAppInitializer(() => inject(WorkbenchLauncher).launch()),
+  ]);
 }

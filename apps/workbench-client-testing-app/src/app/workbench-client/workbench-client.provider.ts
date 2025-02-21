@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {APP_INITIALIZER, EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, runInInjectionContext} from '@angular/core';
+import {EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer, runInInjectionContext} from '@angular/core';
 import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
@@ -29,11 +29,7 @@ export function provideWorkbenchClient(): EnvironmentProviders | [] {
   }
 
   return makeEnvironmentProviders([
-    {
-      provide: APP_INITIALIZER,
-      useFactory: connectToWorkbenchFn,
-      multi: true,
-    },
+    provideAppInitializer(connectToWorkbenchFn),
     {provide: APP_IDENTITY, useFactory: () => Beans.get(APP_IDENTITY)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
@@ -59,15 +55,13 @@ export function provideWorkbenchClient(): EnvironmentProviders | [] {
 /**
  * Connects this app to the workbench in the host app.
  */
-function connectToWorkbenchFn(): () => Promise<void> {
+async function connectToWorkbenchFn(): Promise<void> {
   const zone = inject(NgZone);
   const injector = inject(Injector);
 
-  return async (): Promise<void> => {
-    Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
-    await zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
-    await runInInjectionContext(injector, () => inject(WORKBENCH_POST_CONNECT, {optional: true}));
-  };
+  Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
+  await zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
+  await runInInjectionContext(injector, () => inject(WORKBENCH_POST_CONNECT, {optional: true}));
 }
 
 /**

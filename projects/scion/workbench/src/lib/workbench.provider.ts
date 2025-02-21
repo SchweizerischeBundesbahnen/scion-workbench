@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ENVIRONMENT_INITIALIZER, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, makeEnvironmentProviders, provideEnvironmentInitializer} from '@angular/core';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchUrlObserver} from './routing/workbench-url-observer.service';
 import {WorkbenchConfig} from './workbench-config';
@@ -90,21 +90,13 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       useClass: ViewMoveHandler,
       multi: true,
     },
-    {
-      provide: ENVIRONMENT_INITIALIZER,
-      multi: true,
-      useValue: () => inject(WorkbenchUrlObserver),
-    },
-    {
-      provide: ENVIRONMENT_INITIALIZER,
-      multi: true,
-      useValue: () => {
-        if (inject(WorkbenchService, {optional: true, skipSelf: true})) {
-          throw Error('[ProvideWorkbenchError] SCION Workbench must be provided in root environment.');
-        }
-        return 'root';
-      },
-    },
+    provideEnvironmentInitializer(() => inject(WorkbenchUrlObserver)),
+    provideEnvironmentInitializer(() => {
+      if (inject(WorkbenchService, {optional: true, skipSelf: true})) {
+        throw Error('[ProvideWorkbenchError] SCION Workbench must be provided in root environment.');
+      }
+      return 'root';
+    }),
     provideWorkbenchLauncher(config),
     provideLogging(config),
     provideLocationPatch(),

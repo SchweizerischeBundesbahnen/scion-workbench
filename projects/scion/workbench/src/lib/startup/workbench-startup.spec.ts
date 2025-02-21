@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {APP_INITIALIZER, ApplicationInitStatus, inject} from '@angular/core';
+import {ApplicationInitStatus, inject, provideAppInitializer} from '@angular/core';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchLauncher} from './workbench-launcher.service';
 
@@ -39,14 +39,7 @@ describe('Workbench Startup', () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
-        {
-          provide: APP_INITIALIZER,
-          multi: true,
-          useFactory: () => {
-            const workbenchLauncher = inject(WorkbenchLauncher);
-            return () => workbenchLauncher.launch();
-          },
-        },
+        provideAppInitializer(() => inject(WorkbenchLauncher).launch()),
       ],
     });
 
