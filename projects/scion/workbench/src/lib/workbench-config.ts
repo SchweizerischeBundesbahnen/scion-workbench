@@ -54,13 +54,13 @@ export abstract class WorkbenchConfig {
    */
   public abstract startup?: {
     /**
-     * Configures the workbench launching strategy. Defaults to `LAZY` if not specified.
+     * Configures the workbench launching strategy. Defaults to `LAZY`.
      *
      *  - **APP_INITIALIZER**
-     *   Launches the workbench in an Angular `APP_INITIALIZER`, which is before bootstrapping the app component.
+     *   Starts the workbench during application bootstrap, blocking the app startup until the workbench is ready. No splash is displayed with this strategy.
      *
      * - **LAZY**
-     *   Launches the workbench at the latest when bootstrapping the workbench root component `<wb-workbench>`.
+     *   Starts the workbench at the latest when bootstrapping the workbench root component `<wb-workbench>`.
      *
      *   With this strategy, you are flexible when to start the workbench. You can start the workbench explicitly by
      *   calling {@link WorkbenchLauncher#launch}, e.g., to launch the workbench from a route guard or app initializer,
@@ -73,8 +73,7 @@ export abstract class WorkbenchConfig {
      * Specifies the component to display when mounting the workbench root component `<wb-workbench>` to the DOM before the
      * workbench startup has finished.
      *
-     * Note that when launching the workbench in an Angular `APP_INITIALIZER`, no splash will display since the workbench
-     * will start upfront.
+     * Note that when launching the workbench in an app initializer, no splash will display since the workbench will start upfront.
      */
     splash?: ComponentType<unknown>;
   };
