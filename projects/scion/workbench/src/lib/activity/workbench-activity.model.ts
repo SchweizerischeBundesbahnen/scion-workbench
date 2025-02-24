@@ -25,7 +25,7 @@ export interface MActivityLayout {
     rightBottom: MActivityGroup;
     bottomLeft: MActivityGroup;
     bottomRight: MActivityGroup;
-    showLabels: boolean;
+    // showLabels: boolean; // TODO [activity] phase 2
   };
   panels: {
     left: {
@@ -41,6 +41,7 @@ export interface MActivityLayout {
       ratio?: number;
     };
   };
+  activeActivitiesSnapshot: ActivityId[];
 }
 
 export interface MActivityGroup {
@@ -53,4 +54,5 @@ export interface MActivity {
   icon: string;
   label: string | `%${string}`;
   tooltip?: string | `%${string}`;
+  cssClass?: string | string[];
 }

@@ -60,7 +60,7 @@ export class LayoutComponent {
   private readonly _panels = computed(() => this.layout().activityLayout.panels);
 
   protected readonly desktop = inject(DESKTOP);
-  protected readonly mainGrid = computed(() => this.layout().maximized && this.layout().grids.mainArea ? this.layout().grids.mainArea! : this.layout().grids.main);
+  protected readonly mainGrid = computed(() => this.layout().grids.main);
   protected readonly leftActivityPanel = computed(() => this._toolbars().leftTop.activeActivityId || this._toolbars().leftBottom.activeActivityId ? this._panels().left : null);
   protected readonly rightActivityPanel = computed(() => this._toolbars().rightTop.activeActivityId || this._toolbars().rightBottom.activeActivityId ? this._panels().right : null);
   protected readonly bottomActivityPanel = computed(() => this._toolbars().bottomLeft.activeActivityId || this._toolbars().bottomRight.activeActivityId ? this._panels().bottom : null);

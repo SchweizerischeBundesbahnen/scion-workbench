@@ -140,7 +140,6 @@ export class WorkbenchUrlObserver {
       },
       activityLayout: workbenchNavigationalState?.activityLayout ?? previousLayout?.activityLayout,
       perspectiveId: workbenchNavigationalState?.perspectiveId ?? previousLayout?.perspectiveId,
-      maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
       navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
       outlets: Object.fromEntries(Routing.parseOutlets(urlTree, {part: true, view: true})),
     });

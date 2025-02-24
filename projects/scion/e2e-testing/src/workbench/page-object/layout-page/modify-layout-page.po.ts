@@ -24,9 +24,10 @@ export class ModifyLayoutPagePO {
   }
 
   public async modify(fn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
-    const {parts, views, partNavigations, viewNavigations} = fn(new ɵWorkbenchLayout()) as ɵWorkbenchLayout;
+    const {activities, parts, views, partNavigations, viewNavigations} = fn(new ɵWorkbenchLayout()) as ɵWorkbenchLayout;
 
     // Enter the layout.
+    await LayoutPages.enterActivities(this.locator.locator('app-add-activities'), activities);
     await LayoutPages.enterParts(this.locator.locator('app-add-parts'), parts);
     await LayoutPages.enterViews(this.locator.locator('app-add-views'), views);
     await LayoutPages.enterPartNavigations(this.locator.locator('app-navigate-parts'), partNavigations);

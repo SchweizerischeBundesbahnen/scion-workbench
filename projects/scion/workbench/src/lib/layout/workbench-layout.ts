@@ -10,6 +10,7 @@
 
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
+import {ActivityId} from '../activity/workbench-activity.model';
 
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
@@ -242,6 +243,7 @@ export interface PartExtras {
   icon: string;
   label: string | `%${string}`;
   tooltip?: string | `%${string}`;
+  ɵactivityId?: ActivityId;
 }
 
 export interface DockingArea {

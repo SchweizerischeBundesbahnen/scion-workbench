@@ -130,7 +130,7 @@ function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
 function provideActivityPerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
-    .addPart('project', {dockTo: 'left-top'}, {icon: 'folder', label: 'Project'})
+    .addPart('project', {dockTo: 'left-top'}, {icon: 'folder', label: 'Project', cssClass: 'e2e-project'})
     .addPart('search', {dockTo: 'left-top'}, {icon: 'search', label: 'Search'})
     .addPart('bookmarks', {dockTo: 'left-bottom'}, {icon: 'bookmark', label: 'Bookmarks'})
     .addPart('terminal', {dockTo: 'bottom-left'}, {icon: 'terminal', label: 'Terminal'})
@@ -153,6 +153,7 @@ function provideActivityPerspective1Layout(factory: WorkbenchLayoutFactory): Wor
     .activatePart('project')
     .activateView('terminal2', {activatePart: true});
 }
+
 // function provideActivityPerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
 //   return factory
 //     .addPart(MAIN_AREA)

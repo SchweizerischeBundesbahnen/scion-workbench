@@ -13,6 +13,7 @@ import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
 import {PartId, ViewId} from '@scion/workbench';
+import {MActivityGroup} from '../../../workbench/src/lib/activity/workbench-activity.model';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -54,6 +55,10 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
     const activePartLocator = locator.locator(`wb-layout wb-part[data-partid="${activePartId}"]:not([data-context="main-area"]).active`);
     await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main grid, but is not.`));
     await throwIfPresent(locator.locator(`wb-layout wb-part:not([data-partid="${activePartId}"]):not([data-context="main-area"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main grid, but is not.`));
+  }
+  // Assert activity layout
+  if (expected.activityLayout) {
+    await assertActivityLayout(expected.activityLayout, locator);
   }
 }
 
@@ -254,6 +259,26 @@ async function assertSashBoundingBox(expectedTreeNode: MTreeNode & {nodeId: stri
   }
 }
 
+async function assertActivityLayout(activityLayout: MActivityLayout, locator: Locator): Promise<void> {
+  await assertActivityGroup(activityLayout.toolbars.leftTop, locator.locator('wb-layout wb-activity-group.e2e-left-top'));
+  await assertActivityGroup(activityLayout.toolbars.leftBottom, locator.locator('wb-layout wb-activity-group.e2e-left-bottom'));
+  await assertActivityGroup(activityLayout.toolbars.rightTop, locator.locator('wb-layout wb-activity-group.e2e-right-top'));
+  await assertActivityGroup(activityLayout.toolbars.rightBottom, locator.locator('wb-layout wb-activity-group.e2e-right-bottom'));
+  await assertActivityGroup(activityLayout.toolbars.bottomLeft, locator.locator('wb-layout wb-activity-group.e2e-bottom-left'));
+  await assertActivityGroup(activityLayout.toolbars.bottomRight, locator.locator('wb-layout wb-activity-group.e2e-bottom-right'));
+}
+
+async function assertActivityGroup(group: MActivityGroup, locator: Locator): Promise<void> {
+  for (const [i, activity] of group.activities.entries()) {
+    const activityLocator = locator.locator('wb-activity-item').nth(i).locator(`:scope[data-activityid="${activity.id}"]`);
+    await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be present, but is not. [activityId=${activity.id}, locator=${activityLocator}]`));
+  }
+  if (group.activeActivityId) {
+    const activityLocator = locator.locator(`wb-activity-item[data-activityid="${group.activeActivityId}"].active`);
+    await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be active, but is not. [activityId=${group.activeActivityId}, locator=${activityLocator}]`));
+  }
+}
+
 /**
  * Throws if specified element can be located in the DOM.
  */
@@ -318,6 +343,39 @@ export interface ExpectedWorkbenchLayout {
    * Specifies the expected main area grid. If not set, does not assert the main area grid.
    */
   mainAreaGrid?: MPartGrid;
+  /**
+   * Specifies the expected activity layout. If not set, does not assert the activity layout.
+   */
+  activityLayout?: MActivityLayout;
+}
+
+/**
+ * Modified version of {@link MActivityLayout} to expect the workbench layout.
+ */
+export interface MActivityLayout {
+  toolbars: {
+    leftTop: MActivityGroup;
+    leftBottom: MActivityGroup;
+    rightTop: MActivityGroup;
+    rightBottom: MActivityGroup;
+    bottomLeft: MActivityGroup;
+    bottomRight: MActivityGroup;
+    // showLabels: boolean; // TODO [activity] phase 2
+  };
+  panels: {
+    left: {
+      width?: string;
+      ratio?: number;
+    };
+    right: {
+      width?: string;
+      ratio?: number;
+    };
+    bottom: {
+      height?: string;
+      ratio?: number;
+    };
+  };
 }
 
 interface BoundingBox {

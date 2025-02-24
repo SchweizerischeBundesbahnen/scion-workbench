@@ -370,7 +370,6 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
       // Fall back to the current layout's perspective if not specified by the new layout,
       // e.g., the navigator provides a new layout to replace the current layout.
       perspectiveId: newLayout.perspectiveId ?? currentLayout?.perspectiveId,
-      maximized: newLayout.maximized,
       navigationStates: newLayout.navigationStates(),
     }),
     // Add the main area as query parameter.

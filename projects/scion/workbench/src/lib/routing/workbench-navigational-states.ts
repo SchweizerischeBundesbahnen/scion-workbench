@@ -55,10 +55,6 @@ export interface WorkbenchNavigationalState {
    */
   perspectiveId?: string;
   /**
-   * Indicates whether to maximize the main area.
-   */
-  maximized: boolean;
-  /**
    * Provides navigation state of views contained in the workbench layout.
    */
   navigationStates: NavigationStates;
