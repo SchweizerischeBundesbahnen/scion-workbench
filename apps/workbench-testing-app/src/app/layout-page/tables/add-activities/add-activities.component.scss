@@ -5,12 +5,13 @@
 
   > form {
     display: grid;
-    grid-template-columns: 7.5em repeat(3, 1fr) min-content auto;
+    grid-template-columns: repeat(7, 1fr) min-content;
     gap: .5em .75em;
     align-items: center;
 
     > input, select {
       @include sci-design.style-input-field();
+      min-width: 0;
     }
   }
 }

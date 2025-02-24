@@ -42,25 +42,27 @@ test.describe('View Drag Main Grid', () => {
 
       // Expect test view to be moved to the west of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .2,
-            child1: new MPart({
-              id: testViewInfo.partId,
-              views: [{id: testViewInfo.viewId}],
-              activeViewId: testViewInfo.viewId,
+        grids: {
+          mainGrid: {
+            root: new MTreeNode({
+              direction: 'row',
+              ratio: .2,
+              child1: new MPart({
+                id: testViewInfo.partId,
+                views: [{id: testViewInfo.viewId}],
+                activeViewId: testViewInfo.viewId,
+              }),
+              child2: new MPart({id: MAIN_AREA}),
             }),
-            child2: new MPart({id: MAIN_AREA}),
-          }),
-        },
-        mainAreaGrid: {
-          root: new MPart({
-            id: 'part.initial',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          activePartId: 'part.initial',
+          },
+          mainAreaGrid: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
+            }),
+            activePartId: 'part.initial',
+          },
         },
       });
     });
@@ -95,43 +97,45 @@ test.describe('View Drag Main Grid', () => {
 
       // Expect test view to be moved to the west of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .2,
-            child1: new MPart({
-              id: testViewInfo.partId,
-              views: [{id: testViewInfo.viewId}],
-              activeViewId: testViewInfo.viewId,
-            }),
-            child2: new MTreeNode({
+        grids: {
+          mainGrid: {
+            root: new MTreeNode({
               direction: 'row',
-              ratio: .25,
-              child1: new MTreeNode({
-                direction: 'column',
-                ratio: .75,
-                child1: new MPart({
-                  id: 'part.left-top',
-                  views: [{id: 'view.102'}],
-                  activeViewId: 'view.102',
-                }),
-                child2: new MPart({
-                  id: 'part.left-bottom',
-                  views: [{id: 'view.103'}],
-                  activeViewId: 'view.103',
-                }),
+              ratio: .2,
+              child1: new MPart({
+                id: testViewInfo.partId,
+                views: [{id: testViewInfo.viewId}],
+                activeViewId: testViewInfo.viewId,
               }),
-              child2: new MPart({id: MAIN_AREA}),
+              child2: new MTreeNode({
+                direction: 'row',
+                ratio: .25,
+                child1: new MTreeNode({
+                  direction: 'column',
+                  ratio: .75,
+                  child1: new MPart({
+                    id: 'part.left-top',
+                    views: [{id: 'view.102'}],
+                    activeViewId: 'view.102',
+                  }),
+                  child2: new MPart({
+                    id: 'part.left-bottom',
+                    views: [{id: 'view.103'}],
+                    activeViewId: 'view.103',
+                  }),
+                }),
+                child2: new MPart({id: MAIN_AREA}),
+              }),
             }),
-          }),
-        },
-        mainAreaGrid: {
-          root: new MPart({
-            id: 'part.initial',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          activePartId: 'part.initial',
+          },
+          mainAreaGrid: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
+            }),
+            activePartId: 'part.initial',
+          },
         },
       });
     });
@@ -159,25 +163,27 @@ test.describe('View Drag Main Grid', () => {
 
       // Expect test view to be moved to the east of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .8,
-            child1: new MPart({id: MAIN_AREA}),
-            child2: new MPart({
-              id: testViewInfo.partId,
-              views: [{id: testViewInfo.viewId}],
-              activeViewId: testViewInfo.viewId,
+        grids: {
+          mainGrid: {
+            root: new MTreeNode({
+              direction: 'row',
+              ratio: .8,
+              child1: new MPart({id: MAIN_AREA}),
+              child2: new MPart({
+                id: testViewInfo.partId,
+                views: [{id: testViewInfo.viewId}],
+                activeViewId: testViewInfo.viewId,
+              }),
             }),
-          }),
-        },
-        mainAreaGrid: {
-          root: new MPart({
-            id: 'part.initial',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          activePartId: 'part.initial',
+          },
+          mainAreaGrid: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
+            }),
+            activePartId: 'part.initial',
+          },
         },
       });
     });
@@ -212,43 +218,45 @@ test.describe('View Drag Main Grid', () => {
 
       // Expect test view to be moved to the east of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .8,
-            child1: new MTreeNode({
+        grids: {
+          mainGrid: {
+            root: new MTreeNode({
               direction: 'row',
-              ratio: .75,
-              child1: new MPart({id: MAIN_AREA}),
-              child2: new MTreeNode({
-                direction: 'column',
+              ratio: .8,
+              child1: new MTreeNode({
+                direction: 'row',
                 ratio: .75,
-                child1: new MPart({
-                  id: 'part.right-top',
-                  views: [{id: 'view.102'}],
-                  activeViewId: 'view.102',
-                }),
-                child2: new MPart({
-                  id: 'part.right-bottom',
-                  views: [{id: 'view.103'}],
-                  activeViewId: 'view.103',
+                child1: new MPart({id: MAIN_AREA}),
+                child2: new MTreeNode({
+                  direction: 'column',
+                  ratio: .75,
+                  child1: new MPart({
+                    id: 'part.right-top',
+                    views: [{id: 'view.102'}],
+                    activeViewId: 'view.102',
+                  }),
+                  child2: new MPart({
+                    id: 'part.right-bottom',
+                    views: [{id: 'view.103'}],
+                    activeViewId: 'view.103',
+                  }),
                 }),
               }),
+              child2: new MPart({
+                id: testViewInfo.partId,
+                views: [{id: testViewInfo.viewId}],
+                activeViewId: testViewInfo.viewId,
+              }),
             }),
-            child2: new MPart({
-              id: testViewInfo.partId,
-              views: [{id: testViewInfo.viewId}],
-              activeViewId: testViewInfo.viewId,
+          },
+          mainAreaGrid: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
-          }),
-        },
-        mainAreaGrid: {
-          root: new MPart({
-            id: 'part.initial',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          activePartId: 'part.initial',
+            activePartId: 'part.initial',
+          },
         },
       });
     });
@@ -279,25 +287,27 @@ test.describe('View Drag Main Grid', () => {
 
       // Expect test view to be moved to the south of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MTreeNode({
-            direction: 'column',
-            ratio: .8,
-            child1: new MPart({id: MAIN_AREA}),
-            child2: new MPart({
-              id: testViewInfo.partId,
-              views: [{id: testViewInfo.viewId}],
-              activeViewId: testViewInfo.viewId,
+        grids: {
+          mainGrid: {
+            root: new MTreeNode({
+              direction: 'column',
+              ratio: .8,
+              child1: new MPart({id: MAIN_AREA}),
+              child2: new MPart({
+                id: testViewInfo.partId,
+                views: [{id: testViewInfo.viewId}],
+                activeViewId: testViewInfo.viewId,
+              }),
             }),
-          }),
-        },
-        mainAreaGrid: {
-          root: new MPart({
-            id: 'part.initial',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          activePartId: 'part.initial',
+          },
+          mainAreaGrid: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
+            }),
+            activePartId: 'part.initial',
+          },
         },
       });
     });
@@ -335,43 +345,45 @@ test.describe('View Drag Main Grid', () => {
 
       // Expect test view to be moved to the south of the main grid.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MTreeNode({
-            direction: 'column',
-            ratio: .8,
-            child1: new MTreeNode({
+        grids: {
+          mainGrid: {
+            root: new MTreeNode({
               direction: 'column',
-              ratio: .75,
-              child1: new MPart({id: MAIN_AREA}),
-              child2: new MTreeNode({
-                direction: 'row',
-                ratio: .4,
-                child1: new MPart({
-                  id: 'part.bottom-left',
-                  views: [{id: 'view.102'}],
-                  activeViewId: 'view.102',
-                }),
-                child2: new MPart({
-                  id: 'part.bottom-right',
-                  views: [{id: 'view.103'}],
-                  activeViewId: 'view.103',
+              ratio: .8,
+              child1: new MTreeNode({
+                direction: 'column',
+                ratio: .75,
+                child1: new MPart({id: MAIN_AREA}),
+                child2: new MTreeNode({
+                  direction: 'row',
+                  ratio: .4,
+                  child1: new MPart({
+                    id: 'part.bottom-left',
+                    views: [{id: 'view.102'}],
+                    activeViewId: 'view.102',
+                  }),
+                  child2: new MPart({
+                    id: 'part.bottom-right',
+                    views: [{id: 'view.103'}],
+                    activeViewId: 'view.103',
+                  }),
                 }),
               }),
+              child2: new MPart({
+                id: testViewInfo.partId,
+                views: [{id: testViewInfo.viewId}],
+                activeViewId: testViewInfo.viewId,
+              }),
             }),
-            child2: new MPart({
-              id: testViewInfo.partId,
-              views: [{id: testViewInfo.viewId}],
-              activeViewId: testViewInfo.viewId,
+          },
+          mainAreaGrid: {
+            root: new MPart({
+              id: 'part.initial',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
-          }),
-        },
-        mainAreaGrid: {
-          root: new MPart({
-            id: 'part.initial',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          activePartId: 'part.initial',
+            activePartId: 'part.initial',
+          },
         },
       });
     });

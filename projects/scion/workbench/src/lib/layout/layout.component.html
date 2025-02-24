@@ -1,6 +1,6 @@
 <!-- Left Activity Bar -->
 @if (leftActivityBarVisible()) {
-  <wb-activity-bar side="left"/>
+  <wb-activity-bar [align]="'left'"/>
 }
 
 <main>
@@ -87,7 +87,7 @@
 
 <!-- Right Activity Bar -->
 @if (rightActivityBarVisible()) {
-  <wb-activity-bar side="right"/>
+  <wb-activity-bar [align]="'right'"/>
 }
 
 <!-- Main Grid -->

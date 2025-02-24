@@ -55,8 +55,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private readonly _activityLayoutSerializer = inject(WorkbenchActivityLayoutSerializer);
   private readonly _injector = inject(Injector);
 
-  private _maximized: boolean;
-
   /** Identifies the perspective of this layout, if any. */
   public readonly perspectiveId: string | undefined;
 
@@ -73,7 +71,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     };
 
     this._activityLayout = coerceMActivityLayout(config?.activityLayout, {default: createDefaultActivityLayout});
-    this._maximized = config?.maximized ?? false;
     this._outlets = new Map(Objects.entries(coerceOutlets(config?.outlets)));
     this._navigationStates = new Map(Objects.entries(config?.navigationStates ?? {}));
     this.perspectiveId = config?.perspectiveId;
@@ -186,13 +183,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.__toggleMaximized();
     return workingCopy;
-  }
-
-  /**
-   * Indicates whether the main area is maximized.
-   */
-  public get maximized(): boolean {
-    return this._maximized;
   }
 
   /**
@@ -577,8 +567,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       layout1.outlets({mainGrid: true}) === layout2.outlets({mainGrid: true}) &&
       layout1.outlets({mainAreaGrid: true}) === layout2.outlets({mainAreaGrid: true}) &&
       layout1.outlets({activityGrids: true}) === layout2.outlets({activityGrids: true}) &&
-      this.perspectiveId === other.perspectiveId &&
-      this.maximized === other.maximized
+      this.perspectiveId === other.perspectiveId
       // Navigational state is not tested for equality as it is set through view navigation, resulting in a new navigation id when modified.
     );
   }
@@ -653,7 +642,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const activityId = WorkbenchLayouts.computeActivityId();
+    if (extras.ɵactivityId && this.hasActivity(extras.ɵactivityId)) {
+      throw Error(`[ActivityAddError] Activity id must be unique. The layout already contains an activity with the id '${extras.ɵactivityId}'.`);
+    }
+
+    const activityId = extras.ɵactivityId ?? WorkbenchLayouts.computeActivityId();
     this._grids[activityId] = {
       root: new MPart({id, alternativeId: extras.alternativeId, structural: true, views: []}), // TODO [activity] still required to be structural?,
       activePartId: id,
@@ -664,6 +657,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       icon: extras.icon,
       label: extras.label,
       tooltip: extras.tooltip,
+      cssClass: extras.cssClass,
     });
   }
 
@@ -997,7 +991,72 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __toggleMaximized(): void {
-    this._maximized = !this._maximized;
+    const activeActivities = this.getActiveActivities();
+    if (activeActivities.length) {
+      this.__memoizeActiveActivities(activeActivities);
+      this.__minimizeActivities();
+    }
+    else {
+      this.__restoreMemoizedActiveActivities();
+    }
+  }
+
+  private __memoizeActiveActivities(activities: MActivity[]): void {
+    this._activityLayout.activeActivitiesSnapshot = activities.map(activity => activity.id);
+  }
+
+  private __minimizeActivities(): void {
+    this._activityLayout.toolbars.leftTop.activeActivityId = undefined;
+    this._activityLayout.toolbars.leftBottom.activeActivityId = undefined;
+    this._activityLayout.toolbars.rightTop.activeActivityId = undefined;
+    this._activityLayout.toolbars.rightBottom.activeActivityId = undefined;
+    this._activityLayout.toolbars.bottomLeft.activeActivityId = undefined;
+    this._activityLayout.toolbars.bottomRight.activeActivityId = undefined;
+  }
+
+  private __restoreMemoizedActiveActivities(): void {
+    const memoizedActiveActivities = new Set(this._activityLayout.activeActivitiesSnapshot);
+    const leftTopActiveActivity = this._activityLayout.toolbars.leftTop.activities.find(activity => memoizedActiveActivities.has(activity.id));
+    if (leftTopActiveActivity) {
+      this._activityLayout.toolbars.leftTop.activeActivityId = leftTopActiveActivity.id;
+    }
+    const leftBottomActivity = this._activityLayout.toolbars.leftBottom.activities.find(activity => memoizedActiveActivities.has(activity.id));
+    if (leftBottomActivity) {
+      this._activityLayout.toolbars.leftBottom.activeActivityId = leftBottomActivity.id;
+    }
+    const rightTopActiveActivity = this._activityLayout.toolbars.rightTop.activities.find(activity => memoizedActiveActivities.has(activity.id));
+    if (rightTopActiveActivity) {
+      this._activityLayout.toolbars.rightTop.activeActivityId = rightTopActiveActivity.id;
+    }
+    const rightBottomActiveActivity = this._activityLayout.toolbars.rightBottom.activities.find(activity => memoizedActiveActivities.has(activity.id));
+    if (rightBottomActiveActivity) {
+      this._activityLayout.toolbars.rightBottom.activeActivityId = rightBottomActiveActivity.id;
+    }
+    const bottomLeftActiveActivity = this._activityLayout.toolbars.bottomLeft.activities.find(activity => memoizedActiveActivities.has(activity.id));
+    if (bottomLeftActiveActivity) {
+      this._activityLayout.toolbars.bottomLeft.activeActivityId = bottomLeftActiveActivity.id;
+    }
+    const bottomRightActiveActivity = this._activityLayout.toolbars.bottomRight.activities.find(activity => memoizedActiveActivities.has(activity.id));
+    if (bottomRightActiveActivity) {
+      this._activityLayout.toolbars.bottomRight.activeActivityId = bottomRightActiveActivity.id;
+    }
+  }
+
+  private getActiveActivities(): MActivity[] {
+    return this.getActivityGroups()
+      .map(group => group.activeActivityId && group.activities.find(activity => activity.id === group.activeActivityId))
+      .filter(activity => !!activity);
+  }
+
+  private getActivityGroups(): MActivityGroup[] {
+    return [
+      this._activityLayout.toolbars.leftTop,
+      this._activityLayout.toolbars.leftBottom,
+      this._activityLayout.toolbars.rightTop,
+      this._activityLayout.toolbars.rightBottom,
+      this._activityLayout.toolbars.bottomLeft,
+      this._activityLayout.toolbars.bottomRight,
+    ];
   }
 
   /**
@@ -1162,7 +1221,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       perspectiveId: this.perspectiveId,
       outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),
-      maximized: this._maximized,
     }));
   }
 }
@@ -1201,7 +1259,7 @@ function createDefaultActivityLayout(): MActivityLayout {
       rightBottom: {activities: []},
       bottomLeft: {activities: []},
       bottomRight: {activities: []},
-      showLabels: false,
+      // showLabels: false, TODO [ac
     },
     panels: {
       left: {
@@ -1214,6 +1272,7 @@ function createDefaultActivityLayout(): MActivityLayout {
         height: '150px',
       },
     },
+    activeActivitiesSnapshot: [],
   };
 }
 
@@ -1456,5 +1515,4 @@ export interface WorkbenchLayoutConstructConfig {
   perspectiveId?: string;
   outlets?: Outlets | string;
   navigationStates?: NavigationStates;
-  maximized?: boolean;
 }

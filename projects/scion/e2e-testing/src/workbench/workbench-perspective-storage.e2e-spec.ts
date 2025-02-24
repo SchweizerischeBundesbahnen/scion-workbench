@@ -45,33 +45,35 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective to be restored from the storage
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.101'}, {id: 'view.102'}],
-            activeViewId: 'view.102',
-          }),
-          child2: new MTreeNode({
+      grids: {
+        mainGrid: {
+          root: new MTreeNode({
             direction: 'row',
-            ratio: .75,
+            ratio: .25,
             child1: new MPart({
-              id: MAIN_AREA,
+              id: 'part.left',
+              views: [{id: 'view.101'}, {id: 'view.102'}],
+              activeViewId: 'view.102',
             }),
-            child2: new MPart({
-              id: 'part.right',
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .75,
+              child1: new MPart({
+                id: MAIN_AREA,
+              }),
+              child2: new MPart({
+                id: 'part.right',
+              }),
             }),
           }),
-        }),
-        activePartId: 'part.left',
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.103'}],
-          activeViewId: 'view.103',
-        }),
+          activePartId: 'part.left',
+        },
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: 'view.103'}],
+            activeViewId: 'view.103',
+          }),
+        },
       },
     });
 
@@ -88,33 +90,35 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective to be restored from the storage
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.101'}],
-            activeViewId: 'view.101',
-          }),
-          child2: new MTreeNode({
+      grids: {
+        mainGrid: {
+          root: new MTreeNode({
             direction: 'row',
-            ratio: .75,
+            ratio: .25,
             child1: new MPart({
-              id: MAIN_AREA,
+              id: 'part.left',
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
-            child2: new MPart({
-              id: 'part.right',
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .75,
+              child1: new MPart({
+                id: MAIN_AREA,
+              }),
+              child2: new MPart({
+                id: 'part.right',
+              }),
             }),
           }),
-        }),
-        activePartId: 'part.left',
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.103'}],
-          activeViewId: 'view.103',
-        }),
+          activePartId: 'part.left',
+        },
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: 'view.103'}],
+            activeViewId: 'view.103',
+          }),
+        },
       },
     });
     await expectView(viewPage1).toBeActive();
