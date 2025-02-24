@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, DockingArea, NavigationData, NavigationState, PartId, PartExtras, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {ActivityId, Commands, DockingArea, NavigationData, NavigationState, PartExtras, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -67,6 +67,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       icon: extras.icon,
       label: extras.label,
       tooltip: extras.tooltip,
+      cssClass: extras.cssClass,
+      ɵactivityId: extras.ɵactivityId,
     });
     return this;
   }
@@ -149,6 +151,8 @@ export interface ActivityDescriptor {
   icon: string;
   label: string | `%${string}`;
   tooltip?: string | `%${string}`;
+  cssClass?: string | string[];
+  ɵactivityId?: ActivityId;
 }
 
 /**

@@ -10,11 +10,26 @@
 
 import {Locator} from '@playwright/test';
 import {coerceArray, commandsToPath, toMatrixNotation} from '../../../helper/testing.util';
-import {PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
+import {ActivityDescriptor, PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 
 export const LayoutPages = {
 
+  /**
+   * Enters activities into {@link AddActivitiesComponent}.
+   */
+  enterActivities: async (locator: Locator, activities: ActivityDescriptor[]): Promise<void> => {
+    for (const [i, activity] of activities.entries()) {
+      await locator.locator('button.e2e-add').click();
+      await locator.locator('input.e2e-part-id').nth(i).fill(activity.id);
+      await locator.locator('select.e2e-dock-to').nth(i).selectOption(activity.dockTo);
+      await locator.locator('input.e2e-icon').nth(i).fill(activity.icon);
+      await locator.locator('input.e2e-label').nth(i).fill(activity.label);
+      await locator.locator('input.e2e-tooltip').nth(i).fill(activity.tooltip ?? '');
+      await locator.locator('input.e2e-class').nth(i).fill(coerceArray(activity).join(' '));
+      await locator.locator('input.e2e-activity-id').nth(i).fill(activity.ɵactivityId ?? '');
+    }
+  },
   /**
    * Enters parts into {@link AddPartsComponent}.
    */

@@ -1,0 +1,15 @@
+:host {
+  display: grid;
+  border-radius: var(--sci-corner);
+
+  &:is(:hover, .active) {
+    background-color: var(--sci-color-background-secondary-selected);
+  }
+
+  > button.activity-item {
+    all: unset;
+    height: 24px;
+    width: 24px;
+    padding: .125em;
+  }
+}

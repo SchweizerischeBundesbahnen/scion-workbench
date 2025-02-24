@@ -97,6 +97,8 @@ export default class ModifyLayoutPageComponent {
           icon: activity.extras.icon,
           label: activity.extras.label,
           tooltip: activity.extras.tooltip,
+          cssClass: activity.extras.cssClass,
+          ɵactivityId: activity.extras.ɵactivityId,
         });
       }
 

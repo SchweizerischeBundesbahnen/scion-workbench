@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, input} from '@angular/core';
-import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {ActivityId, MActivityGroup} from '../../workbench-activity.model';
-import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
+import {Component, input} from '@angular/core';
+import {MActivityGroup} from '../../workbench-activity.model';
+import {ActivityItemComponent} from '../activity-item/activity-item.component';
 
 @Component({
   selector: 'wb-activity-group',
@@ -19,16 +18,12 @@ import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
   styleUrls: ['./activity-group.component.scss'],
   standalone: true,
   imports: [
-    SciMaterialIconDirective,
+    ActivityItemComponent,
   ],
 })
 export class ActivityGroupComponent {
 
   public readonly group = input.required<MActivityGroup>();
 
-  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
-  protected toggleActivity(id: ActivityId, enable: boolean): void {
-    void this._workbenchRouter.navigate(layout => enable ? layout.activateActivity(id) : layout.deactivateActivity(id));
-  }
 }

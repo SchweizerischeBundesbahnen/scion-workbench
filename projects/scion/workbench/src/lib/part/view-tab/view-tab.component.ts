@@ -8,10 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
-import {fromEvent, merge, withLatestFrom} from 'rxjs';
+import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, Signal} from '@angular/core';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {map} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
@@ -20,9 +18,6 @@ import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
-import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {subscribeIn} from '@scion/toolkit/operators';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
@@ -47,7 +42,6 @@ export class ViewTabComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-  private readonly _router = inject(ɵWorkbenchRouter);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _viewContextMenuService = inject(ViewMenuService);
   private readonly _injector = inject(Injector);
@@ -77,7 +71,6 @@ export class ViewTabComponent {
   }
 
   constructor() {
-    this.installMaximizeListener();
     this.addHostCssClasses();
     this.installMenuItemAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
@@ -104,7 +97,9 @@ export class ViewTabComponent {
   }
 
   public onClose(event: Event): void {
+    console.log('>>> onClose Tab', event);
     event.stopPropagation(); // prevent the view from being activated
+    event.preventDefault();
     void this.view().close();
   }
 
@@ -166,33 +161,6 @@ export class ViewTabComponent {
   @HostListener('dragend')
   public onDragEnd(): void {
     this._viewDragService.unsetViewDragData();
-  }
-
-  /**
-   * Listens for 'dblclick' events to maximize or minimize the main area.
-   *
-   * Note that the listener is not activated until the mouse is moved. Otherwise, closing successive
-   * views (if they have different tab widths) could result in unintended maximization or minimization.
-   */
-  private installMaximizeListener(): void {
-    const zone = inject(NgZone);
-    const enabled$ = merge(fromEvent<Event>(this.host, 'mouseenter'), fromEvent<Event>(this.host, 'mousemove'), fromEvent<Event>(this.host, 'mouseleave'))
-      .pipe(
-        subscribeIn(fn => zone.runOutsideAngular(fn)),
-        map(event => event.type === 'mousemove'), // the 'mousemove' event arms the listener
-      );
-
-    fromEvent<Event>(this.host, 'dblclick')
-      .pipe(
-        withLatestFrom(enabled$),
-        takeUntilDestroyed(),
-      )
-      .subscribe(([event, enabled]) => {
-        event.stopPropagation(); // prevent `PartBarComponent` handling the dblclick event which would undo maximization/minimization
-        if (enabled && this.view().part().isInMainArea) {
-          void this._router.navigate(layout => layout.toggleMaximized());
-        }
-      });
   }
 
   private addHostCssClasses(): void {
