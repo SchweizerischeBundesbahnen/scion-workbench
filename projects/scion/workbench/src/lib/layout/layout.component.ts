@@ -72,34 +72,17 @@ export class LayoutComponent {
     this._workbenchLayoutService.signalResizing(true);
   }
 
-  // TODO [Marc] What if we do not have a left sash?
-  protected onHorizontalSashEnd(sashSizes: number[]): void {
+  protected onHorizontalSashEnd({left, right}: {[sashKey: string]: number}): void {
     this._workbenchLayoutService.signalResizing(false);
-
-    if (this.leftActivityPanel() && this.rightActivityPanel()) {
-      const [leftSashSize, _mainSashSize, rightSashSize] = sashSizes; // eslint-disable-line @typescript-eslint/no-unused-vars
-      void this._workbenchRouter.navigate(layout => layout
-        .setActivityPanelSize('left', leftSashSize!)
-        .setActivityPanelSize('right', rightSashSize!),
-      );
-    }
-    else if (this.leftActivityPanel()) {
-      const [leftSashSize] = sashSizes;
-      void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('left', leftSashSize!));
-    }
-    else if (this.rightActivityPanel()) {
-      const [_leftSashSize, _mainSashSize, rightSashSize] = sashSizes; // eslint-disable-line @typescript-eslint/no-unused-vars
-      void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('left', rightSashSize!));
-    }
-    // void this._workbenchRouter.navigate(layout => layout
-    //   .setActivityPanelSize('left', leftPanelSize)
-    //   .setActivityPanelSize('right', rightPanelSize),
-    // );
+    void this._workbenchRouter.navigate(layout => layout
+      .modify(layout => left !== undefined ? layout.setActivityPanelSize('left', left) : layout)
+      .modify(layout => right !== undefined ? layout.setActivityPanelSize('right', right) : layout),
+    );
   }
 
-  protected onVerticalSashEnd([_mainContentSize, bottomPanelSize]: number[]): void {
+  protected onVerticalSashEnd({bottom}: {[sashKey: string]: number}): void {
     this._workbenchLayoutService.signalResizing(false);
-    void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('bottom', bottomPanelSize!));
+    void this._workbenchRouter.navigate(layout => layout.setActivityPanelSize('bottom', bottom!));
   }
 
   protected onDesktopViewDrop(event: WbViewDropEvent): void {

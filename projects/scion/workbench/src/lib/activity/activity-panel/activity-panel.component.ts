@@ -42,21 +42,20 @@ export class ActivityPanelComponent {
     this._workbenchLayoutService.signalResizing(true);
   }
 
-  // TODO [activity] Change to object literal instead of array
-  protected onSashEndLeftPanel([sashSize1, sashSize2]: number[]): void {
-    const ratio = sashSize1! / (sashSize1! + sashSize2!);
+  protected onLeftPanelSashEnd({top, bottom}: {[sashKey: string]: number}): void {
+    const ratio = top! / (top! + bottom!);
     this._workbenchLayoutService.signalResizing(false);
     void this._workbenchRouter.navigate(layout => layout.setActivityPanelRatio('left', ratio));
   }
 
-  protected onSashEndRightPanel([sashSize1, sashSize2]: number[]): void {
-    const ratio = sashSize1! / (sashSize1! + sashSize2!);
+  protected onRightPanelSashEnd({top, bottom}: {[sashKey: string]: number}): void {
+    const ratio = top! / (top! + bottom!);
     this._workbenchLayoutService.signalResizing(false);
     void this._workbenchRouter.navigate(layout => layout.setActivityPanelRatio('right', ratio));
   }
 
-  protected onSashEndBottomPanel([sashSize1, sashSize2]: number[]): void {
-    const ratio = sashSize1! / (sashSize1! + sashSize2!);
+  protected onBottomPanelSashEnd({left, right}: {[sashKey: string]: number}): void {
+    const ratio = left! / (left! + right!);
     this._workbenchLayoutService.signalResizing(false);
     void this._workbenchRouter.navigate(layout => layout.setActivityPanelRatio('bottom', ratio));
   }

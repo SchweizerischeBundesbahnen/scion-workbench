@@ -1,9 +1,9 @@
 @if (activityLayout(); as activityLayout) {
   @switch (panel()) {
     @case ('left') {
-      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onSashEndLeftPanel($event)">
+      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onLeftPanelSashEnd($event)">
         @if (activityLayout.toolbars.leftTop.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="leftPanelSashSize()[0]">
+          <ng-template sciSash [size]="leftPanelSashSize()[0]" key="top">
             <wb-grid [grid]="grids()[activityId]!"
                      [attr.data-grid]="activityId"
                      [gridDropZone]="{
@@ -17,7 +17,7 @@
         }
 
         @if (activityLayout.toolbars.leftBottom.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="leftPanelSashSize()[1]">
+          <ng-template sciSash [size]="leftPanelSashSize()[1]" key="bottom">
             <wb-grid [grid]="grids()[activityId]!"
                      [attr.data-grid]="activityId"
                      [gridDropZone]="{
@@ -32,9 +32,9 @@
       </sci-sashbox>
     }
     @case ('right') {
-      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onSashEndRightPanel($event)">
+      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onRightPanelSashEnd($event)">
         @if (activityLayout.toolbars.rightTop.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="rightPanelSashSize()[0]">
+          <ng-template sciSash [size]="rightPanelSashSize()[0]" key="top">
             <wb-grid [grid]="grids()[activityId]!"
                      [attr.data-grid]="activityId"
                      [gridDropZone]="{
@@ -48,7 +48,7 @@
         }
 
         @if (activityLayout.toolbars.rightBottom.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="rightPanelSashSize()[1]">
+          <ng-template sciSash [size]="rightPanelSashSize()[1]" key="bottom">
             <wb-grid [grid]="grids()[activityId]!"
                      [attr.data-grid]="activityId"
                      [gridDropZone]="{
@@ -63,9 +63,9 @@
       </sci-sashbox>
     }
     @case ('bottom') {
-      <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd)="onSashEndBottomPanel($event)">
+      <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onBottomPanelSashEnd($event)">
         @if (activityLayout.toolbars.bottomLeft.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="bottomPanelSashSize()[0]">
+          <ng-template sciSash [size]="bottomPanelSashSize()[0]" key="left">
             <wb-grid [grid]="grids()[activityId]!"
                      [attr.data-grid]="activityId"
                      [gridDropZone]="{
@@ -79,7 +79,7 @@
         }
 
         @if (activityLayout.toolbars.bottomRight.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="bottomPanelSashSize()[1]">
+          <ng-template sciSash [size]="bottomPanelSashSize()[1]" key="right">
             <wb-grid [grid]="grids()[activityId]!"
                      [attr.data-grid]="activityId"
                      [gridDropZone]="{

@@ -494,7 +494,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private __setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): void {
     if (size < 0) {
-      throw Error(`[LayoutModifyError] Size for '${panel}' activity panel must not be less than 0, but was '${size}'.`);
+      throw Error(`[LayoutModifyError] '${panel}' activity panel size must be 0 or greater, but was '${size}'.`);
     }
     switch (panel) {
       case 'left':

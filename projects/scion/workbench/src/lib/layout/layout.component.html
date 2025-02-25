@@ -14,22 +14,22 @@
     <!-- |   |   BOTTOM   | T | -->
     <!-- +---+------------+---+ -->
     <!-- @formatter:on -->
-    <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
+    <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
       <!-- Left Activity Panel -->
       @if (leftActivityPanel(); as panel) {
-        <ng-template sciSash [size]="panel.width">
+        <ng-template sciSash [size]="panel.width" key="left">
           <wb-activity-panel panel="left"/>
         </ng-template>
       }
       <ng-template sciSash>
-        <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
+        <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
           <!-- Main Grid -->
           <ng-template sciSash>
             <ng-container *ngTemplateOutlet="main_grid"/>
           </ng-template>
           <!-- Bottom Activity Panel -->
           @if (bottomActivityPanel(); as panel) {
-            <ng-template sciSash [size]="panel.height">
+            <ng-template sciSash [size]="panel.height" key="bottom">
               <wb-activity-panel panel="bottom"/>
             </ng-template>
           }
@@ -37,7 +37,7 @@
       </ng-template>
       <!-- Right Activity Panel -->
       @if (rightActivityPanel(); as panel) {
-        <ng-template sciSash [size]="panel.width">
+        <ng-template sciSash [size]="panel.width" key="right">
           <wb-activity-panel panel="right"/>
         </ng-template>
       }
@@ -54,12 +54,12 @@
     <!-- |       BOTTOM       | -->
     <!-- +--------------------+ -->
     <!-- @formatter:on -->
-    <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
+    <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
       <ng-template sciSash>
-        <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
+        <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
           <!-- Left Activity Panel -->
           @if (leftActivityPanel(); as panel) {
-            <ng-template sciSash [size]="panel.width">
+            <ng-template sciSash [size]="panel.width" key="left">
               <wb-activity-panel panel="left"/>
             </ng-template>
           }
@@ -69,7 +69,7 @@
           </ng-template>
           <!-- Right Activity Panel -->
           @if (rightActivityPanel(); as panel) {
-            <ng-template sciSash [size]="panel.width">
+            <ng-template sciSash [size]="panel.width" key="right">
               <wb-activity-panel panel="right"/>
             </ng-template>
           }
@@ -77,7 +77,7 @@
       </ng-template>
       <!-- Bottom Activity Panel -->
       @if (bottomActivityPanel(); as panel) {
-        <ng-template sciSash [size]="panel.height">
+        <ng-template sciSash [size]="panel.height" key="bottom">
           <wb-activity-panel panel="bottom"/>
         </ng-template>
       }
