@@ -1,97 +1,98 @@
-@if (activityLayout(); as activityLayout) {
-  @switch (panel()) {
-    @case ('left') {
-      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onLeftPanelSashEnd($event)">
-        @if (activityLayout.toolbars.leftTop.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="leftPanelSashSize()[0]" key="top">
-            <wb-grid [grid]="grids()[activityId]!"
-                     [attr.data-grid]="activityId"
-                     [gridDropZone]="{
-                       dropRegionSize: 100,
-                       dropPlaceholderSize: 100,
-                       dropZoneCssClass: 'e2e-grid-drop-zone',
-                       dropZoneAttributes: {'data-grid': activityId},
-                     }"
-            />
-          </ng-template>
-        }
+@let toolbars = workbenchLayout().activityLayout.toolbars;
+@let grids = workbenchLayout().grids;
 
-        @if (activityLayout.toolbars.leftBottom.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="leftPanelSashSize()[1]" key="bottom">
-            <wb-grid [grid]="grids()[activityId]!"
-                     [attr.data-grid]="activityId"
-                     [gridDropZone]="{
+@switch (panel()) {
+  @case ('left') {
+    <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onLeftPanelSashEnd($event)">
+      @if (toolbars.leftTop.activeActivityId; as activityId) {
+        <ng-template sciSash [size]="sashSizes()[0]" key="top">
+          <wb-grid [grid]="grids[activityId]!"
+                   [attr.data-grid]="activityId"
+                   [gridDropZone]="{
                        dropRegionSize: 100,
                        dropPlaceholderSize: 100,
                        dropZoneCssClass: 'e2e-grid-drop-zone',
                        dropZoneAttributes: {'data-grid': activityId},
                      }"
-            />
-          </ng-template>
-        }
-      </sci-sashbox>
-    }
-    @case ('right') {
-      <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onRightPanelSashEnd($event)">
-        @if (activityLayout.toolbars.rightTop.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="rightPanelSashSize()[0]" key="top">
-            <wb-grid [grid]="grids()[activityId]!"
-                     [attr.data-grid]="activityId"
-                     [gridDropZone]="{
-                       dropRegionSize: 100,
-                       dropPlaceholderSize: 100,
-                       dropZoneCssClass: 'e2e-grid-drop-zone',
-                       dropZoneAttributes: {'data-grid': activityId},
-                     }"
-            />
-          </ng-template>
-        }
+          />
+        </ng-template>
+      }
 
-        @if (activityLayout.toolbars.rightBottom.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="rightPanelSashSize()[1]" key="bottom">
-            <wb-grid [grid]="grids()[activityId]!"
-                     [attr.data-grid]="activityId"
-                     [gridDropZone]="{
+      @if (toolbars.leftBottom.activeActivityId; as activityId) {
+        <ng-template sciSash [size]="sashSizes()[1]" key="bottom">
+          <wb-grid [grid]="grids[activityId]!"
+                   [attr.data-grid]="activityId"
+                   [gridDropZone]="{
                        dropRegionSize: 100,
                        dropPlaceholderSize: 100,
                        dropZoneCssClass: 'e2e-grid-drop-zone',
                        dropZoneAttributes: {'data-grid': activityId},
                      }"
-            />
-          </ng-template>
-        }
-      </sci-sashbox>
-    }
-    @case ('bottom') {
-      <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onBottomPanelSashEnd($event)">
-        @if (activityLayout.toolbars.bottomLeft.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="bottomPanelSashSize()[0]" key="left">
-            <wb-grid [grid]="grids()[activityId]!"
-                     [attr.data-grid]="activityId"
-                     [gridDropZone]="{
+          />
+        </ng-template>
+      }
+    </sci-sashbox>
+  }
+  @case ('right') {
+    <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onRightPanelSashEnd($event)">
+      @if (toolbars.rightTop.activeActivityId; as activityId) {
+        <ng-template sciSash [size]="sashSizes()[0]" key="top">
+          <wb-grid [grid]="grids[activityId]!"
+                   [attr.data-grid]="activityId"
+                   [gridDropZone]="{
                        dropRegionSize: 100,
                        dropPlaceholderSize: 100,
                        dropZoneCssClass: 'e2e-grid-drop-zone',
                        dropZoneAttributes: {'data-grid': activityId},
                      }"
-            />
-          </ng-template>
-        }
+          />
+        </ng-template>
+      }
 
-        @if (activityLayout.toolbars.bottomRight.activeActivityId; as activityId) {
-          <ng-template sciSash [size]="bottomPanelSashSize()[1]" key="right">
-            <wb-grid [grid]="grids()[activityId]!"
-                     [attr.data-grid]="activityId"
-                     [gridDropZone]="{
+      @if (toolbars.rightBottom.activeActivityId; as activityId) {
+        <ng-template sciSash [size]="sashSizes()[1]" key="bottom">
+          <wb-grid [grid]="grids[activityId]!"
+                   [attr.data-grid]="activityId"
+                   [gridDropZone]="{
                        dropRegionSize: 100,
                        dropPlaceholderSize: 100,
                        dropZoneCssClass: 'e2e-grid-drop-zone',
                        dropZoneAttributes: {'data-grid': activityId},
                      }"
-            />
-          </ng-template>
-        }
-      </sci-sashbox>
-    }
+          />
+        </ng-template>
+      }
+    </sci-sashbox>
+  }
+  @case ('bottom') {
+    <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onBottomPanelSashEnd($event)">
+      @if (toolbars.bottomLeft.activeActivityId; as activityId) {
+        <ng-template sciSash [size]="sashSizes()[0]" key="left">
+          <wb-grid [grid]="grids[activityId]!"
+                   [attr.data-grid]="activityId"
+                   [gridDropZone]="{
+                       dropRegionSize: 100,
+                       dropPlaceholderSize: 100,
+                       dropZoneCssClass: 'e2e-grid-drop-zone',
+                       dropZoneAttributes: {'data-grid': activityId},
+                     }"
+          />
+        </ng-template>
+      }
+
+      @if (toolbars.bottomRight.activeActivityId; as activityId) {
+        <ng-template sciSash [size]="sashSizes()[1]" key="right">
+          <wb-grid [grid]="grids[activityId]!"
+                   [attr.data-grid]="activityId"
+                   [gridDropZone]="{
+                       dropRegionSize: 100,
+                       dropPlaceholderSize: 100,
+                       dropZoneCssClass: 'e2e-grid-drop-zone',
+                       dropZoneAttributes: {'data-grid': activityId},
+                     }"
+          />
+        </ng-template>
+      }
+    </sci-sashbox>
   }
 }

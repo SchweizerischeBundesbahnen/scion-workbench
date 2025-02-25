@@ -1,12 +1,10 @@
 :host {
-  //width: 32px;
-
-  user-select: none;
-  padding: .25em;
-
   display: flex;
   flex-direction: column;
   gap: .5em;
+  user-select: none;
+  padding: .25em;
+  background-color: var(--sci-workbench-activity-bar-background-color);
 
   &.left {
     border-right: 1px solid var(--sci-color-border);
@@ -20,17 +18,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    &[data-group="left-bottom"], &[data-group="right-bottom"] {
+      flex: auto;
+    }
   }
 
-  > div.separator {
+  > hr {
+    all: unset;
     height: 1px;
     width: 24px;
     align-self: center;
     background-color: var(--sci-color-border);
     border-radius: var(--sci-corner);
-  }
-
-  > div.filler {
-    flex: auto;
   }
 }

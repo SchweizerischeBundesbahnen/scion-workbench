@@ -15,15 +15,5 @@
     // For more information about stacking contexts, refer to
     // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context.
     z-index: auto;
-
-    --sci-sashbox-gap: 0;
-    --sci-sashbox-splitter-background-color: var(--sci-workbench-part-divider-color);
-    --sci-sashbox-splitter-background-color-hover: var(--sci-workbench-part-divider-color-hover);
-    --sci-sashbox-splitter-size: var(--sci-workbench-part-divider-size);
-    --sci-sashbox-splitter-size-hover: var(--sci-workbench-part-divider-size-hover);
-    --sci-sashbox-splitter-touch-target-size: var(--sci-workbench-part-divider-touch-target-size);
-    --sci-sashbox-splitter-border-radius: 0;
-    --sci-sashbox-splitter-opacity-active: var(--sci-workbench-part-divider-opacity-active);
-    --sci-sashbox-splitter-opacity-hover: var(--sci-workbench-part-divider-opacity-hover);
   }
 }

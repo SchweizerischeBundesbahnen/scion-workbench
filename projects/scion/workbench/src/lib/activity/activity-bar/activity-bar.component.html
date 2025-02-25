@@ -1,21 +1,24 @@
-@if (activityLayout(); as activityLayout) {
-  @if (side() === 'left') {
-    <wb-activity-group [group]="activityLayout.toolbars.leftTop"/>
-    <!-- separator-->
+@let activityLayout = workbenchService.layout().activityLayout;
+
+@switch (side()) {
+  @case ('left') {
+    <wb-activity-group [group]="activityLayout.toolbars.leftTop" data-group="left-top"/>
+
     @if (activityLayout.toolbars.leftTop.activities.length && activityLayout.toolbars.leftBottom.activities.length) {
-      <div class="separator"></div>
+      <hr/>
     }
-    <wb-activity-group [group]="activityLayout.toolbars.leftBottom"/>
-    <div class="filler"></div>
-    <wb-activity-group [group]="activityLayout.toolbars.bottomLeft"/>
-  } @else {
-    <wb-activity-group [group]="activityLayout.toolbars.rightTop"/>
-    <!-- separator-->
+
+    <wb-activity-group [group]="activityLayout.toolbars.leftBottom" data-group="left-bottom"/>
+    <wb-activity-group [group]="activityLayout.toolbars.bottomLeft" data-group="bottom-left"/>
+  }
+  @case ('right') {
+    <wb-activity-group [group]="activityLayout.toolbars.rightTop" data-group="right-top"/>
+
     @if (activityLayout.toolbars.rightTop.activities.length && activityLayout.toolbars.rightBottom.activities.length) {
-      <div class="separator"></div>
+      <hr>
     }
-    <wb-activity-group [group]="activityLayout.toolbars.rightBottom"/>
-    <div class="filler"></div>
-    <wb-activity-group [group]="activityLayout.toolbars.bottomRight"/>
+
+    <wb-activity-group [group]="activityLayout.toolbars.rightBottom" data-group="right-bottom"/>
+    <wb-activity-group [group]="activityLayout.toolbars.bottomRight" data-group="bottom-right"/>
   }
 }

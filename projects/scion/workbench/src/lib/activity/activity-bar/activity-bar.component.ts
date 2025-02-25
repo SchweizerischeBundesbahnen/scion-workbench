@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, HostBinding, inject, input} from '@angular/core';
-import {MActivityLayout} from '../workbench-activity.model';
-import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {Component, HostBinding, inject, input} from '@angular/core';
 import {ActivityGroupComponent} from './activity-group/activity-group.component';
+import {ɵWorkbenchService} from '../../ɵworkbench.service';
 
 @Component({
   selector: 'wb-activity-bar',
@@ -36,7 +35,5 @@ export class ActivityBarComponent {
     return this.side() === 'right';
   }
 
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-
-  protected readonly activityLayout = computed((): MActivityLayout | undefined => this._workbenchLayoutService.layout()?.activityLayout);
+  protected readonly workbenchService = inject(ɵWorkbenchService);
 }

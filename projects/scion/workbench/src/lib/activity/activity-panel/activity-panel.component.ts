@@ -32,11 +32,8 @@ export class ActivityPanelComponent {
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
-  protected readonly activityLayout = computed(() => this._workbenchLayoutService.layout()!.activityLayout);
-  protected readonly grids = computed(() => this._workbenchLayoutService.layout()!.grids);
-  protected readonly leftPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout().panels.left.ratio ?? 0.5));
-  protected readonly rightPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout().panels.right.ratio ?? 0.5));
-  protected readonly bottomPanelSashSize = computed((): [string, string] => calculateSashSizes(this.activityLayout().panels.bottom.ratio ?? 0.5));
+  protected readonly workbenchLayout = computed(() => this._workbenchLayoutService.layout()!);
+  protected readonly sashSizes = computed(() => calculateSashSizes(this.workbenchLayout().activityLayout.panels[this.panel()].ratio ?? .5));
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);
@@ -61,6 +58,9 @@ export class ActivityPanelComponent {
   }
 }
 
+/**
+ * Calculates the size of two sashes based on the given ratio.
+ */
 function calculateSashSizes(ratio: number): [string, string] {
   // Important: `SciSashboxComponent` requires proportions to be >= 1. For this reason we cannot simply calculate [ratio, 1 - ratio].
   if (ratio === 0) {
