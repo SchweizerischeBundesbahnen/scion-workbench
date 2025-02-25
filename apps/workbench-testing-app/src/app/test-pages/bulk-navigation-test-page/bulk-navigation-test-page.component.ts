@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -26,22 +26,22 @@ import {CssClassComponent} from '../../css-class/css-class.component';
 })
 export default class BulkNavigationTestPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _router = inject(WorkbenchRouter);
+
+  protected readonly form = this._formBuilder.group({
     viewCount: this._formBuilder.control(1, Validators.required),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined, Validators.required),
   });
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _router: WorkbenchRouter) {
-  }
-
-  public onNavigate(): void {
+  protected onNavigate(): void {
     const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
       void this.navigateToViewPage();
     }
   }
 
-  public async onNavigateAwait(): Promise<void> {
+  protected async onNavigateAwait(): Promise<void> {
     const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
       await this.navigateToViewPage();

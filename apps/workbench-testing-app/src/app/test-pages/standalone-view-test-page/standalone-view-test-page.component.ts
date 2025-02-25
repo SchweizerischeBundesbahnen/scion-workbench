@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench';
 
 @Component({
@@ -18,6 +18,5 @@ import {WorkbenchView} from '@scion/workbench';
 })
 export default class StandaloneViewTestPageComponent {
 
-  constructor(public view: WorkbenchView) {
-  }
+  protected readonly view = inject(WorkbenchView);
 }

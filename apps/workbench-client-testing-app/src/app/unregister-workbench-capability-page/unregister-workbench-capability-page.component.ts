@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ManifestService} from '@scion/microfrontend-platform';
 import {stringifyError} from '../common/stringify-error.util';
@@ -29,19 +29,21 @@ import {WorkbenchView} from '@scion/workbench-client';
 })
 export default class UnregisterWorkbenchCapabilityPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly form = this._formBuilder.group({
     id: this._formBuilder.control('', Validators.required),
   });
-  public unregisterError: string | undefined;
-  public unregistered: boolean | undefined;
 
-  constructor(view: WorkbenchView,
-              private _manifestService: ManifestService,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  protected unregisterError: string | undefined;
+  protected unregistered: boolean | undefined;
+
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 
-  public async onUnregister(): Promise<void> {
+  protected async onUnregister(): Promise<void> {
     this.unregisterError = undefined;
     this.unregistered = undefined;
 

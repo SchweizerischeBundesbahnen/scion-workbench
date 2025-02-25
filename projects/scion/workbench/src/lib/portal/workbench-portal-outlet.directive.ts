@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, Input, OnDestroy, TemplateRef, ViewContainerRef} from '@angular/core';
+import {DestroyRef, Directive, inject, Input, TemplateRef, ViewContainerRef} from '@angular/core';
 import {WbComponentPortal} from './wb-component-portal';
 
 /**
@@ -28,11 +28,15 @@ import {WbComponentPortal} from './wb-component-portal';
  * @see WbComponentPortal
  */
 @Directive({selector: 'ng-template[wbPortalOutlet]'})
-export class WorkbenchPortalOutletDirective implements OnDestroy {
+export class WorkbenchPortalOutletDirective {
+
+  private readonly _viewContainerRef = inject(ViewContainerRef);
 
   private _portal: WbComponentPortal | null = null;
 
-  constructor(private _viewContainerRef: ViewContainerRef, nullTemplate: TemplateRef<void>) {
+  constructor() {
+    const nullTemplate = inject(TemplateRef) as TemplateRef<void>;
+
     // To get notified before Angular destroys the portal, we insert a pseudo-element ahead of it.
     // This pseudo-element gets destroyed first, allowing us to detach the portal and prevent its destruction.
     this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => this.detach());
@@ -42,6 +46,8 @@ export class WorkbenchPortalOutletDirective implements OnDestroy {
     // the workbench with opened views would fail to destroy the workbench component entirely.
     // See tests `workbench-ummount.e2e-spec`.
     this._viewContainerRef.createEmbeddedView(nullTemplate);
+
+    inject(DestroyRef).onDestroy(() => this.detach());
   }
 
   @Input({alias: 'wbPortalOutlet', required: true})
@@ -59,9 +65,5 @@ export class WorkbenchPortalOutletDirective implements OnDestroy {
     if (this._portal?.isAttachedTo(this._viewContainerRef)) {
       this._portal.detach();
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.detach();
   }
 }

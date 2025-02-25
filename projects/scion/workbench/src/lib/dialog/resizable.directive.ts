@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Directive, ElementRef, EventEmitter, inject, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {createElement, getCssTranslation, setStyle} from '../common/dom.util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
@@ -31,7 +31,8 @@ const HANDLE_SIZE = 6;
 @Directive({selector: '[wbResizable]'})
 export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
 
-  private readonly _host: HTMLElement;
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
 
   private _handles: {
     top: ResizeHandle;
@@ -55,10 +56,6 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
 
   @Output('wbResizableResize')
   public wbResize = new EventEmitter<WbResizeEvent>();
-
-  constructor(host: ElementRef<HTMLElement>, private _workbenchLayoutService: WorkbenchLayoutService) {
-    this._host = host.nativeElement;
-  }
 
   public ngOnInit(): void {
     this.ensureHostElementPositioned();

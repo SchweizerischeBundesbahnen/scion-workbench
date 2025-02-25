@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding} from '@angular/core';
+import {Component, ElementRef, HostBinding, inject} from '@angular/core';
 import {WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -44,9 +44,15 @@ import {startWith} from 'rxjs/operators';
 })
 export default class MessageBoxPageComponent {
 
-  protected uuid = UUID.randomUUID();
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _preferredSizeService = inject(PreferredSizeService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected form = this._formBuilder.group({
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly messageBox = inject(WorkbenchMessageBox);
+  protected readonly uuid = UUID.randomUUID();
+
+  protected readonly form = this._formBuilder.group({
     height: this._formBuilder.control(''),
     width: this._formBuilder.control(''),
     positionAbsolute: this._formBuilder.control(false),
@@ -71,14 +77,9 @@ export default class MessageBoxPageComponent {
     return this.form.controls.positionAbsolute.value ? 'absolute' : 'static';
   }
 
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _preferredSizeService: PreferredSizeService,
-              private _formBuilder: NonNullableFormBuilder,
-              protected route: ActivatedRoute,
-              protected messageBox: WorkbenchMessageBox) {
+  constructor() {
     this.installPreferredSizeReporter();
-
-    messageBox.signalReady();
+    this.messageBox.signalReady();
   }
 
   /**
@@ -91,7 +92,7 @@ export default class MessageBoxPageComponent {
         takeUntilDestroyed(),
       )
       .subscribe(reportSize => {
-        this._preferredSizeService.fromDimension(reportSize ? this._host.nativeElement : undefined);
+        this._preferredSizeService.fromDimension(reportSize ? this._host : undefined);
       });
   }
 }

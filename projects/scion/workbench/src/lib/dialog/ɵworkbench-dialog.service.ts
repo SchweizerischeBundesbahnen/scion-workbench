@@ -26,7 +26,7 @@ import {UUID} from '@scion/toolkit/uuid';
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchDialogService implements WorkbenchDialogService {
 
-  private readonly _document = inject<Document>(DOCUMENT);
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _dialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _zone = inject(NgZone);

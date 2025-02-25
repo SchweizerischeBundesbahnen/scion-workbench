@@ -16,7 +16,7 @@ import {Router} from '@angular/router';
 import {MenuService} from '../menu/menu.service';
 import {Logger, LogLevel, WorkbenchPerspective, WorkbenchRouter, WorkbenchService} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
 import {SettingsService} from '../settings.service';
@@ -35,21 +35,19 @@ import {sortPerspectives} from './sort-perspectives.util';
 })
 export class HeaderComponent {
 
-  protected readonly PerspectiveData = PerspectiveData;
-  protected readonly lightThemeActiveFormControl = new FormControl<boolean>(true);
-  protected readonly perspectives: Signal<WorkbenchPerspective[]>;
+  private readonly _router = inject(Router);
+  private readonly _wbRouter = inject(WorkbenchRouter);
+  private readonly _menuService = inject(MenuService);
+  private readonly _settingsService = inject(SettingsService);
+  private readonly _logger = inject(Logger);
 
-  constructor(private _router: Router,
-              private _wbRouter: WorkbenchRouter,
-              private _menuService: MenuService,
-              private _settingsService: SettingsService,
-              private _logger: Logger,
-              protected workbenchService: WorkbenchService) {
+  protected readonly workbenchService = inject(WorkbenchService);
+  protected readonly PerspectiveData = PerspectiveData;
+  protected readonly lightThemeActiveFormControl = inject(NonNullableFormBuilder).control(true);
+  protected readonly perspectives = this.computePerspectives();
+
+  constructor() {
     this.installThemeSwitcher();
-    this.perspectives = computed(() => {
-      const perspectives = this.workbenchService.perspectives();
-      return untracked(() => sortPerspectives(perspectives));
-    });
   }
 
   protected async onTogglePerspective(perspective: WorkbenchPerspective): Promise<void> {
@@ -70,6 +68,13 @@ export class HeaderComponent {
       new MenuItemSeparator(),
       ...this.contributeSettingsMenuItems(),
     ]);
+  }
+
+  private computePerspectives(): Signal<WorkbenchPerspective[]> {
+    return computed(() => {
+      const perspectives = this.workbenchService.perspectives();
+      return untracked(() => sortPerspectives(perspectives));
+    });
   }
 
   private contributePerspectiveMenuItems(): MenuItem[] {

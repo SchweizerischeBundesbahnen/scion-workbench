@@ -9,10 +9,9 @@
  */
 
 import {animate, AnimationMetadata, style, transition, trigger} from '@angular/animations';
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {NotificationService} from './notification.service';
 import {ɵNotification} from './ɵnotification';
-import {Observable} from 'rxjs';
 import {NotificationComponent} from './notification.component';
 import {AsyncPipe, NgClass} from '@angular/common';
 import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
@@ -35,13 +34,11 @@ import {NotificationCssClassesPipe} from './notification-css-classes.pipe';
 })
 export class NotificationListComponent {
 
-  public notifications$: Observable<ɵNotification[]>;
+  private readonly _notificationService = inject(NotificationService);
 
-  constructor(private _notificationService: NotificationService) {
-    this.notifications$ = this._notificationService.notifications$;
-  }
+  protected readonly notifications$ = this._notificationService.notifications$;
 
-  public onNotificationClose(notification: ɵNotification): void {
+  protected onNotificationClose(notification: ɵNotification): void {
     this._notificationService.closeNotification(notification);
   }
 

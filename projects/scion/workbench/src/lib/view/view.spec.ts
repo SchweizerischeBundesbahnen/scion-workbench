@@ -1161,7 +1161,10 @@ describe('View', () => {
       template: 'View',
     })
     class SpecViewComponent {
-      constructor(view: WorkbenchView) {
+
+      constructor() {
+        const view = inject(WorkbenchView);
+
         view.title = 'Title';
         view.heading = 'Heading';
         view.cssClass = ['class-1', 'class-2'];
@@ -1207,8 +1210,7 @@ describe('View', () => {
     })
     class SpecViewComponent implements OnInit {
 
-      constructor(private _view: WorkbenchView) {
-      }
+      private readonly _view = inject(WorkbenchView);
 
       public ngOnInit(): void {
         this._view.title = 'Title';
@@ -1255,7 +1257,10 @@ describe('View', () => {
       template: 'View',
     })
     class SpecViewComponent {
-      constructor(view: WorkbenchView) {
+
+      constructor() {
+        const view = inject(WorkbenchView);
+
         view.title = 'Title';
         view.heading = 'Heading';
         view.cssClass = ['class-1', 'class-2'];
@@ -1305,8 +1310,7 @@ describe('View', () => {
     })
     class SpecViewComponent implements OnInit {
 
-      constructor(private _view: WorkbenchView) {
-      }
+      private readonly _view = inject(WorkbenchView);
 
       public ngOnInit(): void {
         this._view.title = 'Title';
@@ -2336,10 +2340,12 @@ describe('View', () => {
       @Component({selector: 'spec-view', template: 'View'})
       class SpecViewComponent {
 
+        public readonly view = inject(WorkbenchView);
+
         public navigationDataCaptor = new Array<NavigationData | undefined>();
 
-        constructor(public view: WorkbenchView) {
-          effect(() => this.navigationDataCaptor.push(view.navigation()?.data));
+        constructor() {
+          effect(() => this.navigationDataCaptor.push(this.view.navigation()?.data));
         }
       }
 
@@ -2383,10 +2389,13 @@ describe('View', () => {
       @Component({selector: 'spec-view', template: 'View'})
       class SpecViewComponent {
 
+        public readonly view = inject(WorkbenchView);
+
         public navigationStateCaptor = new Array<NavigationState | undefined>();
 
-        constructor(public view: WorkbenchView) {
-          effect(() => this.navigationStateCaptor.push(view.navigation()?.state));
+        constructor() {
+
+          effect(() => this.navigationStateCaptor.push(this.view.navigation()?.state));
         }
       }
 
@@ -2432,7 +2441,9 @@ describe('View', () => {
       @Component({selector: 'spec-view-1', template: '{{view.title()}}'})
       class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
-        constructor(public view: WorkbenchView) {
+        public readonly view = inject(WorkbenchView);
+
+        constructor() {
           this.view.title = 'SpecViewComponent1.construct';
           log.push('SpecViewComponent1.construct');
         }
@@ -2446,7 +2457,9 @@ describe('View', () => {
       @Component({selector: 'spec-view-2', template: '{{view.title()}}'})
       class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
-        constructor(public view: WorkbenchView) {
+        public readonly view = inject(WorkbenchView);
+
+        constructor() {
           this.view.title = 'SpecViewComponent2.construct';
           log.push('SpecViewComponent2.construct');
         }
@@ -2491,7 +2504,9 @@ describe('View', () => {
       @Component({selector: 'spec-view-1', template: '{{view.title()}}'})
       class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
-        constructor(public view: WorkbenchView) {
+        public readonly view = inject(WorkbenchView);
+
+        constructor() {
           this.view.title = 'SpecViewComponent1.construct';
           log.push('SpecViewComponent1.construct');
         }
@@ -2505,7 +2520,9 @@ describe('View', () => {
       @Component({selector: 'spec-view-2', template: '{{view.title()}}'})
       class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
 
-        constructor(public view: WorkbenchView) {
+        public readonly view = inject(WorkbenchView);
+
+        constructor() {
           this.view.title = 'SpecViewComponent2.construct';
           log.push('SpecViewComponent2.construct');
         }

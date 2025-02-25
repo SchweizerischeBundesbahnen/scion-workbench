@@ -12,7 +12,7 @@ import './microfrontend-platform.config'; // DO NOT REMOVE to augment `Microfron
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
-import {APP_IDENTITY, IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
+import {IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
@@ -115,8 +115,7 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `MicrofrontendPlatformConfigLoader` DI token. */)
 class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformConfigLoader {
 
-  constructor(private _workbenchConfig: WorkbenchConfig) {
-  }
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
 
   public async load(): Promise<MicrofrontendPlatformConfig> {
     return this._workbenchConfig.microfrontendPlatform! as MicrofrontendPlatformConfig;
@@ -128,7 +127,6 @@ class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformCo
  */
 function provideMicrofrontendPlatformBeans(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    {provide: APP_IDENTITY, useFactory: () => Beans.get(APP_IDENTITY)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, ElementRef, inject, Injector, Input, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchMessageBox, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -38,7 +38,18 @@ import {setStyle} from '../../common/dom.util';
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
+export class MicrofrontendHostMessageBoxComponent implements OnInit {
+
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _dialog = inject(ɵWorkbenchDialog);
+  private readonly _injector = inject(Injector);
+  private readonly _router = inject(Router);
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
+
+  protected readonly outletName = MESSAGE_BOX_ID_PREFIX.concat(UUID.randomUUID());
+
+  protected outletInjector!: Injector;
 
   @Input({required: true})
   public capability!: WorkbenchMessageBoxCapability;
@@ -46,17 +57,8 @@ export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
   @Input({required: true})
   public params!: Map<string, unknown>;
 
-  protected outletName: string;
-  protected outletInjector!: Injector;
-
-  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
-  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
-
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _dialog: ɵWorkbenchDialog,
-              private _injector: Injector,
-              private _router: Router) {
-    this.outletName = MESSAGE_BOX_ID_PREFIX.concat(UUID.randomUUID());
+  constructor() {
+    inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
   }
 
   public ngOnInit(): void {
@@ -96,10 +98,6 @@ export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
       'min-height': this.capability.properties.size?.minHeight ?? null,
       'max-height': this.capability.properties.size?.maxHeight ?? null,
     });
-  }
-
-  public ngOnDestroy(): void {
-    void this.navigate(null); // Remove the outlet from the URL
   }
 }
 

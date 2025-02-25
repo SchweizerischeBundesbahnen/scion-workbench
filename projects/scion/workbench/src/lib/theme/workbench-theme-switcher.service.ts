@@ -27,15 +27,15 @@ const THEME_STORAGE_KEY = 'scion.workbench.theme';
 @Injectable({providedIn: 'root'})
 export class WorkbenchThemeSwitcher {
 
-  private readonly _documentRoot = inject<Document>(DOCUMENT).documentElement;
+  private readonly _workbenchStorage = inject(WorkbenchStorage);
+  private readonly _documentRoot = inject(DOCUMENT).documentElement;
 
   /**
    * Provides the current workbench theme.
    */
-  public readonly theme: Signal<WorkbenchTheme | null>;
+  public readonly theme = this.detectTheme();
 
-  constructor(private _workbenchStorage: WorkbenchStorage) {
-    this.theme = this.detectTheme();
+  constructor() {
     void this.activateThemeFromStorage();
   }
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
+import {inject, Injectable, Injector, NgZone, OnDestroy} from '@angular/core';
 import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, MicrofrontendPlatform, MicrofrontendPlatformConfig, MicrofrontendPlatformHost, ObservableDecorator} from '@scion/microfrontend-platform';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
@@ -36,27 +36,26 @@ import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspectiv
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
 
-  public config: MicrofrontendPlatformConfig | undefined;
+  private readonly _microfrontendPlatformConfigLoader = inject(MicrofrontendPlatformConfigLoader);
+  private readonly _hostManifestInterceptor = inject(WorkbenchHostManifestInterceptor);
+  private readonly _ngZoneObservableDecorator = inject(NgZoneObservableDecorator);
+  private readonly _perspectiveIntentHandler = inject(MicrofrontendPerspectiveIntentHandler);
+  private readonly _viewIntentHandler = inject(MicrofrontendViewIntentHandler);
+  private readonly _popupIntentHandler = inject(MicrofrontendPopupIntentHandler);
+  private readonly _dialogIntentHandler = inject(MicrofrontendDialogIntentHandler);
+  private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
+  private readonly _messageBoxLegacyIntentTranslator = inject(MicrofrontendMessageBoxLegacyIntentTranslator);
+  private readonly _viewCapabilityValidator = inject(MicrofrontendViewCapabilityValidator);
+  private readonly _perspectiveCapabilityValidator = inject(MicrofrontendPerspectiveCapabilityValidator);
+  private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
+  private readonly _dialogCapabilityValidator = inject(MicrofrontendDialogCapabilityValidator);
+  private readonly _messageBoxCapabilityValidator = inject(MicrofrontendMessageBoxCapabilityValidator);
+  private readonly _stableCapabilityIdAssigner = inject(StableCapabilityIdAssigner);
+  private readonly _injector = inject(Injector);
+  private readonly _zone = inject(NgZone);
+  private readonly _logger = inject(Logger);
 
-  constructor(private _microfrontendPlatformConfigLoader: MicrofrontendPlatformConfigLoader,
-              private _hostManifestInterceptor: WorkbenchHostManifestInterceptor,
-              private _ngZoneObservableDecorator: NgZoneObservableDecorator,
-              private _perspectiveIntentHandler: MicrofrontendPerspectiveIntentHandler,
-              private _viewIntentHandler: MicrofrontendViewIntentHandler,
-              private _popupIntentHandler: MicrofrontendPopupIntentHandler,
-              private _dialogIntentHandler: MicrofrontendDialogIntentHandler,
-              private _messageBoxIntentHandler: MicrofrontendMessageBoxIntentHandler,
-              private _messageBoxLegacyIntentTranslator: MicrofrontendMessageBoxLegacyIntentTranslator,
-              private _viewCapabilityValidator: MicrofrontendViewCapabilityValidator,
-              private _perspectiveCapabilityValidator: MicrofrontendPerspectiveCapabilityValidator,
-              private _popupCapabilityValidator: MicrofrontendPopupCapabilityValidator,
-              private _dialogCapabilityValidator: MicrofrontendDialogCapabilityValidator,
-              private _messageBoxCapabilityValidator: MicrofrontendMessageBoxCapabilityValidator,
-              private _stableCapabilityIdAssigner: StableCapabilityIdAssigner,
-              private _injector: Injector,
-              private _zone: NgZone,
-              private _logger: Logger) {
-  }
+  public config: MicrofrontendPlatformConfig | undefined;
 
   public async init(): Promise<void> {
     this._logger.debug('Starting SCION Microfrontend Platform...', LoggerNames.LIFECYCLE);

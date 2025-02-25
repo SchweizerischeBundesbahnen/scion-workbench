@@ -15,7 +15,6 @@ import {WorkbenchDialogCapability, ɵDIALOG_CONTEXT, ɵDialogContext, ɵWorkbenc
 import {NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 import {Microfrontends} from '../common/microfrontend.util';
@@ -36,6 +35,17 @@ import {Microfrontends} from '../common/microfrontend.util';
 })
 export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
 
+  private readonly _outletRouter = inject(OutletRouter);
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _messageClient = inject(MessageClient);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _injector = inject(Injector);
+  private readonly _logger = inject(Logger);
+
+  protected readonly dialog = inject(ɵWorkbenchDialog);
+  /** Splash to display until the microfrontend signals readiness. */
+  protected splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+
   @Input({required: true})
   public capability!: WorkbenchDialogCapability;
 
@@ -46,25 +56,13 @@ export class MicrofrontendDialogComponent implements OnInit, OnDestroy {
    * Indicates if a workbench drag operation is in progress, such as when dragging a view or moving a sash.
    */
   @HostBinding('class.workbench-drag')
-  public isWorkbenchDrag = false;
+  protected isWorkbenchDrag = false;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
-  /**
-   * Splash to display until the microfrontend signals readiness.
-   */
-  protected splash: ComponentType<unknown>;
-
-  constructor(protected dialog: ɵWorkbenchDialog,
-              private _outletRouter: OutletRouter,
-              private _manifestService: ManifestService,
-              private _messageClient: MessageClient,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _injector: Injector,
-              private _logger: Logger) {
+  constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendDialogComponent.', LoggerNames.MICROFRONTEND);
-    this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
     this.installDialogTitleListener();
     this.installDialogCloseListener();
     this.installWorkbenchDragDetector();

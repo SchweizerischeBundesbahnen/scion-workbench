@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/tabbar';
 import {WorkbenchView} from '@scion/workbench-client';
-import {PublishMesagePageComponent} from './publish-message-page/publish-message-page.component';
+import {PublishMessagePageComponent} from './publish-message-page/publish-message-page.component';
 import {PublishIntentPageComponent} from './publish-intent-page/publish-intent-page.component';
 
 @Component({
@@ -21,13 +21,13 @@ import {PublishIntentPageComponent} from './publish-intent-page/publish-intent-p
   imports: [
     SciTabDirective,
     SciTabbarComponent,
-    PublishMesagePageComponent,
+    PublishMessagePageComponent,
     PublishIntentPageComponent,
   ],
 })
 export default class MessagingPageComponent {
 
-  constructor(view: WorkbenchView) {
-    view.signalReady();
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 }

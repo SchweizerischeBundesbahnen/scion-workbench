@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Notification} from '@scion/workbench';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -33,16 +33,19 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class NotificationPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly notification = inject(Notification) as Notification<Map<string, unknown>>;
+  protected readonly durationList = `duration-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     severity: this._formBuilder.control<'info' | 'warn' | 'error' | undefined>(undefined),
     duration: this._formBuilder.control<'short' | 'medium' | 'long' | 'infinite' | string | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
-  public durationList = `duration-list-${UUID.randomUUID()}`;
-
-  constructor(public notification: Notification<Map<string, any>>, private _formBuilder: NonNullableFormBuilder) {
+  constructor() {
     this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(title => {

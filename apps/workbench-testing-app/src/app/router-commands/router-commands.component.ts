@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef} from '@angular/core';
-import {PRIMARY_OUTLET, Router, Routes, UrlSegmentGroup} from '@angular/router';
+import {Component, forwardRef, inject} from '@angular/core';
+import {PRIMARY_OUTLET, Router, UrlSegmentGroup} from '@angular/router';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {Commands} from '@scion/workbench';
@@ -29,16 +29,16 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export class RouterCommandsComponent implements ControlValueAccessor {
 
+  private readonly _router = inject(Router);
+
+  protected readonly routes = this._router.config;
+  protected readonly routeList = `route-list-${UUID.randomUUID()}`;
+  protected readonly formControl = inject(NonNullableFormBuilder).control<string>('');
+
   private _cvaChangeFn: (commands: Commands) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
-  protected routes: Routes;
-  protected routeList = `route-list-${UUID.randomUUID()}`;
-  protected formControl = this._formBuilder.control<string>('');
-
-  constructor(private _router: Router, private _formBuilder: NonNullableFormBuilder) {
-    this.routes = this._router.config;
-
+  constructor() {
     this.formControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

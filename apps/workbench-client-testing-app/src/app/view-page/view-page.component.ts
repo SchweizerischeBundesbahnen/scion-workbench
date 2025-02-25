@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {CanClose, CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
@@ -49,7 +49,17 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 })
 export default class ViewPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _router = inject(WorkbenchRouter);
+  private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
+
+  protected readonly view = inject(WorkbenchView);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly location = inject(Location);
+  protected readonly appInstanceId = inject(APP_INSTANCE_ID);
+  protected readonly uuid = UUID.randomUUID();
+
+  protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     heading: this._formBuilder.control(''),
     closable: this._formBuilder.control(true),
@@ -62,15 +72,8 @@ export default class ViewPageComponent {
       navigatePerParam: this._formBuilder.control(false),
     }),
   });
-  public uuid = UUID.randomUUID();
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _router: WorkbenchRouter,
-              private _messageBoxService: WorkbenchMessageBoxService,
-              public view: WorkbenchView,
-              public route: ActivatedRoute,
-              public location: Location,
-              @Inject(APP_INSTANCE_ID) public appInstanceId: string) {
+  constructor() {
     this.view.setTitle(this.form.controls.title.valueChanges.pipe(this.logCompletion('TitleObservableComplete')));
     this.view.setHeading(this.form.controls.heading.valueChanges.pipe(this.logCompletion('HeadingObservableComplete')));
     this.view.markDirty(NEVER.pipe(this.logCompletion('DirtyObservableComplete')));
@@ -106,7 +109,7 @@ export default class ViewPageComponent {
     return action === 'yes';
   }
 
-  public onMarkDirty(dirty?: boolean): void {
+  protected onMarkDirty(dirty?: boolean): void {
     if (dirty === undefined) {
       this.view.markDirty();
     }
@@ -115,7 +118,7 @@ export default class ViewPageComponent {
     }
   }
 
-  public onSelfNavigate(): void {
+  protected onSelfNavigate(): void {
     const selfNavigationGroup = this.form.controls.selfNavigation;
     const params = parseTypedObject(SciKeyValueFieldComponent.toDictionary(selfNavigationGroup.controls.params, false))!;
     const paramsHandling = selfNavigationGroup.controls.paramsHandling.value;

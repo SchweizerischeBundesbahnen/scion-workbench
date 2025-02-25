@@ -93,7 +93,7 @@ export class WorkbenchViewMenuItemDirective {
   }
 
   private registerMenuItem(): void {
-    const template = inject(TemplateRef<void>);
+    const template = inject(TemplateRef) as TemplateRef<void>;
     const workbenchService = inject(WorkbenchService);
     const context = {
       view: inject(WorkbenchView, {optional: true}),

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
 import {TodoService} from '../todo.service';
 
@@ -21,7 +21,11 @@ import {TodoService} from '../todo.service';
 })
 export default class TodosComponent {
 
-  constructor(view: WorkbenchView, protected todoService: TodoService) {
+  protected readonly todoService = inject(TodoService);
+
+  constructor() {
+    const view = inject(WorkbenchView);
+
     view.title = 'Todos';
     view.heading = 'What to do today?';
     view.closable = false;

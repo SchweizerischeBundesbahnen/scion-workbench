@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {Notification} from './notification';
 
 /**
@@ -11,9 +11,5 @@ import {Notification} from './notification';
 })
 export class TextNotificationComponent {
 
-  public text: string | undefined;
-
-  constructor(notification: Notification) {
-    this.text = notification.input as string | undefined;
-  }
+  public text = inject(Notification).input as string | undefined;
 }

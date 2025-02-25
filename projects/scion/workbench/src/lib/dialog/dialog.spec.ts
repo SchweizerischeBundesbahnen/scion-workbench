@@ -162,7 +162,10 @@ describe('Dialog', () => {
       template: `Testee`,
     })
     class SpecDialogComponent {
-      constructor(public dialog: WorkbenchDialog) {
+
+      constructor() {
+        const dialog = inject(WorkbenchDialog);
+
         dialog.size.width = '200px';
         dialog.size.minWidth = '150px';
         dialog.size.maxWidth = '250px';

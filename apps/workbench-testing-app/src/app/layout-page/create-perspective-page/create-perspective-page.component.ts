@@ -39,7 +39,11 @@ import {toSignal} from '@angular/core/rxjs-interop';
 })
 export default class CreatePerspectivePageComponent {
 
-  protected form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _settingsService = inject(SettingsService);
+  private readonly _workbenchService = inject(WorkbenchService);
+
+  protected readonly form = this._formBuilder.group({
     id: this._formBuilder.control('', Validators.required),
     transient: this._formBuilder.control<boolean | undefined>(undefined),
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
@@ -49,16 +53,10 @@ export default class CreatePerspectivePageComponent {
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
   });
 
-  protected registerError: string | false | undefined;
-  protected partProposals: Signal<string[]>;
-  protected viewProposals: Signal<string[]>;
+  protected readonly partProposals = this.computePartProposals();
+  protected readonly viewProposals = this.computeViewProposals();
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _settingsService: SettingsService,
-              private _workbenchService: WorkbenchService) {
-    this.partProposals = this.computePartProposals();
-    this.viewProposals = this.computeViewProposals();
-  }
+  protected registerError: string | false | undefined;
 
   private computePartProposals(): Signal<string[]> {
     const partsFromUI = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
