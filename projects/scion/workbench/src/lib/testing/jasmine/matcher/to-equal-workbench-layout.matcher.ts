@@ -311,6 +311,13 @@ export type MView = Partial<Omit<_MView, 'navigation'> & {navigation?: Partial<_
 export class MTreeNode extends _MTreeNode {
   constructor(treeNode: Partial<Omit<_MTreeNode, 'type'>>) {
     super(treeNode as _MTreeNode);
+    // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
+    // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
+    Object.keys(this).forEach(key => {
+      if (this[key as keyof this] === undefined) {
+        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
   }
 }
 
@@ -320,6 +327,13 @@ export class MTreeNode extends _MTreeNode {
 export class MPart extends _MPart {
   constructor(part: Partial<Omit<_MPart, 'type' | 'views'> & {views: Array<Partial<MView>>}>) {
     super(part as _MPart);
+    // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
+    // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
+    Object.keys(this).forEach(key => {
+      if (this[key as keyof this] === undefined) {
+        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
   }
 }
 

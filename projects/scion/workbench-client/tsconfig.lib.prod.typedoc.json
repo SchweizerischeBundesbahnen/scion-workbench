@@ -1,5 +1,8 @@
 {
   "extends": "./tsconfig.lib.prod.json",
+  "compilerOptions": {
+    "inlineSourceMap": true // Required by typedoc plugin typedoc-plugin-extras
+  },
   "typedocOptions": {
     "name": "SCION Workbench Client",
     "entryPoints": [
