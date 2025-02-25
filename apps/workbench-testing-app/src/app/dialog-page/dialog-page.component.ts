@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Input} from '@angular/core';
+import {Component, HostBinding, inject, Input} from '@angular/core';
 import {WorkbenchDialog, WorkbenchDialogActionDirective} from '@scion/workbench';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
@@ -32,8 +32,12 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 })
 export class DialogPageComponent {
 
-  public uuid = UUID.randomUUID();
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly dialog = inject(WorkbenchDialog) as WorkbenchDialog<string>;
+  protected readonly uuid = UUID.randomUUID();
+
+  protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     dialogSize: new FormGroup({
       minHeight: this._formBuilder.control(''),
@@ -71,11 +75,11 @@ export class DialogPageComponent {
     return this.form.controls.contentSize.controls.width.value || undefined;
   }
 
-  constructor(public dialog: WorkbenchDialog<string>, private _formBuilder: NonNullableFormBuilder) {
+  constructor() {
     this.installPropertyUpdater();
   }
 
-  public onClose(): void {
+  protected onClose(): void {
     const result = this.form.controls.closeWithError.value ? new Error(this.form.controls.result.value) : this.form.controls.result.value;
     this.dialog.close(result);
   }

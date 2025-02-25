@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Injector, OnDestroy, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, inject, Injector, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchPopup, ɵPopupContext} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -36,17 +36,19 @@ import {Objects} from '../../common/objects.util';
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostPopupComponent implements OnDestroy {
+export class MicrofrontendHostPopupComponent {
 
-  public readonly outletName: string;
-  public readonly outletInjector: Injector;
-
+  private readonly _injector = inject(Injector);
+  private readonly _router = inject(Router);
   /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
-  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
+  private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  constructor(popup: ɵPopup<ɵPopupContext>,
-              private _injector: Injector,
-              private _router: Router) {
+  protected readonly outletName: string;
+  protected readonly outletInjector: Injector;
+
+  constructor() {
+    const popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
+
     const popupContext = popup.input!;
     const capability = popupContext.capability;
     const path = Defined.orElseThrow(capability.properties.path, () => Error(`[PopupProviderError] Missing required path for popup capability [application="${capability.metadata!.appSymbolicName}", capability=${Objects.toMatrixNotation(capability.qualifier)}]`));
@@ -63,6 +65,8 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
         popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
     });
+
+    inject(DestroyRef).onDestroy(() => void this.navigate(null, {outletName: this.outletName})); // Remove the outlet from the URL
   }
 
   /**
@@ -74,10 +78,6 @@ export class MicrofrontendHostPopupComponent implements OnDestroy {
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);
     const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
     return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
-  }
-
-  public ngOnDestroy(): void {
-    void this.navigate(null, {outletName: this.outletName}); // Remove the outlet from the URL
   }
 }
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, HostListener, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, HostListener, inject, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {asapScheduler, EMPTY, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
@@ -35,20 +35,18 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export class NotificationComponent implements OnChanges {
 
-  private _closeTimerChange$ = new Subject<void>();
+  private readonly _injector = inject(Injector);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _cd = inject(ChangeDetectorRef);
+  private readonly _closeTimerChange$ = new Subject<void>();
 
-  public portal: ComponentPortal<any> | undefined;
+  protected portal: ComponentPortal<unknown> | undefined;
 
   @Input({required: true})
   public notification!: ɵNotification;
 
   @Output()
   public closeNotification = new EventEmitter<void>();
-
-  constructor(private _injector: Injector,
-              private _destroyRef: DestroyRef,
-              private _cd: ChangeDetectorRef) {
-  }
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.installAutoCloseTimer();
@@ -61,13 +59,13 @@ export class NotificationComponent implements OnChanges {
   }
 
   @HostListener('mousedown', ['$event'])
-  public onMousedown(event: MouseEvent): void {
+  protected onMousedown(event: MouseEvent): void {
     if (event.buttons === AUXILARY_MOUSE_BUTTON) {
       this.closeNotification.emit();
     }
   }
 
-  public onClose(): void {
+  protected onClose(): void {
     this.closeNotification.emit();
   }
 

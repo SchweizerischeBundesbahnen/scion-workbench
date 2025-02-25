@@ -181,8 +181,12 @@ In this step, we will create the TODO list and place it to the left of the main 
           ],
         })
     [+] export default class TodosComponent {
-    
-    [+]   constructor(view: WorkbenchView, protected todoService: TodoService) {
+
+    [+]   protected todoService = inject(TodoService);
+
+    [+]   constructor() {
+    [+]     const view = inject(WorkbenchView);
+
     [+]     view.title = 'Todos';
     [+]     view.heading = 'What to do today?';
     [+]     view.closable = false;
@@ -292,14 +296,16 @@ In this step, we will create a component to open a TODO in a view in the main ar
         })
     [+] export default class TodoComponent {
         
+    [+]   public id = input.required<string>();
+
     [+]   private todoService = inject(TodoService);
     [+]   private locale = inject(LOCALE_ID);
    
-    [+]   public id = input.required<string>();
-   
     [+]   protected todo = computed(() => this.todoService.getTodo(this.id()));
 
-    [+]   constructor(view: WorkbenchView) {
+    [+]   constructor() {
+    [+]     const view = inject(WorkbenchView);
+
     [+]     effect(() => {
     [+]       view.title = this.todo().task;
     [+]       view.heading = `Due by ${formatDate(this.todo().dueDate, 'short', this.locale)}`;

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {IntentClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchNotificationConfig} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -25,7 +25,11 @@ import {NotificationService} from '../../notification/notification.service';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 export class MicrofrontendNotificationIntentHandler {
 
-  constructor(intentClient: IntentClient, notificationService: NotificationService, logger: Logger) {
+  constructor() {
+    const intentClient = inject(IntentClient);
+    const notificationService = inject(NotificationService);
+    const logger = inject(Logger);
+
     intentClient.onIntent<WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {}}, ({body: config}) => {
       logger.debug(() => 'Showing notification', LoggerNames.MICROFRONTEND, config);
       notificationService.notify({

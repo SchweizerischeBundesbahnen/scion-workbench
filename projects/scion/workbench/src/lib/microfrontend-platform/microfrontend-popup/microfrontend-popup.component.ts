@@ -8,15 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
 import {ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
-import {WorkbenchPopupCapability, ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
+import {ɵPOPUP_CONTEXT, ɵPopupContext, ɵWorkbenchCommands, ɵWorkbenchPopupMessageHeaders} from '@scion/workbench-client';
 import {ɵPopup} from '../../popup/popup.config';
 import {NgClass, NgComponentOutlet} from '@angular/common';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {Microfrontends} from '../common/microfrontend.util';
 
@@ -32,40 +31,35 @@ import {Microfrontends} from '../common/microfrontend.util';
   imports: [NgClass, NgComponentOutlet],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
-export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
+export class MicrofrontendPopupComponent implements OnInit {
 
-  private _popupContext: ɵPopupContext;
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _outletRouter = inject(OutletRouter);
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _messageClient = inject(MessageClient);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _injector = inject(Injector);
+  private readonly _logger = inject(Logger);
 
-  public popupCapability: WorkbenchPopupCapability;
+  protected readonly popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
+  /** Splash to display until the microfrontend signals readiness. */
+  protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+  protected readonly popupCapability = this.popupContext.capability;
 
   /**
    * Indicates whether a workbench drag operation is in progress, such as when dragging a view or moving a sash.
    */
   @HostBinding('class.workbench-drag')
-  public isWorkbenchDrag = false;
-
-  /**
-   * Splash to display until the microfrontend signals readiness.
-   */
-  protected splash: ComponentType<unknown>;
+  protected isWorkbenchDrag = false;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
-  constructor(public popup: ɵPopup<ɵPopupContext>,
-              private _host: ElementRef<HTMLElement>,
-              private _outletRouter: OutletRouter,
-              private _manifestService: ManifestService,
-              private _messageClient: MessageClient,
-              private _destroyRef: DestroyRef,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _injector: Injector,
-              private _logger: Logger) {
-    this._popupContext = this.popup.input!;
-    this.popupCapability = this._popupContext.capability;
+  constructor() {
     this.installWorkbenchDragDetector();
     this._logger.debug(() => 'Constructing MicrofrontendPopupComponent.', LoggerNames.MICROFRONTEND);
-    this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.popup.id}));
   }
 
   public ngOnInit(): void {
@@ -82,33 +76,33 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
       .subscribe(result => this.popup.setResult(result.body));
 
     // Make the popup context available to embedded content.
-    this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this._popupContext);
+    this.routerOutletElement.nativeElement.setContextValue(ɵPOPUP_CONTEXT, this.popupContext);
 
     // Propagate workbench and color theme to the microfrontend.
     this.propagateWorkbenchTheme();
 
     // Navigate to the microfrontend.
     const application = this._manifestService.getApplication(this.popupCapability.metadata!.appSymbolicName);
-    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this._popupContext.params, this.popupCapability);
+    this._logger.debug(() => `Loading microfrontend into workbench popup [app=${this.popupCapability.metadata!.appSymbolicName}, baseUrl=${application.baseUrl}, path=${(this.popupCapability.properties.path)}].`, LoggerNames.MICROFRONTEND, this.popupContext.params, this.popupCapability);
     void this._outletRouter.navigate(this.popupCapability.properties.path, {
       outlet: this.popup.id,
       relativeTo: application.baseUrl,
-      params: this._popupContext.params,
+      params: this.popupContext.params,
       pushStateToSessionHistoryStack: false,
       showSplash: this.popupCapability.properties.showSplash,
     });
   }
 
-  public onFocusWithin(event: Event): void {
+  protected onFocusWithin(event: Event): void {
     const {detail: focusWithin} = event as CustomEvent<boolean>;
 
     // Close the popup on focus loss.
-    if (this._popupContext.closeOnFocusLost && !focusWithin) {
+    if (this.popupContext.closeOnFocusLost && !focusWithin) {
       this.popup.close(this.popup.result);
     }
 
     if (focusWithin) {
-      this._host.nativeElement.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+      this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
     }
   }
 
@@ -124,7 +118,7 @@ export class MicrofrontendPopupComponent implements OnInit, OnDestroy {
     runInInjectionContext(this._injector, () => Microfrontends.propagateTheme(this.routerOutletElement.nativeElement));
   }
 
-  public ngOnDestroy(): void {
-    void this._outletRouter.navigate(null, {outlet: this.popup.id});
+  private get popupContext(): ɵPopupContext {
+    return this.popup.input!;
   }
 }

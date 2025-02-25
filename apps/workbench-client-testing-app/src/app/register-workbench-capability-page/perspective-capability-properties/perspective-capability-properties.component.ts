@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef} from '@angular/core';
+import {Component, forwardRef, inject} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormArray, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {noop, Observable} from 'rxjs';
@@ -44,20 +44,22 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 })
 export class PerspectiveCapabilityPropertiesComponent implements ControlValueAccessor, Validator {
 
-  private _cvaChangeFn: (properties: WorkbenchPerspectiveCapabilityProperties) => void = noop;
-  private _cvaTouchedFn: () => void = noop;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     parts: this._formBuilder.array<FormGroup<PartFormGroup>>([]),
   });
 
-  protected MAIN_AREA = MAIN_AREA;
-  protected relativeToList = `relative-to-list-${UUID.randomUUID()}`;
-  protected partIdList = `partid-list-${UUID.randomUUID()}`;
-  protected partProposals$: Observable<string[]>;
+  protected readonly MAIN_AREA = MAIN_AREA;
+  protected readonly relativeToList = `relative-to-list-${UUID.randomUUID()}`;
+  protected readonly partIdList = `partid-list-${UUID.randomUUID()}`;
+  protected readonly partProposals$: Observable<string[]>;
 
-  constructor(private _formBuilder: NonNullableFormBuilder) {
+  private _cvaChangeFn: (properties: WorkbenchPerspectiveCapabilityProperties) => void = noop;
+  private _cvaTouchedFn: () => void = noop;
+
+  constructor() {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

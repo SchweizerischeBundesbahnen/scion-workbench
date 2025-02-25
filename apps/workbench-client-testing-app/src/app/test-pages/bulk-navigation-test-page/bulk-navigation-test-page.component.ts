@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench-client';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {APP_IDENTITY} from '@scion/microfrontend-platform';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {CssClassComponent} from '../../css-class/css-class.component';
+import {APP_SYMBOLIC_NAME} from '../../workbench-client/workbench-client.provider';
 
 @Component({
   selector: 'app-bulk-navigation-test-page',
@@ -27,24 +27,23 @@ import {CssClassComponent} from '../../css-class/css-class.component';
 })
 export default class BulkNavigationTestPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _router = inject(WorkbenchRouter);
+  private readonly _appSymbolicName = inject(APP_SYMBOLIC_NAME);
+
+  protected readonly form = this._formBuilder.group({
     viewCount: this._formBuilder.control(1, Validators.required),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined, Validators.required),
   });
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _router: WorkbenchRouter,
-              @Inject(APP_IDENTITY) private _appSymbolicName: string) {
-  }
-
-  public onNavigate(): void {
+  protected onNavigate(): void {
     const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
       void this.navigateToViewPage();
     }
   }
 
-  public async onNavigateAwait(): Promise<void> {
+  protected async onNavigateAwait(): Promise<void> {
     const viewCount = this.form.controls.viewCount.value;
     for (let i = 0; i < viewCount; i++) {
       await this.navigateToViewPage();

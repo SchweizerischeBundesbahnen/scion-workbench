@@ -46,7 +46,7 @@ import {DESKTOP} from '../workbench-element-references';
 export class WorkbenchDesktopDirective {
 
   constructor() {
-    const template = inject(TemplateRef<void>);
+    const template = inject(TemplateRef) as TemplateRef<void>;
     const desktop = inject(DESKTOP);
 
     // Register the desktop.

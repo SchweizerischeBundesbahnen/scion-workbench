@@ -40,12 +40,14 @@ import {Logger, LoggerNames} from '../logging';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLauncher {
 
+  private readonly _startup = inject(WorkbenchStartup);
+  private readonly _logger = inject(Logger);
+  private readonly _zone = inject(NgZone);
+  private readonly _injector = inject(Injector);
+
   private _state: StartupState = StartupState.Stopped;
 
-  constructor(private _startup: WorkbenchStartup,
-              private _logger: Logger,
-              private _zone: NgZone,
-              private _injector: Injector) {
+  constructor() {
     const workbenchConfig = inject(WorkbenchConfig, {optional: true});
     if (!workbenchConfig) {
       throw Error(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);

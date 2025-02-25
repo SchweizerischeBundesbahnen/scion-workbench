@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, inject} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -44,7 +44,19 @@ import {A11yModule} from '@angular/cdk/a11y';
 })
 export default class DialogPageComponent {
 
-  protected uuid = UUID.randomUUID();
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly dialog = inject<WorkbenchDialog<string>>(WorkbenchDialog);
+  protected readonly uuid = UUID.randomUUID();
+
+  protected readonly form = this._formBuilder.group({
+    title: this._formBuilder.control(''),
+    height: this._formBuilder.control(''),
+    width: this._formBuilder.control(''),
+    closeWithError: this._formBuilder.control(false),
+    result: this._formBuilder.control(''),
+  });
 
   @HostBinding('style.width')
   protected get width(): string {
@@ -56,18 +68,8 @@ export default class DialogPageComponent {
     return this.form.controls.height.value;
   }
 
-  protected form = this._formBuilder.group({
-    title: this._formBuilder.control(''),
-    height: this._formBuilder.control(''),
-    width: this._formBuilder.control(''),
-    closeWithError: this._formBuilder.control(false),
-    result: this._formBuilder.control(''),
-  });
-
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              protected route: ActivatedRoute,
-              protected dialog: WorkbenchDialog<string>) {
-    dialog.signalReady();
+  constructor() {
+    this.dialog.signalReady();
 
     this.form.controls.title.valueChanges
       .pipe(takeUntilDestroyed())

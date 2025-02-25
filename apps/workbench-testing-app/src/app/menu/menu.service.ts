@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, Injector} from '@angular/core';
+import {inject, Injectable, Injector} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {MenuItem, MenuItemSeparator} from './menu-item';
 import {MENU_ITEMS, MenuComponent} from './menu.component';
@@ -20,8 +20,8 @@ const START: ConnectedPosition = {originX: 'start', originY: 'bottom', overlayX:
 @Injectable({providedIn: 'root'})
 export class MenuService {
 
-  constructor(private _overlay: Overlay, private _injector: Injector) {
-  }
+  private readonly _overlay = inject(Overlay);
+  private readonly _injector = inject(Injector);
 
   /**
    * Shows a menu with passed menu items.

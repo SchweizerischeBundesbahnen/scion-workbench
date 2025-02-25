@@ -10,8 +10,9 @@ import {WORKBENCH_POST_CONNECT} from '../workbench-client/workbench-client.provi
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as associated with the {@link WORKBENCH_POST_CONNECT} DI token. */)
 class WorkbenchThemeSwitcher {
 
-  constructor(workbenchThemeMonitor: WorkbenchThemeMonitor) {
-    const documentRoot = inject<Document>(DOCUMENT).documentElement;
+  constructor() {
+    const workbenchThemeMonitor = inject(WorkbenchThemeMonitor);
+    const documentRoot = inject(DOCUMENT).documentElement;
 
     workbenchThemeMonitor.theme$
       .pipe(takeUntilDestroyed())

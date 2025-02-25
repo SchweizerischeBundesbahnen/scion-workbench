@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {MPartGridV2, MPartV2, MTreeNodeV2, MViewV2} from './model/workbench-layout-migration-v2.model';
 import {MPartGridV3, MPartV3, MTreeNodeV3, MViewV3, VIEW_ID_PREFIX_V3, ViewIdV3} from './model/workbench-layout-migration-v3.model';
 import {Router, UrlTree} from '@angular/router';
@@ -23,8 +23,7 @@ import {Routing} from '../../routing/routing.util';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutMigrationV3 implements WorkbenchMigration {
 
-  constructor(private _router: Router) {
-  }
+  private readonly _router = inject(Router);
 
   public migrate(json: string): string {
     const partGridV2 = JSON.parse(json) as MPartGridV2;

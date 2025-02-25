@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchDialogOptions} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -30,8 +30,8 @@ import {MicrofrontendHostDialogComponent} from '../microfrontend-host-dialog/mic
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
 
-  constructor(private _dialogService: WorkbenchDialogService, private _logger: Logger) {
-  }
+  private readonly _dialogService = inject(WorkbenchDialogService);
+  private readonly _logger = inject(Logger);
 
   /**
    * Dialog intents are handled in this interceptor and then swallowed.

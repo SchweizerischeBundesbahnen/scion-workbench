@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, inject, Injector, Input, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
 import {WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -42,7 +42,17 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
+export class MicrofrontendHostDialogComponent implements OnInit {
+
+  private readonly _dialog = inject(ɵWorkbenchDialog);
+  private readonly _injector = inject(Injector);
+  private readonly _router = inject(Router);
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
+
+  protected readonly outletName = DIALOG_ID_PREFIX.concat(this._dialog.id);
+
+  protected outletInjector!: Injector;
 
   @Input({required: true})
   public capability!: WorkbenchDialogCapability;
@@ -50,16 +60,8 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   @Input({required: true})
   public params!: Map<string, unknown>;
 
-  protected outletName: string;
-  protected outletInjector!: Injector;
-
-  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
-  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
-
-  constructor(private _dialog: ɵWorkbenchDialog,
-              private _injector: Injector,
-              private _router: Router) {
-    this.outletName = DIALOG_ID_PREFIX.concat(this._dialog.id);
+  constructor() {
+    inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
   }
 
   public ngOnInit(): void {
@@ -105,10 +107,6 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
     this._dialog.closable = this.capability.properties.closable ?? true;
     this._dialog.resizable = this.capability.properties.resizable ?? true;
     this._dialog.padding = this.capability.properties.padding ?? true;
-  }
-
-  public ngOnDestroy(): void {
-    void this.navigate(null); // Remove the outlet from the URL
   }
 }
 

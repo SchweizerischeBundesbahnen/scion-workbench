@@ -12,7 +12,7 @@ import {ChangeDetectionStrategy, Component, computed, HostBinding, HostListener,
 import {OverlayRef} from '@angular/cdk/overlay';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {FormControl, ReactiveFormsModule} from '@angular/forms';
+import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {PartId, WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -48,7 +48,7 @@ export class ViewListComponent implements OnInit {
   protected viewsInsideTabbar: Signal<WorkbenchView[]>;
   /** Views that are scrolled out of the tab bar. */
   protected viewsOutsideTabbar: Signal<WorkbenchView[]>;
-  protected filterFormControl = new FormControl<string>('', {nonNullable: true});
+  protected filterFormControl = inject(NonNullableFormBuilder).control('');
 
   @Input(ViewListComponentInputs.POSITION)
   public position?: 'north' | 'south' | undefined;
