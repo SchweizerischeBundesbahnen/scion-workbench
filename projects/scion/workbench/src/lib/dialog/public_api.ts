@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchDialog, WorkbenchDialogSize} from './workbench-dialog';
-export {WorkbenchDialogOptions} from './workbench-dialog.options';
+export {WorkbenchDialog, type WorkbenchDialogSize} from './workbench-dialog';
+export {type WorkbenchDialogOptions} from './workbench-dialog.options';
 export {WorkbenchDialogService} from './workbench-dialog.service';
 export {WorkbenchDialogActionDirective} from './dialog-footer/workbench-dialog-action.directive';
 export {WorkbenchDialogFooterDirective} from './dialog-footer/workbench-dialog-footer.directive';

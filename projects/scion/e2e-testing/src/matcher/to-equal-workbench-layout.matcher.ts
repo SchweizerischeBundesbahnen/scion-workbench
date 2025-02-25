@@ -348,6 +348,13 @@ export class MTreeNode {
 
   constructor(treeNode: Omit<MTreeNode, 'type'>) {
     Object.assign(this, treeNode);
+    // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
+    // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
+    Object.keys(this).forEach(key => {
+      if (this[key as keyof this] === undefined) {
+        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
   }
 }
 
@@ -364,6 +371,13 @@ export class MPart {
 
   constructor(part: Omit<MPart, 'type'>) {
     Object.assign(this, part);
+    // If `useDefineForClassFields` TypeScript flag is enabled, all class members that are not explicitly set will be initialised to `undefined`.
+    // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are deleted.
+    Object.keys(this).forEach(key => {
+      if (this[key as keyof this] === undefined) {
+        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
   }
 }
 

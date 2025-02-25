@@ -9,5 +9,5 @@
  */
 
 export {Notification} from './notification';
-export {NotificationConfig} from './notification.config';
+export {type NotificationConfig} from './notification.config';
 export {NotificationService} from './notification.service';

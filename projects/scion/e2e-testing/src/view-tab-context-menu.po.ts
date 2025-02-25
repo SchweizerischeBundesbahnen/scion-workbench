@@ -15,15 +15,22 @@ import {Locator} from '@playwright/test';
  */
 export class ViewTabContextMenuPO {
 
-  public readonly menuItems = {
-    closeTab: new ContextMenuItem(this.locator.locator('button.e2e-close')),
-    closeAll: new ContextMenuItem(this.locator.locator('button.e2e-close-all-tabs')),
-    moveToNewWindow: new ContextMenuItem(this.locator.locator('button.e2e-move-to-new-window')),
-    moveView: new ContextMenuItem(this.locator.locator('button.e2e-move-view')),
-    showViewInfo: new ContextMenuItem(this.locator.locator('button.e2e-show-view-info')),
+  public readonly menuItems: {
+    closeTab: ContextMenuItem;
+    closeAll: ContextMenuItem;
+    moveToNewWindow: ContextMenuItem;
+    moveView: ContextMenuItem;
+    showViewInfo: ContextMenuItem;
   };
 
   constructor(public locator: Locator) {
+    this.menuItems = {
+      closeTab: new ContextMenuItem(this.locator.locator('button.e2e-close')),
+      closeAll: new ContextMenuItem(this.locator.locator('button.e2e-close-all-tabs')),
+      moveToNewWindow: new ContextMenuItem(this.locator.locator('button.e2e-move-to-new-window')),
+      moveView: new ContextMenuItem(this.locator.locator('button.e2e-move-view')),
+      showViewInfo: new ContextMenuItem(this.locator.locator('button.e2e-show-view-info')),
+    };
   }
 
   public async pressEscape(): Promise<void> {

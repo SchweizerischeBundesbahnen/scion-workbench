@@ -31,20 +31,23 @@ export class ViewTabPO {
   /**
    * Locates the title of the view tab.
    */
-  public readonly title = this.locator.locator('.e2e-title');
+  public readonly title: Locator;
 
   /**
    * Locates the heading of the view tab.
    */
-  public readonly heading = this.locator.locator('.e2e-heading');
+  public readonly heading: Locator;
 
   /**
    * Locates the close button of the view tab.
    */
-  public readonly closeButton = this.locator.locator('button.e2e-close');
+  public readonly closeButton: Locator;
 
   constructor(public readonly locator: Locator, part: PartPO) {
     this.part = part;
+    this.title = this.locator.locator('.e2e-title');
+    this.heading = this.locator.locator('.e2e-heading');
+    this.closeButton = this.locator.locator('button.e2e-close');
   }
 
   public async getViewId(): Promise<ViewId> {

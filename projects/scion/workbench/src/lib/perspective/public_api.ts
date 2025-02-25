@@ -8,4 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchPerspective, WorkbenchPerspectives, WorkbenchPerspectiveDefinition, WorkbenchLayoutFn, WorkbenchPerspectiveSelectionFn} from './workbench-perspective.model';
+export {type WorkbenchPerspective, type WorkbenchPerspectives, type WorkbenchPerspectiveDefinition, type WorkbenchLayoutFn, type WorkbenchPerspectiveSelectionFn} from './workbench-perspective.model';

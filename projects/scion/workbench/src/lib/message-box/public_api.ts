@@ -9,4 +9,4 @@
  */
 
 export {WorkbenchMessageBoxService} from './workbench-message-box.service';
-export {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
+export {type WorkbenchMessageBoxOptions} from './workbench-message-box.options';
