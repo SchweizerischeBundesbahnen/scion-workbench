@@ -8,4 +8,4 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {Disposable} from './disposable';
+export {type Disposable} from './disposable';

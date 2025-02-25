@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {firstValueFrom} from 'rxjs';
+import {firstValueFrom, Observable} from 'rxjs';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
 import {CanClose, CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../workbench.model';
@@ -58,7 +58,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _dirty = signal(false);
   private readonly _closable = signal(true);
   private readonly _closableComputed = computed(() => this._closable() && !this._blockedBy());
-  private readonly _blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
+  private readonly _blockedBy: Signal<ɵWorkbenchDialog | null>;
   private readonly _scrolledIntoView = signal(true);
   private readonly _classBasedCanCloseGuard = this.constructClassBasedCanCloseGuard();
 
@@ -78,7 +78,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly active = signal<boolean>(false);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
-  public readonly blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
+  public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
 
@@ -86,6 +86,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
     this.portal = this.createPortal(options.component);
     this.menuItems = this.computeMenuItems();
+    this._blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
+    this.blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});

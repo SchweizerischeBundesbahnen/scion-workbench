@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchConfig, MenuItemConfig, ViewMenuItemsConfig} from './workbench-config';
+export {WorkbenchConfig, type MenuItemConfig, type ViewMenuItemsConfig} from './workbench-config';
 export {provideWorkbench} from './workbench.provider';
 export {WorkbenchService} from './workbench.service';
 export {WORKBENCH_ID} from './workbench-id';
-export {WorkbenchPartAction, WorkbenchPartActionFn, WorkbenchMenuItem, WorkbenchViewMenuItemFn, WorkbenchTheme, CanClose, CanCloseFn, CanCloseRef} from './workbench.model';
+export {type WorkbenchPartAction, type WorkbenchPartActionFn, type WorkbenchMenuItem, type WorkbenchViewMenuItemFn, type WorkbenchTheme, type CanClose, type CanCloseFn, type CanCloseRef} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
-export {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from './workbench.constants';
+export {VIEW_TAB_RENDERING_CONTEXT, type ViewTabRenderingContext} from './workbench.constants';
 
 export * from './layout/public_api';
 export * from './desktop/public_api';

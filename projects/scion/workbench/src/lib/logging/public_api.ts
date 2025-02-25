@@ -8,5 +8,5 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {LogAppender, LogEvent, LogLevel, LoggerName} from './logging.model';
+export {LogAppender, type LogEvent, LogLevel, LoggerName} from './logging.model';
 export {Logger} from './logger';
