@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, HostBinding, HostListener, Input} from '@angular/core';
+import {Component, HostBinding, HostListener, inject, Input} from '@angular/core';
 import {MessageBoxFooterComponent} from './message-box-footer/message-box-footer.component';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
@@ -46,6 +46,8 @@ import {SciDimensionDirective} from '@scion/components/dimension';
 })
 export class WorkbenchMessageBoxComponent {
 
+  private readonly _dialog = inject(ɵWorkbenchDialog);
+
   // Ensure host element to be focusable in order to close the message box on Escape keystroke.
   @HostBinding('attr.tabindex')
   protected tabindex = -1;
@@ -69,7 +71,7 @@ export class WorkbenchMessageBoxComponent {
     return !!this.options?.title;
   }
 
-  constructor(private _dialog: ɵWorkbenchDialog) {
+  constructor() {
     this._dialog.closable = false;
     this._dialog.resizable = false;
     this._dialog.padding = false;

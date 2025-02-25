@@ -33,23 +33,21 @@ import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.co
 })
 export default class ModifyLayoutPageComponent {
 
-  protected form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _settingsService = inject(SettingsService);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+
+  protected readonly form = this._formBuilder.group({
     parts: this._formBuilder.control<PartDescriptor[]>([]),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
   });
 
-  protected modifyError: string | false | undefined;
-  protected partProposals: Signal<string[]>;
-  protected viewProposals: Signal<string[]>;
+  protected readonly partProposals = this.computePartProposals();
+  protected readonly viewProposals = this.computeViewProposals();
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _settingsService: SettingsService,
-              private _workbenchRouter: WorkbenchRouter) {
-    this.partProposals = this.computePartProposals();
-    this.viewProposals = this.computeViewProposals();
-  }
+  protected modifyError: string | false | undefined;
 
   private computePartProposals(): Signal<string[]> {
     const partsFromUI = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});

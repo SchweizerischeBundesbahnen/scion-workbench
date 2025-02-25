@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, inject} from '@angular/core';
 import {Popup} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -33,7 +33,21 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 })
 export class PopupPageComponent {
 
-  public uuid = UUID.randomUUID();
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly popup = inject(Popup);
+  protected readonly uuid = UUID.randomUUID();
+
+  protected readonly form = this._formBuilder.group({
+    minHeight: this._formBuilder.control(''),
+    height: this._formBuilder.control(''),
+    maxHeight: this._formBuilder.control(''),
+    minWidth: this._formBuilder.control(''),
+    width: this._formBuilder.control(''),
+    maxWidth: this._formBuilder.control(''),
+    closeWithError: this._formBuilder.control(false),
+    result: this._formBuilder.control(''),
+  });
 
   @HostBinding('style.min-height')
   public get minHeight(): string {
@@ -63,20 +77,6 @@ export class PopupPageComponent {
   @HostBinding('style.max-width')
   public get maxWidth(): string {
     return this.form.controls.maxWidth.value;
-  }
-
-  public form = this._formBuilder.group({
-    minHeight: this._formBuilder.control(''),
-    height: this._formBuilder.control(''),
-    maxHeight: this._formBuilder.control(''),
-    minWidth: this._formBuilder.control(''),
-    width: this._formBuilder.control(''),
-    maxWidth: this._formBuilder.control(''),
-    closeWithError: this._formBuilder.control(false),
-    result: this._formBuilder.control(''),
-  });
-
-  constructor(public popup: Popup, private _formBuilder: NonNullableFormBuilder) {
   }
 
   protected onApplyReturnValue(): void {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ViewId, WorkbenchDialogOptions, WorkbenchDialogService, WorkbenchView} from '@scion/workbench-client';
 import {stringifyError} from '../common/stringify-error.util';
@@ -33,7 +33,10 @@ import {CssClassComponent} from '../css-class/css-class.component';
 })
 export default class DialogOpenerPageComponent {
 
-  protected form = this._formBuilder.group({
+  private readonly _dialogService = inject(WorkbenchDialogService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
       this._formBuilder.group({
         key: this._formBuilder.control('component'),
@@ -56,10 +59,8 @@ export default class DialogOpenerPageComponent {
   protected dialogError: string | undefined;
   protected returnValue: string | undefined;
 
-  constructor(view: WorkbenchView,
-              private _dialogService: WorkbenchDialogService,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  constructor() {
+    inject(WorkbenchView).signalReady();
     this.installContextualViewIdEnabler();
   }
 

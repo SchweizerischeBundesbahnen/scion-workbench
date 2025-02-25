@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, HostBinding} from '@angular/core';
+import {Component, ElementRef, HostBinding, inject} from '@angular/core';
 import {WorkbenchPopup} from '@scion/workbench-client';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {PreferredSizeService} from '@scion/microfrontend-platform';
@@ -48,39 +48,13 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 })
 export default class PopupPageComponent {
 
-  public uuid = UUID.randomUUID();
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  @HostBinding('style.width')
-  public get width(): string {
-    return this.form.controls.width.value;
-  }
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly popup = inject(WorkbenchPopup);
+  protected readonly uuid = UUID.randomUUID();
 
-  @HostBinding('style.height')
-  public get height(): string {
-    return this.form.controls.height.value;
-  }
-
-  @HostBinding('style.min-height')
-  public get minHeight(): string {
-    return this.form.controls.minHeight.value;
-  }
-
-  @HostBinding('style.max-height')
-  public get maxHeight(): string {
-    return this.form.controls.maxHeight.value;
-  }
-
-  @HostBinding('style.min-width')
-  public get minWidth(): string {
-    return this.form.controls.minWidth.value;
-  }
-
-  @HostBinding('style.max-width')
-  public get maxWidth(): string {
-    return this.form.controls.maxWidth.value;
-  }
-
-  public form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     minHeight: this._formBuilder.control(''),
     height: this._formBuilder.control(''),
     maxHeight: this._formBuilder.control(''),
@@ -96,17 +70,45 @@ export default class PopupPageComponent {
     result: this._formBuilder.control(''),
   });
 
-  constructor(host: ElementRef<HTMLElement>,
-              private _formBuilder: NonNullableFormBuilder,
-              public route: ActivatedRoute,
-              public popup: WorkbenchPopup) {
-    // Use the size of this component as the popup size.
-    Beans.get(PreferredSizeService).fromDimension(host.nativeElement);
+  @HostBinding('style.width')
+  protected get width(): string {
+    return this.form.controls.width.value;
+  }
 
-    const configuredPopupSize = popup.capability.properties.size;
+  @HostBinding('style.height')
+  protected get height(): string {
+    return this.form.controls.height.value;
+  }
+
+  @HostBinding('style.min-height')
+  protected get minHeight(): string {
+    return this.form.controls.minHeight.value;
+  }
+
+  @HostBinding('style.max-height')
+  protected get maxHeight(): string {
+    return this.form.controls.maxHeight.value;
+  }
+
+  @HostBinding('style.min-width')
+  protected get minWidth(): string {
+    return this.form.controls.minWidth.value;
+  }
+
+  @HostBinding('style.max-width')
+  protected get maxWidth(): string {
+    return this.form.controls.maxWidth.value;
+  }
+
+  constructor() {
+    // Use the size of this component as the popup size.
+    const host = inject(ElementRef).nativeElement as HTMLElement;
+    Beans.get(PreferredSizeService).fromDimension(host);
+
+    const configuredPopupSize = this.popup.capability.properties.size;
     this.form.controls.width.setValue(configuredPopupSize?.width ?? 'max-content');
     this.form.controls.height.setValue(configuredPopupSize?.height ?? 'max-content');
-    popup.signalReady();
+    this.popup.signalReady();
   }
 
   protected onApplyReturnValue(): void {

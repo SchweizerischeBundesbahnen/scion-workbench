@@ -23,14 +23,16 @@ import {DatePipe, formatDate} from '@angular/common';
 })
 export default class TodoComponent {
 
-  private todoService = inject(TodoService);
-  private locale = inject(LOCALE_ID);
+  public readonly id = input.required<string>();
 
-  public id = input.required<string>();
+  private readonly todoService = inject(TodoService);
+  private readonly locale = inject(LOCALE_ID);
 
   protected todo = computed(() => this.todoService.getTodo(this.id()));
 
-  constructor(view: WorkbenchView) {
+  constructor() {
+    const view = inject(WorkbenchView);
+
     effect(() => {
       view.title = this.todo().task;
       view.heading = `Due by ${formatDate(this.todo().dueDate, 'short', this.locale)}`;

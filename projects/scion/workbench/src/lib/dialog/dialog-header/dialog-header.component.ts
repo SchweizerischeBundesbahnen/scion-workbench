@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 
 /**
@@ -21,8 +21,7 @@ import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 })
 export class DialogHeaderComponent {
 
-  constructor(protected dialog: ɵWorkbenchDialog) {
-  }
+  protected readonly dialog = inject(ɵWorkbenchDialog);
 
   protected onCloseClick(): void {
     this.dialog.close();

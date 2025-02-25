@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, HostListener, Inject, InjectionToken, Injector, OnInit, runInInjectionContext} from '@angular/core';
+import {Component, DestroyRef, HostListener, inject, InjectionToken, Injector, OnInit, runInInjectionContext} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {fromEvent} from 'rxjs';
 import {MenuItem, MenuItemSeparator} from './menu-item';
@@ -34,13 +34,12 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
 })
 export class MenuComponent implements OnInit {
 
-  public MenuItem = MenuItem;
+  private readonly _overlayRef = inject(OverlayRef);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _injector = inject(Injector);
 
-  constructor(private _overlayRef: OverlayRef,
-              private _destroyRef: DestroyRef,
-              private _injector: Injector,
-              @Inject(MENU_ITEMS) public menuItems: Array<MenuItem | MenuItemSeparator>) {
-  }
+  protected readonly menuItems = inject(MENU_ITEMS);
+  protected readonly MenuItem = MenuItem;
 
   public ngOnInit(): void {
     fromEvent(this._overlayRef.backdropElement!, 'mousedown')
@@ -48,7 +47,7 @@ export class MenuComponent implements OnInit {
       .subscribe(() => this.closeMenu());
   }
 
-  public onMenuItemClick(menuItem: MenuItem): void {
+  protected onMenuItemClick(menuItem: MenuItem): void {
     if (menuItem.disabled) {
       return;
     }
@@ -58,7 +57,7 @@ export class MenuComponent implements OnInit {
   }
 
   @HostListener('document:keydown.escape')
-  public onEscape(): void {
+  protected onEscape(): void {
     this.closeMenu();
   }
 

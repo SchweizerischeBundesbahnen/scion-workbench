@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, HostBinding, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -42,25 +42,25 @@ import {PartId} from '../../part/workbench-part.model';
 })
 export class GridElementComponent implements OnChanges {
 
-  public MTreeNode = MTreeNode;
-  public MPart = MPart;
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
 
-  public children = new Array<ChildElement>();
+  protected readonly MTreeNode = MTreeNode;
+  protected readonly MPart = MPart;
+
+  protected children = new Array<ChildElement>();
 
   @HostBinding('attr.data-parentnodeid')
-  public parentNodeId: string | undefined;
+  protected parentNodeId: string | undefined;
 
   @HostBinding('attr.data-nodeid')
-  public nodeId: string | undefined;
+  protected nodeId: string | undefined;
 
   @HostBinding('attr.data-partid')
-  public partId: PartId | undefined;
+  protected partId: PartId | undefined;
 
   @Input({required: true})
   public element!: MTreeNode | MPart;
-
-  constructor(private _workbenchRouter: ɵWorkbenchRouter, private _workbenchLayoutService: WorkbenchLayoutService) {
-  }
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
@@ -69,11 +69,11 @@ export class GridElementComponent implements OnChanges {
     this.partId = this.element instanceof MPart ? this.element.id : undefined;
   }
 
-  public onSashStart(): void {
+  protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);
   }
 
-  public onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
+  protected onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
     this._workbenchLayoutService.signalResizing(false);
     void this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio));

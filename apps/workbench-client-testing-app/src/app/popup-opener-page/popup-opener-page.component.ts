@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, ViewChild} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {CloseStrategy, PopupOrigin, ViewId, WorkbenchPopupService, WorkbenchView} from '@scion/workbench-client';
 import {Observable} from 'rxjs';
@@ -40,9 +40,11 @@ import {CssClassComponent} from '../css-class/css-class.component';
 })
 export default class PopupOpenerPageComponent {
 
-  private _popupOrigin$: Observable<PopupOrigin>;
+  private readonly _popupService = inject(WorkbenchPopupService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _popupOrigin$: Observable<PopupOrigin>;
 
-  public form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([
       this._formBuilder.group({
         key: this._formBuilder.control('component'),
@@ -70,20 +72,18 @@ export default class PopupOpenerPageComponent {
     }),
   });
 
-  public popupError: string | undefined;
-  public returnValue: string | undefined;
+  protected popupError: string | undefined;
+  protected returnValue: string | undefined;
 
   @ViewChild('open_button', {static: true})
   private _openButton!: ElementRef<HTMLButtonElement>;
 
-  constructor(view: WorkbenchView,
-              private _popupService: WorkbenchPopupService,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  constructor() {
+    inject(WorkbenchView).signalReady();
     this._popupOrigin$ = this.observePopupOrigin$();
   }
 
-  public async onPopupOpen(): Promise<void> {
+  protected async onPopupOpen(): Promise<void> {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;
     const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
 

@@ -25,8 +25,10 @@ import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
 @Directive({selector: '[wbMovable]'})
 export class MovableDirective implements OnInit {
 
-  private readonly _document = inject<Document>(DOCUMENT);
-  private readonly _host: HTMLElement;
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _document = inject(DOCUMENT);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
 
   private _x = 0;
   private _y = 0;
@@ -36,12 +38,6 @@ export class MovableDirective implements OnInit {
 
   @Output('wbMovableMove')
   public wbMove = new EventEmitter<WbMoveEvent>();
-
-  constructor(host: ElementRef<HTMLElement>,
-              private _destroyRef: DestroyRef,
-              private _workbenchLayoutService: WorkbenchLayoutService) {
-    this._host = host.nativeElement;
-  }
 
   public ngOnInit(): void {
     this.wbHandleElement.style.setProperty('cursor', 'move');

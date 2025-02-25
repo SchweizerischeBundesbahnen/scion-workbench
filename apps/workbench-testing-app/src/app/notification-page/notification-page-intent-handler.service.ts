@@ -1,4 +1,4 @@
-import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MICROFRONTEND_PLATFORM_POST_STARTUP, NotificationService} from '@scion/workbench';
 import {WorkbenchCapabilities, WorkbenchNotificationConfig} from '@scion/workbench-client';
 import {IntentClient} from '@scion/microfrontend-platform';
@@ -11,7 +11,10 @@ import {NotificationPageComponent} from './notification-page.component';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
 class NotificationPageIntentHandler {
 
-  constructor(intentClient: IntentClient, notificationService: NotificationService) {
+  constructor() {
+    const intentClient = inject(IntentClient);
+    const notificationService = inject(NotificationService);
+
     intentClient.onIntent<WorkbenchNotificationConfig, void>({type: WorkbenchCapabilities.Notification, qualifier: {component: 'notification-page'}}, request => {
       const config: WorkbenchNotificationConfig = request.body!;
 

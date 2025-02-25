@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {ViewId, WorkbenchMessageBoxOptions, WorkbenchMessageBoxService, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -33,8 +33,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 export default class MessageBoxOpenerPageComponent {
 
-  protected isEmptyQualifier = true;
-  protected form = this._formBuilder.group({
+  private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     message: this._formBuilder.control(''),
     options: this._formBuilder.group({
@@ -49,13 +51,12 @@ export default class MessageBoxOpenerPageComponent {
     }),
   });
 
+  protected isEmptyQualifier = true;
   protected openError: string | undefined;
   protected closeAction: string | undefined;
 
-  constructor(view: WorkbenchView,
-              private _messageBoxService: WorkbenchMessageBoxService,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  constructor() {
+    inject(WorkbenchView).signalReady();
     this.installContextualViewIdEnabler();
     this.installEmptyQualifierDetector();
   }

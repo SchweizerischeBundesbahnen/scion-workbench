@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchCapabilities, WorkbenchMessageBoxLegacyOptions, WorkbenchView} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
@@ -33,7 +33,10 @@ import {IntentClient, mapToBody} from '@scion/microfrontend-platform';
 })
 export default class LegacyMessageBoxOpenerPageComponent {
 
-  protected form = this._formBuilder.group({
+  private readonly _intentClient = inject(IntentClient);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly form = this._formBuilder.group({
     content: this._formBuilder.control(''),
     title: this._formBuilder.control(''),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
@@ -42,13 +45,11 @@ export default class LegacyMessageBoxOpenerPageComponent {
   protected openError: string | undefined;
   protected closeAction: string | undefined;
 
-  constructor(view: WorkbenchView,
-              private _intentClient: IntentClient,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 
-  public onMessageBoxOpen(): void {
+  protected onMessageBoxOpen(): void {
     this.openError = undefined;
     this.closeAction = undefined;
 

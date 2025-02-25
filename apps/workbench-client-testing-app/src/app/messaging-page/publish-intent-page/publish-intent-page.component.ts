@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Intent, IntentClient} from '@scion/microfrontend-platform';
@@ -27,18 +27,18 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 })
 export class PublishIntentPageComponent {
 
-  public publishError: string | false | undefined;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _intentClient = inject(IntentClient);
 
-  public form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     type: this._formBuilder.control('', Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
   });
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _intentClient: IntentClient) {
-  }
+  protected publishError: string | false | undefined;
 
-  public onPublish(): void {
+  protected onPublish(): void {
     this.publishError = undefined;
     const intent: Intent = {
       type: this.form.controls.type.value,

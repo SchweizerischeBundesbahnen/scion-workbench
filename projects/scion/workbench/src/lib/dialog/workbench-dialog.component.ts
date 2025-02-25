@@ -59,10 +59,16 @@ import {synchronizeCssClasses} from '../common/css-class.util';
 })
 export class WorkbenchDialogComponent implements OnInit {
 
+  private readonly _zone = inject(NgZone);
+  private readonly _destroyRef = inject(DestroyRef);
+
   /**
    * Element of the dialog that has or last had focus.
    */
-  private _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
+  private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
+
+  protected readonly dialog = inject(ɵWorkbenchDialog);
+
   private _headerHeight: string | undefined;
 
   @ViewChild(CdkTrapFocus, {static: true})
@@ -117,9 +123,7 @@ export class WorkbenchDialogComponent implements OnInit {
     return this.dialog.id;
   }
 
-  constructor(public dialog: ɵWorkbenchDialog,
-              private _zone: NgZone,
-              private _destroyRef: DestroyRef) {
+  constructor() {
     this.setDialogOffset();
     this.addHostCssClasses();
   }

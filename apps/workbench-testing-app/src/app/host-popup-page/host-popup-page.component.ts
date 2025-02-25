@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, inject} from '@angular/core';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {WorkbenchPopup} from '@scion/workbench-client';
@@ -46,39 +46,13 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 })
 export default class HostPopupPageComponent {
 
-  public uuid = UUID.randomUUID();
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  @HostBinding('style.min-height')
-  public get minHeight(): string {
-    return this.form.controls.minHeight.value;
-  }
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly popup = inject(WorkbenchPopup);
+  protected readonly uuid = UUID.randomUUID();
 
-  @HostBinding('style.height')
-  public get height(): string {
-    return this.form.controls.height.value;
-  }
-
-  @HostBinding('style.max-height')
-  public get maxHeight(): string {
-    return this.form.controls.maxHeight.value;
-  }
-
-  @HostBinding('style.min-width')
-  public get minWidth(): string {
-    return this.form.controls.minWidth.value;
-  }
-
-  @HostBinding('style.width')
-  public get width(): string {
-    return this.form.controls.width.value;
-  }
-
-  @HostBinding('style.max-width')
-  public get maxWidth(): string {
-    return this.form.controls.maxWidth.value;
-  }
-
-  public form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     minHeight: this._formBuilder.control(''),
     height: this._formBuilder.control(''),
     maxHeight: this._formBuilder.control(''),
@@ -89,9 +63,34 @@ export default class HostPopupPageComponent {
     result: this._formBuilder.control(''),
   });
 
-  constructor(public route: ActivatedRoute,
-              public popup: WorkbenchPopup,
-              private _formBuilder: NonNullableFormBuilder) {
+  @HostBinding('style.min-height')
+  protected get minHeight(): string {
+    return this.form.controls.minHeight.value;
+  }
+
+  @HostBinding('style.height')
+  protected get height(): string {
+    return this.form.controls.height.value;
+  }
+
+  @HostBinding('style.max-height')
+  protected get maxHeight(): string {
+    return this.form.controls.maxHeight.value;
+  }
+
+  @HostBinding('style.min-width')
+  protected get minWidth(): string {
+    return this.form.controls.minWidth.value;
+  }
+
+  @HostBinding('style.width')
+  protected get width(): string {
+    return this.form.controls.width.value;
+  }
+
+  @HostBinding('style.max-width')
+  protected get maxWidth(): string {
+    return this.form.controls.maxWidth.value;
   }
 
   protected onApplyReturnValue(): void {

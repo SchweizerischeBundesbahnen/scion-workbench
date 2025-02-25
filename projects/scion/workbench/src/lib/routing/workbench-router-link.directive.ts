@@ -8,15 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Directive, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, Optional, SimpleChanges} from '@angular/core';
+import {ChangeDetectorRef, Directive, ElementRef, HostBinding, HostListener, inject, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {WorkbenchRouter} from './workbench-router.service';
 import {mergeWith, Subject} from 'rxjs';
 import {LocationStrategy} from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
-import {filter, takeUntil} from 'rxjs/operators';
+import {filter} from 'rxjs/operators';
 import {Commands, WorkbenchNavigationExtras} from './routing.model';
 import {Defined} from '@scion/toolkit/util';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Like the Angular 'RouterLink' directive but with functionality to navigate a view.
@@ -42,12 +43,18 @@ import {Defined} from '@scion/toolkit/util';
  * ```
  */
 @Directive({selector: '[wbRouterLink]'})
-export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
+export class WorkbenchRouterLinkDirective implements OnChanges {
+
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _router = inject(Router);
+  private readonly _route = inject(ActivatedRoute);
+  private readonly _locationStrategy = inject(LocationStrategy);
+  private readonly _cd = inject(ChangeDetectorRef);
+  private readonly _view = inject(WorkbenchView, {optional: true});
+  private readonly _ngOnChange$ = new Subject<void>();
 
   private _commands: Commands = [];
   private _extras: Omit<WorkbenchNavigationExtras, 'close'> = {};
-  private _ngOnChange$ = new Subject<void>();
-  private _ngOnDestroy$ = new Subject<void>();
 
   @HostBinding('attr.href')
   public href: string | null = null;
@@ -62,14 +69,10 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
     this._extras = extras ?? {};
   }
 
-  constructor(private _workbenchRouter: WorkbenchRouter,
-              private _router: Router,
-              private _route: ActivatedRoute,
-              private _locationStrategy: LocationStrategy,
-              private _cd: ChangeDetectorRef,
-              host: ElementRef<HTMLElement>,
-              @Optional() private _view: WorkbenchView | null) {
-    if (host.nativeElement.tagName === 'A') {
+  constructor() {
+    const host = inject(ElementRef).nativeElement as HTMLElement;
+
+    if (host.tagName === 'A') {
       this.installHrefUpdater();
     }
   }
@@ -107,7 +110,7 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
       .pipe(
         filter(event => event instanceof NavigationEnd),
         mergeWith(this._ngOnChange$),
-        takeUntil(this._ngOnDestroy$),
+        takeUntilDestroyed(),
       )
       .subscribe(() => {
         const urlTree = this._commands.length && this._router.createUrlTree(this._commands, this.computeNavigationExtras());
@@ -118,9 +121,5 @@ export class WorkbenchRouterLinkDirective implements OnChanges, OnDestroy {
 
   public ngOnChanges(changes: SimpleChanges): void {
     this._ngOnChange$.next();
-  }
-
-  public ngOnDestroy(): void {
-    this._ngOnDestroy$.next();
   }
 }

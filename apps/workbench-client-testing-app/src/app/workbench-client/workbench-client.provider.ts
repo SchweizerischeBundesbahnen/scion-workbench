@@ -21,6 +21,11 @@ import {environment} from '../../environments/environment';
 export const WORKBENCH_POST_CONNECT = new InjectionToken<unknown>('WORKBENCH_POST_CONNECT');
 
 /**
+ * DI token providing access to the {@link APP_IDENTITY}.
+ */
+export const APP_SYMBOLIC_NAME = new InjectionToken<string>('APP_SYMBOLIC_NAME');
+
+/**
  * Registers a set of DI providers to set up SCION Workbench Client.
  */
 export function provideWorkbenchClient(): EnvironmentProviders | [] {
@@ -30,7 +35,7 @@ export function provideWorkbenchClient(): EnvironmentProviders | [] {
 
   return makeEnvironmentProviders([
     provideAppInitializer(connectToWorkbenchFn),
-    {provide: APP_IDENTITY, useFactory: () => Beans.get(APP_IDENTITY)},
+    {provide: APP_SYMBOLIC_NAME, useFactory: () => Beans.get(APP_IDENTITY)},
     {provide: MessageClient, useFactory: () => Beans.get(MessageClient)},
     {provide: IntentClient, useFactory: () => Beans.get(IntentClient)},
     {provide: OutletRouter, useFactory: () => Beans.get(OutletRouter)},

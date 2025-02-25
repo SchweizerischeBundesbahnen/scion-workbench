@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Inject, Optional} from '@angular/core';
-import {APP_IDENTITY, FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
+import {Component, inject} from '@angular/core';
+import {FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-platform';
 import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
 import {A11yModule} from '@angular/cdk/a11y';
+import {APP_SYMBOLIC_NAME} from './workbench-client/workbench-client.provider';
 
 @Component({
   selector: 'app-root',
@@ -28,12 +29,7 @@ import {A11yModule} from '@angular/cdk/a11y';
 })
 export class AppComponent {
 
-  public readonly focusMonitor = inject(FocusMonitor, {optional: true}); // only available if running in the workbench context
-  public readonly workbenchContextActive = MicrofrontendPlatformClient.isConnected();
-
-  public appSymbolicName: string;
-
-  constructor(@Inject(APP_IDENTITY) @Optional() symbolicName: string) { // only available if running in the workbench context
-    this.appSymbolicName = symbolicName;
-  }
+  protected readonly focusMonitor = inject(FocusMonitor, {optional: true}); // only available if running in the workbench context
+  protected readonly appSymbolicName = inject(APP_SYMBOLIC_NAME, {optional: true}); // only available if running in the workbench context
+  protected readonly workbenchContextActive = MicrofrontendPlatformClient.isConnected();
 }

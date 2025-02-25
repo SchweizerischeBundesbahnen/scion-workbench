@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 
@@ -24,11 +24,7 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export default class TextMessageComponent {
 
-  protected message: string;
-
-  constructor(messageBox: WorkbenchMessageBox) {
-    this.message = messageBox.params.get(eMESSAGE_BOX_MESSAGE_PARAM) as string;
-  }
+  protected message = inject(WorkbenchMessageBox).params.get(eMESSAGE_BOX_MESSAGE_PARAM) as string;
 }
 
 /**

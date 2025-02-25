@@ -9,7 +9,7 @@
  */
 
 import {Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
 import {Beans} from '@scion/toolkit/bean-manager';
@@ -21,8 +21,8 @@ import {WorkbenchService} from '../../workbench.service';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPerspectiveIntentHandler implements IntentInterceptor {
 
-  constructor(private _workbenchService: WorkbenchService, private _logger: Logger) {
-  }
+  private readonly _workbenchService = inject(WorkbenchService);
+  private readonly _logger = inject(Logger);
 
   /**
    * Perspective intents are handled in this interceptor and then swallowed.

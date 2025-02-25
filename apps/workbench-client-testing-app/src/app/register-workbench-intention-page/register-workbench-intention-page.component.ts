@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Intention, ManifestService} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchView} from '@scion/workbench-client';
@@ -28,22 +28,24 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 })
 export default class RegisterWorkbenchIntentionPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly form = this._formBuilder.group({
     type: this._formBuilder.control('', Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
   });
 
-  public intentionId: string | undefined;
-  public registerError: string | undefined;
-  public WorkbenchCapabilities = WorkbenchCapabilities;
+  protected readonly WorkbenchCapabilities = WorkbenchCapabilities;
 
-  constructor(view: WorkbenchView,
-              private _manifestService: ManifestService,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  protected intentionId: string | undefined;
+  protected registerError: string | undefined;
+
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 
-  public async onRegister(): Promise<void> {
+  protected async onRegister(): Promise<void> {
     const intention: Intention = {
       type: this.form.controls.type.value,
       qualifier: SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier) ?? undefined,

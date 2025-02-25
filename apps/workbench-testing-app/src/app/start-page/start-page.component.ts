@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, Optional, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, ViewChild} from '@angular/core';
 import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
 import {Observable, of} from 'rxjs';
@@ -43,30 +43,31 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
 })
 export default class StartPageComponent {
 
+  private readonly _view = inject(WorkbenchView, {optional: true}); // not available on entry point page
+  private readonly _workbenchClientRouter = inject(WorkbenchClientRouter, {optional: true}); // not available when starting the workbench standalone
+  private readonly _intentClient = inject(IntentClient, {optional: true}); // not available when starting the workbench standalone
+  private readonly _manifestService = inject(ManifestService, {optional: true}); // not available when starting the workbench standalone
+  private readonly _workbenchClientPopupService = inject(WorkbenchClientPopupService, {optional: true}); // not available when starting the workbench standalone
+  private readonly _workbenchService = inject(WorkbenchService);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
+  private readonly _cd = inject(ChangeDetectorRef);
+
+  protected readonly WorkbenchRouteData = WorkbenchRouteData;
+  protected readonly filterControl = inject(NonNullableFormBuilder).control('');
+  protected readonly workbenchViewRoutes$: Observable<Routes>;
+  protected readonly microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
+  protected readonly testCapabilities$: Observable<Capability[]> | undefined;
+
   @ViewChild(SciFilterFieldComponent)
   private _filterField!: SciFilterFieldComponent;
 
   @HostBinding('attr.data-partid')
-  public partId: PartId | undefined;
+  protected partId: PartId | undefined;
 
-  public filterControl = this._formBuilder.control('');
-  public workbenchViewRoutes$: Observable<Routes>;
-  public microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
-  public testCapabilities$: Observable<Capability[]> | undefined;
+  constructor() {
+    const router = inject(Router);
+    const workbenchConfig = inject(WorkbenchConfig);
 
-  public WorkbenchRouteData = WorkbenchRouteData;
-
-  constructor(@Optional() private _view: WorkbenchView | null, // not available on entry point page
-              @Optional() private _workbenchClientRouter: WorkbenchClientRouter | null, // not available when starting the workbench standalone
-              @Optional() private _intentClient: IntentClient | null, // not available when starting the workbench standalone
-              @Optional() private _manifestService: ManifestService | null, // not available when starting the workbench standalone
-              @Optional() private _workbenchClientPopupService: WorkbenchClientPopupService | null, // not available when starting the workbench standalone
-              private _workbenchService: WorkbenchService,
-              private _workbenchRouter: WorkbenchRouter,
-              private _formBuilder: NonNullableFormBuilder,
-              private _cd: ChangeDetectorRef,
-              router: Router,
-              workbenchConfig: WorkbenchConfig) {
     // Read views to be pinned to the desktop.
     this.workbenchViewRoutes$ = of(router.config)
       .pipe(filterArray(route => {
@@ -97,7 +98,7 @@ export default class StartPageComponent {
     this.memoizeContextualPart();
   }
 
-  public onViewOpen(path: string, event: MouseEvent): void {
+  protected onViewOpen(path: string, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     void this._workbenchRouter.navigate([path], {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
@@ -105,7 +106,7 @@ export default class StartPageComponent {
     });
   }
 
-  public onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
+  protected onMicrofrontendViewOpen(viewCapability: WorkbenchViewCapability, event: MouseEvent): void {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     void this._workbenchClientRouter!.navigate(viewCapability.qualifier, {
       target: event.ctrlKey ? 'blank' : this._view?.id ?? 'blank',
@@ -113,7 +114,7 @@ export default class StartPageComponent {
     });
   }
 
-  public async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
+  protected async onTestCapabilityOpen(testCapability: Capability, event: MouseEvent): Promise<void> {
     event.preventDefault(); // Prevent href navigation imposed by accessibility rules
     // TODO [#343] Remove switch-case after fixed issue https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/343
     switch (testCapability.type) {
@@ -133,14 +134,14 @@ export default class StartPageComponent {
   }
 
   @HostListener('keydown', ['$event'])
-  public onKeyDown(event: KeyboardEvent): void {
+  protected onKeyDown(event: KeyboardEvent): void {
     this._filterField.focusAndApplyKeyboardEvent(event);
   }
 
   /**
    * Returns `true` if in the context of the welcome page.
    */
-  public isWelcomePage(): boolean {
+  protected isWelcomePage(): boolean {
     return !this._view;
   }
 

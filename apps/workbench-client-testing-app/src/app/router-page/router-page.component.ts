@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, numberAttribute} from '@angular/core';
+import {Component, inject, numberAttribute} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
@@ -33,7 +33,10 @@ import {stringifyError} from '../common/stringify-error.util';
 })
 export default class RouterPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _router = inject(WorkbenchRouter);
+
+  protected readonly form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([], Validators.required),
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     target: this._formBuilder.control(''),
@@ -43,18 +46,17 @@ export default class RouterPageComponent {
     close: this._formBuilder.control<boolean | undefined>(undefined),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
-  public navigateError: string | undefined;
 
-  public targetList = `target-list-${UUID.randomUUID()}`;
-  public positionList = `position-list-${UUID.randomUUID()}`;
+  protected readonly targetList = `target-list-${UUID.randomUUID()}`;
+  protected readonly positionList = `position-list-${UUID.randomUUID()}`;
 
-  constructor(view: WorkbenchView,
-              private _formBuilder: NonNullableFormBuilder,
-              private _router: WorkbenchRouter) {
-    view.signalReady();
+  protected navigateError: string | undefined;
+
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 
-  public async onNavigate(): Promise<void> {
+  protected async onNavigate(): Promise<void> {
     this.navigateError = undefined;
 
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier)!;

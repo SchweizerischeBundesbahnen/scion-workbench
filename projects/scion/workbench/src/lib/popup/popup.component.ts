@@ -39,53 +39,51 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 })
 export class PopupComponent implements OnInit {
 
-  public portal: ComponentPortal<any>;
+  private readonly _popup = inject(ɵPopup);
+
+  protected portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, inject(Injector));
 
   @ViewChild('focus_trap', {static: true, read: CdkTrapFocus})
   private _cdkTrapFocus!: CdkTrapFocus;
 
   @HostBinding('style.width')
-  public get popupWidth(): string | undefined {
+  protected get popupWidth(): string | undefined {
     return this._popup.size?.width;
   }
 
   @HostBinding('style.min-width')
-  public get popupMinWidth(): string | undefined {
+  protected get popupMinWidth(): string | undefined {
     return this._popup.size?.minWidth;
   }
 
   @HostBinding('style.max-width')
-  public get popupMaxWidth(): string | undefined {
+  protected get popupMaxWidth(): string | undefined {
     return this._popup.size?.maxWidth;
   }
 
   @HostBinding('style.height')
-  public get popupHeight(): string | undefined {
+  protected get popupHeight(): string | undefined {
     return this._popup.size?.height;
   }
 
   @HostBinding('style.min-height')
-  public get popupMinHeight(): string | undefined {
+  protected get popupMinHeight(): string | undefined {
     return this._popup.size?.minHeight;
   }
 
   @HostBinding('style.max-height')
-  public get popupMaxHeight(): string | undefined {
+  protected get popupMaxHeight(): string | undefined {
     return this._popup.size?.maxHeight;
   }
 
   @HostBinding('attr.class')
-  public get cssClasses(): string {
+  protected get cssClasses(): string {
     return this._popup.cssClasses.join(' ');
   }
 
   @HostBinding('attr.data-popupid')
-  public get id(): string {
+  protected get id(): string {
     return this._popup.id;
-  }
-
-  constructor(private _popup: ɵPopup, injector: Injector) {
-    this.portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, injector);
   }
 
   public ngOnInit(): void {

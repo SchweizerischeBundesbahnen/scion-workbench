@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Injector, NgZone, signal, Signal} from '@angular/core';
+import {Component, HostBinding, inject, Injector, NgZone, signal} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
@@ -37,45 +37,39 @@ import {MAIN_AREA} from '../../layout/workbench-layout';
 })
 export class ViewTabDragImageComponent {
 
-  public readonly view = signal(inject(WorkbenchView));
-  public readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
+  private readonly _viewDragService = inject(ViewDragService);
+
+  protected readonly view = signal(inject(WorkbenchView)).asReadonly();
+  protected readonly viewTabContentPortal = signal(new ComponentPortal(inject(WorkbenchConfig).viewTabComponent ?? ViewTabContentComponent, null, inject(Injector))).asReadonly();
 
   @HostBinding('class.active')
-  public active = true;
+  protected active = true;
 
   /**
    * Indicates if dragging this view tab over a tabbar.
    */
   @HostBinding('class.drag-over-tabbar')
-  public isDragOverTabbar = false;
+  protected isDragOverTabbar = false;
 
   /**
    * Indicates if dragging this view tab over a valid drop target.
    */
   @HostBinding('class.can-drop')
-  public canDrop = false;
+  protected canDrop = false;
 
   /**
    * Indicates if dragging this view tab over a tabbar located in the peripheral area.
    */
   @HostBinding('class.drag-over-peripheral-tabbar')
-  public isDragOverPeripheralTabbar = false;
+  protected isDragOverPeripheralTabbar = false;
 
-  constructor(private _workbenchConfig: WorkbenchConfig,
-              private _viewDragService: ViewDragService,
-              private _injector: Injector) {
+  constructor() {
     this.installDragOverTabbarDetector();
     this.installCanDropDetector();
-    this.viewTabContentPortal = signal(this.createViewTabContentPortal());
   }
 
-  public onClose(..._: unknown[]): void {
+  protected onClose(..._: unknown[]): void {
     throw Error('[UnsupportedOperationError]');
-  }
-
-  private createViewTabContentPortal(): ComponentPortal<unknown> {
-    const componentType = this._workbenchConfig.viewTabComponent ?? ViewTabContentComponent;
-    return new ComponentPortal(componentType, null, this._injector);
   }
 
   private installDragOverTabbarDetector(): void {

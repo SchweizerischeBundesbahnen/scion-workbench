@@ -11,7 +11,7 @@
 import {isPartId, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MPart, MPartGrid} from './workbench-layout.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
-import {EnvironmentInjector, Injectable, Injector, runInInjectionContext} from '@angular/core';
+import {EnvironmentInjector, inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID} from './workbench-layout';
 import {NavigationStates, Outlets} from '../routing/routing.model';
 import {WorkbenchLayouts} from './workbench-layouts.util';
@@ -22,8 +22,7 @@ import {WorkbenchLayouts} from './workbench-layouts.util';
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
 
-  constructor(private _environmentInjector: EnvironmentInjector) {
-  }
+  private readonly _environmentInjector = inject(EnvironmentInjector);
 
   /**
    * @inheritDoc

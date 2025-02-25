@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, HostBinding, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, Input, OnInit, runInInjectionContext, ViewChild} from '@angular/core';
 import {ManifestService, MicrofrontendPlatformConfig, OutletRouter, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {Logger, LoggerNames} from '../../logging';
 import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContext} from '@scion/workbench-client';
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {ComponentType} from '@angular/cdk/portal';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {setStyle} from '../../common/dom.util';
@@ -34,8 +33,16 @@ import {Microfrontends} from '../common/microfrontend.util';
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // required because <sci-router-outlet> is a custom element
 })
-export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
+export class MicrofrontendMessageBoxComponent implements OnInit {
 
+  private readonly _outletRouter = inject(OutletRouter);
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _injector = inject(Injector);
+  private readonly _logger = inject(Logger);
+
+  /** Splash to display until the microfrontend signals readiness. */
+  protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
   protected readonly outletName = UUID.randomUUID();
 
   @Input({required: true})
@@ -48,24 +55,15 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
    * Indicates if a workbench drag operation is in progress, such as when dragging a view or moving a sash.
    */
   @HostBinding('class.workbench-drag')
-  public isWorkbenchDrag = false;
+  protected isWorkbenchDrag = false;
 
   @ViewChild('router_outlet', {static: true})
   public routerOutletElement!: ElementRef<SciRouterOutletElement>;
 
-  /**
-   * Splash to display until the microfrontend signals readiness.
-   */
-  protected splash: ComponentType<unknown>;
-
-  constructor(private _outletRouter: OutletRouter,
-              private _manifestService: ManifestService,
-              private _workbenchLayoutService: WorkbenchLayoutService,
-              private _injector: Injector,
-              private _logger: Logger) {
+  constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendMessageBoxComponent.', LoggerNames.MICROFRONTEND);
-    this.splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
     this.installWorkbenchDragDetector();
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.outletName})); // Clear the outlet.
   }
 
   public ngOnInit(): void {
@@ -119,9 +117,5 @@ export class MicrofrontendMessageBoxComponent implements OnInit, OnDestroy {
    */
   private installWorkbenchDragDetector(): void {
     effect(() => this.isWorkbenchDrag = this._workbenchLayoutService.dragging());
-  }
-
-  public ngOnDestroy(): void {
-    void this._outletRouter.navigate(null, {outlet: this.outletName}); // Clear the outlet.
   }
 }

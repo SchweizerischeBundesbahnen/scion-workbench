@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {Capability, ManifestService, ParamDefinition} from '@scion/microfrontend-platform';
@@ -44,7 +44,10 @@ import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapability
 })
 export default class RegisterWorkbenchCapabilityPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly form = this._formBuilder.group({
     type: this._formBuilder.control<WorkbenchCapabilities | ''>('', Validators.required),
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     requiredParams: this._formBuilder.control(''),
@@ -107,14 +110,13 @@ export default class RegisterWorkbenchCapabilityPageComponent {
     }),
   });
 
-  public capability: Capability | undefined;
-  public registerError: string | undefined;
-  public WorkbenchCapabilities = WorkbenchCapabilities;
+  protected readonly WorkbenchCapabilities = WorkbenchCapabilities;
 
-  constructor(view: WorkbenchView,
-              private _manifestService: ManifestService,
-              private _formBuilder: NonNullableFormBuilder) {
-    view.signalReady();
+  protected capability: Capability | undefined;
+  protected registerError: string | undefined;
+
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 
   public async onRegister(): Promise<void> {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Injector, numberAttribute} from '@angular/core';
+import {Component, inject, Injector, numberAttribute} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNavigationExtras, WorkbenchRouter, WorkbenchRouterLinkDirective, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {NgTemplateOutlet} from '@angular/common';
@@ -40,7 +40,16 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export default class RouterPageComponent {
 
-  protected form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _wbRouter = inject(WorkbenchRouter);
+  private readonly _settingsService = inject(SettingsService);
+
+  protected readonly workbenchService = inject(WorkbenchService);
+  protected readonly targetList = `target-list-${UUID.randomUUID()}`;
+  protected readonly partList = `part-list-${UUID.randomUUID()}`;
+  protected readonly positionList = `position-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     commands: this._formBuilder.control([]),
     extras: this._formBuilder.group({
       data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
@@ -56,27 +65,18 @@ export default class RouterPageComponent {
     }),
     viewContext: this._formBuilder.control(true),
   });
-  protected navigateError: string | undefined;
 
-  protected nullViewInjector: Injector;
+  protected readonly nullViewInjector = Injector.create({
+    parent: inject(Injector),
+    providers: [
+      {provide: WorkbenchView, useValue: undefined},
+    ],
+  });
+
+  protected navigateError: string | undefined;
   protected extras: WorkbenchNavigationExtras = {};
 
-  protected targetList = `target-list-${UUID.randomUUID()}`;
-  protected partList = `part-list-${UUID.randomUUID()}`;
-  protected positionList = `position-list-${UUID.randomUUID()}`;
-
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              injector: Injector,
-              private _wbRouter: WorkbenchRouter,
-              private _settingsService: SettingsService,
-              protected workbenchService: WorkbenchService) {
-    this.nullViewInjector = Injector.create({
-      parent: injector,
-      providers: [
-        {provide: WorkbenchView, useValue: undefined},
-      ],
-    });
-
+  constructor() {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

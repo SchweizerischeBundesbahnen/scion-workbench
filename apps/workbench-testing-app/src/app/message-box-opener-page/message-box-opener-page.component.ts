@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Type} from '@angular/core';
+import {Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchMessageBoxOptions, WorkbenchMessageBoxService} from '@scion/workbench';
 import {stringifyError} from '../common/stringify-error.util';
@@ -32,7 +32,10 @@ import {CssClassComponent} from '../css-class/css-class.component';
 })
 export default class MessageBoxOpenerPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
+
+  protected readonly form = this._formBuilder.group({
     component: this._formBuilder.control(''),
     message: this._formBuilder.control(''),
     options: this._formBuilder.group({
@@ -46,14 +49,10 @@ export default class MessageBoxOpenerPageComponent {
     }),
   });
 
-  public messageBoxError: string | undefined;
-  public closeAction: string | undefined;
+  protected messageBoxError: string | undefined;
+  protected closeAction: string | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _messageBoxService: WorkbenchMessageBoxService) {
-  }
-
-  public async onMessageBoxOpen(): Promise<void> {
+  protected async onMessageBoxOpen(): Promise<void> {
     this.messageBoxError = undefined;
     this.closeAction = undefined;
 
@@ -90,7 +89,7 @@ export default class MessageBoxOpenerPageComponent {
     }
   }
 
-  public isUseComponent(): boolean {
+  protected isUseComponent(): boolean {
     return !!this.form.controls.component.value;
   }
 

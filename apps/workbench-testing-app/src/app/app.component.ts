@@ -31,13 +31,19 @@ import {SettingsService} from './settings.service';
 })
 export class AppComponent implements DoCheck {
 
+  private readonly _router = inject(Router);
+  private readonly _workbenchService = inject(WorkbenchService);
+  private readonly _zone = inject(NgZone);
+
+  protected readonly workbenchStartup = inject(WorkbenchStartup);
+
   private _logAngularChangeDetectionCycles = false;
 
   @HostBinding('attr.data-workbench-id')
-  public workbenchId = inject(WORKBENCH_ID);
+  protected workbenchId = inject(WORKBENCH_ID);
 
   @HostBinding('attr.data-perspective-id')
-  public get activePerspectiveId(): string | undefined {
+  protected get activePerspectiveId(): string | undefined {
     return this._workbenchService.activePerspective()?.id;
   }
 
@@ -50,16 +56,12 @@ export class AppComponent implements DoCheck {
   @HostBinding('attr.data-navigationid')
   protected navigationId: string | undefined;
 
-  constructor(settingsService: SettingsService,
-              private _router: Router,
-              private _workbenchService: WorkbenchService,
-              private _zone: NgZone,
-              protected workbenchStartup: WorkbenchStartup) {
+  constructor() {
     this.installRouterEventListeners();
     this.installPropagatedKeyboardEventLogger();
     this.provideWorkbenchService();
 
-    settingsService.observe$('logAngularChangeDetectionCycles')
+    inject(SettingsService).observe$('logAngularChangeDetectionCycles')
       .pipe(takeUntilDestroyed())
       .subscribe(enabled => this._logAngularChangeDetectionCycles = enabled);
   }

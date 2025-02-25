@@ -27,23 +27,26 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class ViewMoveDialogTestPageComponent {
 
-  @Input({required: true})
-  public view!: WorkbenchView;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _dialog = inject(WorkbenchDialog);
 
-  public form = this._formBuilder.group({
+  protected readonly targetList = `target-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     workbenchId: this._formBuilder.control<string | 'new-window'>(inject(WORKBENCH_ID)),
     partId: this._formBuilder.control('', Validators.required),
     region: this._formBuilder.control<'north' | 'south' | 'west' | 'east' | ''>(''),
   });
 
-  public targetList = `target-list-${UUID.randomUUID()}`;
+  @Input({required: true})
+  public view!: WorkbenchView;
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _dialog: WorkbenchDialog) {
+  constructor() {
     this._dialog.title = 'Move view';
     this.requirePartIfMovingToExistingWindow();
   }
 
-  public onOk(): void {
+  protected onOk(): void {
     if (this.form.controls.workbenchId.value === 'new-window') {
       this.view.move('new-window');
     }
@@ -56,7 +59,7 @@ export class ViewMoveDialogTestPageComponent {
     this._dialog.close();
   }
 
-  public onCancel(): void {
+  protected onCancel(): void {
     this._dialog.close();
   }
 

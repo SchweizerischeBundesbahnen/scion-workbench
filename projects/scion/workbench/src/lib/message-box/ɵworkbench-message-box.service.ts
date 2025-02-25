@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, inject, Injectable, NgZone} from '@angular/core';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxComponent} from './workbench-message-box.component';
@@ -18,8 +18,8 @@ import {WorkbenchMessageBoxService} from './workbench-message-box.service';
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService {
 
-  constructor(private _workbenchDialogService: WorkbenchDialogService, private _zone: NgZone) {
-  }
+  private readonly _workbenchDialogService = inject(WorkbenchDialogService);
+  private readonly _zone = inject(NgZone);
 
   /**
    * @inheritDoc

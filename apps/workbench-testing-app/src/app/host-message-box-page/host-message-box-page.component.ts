@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding} from '@angular/core';
+import {Component, HostBinding, inject} from '@angular/core';
 import {WorkbenchMessageBox} from '@scion/workbench-client';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
@@ -42,7 +42,16 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 })
 export default class HostMessageBoxPageComponent {
 
-  protected uuid = UUID.randomUUID();
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly messageBox = inject(WorkbenchMessageBox);
+  protected readonly uuid = UUID.randomUUID();
+
+  protected readonly form = this._formBuilder.group({
+    height: this._formBuilder.control(''),
+    width: this._formBuilder.control(''),
+  });
 
   @HostBinding('style.width')
   protected get width(): string {
@@ -52,15 +61,5 @@ export default class HostMessageBoxPageComponent {
   @HostBinding('style.height')
   protected get height(): string {
     return this.form.controls.height.value;
-  }
-
-  protected form = this._formBuilder.group({
-    height: this._formBuilder.control(''),
-    width: this._formBuilder.control(''),
-  });
-
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              protected route: ActivatedRoute,
-              protected messageBox: WorkbenchMessageBox) {
   }
 }

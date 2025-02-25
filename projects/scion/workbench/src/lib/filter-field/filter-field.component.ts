@@ -8,7 +8,7 @@
  *  SPDX-License-Identifier: EPL-2.0
  */
 
-import {booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, HostListener, Input, OnDestroy, Output, ViewChild} from '@angular/core';
+import {booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostBinding, HostListener, inject, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {noop} from 'rxjs';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
@@ -30,10 +30,15 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
 
+  private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly _focusManager = inject(FocusMonitor);
+  private readonly _cd = inject(ChangeDetectorRef);
+
+  protected readonly id = UUID.randomUUID();
+  protected readonly formControl = new FormControl('', {updateOn: 'change', nonNullable: true});
+
   private _cvaChangeFn: (value: string) => void = noop;
   private _cvaTouchedFn: () => void = noop;
-
-  public readonly id = UUID.randomUUID();
 
   /**
    * Sets focus order in sequential keyboard navigation.
@@ -74,13 +79,7 @@ export class FilterFieldComponent implements ControlValueAccessor, OnDestroy {
     return !this.formControl.value;
   }
 
-  /* @docs-private */
-  public formControl: FormControl<string>;
-
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _focusManager: FocusMonitor,
-              private _cd: ChangeDetectorRef) {
-    this.formControl = new FormControl('', {updateOn: 'change', nonNullable: true});
+  constructor() {
     this.formControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(value => {

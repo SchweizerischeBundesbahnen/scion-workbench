@@ -9,7 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
-import {Injectable, NgZone} from '@angular/core';
+import {inject, Injectable, NgZone} from '@angular/core';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {ObservableDecorator} from '@scion/microfrontend-platform';
 
@@ -19,8 +19,7 @@ import {ObservableDecorator} from '@scion/microfrontend-platform';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class NgZoneObservableDecorator implements ObservableDecorator {
 
-  constructor(private _zone: NgZone) {
-  }
+  private readonly _zone = inject(NgZone);
 
   public decorate$<T>(source$: Observable<T>): Observable<T> {
     return new Observable<T>(observer => {

@@ -35,21 +35,19 @@ import {sortPerspectives} from './sort-perspectives.util';
 })
 export class HeaderComponent {
 
+  private readonly _router = inject(Router);
+  private readonly _wbRouter = inject(WorkbenchRouter);
+  private readonly _menuService = inject(MenuService);
+  private readonly _settingsService = inject(SettingsService);
+  private readonly _logger = inject(Logger);
+
+  protected readonly workbenchService = inject(WorkbenchService);
   protected readonly PerspectiveData = PerspectiveData;
   protected readonly lightThemeActiveFormControl = new FormControl<boolean>(true);
-  protected readonly perspectives: Signal<WorkbenchPerspective[]>;
+  protected readonly perspectives = this.computePerspectives();
 
-  constructor(private _router: Router,
-              private _wbRouter: WorkbenchRouter,
-              private _menuService: MenuService,
-              private _settingsService: SettingsService,
-              private _logger: Logger,
-              protected workbenchService: WorkbenchService) {
+  constructor() {
     this.installThemeSwitcher();
-    this.perspectives = computed(() => {
-      const perspectives = this.workbenchService.perspectives();
-      return untracked(() => sortPerspectives(perspectives));
-    });
   }
 
   protected async onTogglePerspective(perspective: WorkbenchPerspective): Promise<void> {
@@ -70,6 +68,13 @@ export class HeaderComponent {
       new MenuItemSeparator(),
       ...this.contributeSettingsMenuItems(),
     ]);
+  }
+
+  private computePerspectives(): Signal<WorkbenchPerspective[]> {
+    return computed(() => {
+      const perspectives = this.workbenchService.perspectives();
+      return untracked(() => sortPerspectives(perspectives));
+    });
   }
 
   private contributePerspectiveMenuItems(): MenuItem[] {

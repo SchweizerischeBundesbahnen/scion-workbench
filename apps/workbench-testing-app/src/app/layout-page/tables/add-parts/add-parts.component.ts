@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, inject, Input} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -33,16 +33,13 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class AddPartsComponent implements ControlValueAccessor, Validator {
 
-  private _cvaChangeFn: (value: PartDescriptor[]) => void = noop;
-  private _cvaTouchedFn: () => void = noop;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  @Input()
-  public requiresInitialPart = false;
+  protected readonly MAIN_AREA = MAIN_AREA;
+  protected readonly relativeToList = `relative-to-list-${UUID.randomUUID()}`;
+  protected readonly idList = `id-list-${UUID.randomUUID()}`;
 
-  @Input({transform: arrayAttribute})
-  public partProposals: string[] = [];
-
-  protected form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     parts: this._formBuilder.array<FormGroup<{
       id: FormControl<string | MAIN_AREA>;
       relativeTo: FormGroup<{
@@ -56,11 +53,16 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
     }>>([]),
   });
 
-  protected MAIN_AREA = MAIN_AREA;
-  protected relativeToList = `relative-to-list-${UUID.randomUUID()}`;
-  protected idList = `id-list-${UUID.randomUUID()}`;
+  private _cvaChangeFn: (value: PartDescriptor[]) => void = noop;
+  private _cvaTouchedFn: () => void = noop;
 
-  constructor(private _formBuilder: NonNullableFormBuilder) {
+  @Input()
+  public requiresInitialPart = false;
+
+  @Input({transform: arrayAttribute})
+  public partProposals: string[] = [];
+
+  constructor() {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

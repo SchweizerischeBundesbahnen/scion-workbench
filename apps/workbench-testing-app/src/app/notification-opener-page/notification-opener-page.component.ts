@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, Type} from '@angular/core';
+import {Component, inject, Type} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {NotificationService} from '@scion/workbench';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
@@ -32,9 +32,12 @@ import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 })
 export default class NotificationOpenerPageComponent {
 
-  public notificationOpenError: string | undefined;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _notificationService = inject(NotificationService);
 
-  public form = this._formBuilder.group({
+  protected readonly durationList = `duration-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control(''),
     content: this._formBuilder.control(''),
     component: this._formBuilder.control<'notification-page' | ''>(''),
@@ -46,12 +49,9 @@ export default class NotificationOpenerPageComponent {
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
-  public durationList = `duration-list-${UUID.randomUUID()}`;
+  protected notificationOpenError: string | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _notificationService: NotificationService) {
-  }
-
-  public onNotificationShow(): void {
+  protected onNotificationShow(): void {
     this.notificationOpenError = undefined;
     try {
       this._notificationService.notify({
@@ -90,11 +90,11 @@ export default class NotificationOpenerPageComponent {
     return Number(duration);
   }
 
-  public isUseComponent(): boolean {
+  protected isUseComponent(): boolean {
     return !!this.form.controls.component.value;
   }
 
-  public isUseGroupInputReducer(): boolean {
+  protected isUseGroupInputReducer(): boolean {
     return this.form.controls.useGroupInputReducer.value;
   }
 

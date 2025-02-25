@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Capability, ManifestService} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {BehaviorSubject, firstValueFrom, Observable} from 'rxjs';
@@ -21,9 +21,10 @@ import {WorkbenchInitializer} from '../startup/workbench-initializer';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class ManifestObjectCache implements WorkbenchInitializer {
 
-  private _capabilities$ = new BehaviorSubject(new Map<string, Capability>());
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _capabilities$ = new BehaviorSubject(new Map<string, Capability>());
 
-  constructor(private _manifestService: ManifestService) {
+  constructor() {
     this.installCapabilityLookup();
   }
 

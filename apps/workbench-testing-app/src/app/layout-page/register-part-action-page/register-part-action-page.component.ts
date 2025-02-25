@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {WorkbenchPart, WorkbenchService} from '@scion/workbench';
 import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
@@ -31,7 +31,15 @@ import {Arrays} from '@scion/toolkit/util';
 })
 export default class RegisterPartActionPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _settingsService = inject(SettingsService);
+
+  protected readonly workbenchService = inject(WorkbenchService);
+  protected readonly viewList = `view-list-${UUID.randomUUID()}`;
+  protected readonly partList = `part-list-${UUID.randomUUID()}`;
+  protected readonly gridList = `grid-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     content: this._formBuilder.control('', {validators: Validators.required}),
     align: this._formBuilder.control<'start' | 'end' | ''>(''),
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
@@ -41,18 +49,10 @@ export default class RegisterPartActionPageComponent {
       grid: this._formBuilder.control<'workbench' | 'mainArea' | ''>(''),
     }),
   });
-  public registerError: string | false | undefined;
 
-  protected viewList = `view-list-${UUID.randomUUID()}`;
-  protected partList = `part-list-${UUID.randomUUID()}`;
-  protected gridList = `grid-list-${UUID.randomUUID()}`;
+  protected registerError: string | false | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _settingsService: SettingsService,
-              public workbenchService: WorkbenchService) {
-  }
-
-  public onRegister(): void {
+  protected onRegister(): void {
     this.registerError = undefined;
     // Capture form values because the action will be constructed asynchronously.
     const canMatchPartIds = undefinedIfEmpty(this.form.controls.canMatch.controls.part.value.split(/\s+/).filter(Boolean));

@@ -29,12 +29,13 @@ import {Arrays} from '@scion/toolkit/util';
 @Directive({selector: '[wbGlassPane]'})
 export class GlassPaneDirective implements OnDestroy, AfterViewInit {
 
-  private readonly _targetElement: HTMLElement;
-  private _glassPane: GlassPane | null = null;
-  private _options = inject(GLASS_PANE_OPTIONS, {optional: true, host: true}) ?? undefined;
+  private readonly _injector = inject(Injector);
+  private readonly _targetElement = coerceElement<HTMLElement>(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
+  private readonly _options = inject(GLASS_PANE_OPTIONS, {optional: true, host: true}) ?? undefined;
 
-  constructor(private _injector: Injector) {
-    this._targetElement = coerceElement<HTMLElement>(inject(GLASS_PANE_TARGET_ELEMENT, {optional: true, host: true}) ?? inject(ElementRef));
+  private _glassPane: GlassPane | null = null;
+
+  constructor() {
     this.ensureHostElementPositioned();
   }
 

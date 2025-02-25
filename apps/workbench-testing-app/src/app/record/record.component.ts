@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, inject, Input} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -28,15 +28,15 @@ import {NgClass} from '@angular/common';
 })
 export class RecordComponent implements ControlValueAccessor {
 
+  protected readonly formControl = inject(NonNullableFormBuilder).control<string>('');
+
   private _cvaChangeFn: (record: Record<string, string> | undefined) => void = noop;
   private _cvaTouchedFn: () => void = noop;
-
-  protected formControl = this._formBuilder.control<string>('');
 
   @Input('class')
   public cssClass: string | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder) {
+  constructor() {
     this.formControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

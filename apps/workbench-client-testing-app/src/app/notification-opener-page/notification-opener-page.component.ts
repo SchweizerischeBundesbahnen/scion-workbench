@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchNotificationService, WorkbenchView} from '@scion/workbench-client';
 import {stringifyError} from '../common/stringify-error.util';
@@ -30,7 +30,10 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export default class NotificationOpenerPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _notificationService = inject(WorkbenchNotificationService);
+
+  protected readonly form = this._formBuilder.group({
     qualifier: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
     title: this._formBuilder.control(''),
@@ -41,17 +44,15 @@ export default class NotificationOpenerPageComponent {
     cssClass: this._formBuilder.control<string | string[] | undefined>(undefined),
   });
 
-  public notificationOpenError: string | undefined;
+  protected readonly durationList = `duration-list-${UUID.randomUUID()}`;
 
-  public durationList = `duration-list-${UUID.randomUUID()}`;
+  protected notificationOpenError: string | undefined;
 
-  constructor(view: WorkbenchView,
-              private _formBuilder: NonNullableFormBuilder,
-              private _notificationService: WorkbenchNotificationService) {
-    view.signalReady();
+  constructor() {
+    inject(WorkbenchView).signalReady();
   }
 
-  public onNotificationShow(): void {
+  protected onNotificationShow(): void {
     const qualifier = SciKeyValueFieldComponent.toDictionary(this.form.controls.qualifier);
     const params = SciKeyValueFieldComponent.toDictionary(this.form.controls.params);
 
