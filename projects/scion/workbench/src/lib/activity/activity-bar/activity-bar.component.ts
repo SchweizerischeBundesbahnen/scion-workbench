@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {ActivityGroupComponent} from './activity-group/activity-group.component';
 import {ɵWorkbenchService} from '../../ɵworkbench.service';
 
@@ -20,20 +20,13 @@ import {ɵWorkbenchService} from '../../ɵworkbench.service';
   imports: [
     ActivityGroupComponent,
   ],
+  host: {
+    '[attr.data-align]': 'align()',
+  },
 })
 export class ActivityBarComponent {
 
-  public readonly side = input.required<'left' | 'right'>();
-
-  @HostBinding('class.left')
-  protected get left(): boolean {
-    return this.side() === 'left';
-  }
-
-  @HostBinding('class.right')
-  protected get right(): boolean {
-    return this.side() === 'right';
-  }
+  public readonly align = input.required<'left' | 'right'>();
 
   protected readonly workbenchService = inject(ɵWorkbenchService);
 }

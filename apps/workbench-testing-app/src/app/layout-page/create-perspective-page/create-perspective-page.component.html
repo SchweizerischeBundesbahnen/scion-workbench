@@ -36,6 +36,11 @@
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
   </section>
 
+  <section>
+    <header>Activate Parts</header>
+    <app-activate-parts [formControl]="form.controls.activeParts"/>
+  </section>
+
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>Register</button>
 </form>
 

@@ -32,6 +32,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public views = new Array<ViewDescriptor>();
   public partNavigations = new Array<PartNavigationDescriptor>();
   public viewNavigations = new Array<ViewNavigationDescriptor>();
+  public activeParts = new Array<string>();
 
   public addInitialPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
     this.parts.push({id, activate: options?.activate});
@@ -130,7 +131,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   public activatePart(id: string): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.activatePart` is not supported.');
+    this.activeParts.push(id);
+    return this;
   }
 
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout {

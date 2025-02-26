@@ -22,6 +22,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
+import {ActivatePartsComponent} from '../tables/activate-parts/activate-parts.component';
 
 @Component({
   selector: 'app-create-perspective-page',
@@ -38,6 +39,7 @@ import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activiti
     SciKeyValueFieldComponent,
     NavigatePartsComponent,
     AddActivitiesComponent,
+    ActivatePartsComponent,
   ],
 })
 export default class CreatePerspectivePageComponent {
@@ -51,6 +53,7 @@ export default class CreatePerspectivePageComponent {
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
+    activeParts: this._formBuilder.control<string[] | undefined>([]),
   });
 
   protected registerError: string | false | undefined;
@@ -114,6 +117,7 @@ export default class CreatePerspectivePageComponent {
     const views = this.form.controls.views.value;
     const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
+    const activeParts = this.form.controls.activeParts.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
       // Add initial part.
@@ -171,6 +175,12 @@ export default class CreatePerspectivePageComponent {
           cssClass: viewNavigation.extras?.cssClass,
         });
       }
+
+      // Add active parts.
+      for (const activePart of activeParts ?? []) {
+        layout = layout.activatePart(activePart);
+      }
+
       return layout;
     };
   }

@@ -24,7 +24,7 @@ export class ModifyLayoutPagePO {
   }
 
   public async modify(fn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
-    const {activities, parts, views, partNavigations, viewNavigations} = fn(new ɵWorkbenchLayout()) as ɵWorkbenchLayout;
+    const {activities, parts, views, partNavigations, viewNavigations, activeParts} = fn(new ɵWorkbenchLayout()) as ɵWorkbenchLayout;
 
     // Enter the layout.
     await LayoutPages.enterActivities(this.locator.locator('app-add-activities'), activities);
@@ -32,6 +32,7 @@ export class ModifyLayoutPagePO {
     await LayoutPages.enterViews(this.locator.locator('app-add-views'), views);
     await LayoutPages.enterPartNavigations(this.locator.locator('app-navigate-parts'), partNavigations);
     await LayoutPages.enterViewNavigations(this.locator.locator('app-navigate-views'), viewNavigations);
+    await LayoutPages.enterActiveParts(this.locator.locator('app-activate-parts'), activeParts);
 
     // Apply the layout.
     const appPO = new AppPO(this.locator.page());

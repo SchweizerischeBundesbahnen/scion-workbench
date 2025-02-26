@@ -31,12 +31,12 @@ test.describe('Workbench', () => {
     );
 
     // Open activity.1
-    const activity1 = appPO.activity({activityId: 'activity.1'});
-    await activity1.toggle();
+    const activity1 = appPO.activityItem({activityId: 'activity.1'});
+    await activity1.click();
 
     // Open activity.2
-    const activity2 = appPO.activity({activityId: 'activity.2'});
-    await activity2.toggle();
+    const activity2 = appPO.activityItem({activityId: 'activity.2'});
+    await activity2.click();
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {

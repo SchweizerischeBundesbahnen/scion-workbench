@@ -85,7 +85,6 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
     perspectiveId: actual.perspectiveId,
     mainAreaGrid: actual.grids.mainArea ?? undefined,
     mainGrid: actual.grids.main,
-    maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
     outlets: actual.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}),
   };

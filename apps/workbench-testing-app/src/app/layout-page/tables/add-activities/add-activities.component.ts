@@ -156,7 +156,7 @@ export interface ActivityDescriptor {
 }
 
 export function activityIdFormatValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
+  return (control: AbstractControl<ActivityId | undefined>): ValidationErrors | null => {
     if (!control.value) {
       return null;
     }

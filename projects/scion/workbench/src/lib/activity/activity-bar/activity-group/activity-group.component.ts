@@ -24,6 +24,4 @@ import {ActivityItemComponent} from '../activity-item/activity-item.component';
 export class ActivityGroupComponent {
 
   public readonly group = input.required<MActivityGroup>();
-
-
 }

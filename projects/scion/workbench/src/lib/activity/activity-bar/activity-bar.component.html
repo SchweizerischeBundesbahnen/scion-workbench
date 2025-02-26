@@ -1,6 +1,6 @@
 @let activityLayout = workbenchService.layout().activityLayout;
 
-@switch (side()) {
+@switch (align()) {
   @case ('left') {
     <wb-activity-group [group]="activityLayout.toolbars.leftTop" data-group="left-top"/>
 

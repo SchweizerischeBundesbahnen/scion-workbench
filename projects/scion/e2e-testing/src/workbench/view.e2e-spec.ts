@@ -962,19 +962,21 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            views: [{id: testee1ViewId}],
-            activeViewId: testee1ViewId,
+      grids: {
+        mainAreaGrid: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              views: [{id: testee1ViewId}],
+              activeViewId: testee1ViewId,
+            }),
+            child2: new MPart({
+              views: [{id: testee2ViewId}],
+              activeViewId: testee2ViewId,
+            }),
           }),
-          child2: new MPart({
-            views: [{id: testee2ViewId}],
-            activeViewId: testee2ViewId,
-          }),
-        }),
+        },
       },
     });
   });
@@ -1010,22 +1012,24 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .8,
-          child1: new MPart({id: MAIN_AREA}),
-          child2: new MPart({
-            views: [{id: testee2ViewId}],
-            activeViewId: testee2ViewId,
+      grids: {
+        mainGrid: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .8,
+            child1: new MPart({id: MAIN_AREA}),
+            child2: new MPart({
+              views: [{id: testee2ViewId}],
+              activeViewId: testee2ViewId,
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+        },
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
   });
@@ -1062,22 +1066,26 @@ test.describe('Workbench View', () => {
 
     // Expect view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
     await expectView(new ViewPagePO(newWindow.appPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+      grids: {
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
     await expectView(testee1ViewPage).toBeActive();
@@ -1119,22 +1127,26 @@ test.describe('Workbench View', () => {
 
     // Expect view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
     await expectView(new ViewPagePO(newAppPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+      grids: {
+        mainAreaGrid: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
     await expectView(testee1ViewPage).toBeActive();

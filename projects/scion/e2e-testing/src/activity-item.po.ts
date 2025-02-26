@@ -11,9 +11,9 @@
 import {Locator} from '@playwright/test';
 
 /**
- * Handle for interacting with a workbench activity.
+ * Handle for interacting with an activity item in the activity bar.
  */
-export class ActivityPO {
+export class ActivityItemPO {
 
   public readonly buttonLocator: Locator;
 
@@ -21,7 +21,7 @@ export class ActivityPO {
     this.buttonLocator = locator.locator('button.activity-item');
   }
 
-  public async toggle(): Promise<void> {
+  public async click(): Promise<void> {
     await this.buttonLocator.click();
   }
 }

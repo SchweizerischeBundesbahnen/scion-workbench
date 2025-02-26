@@ -21,7 +21,7 @@ import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
 import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
-import {ActivityPO} from './activity.po';
+import {ActivityItemPO} from './activity-item.po';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -246,15 +246,15 @@ export class AppPO {
    * @param locateBy.activityId - Identifies the activity by its id
    * @param locateBy.cssClass - Identifies the activity by its CSS class
    */
-  public activity(locateBy: {activityId?: ActivityId; cssClass?: string}): ActivityPO {
+  public activityItem(locateBy: {activityId?: ActivityId; cssClass?: string}): ActivityItemPO {
     if (locateBy.activityId !== undefined && locateBy.cssClass !== undefined) {
-      return new ActivityPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"].${locateBy.cssClass}`));
+      return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"].${locateBy.cssClass}`));
     }
     else if (locateBy.activityId !== undefined) {
-      return new ActivityPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"]`));
+      return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"]`));
     }
     else if (locateBy.cssClass !== undefined) {
-      return new ActivityPO(this.page.locator(`wb-activity-item.${locateBy.cssClass}`));
+      return new ActivityItemPO(this.page.locator(`wb-activity-item.${locateBy.cssClass}`));
     }
     throw Error(`[ActivityLocateError] Missing required locator. Either 'activityId' or 'cssClass', or both must be set.`);
   }
