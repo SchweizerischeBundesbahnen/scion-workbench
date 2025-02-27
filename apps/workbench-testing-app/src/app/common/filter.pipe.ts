@@ -19,7 +19,7 @@ import {Observable, of} from 'rxjs';
 /**
  * Filters elements that match the text of the passed filter control.
  */
-@Pipe({name: 'appFilter$', standalone: true})
+@Pipe({name: 'appFilter$'})
 export class FilterPipe implements PipeTransform {
 
   public transform<T>(items: T[] | null | undefined, filterControl: FormControl<string>, itemTextFn: (item: T) => string | undefined): Observable<T[]> {

@@ -7,7 +7,7 @@ import {ɵNotification} from './ɵnotification';
  * Collects CSS classes to be applied to the passed notification instance and returns them as
  * array in an Observable.
  */
-@Pipe({name: 'wbNotificationCssClasses$', standalone: true})
+@Pipe({name: 'wbNotificationCssClasses$'})
 export class NotificationCssClassesPipe implements PipeTransform {
 
   public transform(notification: ɵNotification): Observable<string[]> {

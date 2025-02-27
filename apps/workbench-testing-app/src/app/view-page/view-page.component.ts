@@ -32,7 +32,6 @@ import {CanClose} from '@scion/workbench-client';
   selector: 'app-view-page',
   templateUrl: './view-page.component.html',
   styleUrls: ['./view-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     FormsModule,

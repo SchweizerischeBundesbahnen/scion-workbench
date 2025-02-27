@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {Notification} from './notification';
 
 /**
@@ -8,13 +8,8 @@ import {Notification} from './notification';
   selector: 'wb-text-notification',
   template: `{{text ?? ''}}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
 })
 export class TextNotificationComponent {
 
-  public text: string | undefined;
-
-  constructor(notification: Notification) {
-    this.text = notification.input as string | undefined;
-  }
+  public text: string | undefined = inject(Notification).input as string | undefined;
 }

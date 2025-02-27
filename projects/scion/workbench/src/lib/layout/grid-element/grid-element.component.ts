@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, effect, HostBinding, inject, input} from '@angular/core';
 import {MPart, MTreeNode} from '../workbench-layout.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
@@ -32,7 +32,6 @@ import {PartId} from '../../part/workbench-part.model';
   selector: 'wb-grid-element',
   templateUrl: './grid-element.component.html',
   styleUrls: ['./grid-element.component.scss'],
-  standalone: true,
   imports: [
     InstanceofPipe,
     PortalModule,
@@ -41,40 +40,42 @@ import {PartId} from '../../part/workbench-part.model';
     SciSashDirective,
   ],
 })
-export class GridElementComponent implements OnChanges {
+export class GridElementComponent {
 
-  public MTreeNode = MTreeNode;
-  public MPart = MPart;
+  public readonly element = input.required<MTreeNode | MPart>();
 
-  public children = new Array<ChildElement>();
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+
+  protected readonly MTreeNode = MTreeNode;
+  protected readonly MPart = MPart;
+
+  protected children = new Array<ChildElement>();
 
   @HostBinding('attr.data-parentnodeid')
-  public parentNodeId: string | undefined;
+  protected parentNodeId: string | undefined;
 
   @HostBinding('attr.data-nodeid')
-  public nodeId: string | undefined;
+  protected nodeId: string | undefined;
 
   @HostBinding('attr.data-partid')
-  public partId: PartId | undefined;
+  protected partId: PartId | undefined;
 
-  @Input({required: true})
-  public element!: MTreeNode | MPart;
-
-  constructor(private _workbenchRouter: ɵWorkbenchRouter, private _workbenchLayoutService: WorkbenchLayoutService) {
+  constructor() {
+    effect(() => {
+      const element = this.element();
+      this.children = element instanceof MTreeNode ? this.computeChildren(element) : [];
+      this.parentNodeId = element.parent?.id;
+      this.nodeId = element instanceof MTreeNode ? element.id : undefined;
+      this.partId = element instanceof MPart ? element.id : undefined;
+    });
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.children = this.element instanceof MTreeNode ? this.computeChildren(this.element) : [];
-    this.parentNodeId = this.element.parent?.id;
-    this.nodeId = this.element instanceof MTreeNode ? this.element.id : undefined;
-    this.partId = this.element instanceof MPart ? this.element.id : undefined;
-  }
-
-  public onSashStart(): void {
+  protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);
   }
 
-  public onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
+  protected onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
     const ratio = sashSize1 / (sashSize1 + sashSize2);
     this._workbenchLayoutService.signalResizing(false);
     void this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio));

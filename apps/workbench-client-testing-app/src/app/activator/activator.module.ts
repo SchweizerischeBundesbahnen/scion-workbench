@@ -8,15 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Inject, NgModule} from '@angular/core';
+import {inject, NgModule} from '@angular/core';
 import {Beans} from '@scion/toolkit/bean-manager';
-import {APP_IDENTITY, ManifestService, MessageClient} from '@scion/microfrontend-platform';
+import {ManifestService, MessageClient} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability, WorkbenchViewCapability} from '@scion/workbench-client';
+import {APP_SYMBOLIC_NAME} from '../workbench-client/workbench-client.provider';
 
 @NgModule({})
 export default class ActivatorModule {
 
-  constructor(private _manifestService: ManifestService, @Inject(APP_IDENTITY) symbolicName: string) {
+  private readonly _manifestService = inject(ManifestService);
+
+  constructor() {
+    const symbolicName = inject(APP_SYMBOLIC_NAME);
     void this.registerManifestObjects(symbolicName).then(() => Beans.get(MessageClient).publish('activator-ready'));
   }
 

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, effect, inject, Injector, input, runInInjectionContext, StaticProvider, untracked} from '@angular/core';
 import {WorkbenchDialog as WorkbenchClientDialog, WorkbenchDialogCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -37,39 +37,46 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'wb-microfrontend-host-dialog',
   styleUrls: ['./microfrontend-host-dialog.component.scss'],
   templateUrl: './microfrontend-host-dialog.component.html',
-  standalone: true,
   imports: [
     RouterOutlet,
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
+export class MicrofrontendHostDialogComponent {
 
-  @Input({required: true})
-  public capability!: WorkbenchDialogCapability;
+  public readonly capability = input.required<WorkbenchDialogCapability>();
+  public readonly params = input.required<Map<string, unknown>>();
 
-  @Input({required: true})
-  public params!: Map<string, unknown>;
+  private readonly _dialog = inject(ɵWorkbenchDialog);
+  private readonly _injector = inject(Injector);
+  private readonly _router = inject(Router);
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  protected outletName: string;
+  protected readonly outletName = DIALOG_ID_PREFIX.concat(this._dialog.id);
+
   protected outletInjector!: Injector;
 
-  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
-  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
-
-  constructor(private _dialog: ɵWorkbenchDialog,
-              private _injector: Injector,
-              private _router: Router) {
-    this.outletName = DIALOG_ID_PREFIX.concat(this._dialog.id);
-  }
-
-  public ngOnInit(): void {
+  constructor() {
     this.setDialogProperties();
     this.createOutletInjector();
-    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
-      if (!success) {
-        this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
-      }
+    this.navigateCapability();
+
+    inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
+  }
+
+  private navigateCapability(): void {
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        void this.navigate(capability.properties.path, {params}).then(success => {
+          if (!success) {
+            this._dialog.close(Error('[DialogNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+          }
+        });
+      });
     });
   }
 
@@ -85,31 +92,40 @@ export class MicrofrontendHostDialogComponent implements OnDestroy, OnInit {
   }
 
   private createOutletInjector(): void {
-    this.outletInjector = Injector.create({
-      parent: this._injector,
-      providers: [provideWorkbenchClientDialogHandle(this.capability, this.params),
-        // Prevent injecting the dialog handle in host dialog component.
-        {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)},
-      ],
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        this.outletInjector = Injector.create({
+          parent: this._injector,
+          providers: [provideWorkbenchClientDialogHandle(capability, params),
+            // Prevent injecting the dialog handle in host dialog component.
+            {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)},
+          ],
+        });
+      });
     });
   }
 
   private setDialogProperties(): void {
-    this._dialog.size.width = this.capability.properties.size?.width;
-    this._dialog.size.height = this.capability.properties.size?.height;
-    this._dialog.size.minWidth = this.capability.properties.size?.minWidth;
-    this._dialog.size.maxWidth = this.capability.properties.size?.maxWidth;
-    this._dialog.size.minHeight = this.capability.properties.size?.minHeight;
-    this._dialog.size.maxHeight = this.capability.properties.size?.maxHeight;
+    effect(() => {
+      const capability = this.capability();
 
-    this._dialog.title = Microfrontends.substituteNamedParameters(this.capability.properties.title, this.params);
-    this._dialog.closable = this.capability.properties.closable ?? true;
-    this._dialog.resizable = this.capability.properties.resizable ?? true;
-    this._dialog.padding = this.capability.properties.padding ?? true;
-  }
+      untracked(() => {
+        this._dialog.size.width = capability.properties.size?.width;
+        this._dialog.size.height = capability.properties.size?.height;
+        this._dialog.size.minWidth = capability.properties.size?.minWidth;
+        this._dialog.size.maxWidth = capability.properties.size?.maxWidth;
+        this._dialog.size.minHeight = capability.properties.size?.minHeight;
+        this._dialog.size.maxHeight = capability.properties.size?.maxHeight;
 
-  public ngOnDestroy(): void {
-    void this.navigate(null); // Remove the outlet from the URL
+        this._dialog.title = Microfrontends.substituteNamedParameters(capability.properties.title, this.params());
+        this._dialog.closable = capability.properties.closable ?? true;
+        this._dialog.resizable = capability.properties.resizable ?? true;
+        this._dialog.padding = capability.properties.padding ?? true;
+      });
+    });
   }
 }
 

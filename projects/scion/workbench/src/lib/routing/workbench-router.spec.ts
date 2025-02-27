@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {Component, OnDestroy} from '@angular/core';
+import {Component, inject, OnDestroy} from '@angular/core';
 import {provideRouter, Router} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -130,7 +130,7 @@ describe('WorkbenchRouter', () => {
   it('should not display "Not Found" page when closing view', async () => {
     const log = new Array<string>();
 
-    @Component({selector: 'spec-view', template: 'View', standalone: true})
+    @Component({selector: 'spec-view', template: 'View'})
     class SpecViewComponent implements OnDestroy {
 
       constructor() {
@@ -142,7 +142,7 @@ describe('WorkbenchRouter', () => {
       }
     }
 
-    @Component({selector: 'spec-not-found-page', template: 'View', standalone: true})
+    @Component({selector: 'spec-not-found-page', template: 'View'})
     class PageNotFoundComponent implements OnDestroy {
 
       constructor() {
@@ -184,10 +184,12 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when view navigation is cancelled', async () => {
-    @Component({selector: 'spec-view', template: '{{view.id}}', standalone: true})
+    @Component({selector: 'spec-view', template: '{{view.id}}'})
     class SpecViewComponent {
-      constructor(protected view: WorkbenchView) {
-        view.title = view.id;
+      protected view = inject(WorkbenchView);
+
+      constructor() {
+        this.view.title = this.view.id;
       }
     }
 
@@ -281,10 +283,12 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when view navigation fails', async () => {
-    @Component({selector: 'spec-view', template: '{{view.id}}', standalone: true})
+    @Component({selector: 'spec-view', template: '{{view.id}}'})
     class SpecViewComponent {
-      constructor(protected view: WorkbenchView) {
-        view.title = view.id;
+      protected view = inject(WorkbenchView);
+
+      constructor() {
+        this.view.title = this.view.id;
       }
     }
 
@@ -377,7 +381,7 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when part navigation is cancelled', async () => {
-    @Component({selector: 'spec-view', template: 'testee', standalone: true})
+    @Component({selector: 'spec-view', template: 'testee'})
     class SpecTesteeComponent {
     }
 
@@ -564,7 +568,7 @@ describe('WorkbenchRouter', () => {
   });
 
   it('should roll back layout when part navigation fails', async () => {
-    @Component({selector: 'spec-view', template: 'testee', standalone: true})
+    @Component({selector: 'spec-view', template: 'testee'})
     class SpecTesteeComponent {
     }
 

@@ -101,7 +101,7 @@ const DI_TOKEN = new InjectionToken<string>('TOKEN');
 class FeatureService {
 }
 
-@Component({template: 'Injected value: {{injectedValue}}', standalone: true})
+@Component({template: 'Injected value: {{injectedValue}}'})
 class Feature_View_Component {
 
   public injectedValue = inject<string>(DI_TOKEN);

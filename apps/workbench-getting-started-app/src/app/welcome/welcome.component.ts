@@ -14,7 +14,6 @@ import {Component} from '@angular/core';
   selector: 'app-welcome',
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss',
-  standalone: true,
 })
 export default class WelcomeComponent {
 }

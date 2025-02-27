@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef} from '@angular/core';
+import {Component, forwardRef, inject} from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -18,7 +18,6 @@ import {Arrays} from '@scion/toolkit/util';
   selector: 'app-css-class',
   templateUrl: './css-class.component.html',
   styleUrls: ['./css-class.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
   ],
@@ -28,12 +27,12 @@ import {Arrays} from '@scion/toolkit/util';
 })
 export class CssClassComponent implements ControlValueAccessor {
 
+  protected readonly formControl = inject(NonNullableFormBuilder).control<string>('');
+
   private _cvaChangeFn: (cssClasses: string | string[] | undefined) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
-  protected formControl = this._formBuilder.control<string>('');
-
-  constructor(private _formBuilder: NonNullableFormBuilder) {
+  constructor() {
     this.formControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component, HostBinding, HostListener, Input} from '@angular/core';
+import {Component, HostBinding, HostListener, inject, input} from '@angular/core';
 import {MessageBoxFooterComponent} from './message-box-footer/message-box-footer.component';
 import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
@@ -31,7 +31,6 @@ import {SciDimensionDirective} from '@scion/components/dimension';
   selector: 'wb-message-box',
   templateUrl: './workbench-message-box.component.html',
   styleUrls: ['./workbench-message-box.component.scss'],
-  standalone: true,
   imports: [
     NgComponentOutlet,
     SciDimensionDirective,
@@ -47,6 +46,11 @@ import {SciDimensionDirective} from '@scion/components/dimension';
 })
 export class WorkbenchMessageBoxComponent {
 
+  public readonly message = input.required({transform: nullIfEmptyMessage});
+  public readonly options = input<WorkbenchMessageBoxOptions>();
+
+  private readonly _dialog = inject(ɵWorkbenchDialog);
+
   // Ensure host element to be focusable in order to close the message box on Escape keystroke.
   @HostBinding('attr.tabindex')
   protected tabindex = -1;
@@ -54,23 +58,17 @@ export class WorkbenchMessageBoxComponent {
   @HostBinding('class.empty')
   protected empty = false;
 
-  @Input({required: true, transform: nullIfEmptyMessage})
-  public message!: string | ComponentType<unknown> | null;
-
-  @Input()
-  public options?: WorkbenchMessageBoxOptions;
-
   @HostBinding('class.content-selectable')
   protected get contentSelectable(): boolean | undefined {
-    return this.options?.contentSelectable;
+    return this.options()?.contentSelectable;
   }
 
   @HostBinding('class.has-title')
   protected get hasTitle(): boolean {
-    return !!this.options?.title;
+    return !!this.options()?.title;
   }
 
-  constructor(private _dialog: ɵWorkbenchDialog) {
+  constructor() {
     this._dialog.closable = false;
     this._dialog.resizable = false;
     this._dialog.padding = false;
@@ -83,7 +81,7 @@ export class WorkbenchMessageBoxComponent {
 
   @HostListener('keydown.escape')
   protected onEscape(): void {
-    if ('cancel' in (this.options?.actions ?? {})) {
+    if ('cancel' in (this.options()?.actions ?? {})) {
       this._dialog.close('cancel');
     }
   }

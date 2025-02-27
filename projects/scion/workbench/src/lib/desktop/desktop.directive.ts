@@ -42,7 +42,7 @@ import {DESKTOP} from '../workbench-element-references';
  * });
  * ```
  */
-@Directive({selector: 'ng-template[wbDesktop]', standalone: true})
+@Directive({selector: 'ng-template[wbDesktop]'})
 export class WorkbenchDesktopDirective {
 
   constructor() {

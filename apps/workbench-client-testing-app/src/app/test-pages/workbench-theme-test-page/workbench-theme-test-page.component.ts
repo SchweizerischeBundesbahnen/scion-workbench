@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WorkbenchThemeMonitor} from '@scion/workbench-client';
 import {AsyncPipe} from '@angular/common';
@@ -17,7 +17,6 @@ import {AsyncPipe} from '@angular/common';
   selector: 'app-workbench-theme-test-page',
   templateUrl: './workbench-theme-test-page.component.html',
   styleUrls: ['./workbench-theme-test-page.component.scss'],
-  standalone: true,
   imports: [
     AsyncPipe,
     SciFormFieldComponent,
@@ -25,6 +24,5 @@ import {AsyncPipe} from '@angular/common';
 })
 export default class WorkbenchThemeTestPageComponent {
 
-  constructor(public workbenchThemeMonitor: WorkbenchThemeMonitor) {
-  }
+  protected readonly workbenchThemeMonitor = inject(WorkbenchThemeMonitor);
 }

@@ -40,6 +40,6 @@ describe('WorkbenchProvider', () => {
   }));
 });
 
-@Component({template: '', standalone: true})
+@Component({template: ''})
 class TestComponent {
 }

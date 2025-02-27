@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, Inject, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, inject, Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
 import {ɵNotification} from './ɵnotification';
 import {NotificationConfig} from './notification.config';
@@ -32,9 +32,11 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Injectable({providedIn: 'root'})
 export class NotificationService {
 
-  private _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
+  private readonly _zone = inject(NgZone);
+  private readonly _document = inject(DOCUMENT);
+  private readonly _notifications$ = new BehaviorSubject<ɵNotification[]>([]);
 
-  constructor(private _zone: NgZone, @Inject(DOCUMENT) private _document: Document) {
+  constructor() {
     this.installEscapeHandler();
   }
 

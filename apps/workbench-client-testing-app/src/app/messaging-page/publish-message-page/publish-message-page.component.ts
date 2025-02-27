@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {MessageClient} from '@scion/microfrontend-platform';
@@ -18,24 +18,23 @@ import {stringifyError} from '../../common/stringify-error.util';
   selector: 'app-publish-message-page',
   templateUrl: './publish-message-page.component.html',
   styleUrls: ['./publish-message-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
   ],
 })
-export class PublishMesagePageComponent {
+export class PublishMessagePageComponent {
 
-  public publishError: string | false | undefined;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _messageClient = inject(MessageClient);
 
-  public form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     topic: this._formBuilder.control('', Validators.required),
   });
 
-  constructor(private _formBuilder: NonNullableFormBuilder, private _messageClient: MessageClient) {
-  }
+  protected publishError: string | false | undefined;
 
-  public onPublish(): void {
+  protected onPublish(): void {
     this.publishError = undefined;
     this._messageClient
       .publish(this.form.controls.topic.value)

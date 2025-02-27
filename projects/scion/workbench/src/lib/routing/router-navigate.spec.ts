@@ -359,7 +359,6 @@ describe('Router', () => {
       <li><a wbRouterLink="/feature-a/feature-b/view-2">/feature-a/feature-b/view-2</a></li>
     </ul>
   `,
-  standalone: true,
   imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureA_EntryComponent {
@@ -380,7 +379,6 @@ class FeatureA_EntryComponent {
       <li><a wbRouterLink="/feature-a/feature-b">/feature-a/feature-b</a></li>
     </ul>
   `,
-  standalone: true,
   imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureA_View1Component {
@@ -395,7 +393,6 @@ class FeatureA_View1Component {
       <li><a wbRouterLink="../view-1">../view-1</a></li>
     </ul>
   `,
-  standalone: true,
   imports: [WorkbenchRouterLinkDirective,
   ],
 })
@@ -430,7 +427,6 @@ const routesFeatureA: Routes = [
       <li><a wbRouterLink="/feature-a/view-1">/feature-a/view-1</a></li>
     </ul>
   `,
-  standalone: true,
   imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureB_EntryComponent {
@@ -446,7 +442,6 @@ class FeatureB_EntryComponent {
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,
-  standalone: true,
   imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureB_View1Component {
@@ -462,7 +457,6 @@ class FeatureB_View1Component {
       <li><a wbRouterLink="../../view-1">../../view-1</a></li>
     </ul>
   `,
-  standalone: true,
   imports: [WorkbenchRouterLinkDirective],
 })
 class FeatureB_View2Component {
@@ -480,7 +474,6 @@ const routesFeatureB: Routes = [
 @Component({
   selector: 'spec-view-1',
   template: '',
-  standalone: true,
 })
 class SpecView1Component {
 }
@@ -488,7 +481,6 @@ class SpecView1Component {
 @Component({
   selector: 'spec-view-2',
   template: '',
-  standalone: true,
 })
 class SpecView2Component {
 }

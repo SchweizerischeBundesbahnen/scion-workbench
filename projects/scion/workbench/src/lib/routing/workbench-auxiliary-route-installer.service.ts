@@ -8,7 +8,7 @@
 * SPDX-License-Identifier: EPL-2.0
 */
 
-import {Component, Injectable, InjectionToken} from '@angular/core';
+import {Component, inject, Injectable, InjectionToken} from '@angular/core';
 import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
@@ -21,8 +21,8 @@ import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
 @Injectable({providedIn: 'root'})
 export class WorkbenchAuxiliaryRouteInstaller {
 
-  constructor(private _workbenchConfig: WorkbenchConfig, private _router: Router) {
-  }
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
+  private readonly _router = inject(Router);
 
   /**
    * Registers an auxiliary route for each top-level route, enabling navigation in the specified router outlet(s).
@@ -115,6 +115,6 @@ export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('ɵWO
 /**
  * Component to display if the outlet has not yet been navigated or no navigation information is available.
  */
-@Component({selector: 'wb-blank', template: '', standalone: true})
+@Component({selector: 'wb-blank', template: ''})
 export class BlankComponent {
 }

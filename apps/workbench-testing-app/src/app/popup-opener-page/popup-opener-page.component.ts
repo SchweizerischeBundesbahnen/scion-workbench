@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, Type, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, Type, viewChild} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {PopupService, PopupSize, ViewId} from '@scion/workbench';
 import {PopupPageComponent} from '../popup-page/popup-page.component';
@@ -34,7 +34,6 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
   selector: 'app-popup-opener-page',
   templateUrl: './popup-opener-page.component.html',
   styleUrls: ['./popup-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -47,9 +46,12 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
 })
 export default class PopupOpenerPageComponent {
 
-  private _popupOrigin$: Observable<PopupOrigin>;
+  private readonly _popupService = inject(PopupService);
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _openButton = viewChild.required<ElementRef<HTMLButtonElement>>('open_button');
+  private readonly _popupOrigin$: Observable<PopupOrigin>;
 
-  public form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     popupComponent: this._formBuilder.control('popup-page', Validators.required),
     anchor: this._formBuilder.group({
       position: this._formBuilder.control<Position | 'element'>('element', Validators.required),
@@ -76,24 +78,21 @@ export default class PopupOpenerPageComponent {
     }),
   });
 
-  public popupError: string | undefined;
-  public returnValue: string | undefined;
+  protected popupError: string | undefined;
+  protected returnValue: string | undefined;
 
-  @ViewChild('open_button', {static: true})
-  private _openButton!: ElementRef<HTMLButtonElement>;
-
-  constructor(private _popupService: PopupService, private _formBuilder: NonNullableFormBuilder) {
+  constructor() {
     this._popupOrigin$ = this.observePopupOrigin$();
   }
 
-  public async onOpen(): Promise<void> {
+  protected async onOpen(): Promise<void> {
     this.popupError = undefined;
     this.returnValue = undefined;
 
     await this._popupService.open<string>({
       component: this.parsePopupComponentInput(),
       input: this.form.controls.input.value || undefined,
-      anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton : this._popupOrigin$,
+      anchor: this.form.controls.anchor.controls.position.value === 'element' ? this._openButton() : this._popupOrigin$,
       align: this.form.controls.align.value || undefined,
       cssClass: this.form.controls.cssClass.value,
       closeStrategy: {

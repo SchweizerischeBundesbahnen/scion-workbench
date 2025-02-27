@@ -22,7 +22,6 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   selector: 'app-angular-zone-test-page',
   templateUrl: './angular-zone-test-page.component.html',
   styleUrls: ['./angular-zone-test-page.component.scss'],
-  standalone: true,
   imports: [
     CommonModule,
     FormsModule,
@@ -33,16 +32,15 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 })
 export default class AngularZoneTestPageComponent {
 
-  public tests = {
+  private readonly _zone = inject(NgZone);
+
+  protected readonly tests = {
     workbenchView: {
       capability: new TestCaseModel(model => void this.testWorkbenchViewCapability(model)),
       params: new TestCaseModel(model => void this.testWorkbenchViewParams(model)),
       active: new TestCaseModel(model => void this.testWorkbenchViewActive(model)),
     },
   };
-
-  constructor(private _zone: NgZone) {
-  }
 
   private async testWorkbenchViewCapability(model: TestCaseModel): Promise<void> {
     const workbenchViewTestee = this._zone.runOutsideAngular(() => new ɵWorkbenchView('view.999'));

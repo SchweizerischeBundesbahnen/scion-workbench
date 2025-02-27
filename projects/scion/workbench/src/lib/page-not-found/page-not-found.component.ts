@@ -16,7 +16,6 @@ import {WorkbenchPart} from '../part/workbench-part.model';
   selector: 'wb-page-not-found',
   templateUrl: './page-not-found.component.html',
   styleUrls: ['./page-not-found.component.scss'],
-  standalone: true,
 })
 export default class PageNotFoundComponent {
 

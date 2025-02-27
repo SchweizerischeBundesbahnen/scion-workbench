@@ -15,7 +15,6 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
   selector: 'app-focus-test-page',
   templateUrl: './focus-test-page.component.html',
   styleUrls: ['./focus-test-page.component.scss'],
-  standalone: true,
   imports: [SciFormFieldComponent],
 })
 export default class FocusTestPageComponent {

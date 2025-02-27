@@ -30,7 +30,6 @@ import {PartId} from './workbench-part.model';
   selector: 'wb-part',
   templateUrl: './part.component.html',
   styleUrls: ['./part.component.scss'],
-  standalone: true,
   imports: [
     PartBarComponent,
     ViewDropZoneDirective,

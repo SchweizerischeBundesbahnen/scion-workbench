@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ElementRef, inject, Injector, Input, OnDestroy, OnInit, runInInjectionContext, StaticProvider} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, inject, Injector, input, runInInjectionContext, StaticProvider, untracked} from '@angular/core';
 import {WorkbenchMessageBox, WorkbenchMessageBoxCapability} from '@scion/workbench-client';
 import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
@@ -33,40 +33,47 @@ import {setStyle} from '../../common/dom.util';
   selector: 'wb-microfrontend-host-message-box',
   styleUrls: ['./microfrontend-host-message-box.component.scss'],
   templateUrl: './microfrontend-host-message-box.component.html',
-  standalone: true,
   imports: [
     RouterOutlet,
     NgTemplateOutlet,
   ],
 })
-export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
+export class MicrofrontendHostMessageBoxComponent {
 
-  @Input({required: true})
-  public capability!: WorkbenchMessageBoxCapability;
+  public readonly capability = input.required<WorkbenchMessageBoxCapability>();
+  public readonly params = input.required<Map<string, unknown>>();
 
-  @Input({required: true})
-  public params!: Map<string, unknown>;
+  private readonly _host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly _dialog = inject(ɵWorkbenchDialog);
+  private readonly _injector = inject(Injector);
+  private readonly _router = inject(Router);
+  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
+  private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  protected outletName: string;
+  protected readonly outletName = MESSAGE_BOX_ID_PREFIX.concat(UUID.randomUUID());
+
   protected outletInjector!: Injector;
 
-  /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
-  private _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
-
-  constructor(private _host: ElementRef<HTMLElement>,
-              private _dialog: ɵWorkbenchDialog,
-              private _injector: Injector,
-              private _router: Router) {
-    this.outletName = MESSAGE_BOX_ID_PREFIX.concat(UUID.randomUUID());
-  }
-
-  public ngOnInit(): void {
+  constructor() {
     this.setSizeProperties();
     this.createOutletInjector();
-    void this.navigate(this.capability.properties.path, {params: this.params}).then(success => {
-      if (!success) {
-        this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
-      }
+    this.navigateCapability();
+
+    inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
+  }
+
+  private navigateCapability(): void {
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        void this.navigate(capability.properties.path, {params}).then(success => {
+          if (!success) {
+            this._dialog.close(Error('[MessageBoxNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+          }
+        });
+      });
     });
   }
 
@@ -82,25 +89,34 @@ export class MicrofrontendHostMessageBoxComponent implements OnDestroy, OnInit {
   }
 
   private createOutletInjector(): void {
-    this.outletInjector = Injector.create({
-      parent: this._injector,
-      providers: [provideWorkbenchClientMessageBoxHandle(this.capability, this.params)],
+    effect(() => {
+      const capability = this.capability();
+      const params = this.params();
+
+      untracked(() => {
+        this.outletInjector = Injector.create({
+          parent: this._injector,
+          providers: [provideWorkbenchClientMessageBoxHandle(capability, params)],
+        });
+      });
     });
   }
 
   private setSizeProperties(): void {
-    setStyle(this._host, {
-      'width': this.capability.properties.size?.width ?? null,
-      'min-width': this.capability.properties.size?.minWidth ?? null,
-      'max-width': this.capability.properties.size?.maxWidth ?? null,
-      'height': this.capability.properties.size?.height ?? null,
-      'min-height': this.capability.properties.size?.minHeight ?? null,
-      'max-height': this.capability.properties.size?.maxHeight ?? null,
-    });
-  }
+    effect(() => {
+      const capability = this.capability();
 
-  public ngOnDestroy(): void {
-    void this.navigate(null); // Remove the outlet from the URL
+      untracked(() => {
+        setStyle(this._host, {
+          'width': capability.properties.size?.width ?? null,
+          'min-width': capability.properties.size?.minWidth ?? null,
+          'max-width': capability.properties.size?.maxWidth ?? null,
+          'height': capability.properties.size?.height ?? null,
+          'min-height': capability.properties.size?.minHeight ?? null,
+          'max-height': capability.properties.size?.maxHeight ?? null,
+        });
+      });
+    });
   }
 }
 

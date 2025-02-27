@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, HostBinding, HostListener, inject, Input, OnInit, Signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, HostBinding, HostListener, inject, input, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {WorkbenchView} from '../../view/workbench-view.model';
@@ -31,7 +31,6 @@ export const ViewListComponentInputs = {
   templateUrl: './view-list.component.html',
   styleUrls: ['./view-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     FilterFieldComponent,
@@ -39,28 +38,27 @@ export const ViewListComponentInputs = {
     SciViewportComponent,
   ],
 })
-export class ViewListComponent implements OnInit {
+export class ViewListComponent {
 
-  private _filterFieldComponent = viewChild.required(FilterFieldComponent);
-  private _part = inject(WorkbenchPart);
-  private _overlayRef = inject(OverlayRef);
+  public readonly position = input<'north' | 'south'>();
+
+  private readonly _filterFieldComponent = viewChild.required(FilterFieldComponent);
+  private readonly _part = inject(WorkbenchPart);
+  private readonly _overlayRef = inject(OverlayRef);
 
   /** Views that are scrolled into the tab bar. */
-  protected viewsInsideTabbar: Signal<WorkbenchView[]>;
+  protected readonly viewsInsideTabbar: Signal<WorkbenchView[]>;
   /** Views that are scrolled out of the tab bar. */
-  protected viewsOutsideTabbar: Signal<WorkbenchView[]>;
-  protected filterFormControl = new FormControl<string>('', {nonNullable: true});
-
-  @Input(ViewListComponentInputs.POSITION)
-  public position?: 'north' | 'south' | undefined;
+  protected readonly viewsOutsideTabbar: Signal<WorkbenchView[]>;
+  protected readonly filterFormControl = new FormControl<string>('', {nonNullable: true});
 
   @HostBinding('class.south')
-  public get isSouthPosition(): boolean {
-    return this.position === 'south';
+  protected get isSouthPosition(): boolean {
+    return this.position() === 'south';
   }
 
   @HostBinding('attr.data-partid')
-  public get partId(): PartId {
+  protected get partId(): PartId {
     return this._part.id;
   }
 
@@ -78,31 +76,32 @@ export class ViewListComponent implements OnInit {
       .filter(view => !view.scrolledIntoView())
       .filter(view => matchesView(filterText(), view)),
     );
+
+    const effectRef = effect(() => {
+      this._filterFieldComponent().focus();
+      effectRef.destroy();
+    });
   }
 
-  public ngOnInit(): void {
-    this._filterFieldComponent().focus();
-  }
-
-  public onActivateView(view: WorkbenchView): void {
+  protected onActivateView(view: WorkbenchView): void {
     void view.activate();
     this._overlayRef.dispose();
   }
 
   @HostListener('document:keydown.escape')
-  public onEscape(): void {
+  protected onEscape(): void {
     this._overlayRef.dispose();
   }
 
   @HostListener('mousedown', ['$event'])
   @HostListener('sci-microfrontend-focusin', ['$event'])
-  public onHostCloseEvent(event: Event): void {
+  protected onHostCloseEvent(event: Event): void {
     event.stopPropagation(); // Prevent closing this overlay if emitted from a child of this overlay.
   }
 
   @HostListener('document:mousedown')
   @HostListener('document:sci-microfrontend-focusin')
-  public onDocumentCloseEvent(): void {
+  protected onDocumentCloseEvent(): void {
     this._overlayRef.dispose();
   }
 }

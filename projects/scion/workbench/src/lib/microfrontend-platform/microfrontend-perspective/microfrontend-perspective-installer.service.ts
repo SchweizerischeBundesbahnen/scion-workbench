@@ -29,9 +29,11 @@ import {WorkbenchPerspectiveData} from './workbench-perspective-data';
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPerspectiveInstaller {
 
-  constructor(private _manifestService: ManifestService,
-              private _workbenchService: WorkbenchService,
-              private _logger: Logger) {
+  private readonly _manifestService = inject(ManifestService);
+  private readonly _workbenchService = inject(WorkbenchService);
+  private readonly _logger = inject(Logger);
+
+  constructor() {
     this.installPerspectiveCapabilityListener();
   }
 

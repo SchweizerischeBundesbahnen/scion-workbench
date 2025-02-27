@@ -16,7 +16,7 @@ import {Observables} from '@scion/toolkit/util';
  * Creates an `Observable` from the given value, or returns the value if already an `Observable`.
  * If given a `Promise`, it is converted into an `Observable`.
  */
-@Pipe({name: 'wbCoerceObservable$', standalone: true})
+@Pipe({name: 'wbCoerceObservable$'})
 export class CoerceObservablePipe implements PipeTransform {
 
   public transform<T>(value: T | Observable<T>): Observable<T> {

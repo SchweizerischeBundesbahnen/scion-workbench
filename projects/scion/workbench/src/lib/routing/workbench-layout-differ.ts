@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
+import {inject, Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {ViewId} from '../view/workbench-view.model';
 import {PartId} from '../part/workbench-part.model';
@@ -22,7 +22,9 @@ export class WorkbenchLayoutDiffer {
   private _partsDiffer: IterableDiffer<PartId>;
   private _viewsDiffer: IterableDiffer<ViewId>;
 
-  constructor(differs: IterableDiffers) {
+  constructor() {
+    const differs = inject(IterableDiffers);
+
     this._partsDiffer = differs.find([]).create<PartId>();
     this._viewsDiffer = differs.find([]).create<ViewId>();
   }

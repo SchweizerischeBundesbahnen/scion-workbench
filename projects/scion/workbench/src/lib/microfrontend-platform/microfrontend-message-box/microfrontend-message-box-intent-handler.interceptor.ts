@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {APP_IDENTITY, Handler, IntentInterceptor, IntentMessage, MessageClient, MessageHeaders, ResponseStatusCodes} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchMessageBoxCapability, WorkbenchMessageBoxOptions} from '@scion/workbench-client';
 import {Logger, LoggerNames} from '../../logging';
@@ -30,9 +30,8 @@ import {MicrofrontendMessageBoxComponent} from './microfrontend-message-box.comp
 @Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendMessageBoxIntentHandler implements IntentInterceptor {
 
-  constructor(private _messageBoxService: WorkbenchMessageBoxService,
-              private _logger: Logger) {
-  }
+  private readonly _messageBoxService = inject(WorkbenchMessageBoxService);
+  private readonly _logger = inject(Logger);
 
   /**
    * Message box intents are handled in this interceptor and then swallowed.

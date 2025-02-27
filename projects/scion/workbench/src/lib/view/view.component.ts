@@ -29,7 +29,6 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
   selector: 'wb-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss'],
-  standalone: true,
   imports: [
     RouterOutlet,
     RouterOutletRootContextDirective,

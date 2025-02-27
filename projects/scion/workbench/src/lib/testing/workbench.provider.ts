@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {ENVIRONMENT_INITIALIZER, EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, provideEnvironmentInitializer} from '@angular/core';
 import {provideWorkbench} from '../workbench.provider';
 import {provideNoopAnimations} from '@angular/platform-browser/animations';
 import {ActivationInstantProvider} from '../activation-instant.provider';
@@ -47,9 +47,9 @@ export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInit
     {provide: ActivationInstantProvider, useClass: SequenceInstantProvider},
     config?.mainAreaInitialPartId ? {provide: MAIN_AREA_INITIAL_PART_ID, useValue: config.mainAreaInitialPartId} : [],
     {provide: ComponentFixtureAutoDetect, useValue: true},
-    {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => inject(Router).initialNavigation()},
-    {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => localStorage.clear()},
-    {provide: ENVIRONMENT_INITIALIZER, multi: true, useValue: () => window.name = ''},
+    provideEnvironmentInitializer(() => inject(Router).initialNavigation()),
+    provideEnvironmentInitializer(() => localStorage.clear()),
+    provideEnvironmentInitializer(() => window.name = ''),
   ]);
 }
 

@@ -23,7 +23,6 @@ import {Chart} from './chart';
   selector: 'app-chart-skeleton',
   templateUrl: './chart-skeleton.component.html',
   styleUrls: ['./chart-skeleton.component.scss'],
-  standalone: true,
   imports: [
     NgClass,
   ],

@@ -26,7 +26,7 @@ import {subscribeIn} from '@scion/toolkit/operators';
  * The drop zone is aligned with the bounds of the host element, requiring the host to define a positioning context.
  * If not positioned, the element is changed to be positioned relative.
  */
-@Directive({selector: '[wbViewDropZone]', standalone: true})
+@Directive({selector: '[wbViewDropZone]'})
 export class ViewDropZoneDirective implements OnInit {
 
   /**

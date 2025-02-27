@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchDialog} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {Subject} from 'rxjs';
@@ -17,18 +17,15 @@ import {Subject} from 'rxjs';
   selector: 'app-dialog-properties-test-page',
   templateUrl: './dialog-properties-test-page.component.html',
   styleUrl: './dialog-properties-test-page.component.scss',
-  standalone: true,
   imports: [
     SciFormFieldComponent,
   ],
 })
 export default class DialogPropertiesTestPageComponent {
 
-  private _titleObservable1$ = new Subject<string>();
-  private _titleObservable2$ = new Subject<string>();
-
-  constructor(private _dialog: WorkbenchDialog) {
-  }
+  private readonly _dialog = inject(WorkbenchDialog);
+  private readonly _titleObservable1$ = new Subject<string>();
+  private readonly _titleObservable2$ = new Subject<string>();
 
   protected onTitleObservable1Install(): void {
     this._dialog.setTitle(this._titleObservable1$);
