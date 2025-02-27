@@ -15,7 +15,7 @@ import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {filterNull} from '../common/operators';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
-import {WorkbenchStorage} from '@scion/workbench';
+import {WorkbenchStorage} from '../storage/workbench-storage';
 
 /**
  * Provides access to the workbench layout.
