@@ -13,7 +13,7 @@ import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {PartId, WorkbenchPart} from './part/workbench-part.model';
-import {Injectable, Signal} from '@angular/core';
+import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
 
@@ -182,7 +182,8 @@ export abstract class WorkbenchService {
    */
   public abstract readonly theme: Signal<WorkbenchTheme | null>;
 
-  public abstract enableWidescreenMode(enabled: boolean): Promise<void>;
-
-  public abstract readonly widescreenModeEnabled: Signal<boolean>;
+  /**
+   * Indicates if the layout should be optimized for widescreen displays.
+   */
+  public abstract readonly widescreenModeEnabled: WritableSignal<boolean>;
 }

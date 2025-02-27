@@ -222,7 +222,7 @@ export class HeaderComponent {
       new MenuItem({
         text: 'Widescreen Layout',
         checked: this.workbenchService.widescreenModeEnabled(),
-        onAction: () => this.workbenchService.enableWidescreenMode(!this.workbenchService.widescreenModeEnabled()),
+        onAction: () => this.workbenchService.widescreenModeEnabled.update(enabled => !enabled),
       }),
     ];
   }

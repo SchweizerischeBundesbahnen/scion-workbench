@@ -17,7 +17,7 @@ import {WorkbenchTheme} from '../workbench.model';
 import {toSignal} from '@angular/core/rxjs-interop';
 
 /**
- * Represents the key to associate the activated theme in the storage.
+ * Key for storing the activated theme across layouts.
  */
 const THEME_STORAGE_KEY = 'scion.workbench.theme';
 
