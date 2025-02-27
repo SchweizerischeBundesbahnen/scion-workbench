@@ -13,6 +13,7 @@ import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
 import {PartId, ViewId} from '@scion/workbench';
+import {Objects} from '../../../workbench/src/lib/common/objects.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -348,6 +349,13 @@ export class MTreeNode {
 
   constructor(treeNode: Omit<MTreeNode, 'type'>) {
     Object.assign(this, treeNode);
+    // If useDefineForClassFields is enabled in tsconfig.json, all class members that are not explicitly set will be initialised to `undefined`.
+    // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are filtered out.
+    Objects.keys(this).forEach(key => {
+      if (this[key] === undefined) {
+        delete this[key]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
   }
 }
 
@@ -364,6 +372,13 @@ export class MPart {
 
   constructor(part: Omit<MPart, 'type'>) {
     Object.assign(this, part);
+    // If useDefineForClassFields is enabled in tsconfig.json, all class members that are not explicitly set will be initialised to `undefined`.
+    // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are filtered out.
+    Objects.keys(this).forEach(key => {
+      if (this[key] === undefined) {
+        delete this[key]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+      }
+    });
   }
 }
 
