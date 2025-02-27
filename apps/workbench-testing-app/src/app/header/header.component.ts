@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject, Signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, signal} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
@@ -20,6 +20,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
 import {SettingsService} from '../settings.service';
+import {Maps} from '@scion/toolkit/util';
 import {sortPerspectives} from './sort-perspectives.util';
 
 @Component({
@@ -38,7 +39,8 @@ export class HeaderComponent {
 
   protected readonly PerspectiveData = PerspectiveData;
   protected readonly lightThemeActiveFormControl = new FormControl<boolean>(true);
-  protected readonly perspectives: Signal<WorkbenchPerspective[]>;
+  protected readonly perspectiveSwitcherMenuOpen = signal(false);
+  protected readonly settingsMenuOpen = signal(false);
 
   constructor(private _router: Router,
               private _wbRouter: WorkbenchRouter,
@@ -47,19 +49,20 @@ export class HeaderComponent {
               private _logger: Logger,
               protected workbenchService: WorkbenchService) {
     this.installThemeSwitcher();
-    this.perspectives = computed(() => {
-      const perspectives = this.workbenchService.perspectives();
-      return untracked(() => sortPerspectives(perspectives));
-    });
   }
 
-  protected async onTogglePerspective(perspective: WorkbenchPerspective): Promise<void> {
-    await this.workbenchService.switchPerspective(perspective.active() ? 'blank' : perspective.id);
-  }
+  protected onPerspectiveSwitcherMenuOpen(element: Element): void {
+    this.perspectiveSwitcherMenuOpen.set(true);
+    const menuItems = this.contributePerspectiveSwitcherMenuItems();
+    void this._menuService.openMenu(element, menuItems).finally(() => this.perspectiveSwitcherMenuOpen.set(false));
+  };
 
-  protected onMenuOpen(event: MouseEvent): void {
-    this._menuService.openMenu(event, [
+  protected onSettingsMenuOpen(element: Element): void {
+    this.settingsMenuOpen.set(true);
+    void this._menuService.openMenu(element, [
       ...this.contributePerspectiveMenuItems(),
+      new MenuItemSeparator(),
+      ...this.contributeLayoutMenuItems(),
       new MenuItemSeparator(),
       ...this.contributeLoggerMenuItems(),
       new MenuItemSeparator(),
@@ -70,9 +73,7 @@ export class HeaderComponent {
       ...this.contributeNavigationMenuItems(),
       new MenuItemSeparator(),
       ...this.contributeSettingsMenuItems(),
-      new MenuItemSeparator(),
-      ...this.contributeLayoutMenuItems(),
-    ]);
+    ]).finally(() => this.settingsMenuOpen.set(false));
   }
 
   private contributePerspectiveMenuItems(): MenuItem[] {
@@ -224,5 +225,37 @@ export class HeaderComponent {
         onAction: () => this.workbenchService.enableWidescreenMode(!this.workbenchService.widescreenModeEnabled()),
       }),
     ];
+  }
+
+  private contributePerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
+    const groupLabels = new Map<string, string>()
+      .set('sample-layout-docked-parts', 'Layout with Docked Parts')
+      .set('sample-layout-fixed-parts', 'Layout with Fixed Parts');
+
+    const menuItems = new Array<MenuItem | MenuItemSeparator>();
+
+    [...this.workbenchService.perspectives()]
+      // Sort perspectives.
+      .sort(sortPerspectives)
+      // Group perspectives.
+      .reduce((grouped, perspective) => {
+        const group = (perspective.data[PerspectiveData.menuGroup] ?? 'default') as string;
+        return Maps.addListValue(grouped, group, perspective);
+      }, new Map<string, WorkbenchPerspective[]>())
+      // Create menu item for each perspective.
+      .forEach((perspectives, group) => {
+        if (menuItems.length) {
+          menuItems.push(new MenuItemSeparator(groupLabels.get(group)));
+        }
+        perspectives.forEach(perspective => menuItems.push(new MenuItem({
+          text: (perspective.data[PerspectiveData.menuItemLabel] ?? perspective.id) as string,
+          onAction: () => void this.workbenchService.switchPerspective(perspective.id),
+          checked: perspective.active(),
+          attributes: {
+            'data-perspectiveid': perspective.id,
+          },
+        })));
+      });
+    return menuItems;
   }
 }

@@ -13,7 +13,7 @@
 [] Testing App:
   [] Drop Down for perspectives
   [] Provide 2 Perspectives with activities
-[] @scion/components: Provide sash sizes as object literal instead of array
+[x] @scion/components: Provide sash sizes as object literal instead of array
 [] Tests
 [] Documentation (JSDoc)
 [] HowTo
@@ -22,10 +22,12 @@
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
 [] Part Portal (to not lose changes when closing activity)
-[] Part Title
+[] Part Title (consider implementing in phase 1 if choosing microfrontend integration instead of phase 2)
 [] Hide Activities & menu to show activities
 [] Show Labels
 [] Minimize Part (-)
+[] Contribute part actions to specific activity (maybe with a context (key/value map))
+[] Remove outlets of hidden activities (maybe not for minimized parts to not reload on reopen, crucial for microfrontend preformance)
 
 ## TODO Phase 3:
 [] Merger
@@ -37,6 +39,8 @@
 [] Consider changing MNode class to interface
 [] Change expectView to expectView(ViewPO).toBeActive(selector), expectView(ViewPO).toBeInactive(), expectView(ViewPO).not.toBePresent()
 -> refactor PageNotFoundPO if changed expectView
+[] Remove null/undefined from WorkbenchLayoutService.layout and WorkbenchService.activePerspective
+   Rational: not required anymore because startup blocks until layout is loaded
 
 ## IDEAS:
 [] Activity icon in form of a component (instead ligature, SVG, or SVG Symbol) => full flexiblity
@@ -56,3 +60,4 @@
      Falls Project Part nicht mehr sichtbar (weil keine View mehr drin), dann automatiscsher
      Fallback auf active View dieses Grids.
 [] Part Actions: How to contribute a part action to a specific activity. (see RegisterPartActionPageComponent)
+

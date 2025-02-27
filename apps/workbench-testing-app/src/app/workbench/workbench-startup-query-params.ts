@@ -88,7 +88,7 @@ export const WorkbenchStartupQueryParams = {
   /**
    * Reads perspectives to register from query params.
    */
-  perspectives: (): string[] => {
+  perspectiveIds: (): string[] => {
     return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PERSPECTIVES_QUERY_PARAM)?.split(';').filter(Boolean) ?? [];
   },
 
