@@ -12,7 +12,7 @@
   padding-right: var(--sci-workbench-tab-padding-inline);
   position: relative; // positioning context
   user-select: none;
-  cursor: pointer;
+  cursor: var(--sci-workbench-tab-cursor);
   box-sizing: border-box;
   outline: none;
   border-top: 1px solid transparent;
@@ -50,7 +50,6 @@
   > button.close {
     all: unset;
     position: absolute;
-    cursor: pointer;
     visibility: hidden;
     padding: .125em;
     border-radius: var(--sci-corner-small);

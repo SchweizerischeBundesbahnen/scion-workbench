@@ -13,6 +13,7 @@
     color: var(--sci-workbench-activity-item-text-color);
     border-radius: var(--sci-workbench-activity-item-border-radius);
     border: var(--sci-workbench-activity-item-border-width) solid var(--sci-workbench-activity-item-border-color);
+    cursor: var(--sci-workbench-activity-item-cursor);
 
     &:hover {
       background-color: var(--sci-workbench-activity-item-background-color-hover);
