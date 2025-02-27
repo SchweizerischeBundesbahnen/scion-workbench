@@ -2,21 +2,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .25em;
+  gap: var(--sci-workbench-activity-item-gap);
 
   > button.activity-item {
     all: unset;
     height: 24px;
     width: 24px;
-    padding: .125em;
-    border-radius: var(--sci-corner);
+    padding: var(--sci-workbench-activity-item-padding);
+    background-color: var(--sci-workbench-activity-item-background-color);
+    color: var(--sci-workbench-activity-item-text-color);
+    border-radius: var(--sci-workbench-activity-item-border-radius);
+    border: var(--sci-workbench-activity-item-border-width) solid var(--sci-workbench-activity-item-border-color);
 
     &:hover {
-      background-color: var(--sci-color-background-secondary-selected);
+      background-color: var(--sci-workbench-activity-item-background-color-hover);
+      color: var(--sci-workbench-activity-item-text-color-hover);
     }
 
     &.active {
-      background-color: var(--sci-color-background-secondary-selected);
+      background-color: var(--sci-workbench-activity-item-background-color-active);
+      color: var(--sci-workbench-activity-item-text-color-active);
     }
   }
 }
