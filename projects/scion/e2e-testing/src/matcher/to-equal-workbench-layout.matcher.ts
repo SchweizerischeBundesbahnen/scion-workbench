@@ -13,7 +13,6 @@ import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
 import {PartId, ViewId} from '@scion/workbench';
-import {Objects} from '../../../workbench/src/lib/common/objects.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -351,9 +350,9 @@ export class MTreeNode {
     Object.assign(this, treeNode);
     // If useDefineForClassFields is enabled in tsconfig.json, all class members that are not explicitly set will be initialised to `undefined`.
     // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are filtered out.
-    Objects.keys(this).forEach(key => {
-      if (this[key] === undefined) {
-        delete this[key]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+    Object.keys(this).forEach(key => {
+      if (this[key as keyof this] === undefined) {
+        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
       }
     });
   }
@@ -374,9 +373,9 @@ export class MPart {
     Object.assign(this, part);
     // If useDefineForClassFields is enabled in tsconfig.json, all class members that are not explicitly set will be initialised to `undefined`.
     // In test expectations, only the explicitly set properties should be asserted. Therefore, `undefined` properties are filtered out.
-    Objects.keys(this).forEach(key => {
-      if (this[key] === undefined) {
-        delete this[key]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+    Object.keys(this).forEach(key => {
+      if (this[key as keyof this] === undefined) {
+        delete this[key as keyof this]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
       }
     });
   }

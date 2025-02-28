@@ -32,28 +32,33 @@ export class AppPO {
   /**
    * Handle for interacting with the header of the testing application.
    */
-  public readonly header = new AppHeaderPO(this.page.locator('app-header'));
+  public readonly header: AppHeaderPO;
   /**
    * Locates the workbench root element `<wb-workbench>`.
    */
-  public readonly workbenchRoot = this.page.locator('wb-workbench');
+  public readonly workbenchRoot: Locator;
 
   /**
    * Locates workbench notifications.
    */
-  public readonly notifications = this.page.locator('wb-notification');
+  public readonly notifications: Locator;
 
   /**
    * Locates workbench dialogs.
    */
-  public readonly dialogs = this.page.locator('wb-dialog');
+  public readonly dialogs: Locator;
 
   /**
    * Enables programmatic interaction with the Workbench API.
    */
-  public readonly workbench = new WorkbenchAccessor(this.page);
+  public readonly workbench: WorkbenchAccessor;
 
   constructor(public readonly page: Page) {
+    this.header = new AppHeaderPO(this.page.locator('app-header'));
+    this.workbenchRoot = this.page.locator('wb-workbench');
+    this.notifications = this.page.locator('wb-notification');
+    this.dialogs = this.page.locator('wb-dialog');
+    this.workbench = new WorkbenchAccessor(this.page);
   }
 
   /**
