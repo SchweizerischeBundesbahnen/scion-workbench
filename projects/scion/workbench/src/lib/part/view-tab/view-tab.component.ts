@@ -37,7 +37,6 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
   selector: 'wb-view-tab',
   templateUrl: './view-tab.component.html',
   styleUrls: ['./view-tab.component.scss'],
-  standalone: true,
   imports: [
     PortalModule,
   ],

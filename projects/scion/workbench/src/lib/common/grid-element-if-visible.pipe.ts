@@ -17,7 +17,7 @@ import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
  *
  * @see isGridElementVisible
  */
-@Pipe({name: 'wbGridElementIfVisible', standalone: true})
+@Pipe({name: 'wbGridElementIfVisible'})
 export class GridElementIfVisiblePipe implements PipeTransform {
 
   public transform(gridElement: MTreeNode | MPart | null | undefined): MTreeNode | MPart | null {

@@ -9,7 +9,7 @@
  */
 
 import {WorkbenchConfig} from '../workbench-config';
-import {APP_INITIALIZER, ApplicationInitStatus, assertNotInReactiveContext, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, signal} from '@angular/core';
+import {ApplicationInitStatus, assertNotInReactiveContext, EnvironmentProviders, inject, Injectable, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer, signal} from '@angular/core';
 import {runWorkbenchInitializers, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP} from './workbench-initializer';
 import {Logger, LoggerNames} from '../logging';
 
@@ -40,12 +40,14 @@ import {Logger, LoggerNames} from '../logging';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLauncher {
 
+  private readonly _startup = inject(WorkbenchStartup);
+  private readonly _logger = inject(Logger);
+  private readonly _zone = inject(NgZone);
+  private readonly _injector = inject(Injector);
+
   private _state: StartupState = StartupState.Stopped;
 
-  constructor(private _startup: WorkbenchStartup,
-              private _logger: Logger,
-              private _zone: NgZone,
-              private _injector: Injector) {
+  constructor() {
     const workbenchConfig = inject(WorkbenchConfig, {optional: true});
     if (!workbenchConfig) {
       throw Error(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
@@ -156,12 +158,7 @@ export function provideWorkbenchLauncher(workbenchConfig: WorkbenchConfig): Envi
     return [];
   }
 
-  return makeEnvironmentProviders([{
-    provide: APP_INITIALIZER,
-    useFactory: () => {
-      const launcher = inject(WorkbenchLauncher);
-      return () => launcher.launch();
-    },
-    multi: true,
-  }]);
+  return makeEnvironmentProviders([
+    provideAppInitializer(() => inject(WorkbenchLauncher).launch()),
+  ]);
 }

@@ -459,7 +459,6 @@ describe('Routing.activatedRoute$', () => {
       selector: 'spec-testee',
       template: '<router-outlet name="outlet"/>',
       imports: [RouterOutlet],
-      standalone: true,
     })
     class TestComponent {
     }
@@ -753,7 +752,6 @@ describe('Routing.activatedRoute$', () => {
     @Component({
       selector: 'spec-testee',
       template: 'Testee',
-      standalone: true,
     })
     class TestComponent {
     }
@@ -977,7 +975,7 @@ describe('Routing.activatedRoute$', () => {
     clearLog();
   });
 
-  @Component({selector: 'spec-component', template: '{{route}}', standalone: true})
+  @Component({selector: 'spec-component', template: '{{route}}'})
   class SpecComponent implements OnDestroy {
 
     public route: string;

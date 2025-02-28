@@ -33,7 +33,6 @@ import {ActivatedRoute} from '@angular/router';
   selector: 'app-sample-view',
   templateUrl: './sample-view.component.html',
   styleUrls: ['./sample-view.component.scss'],
-  standalone: true,
   imports: [
     TableSkeletonComponent,
     InputFieldSkeletonComponent,

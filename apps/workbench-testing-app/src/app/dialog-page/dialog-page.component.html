@@ -7,9 +7,9 @@
     <input class="e2e-component-instance-id" [value]="uuid" disabled>
   </sci-form-field>
 
-  @if (input) {
+  @if (input()) {
     <sci-form-field label="Input">
-      <input class="e2e-input" [value]="input" disabled>
+      <input class="e2e-input" [value]="input()" disabled>
     </sci-form-field>
   }
 

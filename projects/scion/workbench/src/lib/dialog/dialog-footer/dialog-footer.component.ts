@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {NgTemplateOutlet} from '@angular/common';
 import {NullIfEmptyPipe} from '../../common/null-if-empty.pipe';
@@ -20,7 +20,6 @@ import {DialogActionFilterPipe} from './dialog-action-filter.pipe';
   selector: 'wb-dialog-footer',
   templateUrl: './dialog-footer.component.html',
   styleUrls: ['./dialog-footer.component.scss'],
-  standalone: true,
   imports: [
     NgTemplateOutlet,
     NullIfEmptyPipe,
@@ -29,6 +28,6 @@ import {DialogActionFilterPipe} from './dialog-action-filter.pipe';
 })
 export class DialogFooterComponent {
 
-  constructor(protected dialog: ɵWorkbenchDialog) {
-  }
+  protected readonly dialog = inject(ɵWorkbenchDialog);
+
 }

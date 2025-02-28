@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, Input, OnDestroy, TemplateRef} from '@angular/core';
+import {DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {Disposable} from '../../common/disposable';
 import {asapScheduler} from 'rxjs';
@@ -27,24 +27,24 @@ import {asapScheduler} from 'rxjs';
  * </ng-template>
  * ```
  */
-@Directive({selector: 'ng-template[wbDialogAction]', standalone: true})
-export class WorkbenchDialogActionDirective implements OnDestroy {
-
-  private _action: Disposable | undefined;
+@Directive({selector: 'ng-template[wbDialogAction]'})
+export class WorkbenchDialogActionDirective {
 
   /**
    * Specifies where to place this action in the dialog footer. Defaults to `end`.
    */
-  @Input()
-  public align: 'start' | 'end' = 'end';
+  public readonly align = input<'start' | 'end'>('end');
+  public readonly template = inject(TemplateRef);
 
-  constructor(public readonly template: TemplateRef<void>, dialog: ɵWorkbenchDialog) {
+  private _action: Disposable | undefined;
+
+  constructor() {
+    const dialog = inject(ɵWorkbenchDialog);
+
     // Defer registering action to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
     asapScheduler.schedule(() => this._action = dialog.registerAction(this));
-  }
 
-  public ngOnDestroy(): void {
     // Defer disposing action to avoid `ExpressionChangedAfterItHasBeenCheckedError`.
-    asapScheduler.schedule(() => this._action?.dispose());
+    inject(DestroyRef).onDestroy(() => asapScheduler.schedule(() => this._action?.dispose()));
   }
 }

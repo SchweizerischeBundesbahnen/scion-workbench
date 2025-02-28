@@ -55,7 +55,6 @@ describe('Desktop', () => {
             display: grid;
           }
         `,
-        standalone: true,
         imports: [WorkbenchComponent, WorkbenchDesktopDirective],
       })
       class SpecRootComponent {
@@ -157,7 +156,6 @@ describe('Desktop', () => {
             display: grid;
           }
         `,
-        standalone: true,
         imports: [WorkbenchComponent, WorkbenchDesktopDirective],
       })
       class SpecRootComponent {
@@ -234,7 +232,6 @@ describe('Desktop', () => {
             display: grid;
           }
         `,
-        standalone: true,
         imports: [WorkbenchComponent, WorkbenchDesktopDirective],
       })
       class SpecRootComponent {
@@ -334,7 +331,6 @@ describe('Desktop', () => {
             display: grid;
           }
         `,
-        standalone: true,
         imports: [WorkbenchComponent, WorkbenchDesktopDirective],
       })
       class SpecRootComponent {

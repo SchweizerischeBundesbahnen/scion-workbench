@@ -205,7 +205,6 @@ describe('Microfrontend Host Popup', () => {
 @Component({
   selector: 'spec-popup-1',
   template: '',
-  standalone: true,
 })
 class SpecPopup1Component {
 }
@@ -213,7 +212,6 @@ class SpecPopup1Component {
 @Component({
   selector: 'spec-popup-2',
   template: '',
-  standalone: true,
 })
 class SpecPopup2Component {
 }
@@ -221,7 +219,6 @@ class SpecPopup2Component {
 @Component({
   selector: 'spec-view',
   template: '',
-  standalone: true,
 })
 class SpecViewComponent {
 }

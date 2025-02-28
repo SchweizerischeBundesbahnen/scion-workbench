@@ -15,7 +15,7 @@ import {Dictionary, Maps} from '@scion/toolkit/util';
  * Creates a {@link Map} from the given map-like object. If given a {@link Map}, it is returned.
  * If given `null` or `undefined`, returns an empty Map.
  */
-@Pipe({name: 'wbCoerceMap', standalone: true})
+@Pipe({name: 'wbCoerceMap'})
 export class MapCoercePipe implements PipeTransform {
 
   public transform<V>(mapLike: Map<string, V> | Dictionary<V> | undefined | null): Map<string, V> {

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {WorkbenchView} from '@scion/workbench';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -16,11 +16,13 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-navigation-test-page',
   template: 'NavigationTestPageComponent',
-  standalone: true,
 })
 export class NavigationTestPageComponent {
 
-  constructor(route: ActivatedRoute, view: WorkbenchView) {
+  constructor() {
+    const route = inject(ActivatedRoute);
+    const view = inject(WorkbenchView);
+
     route.paramMap
       .pipe(takeUntilDestroyed())
       .subscribe(params => {

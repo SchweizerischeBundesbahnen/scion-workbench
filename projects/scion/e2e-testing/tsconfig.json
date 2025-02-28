@@ -1,3 +1,5 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compilerOptions": {
     "baseUrl": "../../../",
@@ -9,7 +11,6 @@
     "moduleResolution": "bundler",
     "target": "ES2022",
     "module": "ES2022",
-    "useDefineForClassFields": false,
     "types": [
       "node"
     ],

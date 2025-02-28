@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {DestroyRef, Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
 import {createElement, getCssTranslation, setStyle} from '../common/dom.util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
@@ -28,10 +28,14 @@ const HANDLE_SIZE = 6;
  * - must be positioned, either relative or absolute
  * - must be horizontally centered in its layout
  */
-@Directive({selector: '[wbResizable]', standalone: true})
-export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
+@Directive({selector: '[wbResizable]'})
+export class ResizableDirective {
 
-  private readonly _host: HTMLElement;
+  public readonly enabled = input(true, {alias: 'wbResizableEnabled'});
+  public readonly wbResize = output<WbResizeEvent>({alias: 'wbResizableResize'});
+
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
 
   private _handles: {
     top: ResizeHandle;
@@ -50,32 +54,25 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
   private minWidth: number | undefined;
   private maxWidth: number | undefined;
 
-  @Input('wbResizableEnabled')
-  public enabled = true;
-
-  @Output('wbResizableResize')
-  public wbResize = new EventEmitter<WbResizeEvent>();
-
-  constructor(host: ElementRef<HTMLElement>, private _workbenchLayoutService: WorkbenchLayoutService) {
-    this._host = host.nativeElement;
-  }
-
-  public ngOnInit(): void {
+  constructor() {
     this.ensureHostElementPositioned();
-    this.init();
+    this.installEnabledListener();
+
+    inject(DestroyRef).onDestroy(() => this._handles ? this.uninstallHandles() : void null);
   }
 
-  public ngOnChanges(): void {
-    this.init();
-  }
-
-  private init(): void {
-    if (this.enabled && !this._handles) {
-      this.installHandles();
-    }
-    else if (!this.enabled && this._handles) {
-      this.uninstallHandles();
-    }
+  private installEnabledListener(): void {
+    effect(() => {
+      const enabled = this.enabled();
+      untracked(() => {
+        if (enabled && !this._handles) {
+          this.installHandles();
+        }
+        else if (!enabled && this._handles) {
+          this.uninstallHandles();
+        }
+      });
+    });
   }
 
   /**
@@ -338,12 +335,6 @@ export class ResizableDirective implements OnInit, OnChanges, OnDestroy {
   private ensureHostElementPositioned(): void {
     if (getComputedStyle(this._host).position === 'static') {
       setStyle(this._host, {'position': 'relative'});
-    }
-  }
-
-  public ngOnDestroy(): void {
-    if (this._handles) {
-      this.uninstallHandles();
     }
   }
 }

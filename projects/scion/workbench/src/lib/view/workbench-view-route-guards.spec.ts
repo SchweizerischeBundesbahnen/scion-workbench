@@ -293,7 +293,6 @@ describe('CanMatchNotFoundPage', () => {
 @Component({
   selector: 'spec-view-1',
   template: 'View 1',
-  standalone: true,
 })
 class View1Component {
 }
@@ -301,7 +300,6 @@ class View1Component {
 @Component({
   selector: 'spec-view-2',
   template: 'View 2',
-  standalone: true,
 })
 class View2Component {
 }
@@ -309,7 +307,6 @@ class View2Component {
 @Component({
   selector: 'spec-view-3',
   template: 'View 3',
-  standalone: true,
 })
 class View3Component {
 }
@@ -318,7 +315,6 @@ class View3Component {
   selector: 'spec-router-outlet',
   template: '<router-outlet/>',
   styles: [':host { display: grid; }'],
-  standalone: true,
   imports: [
     RouterOutlet,
   ],

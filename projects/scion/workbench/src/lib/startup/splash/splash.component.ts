@@ -19,7 +19,6 @@ import {SciThrobberComponent} from '@scion/components/throbber';
   templateUrl: './splash.component.html',
   styleUrls: ['./splash.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [SciThrobberComponent],
 })
 export class SplashComponent {

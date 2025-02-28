@@ -21,7 +21,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
   styleUrls: ['./view-list-button.component.scss'],
-  standalone: true,
 })
 export class ViewListButtonComponent implements OnDestroy {
 

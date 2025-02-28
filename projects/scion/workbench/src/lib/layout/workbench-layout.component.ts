@@ -50,7 +50,6 @@ import {DESKTOP} from '../workbench-element-references';
   selector: 'wb-workbench-layout',
   templateUrl: './workbench-layout.component.html',
   styleUrls: ['./workbench-layout.component.scss'],
-  standalone: true,
   imports: [
     RouterOutlet,
     GridElementComponent,

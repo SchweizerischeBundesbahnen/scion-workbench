@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ApplicationRef, Component, Type} from '@angular/core';
+import {ApplicationRef, Component, inject, Type} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ViewId, WorkbenchDialogService} from '@scion/workbench';
 import {startWith} from 'rxjs/operators';
@@ -29,7 +29,6 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
   selector: 'app-dialog-opener-page',
   templateUrl: './dialog-opener-page.component.html',
   styleUrls: ['./dialog-opener-page.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
@@ -40,7 +39,11 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
 })
 export default class DialogOpenerPageComponent {
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _dialogService = inject(WorkbenchDialogService);
+  private readonly _appRef = inject(ApplicationRef);
+
+  protected readonly form = this._formBuilder.group({
     component: this._formBuilder.control('dialog-page', Validators.required),
     options: this._formBuilder.group({
       inputs: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
@@ -52,16 +55,15 @@ export default class DialogOpenerPageComponent {
     count: this._formBuilder.control(''),
     viewContextActive: this._formBuilder.control(true),
   });
-  public dialogError: string | undefined;
-  public returnValue: string | undefined;
 
-  constructor(private _formBuilder: NonNullableFormBuilder,
-              private _dialogService: WorkbenchDialogService,
-              private _appRef: ApplicationRef) {
+  protected dialogError: string | undefined;
+  protected returnValue: string | undefined;
+
+  constructor() {
     this.installContextualViewIdEnabler();
   }
 
-  public async onDialogOpen(): Promise<void> {
+  protected async onDialogOpen(): Promise<void> {
     this.dialogError = undefined;
     this.returnValue = undefined;
 

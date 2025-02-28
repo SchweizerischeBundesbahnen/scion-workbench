@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, inject, input} from '@angular/core';
 import {noop} from 'rxjs';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -24,7 +24,6 @@ import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
   selector: 'app-navigate-parts',
   templateUrl: './navigate-parts.component.html',
   styleUrls: ['./navigate-parts.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciMaterialIconDirective,
@@ -39,13 +38,13 @@ import {undefinedIfEmpty} from '../../../common/undefined-if-empty.util';
 })
 export class NavigatePartsComponent implements ControlValueAccessor, Validator {
 
-  private _cvaChangeFn: (value: NavigationDescriptor[]) => void = noop;
-  private _cvaTouchedFn: () => void = noop;
+  public readonly partProposals = input([], {transform: arrayAttribute});
 
-  @Input({transform: arrayAttribute})
-  public partProposals: string[] = [];
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected form = this._formBuilder.group({
+  protected readonly partList = `part-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     navigations: this._formBuilder.array<FormGroup<{
       id: FormControl<string>;
       commands: FormControl<Commands>;
@@ -57,9 +56,11 @@ export class NavigatePartsComponent implements ControlValueAccessor, Validator {
       }>;
     }>>([]),
   });
-  protected partList = `part-list-${UUID.randomUUID()}`;
 
-  constructor(private _formBuilder: NonNullableFormBuilder) {
+  private _cvaChangeFn: (value: NavigationDescriptor[]) => void = noop;
+  private _cvaTouchedFn: () => void = noop;
+
+  constructor() {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {

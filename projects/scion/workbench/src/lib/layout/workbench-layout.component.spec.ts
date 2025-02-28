@@ -3064,7 +3064,6 @@ describe('WorkbenchLayout Component', () => {
     @Component({
       selector: 'spec-view',
       template: 'View',
-      standalone: true,
     })
     class TestViewComponent {
     }
@@ -3148,7 +3147,6 @@ describe('WorkbenchLayout Component', () => {
       }
     `,
   ],
-  standalone: true,
   imports: [
     RouterOutlet,
     WorkbenchComponent,

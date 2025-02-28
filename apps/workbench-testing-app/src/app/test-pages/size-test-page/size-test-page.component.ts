@@ -20,7 +20,6 @@ import {observeIn} from '@scion/toolkit/operators';
   selector: 'app-size-test-page',
   templateUrl: './size-test-page.component.html',
   styleUrl: './size-test-page.component.scss',
-  standalone: true,
   imports: [
     SciViewportComponent,
   ],

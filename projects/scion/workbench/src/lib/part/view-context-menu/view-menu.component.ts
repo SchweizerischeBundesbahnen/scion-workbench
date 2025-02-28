@@ -26,7 +26,6 @@ import {MenuItemComponent} from './menu-item/menu-item.component';
   selector: 'wb-view-menu',
   templateUrl: './view-menu.component.html',
   styleUrls: ['./view-menu.component.scss'],
-  standalone: true,
   imports: [
     NgClass,
     KeyValuePipe,

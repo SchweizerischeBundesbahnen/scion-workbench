@@ -18,7 +18,6 @@ import BlankTestPageComponent from '../blank-test-page/blank-test-page.component
   selector: 'app-popup-position-test-page',
   templateUrl: './popup-position-test-page.component.html',
   styleUrl: './popup-position-test-page.component.scss',
-  standalone: true,
   imports: [
     SciFormFieldComponent,
     FormsModule,

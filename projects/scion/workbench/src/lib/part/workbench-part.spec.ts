@@ -125,31 +125,31 @@ describe('WorkbenchPart', () => {
       }
     }
 
-    @Component({selector: 'spec-part-1', template: 'Part 1', standalone: true})
+    @Component({selector: 'spec-part-1', template: 'Part 1'})
     class SpecPart1Component extends AbstractSpecPartComponent {
     }
 
-    @Component({selector: 'spec-part-2', template: 'Part 2', standalone: true})
+    @Component({selector: 'spec-part-2', template: 'Part 2'})
     class SpecPart2Component extends AbstractSpecPartComponent {
     }
 
-    @Component({selector: 'spec-part-3', template: 'Part 3', standalone: true})
+    @Component({selector: 'spec-part-3', template: 'Part 3'})
     class SpecPart3Component extends AbstractSpecPartComponent {
     }
 
-    @Component({selector: 'spec-part-4', template: 'Part 4', standalone: true})
+    @Component({selector: 'spec-part-4', template: 'Part 4'})
     class SpecPart4Component extends AbstractSpecPartComponent {
     }
 
-    @Component({selector: 'spec-part-5', template: 'Part 5', standalone: true})
+    @Component({selector: 'spec-part-5', template: 'Part 5'})
     class SpecPart5Component extends AbstractSpecPartComponent {
     }
 
-    @Component({selector: 'spec-part-6', template: 'Part 6', standalone: true})
+    @Component({selector: 'spec-part-6', template: 'Part 6'})
     class SpecPart6Component extends AbstractSpecPartComponent {
     }
 
-    @Component({selector: 'spec-part-7', template: 'Part 7', standalone: true})
+    @Component({selector: 'spec-part-7', template: 'Part 7'})
     class SpecPart7Component extends AbstractSpecPartComponent {
     }
 

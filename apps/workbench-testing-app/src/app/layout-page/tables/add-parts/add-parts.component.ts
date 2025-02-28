@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, inject, input} from '@angular/core';
 import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -21,7 +21,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-add-parts',
   templateUrl: './add-parts.component.html',
   styleUrls: ['./add-parts.component.scss'],
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     SciCheckboxComponent,
@@ -34,16 +33,16 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class AddPartsComponent implements ControlValueAccessor, Validator {
 
-  private _cvaChangeFn: (value: PartDescriptor[]) => void = noop;
-  private _cvaTouchedFn: () => void = noop;
+  public readonly requiresInitialPart = input(false);
+  public readonly partProposals = input([], {transform: arrayAttribute});
 
-  @Input()
-  public requiresInitialPart = false;
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  @Input({transform: arrayAttribute})
-  public partProposals: string[] = [];
+  protected readonly MAIN_AREA = MAIN_AREA;
+  protected readonly relativeToList = `relative-to-list-${UUID.randomUUID()}`;
+  protected readonly idList = `id-list-${UUID.randomUUID()}`;
 
-  protected form = this._formBuilder.group({
+  protected readonly form = this._formBuilder.group({
     parts: this._formBuilder.array<FormGroup<{
       id: FormControl<string | MAIN_AREA>;
       relativeTo: FormGroup<{
@@ -57,11 +56,10 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
     }>>([]),
   });
 
-  protected MAIN_AREA = MAIN_AREA;
-  protected relativeToList = `relative-to-list-${UUID.randomUUID()}`;
-  protected idList = `id-list-${UUID.randomUUID()}`;
+  private _cvaChangeFn: (value: PartDescriptor[]) => void = noop;
+  private _cvaTouchedFn: () => void = noop;
 
-  constructor(private _formBuilder: NonNullableFormBuilder) {
+  constructor() {
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(() => {
@@ -92,7 +90,7 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
   }
 
   private addPart(part: PartDescriptor, options?: {emitEvent?: boolean}): void {
-    const isInitialPart = this.requiresInitialPart && this.form.controls.parts.length === 0;
+    const isInitialPart = this.requiresInitialPart() && this.form.controls.parts.length === 0;
     this.form.controls.parts.push(
       this._formBuilder.group({
         id: this._formBuilder.control<string>(part.id, Validators.required),

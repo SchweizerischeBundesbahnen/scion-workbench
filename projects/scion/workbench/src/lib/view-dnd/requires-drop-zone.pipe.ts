@@ -18,7 +18,7 @@ import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
  *
  * An element requires a drop zone if its layout is divided into multiple parts in that region.
  */
-@Pipe({name: 'wbRequiresDropZone', standalone: true})
+@Pipe({name: 'wbRequiresDropZone'})
 export class RequiresDropZonePipe implements PipeTransform {
 
   public transform(element: MTreeNode | MPart, region: 'north' | 'south' | 'east' | 'west'): boolean {

@@ -18,7 +18,6 @@ import {ChildrenOutletContexts} from '@angular/router';
  */
 @Directive({
   selector: 'router-outlet[wbRouterOutletRootContext]',
-  standalone: true,
   providers: [
     {provide: ChildrenOutletContexts, useFactory: () => inject(ApplicationRef).injector.get(ChildrenOutletContexts)},
   ],

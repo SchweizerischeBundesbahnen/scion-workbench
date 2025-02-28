@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {WorkbenchStorage} from '../storage/workbench-storage';
 import {MPerspectiveLayout} from './workbench-perspective.model';
 import {WorkbenchPerspectiveSerializer} from './workench-perspective-serializer.service';
@@ -20,10 +20,9 @@ import {Logger} from '../logging';
 @Injectable({providedIn: 'root'})
 export class WorkbenchPerspectiveStorageService {
 
-  constructor(private _storage: WorkbenchStorage,
-              private _workbenchPerspectiveSerializer: WorkbenchPerspectiveSerializer,
-              private _logger: Logger) {
-  }
+  private readonly _storage = inject(WorkbenchStorage);
+  private readonly _workbenchPerspectiveSerializer = inject(WorkbenchPerspectiveSerializer);
+  private readonly _logger = inject(Logger);
 
   /**
    * Reads the layout of given perspective from storage, applying necessary migrations if the serialized layout is outdated.

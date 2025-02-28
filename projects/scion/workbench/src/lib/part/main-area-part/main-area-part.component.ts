@@ -51,7 +51,6 @@ import {NgTemplateOutlet} from '@angular/common';
   selector: `wb-part[data-partid="${MAIN_AREA}"]`, // eslint-disable-line @angular-eslint/component-selector
   templateUrl: './main-area-part.component.html',
   styleUrls: ['./main-area-part.component.scss'],
-  standalone: true,
   imports: [
     GridElementComponent,
     ViewDropZoneDirective,

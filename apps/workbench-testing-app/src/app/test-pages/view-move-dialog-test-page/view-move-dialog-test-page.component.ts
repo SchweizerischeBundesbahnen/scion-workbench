@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, Input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WORKBENCH_ID, WorkbenchDialog, WorkbenchDialogActionDirective, WorkbenchView} from '@scion/workbench';
@@ -19,7 +19,6 @@ import {UUID} from '@scion/toolkit/uuid';
   selector: 'app-view-move-dialog-test-page',
   templateUrl: './view-move-dialog-test-page.component.html',
   styleUrls: ['./view-move-dialog-test-page.component.scss'],
-  standalone: true,
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,
@@ -28,28 +27,30 @@ import {UUID} from '@scion/toolkit/uuid';
 })
 export class ViewMoveDialogTestPageComponent {
 
-  @Input({required: true})
-  public view!: WorkbenchView;
+  public readonly view = input.required<WorkbenchView>();
 
-  public form = this._formBuilder.group({
+  private readonly _formBuilder = inject(NonNullableFormBuilder);
+  private readonly _dialog = inject(WorkbenchDialog);
+
+  protected readonly targetList = `target-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     workbenchId: this._formBuilder.control<string | 'new-window'>(inject(WORKBENCH_ID)),
     partId: this._formBuilder.control('', Validators.required),
     region: this._formBuilder.control<'north' | 'south' | 'west' | 'east' | ''>(''),
   });
 
-  public targetList = `target-list-${UUID.randomUUID()}`;
-
-  constructor(private _formBuilder: NonNullableFormBuilder, private _dialog: WorkbenchDialog) {
+  constructor() {
     this._dialog.title = 'Move view';
     this.requirePartIfMovingToExistingWindow();
   }
 
-  public onOk(): void {
+  protected onOk(): void {
     if (this.form.controls.workbenchId.value === 'new-window') {
-      this.view.move('new-window');
+      this.view().move('new-window');
     }
     else {
-      this.view.move(this.form.controls.partId.value, {
+      this.view().move(this.form.controls.partId.value, {
         region: this.form.controls.region.value || undefined,
         workbenchId: this.form.controls.workbenchId.value || undefined,
       });
@@ -57,7 +58,7 @@ export class ViewMoveDialogTestPageComponent {
     this._dialog.close();
   }
 
-  public onCancel(): void {
+  protected onCancel(): void {
     this._dialog.close();
   }
 

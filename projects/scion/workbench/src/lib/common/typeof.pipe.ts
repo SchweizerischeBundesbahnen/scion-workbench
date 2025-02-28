@@ -13,7 +13,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 /**
  * Tests if the object is of the specified type.
  */
-@Pipe({name: 'wbTypeof', standalone: true})
+@Pipe({name: 'wbTypeof'})
 export class TypeofPipe implements PipeTransform {
 
   public transform<T>(object: T, type: 'undefined' | 'object' | 'boolean' | 'number' | 'string' | 'symbol' | 'function' | 'bigint'): object is T {

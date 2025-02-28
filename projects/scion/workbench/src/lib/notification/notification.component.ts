@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, EventEmitter, HostListener, Injector, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, effect, HostListener, inject, Injector, input, output, untracked} from '@angular/core';
 import {asapScheduler, EMPTY, Subject, timer} from 'rxjs';
 import {switchMap, takeUntil} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
@@ -27,48 +27,51 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   templateUrl: './notification.component.html',
   styleUrls: ['./notification.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [
     AsyncPipe,
     PortalModule,
     CoerceObservablePipe,
   ],
 })
-export class NotificationComponent implements OnChanges {
+export class NotificationComponent {
 
-  private _closeTimerChange$ = new Subject<void>();
+  public readonly notification = input.required<ɵNotification>();
+  public readonly closeNotification = output<void>();
 
-  public portal: ComponentPortal<any> | undefined;
+  private readonly _injector = inject(Injector);
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _cd = inject(ChangeDetectorRef);
+  private readonly _closeTimerChange$ = new Subject<void>();
 
-  @Input({required: true})
-  public notification!: ɵNotification;
+  protected portal: ComponentPortal<unknown> | undefined;
 
-  @Output()
-  public closeNotification = new EventEmitter<void>();
-
-  constructor(private _injector: Injector,
-              private _destroyRef: DestroyRef,
-              private _cd: ChangeDetectorRef) {
+  constructor() {
+    this.installAutoCloseTimer();
+    this.scheduleCreatePortal();
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    this.installAutoCloseTimer();
-    // Create the portal in a microtask for instant synchronization of notification properties with the user interface,
-    // for example, if they are set in the constructor of the notification component.
-    asapScheduler.schedule(() => {
-      this.portal = this.createPortal(this.notification);
-      this._cd.detectChanges();
+  private scheduleCreatePortal(): void {
+    effect(() => {
+      const notification = this.notification();
+      untracked(() => {
+        // Create the portal in a microtask for instant synchronization of notification properties with the user interface,
+        // for example, if they are set in the constructor of the notification component.
+        asapScheduler.schedule(() => {
+          this.portal = this.createPortal(notification);
+          this._cd.detectChanges();
+        });
+      });
     });
   }
 
   @HostListener('mousedown', ['$event'])
-  public onMousedown(event: MouseEvent): void {
+  protected onMousedown(event: MouseEvent): void {
     if (event.buttons === AUXILARY_MOUSE_BUTTON) {
       this.closeNotification.emit();
     }
   }
 
-  public onClose(): void {
+  protected onClose(): void {
     this.closeNotification.emit();
   }
 
@@ -87,33 +90,39 @@ export class NotificationComponent implements OnChanges {
    * An existing timer, if any, is cancelled.
    */
   private installAutoCloseTimer(): void {
-    this._closeTimerChange$.next();
+    effect(() => {
+      const notification = this.notification();
 
-    this.notification.duration$
-      .pipe(
-        switchMap(duration => {
-          switch (duration) {
-            case 'short':
-              return timer(7000);
-            case 'medium':
-              return timer(15000);
-            case 'long':
-              return timer(30000);
-            case 'infinite':
-              return EMPTY;
-            default:
-              if (typeof duration === 'number') {
-                return timer(duration * 1000);
+      untracked(() => {
+        this._closeTimerChange$.next();
+
+        notification.duration$
+          .pipe(
+            switchMap(duration => {
+              switch (duration) {
+                case 'short':
+                  return timer(7000);
+                case 'medium':
+                  return timer(15000);
+                case 'long':
+                  return timer(30000);
+                case 'infinite':
+                  return EMPTY;
+                default:
+                  if (typeof duration === 'number') {
+                    return timer(duration * 1000);
+                  }
+                  return EMPTY;
               }
-              return EMPTY;
-          }
-        }),
-        takeUntilDestroyed(this._destroyRef),
-        takeUntil(this._closeTimerChange$),
-      )
-      .subscribe(() => {
-        this.closeNotification.emit();
+            }),
+            takeUntilDestroyed(this._destroyRef),
+            takeUntil(this._closeTimerChange$),
+          )
+          .subscribe(() => {
+            this.closeNotification.emit();
+          });
       });
+    });
   }
 }
 

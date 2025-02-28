@@ -16,7 +16,6 @@ import {Component} from '@angular/core';
 @Component({
   selector: 'app-blank-test-page',
   template: 'Blank',
-  standalone: true,
 })
 export default class BlankTestPageComponent {
 }

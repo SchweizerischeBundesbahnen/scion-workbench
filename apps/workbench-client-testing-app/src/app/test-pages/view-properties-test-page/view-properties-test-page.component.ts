@@ -8,18 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {booleanAttribute, Component} from '@angular/core';
+import {booleanAttribute, Component, inject} from '@angular/core';
 import {WorkbenchView} from '@scion/workbench-client';
 import {from, map, mergeMap, Observable} from 'rxjs';
 
 @Component({
   selector: 'app-view-properties-test-page',
   template: '',
-  standalone: true,
 })
 export default class ViewPropertiesTestPageComponent {
 
-  constructor(private _view: WorkbenchView) {
+  private readonly _view = inject(WorkbenchView);
+
+  constructor() {
     this._view.setTitle(this.observeParam$('title'));
     this._view.setHeading(this.observeParam$('heading'));
     this._view.markDirty(this.observeParam$('dirty').pipe(map(booleanAttribute)));

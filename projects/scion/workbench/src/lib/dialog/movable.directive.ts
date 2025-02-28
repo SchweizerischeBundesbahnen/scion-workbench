@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, ElementRef, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {DestroyRef, Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DOCUMENT} from '@angular/common';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -22,30 +22,28 @@ import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
  * when moving it. The host must apply the changed position by updating
  * respective DOM properties.
  */
-@Directive({selector: '[wbMovable]', standalone: true})
-export class MovableDirective implements OnInit {
+@Directive({selector: '[wbMovable]'})
+export class MovableDirective {
 
-  private readonly _document = inject<Document>(DOCUMENT);
-  private readonly _host: HTMLElement;
+  public readonly wbHandleElement = input.required<HTMLElement>({alias: 'wbHandle'});
+  public readonly wbMove = output<WbMoveEvent>({alias: 'wbMovableMove'});
+
+  private readonly _destroyRef = inject(DestroyRef);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _document = inject(DOCUMENT);
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
 
   private _x = 0;
   private _y = 0;
 
-  @Input({alias: 'wbHandle', required: true})
-  public wbHandleElement!: HTMLElement;
-
-  @Output('wbMovableMove')
-  public wbMove = new EventEmitter<WbMoveEvent>();
-
-  constructor(host: ElementRef<HTMLElement>,
-              private _destroyRef: DestroyRef,
-              private _workbenchLayoutService: WorkbenchLayoutService) {
-    this._host = host.nativeElement;
-  }
-
-  public ngOnInit(): void {
-    this.wbHandleElement.style.setProperty('cursor', 'move');
-    this.makeHandleMovable();
+  constructor() {
+    effect(() => {
+      const handle = this.wbHandleElement();
+      untracked(() => {
+        handle.style.setProperty('cursor', 'move');
+        this.makeHandleMovable(handle);
+      });
+    });
   }
 
   /**
@@ -81,10 +79,10 @@ export class MovableDirective implements OnInit {
     this._workbenchLayoutService.signalMoving(false);
   }
 
-  private makeHandleMovable(): void {
+  private makeHandleMovable(handle: HTMLElement): void {
     let prevBodyCursor: string | undefined;
 
-    fromMoveHandle$(this.wbHandleElement)
+    fromMoveHandle$(handle)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe((event: HandleMoveEvent) => {
         switch (event.type) {
