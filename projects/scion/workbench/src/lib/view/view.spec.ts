@@ -1284,7 +1284,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1336,7 +1336,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -2786,7 +2786,7 @@ describe('View', () => {
 
       // Expect view to be moved.
       expect(fixture).toEqualWorkbenchLayout({
-        workbenchGrid: {
+        mainGrid: {
           root: new MPart({id: MAIN_AREA}),
         },
         mainAreaGrid: {

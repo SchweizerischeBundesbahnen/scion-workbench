@@ -1,0 +1,27 @@
+<sci-sashbox [direction]="direction()" (sashStart)="onSashStart()" (sashEnd2)="onSashEnd($event)">
+  @if (activityId1(); as activityId) {
+    <ng-template sciSash [size]="sashSizes().sash1" key="sash1">
+      <wb-grid [grid]="workbenchLayout().grids[activityId]!"
+               [attr.data-grid]="activityId"
+               [gridDropZone]="{
+                 dropRegionSize: 100,
+                 dropPlaceholderSize: 100,
+                 dropZoneCssClass: 'e2e-grid-drop-zone',
+                 dropZoneAttributes: {'data-grid': activityId},
+               }"/>
+    </ng-template>
+  }
+
+  @if (activityId2(); as activityId) {
+    <ng-template sciSash [size]="sashSizes().sash2" key="sash2">
+      <wb-grid [grid]="workbenchLayout().grids[activityId]!"
+               [attr.data-grid]="activityId"
+               [gridDropZone]="{
+                 dropRegionSize: 100,
+                 dropPlaceholderSize: 100,
+                 dropZoneCssClass: 'e2e-grid-drop-zone',
+                 dropZoneAttributes: {'data-grid': activityId},
+               }"/>
+    </ng-template>
+  }
+</sci-sashbox>

@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
-import {assertType} from '../common/asserts.util';
 import {UID} from '../common/uid.util';
-import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, ReferencePart, WorkbenchLayout} from './workbench-layout';
+import {DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
@@ -21,11 +20,15 @@ import {ActivatedRoute, UrlSegment} from '@angular/router';
 import {ViewId} from '../view/workbench-view.model';
 import {Arrays} from '@scion/toolkit/util';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
-import {Objects} from '../common/objects.util';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {PART_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
+import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
+import {ActivityId, MActivity, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
+import {WorkbenchActivityLayoutSerializer} from './workench-activity-layout-serializer.service';
+import {Objects} from '../common/objects.util';
+import {WorkbenchGrids} from './workbench-grids.model';
+import {RequireOne} from '../common/utility-types';
 
 /**
  * @inheritDoc
@@ -42,13 +45,14 @@ import {PartId} from '../part/workbench-part.model';
  */
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
-  private readonly _grids: Grids;
+  private readonly _grids: WorkbenchGrids;
+  private readonly _activityLayout: MActivityLayout;
   private readonly _outlets: Map<WorkbenchOutlet, UrlSegment[]>;
   private readonly _navigationStates: Map<WorkbenchOutlet, NavigationState>;
-  private readonly _gridNames: Array<keyof Grids>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
-  private readonly _serializer = inject(WorkbenchLayoutSerializer);
+  private readonly _gridSerializer = inject(WorkbenchLayoutSerializer);
+  private readonly _activityLayoutSerializer = inject(WorkbenchActivityLayoutSerializer);
   private readonly _injector = inject(Injector);
 
   private _maximized: boolean;
@@ -56,63 +60,94 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /** Identifies the perspective of this layout, if any. */
   public readonly perspectiveId: string | undefined;
 
-  /** @internal **/
-  constructor(config: {workbenchGrid?: string | MPartGrid | null; mainAreaGrid?: string | MPartGrid | null; perspectiveId?: string; outlets?: string | Outlets | null; navigationStates?: NavigationStates | null; maximized?: boolean}) {
-    this._grids = {
-      workbench: coerceMPartGrid(config.workbenchGrid, {default: createDefaultWorkbenchGrid}),
-    };
-    if (this.hasPart(MAIN_AREA, {grid: 'workbench'})) {
-      this._grids.mainArea = coerceMPartGrid(config.mainAreaGrid, {default: createInitialMainAreaGrid});
-    }
-    this._gridNames = Objects.keys(this._grids);
-    this._maximized = config.maximized ?? false;
-    this._outlets = new Map(Objects.entries(coerceOutlets(config.outlets)));
-    this._navigationStates = new Map(Objects.entries(config.navigationStates ?? {}));
-    this.parts().forEach(part => assertType(part, {toBeOneOf: [MTreeNode, MPart]}));
-    this.perspectiveId = config.perspectiveId;
-  }
-
   /**
-   * Reference to the main workbench grid.
-   */
-  public get workbenchGrid(): Readonly<ɵMPartGrid> {
-    return this._grids.workbench;
-  }
-
-  /**
-   * Reference to the main area grid, if any.
+   * Creates a workbench layout based on given config.
    *
-   * The main area grid is a sub-grid included by the {@link MAIN_AREA} part. It defines the arrangement of parts in the main area.
+   * @see WorkbenchLayoutConstructConfig
    */
-  public get mainAreaGrid(): Readonly<ɵMPartGrid> | null {
-    return this._grids.mainArea ?? null;
+  constructor(config?: WorkbenchLayoutConstructConfig) {
+    this._grids = {
+      main: coerceMPartGrid(config?.grids?.main, {default: createDefaultMainGrid}),
+      mainArea: coerceMPartGrid(config?.grids?.mainArea, {default: createDefaultMainAreaGrid}),
+      ...WorkbenchLayouts.pickActivityGrids(config?.grids, grid => coerceMPartGrid(grid)),
+    };
+
+    this._activityLayout = coerceMActivityLayout(config?.activityLayout, {default: createDefaultActivityLayout});
+    this._maximized = config?.maximized ?? false;
+    this._outlets = new Map(Objects.entries(coerceOutlets(config?.outlets)));
+    this._navigationStates = new Map(Objects.entries(config?.navigationStates ?? {}));
+    this.perspectiveId = config?.perspectiveId;
+
+    // Delete main area grid if not contained in the main grid.
+    if (!this.hasPart(MAIN_AREA, {grid: 'main'})) {
+      delete this._grids.mainArea;
+    }
+  }
+
+  public get grids(): WorkbenchGrids {
+    return this._grids;
+  }
+
+  private get gridNames(): Array<keyof WorkbenchGrids> {
+    return Objects.keys(this._grids);
+  }
+
+  public get activityLayout(): MActivityLayout {
+    return this._activityLayout;
   }
 
   /**
    * Tests if given part is contained in the specified grid.
    */
-  public hasPart(id: string, options?: {grid?: keyof Grids}): boolean {
+  public hasPart(id: string, options?: {grid?: keyof WorkbenchGrids}): boolean {
     return this.parts({id, grid: options?.grid}).length > 0;
   }
 
   /**
    * Tests if given view is contained in the specified grid.
    */
-  public hasView(id: string, options?: {grid?: keyof Grids}): boolean {
+  public hasView(id: string, options?: {grid?: keyof WorkbenchGrids}): boolean {
     return this.views({id, grid: options?.grid}).length > 0;
+  }
+
+  /**
+   * Tests if given activity is contained in this layout.
+   */
+  public hasActivity(id: ActivityId): boolean {
+    // TODO [activity] consider also check activity layout
+    return !!this._grids[id];
   }
 
   /**
    * Finds the URL of outlets based on the specified filter.
    *
-   * @param findBy - Defines the search scope.
-   * @param findBy.grid - Searches outlets in the specified grid.
+   * @param selector - Defines the search scope.
    * @return outlets matching the filter criteria.
    */
-  public outlets(findBy?: {grid?: keyof Grids}): Outlets {
-    const partOutlets = this.parts({grid: findBy?.grid}).filter(part => this._outlets.has(part.id)).map<[PartId, UrlSegment[]]>(part => [part.id, this._outlets.get(part.id)!]);
-    const viewOutlets = this.views({grid: findBy?.grid}).filter(view => this._outlets.has(view.id)).map<[ViewId, UrlSegment[]]>(view => [view.id, this._outlets.get(view.id)!]);
-    return Object.fromEntries([...partOutlets, ...viewOutlets]);
+  public outlets(selector: RequireOne<{mainGrid: true; mainAreaGrid: true; activityGrids: true}>): Outlets {
+    const outlets = new Map<WorkbenchOutlet, UrlSegment[]>();
+
+    // Add outlets of parts and views in the main grid.
+    if (selector.mainGrid) {
+      this.parts({grid: 'main'}).filter(part => this._outlets.has(part.id)).forEach(part => outlets.set(part.id, this._outlets.get(part.id)!));
+      this.views({grid: 'main'}).filter(view => this._outlets.has(view.id)).forEach(view => outlets.set(view.id, this._outlets.get(view.id)!));
+    }
+
+    // Add outlets of parts and views in the main area grid.
+    if (selector.mainAreaGrid) {
+      this.parts({grid: 'mainArea'}).filter(part => this._outlets.has(part.id)).forEach(part => outlets.set(part.id, this._outlets.get(part.id)!));
+      this.views({grid: 'mainArea'}).filter(view => this._outlets.has(view.id)).forEach(view => outlets.set(view.id, this._outlets.get(view.id)!));
+    }
+
+    // Add outlets of parts and views in the activity grids.
+    if (selector.activityGrids) {
+      this.gridNames.filter(isActivityId).forEach(activityId => {
+        this.parts({grid: activityId}).filter(part => this._outlets.has(part.id)).forEach(part => outlets.set(part.id, this._outlets.get(part.id)!));
+        this.views({grid: activityId}).filter(view => this._outlets.has(view.id)).forEach(view => outlets.set(view.id, this._outlets.get(view.id)!));
+      });
+    }
+
+    return Object.fromEntries(outlets);
   }
 
   /**
@@ -122,7 +157,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param findBy.grid - Searches outlets in the specified grid.
    * @return state matching the filter criteria.
    */
-  public navigationStates(findBy?: {grid?: keyof Grids}): NavigationStates {
+  public navigationStates(findBy?: {grid?: keyof WorkbenchGrids}): NavigationStates {
     const partStates = this.parts({grid: findBy?.grid}).filter(part => this._navigationStates.has(part.id)).map<[PartId, NavigationState]>(part => [part.id, this._navigationStates.get(part.id)!]);
     const viewStates = this.views({grid: findBy?.grid}).filter(view => this._navigationStates.has(view.id)).map<[ViewId, NavigationState]>(view => [view.id, this._navigationStates.get(view.id)!]);
     return Object.fromEntries([...partStates, ...viewStates]);
@@ -172,7 +207,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple parts are found.
    * @return parts matching the filter criteria.
    */
-  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof Grids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
+  public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
+  public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MPart, ...MPart[]];
+  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
+  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
     const parts = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
       if (!(element instanceof MPart)) {
         return false;
@@ -206,14 +244,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.orElse - Controls to return `null` instead of throwing an error if no part is found.
    * @return part matching the filter criteria.
    */
-  public part(findBy: {partId?: PartId; viewId?: string; grid?: keyof Grids}): MPart;
-  public part(findBy: {partId?: PartId; viewId?: string; grid?: keyof Grids}, options: {orElse: null}): MPart | null;
-  public part(findBy: {partId?: PartId; viewId?: string; grid?: keyof Grids}, options?: {orElse: null}): MPart | null {
-    if (!findBy.partId && !findBy.viewId) {
-      throw Error(`[PartFindError] Missing required argument. Specify either 'partId' or 'viewId'.`);
-    }
-
-    const part = this.parts({id: findBy.partId, viewId: findBy.viewId, grid: findBy.grid}).at(0);
+  public part(findBy: RequireOne<{partId: PartId; viewId: string}> & {grid?: keyof WorkbenchGrids}): MPart;
+  public part(findBy: RequireOne<{partId: PartId; viewId: string}> & {grid?: keyof WorkbenchGrids}, options: {orElse: null}): MPart | null;
+  public part(findBy: RequireOne<{partId: PartId; viewId: string}> & {grid?: keyof WorkbenchGrids}, options?: {orElse: null}): MPart | null {
+    const [part] = this.parts({id: findBy.partId, viewId: findBy.viewId, grid: findBy.grid});
     if (!part && !options) {
       throw Error(`[NullPartError] No matching part found: [${stringifyFilter(findBy)}]`);
     }
@@ -225,16 +259,24 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    *
    * @param id - @inheritDoc
    * @param relativeTo - @inheritDoc
-   * @param options - @inheritDoc
-   * @param options.activate - @inheritDoc
-   * @param options.structural - Specifies if this is a structural part. A structural part will not be removed when removing its last view. Defaults to `true`.
+   * @param extras - @inheritDoc
+   * @param extras.activate - @inheritDoc
+   * @param extras.structural - Specifies if this is a structural part. A structural part will not be removed when removing its last view. Defaults to `true`.
    */
-  public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, options?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, extras?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout;
+  public addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean; structural?: boolean} | PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
     const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
 
     const workingCopy = this.workingCopy();
-    workingCopy.__addPart(partId, relativeTo, {...options, alternativeId});
+
+    if ((reference as Partial<DockingArea>).dockTo) {
+      workingCopy.__addActivity(partId, reference as DockingArea, {...extras, alternativeId} as PartExtras & {cssClass?: string | string[]; alternativeId?: string});
+    }
+    else {
+      workingCopy.__addPart(partId, reference as ReferencePart, {...extras, alternativeId});
+    }
     return workingCopy;
   }
 
@@ -255,9 +297,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Returns the active part of the specified grid, or `null` if specified grid is not present.
    */
-  public activePart(find: {grid: 'workbench'}): Readonly<MPart>;
-  public activePart(find: {grid: keyof Grids}): Readonly<MPart> | null;
-  public activePart(find: {grid: keyof Grids}): Readonly<MPart> | null {
+  public activePart(find: {grid: 'main'}): Readonly<MPart>;
+  public activePart(find: {grid: keyof WorkbenchGrids}): Readonly<MPart> | null;
+  public activePart(find: {grid: keyof WorkbenchGrids}): Readonly<MPart> | null {
     const grid = this._grids[find.grid];
     if (!grid) {
       return null;
@@ -269,6 +311,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public activatePart(id: string): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.parts({id}, {throwIfEmpty: true}).forEach(part => workingCopy.__activatePart(part));
+    return workingCopy;
+  }
+
+  public activateActivity(id: ActivityId): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.getActivityGroupById(id).activeActivityId = id;
+    return workingCopy;
+  }
+
+  public deactivateActivity(id: ActivityId): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.getActivityGroupById(id).activeActivityId = undefined;
     return workingCopy;
   }
 
@@ -284,7 +338,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public view(findBy: {viewId: ViewId}): MView;
   public view(findBy: {viewId: ViewId}, options: {orElse: null}): MView | null;
   public view(findBy: {viewId: ViewId}, options?: {orElse: null}): MView | null {
-    const view = this.views({id: findBy.viewId}).at(0);
+    const [view] = this.views({id: findBy.viewId});
     if (!view && !options) {
       throw Error(`[NullViewError] No view found with id '${findBy.viewId}'.`);
     }
@@ -306,7 +360,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple views are found.
    * @return views matching the filter criteria.
    */
-  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof Grids}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
+  public views(findBy: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MView];
+  public views(findBy: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MView, ...MView[]];
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[];
+  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
     const views = this.parts({id: findBy?.partId, grid: findBy?.grid})
       .flatMap(part => part.views)
       .filter(view => {
@@ -335,13 +392,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /** @inheritDoc */
-  public addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
+  public addView(id: string, extras: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): ɵWorkbenchLayout {
     const workingCopy = this.workingCopy();
     if (isViewId(id)) {
-      workingCopy.__addView({id}, options);
+      workingCopy.__addView({id}, extras);
     }
     else {
-      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id}, options);
+      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id}, extras);
     }
     return workingCopy;
   }
@@ -426,12 +483,62 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return workingCopy;
   }
 
+  public setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__setActivityPanelSize(panel, size);
+    return workingCopy;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __setActivityPanelSize(panel: 'left' | 'right' | 'bottom', size: number): void {
+    if (size < 0) {
+      throw Error(`[LayoutModifyError] '${panel}' activity panel size must be 0 or greater, but was '${size}'.`);
+    }
+    switch (panel) {
+      case 'left':
+        this._activityLayout.panels.left.width = `${size}px`;
+        break;
+      case 'right':
+        this._activityLayout.panels.right.width = `${size}px`;
+        break;
+      case 'bottom':
+        this._activityLayout.panels.bottom.height = `${size}px`;
+        break;
+    }
+  }
+
+  public setActivityPanelRatio(panel: 'left' | 'right' | 'bottom', ratio: number): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__setActivityPanelRatio(panel, ratio);
+    return workingCopy;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __setActivityPanelRatio(panel: 'left' | 'right' | 'bottom', ratio: number): void {
+    if (ratio < 0 || ratio > 1) {
+      throw Error(`[LayoutModifyError] Ratio for node '${panel}' activity panel must be in the closed interval [0,1], but was '${ratio}'.`);
+    }
+    switch (panel) {
+      case 'left':
+        this._activityLayout.panels.left.ratio = ratio;
+        break;
+      case 'right':
+        this._activityLayout.panels.right.ratio = ratio;
+        break;
+      case 'bottom':
+        this._activityLayout.panels.bottom.ratio = ratio;
+        break;
+    }
+  }
+
   /**
    * Serializes this layout into a URL-safe base64 string.
    */
   public serialize(flags?: GridSerializationFlags): SerializedWorkbenchLayout {
-    const root = this.mainAreaGrid?.root;
-    const isMainAreaEmpty = root instanceof MPart && !root.views.length && !root.navigation && !root.structural;
     const workingCopy = this.workingCopy();
 
     // Check if to assign each part a stable id based on its position in the grid.
@@ -439,11 +546,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workingCopy.__assignStablePartIdentifier();
     }
 
+    // Check if to assign each activity a stable id based on its position in the activity layout.
+    if (flags?.assignStableActivityIdentifier) {
+      workingCopy.__assignStableActivityIdentifier();
+    }
+
     return {
-      workbenchGrid: this._serializer.serializeGrid(workingCopy.workbenchGrid, flags),
-      mainAreaGrid: isMainAreaEmpty ? null : this._serializer.serializeGrid(workingCopy.mainAreaGrid, flags),
-      workbenchOutlets: this._serializer.serializeOutlets(workingCopy.outlets({grid: 'workbench'})),
-      mainAreaOutlets: this._serializer.serializeOutlets(workingCopy.outlets({grid: 'mainArea'})),
+      grids: this._gridSerializer.serializeGrids(workingCopy.grids, flags),
+      activityLayout: this._activityLayoutSerializer.serializeActivityLayout(workingCopy.activityLayout),
+      outlets: (selector: RequireOne<{mainGrid: true; mainAreaGrid: true; activityGrids: true}>): string => {
+        return this._gridSerializer.serializeOutlets(workingCopy.outlets(selector));
+      },
     };
   }
 
@@ -459,10 +572,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const layout2 = other.serialize(flags);
 
     return (
-      layout1.workbenchGrid === layout2.workbenchGrid &&
-      layout1.mainAreaGrid === layout2.mainAreaGrid &&
-      layout1.mainAreaOutlets === layout2.mainAreaOutlets &&
-      layout1.workbenchOutlets === layout2.workbenchOutlets &&
+      Objects.isEqual(layout1.grids, layout2.grids) &&
+      layout1.activityLayout === layout2.activityLayout &&
+      layout1.outlets({mainGrid: true}) === layout2.outlets({mainGrid: true}) &&
+      layout1.outlets({mainAreaGrid: true}) === layout2.outlets({mainAreaGrid: true}) &&
+      layout1.outlets({activityGrids: true}) === layout2.outlets({activityGrids: true}) &&
       this.perspectiveId === other.perspectiveId &&
       this.maximized === other.maximized
       // Navigational state is not tested for equality as it is set through view navigation, resulting in a new navigation id when modified.
@@ -476,18 +590,29 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return WorkbenchLayouts.computeNextViewId(this.views().map(view => view.id));
   }
 
+  private activities(): MActivity[] {
+    return [
+      ...this._activityLayout.toolbars.leftTop.activities,
+      ...this._activityLayout.toolbars.leftBottom.activities,
+      ...this._activityLayout.toolbars.rightTop.activities,
+      ...this._activityLayout.toolbars.rightBottom.activities,
+      ...this._activityLayout.toolbars.bottomLeft.activities,
+      ...this._activityLayout.toolbars.bottomRight.activities,
+    ];
+  }
+
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addPart(id: PartId, relativeTo: ReferenceElement, options?: {alternativeId?: string; activate?: boolean; structural?: boolean}): void {
+  private __addPart(id: PartId, relativeTo: ReferenceElement, extras?: {alternativeId?: string; activate?: boolean; structural?: boolean}): void {
     if (this.hasPart(id)) {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const newPart = new MPart({id, alternativeId: options?.alternativeId, structural: options?.structural ?? true, views: []});
+    const newPart = new MPart({id, alternativeId: extras?.alternativeId, structural: extras?.structural ?? true, views: []});
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
-    const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.workbenchGrid.root;
+    const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.grids.main.root;
     const addBefore = relativeTo.align === 'left' || relativeTo.align === 'top';
     const ratio = relativeTo.ratio ?? .5;
 
@@ -515,7 +640,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     newPart.parent = newTreeNode;
 
     // Activate the part.
-    if (options?.activate) {
+    if (extras?.activate) {
       this.__activatePart(newPart);
     }
   }
@@ -523,9 +648,31 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
+  private __addActivity(id: PartId, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]; alternativeId?: string}): void {
+    if (this.hasPart(id)) {
+      throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
+    }
+
+    const activityId = WorkbenchLayouts.computeActivityId();
+    this._grids[activityId] = {
+      root: new MPart({id, alternativeId: extras.alternativeId, structural: true, views: []}), // TODO [activity] still required to be structural?,
+      activePartId: id,
+    };
+
+    this.getActivityGroup(dockTo).activities.push({
+      id: activityId,
+      icon: extras.icon,
+      label: extras.label,
+      tooltip: extras.tooltip,
+    });
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
   private __removePart(part: MPart): void {
     const grid = this.grid({element: part});
-    const gridName = this._gridNames.find(gridName => this._grids[gridName] === grid);
+    const gridName = this.gridNames.find(gridName => this._grids[gridName] === grid);
 
     // The last part is never removed.
     const parts = this.parts({grid: gridName});
@@ -568,7 +715,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
           const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
           return activationInstantPart2 - activationInstantPart1;
         });
-      grid.activePartId = activePart.id;
+      grid.activePartId = activePart!.id;
     }
   }
 
@@ -631,8 +778,39 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
+  private __renameActivity(activity: MActivity, newActivityId: ActivityId): void {
+    if (this.hasActivity(newActivityId)) {
+      throw Error(`[ActivityRenameError] Activity id must be unique. The layout already contains an activity with the id '${newActivityId}'.`);
+    }
+
+    const grid = this.grids[activity.id];
+    if (!grid) {
+      throw Error(`[ActivityRenameError] No grid found for activity with the id '${activity.id}'.`);
+    }
+
+    this._grids[newActivityId] = {...grid};
+    delete this.grids[activity.id]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+
+    const group = this.getActivityGroupById(activity.id);
+    if (group.activeActivityId === activity.id) {
+      group.activeActivityId = newActivityId;
+    }
+
+    activity.id = newActivityId;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
   private __assignStablePartIdentifier(): void {
     this.parts().forEach((part, index) => this.__renamePart(part, `${PART_ID_PREFIX}${index + 1}`));
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __assignStableActivityIdentifier(): void {
+    this.activities().forEach((activity, index) => this.__renameActivity(activity, `${ACTIVITY_ID_PREFIX}${index + 1}`));
   }
 
   /**
@@ -647,7 +825,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throwIfMulti: () => Error(`[ViewAddError] Cannot add view to multiple parts. Multiple parts found with id '${options.partId}'.`),
     });
 
-    const position = coercePosition(options.position ?? 'end', part);
+    const position = coerceViewPosition(options.position ?? 'end', part);
     part.views.splice(position, 0, view);
 
     if (options.activateView) {
@@ -708,7 +886,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this.__addView(view, {partId: targetPartId, position: options?.position});
     }
     else if (options?.position !== undefined) {
-      const position = coercePosition(options.position, targetPart);
+      const position = coerceViewPosition(options.position, targetPart);
       const referenceView: MView | undefined = sourcePart.views.at(position);
       sourcePart.views.splice(sourcePart.views.indexOf(view), 1);
       sourcePart.views.splice(referenceView ? sourcePart.views.indexOf(referenceView) : sourcePart.views.length, 0, view);
@@ -749,13 +927,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Activate the last used view if this view was active.
     if (part.activeViewId === view.id) {
-      part.activeViewId = part.views
+      const [lastUsedViewId] = part.views
         .map(view => view.id)
         .sort((viewId1, viewId2) => {
           const activationInstantView1 = this._viewActivationInstantProvider.getActivationInstant(viewId1);
           const activationInstantView2 = this._viewActivationInstantProvider.getActivationInstant(viewId2);
           return activationInstantView2 - activationInstantView1;
-        }).at(0);
+        });
+      part.activeViewId = lastUsedViewId;
     }
 
     // Remove the part when removing its last view, but only if the part has no navigation and is not a structural part.
@@ -806,7 +985,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __activatePart(part: MPart): void {
-    this.grid({element: part}).activePartId = part.id;
+    const grid = this.grid({element: part});
+    const gridName = this.gridNames.find(gridName => this._grids[gridName] === grid);
+    grid.activePartId = part.id;
+    if (isActivityId(gridName)) {
+      this.getActivityGroupById(gridName).activeActivityId = gridName;
+    }
   }
 
   /**
@@ -850,7 +1034,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return Grid matching the filter criteria.
    */
   private grid(findBy: {element: MPart | MTreeNode}): MPartGrid {
-    const gridName = this._gridNames.find(gridName => {
+    const gridName = this.gridNames.find(gridName => {
       return this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => element === findBy.element, {findFirst: true, grid: gridName}).length > 0;
     });
 
@@ -869,12 +1053,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @return Element matching the filter criteria.
    */
   private findTreeElement<T extends MTreeNode | MPart>(findBy: {id: string}): T {
-    const element = this.findTreeElements((element: MTreeNode | MPart): element is T => {
+    const [element] = this.findTreeElements((element: MTreeNode | MPart): element is T => {
       if (element instanceof MPart) {
         return matchesPartId(findBy.id, element);
       }
       return element.id === findBy.id;
-    }, {findFirst: true}).at(0);
+    }, {findFirst: true});
 
     if (!element) {
       throw Error(`[NullElementError] No element found with id '${findBy.id}'.`);
@@ -891,11 +1075,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.grid - Searches for an element contained in the specified grid.
    * @return Elements matching the filter criteria.
    */
-  private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; grid?: keyof Grids}): T[] {
-    if (options?.grid && !this._grids[options.grid]) {
-      return [];
-    }
-
+  private findTreeElements<T extends MTreeNode | MPart>(predicateFn: (element: MTreeNode | MPart) => element is T, options?: {findFirst?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}): T[] {
     const result: T[] = [];
 
     function visitParts(node: MTreeNode | MPart): boolean {
@@ -912,14 +1092,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       return true;
     }
 
-    if (options?.grid) {
-      visitParts(this._grids[options.grid]!.root);
-    }
-    else {
-      for (const grid of Objects.values(this._grids)) {
-        if (grid && !visitParts(grid.root)) {
-          break;
-        }
+    const gridFilter = options?.grid ? new Set<keyof WorkbenchGrids>(Arrays.coerce(options.grid)) : null;
+    for (const [gridName, grid] of Objects.entries(this._grids)) {
+      if (!grid) {
+        continue;
+      }
+      if (gridFilter && !gridFilter.has(gridName)) {
+        continue;
+      }
+      if (!visitParts(grid.root)) {
+        break;
       }
     }
 
@@ -927,12 +1109,56 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Returns the activities docked to the specified docking area.
+   */
+  private getActivityGroup(dockingArea: DockingArea): MActivityGroup {
+    switch (dockingArea.dockTo) {
+      case 'left-top':
+        return this._activityLayout.toolbars.leftTop;
+      case 'left-bottom':
+        return this._activityLayout.toolbars.leftBottom;
+      case 'right-top':
+        return this._activityLayout.toolbars.rightTop;
+      case 'right-bottom':
+        return this._activityLayout.toolbars.rightBottom;
+      case 'bottom-left':
+        return this._activityLayout.toolbars.bottomLeft;
+      case 'bottom-right':
+        return this._activityLayout.toolbars.bottomRight;
+    }
+  }
+
+  // TODO [activity] Consider merging with 'getActivityGroup'
+  private getActivityGroupById(activityId: ActivityId): MActivityGroup {
+    if (this._activityLayout.toolbars.leftTop.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.leftTop;
+    }
+    if (this._activityLayout.toolbars.leftBottom.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.leftBottom;
+    }
+    if (this._activityLayout.toolbars.rightTop.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.rightTop;
+    }
+    if (this._activityLayout.toolbars.rightBottom.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.rightBottom;
+    }
+    if (this._activityLayout.toolbars.bottomLeft.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.bottomLeft;
+    }
+    if (this._activityLayout.toolbars.bottomRight.activities.find(activity => activity.id === activityId)) {
+      return this._activityLayout.toolbars.bottomRight;
+    }
+    throw Error(`[NullActivityGroupError] No activity group found with activity id '${activityId}'.`);
+  }
+
+  /**
    * Creates a copy of this layout.
    */
   private workingCopy(): ɵWorkbenchLayout {
+    const activityLayout1 = this._activityLayoutSerializer.serializeActivityLayout(this._activityLayout);
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
-      workbenchGrid: this._serializer.serializeGrid(this.workbenchGrid),
-      mainAreaGrid: this._serializer.serializeGrid(this._grids.mainArea),
+      grids: this._gridSerializer.serializeGrids(this._grids),
+      activityLayout: activityLayout1,
       perspectiveId: this.perspectiveId,
       outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),
@@ -942,9 +1168,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 }
 
 /**
- * Creates a default workbench grid with a main area.
+ * Creates the default main grid with a main area.
  */
-function createDefaultWorkbenchGrid(): MPartGrid {
+function createDefaultMainGrid(): MPartGrid {
   return {
     root: new MPart({id: MAIN_AREA, alternativeId: MAIN_AREA_ALTERNATIVE_ID, structural: true, views: []}),
     activePartId: MAIN_AREA,
@@ -952,11 +1178,11 @@ function createDefaultWorkbenchGrid(): MPartGrid {
 }
 
 /**
- * Creates a main area grid with an initial part.
+ * Creates the default main area grid with an initial part.
  *
  * The DI token {@link MAIN_AREA_INITIAL_PART_ID} is used to assign the initial part its identity.
  */
-function createInitialMainAreaGrid(): MPartGrid {
+function createDefaultMainAreaGrid(): MPartGrid {
   return {
     root: new MPart({id: inject(MAIN_AREA_INITIAL_PART_ID), structural: false, views: []}),
     activePartId: inject(MAIN_AREA_INITIAL_PART_ID),
@@ -964,11 +1190,42 @@ function createInitialMainAreaGrid(): MPartGrid {
 }
 
 /**
+ * Creates the layout to dock parts to well-defined areas in the workbench layout.
+ */
+function createDefaultActivityLayout(): MActivityLayout {
+  return {
+    toolbars: {
+      leftTop: {activities: []},
+      leftBottom: {activities: []},
+      rightTop: {activities: []},
+      rightBottom: {activities: []},
+      bottomLeft: {activities: []},
+      bottomRight: {activities: []},
+      showLabels: false,
+    },
+    panels: {
+      left: {
+        width: '200px',
+      },
+      right: {
+        width: '200px',
+      },
+      bottom: {
+        height: '150px',
+      },
+    },
+  };
+}
+
+/**
  * Coerces {@link MPartGrid}, applying necessary migrations if the serialized grid is outdated.
  */
-function coerceMPartGrid(grid: string | MPartGrid | null | undefined, options: {default: () => MPartGrid}): ɵMPartGrid {
-  grid ??= options.default();
-
+function coerceMPartGrid(grid: string | MPartGrid | undefined): ɵMPartGrid | undefined;
+function coerceMPartGrid(grid: string | MPartGrid | undefined, options: {default: () => MPartGrid}): ɵMPartGrid;
+function coerceMPartGrid(grid: string | MPartGrid | undefined, options?: {default: () => MPartGrid}): ɵMPartGrid | undefined {
+  if (!grid) {
+    return options?.default();
+  }
   if (typeof grid === 'object') {
     return grid;
   }
@@ -977,15 +1234,35 @@ function coerceMPartGrid(grid: string | MPartGrid | null | undefined, options: {
     return inject(WorkbenchLayoutSerializer).deserializeGrid(grid);
   }
   catch (error) {
-    inject(Logger).error('[SerializeError] Failed to deserialize workbench layout. Please clear your browser storage and reload the application.', error);
-    return {...options.default(), migrated: true};
+    inject(Logger).error('[SerializeError] Failed to deserialize "MPartGrid". Please clear your browser storage and reload the application.', error);
+    return options?.default ? {...options.default(), migrated: true} : undefined;
+  }
+}
+
+/**
+ * Coerces {@link MActivityLayout}, applying necessary migrations if the serialized layout is outdated.
+ */
+function coerceMActivityLayout(layout: string | MActivityLayout | undefined, options: {default: () => MActivityLayout}): MActivityLayout {
+  if (!layout) {
+    return options.default();
+  }
+  if (typeof layout === 'object') {
+    return layout;
+  }
+
+  try {
+    return inject(WorkbenchActivityLayoutSerializer).deserializeActivityLayout(layout);
+  }
+  catch (error) {
+    inject(Logger).error('[SerializeError] Failed to deserialize "MActivityLayout". Please clear your browser storage and reload the application.', error);
+    return options.default();
   }
 }
 
 /**
  * Coerces {@link Outlets}, applying necessary migrations if the serialized outlets are outdated.
  */
-function coerceOutlets(outlets: string | Outlets | null | undefined): Outlets {
+function coerceOutlets(outlets: string | Outlets | undefined): Outlets {
   if (!outlets) {
     return {};
   }
@@ -998,31 +1275,15 @@ function coerceOutlets(outlets: string | Outlets | null | undefined): Outlets {
     return inject(WorkbenchLayoutSerializer).deserializeOutlets(outlets);
   }
   catch (error) {
-    inject(Logger).error('[SerializeError] Failed to deserialize outlets. Please clear your browser storage and reload the application.', error);
+    inject(Logger).error('[SerializeError] Failed to deserialize "Outlets". Please clear your browser storage and reload the application.', error);
     return {};
   }
 }
 
 /**
- * Grids of the workbench layout.
+ * Coerces a view position, returning the given position if it is a number, or computes it from the given literal otherwise.
  */
-interface Grids {
-  /**
-   * Reference to the grid of the workbench.
-   */
-  workbench: ɵMPartGrid;
-  /**
-   * Reference to the grid of the main area, if any.
-   *
-   * The main area grid is a sub-grid embedded in the main area part, if any. It defines the arrangement of parts in the main area.
-   */
-  mainArea?: ɵMPartGrid;
-}
-
-/**
- * Returns the position if a number, or computes it from the given literal otherwise.
- */
-function coercePosition(position: number | 'start' | 'end' | 'before-active-view' | 'after-active-view', part: MPart): number {
+function coerceViewPosition(position: number | 'start' | 'end' | 'before-active-view' | 'after-active-view', part: MPart): number {
   switch (position) {
     case 'start': {
       return 0;
@@ -1162,11 +1423,38 @@ export function isPartId(partId: string | undefined | null): partId is PartId {
 }
 
 /**
+ * Tests if the given id matches the format of an activity identifier.
+ */
+export function isActivityId(activityId: string | undefined | null): activityId is ActivityId {
+  return activityId?.startsWith(ACTIVITY_ID_PREFIX) ?? false;
+}
+
+/**
  * Serialized artifacts of the workbench layout.
  */
 export interface SerializedWorkbenchLayout {
-  workbenchGrid: string;
-  workbenchOutlets: string;
-  mainAreaGrid: string | null;
-  mainAreaOutlets: string;
+  grids: WorkbenchGrids<string>;
+  activityLayout: string;
+  outlets: (selector: RequireOne<{mainGrid: true; mainAreaGrid: true; activityGrids: true}>) => string;
+}
+
+/**
+ * Configuration for constructing the workbench layout.
+ *
+ * Grids and the activity layout can be passed in serialized or deserialized form.
+ * If they are not provided, default layouts will be created.
+ *
+ * The following rules apply:
+ * - If the main grid is not provided, it defaults to a layout with a main area.
+ * - If the grid for the main area is not provided, but the main grid has a main area part,
+ *   it defaults to a main area grid with an initial part. The DI token {@link MAIN_AREA_INITIAL_PART_ID}
+ *   can be used to assign the initial part its identity.
+ */
+export interface WorkbenchLayoutConstructConfig {
+  grids?: Partial<WorkbenchGrids<MPartGrid | string>>;
+  activityLayout?: MActivityLayout | string;
+  perspectiveId?: string;
+  outlets?: Outlets | string;
+  navigationStates?: NavigationStates;
+  maximized?: boolean;
 }

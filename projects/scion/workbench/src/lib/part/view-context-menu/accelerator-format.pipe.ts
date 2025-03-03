@@ -22,7 +22,7 @@ export class WbFormatAcceleratorPipe implements PipeTransform {
     }
 
     return accelerator
-      .map(key => key[0].toUpperCase() + key.substring(1).toLowerCase())
+      .map(key => key[0]!.toUpperCase() + key.substring(1).toLowerCase())
       .join('+');
   }
 }

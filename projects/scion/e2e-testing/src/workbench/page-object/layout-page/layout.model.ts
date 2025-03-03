@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, NavigationState, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {Commands, DockingArea, NavigationData, NavigationState, PartId, PartExtras, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -27,6 +27,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
  */
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
+  public activities = new Array<ActivityDescriptor>();
   public parts = new Array<PartDescriptor>();
   public views = new Array<ViewDescriptor>();
   public partNavigations = new Array<PartNavigationDescriptor>();
@@ -37,13 +38,35 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this;
   }
 
-  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout;
+  public addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean} | PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+    if ((reference as Partial<DockingArea>).dockTo) {
+      return this.addActivity(id, reference as DockingArea, extras as PartExtras & {cssClass?: string | string[]});
+    }
+    else {
+      return this._addPart(id, reference as ReferencePart, extras as {activate?: boolean});
+    }
+  }
+
+  private _addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout {
     this.parts.push({
       id,
       relativeTo: relativeTo.relativeTo,
       align: relativeTo.align,
       ratio: relativeTo.ratio,
-      activate: options?.activate,
+      activate: extras?.activate,
+    });
+    return this;
+  }
+
+  private addActivity(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+    this.activities.push({
+      id,
+      dockTo: dockTo.dockTo,
+      icon: extras.icon,
+      label: extras.label,
+      tooltip: extras.tooltip,
     });
     return this;
   }
@@ -115,6 +138,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public modify(modifyFn: (layout: WorkbenchLayout) => WorkbenchLayout): WorkbenchLayout {
     throw Error('[PageObjectError] Operation `WorkbenchLayout.modify` is not supported.');
   }
+}
+
+/**
+ * Represents an activity to add to the layout.
+ */
+export interface ActivityDescriptor {
+  id: string;
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+  icon: string;
+  label: string | `%${string}`;
+  tooltip?: string | `%${string}`;
 }
 
 /**

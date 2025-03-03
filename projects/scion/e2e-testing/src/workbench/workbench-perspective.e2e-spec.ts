@@ -26,7 +26,7 @@ test.describe('Workbench Perspective', () => {
 
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-1');
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {root: new MPart({id: 'part.part-1', views: [{id: 'view.101'}]})},
+      mainGrid: {root: new MPart({id: 'part.part-1', views: [{id: 'view.101'}]})},
     });
 
     // Switch to perspective 2.
@@ -34,7 +34,7 @@ test.describe('Workbench Perspective', () => {
 
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {root: new MPart({id: 'part.part-2', views: [{id: 'view.102'}]})},
+      mainGrid: {root: new MPart({id: 'part.part-2', views: [{id: 'view.102'}]})},
     });
 
     // Perform browser history back.
@@ -43,7 +43,7 @@ test.describe('Workbench Perspective', () => {
     // Expect perspective 1 to be active.
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-1');
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {root: new MPart({id: 'part.part-1', views: [{id: 'view.101'}]})},
+      mainGrid: {root: new MPart({id: 'part.part-1', views: [{id: 'view.101'}]})},
     });
 
     // Perform browser history forward.
@@ -52,7 +52,7 @@ test.describe('Workbench Perspective', () => {
     // Expect perspective 2 to be active.
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {root: new MPart({id: 'part.part-2', views: [{id: 'view.102'}]})},
+      mainGrid: {root: new MPart({id: 'part.part-2', views: [{id: 'view.102'}]})},
     });
   });
 });

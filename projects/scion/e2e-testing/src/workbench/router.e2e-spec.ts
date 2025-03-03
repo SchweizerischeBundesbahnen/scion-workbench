@@ -787,7 +787,7 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(3);
   });
 
-  test('should open view in the active part of the workbench grid if specified part is not in the layout', async ({appPO, workbenchNavigator}) => {
+  test('should open view in the active part of the main grid if specified part is not in the layout', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Create perspective with a left and right part.
@@ -1392,7 +1392,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.part({partId: 'part.right'}).bar.viewTabBar.getViewIds()).toEqual(['view.104']);
   });
 
-  test('should support app URL to contain view outlets of views in the workbench grid', async ({appPO, workbenchNavigator}) => {
+  test('should support app URL to contain view outlets of views in the main grid', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
@@ -1405,7 +1405,7 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -1419,12 +1419,12 @@ test.describe('Workbench Router', () => {
       },
     });
 
-    // WHEN: Opening the app with a URL that contains view outlets of views from the workbench grid
+    // WHEN: Opening the app with a URL that contains view outlets of views from the main grid
     await appPO.reload();
 
     // THEN: Expect the workbench layout to be restored.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -1442,7 +1442,7 @@ test.describe('Workbench Router', () => {
     await expectView(viewPage).toBeActive();
   });
 
-  test('should allow for navigation to an empty-path route in the workbench grid', async ({appPO, workbenchNavigator}) => {
+  test('should allow for navigation to an empty-path route in the main grid', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
@@ -1453,7 +1453,7 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -1485,7 +1485,7 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the main area.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {

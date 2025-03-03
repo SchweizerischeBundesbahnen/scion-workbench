@@ -225,7 +225,7 @@ function lookupViewCapabilityAndShareReplay(): OperatorFunction<string, Workbenc
     distinctUntilChanged(),
     tap(viewCapabilityId => latestViewCapabilityId = viewCapabilityId),
     switchMap(viewCapabilityId => Beans.get(ManifestService).lookupCapabilities$<WorkbenchViewCapability>({id: viewCapabilityId})), // async call; long-living
-    map(viewCapabilities => viewCapabilities[0]),
+    map(viewCapabilities => viewCapabilities[0]!),
     // Replay the latest looked up capability for new subscribers.
     shareReplay({refCount: false, bufferSize: 1}),
     // Ensure not to replay a stale capability upon the subscription of new subscribers. For this reason, we install a filter to filter them out.

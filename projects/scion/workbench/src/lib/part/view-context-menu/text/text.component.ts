@@ -7,5 +7,5 @@ import {Component, input} from '@angular/core';
 })
 export class TextComponent {
 
-  protected readonly text = input.required<string>();
+  public readonly text = input.required<string>();
 }

@@ -32,7 +32,7 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Serialize layout without "view.markedForRemoval" field.
     const serializedLayout = layout.serialize({excludeViewMarkedForRemoval: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     // Expect markedForRemoval not to be serialized.
     expect(deserializedLayout.view({viewId: 'view.1'}).markedForRemoval).toBeUndefined();
@@ -49,7 +49,7 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Serialize layout without "view.navigation.id".
     const serializedLayout = layout.serialize({excludeViewNavigationId: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     // Expect navigation id not to be serialized.
     expect(deserializedLayout.view({viewId: 'view.1'}).navigation!.id).toBeUndefined();
@@ -65,7 +65,7 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Serialize layout without "part.navigation.id".
     const serializedLayout = layout.serialize({excludePartNavigationId: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     // Expect navigation id not to be serialized.
     expect(deserializedLayout.part({partId: 'part.1'}).navigation!.id).toBeUndefined();
@@ -85,7 +85,7 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Serialize layout without "nodeId".
     const serializedLayout = layout.serialize({excludeTreeNodeId: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     // Expect node id not to be serialized.
     expect(deserializedLayout.part({partId: 'part.left'}).parent!.id).toBeUndefined();
@@ -99,20 +99,20 @@ describe('WorkbenchLayoutSerializer', () => {
   it('should not serialize "grid.migrated" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
 
-    (layout.workbenchGrid as Mutable<ɵMPartGrid>).migrated = true;
-    (layout.mainAreaGrid as Mutable<ɵMPartGrid>).migrated = true;
+    (layout.grids.main as Mutable<ɵMPartGrid>).migrated = true;
+    (layout.grids.mainArea as Mutable<ɵMPartGrid>).migrated = true;
 
     // Expect "migrated" flag to be set.
-    expect(layout.workbenchGrid.migrated).toBeTrue();
-    expect(layout.mainAreaGrid!.migrated).toBeTrue();
+    expect(layout.grids.main.migrated).toBeTrue();
+    expect(layout.grids.mainArea!.migrated).toBeTrue();
 
     // Serialize layout.
     const serializedLayout = layout.serialize();
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     // Expect "migrated" flag not to be serialized.
-    expect(deserializedLayout.workbenchGrid.migrated).toBeUndefined();
-    expect(deserializedLayout.mainAreaGrid!.migrated).toBeUndefined();
+    expect(deserializedLayout.grids.main.migrated).toBeUndefined();
+    expect(deserializedLayout.grids.mainArea!.migrated).toBeUndefined();
   });
 
   it('should serialize part identifiers into logical identifiers based on their order in the layout', async () => {
@@ -123,10 +123,10 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Serialize and deserialize the layout.
     const serializedLayout = workbenchLayout.serialize({assignStablePartIdentifier: true});
-    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     expect(deserializedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'part.1',
@@ -166,17 +166,19 @@ describe('WorkbenchLayoutSerializer', () => {
    */
   it('should migrate workbench layout v4 to the latest version', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory).create({
-      workbenchGrid: 'eyJyb290Ijp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiJsZWZ0Iiwic3RydWN0dXJhbCI6dHJ1ZSwidmlld3MiOlt7ImlkIjoidmlldy4yIiwibmF2aWdhdGlvbiI6e319LHsiaWQiOiJ2aWV3LjMiLCJuYXZpZ2F0aW9uIjp7ImhpbnQiOiJ0ZXN0LXZpZXcifX1dLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjIifSwiY2hpbGQyIjp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiJtYWluLWFyZWEiLCJzdHJ1Y3R1cmFsIjp0cnVlLCJ2aWV3cyI6W119LCJjaGlsZDIiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiJyaWdodCIsInN0cnVjdHVyYWwiOnRydWUsInZpZXdzIjpbeyJpZCI6InZpZXcuNCIsIm5hdmlnYXRpb24iOnt9fV0sImFjdGl2ZVZpZXdJZCI6InZpZXcuNCJ9LCJkaXJlY3Rpb24iOiJyb3ciLCJyYXRpbyI6MC43NX0sImRpcmVjdGlvbiI6InJvdyIsInJhdGlvIjowLjI1fSwiYWN0aXZlUGFydElkIjoibGVmdCJ9Ly80',
-      mainAreaGrid: 'eyJyb290Ijp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiI2ZjA5ZTZlMi1iNjNhLTRmMGQtOWFlMS0wNjYyNGZkYjM3YzciLCJzdHJ1Y3R1cmFsIjpmYWxzZSwidmlld3MiOlt7ImlkIjoidmlldy4xIiwibmF2aWdhdGlvbiI6e319XSwiYWN0aXZlVmlld0lkIjoidmlldy4xIn0sImNoaWxkMiI6eyJ0eXBlIjoiTVBhcnQiLCJpZCI6IjFkOTRkY2I2LTc2YjYtNDdlYi1iMzAwLTM5NDQ4OTkzZDM2YiIsInN0cnVjdHVyYWwiOmZhbHNlLCJ2aWV3cyI6W3siaWQiOiJ2aWV3LjUiLCJuYXZpZ2F0aW9uIjp7fX1dLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjUifSwiZGlyZWN0aW9uIjoiY29sdW1uIiwicmF0aW8iOjAuNX0sImFjdGl2ZVBhcnRJZCI6IjFkOTRkY2I2LTc2YjYtNDdlYi1iMzAwLTM5NDQ4OTkzZDM2YiJ9Ly80',
+      grids: {
+        main: 'eyJyb290Ijp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiJsZWZ0Iiwic3RydWN0dXJhbCI6dHJ1ZSwidmlld3MiOlt7ImlkIjoidmlldy4yIiwibmF2aWdhdGlvbiI6e319LHsiaWQiOiJ2aWV3LjMiLCJuYXZpZ2F0aW9uIjp7ImhpbnQiOiJ0ZXN0LXZpZXcifX1dLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjIifSwiY2hpbGQyIjp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiJtYWluLWFyZWEiLCJzdHJ1Y3R1cmFsIjp0cnVlLCJ2aWV3cyI6W119LCJjaGlsZDIiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiJyaWdodCIsInN0cnVjdHVyYWwiOnRydWUsInZpZXdzIjpbeyJpZCI6InZpZXcuNCIsIm5hdmlnYXRpb24iOnt9fV0sImFjdGl2ZVZpZXdJZCI6InZpZXcuNCJ9LCJkaXJlY3Rpb24iOiJyb3ciLCJyYXRpbyI6MC43NX0sImRpcmVjdGlvbiI6InJvdyIsInJhdGlvIjowLjI1fSwiYWN0aXZlUGFydElkIjoibGVmdCJ9Ly80',
+        mainArea: 'eyJyb290Ijp7InR5cGUiOiJNVHJlZU5vZGUiLCJjaGlsZDEiOnsidHlwZSI6Ik1QYXJ0IiwiaWQiOiI2ZjA5ZTZlMi1iNjNhLTRmMGQtOWFlMS0wNjYyNGZkYjM3YzciLCJzdHJ1Y3R1cmFsIjpmYWxzZSwidmlld3MiOlt7ImlkIjoidmlldy4xIiwibmF2aWdhdGlvbiI6e319XSwiYWN0aXZlVmlld0lkIjoidmlldy4xIn0sImNoaWxkMiI6eyJ0eXBlIjoiTVBhcnQiLCJpZCI6IjFkOTRkY2I2LTc2YjYtNDdlYi1iMzAwLTM5NDQ4OTkzZDM2YiIsInN0cnVjdHVyYWwiOmZhbHNlLCJ2aWV3cyI6W3siaWQiOiJ2aWV3LjUiLCJuYXZpZ2F0aW9uIjp7fX1dLCJhY3RpdmVWaWV3SWQiOiJ2aWV3LjUifSwiZGlyZWN0aW9uIjoiY29sdW1uIiwicmF0aW8iOjAuNX0sImFjdGl2ZVBhcnRJZCI6IjFkOTRkY2I2LTc2YjYtNDdlYi1iMzAwLTM5NDQ4OTkzZDM2YiJ9Ly80',
+      },
     });
 
-    const [leftPart] = layout.parts({id: 'left'});
-    const [rightPart] = layout.parts({id: 'right'});
-    const [_1d94dcb6Part] = layout.parts({id: '1d94dcb6-76b6-47eb-b300-39448993d36b'});
-    const [_6f09e6e2] = layout.parts({id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'});
+    const [leftPart] = layout.parts({id: 'left'}, {throwIfEmpty: true});
+    const [rightPart] = layout.parts({id: 'right'}, {throwIfEmpty: true});
+    const [_1d94dcb6Part] = layout.parts({id: '1d94dcb6-76b6-47eb-b300-39448993d36b'}, {throwIfEmpty: true});
+    const [_6f09e6e2] = layout.parts({id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'}, {throwIfEmpty: true});
 
     expect(layout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           id: any(),
           direction: 'row',

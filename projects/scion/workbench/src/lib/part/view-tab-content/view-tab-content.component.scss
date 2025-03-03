@@ -29,11 +29,9 @@
     }
   }
 
-  // @formatter:off - Disable formatting because IntelliJ adds a space between number and unit, making the condition invalid.
   @container viewtab (height < #{workbench-constants.$viewtab-multiline-breakpoint}) {
     > span.heading {
       display: none;
     }
   }
-  // @formatter:on
 }

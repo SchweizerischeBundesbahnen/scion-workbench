@@ -41,7 +41,7 @@ export function parseTypedString<T = unknown>(value: string | undefined | null):
       return paramMatch.groups['value'] as T;
     }
     case 'json': {
-      return JSON.parse(paramMatch.groups['value']) as T;
+      return JSON.parse(paramMatch.groups['value']!) as T;
     }
     default: {
       return value as T;

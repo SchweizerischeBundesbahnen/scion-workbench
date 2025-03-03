@@ -14,6 +14,9 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {filterNull} from '../common/operators';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {renderingFlag} from './rendering-flag';
+import {readCssVariable} from '../common/dom.util';
+import {DOCUMENT} from '@angular/common';
 
 /**
  * Provides access to the workbench layout.
@@ -27,7 +30,25 @@ export class WorkbenchLayoutService {
   private readonly _resizing = signal(false);
 
   /**
+   * Configures how to align the bottom activity panel.
+   */
+  public readonly panelAlignment = renderingFlag(
+    'scion.workbench.layout.panel.align',
+    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-layout-panel-align', 'justify'),
+  );
+
+  /**
+   * Configures if to animate activity panels.
+   */
+  public readonly panelAnimation = renderingFlag(
+    'scion.workbench.layout.panel.animate',
+    readCssVariable(inject(DOCUMENT).documentElement, '--sci-workbench-layout-panel-animate', false),
+  );
+
+  /**
    * Provides the current {@link WorkbenchLayout}, or `null` until Angular has performed the initial navigation.
+   *
+   * TODO [activity] Look for usages where we do not have a layout -> try changing it to NOT null.
    */
   public layout = toSignal(this._layout$, {requireSync: true});
 

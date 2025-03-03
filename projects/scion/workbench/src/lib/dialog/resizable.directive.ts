@@ -375,7 +375,7 @@ class ResizeHandle {
             break;
           }
           case 'touchmove': {
-            this._config.onResize(event.touchEvent.touches[0]);
+            this._config.onResize(event.touchEvent.touches[0]!);
             break;
           }
           case 'mouseend': {

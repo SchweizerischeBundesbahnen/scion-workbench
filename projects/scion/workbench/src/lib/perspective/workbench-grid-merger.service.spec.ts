@@ -51,7 +51,7 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes not to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -97,7 +97,7 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.1': segments(['PATH/TO/VIEW/1']),
       'view.100': segments(['path/to/view/100']),
       'part.left': segments(['PATH/TO/PART']),
@@ -135,7 +135,7 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -165,7 +165,7 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.2': segments(['path/to/view/2']),
       'view.100': segments(['PATH/TO/VIEW/100']),
     });
@@ -192,7 +192,7 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -221,7 +221,7 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.1': segments(['path/to/view/1']),
       'view.2': segments(['path/to/view/2b']),
     });
@@ -248,7 +248,7 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -276,7 +276,7 @@ describe('WorkbenchGridMerger', () => {
     // Expect hint not to be present.
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.1': segments(['path/to/view/1']),
     });
   });
@@ -297,7 +297,7 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -310,7 +310,7 @@ describe('WorkbenchGridMerger', () => {
       },
     });
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'part.left': segments(['path/to/part']),
     });
   });
@@ -331,7 +331,7 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -346,7 +346,7 @@ describe('WorkbenchGridMerger', () => {
       },
     });
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       [MAIN_AREA]: segments(['path/to/desktop']),
     });
   });

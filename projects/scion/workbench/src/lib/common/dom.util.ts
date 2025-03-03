@@ -1,5 +1,5 @@
 import {coerceElement} from '@angular/cdk/coercion';
-import {ElementRef} from '@angular/core';
+import {booleanAttribute, ElementRef, numberAttribute} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
@@ -75,6 +75,24 @@ export function unsetCssVariable(element: HTMLElement | ElementRef<HTMLElement>,
 }
 
 /**
+ * Reads and parses specified CSS variable from given element. Defaults to the specified value if not available.
+ */
+export function readCssVariable<T extends string | number | boolean>(element: Element, variable: string, defaultValue: T): T {
+  const value = getComputedStyle(element).getPropertyValue(variable) || defaultValue; // empty string if not set
+  switch (typeof defaultValue) {
+    case 'number': {
+      return numberAttribute(value, defaultValue) as T;
+    }
+    case 'boolean': {
+      return booleanAttribute(value) as T;
+    }
+    default: {
+      return value as T;
+    }
+  }
+}
+
+/**
  * Sets specified CSS class(es) to the given element.
  */
 export function setCssClass(element: HTMLElement | ElementRef<HTMLElement>, ...classes: string[]): void {
@@ -103,8 +121,8 @@ export function getCssTranslation(element: Element): {translateX: string | 'none
   // The transform property returns a matrix in the form `matrix(a, b, c, d, tx, ty)`, where `tx` is the horizontal translation and `ty` is the vertical translation.
   const matrix = transformStyle.slice('matrix('.length, -1).split(/,\s+/);
   return {
-    translateX: matrix[4],
-    translateY: matrix[5],
+    translateX: matrix[4]!,
+    translateY: matrix[5]!,
   };
 }
 

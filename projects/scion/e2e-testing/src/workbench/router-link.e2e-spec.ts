@@ -64,7 +64,7 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -454,7 +454,7 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -507,7 +507,7 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -566,7 +566,7 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,

@@ -25,6 +25,11 @@ export const PART_ID_PREFIX = 'part.';
 export const VIEW_ID_PREFIX = 'view.';
 
 /**
+ * Represents the id prefix of activities.
+ */
+export const ACTIVITY_ID_PREFIX = 'activity.';
+
+/**
  * Represents the id prefix of popups.
  */
 export const POPUP_ID_PREFIX = 'popup.';

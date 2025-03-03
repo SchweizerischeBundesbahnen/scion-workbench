@@ -69,7 +69,7 @@ export class Chart {
 
       const points = new Array<Point>();
       for (let i = 0; i < sampledDataSeries.length; i++) {
-        points.push({x: i, y: sampledDataSeries[i]});
+        points.push({x: i, y: sampledDataSeries[i]!});
       }
       return points;
     });
@@ -86,7 +86,7 @@ export class Chart {
       }
 
       return [
-        `M ${points[0].x} ${points[0].y}`,
+        `M ${points[0]!.x} ${points[0]!.y}`,
         ...points.slice(1).map(point => ` L${point.x} ${point.y}`),
       ].join(' ');
     });
@@ -104,7 +104,7 @@ export class Chart {
       }
 
       return [
-        `M ${points[0].x} ${points[0].y}`,
+        `M ${points[0]!.x} ${points[0]!.y}`,
         ...points.slice(1).map(point => ` L${point.x} ${point.y}`),
         `V ${Math.max(...this._dataSeries()) + this._config.paddingBottom - 1}`,
         'H 0',

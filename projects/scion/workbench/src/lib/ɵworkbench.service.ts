@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, computed, inject, Injectable, Signal} from '@angular/core';
-import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
+import {assertNotInReactiveContext, computed, inject, Injectable} from '@angular/core';
+import {WorkbenchPartActionFn, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {WORKBENCH_VIEW_REGISTRY} from './view/workbench-view.registry';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
-import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
+import {WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WORKBENCH_PART_REGISTRY} from './part/workbench-part.registry';
 import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
@@ -24,7 +24,6 @@ import {WORKBENCH_PERSPECTIVE_REGISTRY} from './perspective/workbench-perspectiv
 import {WORKBENCH_PART_ACTION_REGISTRY} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewId} from './view/workbench-view.model';
-import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {throwError} from './common/throw-error.util';
 import {PartId} from './part/workbench-part.model';
@@ -43,21 +42,14 @@ export class ɵWorkbenchService implements WorkbenchService {
   private readonly _layoutService = inject(WorkbenchLayoutService);
   private readonly _workbenchThemeSwitcher = inject(WorkbenchThemeSwitcher);
 
-  public readonly layout: Signal<ɵWorkbenchLayout>;
-  public readonly perspectives: Signal<ɵWorkbenchPerspective[]>;
-  public readonly parts: Signal<ɵWorkbenchPart[]>;
-  public readonly views: Signal<ɵWorkbenchView[]>;
-  public readonly theme: Signal<WorkbenchTheme | null>;
-  public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
-
-  constructor() {
-    this.layout = computed(() => this._layoutService.layout() ?? throwError('[NullLayoutError] Workbench layout not created yet.'));
-    this.perspectives = this._perspectiveRegistry.objects;
-    this.parts = this._partRegistry.objects;
-    this.views = this._viewRegistry.objects;
-    this.theme = this._workbenchThemeSwitcher.theme;
-    this.activePerspective = this._perspectiveService.activePerspective;
-  }
+  public readonly layout = computed(() => this._layoutService.layout() ?? throwError('[NullLayoutError] Workbench layout not created yet.'));
+  public readonly perspectives = inject(WORKBENCH_PERSPECTIVE_REGISTRY).objects;
+  public readonly parts = inject(WORKBENCH_PART_REGISTRY).objects;
+  public readonly views = inject(WORKBENCH_VIEW_REGISTRY).objects;
+  public readonly theme = inject(WorkbenchThemeSwitcher).theme;
+  public readonly panelAlignment = inject(WorkbenchLayoutService).panelAlignment;
+  public readonly panelAnimation = inject(WorkbenchLayoutService).panelAnimation;
+  public readonly activePerspective = inject(WorkbenchPerspectiveService).activePerspective;
 
   /** @inheritDoc */
   public getPerspective(perspectiveId: string): ɵWorkbenchPerspective | null {
