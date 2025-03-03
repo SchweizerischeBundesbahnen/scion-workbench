@@ -2,13 +2,19 @@
   @if (menuItem | appInstanceof:MenuItem; as menuItem) {
     <button class="menu-item e2e-menu-item"
             [ngClass]="menuItem.cssClass"
+            [appAttributes]="menuItem.attributes"
             [class.disabled]="menuItem.disabled"
             [class.checked]="menuItem.checked"
             (click)="onMenuItemClick(menuItem)">
       <span sciMaterialIcon class="check-mark e2e-check-mark">check</span>
       {{menuItem.text}}
     </button>
-  } @else {
+  }
+  @if (menuItem | appInstanceof:MenuItemSeparator; as separator) {
     <hr>
+
+    @if (separator.heading) {
+      <div class="heading">{{separator.heading}}</div>
+    }
   }
 }

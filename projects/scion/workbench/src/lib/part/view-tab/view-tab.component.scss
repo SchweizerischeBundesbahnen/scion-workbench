@@ -12,7 +12,7 @@
   padding-right: var(--sci-workbench-tab-padding-inline);
   position: relative; // positioning context
   user-select: none;
-  cursor: pointer;
+  cursor: var(--sci-workbench-tab-cursor);
   box-sizing: border-box;
   outline: none;
   border-top: 1px solid transparent;
@@ -33,11 +33,11 @@
     }
 
     > div.content {
-      color: var(--sci-workbench-tab-active-text-color);
+      color: var(--sci-workbench-tab-text-color-active);
     }
 
     &.part-active > div.content {
-      color: var(--sci-workbench-part-active-tab-active-text-color);
+      color: var(--sci-workbench-part-active-tab-text-color-active);
     }
   }
 
@@ -50,7 +50,6 @@
   > button.close {
     all: unset;
     position: absolute;
-    cursor: pointer;
     visibility: hidden;
     padding: .125em;
     border-radius: var(--sci-corner-small);
@@ -68,13 +67,13 @@
   }
 
   &.active > button.close:hover {
-    background-color: var(--sci-workbench-tab-hover-background-color);
+    background-color: var(--sci-workbench-tab-background-color-hover);
   }
 
   // Indicator when hovering the tab
   &:hover:not(.active):not(.drag-over-tabbar):before {
     content: '';
-    background-color: var(--sci-workbench-tab-hover-background-color);
+    background-color: var(--sci-workbench-tab-background-color-hover);
     position: absolute;
     inset: 0 0 .125em .125em;
     border-radius: var(--sci-workbench-tab-border-radius);

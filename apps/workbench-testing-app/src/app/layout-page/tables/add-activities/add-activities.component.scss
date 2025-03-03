@@ -1,0 +1,16 @@
+@use '@scion/components.internal/design' as sci-design;
+
+:host {
+  display: grid;
+
+  > form {
+    display: grid;
+    grid-template-columns: 7.5em repeat(3, 1fr) min-content auto;
+    gap: .5em .75em;
+    align-items: center;
+
+    > input, select {
+      @include sci-design.style-input-field();
+    }
+  }
+}

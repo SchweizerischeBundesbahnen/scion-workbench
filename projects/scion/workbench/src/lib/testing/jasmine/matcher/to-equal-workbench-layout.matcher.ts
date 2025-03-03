@@ -13,7 +13,6 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
-import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
 import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
@@ -24,6 +23,7 @@ import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {Objects} from '../../../common/objects.util';
+import {WorkbenchComponent} from '../../../workbench.component';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -44,15 +44,15 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
             return pass();
           }
 
-          // Resolve debug element for `WorkbenchLayoutComponent`.
+          // Resolve debug element for `WorkbenchComponent`.
           let debugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            debugElement = debugElement.query(By.directive(WorkbenchLayoutComponent));
+          if (!(debugElement.componentInstance instanceof WorkbenchComponent)) {
+            debugElement = debugElement.query(By.directive(WorkbenchComponent));
           }
 
-          // Expect debug element to represent `WorkbenchLayoutComponent` element.
-          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${(actual.componentInstance as object).constructor.name}.`);
+          // Expect debug element to represent `WorkbenchComponent` element.
+          if (!(debugElement.componentInstance instanceof WorkbenchComponent)) {
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchComponent' (or a parent), but was ${actual.componentInstance?.constructor?.name}.`); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           }
 
           // Assert model.
@@ -83,11 +83,11 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
 function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout, util: MatchersUtil): void {
   const actualLayout: ExpectedWorkbenchLayout = {
     perspectiveId: actual.perspectiveId,
-    mainAreaGrid: actual.mainAreaGrid ?? undefined,
-    workbenchGrid: actual.workbenchGrid,
+    mainAreaGrid: actual.grids.mainArea ?? undefined,
+    mainGrid: actual.grids.main,
     maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
-    outlets: actual.outlets(),
+    outlets: actual.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}),
   };
   const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
@@ -101,13 +101,13 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: �
  * Note: To pierce the shadow DOM and use the `:scope` selector, we use `Element.querySelector` instead of `DebugElement.query(By.css(...))`, i.e., to access the light DOM of sci-viewport.
  */
 function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualElement: Element): void {
-  // Assert the workbench grid plus the main area grid if expected.
-  if (expected.workbenchGrid) {
-    assertGridElementDOM(expected.workbenchGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
+  // Assert the main grid plus the main area grid if expected.
+  if (expected.mainGrid) {
+    assertGridElementDOM(expected.mainGrid.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] > wb-grid-element'), expected);
   }
-  // Assert only the main area grid, but not the workbench grid since not expected.
+  // Assert only the main area grid, but not the main grid since not expected.
   else if (expected.mainAreaGrid) {
-    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-part[data-partid="part.main-area"] > wb-grid-element'), expected);
+    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] wb-part[data-partid="part.main-area"] > wb-grid[data-grid="main-area"] > wb-grid-element'), expected);
   }
 }
 
@@ -197,7 +197,7 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
       throw Error(`[DOMAssertError]: Expected element 'wb-part[data-partid="part.main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
     if (expectedWorkbenchLayout.mainAreaGrid) {
-      assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);
+      assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(':scope > wb-grid[data-grid="main-area"] > wb-grid-element'), expectedWorkbenchLayout);
     }
     return;
   }
@@ -270,9 +270,9 @@ function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFail
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Asserts specified workbench grid, if set.
+   * Asserts specified main grid, if set.
    */
-  workbenchGrid?: MPartGrid;
+  mainGrid?: MPartGrid;
   /**
    * Asserts specified main area grid, if set.
    */

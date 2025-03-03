@@ -101,7 +101,7 @@ export class MovableDirective {
             break;
           }
           case 'touchstart': {
-            this.onMoveStart(event.touchEvent.touches[0]);
+            this.onMoveStart(event.touchEvent.touches[0]!);
             break;
           }
           case 'mousemove': {
@@ -109,7 +109,7 @@ export class MovableDirective {
             break;
           }
           case 'touchmove': {
-            this.onMove(event.touchEvent.touches[0]);
+            this.onMove(event.touchEvent.touches[0]!);
             break;
           }
           case 'mouseend': {

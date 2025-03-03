@@ -9,11 +9,13 @@
  */
 
 import {BehaviorSubject, Observable, skip} from 'rxjs';
-import {computed, inject, Injectable, signal} from '@angular/core';
+import {computed, effect, inject, Injectable, Injector, signal} from '@angular/core';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {filterNull} from '../common/operators';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {coerceBooleanProperty} from '@angular/cdk/coercion';
+import {WorkbenchStorage} from '../storage/workbench-storage';
 
 /**
  * Provides access to the workbench layout.
@@ -27,7 +29,14 @@ export class WorkbenchLayoutService {
   private readonly _resizing = signal(false);
 
   /**
+   * Indicates if the layout should be optimized for widescreen displays.
+   */
+  public readonly widescreenModeEnabled = signal(false);
+
+  /**
    * Provides the current {@link WorkbenchLayout}, or `null` until Angular has performed the initial navigation.
+   *
+   * TODO [activity] Look for usages where we do not have a layout -> try changing it to NOT null.
    */
   public layout = toSignal(this._layout$, {requireSync: true});
 
@@ -50,6 +59,10 @@ export class WorkbenchLayoutService {
    */
   public readonly dragging = computed(() => this._viewDragService.dragging() || this._moving() || this._resizing());
 
+  constructor() {
+    void this.installWidescreenModeSynchronizer();
+  }
+
   /**
    * Signals moving a workbench element, such as moving a dialog.
    */
@@ -70,4 +83,24 @@ export class WorkbenchLayoutService {
   public setLayout(layout: ɵWorkbenchLayout): void {
     this._layout$.next(layout);
   }
+
+  /**
+   * Synchronizes the widescreen mode with persistent storage.
+   */
+  private async installWidescreenModeSynchronizer(): Promise<void> {
+    const workbenchStorage = inject(WorkbenchStorage);
+    const injector = inject(Injector);
+    const enabled = await workbenchStorage.load(WIDESCREEN_STORAGE_KEY) ?? false;
+    this.widescreenModeEnabled.set(coerceBooleanProperty(enabled));
+
+    effect(() => {
+      const enabled = this.widescreenModeEnabled();
+      void workbenchStorage.store(WIDESCREEN_STORAGE_KEY, `${enabled}`);
+    }, {injector});
+  }
 }
+
+/**
+ * Key for storing widescreen mode setting across layouts.
+ */
+const WIDESCREEN_STORAGE_KEY = 'scion.workbench.layout.widescreen-mode';

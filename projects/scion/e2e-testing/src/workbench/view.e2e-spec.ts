@@ -1001,7 +1001,7 @@ test.describe('Workbench View', () => {
 
     // Drag view in the layout.
     const dragHandle = await testee2ViewPage.view.tab.startDrag();
-    await dragHandle.dragToEdge('east');
+    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
     // Expect `CanClose` guard not to be invoked.
@@ -1010,7 +1010,7 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .8,
@@ -1172,7 +1172,7 @@ test.describe('Workbench View', () => {
 
     // Drag view 2 into peripheral area.
     const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToEdge('east');
+    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
     await expectView(viewPage1).toBeActive();

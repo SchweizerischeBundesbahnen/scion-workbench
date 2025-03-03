@@ -1,0 +1,16 @@
+<!-- TODO [activity] Why is the drop zone not on the grid as host directive? -->
+<wb-grid-element [element]="root()"
+                 wbViewDropZone
+                 [wbViewDropZoneRegionSize]="gridDropZone()?.dropRegionSize"
+                 [wbViewDropZonePlaceholderSize]="gridDropZone()?.dropPlaceholderSize"
+                 [wbViewDropZoneRegions]="{
+                     north: false,
+                     south: root() | wbRequiresDropZone:'south',
+                     west: root() | wbRequiresDropZone:'west',
+                     east: root() | wbRequiresDropZone:'east',
+                     center: false,
+                   }"
+                 [wbViewDropZoneCssClass]="gridDropZone()?.dropZoneCssClass"
+                 [wbViewDropZoneAttributes]="gridDropZone()?.dropZoneAttributes"
+                 (wbViewDropZoneDrop)="onViewDrop($event)
+"/>

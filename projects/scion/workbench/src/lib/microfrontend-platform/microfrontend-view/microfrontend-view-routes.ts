@@ -73,7 +73,7 @@ export const MicrofrontendViewRoutes = {
         consumed: segments,
         posParams: {
           ...Object.fromEntries(posParams),
-          [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: segments[1],
+          [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: segments[1]!,
         },
       };
     };
@@ -99,10 +99,10 @@ export const MicrofrontendViewRoutes = {
    * Tests given URL to be a microfrontend route.
    */
   parseMicrofrontendRoute: (segments: UrlSegment[]): {capabilityId: string; params: Params} | null => {
-    if (segments.length === 2 && segments[0].path === MicrofrontendViewRoutes.ROUTE_PREFIX) {
+    if (segments.length === 2 && segments[0]!.path === MicrofrontendViewRoutes.ROUTE_PREFIX) {
       return {
-        capabilityId: segments[1].path,
-        params: segments[1].parameters,
+        capabilityId: segments[1]!.path,
+        params: segments[1]!.parameters,
       };
     }
     return null;

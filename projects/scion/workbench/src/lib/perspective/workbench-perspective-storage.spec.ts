@@ -15,7 +15,6 @@ import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
 import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
-import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {WorkbenchService} from '../workbench.service';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
@@ -24,6 +23,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchStorage} from '../storage/workbench-storage';
 import {Maps} from '@scion/toolkit/util';
 import {firstValueFrom, Subject} from 'rxjs';
+import {WorkbenchComponent} from '../workbench.component';
 
 describe('WorkbenchPerspectiveStorage', () => {
 
@@ -55,7 +55,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in part 'left-top'
@@ -64,7 +64,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -81,7 +81,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -101,7 +101,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({
             id: 'part.left',
@@ -176,7 +176,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -204,7 +204,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Expect the most recent layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({
           id: 'part.part',
           views: [
@@ -246,7 +246,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // Open view.1 in perspective-1.
@@ -261,7 +261,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -291,7 +291,7 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MTreeNode({
@@ -326,7 +326,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the perspective to have the stored layout.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -368,7 +368,7 @@ describe('WorkbenchPerspectiveStorage', () => {
         ]),
       ],
     });
-    styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // WHEN: Opening view.1 in perspective-1
@@ -384,7 +384,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout of perspective-1 to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective-1')).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MTreeNode({
             child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
@@ -414,7 +414,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout of perspective-2 to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective-2')).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
           child2: new MPart({id: MAIN_AREA}),
@@ -433,7 +433,7 @@ async function loadPerspectiveLayoutFromStorage(perspectiveId: string): Promise<
   }
 
   return TestBed.inject(ɵWorkbenchLayoutFactory).create({
-    workbenchGrid: perspectiveLayout.userLayout.workbenchGrid,
+    grids: perspectiveLayout.userLayout.grids,
     outlets: perspectiveLayout.userLayout.outlets,
   });
 }

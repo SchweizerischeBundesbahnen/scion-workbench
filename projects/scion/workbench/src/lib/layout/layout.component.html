@@ -1,0 +1,118 @@
+<!-- Left Activity Bar -->
+@if (leftActivityBarVisible()) {
+  <wb-activity-bar side="left"/>
+}
+
+<main>
+  @if (widescreenModeEnabled()) {
+    <!-- @formatter:off -->
+    <!-- +---+------------+---+ -->
+    <!-- | L |    MAIN    | R | -->
+    <!-- | E |    GRID    | I | -->
+    <!-- | F |            | G | -->
+    <!-- | T +------------+ H | -->
+    <!-- |   |   BOTTOM   | T | -->
+    <!-- +---+------------+---+ -->
+    <!-- @formatter:on -->
+    <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+      <!-- Left Activity Panel -->
+      @if (leftActivityPanel(); as panel) {
+        <ng-template sciSash [size]="panel.width" key="left">
+          <wb-activity-panel panel="left"/>
+        </ng-template>
+      }
+      <ng-template sciSash>
+        <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
+          <!-- Main Grid -->
+          <ng-template sciSash>
+            <ng-container *ngTemplateOutlet="main_grid"/>
+          </ng-template>
+          <!-- Bottom Activity Panel -->
+          @if (bottomActivityPanel(); as panel) {
+            <ng-template sciSash [size]="panel.height" key="bottom">
+              <wb-activity-panel panel="bottom"/>
+            </ng-template>
+          }
+        </sci-sashbox>
+      </ng-template>
+      <!-- Right Activity Panel -->
+      @if (rightActivityPanel(); as panel) {
+        <ng-template sciSash [size]="panel.width" key="right">
+          <wb-activity-panel panel="right"/>
+        </ng-template>
+      }
+    </sci-sashbox>
+  } @else {
+    <!-- @formatter:off -->
+    <!-- +---+------------+---+ -->
+    <!-- | L |            | R | -->
+    <!-- | E |    MAIN    | I | -->
+    <!-- | F |    GRID    | G | -->
+    <!-- | T |            | H | -->
+    <!-- |   |            | T | -->
+    <!-- +---+------------+---+ -->
+    <!-- |       BOTTOM       | -->
+    <!-- +--------------------+ -->
+    <!-- @formatter:on -->
+    <sci-sashbox direction="column" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
+      <ng-template sciSash>
+        <sci-sashbox direction="row" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+          <!-- Left Activity Panel -->
+          @if (leftActivityPanel(); as panel) {
+            <ng-template sciSash [size]="panel.width" key="left">
+              <wb-activity-panel panel="left"/>
+            </ng-template>
+          }
+          <!-- Main Grid -->
+          <ng-template sciSash>
+            <ng-container *ngTemplateOutlet="main_grid"/>
+          </ng-template>
+          <!-- Right Activity Panel -->
+          @if (rightActivityPanel(); as panel) {
+            <ng-template sciSash [size]="panel.width" key="right">
+              <wb-activity-panel panel="right"/>
+            </ng-template>
+          }
+        </sci-sashbox>
+      </ng-template>
+      <!-- Bottom Activity Panel -->
+      @if (bottomActivityPanel(); as panel) {
+        <ng-template sciSash [size]="panel.height" key="bottom">
+          <wb-activity-panel panel="bottom"/>
+        </ng-template>
+      }
+    </sci-sashbox>
+  }
+</main>
+
+<!-- Right Activity Bar -->
+@if (rightActivityBarVisible()) {
+  <wb-activity-bar side="right"/>
+}
+
+<!-- Main Grid -->
+<ng-template #main_grid>
+  @if (mainGrid().root | wbGridElementIfVisible; as root) {
+    <wb-grid [grid]="mainGrid()"
+             [gridDropZone]="{
+               dropRegionSize: 50,
+               dropPlaceholderSize: 50,
+               dropZoneCssClass: 'e2e-grid-drop-zone',
+               dropZoneAttributes: {'data-grid': 'main'}
+             }"
+             [attr.data-grid]="'main'"
+    />
+  } @else {
+    <sci-viewport class="desktop e2e-desktop"
+                  wbViewDropZone
+                  [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
+                  [wbViewDropZoneCssClass]="'e2e-desktop-drop-zone'"
+                  (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
+      @if (desktop()) {
+        <ng-container *ngTemplateOutlet="desktop()!"/>
+      } @else {
+        <router-outlet (activate)="onLegacyStartPageActivate()"/>
+      }
+    </sci-viewport>
+  }
+</ng-template>

@@ -107,7 +107,7 @@ describe('WorkbenchLayout', () => {
   });
 
   /**
-   * Workbench Grid:
+   * Main Grid:
    * +---------------+
    * |       A       |
    * +---------------+
@@ -125,7 +125,7 @@ describe('WorkbenchLayout', () => {
       .addPart('part.B', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'column',
           ratio: .25,
@@ -145,7 +145,7 @@ describe('WorkbenchLayout', () => {
   });
 
   /**
-   * Workbench Grid:
+   * Main Grid:
    * +---------------+
    * |       A       |
    * +---------------+
@@ -163,7 +163,7 @@ describe('WorkbenchLayout', () => {
       .addPart('part.B', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'column',
           ratio: .25,
@@ -183,7 +183,7 @@ describe('WorkbenchLayout', () => {
   });
 
   /**
-   * Workbench Grid:
+   * Main Grid:
    * +-------+
    * |   A   |
    * +-------+
@@ -199,7 +199,7 @@ describe('WorkbenchLayout', () => {
       .addPart('part.C', {relativeTo: 'part.B', align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'column',
           ratio: .25,
@@ -214,7 +214,7 @@ describe('WorkbenchLayout', () => {
       },
     });
 
-    expect((workbenchLayout as ɵWorkbenchLayout).mainAreaGrid).toBeNull();
+    expect((workbenchLayout as ɵWorkbenchLayout).grids.mainArea).toBeUndefined();
   });
 
   /**
@@ -537,7 +537,7 @@ describe('WorkbenchLayout', () => {
    * |         BOTTOM          |       |
    * +-------------------------+-------+
    */
-  it('should allow adding a new parts to the workbench grid', () => {
+  it('should allow adding a new parts to the main grid', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
     const workbenchLayout = createComplexMainAreaLayout()
@@ -578,7 +578,7 @@ describe('WorkbenchLayout', () => {
           }),
         }),
       },
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'column',
           child1: new MPart({id: 'part.TOP'}),
@@ -667,7 +667,7 @@ describe('WorkbenchLayout', () => {
       .addPart('part.other', {relativeTo: MAIN_AREA, align: 'right', ratio: .5})
       .removePart(MAIN_AREA);
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: 'part.other'}),
       },
     });
@@ -690,10 +690,10 @@ describe('WorkbenchLayout', () => {
       .addPart('part.B', {relativeTo: 'part.A', align: 'left'})
       .addPart('part.C', {relativeTo: 'part.B', align: 'bottom'})
       .serialize();
-    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({workbenchGrid: serializedLayout.workbenchGrid, mainAreaGrid: serializedLayout.mainAreaGrid});
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     // verify the main area root node.
-    const rootNode = workbenchLayout.mainAreaGrid!.root as _MTreeNode;
+    const rootNode = workbenchLayout.grids.mainArea!.root as _MTreeNode;
     expect(rootNode).toBeInstanceOf(_MTreeNode);
     expect(rootNode.parent).toBeUndefined();
 
@@ -736,7 +736,12 @@ describe('WorkbenchLayout', () => {
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.B', {relativeTo: 'part.A', align: 'left'})
-      .addPart('part.C', {relativeTo: 'part.B', align: 'bottom'});
+      .addPart('part.C', {relativeTo: 'part.B', align: 'bottom'})
+      .addView('view.101', {partId: 'part.C'})
+      .navigatePart('part.A', ['path/to/part/a'])
+      .navigatePart('part.B', ['path/to/part/b'])
+      .navigatePart('part.C', ['path/to/part/c'])
+      .navigateView('view.101', ['path/to/view/1']);
 
     const serializedWorkbenchLayout = workbenchLayout.serialize();
 
@@ -745,9 +750,16 @@ describe('WorkbenchLayout', () => {
       .addPart('part.X', {relativeTo: 'part.A', align: 'right'})
       .addPart('part.Y', {relativeTo: 'part.X', align: 'bottom'})
       .addPart('part.Z', {relativeTo: 'part.Y', align: 'bottom'})
+      .addView('view.102', {partId: 'part.C'})
+      .navigatePart('part.X', ['path/to/part/x'])
+      .navigatePart('part.Y', ['path/to/part/y'])
+      .navigatePart('part.Z', ['path/to/part/z'])
+      .navigateView('view.102', ['path/to/view/2'])
       .removePart('part.Z');
 
-    expect(workbenchLayout.serialize()).toEqual(serializedWorkbenchLayout);
+    expect(workbenchLayout.serialize().grids).toEqual(serializedWorkbenchLayout.grids);
+    expect(workbenchLayout.serialize().activityLayout).toEqual(serializedWorkbenchLayout.activityLayout);
+    expect(workbenchLayout.serialize().outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})).toEqual(serializedWorkbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}));
   });
 
   /**
@@ -1167,7 +1179,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.navigationState({outlet: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({outlet: 'view.1'})).toEqual([]);
-    expect(workbenchLayout.outlets()['view.1']).toBeUndefined();
+    expect(workbenchLayout.outlets({mainGrid: true})['view.1']).toBeUndefined();
   });
 
   it('should also rename associated data when renaming view', () => {
@@ -1179,11 +1191,11 @@ describe('WorkbenchLayout', () => {
 
     expect(workbenchLayout.navigationState({outlet: 'view.1'})).toEqual({});
     expect(workbenchLayout.urlSegments({outlet: 'view.1'})).toEqual([]);
-    expect(workbenchLayout.outlets()['view.1']).toBeUndefined();
+    expect(workbenchLayout.outlets({mainGrid: true})['view.1']).toBeUndefined();
 
     expect(workbenchLayout.navigationState({outlet: 'view.2'})).toEqual({some: 'state'});
     expect(workbenchLayout.urlSegments({outlet: 'view.2'})).toEqual(segments(['path/to/view']));
-    expect(workbenchLayout.outlets()['view.2']).toEqual(segments(['path/to/view']));
+    expect(workbenchLayout.outlets({mainGrid: true})['view.2']).toEqual(segments(['path/to/view']));
   });
 
   it('should remove associated data when removing part', () => {
@@ -1196,7 +1208,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.right'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.navigationState({outlet: 'part.right'})).toEqual({});
     expect(workbenchLayout.urlSegments({outlet: 'part.right'})).toEqual([]);
-    expect(workbenchLayout.outlets()['part.right']).toBeUndefined();
+    expect(workbenchLayout.outlets({mainGrid: true})['part.right']).toBeUndefined();
   });
 
   it('should activate part and view when moving view to another part', () => {
@@ -1770,7 +1782,7 @@ describe('WorkbenchLayout', () => {
     ]));
 
     // Find by grid
-    expect(workbenchLayout.parts({grid: 'workbench'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([
+    expect(workbenchLayout.parts({grid: 'main'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([
       'part.outerLeft',
       MAIN_AREA,
       'part.outerRight',
@@ -1805,10 +1817,10 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.outerRight'}).id).toEqual('part.outerRight');
 
     // Find by grid and part id
-    expect(workbenchLayout.part({grid: 'workbench', partId: 'part.outerLeft'}).id).toEqual('part.outerLeft');
+    expect(workbenchLayout.part({grid: 'main', partId: 'part.outerLeft'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerLeft'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerRight'}).id).toEqual('part.innerRight');
-    expect(workbenchLayout.part({grid: 'workbench', partId: 'part.outerRight'}).id).toEqual('part.outerRight');
+    expect(workbenchLayout.part({grid: 'main', partId: 'part.outerRight'}).id).toEqual('part.outerRight');
 
     // Find by view id
     expect(workbenchLayout.part({viewId: 'view.1'}).id).toEqual('part.innerLeft');
@@ -1819,8 +1831,8 @@ describe('WorkbenchLayout', () => {
     // Find by grid and view id
     expect(workbenchLayout.part({grid: 'mainArea', viewId: 'view.1'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', viewId: 'view.2'}).id).toEqual('part.innerRight');
-    expect(workbenchLayout.part({grid: 'workbench', viewId: 'view.3'}).id).toEqual('part.outerLeft');
-    expect(workbenchLayout.part({grid: 'workbench', viewId: 'view.4'}).id).toEqual('part.outerRight');
+    expect(workbenchLayout.part({grid: 'main', viewId: 'view.3'}).id).toEqual('part.outerLeft');
+    expect(workbenchLayout.part({grid: 'main', viewId: 'view.4'}).id).toEqual('part.outerRight');
 
     // Find by part id and view id
     expect(workbenchLayout.part({partId: 'part.innerLeft', viewId: 'view.1'}).id).toEqual('part.innerLeft');
@@ -1831,8 +1843,8 @@ describe('WorkbenchLayout', () => {
     // Find by grid, part id and view id
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerLeft', viewId: 'view.1'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerRight', viewId: 'view.2'}).id).toEqual('part.innerRight');
-    expect(workbenchLayout.part({grid: 'workbench', partId: 'part.outerLeft', viewId: 'view.3'}).id).toEqual('part.outerLeft');
-    expect(workbenchLayout.part({grid: 'workbench', partId: 'part.outerRight', viewId: 'view.4'}).id).toEqual('part.outerRight');
+    expect(workbenchLayout.part({grid: 'main', partId: 'part.outerLeft', viewId: 'view.3'}).id).toEqual('part.outerLeft');
+    expect(workbenchLayout.part({grid: 'main', partId: 'part.outerRight', viewId: 'view.4'}).id).toEqual('part.outerRight');
   });
 
   it('should throw an error if not finding the part', () => {
@@ -1845,9 +1857,9 @@ describe('WorkbenchLayout', () => {
     expect(() => workbenchLayout.part({partId: 'part.does-not-exist'})).toThrowError(/NullPartError/);
     expect(() => workbenchLayout.part({partId: 'part.does-not-exist', viewId: 'view.1'})).toThrowError(/NullPartError/);
     expect(() => workbenchLayout.part({partId: 'part.initial', viewId: 'view.2'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'workbench', partId: 'part.initial', viewId: 'view.1'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'workbench', viewId: 'view.1'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'workbench', partId: 'part.initial'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({grid: 'main', partId: 'part.initial', viewId: 'view.1'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({grid: 'main', viewId: 'view.1'})).toThrowError(/NullPartError/);
+    expect(() => workbenchLayout.part({grid: 'main', partId: 'part.initial'})).toThrowError(/NullPartError/);
     expect(() => workbenchLayout.parts({id: 'part.does-not-exist'}, {throwIfEmpty: true})).toThrowError(/NullPartError/);
     expect(workbenchLayout.parts({id: 'part.does-not-exist'})).toHaveSize(0);
   });
@@ -1873,9 +1885,9 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.does-not-exist'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.part({partId: 'part.does-not-exist', viewId: 'view.1'}, {orElse: null})).toBeNull();
     expect(workbenchLayout.part({partId: 'part.initial', viewId: 'view.2'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'workbench', partId: 'part.initial', viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'workbench', viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'workbench', partId: 'part.initial'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({grid: 'main', partId: 'part.initial', viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({grid: 'main', viewId: 'view.1'}, {orElse: null})).toBeNull();
+    expect(workbenchLayout.part({grid: 'main', partId: 'part.initial'}, {orElse: null})).toBeNull();
   });
 
   it('should return whether a part is contained in the main area', () => {
@@ -1906,7 +1918,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
 
     // Find by grid
-    expect(workbenchLayout.views({grid: 'workbench'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.3']));
+    expect(workbenchLayout.views({grid: 'main'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.3']));
     expect(workbenchLayout.views({grid: 'mainArea'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
   });
 
@@ -2094,27 +2106,27 @@ describe('WorkbenchLayout', () => {
       .addPart('part.outerLeft', {relativeTo: MAIN_AREA, align: 'left'})
       .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'});
 
-    expect(workbenchLayout.activePart({grid: 'workbench'}).id).toEqual(MAIN_AREA);
+    expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual(MAIN_AREA);
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
 
     // Activate part 'outerLeft''
     workbenchLayout = workbenchLayout.activatePart('part.outerLeft');
-    expect(workbenchLayout.activePart({grid: 'workbench'}).id).toEqual('part.outerLeft');
+    expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
 
     // Activate part 'outerRight'
     workbenchLayout = workbenchLayout.activatePart('part.outerRight');
-    expect(workbenchLayout.activePart({grid: 'workbench'}).id).toEqual('part.outerRight');
+    expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.outerRight');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
 
     // Activate part 'innerLeft'
     workbenchLayout = workbenchLayout.activatePart('part.innerLeft');
-    expect(workbenchLayout.activePart({grid: 'workbench'}).id).toEqual('part.outerRight');
+    expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.outerRight');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.innerLeft');
 
     // Activate part 'innerRight'
     workbenchLayout = workbenchLayout.activatePart('part.innerRight');
-    expect(workbenchLayout.activePart({grid: 'workbench'}).id).toEqual('part.outerRight');
+    expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.outerRight');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.innerRight');
   });
 
@@ -2293,8 +2305,8 @@ describe('WorkbenchLayout', () => {
     await waitUntilStable();
 
     // Capture model objects. The ids should not change when serializing and deserializing the layout.
-    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().workbenchGrid.root;
-    const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().mainAreaGrid!.root;
+    const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().grids.main.root;
+    const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().grids.mainArea!.root;
     const view100 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.100'});
     const view101 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.101'});
     const view102 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.102'});
@@ -2303,7 +2315,7 @@ describe('WorkbenchLayout', () => {
 
     // Expect initial layout.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           id: workbenchLayoutRoot.id,
           direction: 'row',
@@ -2356,7 +2368,7 @@ describe('WorkbenchLayout', () => {
 
     // Expect ids not to have changed.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           id: workbenchLayoutRoot.id,
           direction: 'row',
@@ -2410,7 +2422,7 @@ describe('WorkbenchLayout', () => {
 
     // Expect ids not to have changed.
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           id: workbenchLayoutRoot.id,
           direction: 'row',
@@ -2524,7 +2536,7 @@ describe('WorkbenchLayout', () => {
     layout = layout.navigatePart('part', ['test-part']);
 
     expect(layout).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,

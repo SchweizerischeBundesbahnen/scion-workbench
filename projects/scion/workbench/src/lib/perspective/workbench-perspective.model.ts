@@ -10,6 +10,7 @@
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {Signal} from '@angular/core';
+import {ActivityId} from '../activity/workbench-activity.model';
 
 /**
  * Represents a workbench perspective.
@@ -201,7 +202,11 @@ export interface MPerspectiveLayout {
      * @see WorkbenchLayoutSerializer.serializeGrid
      * @see WorkbenchLayoutSerializer.deserializeGrid
      */
-    workbenchGrid: string;
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    activityLayout: string;
     /**
      * @see WorkbenchLayoutSerializer.serializeOutlets
      * @see WorkbenchLayoutSerializer.deserializeOutlets
@@ -216,7 +221,11 @@ export interface MPerspectiveLayout {
      * @see WorkbenchLayoutSerializer.serializeGrid
      * @see WorkbenchLayoutSerializer.deserializeGrid
      */
-    workbenchGrid: string;
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    activityLayout: string;
     /**
      * @see WorkbenchLayoutSerializer.serializeOutlets
      * @see WorkbenchLayoutSerializer.deserializeOutlets

@@ -15,13 +15,26 @@ import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/c
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
 import {SettingsService} from './settings.service';
 import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
+import {ProjectComponent} from './project/project.component';
+import {SearchComponent} from './search/search.component';
+import {BookmarkComponent} from './bookmark/bookmark.component';
 
 /**
- * Keys to associate data with a perspective.
+ * Keys for associating data with a perspective.
  */
 export const PerspectiveData = {
+  /**
+   * Label displayed for the selected perspective in the perspective switcher.
+   */
   label: 'label',
-  tooltip: 'tooltip',
+  /**
+   * Label displayed in the perspective switcher menu.
+   */
+  menuItemLabel: 'menuItemLabel',
+  /**
+   * Enables grouping in the perspective switcher menu.
+   */
+  menuGroup: 'menuGroup',
 } as const;
 
 /**
@@ -41,28 +54,52 @@ export const Perspectives = {
       {
         id: 'blank',
         layout: factory => factory.addPart(MAIN_AREA),
+        data: {
+          [PerspectiveData.label]: 'Default Layout',
+          [PerspectiveData.menuItemLabel]: 'Default Layout',
+          [PerspectiveData.menuGroup]: 'blank',
+        },
+      },
+      {
+        id: 'activity-perspective-1',
+        layout: provideActivityPerspectiveLayout1,
+        data: {
+          [PerspectiveData.label]: 'Sample Layout 1 (Docked Parts)',
+          [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
+          [PerspectiveData.menuGroup]: 'sample-layout-docked-parts',
+        },
+      },
+      {
+        id: 'activity-perspective-2',
+        layout: provideActivityPerspectiveLayout2,
+        data: {
+          [PerspectiveData.label]: 'Sample Layout 2 (Docked Parts)',
+          [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
+          [PerspectiveData.menuGroup]: 'sample-layout-docked-parts',
+        },
       },
       {
         id: 'perspective-1',
-        layout: providePerspective1Layout,
+        layout: providePerspectiveLayout1,
         data: {
-          [PerspectiveData.label]: 'Perspective 1',
-          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+          [PerspectiveData.label]: 'Sample Layout 1 (Fixed Parts)',
+          [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
+          [PerspectiveData.menuGroup]: 'sample-layout-fixed-parts',
         },
       },
       {
         id: 'perspective-2',
-        layout: providePerspective2Layout,
+        layout: providePerspectiveLayout2,
         data: {
-          [PerspectiveData.label]: 'Perspective 2',
-          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+          [PerspectiveData.label]: 'Sample Layout 2 (Fixed Parts)',
+          [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
+          [PerspectiveData.menuGroup]: 'sample-layout-fixed-parts',
         },
       },
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
-      ...WorkbenchStartupQueryParams.perspectives().map(perspective => ({
-        id: perspective,
+      ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => ({
+        id: perspectiveId,
         layout: factory => factory.addPart(MAIN_AREA),
-        data: {[PerspectiveData.label]: perspective.toUpperCase()},
       } satisfies WorkbenchPerspectiveDefinition)),
     ];
   },
@@ -82,13 +119,70 @@ export const Perspectives = {
           // Sample Part
           {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
           {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./part-page/part-page.component')},
+          {path: 'project', component: ProjectComponent},
+          {path: 'search', component: SearchComponent},
+          {path: 'bookmarks', component: BookmarkComponent},
         ] satisfies Routes,
       },
     ]);
   },
 } as const;
 
-function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+    .addPart('project', {dockTo: 'left-top'}, {icon: 'folder', label: 'Project'})
+    .addPart('search', {dockTo: 'left-top'}, {icon: 'search', label: 'Search'})
+    .addPart('bookmarks', {dockTo: 'left-bottom'}, {icon: 'bookmark', label: 'Bookmarks'})
+    .addPart('terminal', {dockTo: 'bottom-left'}, {icon: 'terminal', label: 'Terminal'})
+    .addPart('notifications', {dockTo: 'right-top'}, {icon: 'notifications', label: 'Notifications'})
+    .addPart('database', {dockTo: 'right-bottom'}, {icon: 'database', label: 'Database'})
+    .addPart('error', {dockTo: 'bottom-right'}, {icon: 'error', label: 'Error'})
+    .navigatePart('project', ['project'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('search', ['search'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('bookmarks', ['bookmarks'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('terminal', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('notifications', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('database', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('error', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .addView('terminal1', {partId: 'terminal'})
+    .addView('terminal2', {partId: 'terminal'})
+    .addView('terminal3', {partId: 'terminal'})
+    .navigateView('terminal1', ['test-view'])
+    .navigateView('terminal2', ['test-view'])
+    .navigateView('terminal3', ['test-view'])
+    .activatePart('project')
+    .activateView('terminal2', {activatePart: true});
+}
+
+function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+    .addPart('project', {dockTo: 'left-top'}, {icon: 'folder', label: 'Project'})
+    .addPart('search', {dockTo: 'left-top'}, {icon: 'search', label: 'Search'})
+    .addPart('bookmarks', {dockTo: 'left-bottom'}, {icon: 'bookmark', label: 'Bookmarks'})
+    .addPart('terminal', {dockTo: 'bottom-left'}, {icon: 'terminal', label: 'Terminal'})
+    .addPart('notifications', {dockTo: 'right-top'}, {icon: 'notifications', label: 'Notifications'})
+    .addPart('database', {dockTo: 'right-bottom'}, {icon: 'database', label: 'Database'})
+    .addPart('error', {dockTo: 'bottom-right'}, {icon: 'error', label: 'Error'})
+    .navigatePart('project', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('search', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('bookmarks', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('terminal', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('notifications', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('database', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .navigatePart('error', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    .addView('terminal1', {partId: 'terminal'})
+    .addView('terminal2', {partId: 'terminal'})
+    .addView('terminal3', {partId: 'terminal'})
+    .navigateView('terminal1', ['test-view'])
+    .navigateView('terminal2', ['test-view'])
+    .navigateView('terminal3', ['test-view'])
+    .activatePart('project')
+    .activateView('terminal2', {activatePart: true});
+}
+
+function providePerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
     .addPart('top-right', {align: 'right', ratio: .2})
@@ -114,7 +208,7 @@ function providePerspective1Layout(factory: WorkbenchLayoutFactory): WorkbenchLa
     .activateView('sample-view-7');
 }
 
-function providePerspective2Layout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+function providePerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory
     .addPart(MAIN_AREA)
     .addPart('top-left', {align: 'left', ratio: .181})

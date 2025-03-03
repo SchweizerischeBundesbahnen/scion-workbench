@@ -232,3 +232,32 @@ export interface WorkbenchTheme {
    */
   colorScheme: 'light' | 'dark';
 }
+
+export interface ComponentDescriptor {
+  component: ComponentType<unknown>;
+  /**
+   * Optional data to pass to the component. Inputs are available as input properties in the component.
+   *
+   * ```ts
+   * @Component({...})
+   * class MyComponent {
+   *   myInput = input.required<string>();
+   * }
+   * ```
+   */
+  inputs?: {[name: string]: unknown};
+  /**
+   * Sets the injector for the instantiation of the component, giving control over the objects available for injection.
+   *
+   * **Example:**
+   * ```ts
+   * Injector.create({
+   *   parent: ...,
+   *   providers: [
+   *    {provide: <TOKEN>, useValue: <VALUE>}
+   *   ],
+   * })
+   * ```
+   */
+  injector?: Injector;
+}

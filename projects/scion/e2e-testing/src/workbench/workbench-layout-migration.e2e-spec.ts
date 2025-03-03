@@ -75,7 +75,7 @@ test.describe('Workbench Layout Migration', () => {
     const _2b534d97Part = parts.find(part => part.alternativeId === '2b534d97-ed7d-43b3-bb2c-0e59d9766e86') ?? throwError(`Part not found with alternativeId '2b534d97-ed7d-43b3-bb2c-0e59d9766e86'`);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .8,
@@ -211,7 +211,7 @@ test.describe('Workbench Layout Migration', () => {
     const _1d94dcb6Part = parts.find(part => part.alternativeId === '1d94dcb6-76b6-47eb-b300-39448993d36b') ?? throwError(`Part not found with alternativeId '1d94dcb6-76b6-47eb-b300-39448993d36b'`);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,

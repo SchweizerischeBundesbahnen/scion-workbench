@@ -16,7 +16,6 @@ import {TestComponent, withComponentContent} from '../testing/test.component';
 import {By} from '@angular/platform-browser';
 import {Component, DestroyRef, inject, isSignal} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {firstValueFrom, Subject, timer} from 'rxjs';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {MAIN_AREA} from '../layout/workbench-layout';
@@ -73,7 +72,7 @@ describe('Workbench Perspective', () => {
     expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MPart({id: MAIN_AREA}),
       },
       mainAreaGrid: {
@@ -98,7 +97,7 @@ describe('Workbench Perspective', () => {
     expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -141,7 +140,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -188,7 +187,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.top'}),
           child2: new MPart({id: 'part.bottom'}),
@@ -242,7 +241,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.top'}),
           child2: new MPart({id: 'part.bottom'}),
@@ -284,7 +283,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -326,7 +325,7 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left'}),
           child2: new MPart({id: 'part.right'}),
@@ -480,7 +479,7 @@ describe('Workbench Perspective', () => {
   });
 
   /**
-   * Regression test for a bug where the workbench grid of the initial layout got replaced by the "default" grid deployed during the initial navigation,
+   * Regression test for a bug where the main grid of the initial layout got replaced by the "default" grid applied during the initial navigation,
    * resulting in only the main area being displayed.
    */
   it('should display the perspective also for asynchronous/slow initial navigation', async () => {
@@ -507,7 +506,7 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     // Delay activation of the perspective.
@@ -516,7 +515,7 @@ describe('Workbench Perspective', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: MAIN_AREA}),
@@ -549,11 +548,11 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
@@ -567,9 +566,9 @@ describe('Workbench Perspective', () => {
     await TestBed.inject(WorkbenchRouter).navigate(['details/1']);
     await waitUntilStable();
 
-    // empty-path view should be opened in the active part (right) of the workbench grid
+    // empty-path view should be opened in the active part (right) of the main grid
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
@@ -598,11 +597,11 @@ describe('Workbench Perspective', () => {
       ],
     });
 
-    const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           child1: new MPart({id: 'part.left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
           child2: new MPart({id: 'part.right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),

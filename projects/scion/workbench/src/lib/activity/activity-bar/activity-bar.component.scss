@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+  user-select: none;
+  padding: .25em;
+  background-color: var(--sci-workbench-activity-bar-background-color);
+
+  &.left {
+    border-right: 1px solid var(--sci-color-border);
+  }
+
+  &.right {
+    border-left: 1px solid var(--sci-color-border);
+  }
+
+  > wb-activity-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &[data-group="left-bottom"], &[data-group="right-bottom"] {
+      flex: auto;
+    }
+  }
+
+  > hr {
+    all: unset;
+    height: 1px;
+    width: 24px;
+    align-self: center;
+    background-color: var(--sci-color-border);
+    border-radius: var(--sci-corner);
+  }
+}

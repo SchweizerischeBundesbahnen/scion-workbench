@@ -18,6 +18,7 @@ import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@
 import {stringifyError} from '../../common/stringify-error.util';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
+import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -29,6 +30,7 @@ import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.co
     NavigateViewsComponent,
     ReactiveFormsModule,
     NavigatePartsComponent,
+    AddActivitiesComponent,
   ],
 })
 export default class ModifyLayoutPageComponent {
@@ -38,6 +40,7 @@ export default class ModifyLayoutPageComponent {
   private readonly _workbenchRouter = inject(WorkbenchRouter);
 
   protected readonly form = this._formBuilder.group({
+    activities: this._formBuilder.control<ActivityDescriptor[]>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([]),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
@@ -85,6 +88,15 @@ export default class ModifyLayoutPageComponent {
 
   private navigate(): Promise<boolean> {
     return this._workbenchRouter.navigate(layout => {
+      // Add activities.
+      for (const activity of this.form.controls.activities.value) {
+        layout = layout.addPart(activity.id, activity.dockTo, {
+          icon: activity.extras.icon,
+          label: activity.extras.label,
+          tooltip: activity.extras.tooltip,
+        });
+      }
+
       // Add parts.
       for (const part of this.form.controls.parts.value) {
         layout = layout.addPart(part.id, {

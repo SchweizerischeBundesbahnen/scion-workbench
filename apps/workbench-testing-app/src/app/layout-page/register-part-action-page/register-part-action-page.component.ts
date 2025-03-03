@@ -46,7 +46,7 @@ export default class RegisterPartActionPageComponent {
     canMatch: this._formBuilder.group({
       view: this._formBuilder.control(''),
       part: this._formBuilder.control(''),
-      grid: this._formBuilder.control<'workbench' | 'mainArea' | ''>(''),
+      grid: this._formBuilder.control<'main' | 'mainArea' | ''>(''),
     }),
   });
 
@@ -69,7 +69,7 @@ export default class RegisterPartActionPageComponent {
       if (canMatchViewIds && (!part.activeViewId() || !Arrays.coerce(canMatchViewIds).includes(part.activeViewId()!))) {
         return false;
       }
-      if (canMatchGrid && canMatchGrid !== (part.isInMainArea ? 'mainArea' : 'workbench')) {
+      if (canMatchGrid && canMatchGrid !== (part.isInMainArea ? 'mainArea' : 'main')) {
         return false;
       }
       return true;

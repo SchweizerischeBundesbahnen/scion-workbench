@@ -1083,7 +1083,7 @@ test.describe('Workbench View', () => {
 
     // Drag view 2 into peripheral area.
     const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToEdge('east');
+    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
     await expectView(viewPage1).toBeActive();

@@ -33,11 +33,13 @@ export interface WorkbenchLayout {
    *
    * @param id - The id of the part to add.  Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
-   * @param options - Controls how to add the part to the layout.
-   * @param options.activate - Controls whether to activate the part. Defaults to `false`.
+   * @param extras - Controls how to add the part to the layout.
+   * @param extras.activate - Controls whether to activate the part. Defaults to `false`.
    * @return a copy of this layout with the part added.
    */
-  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
+  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout;
+
+  addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Navigates the specified part based on the provided array of commands and extras.
@@ -96,14 +98,14 @@ export interface WorkbenchLayout {
    * Adds a view to the specified part.
    *
    * @param id - The id of the view to add.
-   * @param options - Controls how to add the view to the layout.
-   * @param options.partId - References the part to which to add the view.
-   * @param options.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
-   * @param options.activateView - Controls whether to activate the view. Defaults to `false`.
-   * @param options.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
+   * @param extras - Controls how to add the view to the layout.
+   * @param extras.partId - References the part to which to add the view.
+   * @param extras.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
+   * @param extras.activateView - Controls whether to activate the view. Defaults to `false`.
+   * @param extras.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
    * @return a copy of this layout with the view added.
    */
-  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
+  addView(id: string, extras: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Navigates the specified view based on the provided array of commands and extras.
@@ -234,6 +236,16 @@ export interface ReferencePart {
    * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.
    */
   ratio?: number;
+}
+
+export interface PartExtras {
+  icon: string;
+  label: string | `%${string}`;
+  tooltip?: string | `%${string}`;
+}
+
+export interface DockingArea {
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
 }
 
 /**

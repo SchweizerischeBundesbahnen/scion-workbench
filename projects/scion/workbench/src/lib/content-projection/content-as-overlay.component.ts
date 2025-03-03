@@ -76,7 +76,7 @@ export class ContentAsOverlayComponent {
         if (overlayViewRef.rootNodes.length !== 1) {
           throw Error(`[ContentAsOverlayError] Expected single root node for content projection, but received ${overlayViewRef.rootNodes.length} root nodes.`);
         }
-        const [overlayElement] = overlayViewRef.rootNodes as HTMLElement[];
+        const [overlayElement] = overlayViewRef.rootNodes as [HTMLElement];
 
         // Position projected content out of the document flow relative to the page viewport.
         setStyle(overlayElement, {position: 'fixed'});

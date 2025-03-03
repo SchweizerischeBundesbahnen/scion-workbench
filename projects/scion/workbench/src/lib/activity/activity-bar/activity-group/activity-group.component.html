@@ -1,0 +1,10 @@
+@for (activity of group().activities; track activity.id) {
+  @let isActive = group().activeActivityId === activity.id;
+  <button class="activity-item e2e-activity-item"
+          [class.active]="isActive"
+          (click)="toggleActivity(activity.id, !isActive)">
+    <span sciMaterialIcon>
+     {{activity.icon}}
+    </span>
+  </button>
+}

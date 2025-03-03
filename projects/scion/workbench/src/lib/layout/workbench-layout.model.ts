@@ -12,6 +12,7 @@ import {assertType} from '../common/asserts.util';
 import {ViewId} from '../view/workbench-view.model';
 import {NavigationData} from '../routing/routing.model';
 import {PartId} from '../part/workbench-part.model';
+// TODO [activity] Rename to workbench-grid.model.ts
 
 /**
  * Represents the arrangement of parts as grid.

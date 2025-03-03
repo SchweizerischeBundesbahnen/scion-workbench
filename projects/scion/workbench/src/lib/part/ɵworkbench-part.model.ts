@@ -81,7 +81,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
     const mPart = layout.part({partId: this.id});
-    const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
+    const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'main'})?.id === this.id;
     this.active.set(active);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);

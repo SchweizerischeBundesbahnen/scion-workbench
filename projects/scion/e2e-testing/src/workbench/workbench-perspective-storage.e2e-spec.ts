@@ -19,10 +19,10 @@ import {expectPart} from '../matcher/part-matcher';
 
 test.describe('Workbench Perspective Storage', () => {
 
-  test('should restore workbench grid from storage', async ({appPO, workbenchNavigator}) => {
+  test('should restore main grid from storage', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-    // Add part and view to the workbench grid
+    // Add part and view to the main grid
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
       .addPart('part.right', {relativeTo: MAIN_AREA, align: 'right', ratio: .25})
@@ -45,7 +45,7 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective to be restored from the storage
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -88,7 +88,7 @@ test.describe('Workbench Perspective Storage', () => {
 
     // Expect perspective to be restored from the storage
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -139,6 +139,6 @@ test.describe('Workbench Perspective Storage', () => {
       },
     });
 
-    await expect.poll(() => appPO.header.perspectiveToggleButton({perspectiveId: 'testee-2'}).isActive()).toBe(true);
+    await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
   });
 });

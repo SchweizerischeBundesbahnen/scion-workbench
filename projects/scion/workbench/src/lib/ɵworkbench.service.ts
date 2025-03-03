@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, computed, inject, Injectable, Signal} from '@angular/core';
+import {assertNotInReactiveContext, computed, inject, Injectable, Signal, WritableSignal} from '@angular/core';
 import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
@@ -48,6 +48,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly parts: Signal<ɵWorkbenchPart[]>;
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly theme: Signal<WorkbenchTheme | null>;
+  public readonly widescreenModeEnabled: WritableSignal<boolean>;
   public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
 
   constructor() {
@@ -56,6 +57,7 @@ export class ɵWorkbenchService implements WorkbenchService {
     this.parts = this._partRegistry.objects;
     this.views = this._viewRegistry.objects;
     this.theme = this._workbenchThemeSwitcher.theme;
+    this.widescreenModeEnabled = this._layoutService.widescreenModeEnabled;
     this.activePerspective = this._perspectiveService.activePerspective;
   }
 

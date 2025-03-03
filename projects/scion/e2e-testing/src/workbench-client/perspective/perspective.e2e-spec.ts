@@ -83,7 +83,7 @@ test.describe('Workbench Perspective', () => {
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .25,
@@ -207,7 +207,7 @@ test.describe('Workbench Perspective', () => {
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .8,
@@ -420,7 +420,7 @@ test.describe('Workbench Perspective', () => {
     // Expect perspective 1 to be active.
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual(perspective1.metadata!.id);
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -445,7 +445,7 @@ test.describe('Workbench Perspective', () => {
     // Expect perspective 2 to be active.
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual(perspective2.metadata!.id);
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -543,7 +543,7 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -587,7 +587,7 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -659,7 +659,7 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -732,7 +732,7 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -813,7 +813,7 @@ test.describe('Workbench Perspective', () => {
     await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,
@@ -895,7 +895,7 @@ test.describe('Workbench Perspective', () => {
     await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NotQualifiedError/})).not.toEqual([]);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
+      mainGrid: {
         root: new MTreeNode({
           direction: 'row',
           ratio: .5,

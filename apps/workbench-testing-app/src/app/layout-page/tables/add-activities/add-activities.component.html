@@ -1,0 +1,30 @@
+<form [formGroup]="form">
+  <span>Part ID</span>
+  <span>DockTo</span>
+  <span>Icon</span>
+  <span>Label</span>
+  <span>Tooltip</span>
+  <button (click)="onAddActivity()" class="e2e-add" title="Add activity" sciMaterialIcon>add</button>
+
+  @for (activityFormGroup of form.controls.activities.controls; track $index) {
+    <!-- ID -->
+    <input [formControl]="activityFormGroup.controls.id" [class]="'e2e-part-id'">
+    <!-- DockTo -->
+    <select [formControl]="activityFormGroup.controls.dockTo.controls.dockTo" [class]="'e2e-dock-to'">
+      <option value="left-top">left-top</option>
+      <option value="left-bottom">left-bottom</option>
+      <option value="right-top">right-top</option>
+      <option value="right-bottom">right-bottom</option>
+      <option value="bottom-left">bottom-left</option>
+      <option value="bottom-right">bottom-right</option>
+    </select>
+    <!-- Icon -->
+    <input [formControl]="activityFormGroup.controls.extras.controls.icon" [class]="'e2e-icon'">
+    <!-- Label -->
+    <input [formControl]="activityFormGroup.controls.extras.controls.label" [class]="'e2e-label'">
+    <!-- Tooltip -->
+    <input [formControl]="activityFormGroup.controls.extras.controls.tooltip" [class]="'e2e-tooltip'">
+    <button class="e2e-remove" (click)="onRemoveActivity($index)" title="Remove activity" sciMaterialIcon>remove</button>
+  }
+</form>
+

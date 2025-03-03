@@ -15,7 +15,6 @@ import {WorkbenchConfig} from './workbench-config';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
 import {DOCUMENT, NgComponentOutlet} from '@angular/common';
-import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
@@ -24,6 +23,8 @@ import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-ro
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Routing} from './routing/routing.util';
+import {LayoutComponent} from './layout/layout.component';
+import {ɵWorkbenchService} from './ɵworkbench.service';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -34,9 +35,9 @@ import {Routing} from './routing/routing.util';
   styleUrls: ['./workbench.component.scss'],
   imports: [
     NgComponentOutlet,
-    WorkbenchLayoutComponent,
     NotificationListComponent,
     GlassPaneDirective,
+    LayoutComponent,
   ],
   viewProviders: [
     configureWorkbenchGlassPane(),
@@ -53,6 +54,7 @@ export class WorkbenchComponent {
   /** Splash to display during workbench startup. */
   protected splash = inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
   protected workbenchStartup = inject(WorkbenchStartup);
+  protected workbenchService = inject(ɵWorkbenchService);
 
   constructor() {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);

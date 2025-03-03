@@ -19,7 +19,7 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {PartId, ViewId} from '@scion/workbench';
+import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
 
 /**
@@ -295,7 +295,7 @@ export class AppPO {
    */
   public async openNewViewTab(): Promise<StartPagePO> {
     const navigationId = await this.getCurrentNavigationId();
-    await this.header.clickMenuItem({cssClass: 'e2e-open-start-page'});
+    await this.header.clickSettingsMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
     const inMainArea = await this.hasMainArea();
@@ -308,7 +308,7 @@ export class AppPO {
   public async switchPerspective(perspectiveId: string): Promise<void> {
     if (perspectiveId !== await this.getActivePerspectiveId()) {
       const navigationId = await this.getCurrentNavigationId();
-      await this.header.perspectiveToggleButton({perspectiveId}).click();
+      await this.header.switchPerspective(perspectiveId);
       await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
     }
   }
@@ -324,7 +324,7 @@ export class AppPO {
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
-    await this.page.locator('wb-workbench wb-workbench-layout').waitFor({state: 'visible'});
+    await this.page.locator('wb-workbench wb-layout').waitFor({state: 'visible'});
   }
 
   /**
@@ -363,10 +363,12 @@ export class AppPO {
   }
 
   /**
-   * Gets the active drop zone when dragging a view to the workbench edge.
+   * Gets the active drop zone of the specified grid.
+   *
+   * Drop zones of a grid are activated when dragging near the grid edge.
    */
-  public async getActiveEdgeDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
-    const dropZone = this.page.locator('div.e2e-edge-drop-zone');
+  public async getActiveGridDropZone(locateBy: {grid: 'main' | 'main-area' | ActivityId}): Promise<'north' | 'east' | 'south' | 'west' | null> {
+    const dropZone = this.page.locator('wb-layout').locator(`div.e2e-grid-drop-zone[data-grid="${locateBy.grid}"]`);
     if (!await dropZone.isVisible()) {
       return null;
     }

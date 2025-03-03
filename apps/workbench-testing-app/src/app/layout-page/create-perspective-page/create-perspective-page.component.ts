@@ -21,6 +21,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
 
 @Component({
   selector: 'app-create-perspective-page',
@@ -35,6 +36,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
     SciCheckboxComponent,
     SciKeyValueFieldComponent,
     NavigatePartsComponent,
+    AddActivitiesComponent,
   ],
 })
 export default class CreatePerspectivePageComponent {
@@ -47,6 +49,7 @@ export default class CreatePerspectivePageComponent {
     id: this._formBuilder.control('', Validators.required),
     transient: this._formBuilder.control<boolean | undefined>(undefined),
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
+    activities: this._formBuilder.control<ActivityDescriptor[]>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([], Validators.required),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
@@ -103,7 +106,8 @@ export default class CreatePerspectivePageComponent {
 
   private createLayout(): WorkbenchLayoutFn {
     // Capture form values, since the `layout` function is evaluated independently of the form life-cycle
-    const [initialPart, ...parts] = this.form.controls.parts.value;
+    const [initialPart, ...parts] = this.form.controls.parts.value as [PartDescriptor, ...PartDescriptor[]];
+    const activities = this.form.controls.activities.value;
     const views = this.form.controls.views.value;
     const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
@@ -113,6 +117,15 @@ export default class CreatePerspectivePageComponent {
       let layout = factory.addPart(initialPart.id, {
         activate: initialPart.options?.activate,
       });
+
+      // Add activities.
+      for (const activity of activities) {
+        layout = layout.addPart(activity.id, activity.dockTo, {
+          icon: activity.extras.icon,
+          label: activity.extras.label,
+          tooltip: activity.extras.tooltip,
+        });
+      }
 
       // Add other parts.
       for (const part of parts) {

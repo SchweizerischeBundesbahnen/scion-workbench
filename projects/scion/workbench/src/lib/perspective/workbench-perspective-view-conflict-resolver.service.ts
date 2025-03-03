@@ -12,6 +12,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {Objects} from '../common/objects.util';
 
 /**
  * Detects and resolves conflicting view ids, that may occur when switching between perspectives.
@@ -28,17 +29,19 @@ export class WorkbenchPerspectiveViewConflictResolver {
    * @return layout of the perspective with conflicts resolved.
    */
   public resolve(currentLayout: ɵWorkbenchLayout, perspectiveLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
-    const perspectiveViewIds = perspectiveLayout.views({grid: 'workbench'}).map(view => view.id);
+    const activityGrids = WorkbenchLayouts.pickActivityGrids(perspectiveLayout.grids);
+    const activityViewIds = perspectiveLayout.views({grid: Objects.keys(activityGrids)}).map(view => view.id);
+    const mainViewIds = perspectiveLayout.views({grid: 'main'}).map(view => view.id);
     const mainAreaViewIds = currentLayout.views({grid: 'mainArea'}).map(view => view.id);
 
     // Test if there are conflicts.
-    const conflictingViewIds = Arrays.intersect(perspectiveViewIds, mainAreaViewIds);
+    const conflictingViewIds = Arrays.intersect([...activityViewIds, ...mainViewIds], mainAreaViewIds);
     if (!conflictingViewIds.length) {
       return perspectiveLayout;
     }
 
     // Rename conflicting views.
-    const usedViewIds = new Set<ViewId>(perspectiveViewIds.concat(mainAreaViewIds));
+    const usedViewIds = new Set<ViewId>(activityViewIds.concat(mainViewIds).concat(mainAreaViewIds));
     conflictingViewIds.forEach(conflictingViewId => {
       const newViewId = WorkbenchLayouts.computeNextViewId(usedViewIds);
       perspectiveLayout = perspectiveLayout.renameView(conflictingViewId, newViewId);
