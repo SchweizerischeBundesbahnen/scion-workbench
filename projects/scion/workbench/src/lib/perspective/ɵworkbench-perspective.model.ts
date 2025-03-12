@@ -270,6 +270,7 @@ export const ACTIVE_PERSPECTIVE = new InjectionToken<Signal<ɵWorkbenchPerspecti
         return undefined;
       }
 
+      // TODO [activity] Can perspective be null?
       const perspectiveId = workbenchLayoutService.layout()?.perspectiveId;
       if (!perspectiveId) {
         return undefined; // The initial perspective has not been activated yet.

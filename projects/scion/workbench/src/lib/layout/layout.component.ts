@@ -27,6 +27,7 @@ import {DESKTOP} from '../workbench-element-references';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {Logger} from '../logging';
 import {WORKBENCH_ID} from '../workbench-id';
+import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.service';
 
 @Component({
   selector: 'wb-layout',
@@ -44,6 +45,9 @@ import {WORKBENCH_ID} from '../workbench-id';
     SciViewportComponent,
     ViewDropZoneDirective,
   ],
+  host: {
+    '[@.disabled]': 'perspectiveService.switchingPerspective() || perspectiveService.resettingPerspective()',
+  },
 })
 export class LayoutComponent {
 
@@ -68,6 +72,8 @@ export class LayoutComponent {
 
   protected readonly panelAlignment = inject(WorkbenchService).panelAlignment;
   protected readonly panelAnimation = inject(WorkbenchService).panelAnimation;
+
+  protected readonly perspectiveService = inject(WorkbenchPerspectiveService);
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);

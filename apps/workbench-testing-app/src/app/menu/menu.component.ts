@@ -63,6 +63,7 @@ export class MenuComponent implements OnInit {
   protected onMenuItemActionClick(action: MenuAction, event: Event): void {
     runInInjectionContext(this._injector, () => void action.onAction());
     event.stopPropagation();
+    this.closeMenu();
   }
 
   @HostListener('document:keydown.escape')

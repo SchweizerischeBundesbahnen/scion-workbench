@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, inject, Injectable, runInInjectionContext} from '@angular/core';
+import {ApplicationInitStatus, createEnvironmentInjector, EnvironmentInjector, inject, Injectable, runInInjectionContext, Signal, signal} from '@angular/core';
 import {ACTIVE_PERSPECTIVE, ɵWorkbenchPerspective} from './ɵworkbench-perspective.model';
 import {WorkbenchPerspectiveDefinition} from './workbench-perspective.model';
 import {WorkbenchInitializer} from '../startup/workbench-initializer';
@@ -29,6 +29,9 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
   private readonly _environmentInjector = inject(EnvironmentInjector);
   private readonly _applicationInitStatus = inject(ApplicationInitStatus);
   private readonly _workbenchPerspectiveStorageService = inject(WorkbenchPerspectiveStorageService);
+
+  private readonly _switchingPerspective = signal(false);
+  private readonly _resettingPerspective = signal(false);
 
   public readonly activePerspective = inject(ACTIVE_PERSPECTIVE);
 
@@ -109,7 +112,12 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
     if (this.activePerspective()?.id === id) {
       return true;
     }
-    const activated = await this._perspectiveRegistry.get(id).activate();
+
+    // Switch perspective.
+    this._switchingPerspective.set(true);
+    const activated = await this._perspectiveRegistry.get(id).activate().finally(() => this._switchingPerspective.set(false));
+
+    // Store activated perspective.
     if (activated && (options?.storePerspectiveAsActive ?? true)) {
       await this._workbenchPerspectiveStorageService.storeActivePerspectiveId(id);
       window.name = generatePerspectiveWindowName(id);
@@ -121,7 +129,27 @@ export class WorkbenchPerspectiveService implements WorkbenchInitializer {
    * Resets the currently active perspective to its initial layout. The main area will not change.
    */
   public async resetPerspective(): Promise<void> {
-    await this.activePerspective()?.reset();
+    const activePerspective = this.activePerspective();
+    if (!activePerspective) {
+      return;
+    }
+
+    this._resettingPerspective.set(true);
+    await activePerspective.reset().finally(() => this._resettingPerspective.set(false));
+  }
+
+  /**
+   * Indicates when switching perspective.
+   */
+  public get switchingPerspective(): Signal<boolean> {
+    return this._switchingPerspective;
+  }
+
+  /**
+   * Indicates when resetting perspective.
+   */
+  public get resettingPerspective(): Signal<boolean> {
+    return this._resettingPerspective;
   }
 
   /**
