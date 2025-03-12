@@ -41,10 +41,10 @@ import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 @Injectable({providedIn: 'root'})
 export class WorkbenchLauncher {
 
-  private readonly _startup = inject(WorkbenchStartup);
-  private readonly _logger = inject(Logger);
-  private readonly _zone = inject(NgZone);
-  private readonly _injector = inject(Injector);
+  private readonly _startup: WorkbenchStartup;
+  private readonly _logger: Logger;
+  private readonly _zone: NgZone;
+  private readonly _injector: Injector;
 
   private _state: StartupState = StartupState.Stopped;
 
@@ -53,6 +53,12 @@ export class WorkbenchLauncher {
     if (!workbenchConfig) {
       throw Error(`[WorkbenchError] Missing required workbench providers. Did you forget to call 'provideWorkbench()' in the providers array of 'bootstrapApplication' or the root 'NgModule'?`);
     }
+
+    // Do not inject dependencies before the above check to avoid `NullInjectorError` error.
+    this._startup = inject(WorkbenchStartup);
+    this._logger = inject(Logger);
+    this._zone = inject(NgZone);
+    this._injector = inject(Injector);
   }
 
   /**
