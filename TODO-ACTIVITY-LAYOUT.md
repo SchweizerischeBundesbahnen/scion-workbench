@@ -18,7 +18,7 @@
 [] Documentation (JSDoc)
 [] HowTo
 [] Add test if to have drop zone in main grid (Enabled for layouts without activities or layouts with activities but no main area.)
-
+[] Do not disable animations when starting locally and on CI (fix tests: e.g.: host-popup.e2e-spec.ts: should stick to the popup anchor)
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
