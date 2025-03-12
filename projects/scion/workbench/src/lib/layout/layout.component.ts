@@ -28,6 +28,7 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {Logger} from '../logging';
 import {WORKBENCH_ID} from '../workbench-id';
 import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.service';
+import {MAIN_AREA} from './workbench-layout';
 
 @Component({
   selector: 'wb-layout',
@@ -67,6 +68,7 @@ export class LayoutComponent {
   protected readonly leftActivityPanel = computed(() => this.toolbars().leftTop.activeActivityId || this.toolbars().leftBottom.activeActivityId ? this._panels().left : null);
   protected readonly rightActivityPanel = computed(() => this.toolbars().rightTop.activeActivityId || this.toolbars().rightBottom.activeActivityId ? this._panels().right : null);
   protected readonly bottomActivityPanel = computed(() => this.toolbars().bottomLeft.activeActivityId || this.toolbars().bottomRight.activeActivityId ? this._panels().bottom : null);
+
   protected readonly leftActivityBarVisible = computed(() => this.toolbars().leftTop.activities.length || this.toolbars().leftBottom.activities.length || this.toolbars().bottomLeft.activities.length);
   protected readonly rightActivityBarVisible = computed(() => this.toolbars().rightTop.activities.length || this.toolbars().rightBottom.activities.length || this.toolbars().bottomRight.activities.length);
 
@@ -74,6 +76,15 @@ export class LayoutComponent {
   protected readonly panelAnimation = inject(WorkbenchService).panelAnimation;
 
   protected readonly perspectiveService = inject(WorkbenchPerspectiveService);
+
+  /**
+   * Determines if dropping at the boundaries of the main grid is enabled.
+   *
+   * Enabled for layouts without activities or layouts with activities but no main area.
+   */
+  protected readonly canDropInMainGrid = computed(() => {
+    return !this.layout().hasActivities() || this.layout().parts({grid: 'main'}).some(part => part.id !== MAIN_AREA);
+  });
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);

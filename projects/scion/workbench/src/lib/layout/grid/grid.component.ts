@@ -54,8 +54,15 @@ import {ViewDragService} from '../../view-dnd/view-drag.service';
 })
 export class GridComponent {
 
+  /**
+   * Specifies the grid to render.
+   */
   public readonly grid = input.required<MPartGrid>();
-  public readonly gridDropZone = input<GridDropZoneConfig>();
+
+  /**
+   * Controls dropping at the grid boundaries.
+   */
+  public readonly gridDropZone = input<GridDropZoneConfig | false>(false);
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _viewDragService = inject(ViewDragService);

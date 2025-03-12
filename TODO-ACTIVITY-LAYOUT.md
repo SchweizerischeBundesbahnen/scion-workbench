@@ -17,6 +17,7 @@
 [] Tests
 [] Documentation (JSDoc)
 [] HowTo
+[] Add test if to have drop zone in main grid (Enabled for layouts without activities or layouts with activities but no main area.)
 
 
 ## TODO Phase 2:

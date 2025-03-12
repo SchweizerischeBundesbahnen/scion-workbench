@@ -119,6 +119,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Indicates if this layout contains activities.
+   */
+  public hasActivities(): boolean {
+    const activityGrids = WorkbenchLayouts.pickActivityGrids(this.grids);
+    return !!Objects.keys(activityGrids).length;
+  }
+
+  /**
    * Finds the URL of outlets based on the specified filter.
    *
    * @param selector - Defines the search scope.
