@@ -1,0 +1,28 @@
+:host {
+  display: grid;
+  background-color: var(--sci-workbench-activity-item-background-color);
+  color: var(--sci-workbench-activity-item-text-color);
+  border: var(--sci-workbench-activity-item-border-width) solid var(--sci-workbench-activity-item-border-color);
+  border-radius: var(--sci-workbench-activity-item-border-radius);
+  cursor: var(--sci-workbench-activity-item-cursor);
+
+  &:hover {
+    background-color: var(--sci-workbench-activity-item-background-color-hover);
+    color: var(--sci-workbench-activity-item-text-color-hover);
+  }
+
+  &.active {
+    background-color: var(--sci-workbench-activity-item-background-color-active);
+    color: var(--sci-workbench-activity-item-text-color-active);
+  }
+
+  > button {
+    all: unset;
+    display: grid;
+    place-content: center;
+    overflow: hidden;
+    height: 24px;
+    width: 24px;
+    padding: var(--sci-workbench-activity-item-padding);
+  }
+}

@@ -10,6 +10,7 @@
 
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
+import {ActivityId} from '../activity/workbench-activity.model';
 
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
@@ -39,7 +40,7 @@ export interface WorkbenchLayout {
    */
   addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout;
 
-  addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
+  addPart(id: string, dockTo: DockingArea, extras: PartExtras): WorkbenchLayout;
 
   /**
    * Navigates the specified part based on the provided array of commands and extras.
@@ -242,6 +243,8 @@ export interface PartExtras {
   icon: string;
   label: string | `%${string}`;
   tooltip?: string | `%${string}`;
+  cssClass?: string | string[];
+  ɵactivityId?: ActivityId;
 }
 
 export interface DockingArea {

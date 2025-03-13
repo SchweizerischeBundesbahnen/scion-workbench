@@ -55,8 +55,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private readonly _activityLayoutSerializer = inject(WorkbenchActivityLayoutSerializer);
   private readonly _injector = inject(Injector);
 
-  private _maximized: boolean;
-
   /** Identifies the perspective of this layout, if any. */
   public readonly perspectiveId: string | undefined;
 
@@ -73,7 +71,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     };
 
     this._activityLayout = coerceMActivityLayout(config?.activityLayout, {default: createDefaultActivityLayout});
-    this._maximized = config?.maximized ?? false;
     this._outlets = new Map(Objects.entries(coerceOutlets(config?.outlets)));
     this._navigationStates = new Map(Objects.entries(config?.navigationStates ?? {}));
     this.perspectiveId = config?.perspectiveId;
@@ -194,13 +191,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.__toggleMaximized();
     return workingCopy;
-  }
-
-  /**
-   * Indicates whether the main area is maximized.
-   */
-  public get maximized(): boolean {
-    return this._maximized;
   }
 
   /**
@@ -585,8 +575,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       layout1.outlets({mainGrid: true}) === layout2.outlets({mainGrid: true}) &&
       layout1.outlets({mainAreaGrid: true}) === layout2.outlets({mainAreaGrid: true}) &&
       layout1.outlets({activityGrids: true}) === layout2.outlets({activityGrids: true}) &&
-      this.perspectiveId === other.perspectiveId &&
-      this.maximized === other.maximized
+      this.perspectiveId === other.perspectiveId
       // Navigational state is not tested for equality as it is set through view navigation, resulting in a new navigation id when modified.
     );
   }
@@ -1170,7 +1159,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       perspectiveId: this.perspectiveId,
       outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),
-      maximized: this._maximized,
     }));
   }
 }
@@ -1464,5 +1452,4 @@ export interface WorkbenchLayoutConstructConfig {
   perspectiveId?: string;
   outlets?: Outlets | string;
   navigationStates?: NavigationStates;
-  maximized?: boolean;
 }

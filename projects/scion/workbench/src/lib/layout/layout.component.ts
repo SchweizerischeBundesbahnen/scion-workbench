@@ -62,7 +62,6 @@ export class LayoutComponent {
   private readonly _panels = computed(() => this.layout().activityLayout.panels);
 
   protected readonly desktop = inject(DESKTOP);
-  protected readonly mainGrid = computed(() => this.layout().maximized && this.layout().grids.mainArea ? this.layout().grids.mainArea! : this.layout().grids.main);
   protected readonly toolbars = computed(() => this.layout().activityLayout.toolbars);
 
   protected readonly leftActivityPanel = computed(() => this.toolbars().leftTop.activeActivityId || this.toolbars().leftBottom.activeActivityId ? this._panels().left : null);
@@ -114,7 +113,7 @@ export class LayoutComponent {
         classList: event.dragData.classList,
       },
       target: GridDropTargets.resolve({
-        grid: this.mainGrid(),
+        grid: this.layout().grids.main,
         workbenchId: this._workbenchId,
         dropRegion: event.dropRegion,
       }),

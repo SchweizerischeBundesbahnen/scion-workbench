@@ -132,7 +132,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
       perspectiveId: this.id,
       outlets: Object.fromEntries(outlets),
       navigationStates: currentLayout.navigationStates({grid: 'mainArea'}), // preserve navigation state of parts and views in the main area; navigation state of parts and views outside the main area cannot be restored since not persisted.
-      maximized: undefined, // Do not preserve maximized state when switching between perspectives.
     });
   }
 

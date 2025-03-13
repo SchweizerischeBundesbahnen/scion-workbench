@@ -6,11 +6,11 @@
   padding: .25em;
   background-color: var(--sci-workbench-activity-bar-background-color);
 
-  &.left {
+  &[data-align="left"] {
     border-right: 1px solid var(--sci-color-border);
   }
 
-  &.right {
+  &[data-align="right"] {
     border-left: 1px solid var(--sci-color-border);
   }
 

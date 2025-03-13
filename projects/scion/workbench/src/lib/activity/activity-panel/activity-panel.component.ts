@@ -24,6 +24,9 @@ import {ActivityId} from '../workbench-activity.model';
     SciSashDirective,
     GridComponent,
   ],
+  host: {
+    '[attr.data-panel]': 'panel()'
+  }
 })
 export class ActivityPanelComponent {
 

@@ -85,7 +85,6 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: É
     perspectiveId: actual.perspectiveId,
     mainAreaGrid: actual.grids.mainArea ?? undefined,
     mainGrid: actual.grids.main,
-    maximized: actual.maximized,
     navigationStates: actual.navigationStates(),
     outlets: actual.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}),
   };
@@ -281,10 +280,6 @@ export interface ExpectedWorkbenchLayout {
    * Asserts the layout to belong to specified perspective, if set.
    */
   perspectiveId?: string | undefined;
-  /**
-   * Asserts specified maximized state, if set.
-   */
-  maximized?: boolean;
   /**
    * Asserts specified navigation states, if set.
    */
