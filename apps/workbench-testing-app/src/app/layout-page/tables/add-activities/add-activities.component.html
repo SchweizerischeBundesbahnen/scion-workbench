@@ -4,6 +4,8 @@
   <span>Icon</span>
   <span>Label</span>
   <span>Tooltip</span>
+  <span>CSS Class(es)</span>
+  <span>Activity ID</span>
   <button (click)="onAddActivity()" class="e2e-add" title="Add activity" sciMaterialIcon>add</button>
 
   @for (activityFormGroup of form.controls.activities.controls; track $index) {
@@ -24,6 +26,10 @@
     <input [formControl]="activityFormGroup.controls.extras.controls.label" [class]="'e2e-label'">
     <!-- Tooltip -->
     <input [formControl]="activityFormGroup.controls.extras.controls.tooltip" [class]="'e2e-tooltip'">
+    <!-- CSS class -->
+    <app-multi-value-input [formControl]="activityFormGroup.controls.extras.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
+    <!-- Activity Id -->
+    <input [formControl]="activityFormGroup.controls.extras.controls.activityId" [class]="'e2e-activity-id'">
     <button class="e2e-remove" (click)="onRemoveActivity($index)" title="Remove activity" sciMaterialIcon>remove</button>
   }
 </form>

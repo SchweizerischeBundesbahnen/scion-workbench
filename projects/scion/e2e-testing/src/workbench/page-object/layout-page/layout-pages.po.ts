@@ -10,11 +10,26 @@
 
 import {Locator} from '@playwright/test';
 import {coerceArray, commandsToPath, toMatrixNotation} from '../../../helper/testing.util';
-import {PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
+import {ActivityDescriptor, PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 
 export const LayoutPages = {
 
+  /**
+   * Enters activities into {@link AddActivitiesComponent}.
+   */
+  enterActivities: async (locator: Locator, activities: ActivityDescriptor[]): Promise<void> => {
+    for (const [i, activity] of activities.entries()) {
+      await locator.locator('button.e2e-add').click();
+      await locator.locator('input.e2e-part-id').nth(i).fill(activity.id);
+      await locator.locator('select.e2e-dock-to').nth(i).selectOption(activity.dockTo);
+      await locator.locator('input.e2e-icon').nth(i).fill(activity.icon);
+      await locator.locator('input.e2e-label').nth(i).fill(activity.label);
+      await locator.locator('input.e2e-tooltip').nth(i).fill(activity.tooltip ?? '');
+      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(activity.cssClass).join(' '));
+      await locator.locator('input.e2e-activity-id').nth(i).fill(activity.ɵactivityId ?? '');
+    }
+  },
   /**
    * Enters parts into {@link AddPartsComponent}.
    */
@@ -44,7 +59,7 @@ export const LayoutPages = {
       await locator.locator('input.e2e-view-id').nth(i).fill(view.id);
       await locator.locator('input.e2e-part-id').nth(i).fill(view.partId);
       await locator.locator('input.e2e-position').nth(i).fill(view.position?.toString() ?? '');
-      await locator.locator('input.e2e-class').nth(i).fill(coerceArray(view.cssClass).join(' '));
+      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(view.cssClass).join(' '));
       await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-activate-view').nth(i)).toggle(view.activateView === true);
       await new SciCheckboxPO(locator.locator('sci-checkbox.e2e-activate-part').nth(i)).toggle(view.activatePart === true);
     }
@@ -61,7 +76,7 @@ export const LayoutPages = {
       await locator.locator('input.e2e-hint').nth(i).fill(partNavigation.hint ?? '');
       await locator.locator('input.e2e-data').nth(i).fill(toMatrixNotation(partNavigation.data));
       await locator.locator('input.e2e-state').nth(i).fill(toMatrixNotation(partNavigation.state));
-      await locator.locator('input.e2e-class').nth(i).fill(coerceArray(partNavigation.cssClass).join(' '));
+      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(partNavigation.cssClass).join(' '));
     }
   },
 
@@ -76,7 +91,21 @@ export const LayoutPages = {
       await locator.locator('input.e2e-hint').nth(i).fill(viewNavigation.hint ?? '');
       await locator.locator('input.e2e-data').nth(i).fill(toMatrixNotation(viewNavigation.data));
       await locator.locator('input.e2e-state').nth(i).fill(toMatrixNotation(viewNavigation.state));
-      await locator.locator('input.e2e-class').nth(i).fill(coerceArray(viewNavigation.cssClass).join(' '));
+      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(viewNavigation.cssClass).join(' '));
     }
+  },
+
+  /**
+   * Enters parts to activate into {@link ActivatePartsComponent}.
+   */
+  enterActiveParts: async (locator: Locator, activateParts: string[] = []): Promise<void> => {
+    await locator.locator('input').fill(activateParts.join(' '));
+  },
+
+  /**
+   * Enters parts to remove into {@link RemovePartsComponent}.
+   */
+  enterRemoveParts: async (locator: Locator, removeParts: string[] = []): Promise<void> => {
+    await locator.locator('input').fill(removeParts.join(' '));
   },
 } as const;

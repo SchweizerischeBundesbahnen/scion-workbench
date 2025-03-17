@@ -9,10 +9,12 @@
  */
 
 import {Component, forwardRef, inject} from '@angular/core';
-import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, Validators} from '@angular/forms';
+import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDATORS, NG_VALUE_ACCESSOR, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validator, ValidatorFn, Validators} from '@angular/forms';
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
+import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
+import {ActivityId} from '@scion/workbench';
 
 @Component({
   selector: 'app-add-activities',
@@ -21,6 +23,7 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
   imports: [
     ReactiveFormsModule,
     SciMaterialIconDirective,
+    MultiValueInputComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => AddActivitiesComponent)},
@@ -44,6 +47,8 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
         icon: FormControl<string>;
         label: FormControl<string | `%${string}`>;
         tooltip: FormControl<string | `%${string}` | undefined>;
+        cssClass: FormControl<string | string[] | undefined>;
+        activityId: FormControl<ActivityId | undefined>;
       }>;
     }>>([]),
   });
@@ -61,6 +66,8 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
             icon: activityFormGroup.controls.extras.controls.icon.value,
             label: activityFormGroup.controls.extras.controls.label.value,
             tooltip: activityFormGroup.controls.extras.controls.tooltip.value,
+            cssClass: activityFormGroup.controls.extras.controls.cssClass.value,
+            ɵactivityId: activityFormGroup.controls.extras.controls.activityId.value,
           },
         })));
         this._cvaTouchedFn();
@@ -95,6 +102,8 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
           icon: this._formBuilder.control<string>(activity.extras.icon, Validators.required),
           label: this._formBuilder.control<string>(activity.extras.label, Validators.required),
           tooltip: this._formBuilder.control<string | undefined>(activity.extras.tooltip),
+          cssClass: this._formBuilder.control<string | string[] | undefined>(activity.extras.cssClass),
+          activityId: this._formBuilder.control<ActivityId | undefined>(activity.extras.ɵactivityId, activityIdFormatValidator()),
         }),
       }), {emitEvent: options?.emitEvent ?? true});
   }
@@ -142,5 +151,17 @@ export interface ActivityDescriptor {
     icon: string;
     label: string | `%${string}`;
     tooltip?: string | `%${string}`;
+    cssClass?: string | string[];
+    ɵactivityId?: ActivityId;
+  };
+}
+
+export function activityIdFormatValidator(): ValidatorFn {
+  return (control: AbstractControl<ActivityId | undefined>): ValidationErrors | null => {
+    if (!control.value) {
+      return null;
+    }
+    const regex = /^activity\..+/;
+    return regex.test(control.value) ? null : {invalidActivityIdFormat: true};
   };
 }

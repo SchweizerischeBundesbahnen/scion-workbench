@@ -15,7 +15,7 @@ import {undefinedIfEmpty} from '../../common/undefined-if-empty.util';
 import {stringifyError} from '../../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SettingsService} from '../../settings.service';
-import {CssClassComponent} from '../../css-class/css-class.component';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {Arrays} from '@scion/toolkit/util';
 
@@ -26,7 +26,7 @@ import {Arrays} from '@scion/toolkit/util';
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class RegisterPartActionPageComponent {

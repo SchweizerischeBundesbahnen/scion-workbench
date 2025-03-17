@@ -3279,7 +3279,7 @@ test.describe('Activity Layout', () => {
 
     // Open view.100
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.navigate(['test-view'], {partId: 'part.activity-1', target: 'view.100'})
+    await routerPage.navigate(['test-view'], {partId: 'part.activity-1', target: 'view.100'});
 
     // Assert activity layout
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({

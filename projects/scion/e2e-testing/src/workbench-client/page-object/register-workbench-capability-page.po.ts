@@ -141,7 +141,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
         const viewsLocator = partLocator.locator('section.e2e-views');
         await viewsLocator.locator('input.e2e-qualifier').nth(viewIndex).fill(toMatrixNotation(view.qualifier));
         await viewsLocator.locator('input.e2e-params').nth(viewIndex).fill(toMatrixNotation(view.params));
-        await viewsLocator.locator('input.e2e-class').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));
+        await viewsLocator.locator('app-multi-value-input.e2e-class input').nth(viewIndex).fill(coerceArray(view.cssClass).join(' '));
         if (view.active !== undefined) {
           await new SciCheckboxPO(viewsLocator.locator('sci-checkbox.e2e-active').nth(viewIndex)).toggle(view.active);
         }
@@ -153,7 +153,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
     await this.locator.locator('input.e2e-path').fill(capability.properties.path);
 
     if (capability.properties.cssClass !== undefined) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+      await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
     if (capability.properties.title !== undefined) {
       await this.locator.locator('input.e2e-title').fill(capability.properties.title);
@@ -201,7 +201,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-pin-to-desktop')).toggle(capability.properties.pinToDesktop);
     }
     if (capability.properties.cssClass !== undefined) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+      await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
   }
 
@@ -243,7 +243,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
     if (capability.properties.cssClass !== undefined) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+      await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
   }
 
@@ -273,7 +273,7 @@ export class RegisterWorkbenchCapabilityPagePO implements MicrofrontendViewPageP
       await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-show-splash')).toggle(capability.properties.showSplash);
     }
     if (capability.properties.cssClass !== undefined) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(capability.properties.cssClass).join(' '));
+      await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(capability.properties.cssClass).join(' '));
     }
   }
 

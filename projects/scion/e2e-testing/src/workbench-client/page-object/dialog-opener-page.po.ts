@@ -60,7 +60,7 @@ export class DialogOpenerPagePO implements MicrofrontendViewPagePO {
     }
 
     if (options?.cssClass) {
-      await this.locator.locator('input.e2e-class').fill(coerceArray(options.cssClass).join(' '));
+      await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(options.cssClass).join(' '));
     }
 
     // open the dialog

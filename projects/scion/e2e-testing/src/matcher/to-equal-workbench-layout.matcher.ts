@@ -97,15 +97,13 @@ async function assertActivityGroup(expectedGroup: MActivityGroup, locator: Locat
     const activityLocator = locator.locator('wb-activity-item').nth(i).locator(`:scope[data-activityid="${activity.id}"]`);
     await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be present, but is not. [activityId=${activity.id}, locator=${activityLocator}]`));
   }
-  if (expectedGroup.activeActivityId) {
-    if (expectedGroup.activeActivityId === 'none') {
-      const activityLocator = locator.locator(`wb-activity-item.active`);
-      await throwIfPresent(activityLocator, () => Error(`[DOMAssertError] Expected no activity to be active, but is. [locator=${activityLocator}]`));
-    }
-    else {
-      const activityLocator = locator.locator(`wb-activity-item[data-activityid="${expectedGroup.activeActivityId}"].active`);
-      await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be active, but is not. [activityId=${expectedGroup.activeActivityId}, locator=${activityLocator}]`));
-    }
+  if (expectedGroup.activeActivityId === 'none') {
+    const activityLocator = locator.locator(`wb-activity-item.active`);
+    await throwIfPresent(activityLocator, () => Error(`[DOMAssertError] Expected no activity to be active, but is. [locator=${activityLocator}]`));
+  }
+  else {
+    const activityLocator = locator.locator(`wb-activity-item[data-activityid="${expectedGroup.activeActivityId}"].active`);
+    await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be active, but is not. [activityId=${expectedGroup.activeActivityId}, locator=${activityLocator}]`));
   }
 }
 

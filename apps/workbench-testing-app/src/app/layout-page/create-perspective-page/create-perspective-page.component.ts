@@ -22,8 +22,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
-import {ActivatePartsComponent} from '../tables/activate-parts/activate-parts.component';
-import {RemovePartsComponent} from '../tables/remove-parts/remove-parts.component';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-create-perspective-page',
@@ -39,8 +38,7 @@ import {RemovePartsComponent} from '../tables/remove-parts/remove-parts.componen
     SciKeyValueFieldComponent,
     NavigatePartsComponent,
     AddActivitiesComponent,
-    ActivatePartsComponent,
-    RemovePartsComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class CreatePerspectivePageComponent {
@@ -59,7 +57,6 @@ export default class CreatePerspectivePageComponent {
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     activateParts: this._formBuilder.control<string[] | undefined>([]),
-    removeParts: this._formBuilder.control<string[] | undefined>([]),
   });
 
   protected readonly partProposals = this.computePartProposals();
@@ -118,7 +115,6 @@ export default class CreatePerspectivePageComponent {
     const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
     const activateParts = this.form.controls.activateParts.value;
-    const removeParts = this.form.controls.removeParts.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
       // Add initial part.
@@ -180,11 +176,6 @@ export default class CreatePerspectivePageComponent {
       // Activate parts.
       for (const part of activateParts ?? []) {
         layout = layout.activatePart(part);
-      }
-
-      // Remove parts.
-      for (const part of removeParts ?? []) {
-        layout = layout.removePart(part);
       }
 
       return layout;

@@ -26,12 +26,12 @@
 
   <section>
     <header>Activate Parts</header>
-    <app-activate-parts [formControl]="form.controls.activeParts"/>
+    <app-multi-value-input [formControl]="form.controls.activateParts" [placeholder]="'part.1 part.2'" class="e2e-activate-parts"/>
   </section>
 
   <section>
     <header>Remove Parts</header>
-    <app-remove-parts [formControl]="form.controls.removeParts"/>
+    <app-multi-value-input [formControl]="form.controls.removeParts" [placeholder]="'part.1 part.2'" class="e2e-remove-parts"/>
   </section>
 
   <button (click)="onModify()" [disabled]="form.invalid" class="e2e-modify" sci-primary>Modify</button>

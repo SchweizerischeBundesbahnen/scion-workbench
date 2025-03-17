@@ -19,8 +19,7 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
-import {ActivatePartsComponent} from '../tables/activate-parts/activate-parts.component';
-import {RemovePartsComponent} from '../tables/remove-parts/remove-parts.component';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -33,8 +32,7 @@ import {RemovePartsComponent} from '../tables/remove-parts/remove-parts.componen
     ReactiveFormsModule,
     NavigatePartsComponent,
     AddActivitiesComponent,
-    ActivatePartsComponent,
-    RemovePartsComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class ModifyLayoutPageComponent {

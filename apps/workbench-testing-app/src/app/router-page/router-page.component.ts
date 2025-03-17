@@ -20,7 +20,7 @@ import {stringifyError} from '../common/stringify-error.util';
 import {RouterCommandsComponent} from '../router-commands/router-commands.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {parseTypedObject} from '../common/parse-typed-value.util';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
@@ -35,7 +35,7 @@ import {UUID} from '@scion/toolkit/uuid';
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
     RouterCommandsComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class RouterPageComponent {

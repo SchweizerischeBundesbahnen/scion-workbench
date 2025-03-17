@@ -15,7 +15,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
 import {NotificationPageComponent} from '../notification-page/notification-page.component';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
 
@@ -27,7 +27,7 @@ import {undefinedIfEmpty} from '../common/undefined-if-empty.util';
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciCheckboxComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class NotificationOpenerPageComponent {

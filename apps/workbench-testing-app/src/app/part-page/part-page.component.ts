@@ -21,7 +21,7 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -40,7 +40,7 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
     SciFormFieldComponent,
     SciKeyValueComponent,
     WorkbenchPartActionDirective,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class PartPageComponent {
