@@ -13,7 +13,7 @@
   position: relative; // Positioning context for the bottom border pseudo element.
   padding-inline: var(--sci-workbench-part-bar-padding-inline);
 
-  @include workbench-mixins.peripheral-workbench-parts-selector {
+  wb-part[data-peripheral] & {
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
   }
 

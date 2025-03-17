@@ -2109,7 +2109,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual(MAIN_AREA);
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
 
-    // Activate part 'outerLeft''
+    // Activate part 'outerLeft'
     workbenchLayout = workbenchLayout.activatePart('part.outerLeft');
     expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
@@ -2204,18 +2204,18 @@ describe('WorkbenchLayout', () => {
     expect(findParentNode('part.left').ratio).toEqual(.5);
 
     // Set ratio to 0.3.
-    workbenchLayout = workbenchLayout.setSplitRatio(findParentNode('part.left').id, .3);
+    workbenchLayout = workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, .3);
     expect(findParentNode('part.left').ratio).toEqual(.3);
 
     // Expect to error if setting the ratio for a node not contained in the layout.
-    expect(() => workbenchLayout.setSplitRatio('does-not-exist', .3)).toThrowError(/NullElementError/);
+    expect(() => workbenchLayout.setTreeNodeSplitRatio('does-not-exist', .3)).toThrowError(/NullElementError/);
 
     // Expect to error if setting an illegal ratio.
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('part.left').id, -.1)).toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('part.left').id, 0)).not.toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('part.left').id, .5)).not.toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('part.left').id, 1)).not.toThrowError(/LayoutModifyError/);
-    expect(() => workbenchLayout.setSplitRatio(findParentNode('part.left').id, 1.1)).toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, -.1)).toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, 0)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, .5)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, 1)).not.toThrowError(/LayoutModifyError/);
+    expect(() => workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, 1.1)).toThrowError(/LayoutModifyError/);
 
     function findParentNode(partId: PartId): MTreeNode {
       const parent = workbenchLayout.part({partId}).parent;

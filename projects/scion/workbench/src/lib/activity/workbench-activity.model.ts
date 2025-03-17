@@ -9,6 +9,7 @@
  */
 
 import {ACTIVITY_ID_PREFIX} from '../workbench.constants';
+import {PartId} from '../part/workbench-part.model';
 
 /**
  * Format of an activity identifier.
@@ -45,11 +46,15 @@ export interface MActivityLayout {
 export interface MActivityGroup {
   activities: MActivity[];
   activeActivityId?: ActivityId;
-  activeActivityIdBeforeLayoutMaximization?: ActivityId;
+  minimizedActivityId?: ActivityId;
 }
 
 export interface MActivity {
   id: ActivityId;
+  /**
+   * References the part TODO [activity]
+   */
+  referencePartId: PartId;
   icon: string;
   label: string | `%${string}`;
   tooltip?: string | `%${string}`;

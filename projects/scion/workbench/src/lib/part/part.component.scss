@@ -5,7 +5,7 @@
   background-color: var(--sci-workbench-part-background-color);
   overflow: hidden; // required for the part bar not to exceed available space
 
-  wb-workbench:has(wb-part[data-partid="part.main-area"]) &:not([data-context="main-area"]) {
+  &[data-peripheral] {
     background-color: var(--sci-workbench-part-peripheral-background-color);
   }
 

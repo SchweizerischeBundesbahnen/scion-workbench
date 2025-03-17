@@ -6,7 +6,7 @@
   background-color: var(--sci-workbench-view-background-color);
   color: var(--sci-color-text);
 
-  @include workbench-mixins.peripheral-workbench-parts-selector {
+  wb-part[data-peripheral] & {
     background-color: var(--sci-workbench-view-peripheral-background-color);
   }
 

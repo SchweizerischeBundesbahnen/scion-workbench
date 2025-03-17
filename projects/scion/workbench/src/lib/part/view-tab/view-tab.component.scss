@@ -28,7 +28,7 @@
     border-top-color: var(--sci-workbench-tab-border-color);
     background-color: var(--sci-workbench-view-background-color);
 
-    @include workbench-mixins.peripheral-workbench-parts-selector {
+    wb-part[data-peripheral] & {
       background-color: var(--sci-workbench-view-peripheral-background-color);
     }
 
@@ -97,7 +97,7 @@
       box-shadow: inset 0 0 0 1px var(--sci-workbench-tab-border-color);
       box-sizing: content-box;
 
-      @include workbench-mixins.peripheral-workbench-parts-selector {
+      wb-part[data-peripheral] & {
         border-color: var(--sci-workbench-view-peripheral-background-color);
       }
     }

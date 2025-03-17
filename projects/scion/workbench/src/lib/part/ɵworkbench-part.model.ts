@@ -40,10 +40,10 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId = signal<ViewId | null>(null);
+  public readonly peripheral = signal(false);
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
 
-  private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
 
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
@@ -79,10 +79,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private onLayoutChange(change: {layout: ɵWorkbenchLayout; route?: ActivatedRouteSnapshot; previousRoute?: ActivatedRouteSnapshot | null}): void {
     const {layout, route, previousRoute} = change;
 
-    this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
     const mPart = layout.part({partId: this.id});
-    const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'main'})?.id === this.id;
-    this.active.set(active);
+    this.peripheral.set(computePeripheral(layout, this.id));
+    this.active.set(layout.grid({partId: this.id}).activePartId === this.id);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
 
@@ -135,10 +134,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   public get activationInstant(): number | undefined {
     return this._activationInstant;
-  }
-
-  public get isInMainArea(): boolean {
-    return this._isInMainArea ?? false;
   }
 
   /**
@@ -234,6 +229,18 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     if (this.activeViewId()) {
       this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
     }
+  }
+}
+
+/**
+ * Computes if the specified part is located in the peripheral area.
+ */
+function computePeripheral(layout: ɵWorkbenchLayout, partId: PartId): boolean {
+  if (layout.hasActivities()) {
+    return layout.activity({partId}, {orElse: null}) !== null;
+  }
+  else {
+    return layout.hasPart(partId, {grid: 'main'}) && !!layout.grids.mainArea;
   }
 }
 

@@ -19,7 +19,6 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
-import {MAIN_AREA} from '../../layout/workbench-layout';
 
 /**
  * @see ViewTabComponent
@@ -80,7 +79,7 @@ export class ViewTabDragImageComponent {
         // Compute if dragging this view tab over a tabbar.
         this.isDragOverTabbar = !!partId;
         // Compute if dragging this view tab over a tabbar located in the peripheral area.
-        this.isDragOverPeripheralTabbar = !!partId && partRegistry.has(MAIN_AREA) && !partRegistry.get(partId).isInMainArea;
+        this.isDragOverPeripheralTabbar = !!partId && partRegistry.get(partId).peripheral();
       });
   }
 

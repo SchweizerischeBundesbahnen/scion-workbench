@@ -25,8 +25,8 @@ import {ActivityId} from '../workbench-activity.model';
     GridComponent,
   ],
   host: {
-    '[attr.data-panel]': 'panel()'
-  }
+    '[attr.data-panel]': 'panel()',
+  },
 })
 export class ActivityPanelComponent {
 
@@ -60,7 +60,7 @@ export class ActivityPanelComponent {
     this._workbenchLayoutService.signalResizing(false);
 
     const ratio = sash1! / (sash1! + sash2!);
-    void this._workbenchRouter.navigate(layout => layout.setActivityPanelRatio(this.panel(), ratio));
+    void this._workbenchRouter.navigate(layout => layout.setActivityPanelSplitRatio(this.panel(), ratio));
   }
 }
 

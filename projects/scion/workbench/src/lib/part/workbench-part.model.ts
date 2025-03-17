@@ -40,9 +40,9 @@ export abstract class WorkbenchPart {
   public abstract readonly alternativeId: string | undefined;
 
   /**
-   * Indicates whether this part is located in the main area.
+   * Indicates whether this part is located in the peripheral area of the workbench layout.
    */
-  public abstract readonly isInMainArea: boolean;
+  public abstract readonly peripheral: Signal<boolean>;
 
   /**
    * Indicates whether this part is active or inactive.

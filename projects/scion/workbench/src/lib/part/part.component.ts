@@ -39,6 +39,9 @@ import {PartId} from './workbench-part.model';
     ViewPortalPipe,
     SciViewportComponent,
   ],
+  host: {
+    '[attr.data-peripheral]': 'part.peripheral() || undefined',
+  },
 })
 export class PartComponent implements OnInit {
 
@@ -56,14 +59,6 @@ export class PartComponent implements OnInit {
   @HostBinding('attr.data-partid')
   protected get partId(): PartId {
     return this.part.id;
-  }
-
-  /**
-   * Gets the context in which this part is used.
-   */
-  @HostBinding('attr.data-context')
-  protected get context(): 'main-area' | null {
-    return this.part.isInMainArea ? 'main-area' : null;
   }
 
   @HostBinding('class.active')
