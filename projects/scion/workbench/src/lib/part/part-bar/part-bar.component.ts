@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostListener, inject, InjectionToken, Signal, viewChild} from '@angular/core';
+import {Component, computed, ElementRef, inject, InjectionToken, Signal, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {PartActionComponent} from '../part-action/part-action.component';
@@ -51,12 +51,10 @@ export class PartBarComponent {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
   }
 
-  @HostListener('dblclick', ['$event'])
-  protected onDoubleClick(event: MouseEvent): void {
-    if (this.part.isInMainArea) {
+  protected onDoubleClick(): void {
+    if (!this.part.peripheral()) {
       void this._router.navigate(layout => layout.toggleMaximized());
     }
-    event.stopPropagation();
   }
 
   /**

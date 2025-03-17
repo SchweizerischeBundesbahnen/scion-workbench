@@ -19,6 +19,8 @@ import {stringifyError} from '../../common/stringify-error.util';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
+import {ActivatePartsComponent} from '../tables/activate-parts/activate-parts.component';
+import {RemovePartsComponent} from '../tables/remove-parts/remove-parts.component';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -31,6 +33,8 @@ import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activiti
     ReactiveFormsModule,
     NavigatePartsComponent,
     AddActivitiesComponent,
+    ActivatePartsComponent,
+    RemovePartsComponent,
   ],
 })
 export default class ModifyLayoutPageComponent {
@@ -45,6 +49,8 @@ export default class ModifyLayoutPageComponent {
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
+    activateParts: this._formBuilder.control<string[] | undefined>([]),
+    removeParts: this._formBuilder.control<string[] | undefined>([]),
   });
 
   protected readonly partProposals = this.computePartProposals();
@@ -94,6 +100,8 @@ export default class ModifyLayoutPageComponent {
           icon: activity.extras.icon,
           label: activity.extras.label,
           tooltip: activity.extras.tooltip,
+          cssClass: activity.extras.cssClass,
+          ɵactivityId: activity.extras.ɵactivityId,
         });
       }
 
@@ -135,6 +143,16 @@ export default class ModifyLayoutPageComponent {
           state: viewNavigation.extras?.state,
           cssClass: viewNavigation.extras?.cssClass,
         });
+      }
+
+      // Activate parts.
+      for (const part of this.form.controls.activateParts.value ?? []) {
+        layout = layout.activatePart(part);
+      }
+
+      // Remove parts.
+      for (const part of this.form.controls.removeParts.value ?? []) {
+        layout = layout.removePart(part);
       }
 
       return layout;

@@ -1228,10 +1228,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>, options?: {orElse: null}): MPartGrid | null {
     const gridName = Objects.keys(this._grids).find(gridName => {
       return this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => {
-        if (findBy?.partId && element.type !== 'MPart' && element.id !== findBy.partId) {
+        if (findBy?.partId && (element.type !== 'MPart' || element.id !== findBy.partId)) {
           return false;
         }
-        if (findBy?.nodeId && element.type !== 'MTreeNode' && element.id !== findBy.nodeId) {
+        if (findBy?.nodeId && (element.type !== 'MTreeNode' || element.id !== findBy.nodeId)) {
           return false;
         }
         if (findBy?.viewId && (element.type !== 'MPart' || !element.views.some(view => matchesViewId(findBy.viewId!, view)))) {

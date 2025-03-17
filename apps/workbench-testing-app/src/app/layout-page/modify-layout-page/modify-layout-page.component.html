@@ -1,12 +1,12 @@
 <form [formGroup]="form" autocomplete="off">
   <section>
-    <header>Parts (Activities)</header>
-    <app-add-activities [formControl]="form.controls.activities"/>
+    <header>Parts</header>
+    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals()"/>
   </section>
 
   <section>
-    <header>Parts</header>
-    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals()"/>
+    <header>Docked Parts</header>
+    <app-add-activities [formControl]="form.controls.activities"/>
   </section>
 
   <section>
@@ -22,6 +22,16 @@
   <section>
     <header>View Navigations</header>
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
+  </section>
+
+  <section>
+    <header>Activate Parts</header>
+    <app-activate-parts [formControl]="form.controls.activeParts"/>
+  </section>
+
+  <section>
+    <header>Remove Parts</header>
+    <app-remove-parts [formControl]="form.controls.removeParts"/>
   </section>
 
   <button (click)="onModify()" [disabled]="form.invalid" class="e2e-modify" sci-primary>Modify</button>

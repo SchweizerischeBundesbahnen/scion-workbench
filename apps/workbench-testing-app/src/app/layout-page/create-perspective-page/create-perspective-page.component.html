@@ -12,13 +12,13 @@
   </section>
 
   <section>
-    <header>Parts (Activities)</header>
-    <app-add-activities [formControl]="form.controls.activities"/>
+    <header>Parts</header>
+    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals()" [requiresInitialPart]="true"/>
   </section>
 
   <section>
-    <header>Parts</header>
-    <app-add-parts [formControl]="form.controls.parts" [partProposals]="partProposals()" [requiresInitialPart]="true"/>
+    <header>Docked Parts</header>
+    <app-add-activities [formControl]="form.controls.activities"/>
   </section>
 
   <section>
@@ -34,6 +34,16 @@
   <section>
     <header>View Navigations</header>
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
+  </section>
+
+  <section>
+    <header>Activate Parts</header>
+    <app-activate-parts [formControl]="form.controls.activateParts"/>
+  </section>
+
+  <section>
+    <header>Remove Parts</header>
+    <app-remove-parts [formControl]="form.controls.removeParts"/>
   </section>
 
   <button (click)="onRegister()" [disabled]="form.invalid" class="e2e-register" sci-primary>Register</button>
