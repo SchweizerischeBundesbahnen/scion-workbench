@@ -64,13 +64,15 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+        },
       },
     });
   });
@@ -454,13 +456,15 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          }),
+        },
       },
     });
   });
@@ -507,19 +511,21 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
   });
@@ -566,19 +572,21 @@ test.describe('Workbench RouterLink', () => {
     );
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.102'}],
-          activeViewId: 'view.102',
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.102'}],
+            activeViewId: 'view.102',
+          }),
+        },
       },
     });
   });

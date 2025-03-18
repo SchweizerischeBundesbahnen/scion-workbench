@@ -56,7 +56,7 @@ export default class CreatePerspectivePageComponent {
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
-    activateParts: this._formBuilder.control<string[] | undefined>([]),
+    activeParts: this._formBuilder.control<string[] | undefined>([]),
   });
 
   protected readonly partProposals = this.computePartProposals();
@@ -114,7 +114,7 @@ export default class CreatePerspectivePageComponent {
     const views = this.form.controls.views.value;
     const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
-    const activateParts = this.form.controls.activateParts.value;
+    const activeParts = this.form.controls.activeParts.value;
 
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
       // Add initial part.
@@ -174,7 +174,7 @@ export default class CreatePerspectivePageComponent {
       }
 
       // Activate parts.
-      for (const part of activateParts ?? []) {
+      for (const part of activeParts ?? []) {
         layout = layout.activatePart(part);
       }
 

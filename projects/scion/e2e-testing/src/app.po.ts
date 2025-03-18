@@ -21,6 +21,9 @@ import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
 import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
+import {ActivityItemPO} from './activity-item.po';
+import {ActivityPanelPO} from './activity-panel.po';
+import {RequireOne} from './helper/utility-types';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -166,12 +169,12 @@ export class AppPO {
   /**
    * Handle for interacting with the currently active workbench part in the specified area.
    */
-  public activePart(locateBy: {inMainArea: boolean}): PartPO {
-    if (locateBy.inMainArea) {
-      return new PartPO(this.page.locator('wb-part[data-context="main-area"].active'));
+  public activePart(locateBy: {peripheral: boolean}): PartPO {
+    if (locateBy.peripheral) {
+      return new PartPO(this.page.locator('wb-part[data-peripheral].active'));
     }
     else {
-      return new PartPO(this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]).active'));
+      return new PartPO(this.page.locator('wb-part:not([data-peripheral]).active'));
     }
   }
 
@@ -199,15 +202,15 @@ export class AppPO {
    * Locates opened views.
    *
    * @param locateBy - Controls which views to locate.
-   * @param locateBy.inMainArea - Controls whether to locate views contained in the main area (`true`), not contained in the main area (`false`), or both (not specified).
+   * @param locateBy.peripheral - Controls whether to locate views located in the peripheral area.
    */
-  public views(locateBy?: {inMainArea?: boolean; cssClass?: string}): Locator {
+  public views(locateBy?: {peripheral?: boolean; cssClass?: string}): Locator {
     const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
-    if (locateBy?.inMainArea === true) {
-      return this.page.locator('wb-part[data-context="main-area"] wb-view-tab').locator(locateByCssClass);
+    if (locateBy?.peripheral === true) {
+      return this.page.locator('wb-part[data-peripheral] wb-view-tab').locator(locateByCssClass);
     }
-    if (locateBy?.inMainArea === false) {
-      return this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]) wb-view-tab').locator(locateByCssClass);
+    if (locateBy?.peripheral === false) {
+      return this.page.locator('wb-part:not([data-peripheral]) wb-view-tab').locator(locateByCssClass);
     }
     else {
       return this.page.locator('wb-view-tab').locator(locateByCssClass);
@@ -241,6 +244,35 @@ export class AppPO {
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
+  }
+
+  /**
+   * Handle to the specified activity item in the workbench layout.
+   *
+   * @param locateBy - Specifies how to locate the activity item.
+   * @param locateBy.activityId - Identifies the activity by its id.
+   * @param locateBy.cssClass - Identifies the activity by its CSS class.
+   */
+  public activityItem(locateBy: RequireOne<{activityId: ActivityId; cssClass: string}>): ActivityItemPO {
+    if (locateBy.activityId !== undefined && locateBy.cssClass !== undefined) {
+      return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"].${locateBy.cssClass}`));
+    }
+    else if (locateBy.activityId !== undefined) {
+      return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"]`));
+    }
+    else if (locateBy.cssClass !== undefined) {
+      return new ActivityItemPO(this.page.locator(`wb-activity-item.${locateBy.cssClass}`));
+    }
+    throw Error(`[ActivityLocateError] Missing required locator. Either 'activityId' or 'cssClass', or both must be set.`);
+  }
+
+  /**
+   * Handle to the specified activity panel in the workbench layout.
+   *
+   * @param panel - Specifies which activity panel to locate.
+   */
+  public activityPanel(panel: 'left' | 'right' | 'bottom'): ActivityPanelPO {
+    return new ActivityPanelPO(this.page.locator(`wb-activity-panel[data-panel="${panel}"]`), panel);
   }
 
   /**
@@ -298,8 +330,8 @@ export class AppPO {
     await this.header.clickSettingsMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
-    const inMainArea = await this.hasMainArea();
-    return new StartPagePO(this, {viewId: await this.activePart({inMainArea}).activeView.getViewId()});
+    const part = new PartPO(this.page.locator('wb-part:not([data-peripheral]).active'));
+    return new StartPagePO(this, {viewId: await part.activeView.getViewId()});
   }
 
   /**
@@ -420,13 +452,6 @@ export class AppPO {
    */
   public getLocalStorageItem(key: string): Promise<string | null> {
     return this.page.evaluate(key => localStorage.getItem(key), key);
-  }
-
-  /**
-   * Tests if the layout has a main area.
-   */
-  public hasMainArea(): Promise<boolean> {
-    return this.workbenchRoot.locator('wb-part[data-partid="part.main-area"]').isVisible();
   }
 
   /**

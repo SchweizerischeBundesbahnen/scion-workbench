@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -62,13 +62,15 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view 2 not to be moved.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MPart({
-            id: await view1.part.getPartId(),
-            views: [{id: 'view.1'}, {id: 'view.2'}],
-            activeViewId: 'view.2',
-          }),
-          activePartId: await view1.part.getPartId(),
+        grids: {
+          mainArea: {
+            root: new MPart({
+              id: await view1.part.getPartId(),
+              views: [{id: 'view.1'}, {id: 'view.2'}],
+              activeViewId: 'view.2',
+            }),
+            activePartId: await view1.part.getPartId(),
+          },
         },
       });
     });
@@ -93,22 +95,24 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view 2 to be moved to a new part in the west.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MPart({
-              id: await view2.part.getPartId(),
-              views: [{id: 'view.2'}],
-              activeViewId: 'view.2',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: await view2.part.getPartId(),
+                views: [{id: 'view.2'}],
+                activeViewId: 'view.2',
+              }),
+              child2: new MPart({
+                id: await view1.part.getPartId(),
+                views: [{id: 'view.1'}],
+                activeViewId: 'view.1',
+              }),
             }),
-            child2: new MPart({
-              id: await view1.part.getPartId(),
-              views: [{id: 'view.1'}],
-              activeViewId: 'view.1',
-            }),
-          }),
-          activePartId: await view2.part.getPartId(),
+            activePartId: await view2.part.getPartId(),
+          },
         },
       });
     });
@@ -133,22 +137,24 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view 2 to be moved to a new part in the east.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MPart({
-              id: await view1.part.getPartId(),
-              views: [{id: 'view.1'}],
-              activeViewId: 'view.1',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: await view1.part.getPartId(),
+                views: [{id: 'view.1'}],
+                activeViewId: 'view.1',
+              }),
+              child2: new MPart({
+                id: await view2.part.getPartId(),
+                views: [{id: 'view.2'}],
+                activeViewId: 'view.2',
+              }),
             }),
-            child2: new MPart({
-              id: await view2.part.getPartId(),
-              views: [{id: 'view.2'}],
-              activeViewId: 'view.2',
-            }),
-          }),
-          activePartId: await view2.part.getPartId(),
+            activePartId: await view2.part.getPartId(),
+          },
         },
       });
     });
@@ -176,22 +182,24 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view 2 to be moved to a new part in the north.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: await view2.part.getPartId(),
-              views: [{id: 'view.2'}],
-              activeViewId: 'view.2',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: await view2.part.getPartId(),
+                views: [{id: 'view.2'}],
+                activeViewId: 'view.2',
+              }),
+              child2: new MPart({
+                id: await view1.part.getPartId(),
+                views: [{id: 'view.1'}],
+                activeViewId: 'view.1',
+              }),
             }),
-            child2: new MPart({
-              id: await view1.part.getPartId(),
-              views: [{id: 'view.1'}],
-              activeViewId: 'view.1',
-            }),
-          }),
-          activePartId: await view2.part.getPartId(),
+            activePartId: await view2.part.getPartId(),
+          },
         },
       });
     });
@@ -219,22 +227,24 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view 2 to be moved to a new part in the south.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: await view1.part.getPartId(),
-              views: [{id: 'view.1'}],
-              activeViewId: 'view.1',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: await view1.part.getPartId(),
+                views: [{id: 'view.1'}],
+                activeViewId: 'view.1',
+              }),
+              child2: new MPart({
+                id: await view2.part.getPartId(),
+                views: [{id: 'view.2'}],
+                activeViewId: 'view.2',
+              }),
             }),
-            child2: new MPart({
-              id: await view2.part.getPartId(),
-              views: [{id: 'view.2'}],
-              activeViewId: 'view.2',
-            }),
-          }),
-          activePartId: await view2.part.getPartId(),
+            activePartId: await view2.part.getPartId(),
+          },
         },
       });
     });
@@ -268,22 +278,24 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to the initial part.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.initial',
-              views: [{id: 'view.1'}, {id: 'view.101'}],
-              activeViewId: 'view.101',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.initial',
+                views: [{id: 'view.1'}, {id: 'view.101'}],
+                activeViewId: 'view.101',
+              }),
+              child2: new MPart({
+                id: 'part.right',
+                views: [{id: 'view.102'}],
+                activeViewId: 'view.102',
+              }),
             }),
-            child2: new MPart({
-              id: 'part.right',
-              views: [{id: 'view.102'}],
-              activeViewId: 'view.102',
-            }),
-          }),
-          activePartId: 'part.initial',
+            activePartId: 'part.initial',
+          },
         },
       });
     });
@@ -315,31 +327,33 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to a new part in the west of the initial part.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MTreeNode({
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
               direction: 'row',
               ratio: .5,
-              child1: new MPart({
-                id: testViewInfo.partId,
-                views: [{id: 'view.101'}],
-                activeViewId: 'view.101',
+              child1: new MTreeNode({
+                direction: 'row',
+                ratio: .5,
+                child1: new MPart({
+                  id: testViewInfo.partId,
+                  views: [{id: 'view.101'}],
+                  activeViewId: 'view.101',
+                }),
+                child2: new MPart({
+                  id: 'part.initial',
+                  views: [{id: 'view.1'}],
+                  activeViewId: 'view.1',
+                }),
               }),
               child2: new MPart({
-                id: 'part.initial',
-                views: [{id: 'view.1'}],
-                activeViewId: 'view.1',
+                id: 'part.right',
+                views: [{id: 'view.102'}],
+                activeViewId: 'view.102',
               }),
             }),
-            child2: new MPart({
-              id: 'part.right',
-              views: [{id: 'view.102'}],
-              activeViewId: 'view.102',
-            }),
-          }),
-          activePartId: testViewInfo.partId,
+            activePartId: testViewInfo.partId,
+          },
         },
       });
     });
@@ -371,31 +385,33 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to a new part in the east of the initial part.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MTreeNode({
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
               direction: 'row',
               ratio: .5,
-              child1: new MPart({
-                id: 'part.initial',
-                views: [{id: 'view.1'}],
-                activeViewId: 'view.1',
+              child1: new MTreeNode({
+                direction: 'row',
+                ratio: .5,
+                child1: new MPart({
+                  id: 'part.initial',
+                  views: [{id: 'view.1'}],
+                  activeViewId: 'view.1',
+                }),
+                child2: new MPart({
+                  id: testViewInfo.partId,
+                  views: [{id: 'view.101'}],
+                  activeViewId: 'view.101',
+                }),
               }),
               child2: new MPart({
-                id: testViewInfo.partId,
-                views: [{id: 'view.101'}],
-                activeViewId: 'view.101',
+                id: 'part.right',
+                views: [{id: 'view.102'}],
+                activeViewId: 'view.102',
               }),
             }),
-            child2: new MPart({
-              id: 'part.right',
-              views: [{id: 'view.102'}],
-              activeViewId: 'view.102',
-            }),
-          }),
-          activePartId: testViewInfo.partId,
+            activePartId: testViewInfo.partId,
+          },
         },
       });
     });
@@ -430,31 +446,33 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to a new part in the north of the initial part.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MTreeNode({
-              direction: 'column',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'row',
               ratio: .5,
-              child1: new MPart({
-                id: testViewInfo.partId,
-                views: [{id: 'view.101'}],
-                activeViewId: 'view.101',
+              child1: new MTreeNode({
+                direction: 'column',
+                ratio: .5,
+                child1: new MPart({
+                  id: testViewInfo.partId,
+                  views: [{id: 'view.101'}],
+                  activeViewId: 'view.101',
+                }),
+                child2: new MPart({
+                  id: 'part.initial',
+                  views: [{id: 'view.1'}],
+                  activeViewId: 'view.1',
+                }),
               }),
               child2: new MPart({
-                id: 'part.initial',
-                views: [{id: 'view.1'}],
-                activeViewId: 'view.1',
+                id: 'part.right',
+                views: [{id: 'view.102'}],
+                activeViewId: 'view.102',
               }),
             }),
-            child2: new MPart({
-              id: 'part.right',
-              views: [{id: 'view.102'}],
-              activeViewId: 'view.102',
-            }),
-          }),
-          activePartId: testViewInfo.partId,
+            activePartId: testViewInfo.partId,
+          },
         },
       });
     });
@@ -489,31 +507,33 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to a new part in the south of the initial part.
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-        mainAreaGrid: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .5,
-            child1: new MTreeNode({
-              direction: 'column',
+        grids: {
+          mainArea: {
+            root: new MTreeNode({
+              direction: 'row',
               ratio: .5,
-              child1: new MPart({
-                id: 'part.initial',
-                views: [{id: 'view.1'}],
-                activeViewId: 'view.1',
+              child1: new MTreeNode({
+                direction: 'column',
+                ratio: .5,
+                child1: new MPart({
+                  id: 'part.initial',
+                  views: [{id: 'view.1'}],
+                  activeViewId: 'view.1',
+                }),
+                child2: new MPart({
+                  id: testViewInfo.partId,
+                  views: [{id: 'view.101'}],
+                  activeViewId: 'view.101',
+                }),
               }),
               child2: new MPart({
-                id: testViewInfo.partId,
-                views: [{id: 'view.101'}],
-                activeViewId: 'view.101',
+                id: 'part.right',
+                views: [{id: 'view.102'}],
+                activeViewId: 'view.102',
               }),
             }),
-            child2: new MPart({
-              id: 'part.right',
-              views: [{id: 'view.102'}],
-              activeViewId: 'view.102',
-            }),
-          }),
-          activePartId: testViewInfo.partId,
+            activePartId: testViewInfo.partId,
+          },
         },
       });
     });
@@ -532,15 +552,17 @@ test.describe('View Drag & Drop', () => {
         .navigateView('view.100', ['test-view']),
       );
 
-      // Drop view on the main area.
       const testeeViewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(true);
+
+      // Drop view on the main area.
       const dragHandle = await testeeViewPage.view.tab.startDrag();
       await dragHandle.dragToPart(MAIN_AREA, {region: 'center'});
       await dragHandle.drop();
 
       // Expect view to be moved to the main area.
       await expectView(testeeViewPage).toBeActive();
-      await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+      await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(false);
     });
 
     test('should drop view on desktop of the main area', async ({appPO, workbenchNavigator}) => {
@@ -561,7 +583,7 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to the main area.
       await expectView(testeeViewPage).toBeActive();
-      await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+      await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(false);
     });
 
     /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
@@ -583,7 +605,7 @@ test.describe('View Drag & Drop', () => {
 
       // Expect view to be moved to the main area.
       await expectView(testeeViewPage).toBeActive();
-      await expect.poll(() => testeeViewPage.view.part.isInMainArea()).toBe(true);
+      await expect.poll(() => testeeViewPage.view.part.isPeripheral()).toBe(false);
     });
   });
 

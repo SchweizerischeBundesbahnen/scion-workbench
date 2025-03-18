@@ -1,6 +1,6 @@
 <!-- View Tabs -->
 @if (part.viewIds().length) {
-  <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()" (dblclick)="onDoubleClick()"/>
+  <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
 <!-- Start Actions -->
@@ -13,7 +13,7 @@
 }
 
 <!-- Filler -->
-<div class="filler" #filler (dblclick)="onDoubleClick()"></div>
+<div class="filler" #filler></div>
 
 <!-- End Actions -->
 @if (endActions().length) {

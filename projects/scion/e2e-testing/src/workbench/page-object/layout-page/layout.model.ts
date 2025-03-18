@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, DockingArea, NavigationData, NavigationState, PartId, PartExtras, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {ActivityId, Commands, DockingArea, NavigationData, NavigationState, PartExtras, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -32,6 +32,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public views = new Array<ViewDescriptor>();
   public partNavigations = new Array<PartNavigationDescriptor>();
   public viewNavigations = new Array<ViewNavigationDescriptor>();
+  public activeParts = new Array<string>();
+  public removeParts = new Array<string>();
 
   public addInitialPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
     this.parts.push({id, activate: options?.activate});
@@ -67,6 +69,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       icon: extras.icon,
       label: extras.label,
       tooltip: extras.tooltip,
+      cssClass: extras.cssClass,
+      ɵactivityId: extras.ɵactivityId,
     });
     return this;
   }
@@ -120,7 +124,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   public removePart(id: string): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.removePart` is not supported.');
+    this.removeParts.push(id);
+    return this;
   }
 
   public activateView(id: string, options?: {activatePart?: boolean}): WorkbenchLayout {
@@ -128,7 +133,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   public activatePart(id: string): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.activatePart` is not supported.');
+    this.activeParts.push(id);
+    return this;
   }
 
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout {
@@ -149,6 +155,8 @@ export interface ActivityDescriptor {
   icon: string;
   label: string | `%${string}`;
   tooltip?: string | `%${string}`;
+  cssClass?: string | string[];
+  ɵactivityId?: ActivityId;
 }
 
 /**

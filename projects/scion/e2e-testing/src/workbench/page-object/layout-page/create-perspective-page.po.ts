@@ -37,7 +37,7 @@ export class CreatePerspectivePagePO {
     await LayoutPages.enterViews(this.locator.locator('app-add-views'), views);
     await LayoutPages.enterPartNavigations(this.locator.locator('app-navigate-parts'), partNavigations);
     await LayoutPages.enterViewNavigations(this.locator.locator('app-navigate-views'), viewNavigations);
-    await LayoutPages.enterActiveParts(this.locator.locator('app-multi-value-input.e2e-activate-parts'), activeParts);
+    await LayoutPages.enterActiveParts(this.locator.locator('app-multi-value-input.e2e-active-parts'), activeParts);
 
     // Register the perspective.
     await this.locator.locator('button.e2e-register').click();

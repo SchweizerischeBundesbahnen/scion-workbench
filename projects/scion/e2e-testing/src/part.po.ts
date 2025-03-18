@@ -48,10 +48,10 @@ export class PartPO {
   }
 
   /**
-   * Indicates if this part is contained in the main area.
+   * Indicates if this part is contained in the peripheral area.
    */
-  public async isInMainArea(): Promise<boolean> {
-    return (await this.locator.getAttribute('data-context')) === 'main-area';
+  public async isPeripheral(): Promise<boolean> {
+    return (await this.locator.getAttribute('data-peripheral')) !== null;
   }
 
   /**

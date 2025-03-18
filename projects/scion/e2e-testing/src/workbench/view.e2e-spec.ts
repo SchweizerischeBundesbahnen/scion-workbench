@@ -962,19 +962,21 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            views: [{id: testee1ViewId}],
-            activeViewId: testee1ViewId,
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              views: [{id: testee1ViewId}],
+              activeViewId: testee1ViewId,
+            }),
+            child2: new MPart({
+              views: [{id: testee2ViewId}],
+              activeViewId: testee2ViewId,
+            }),
           }),
-          child2: new MPart({
-            views: [{id: testee2ViewId}],
-            activeViewId: testee2ViewId,
-          }),
-        }),
+        },
       },
     });
   });
@@ -1010,22 +1012,24 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .8,
-          child1: new MPart({id: MAIN_AREA}),
-          child2: new MPart({
-            views: [{id: testee2ViewId}],
-            activeViewId: testee2ViewId,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .8,
+            child1: new MPart({id: MAIN_AREA}),
+            child2: new MPart({
+              views: [{id: testee2ViewId}],
+              activeViewId: testee2ViewId,
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
   });
@@ -1062,22 +1066,26 @@ test.describe('Workbench View', () => {
 
     // Expect view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
     await expectView(new ViewPagePO(newWindow.appPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
     await expectView(testee1ViewPage).toBeActive();
@@ -1119,22 +1127,26 @@ test.describe('Workbench View', () => {
 
     // Expect view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
     await expectView(new ViewPagePO(newAppPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
     await expectView(testee1ViewPage).toBeActive();
@@ -1163,20 +1175,20 @@ test.describe('Workbench View', () => {
   test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Open two views in main area.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+      .addView('view.100', {partId: 'part.activity-1'})
+      .navigateView('view.100', ['test-view'])
+      .activatePart('part.activity-1'),
+    );
+
+    // Open view in main area.
     const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Capture instance id of view 2
+    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.100'});
     const view2ComponentId = await viewPage2.getComponentInstanceId();
-
-    // Drag view 2 into peripheral area.
-    const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
-    await dragHandle.drop();
-
-    await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeActive();
 
     // Maximize the main area.
     await viewPage1.view.tab.dblclick();

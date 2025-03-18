@@ -131,7 +131,7 @@ test.describe('Workbench Router', () => {
     await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // close all view tabs
-    await appPO.activePart({inMainArea: true}).bar.viewTabBar.closeTabs();
+    await appPO.activePart({peripheral: false}).bar.viewTabBar.closeTabs();
 
     await expect(appPO.views()).toHaveCount(0);
 
@@ -770,7 +770,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        partId: await appPO.activePart({inMainArea: true}).getPartId(),
+        partId: await appPO.activePart({peripheral: false}).getPartId(),
         navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
@@ -814,7 +814,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        partId: await appPO.activePart({inMainArea: false}).getPartId(),
+        partId: await appPO.activePart({peripheral: true}).getPartId(),
         navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
@@ -1405,17 +1405,19 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.100'}],
-            activeViewId: 'view.100',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.100'}],
+              activeViewId: 'view.100',
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -1424,17 +1426,19 @@ test.describe('Workbench Router', () => {
 
     // THEN: Expect the workbench layout to be restored.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.100'}],
-            activeViewId: 'view.100',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.100'}],
+              activeViewId: 'view.100',
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -1453,17 +1457,19 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.100'}],
-            activeViewId: 'view.100',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.100'}],
+              activeViewId: 'view.100',
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -1485,14 +1491,16 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the main area.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MPart({id: MAIN_AREA}),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.100'}],
-          activeViewId: 'view.100',
-        }),
+      grids: {
+        main: {
+          root: new MPart({id: MAIN_AREA}),
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.100'}],
+            activeViewId: 'view.100',
+          }),
+        },
       },
     });
 
