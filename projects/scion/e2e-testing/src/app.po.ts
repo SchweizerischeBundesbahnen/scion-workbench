@@ -260,10 +260,9 @@ export class AppPO {
     else if (locateBy.activityId !== undefined) {
       return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"]`));
     }
-    else if (locateBy.cssClass !== undefined) {
+    else {
       return new ActivityItemPO(this.page.locator(`wb-activity-item.${locateBy.cssClass}`));
     }
-    throw Error(`[ActivityLocateError] Missing required locator. Either 'activityId' or 'cssClass', or both must be set.`);
   }
 
   /**

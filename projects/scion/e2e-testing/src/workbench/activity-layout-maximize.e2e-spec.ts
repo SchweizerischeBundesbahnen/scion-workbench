@@ -816,8 +816,8 @@ test.describe('Activity Layout Maximize', () => {
 
     const tab1 = appPO.view({viewId: 'view.101'}).tab;
     const tab2 = appPO.view({viewId: 'view.102'}).tab;
-    await tab1.setTitle('short')
-    await tab2.setTitle('longer view tab title');
+    await tab1.setTitle('title');
+    await tab2.setTitle('title title title'); // longer title than tab 1
 
     // Assert layout
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({

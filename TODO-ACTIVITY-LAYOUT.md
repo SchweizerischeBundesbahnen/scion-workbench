@@ -14,16 +14,17 @@
   [x] Drop Down for perspectives
   [x] Provide 2 Perspectives with activities
 [x] @scion/components: Provide sash sizes as object literal instead of array
-[] Tests
 [] Documentation (JSDoc)
 [] HowTo
 [] Add test if to have drop zone in main grid (Enabled for layouts without activities or layouts with activities but no main area.)
 [] Do not disable animations when starting locally and on CI (fix tests: e.g.: host-popup.e2e-spec.ts: should stick to the popup anchor)
 [x] remove activity part
 [] css class on add part?
-[x] Test: Navigate view with router should activate activity
-[] Test: Panel Alignment: consider property in workbenchlayoutmatcher
-[] Router navigate view if no part specified, only navigate not in peripheral area
+[] Router navigation if not specifying a part and no target should not navigte peripheral views.
+[] Tests:
+  [x] Test: Navigate view with router should activate activity
+  [] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
+  [] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
