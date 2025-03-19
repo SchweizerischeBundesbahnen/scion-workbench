@@ -49,9 +49,9 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
   // Assert active part of the main area grid.
   if (expected.grids?.mainArea?.activePartId) {
     const activePartId = expected.grids.mainArea.activePartId;
-    const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="main-area"][data-partid="${activePartId}"].active`);
+    const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="mainArea"][data-partid="${activePartId}"].active`);
     await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main area grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="main-area"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
+    await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="mainArea"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
   }
   // Assert active part of the main grid.
   if (expected.grids?.main?.activePartId) {
