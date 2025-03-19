@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked} from '@angular/core';
+import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
@@ -24,6 +24,7 @@ import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
+import {WorkbenchGrids} from '../layout/workbench-grids.model';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -40,6 +41,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId = signal<ViewId | null>(null);
+  public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
@@ -49,6 +51,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
     this.alternativeId = layout.part({partId: this.id}).alternativeId;
     this._partComponent = options.component;
+    this.gridName = signal(layout.grid({partId: id}).gridName);
     this.actions = this.computePartActions();
     this.touchOnActivate();
     this.installModelUpdater();
@@ -80,8 +83,10 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     const {layout, route, previousRoute} = change;
 
     const mPart = layout.part({partId: this.id});
+    const {gridName, grid} = layout.grid({partId: this.id});
+    this.gridName.set(gridName);
     this.peripheral.set(computePeripheral(layout, this.id));
-    this.active.set(layout.grid({partId: this.id}).activePartId === this.id);
+    this.active.set(grid.activePartId === this.id);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
 

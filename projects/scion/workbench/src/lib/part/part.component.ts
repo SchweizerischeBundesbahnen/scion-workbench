@@ -41,6 +41,7 @@ import {PartId} from './workbench-part.model';
   ],
   host: {
     '[attr.data-peripheral]': 'part.peripheral() || undefined',
+    '[attr.data-grid]': 'part.gridName()',
   },
 })
 export class PartComponent implements OnInit {

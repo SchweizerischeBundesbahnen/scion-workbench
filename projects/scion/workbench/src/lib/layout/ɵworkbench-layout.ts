@@ -864,7 +864,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Add the tree node to the layout.
     if (!referenceElement.parent) {
-      const grid = this.grid(referenceElement.type === 'MPart' ? {partId: referenceElement.id} : {nodeId: referenceElement.id});
+      const {grid} = this.grid(referenceElement.type === 'MPart' ? {partId: referenceElement.id} : {nodeId: referenceElement.id});
       grid.root = newTreeNode; // top-level node
     }
     else if (referenceElement.parent.child1 === referenceElement) {
@@ -885,7 +885,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __removePart(part: MPart, options?: {force?: boolean}): void {
+  private __removePart(part: MPart): void {
     // Remove activity if this part is the reference part of the activity.
     const activity = this.activity({partId: part.id}, {orElse: null});
     if (activity?.referencePartId === part.id) {
@@ -893,10 +893,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       return;
     }
 
-    const grid = this.grid({partId: part.id});
-    const gridName = Objects.keys(this._grids).find(gridName => this._grids[gridName] === grid);
-
     // The last part is never removed.
+    const {gridName, grid} = this.grid({partId: part.id});
     const parts = this.parts({grid: gridName});
     if (parts.length === 1) {
       return;
@@ -989,7 +987,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._navigationStates.delete(part.id);
     }
 
-    const grid = this.grid({partId: part.id});
+    const {grid} = this.grid({partId: part.id});
     if (grid.activePartId === part.id) {
       grid.activePartId = newPartId;
     }
@@ -1177,7 +1175,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private __activatePart(part: MPart): void {
     // Activate part.
-    this.grid({partId: part.id}).activePartId = part.id;
+    this.grid({partId: part.id}).grid.activePartId = part.id;
 
     // Activate activity.
     const activity = this.activity({partId: part.id}, {orElse: null});
@@ -1223,9 +1221,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.orElse - Controls to return `null` instead of throwing an error if no grid is found.
    * @return grid matching the filter criteria.
    */
-  public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>): MPartGrid;
-  public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>, options: {orElse: null}): MPartGrid | null;
-  public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>, options?: {orElse: null}): MPartGrid | null {
+  public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>): {gridName: keyof WorkbenchGrids; grid: MPartGrid};
+  public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>, options: {orElse: null}): {gridName: keyof WorkbenchGrids; grid: MPartGrid} | null;
+  public grid(findBy: RequireOne<{partId: PartId; viewId: ViewId; nodeId: string}>, options?: {orElse: null}): {gridName: keyof WorkbenchGrids; grid: MPartGrid} | null {
     const gridName = Objects.keys(this._grids).find(gridName => {
       return this.findTreeElements((element: MTreeNode | MPart): element is MPart | MTreeNode => {
         if (findBy.partId && (element.type !== 'MPart' || element.id !== findBy.partId)) {
@@ -1244,7 +1242,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (!gridName && !options) {
       throw Error(`[NullGridError] No matching grid found: [${stringifyFilter(findBy)}]`);
     }
-    return (gridName && this._grids[gridName]) ?? null;
+
+    return gridName ? {gridName, grid: this._grids[gridName]!} : null;
   }
 
   /**

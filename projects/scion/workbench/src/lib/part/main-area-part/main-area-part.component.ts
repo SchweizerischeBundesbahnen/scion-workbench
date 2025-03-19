@@ -59,6 +59,9 @@ import {GridComponent} from '../../layout/grid/grid.component';
     GridElementIfVisiblePipe,
     NgTemplateOutlet,
   ],
+  host: {
+    '[attr.data-grid]': 'part.gridName()',
+  },
 })
 export class MainAreaPartComponent {
 
