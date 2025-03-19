@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,7 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
 import {PartId} from './workbench-part.model';
+import {dasherize} from '../common/dasherize.util';
 
 @Component({
   selector: 'wb-part',
@@ -41,7 +42,7 @@ import {PartId} from './workbench-part.model';
   ],
   host: {
     '[attr.data-peripheral]': 'part.peripheral() || undefined',
-    '[attr.data-grid]': 'part.gridName()',
+    '[attr.data-grid]': 'dasherize(part.gridName())',
   },
 })
 export class PartComponent implements OnInit {
@@ -53,6 +54,7 @@ export class PartComponent implements OnInit {
   private readonly _cd = inject(ChangeDetectorRef);
 
   protected readonly part = inject(ɵWorkbenchPart);
+  protected readonly dasherize = dasherize;
 
   @HostBinding('attr.tabindex')
   protected tabIndex = -1;

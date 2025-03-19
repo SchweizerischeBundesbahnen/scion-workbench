@@ -131,7 +131,7 @@ test.describe('Workbench Router', () => {
     await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // close all view tabs
-    await appPO.activePart({peripheral: false}).bar.viewTabBar.closeTabs();
+    await appPO.activePart({grid: 'mainArea'}).bar.viewTabBar.closeTabs();
 
     await expect(appPO.views()).toHaveCount(0);
 
@@ -770,7 +770,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        partId: await appPO.activePart({peripheral: false}).getPartId(),
+        partId: await appPO.activePart({grid: 'mainArea'}).getPartId(),
         navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
@@ -814,7 +814,7 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        partId: await appPO.activePart({peripheral: true}).getPartId(),
+        partId: await appPO.activePart({grid: 'main'}).getPartId(),
         navigationState: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );

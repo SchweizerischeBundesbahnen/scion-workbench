@@ -24,6 +24,7 @@ import {WorkbenchAccessor} from './workbench-accessor';
 import {ActivityItemPO} from './activity-item.po';
 import {ActivityPanelPO} from './activity-panel.po';
 import {RequireOne} from './helper/utility-types';
+import {dasherize} from './helper/dasherize.util';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -167,15 +168,10 @@ export class AppPO {
   }
 
   /**
-   * Handle for interacting with the currently active workbench part in the specified area.
+   * Handle for interacting with the currently active workbench part in the specified grid.
    */
-  public activePart(locateBy: {peripheral: boolean}): PartPO {
-    if (locateBy.peripheral) {
-      return new PartPO(this.page.locator('wb-part[data-peripheral].active'));
-    }
-    else {
-      return new PartPO(this.page.locator('wb-part:not([data-peripheral]).active'));
-    }
+  public activePart(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): PartPO {
+    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"].active`));
   }
 
   /**

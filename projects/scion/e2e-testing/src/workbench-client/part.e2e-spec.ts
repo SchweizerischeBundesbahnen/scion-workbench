@@ -25,7 +25,7 @@ test.describe('Workbench Part', () => {
     const rightTestPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
     // Move test view to the right
     const dragHandle = await rightTestPage.view.tab.startDrag();
-    await dragHandle.dragToPart(await appPO.activePart({peripheral: false}).getPartId(), {region: 'east'});
+    await dragHandle.dragToPart(await appPO.activePart({grid: 'mainArea'}).getPartId(), {region: 'east'});
     await dragHandle.drop();
 
     // Capture part and view identities.

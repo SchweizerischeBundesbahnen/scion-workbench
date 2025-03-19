@@ -275,7 +275,7 @@ test.describe('Workbench View', () => {
     });
 
     // Move view 2 to the new window
-    await appPO.view({viewId: 'view.102'}).tab.moveTo(await newAppPO.activePart({peripheral: false}).getPartId(), {
+    await appPO.view({viewId: 'view.102'}).tab.moveTo(await newAppPO.activePart({grid: 'mainArea'}).getPartId(), {
       workbenchId: await newAppPO.getWorkbenchId(),
     });
     // Expect view 2 to be moved to the new window.
@@ -310,7 +310,7 @@ test.describe('Workbench View', () => {
     });
 
     // Move view 3 (empty-path view) to the new window
-    await appPO.view({viewId: 'view.103'}).tab.moveTo(await newAppPO.activePart({peripheral: false}).getPartId(), {
+    await appPO.view({viewId: 'view.103'}).tab.moveTo(await newAppPO.activePart({grid: 'mainArea'}).getPartId(), {
       workbenchId: await newAppPO.getWorkbenchId(),
     });
     // Expect view 3 to be moved to the new window.

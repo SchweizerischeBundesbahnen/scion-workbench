@@ -233,7 +233,7 @@ test.describe('Workbench Host Popup', () => {
 
     await popupPage.enterComponentSize({height: '100px', width: '100px'});
 
-    const viewBounds = await appPO.activePart({peripheral: false}).activeView.getBoundingBox();
+    const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
     await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
     await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 

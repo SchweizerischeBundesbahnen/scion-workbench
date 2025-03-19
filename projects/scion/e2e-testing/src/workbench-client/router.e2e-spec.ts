@@ -2220,7 +2220,7 @@ test.describe('Workbench Router', () => {
     const view = appPO.view({cssClass: 'testee'});
     await expect.poll(() => view.getInfo()).toMatchObject(
       {
-        partId: await appPO.activePart({peripheral: false}).getPartId(),
+        partId: await appPO.activePart({grid: 'mainArea'}).getPartId(),
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(2);

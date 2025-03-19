@@ -24,6 +24,7 @@ import {MAIN_AREA} from '../../layout/workbench-layout';
 import {DESKTOP} from '../../workbench-element-references';
 import {NgTemplateOutlet} from '@angular/common';
 import {GridComponent} from '../../layout/grid/grid.component';
+import {dasherize} from '../../common/dasherize.util';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -60,7 +61,7 @@ import {GridComponent} from '../../layout/grid/grid.component';
     NgTemplateOutlet,
   ],
   host: {
-    '[attr.data-grid]': 'part.gridName()',
+    '[attr.data-grid]': 'dasherize(part.gridName())',
   },
 })
 export class MainAreaPartComponent {
@@ -73,6 +74,7 @@ export class MainAreaPartComponent {
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly mainAreaGrid = computed(() => this._workbenchLayoutService.layout()!.grids.mainArea!);
   protected readonly desktop = inject(DESKTOP);
+  protected readonly dasherize = dasherize;
 
   protected onDesktopViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({

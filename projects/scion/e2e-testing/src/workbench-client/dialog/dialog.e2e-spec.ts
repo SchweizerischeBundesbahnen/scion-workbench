@@ -96,7 +96,7 @@ test.describe('Workbench Dialog', () => {
 
       // Open view 1 with dialog.
       const dialogPage = await SizeTestPagePO.openInDialog(appPO);
-      const viewPage1 = new DialogOpenerPagePO(appPO, {viewId: await appPO.activePart({peripheral: false}).activeView.getViewId()});
+      const viewPage1 = new DialogOpenerPagePO(appPO, {viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()});
 
       await expectDialog(dialogPage).toBeVisible();
       const dialogSize = await dialogPage.getBoundingBox();

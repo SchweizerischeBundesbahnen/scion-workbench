@@ -360,7 +360,7 @@ test.describe('Workbench Popup', () => {
 
     const popup = appPO.popup({cssClass: 'testee'});
 
-    const viewBounds = await appPO.activePart({peripheral: false}).activeView.getBoundingBox();
+    const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
     await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
     await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 
@@ -418,7 +418,7 @@ test.describe('Workbench Popup', () => {
 
       // Open view 1 with popup.
       const popupPage = await SizeTestPagePO.openInPopup(appPO);
-      const viewPage1 = new PopupOpenerPagePO(appPO, {viewId: await appPO.activePart({peripheral: false}).activeView.getViewId()});
+      const viewPage1 = new PopupOpenerPagePO(appPO, {viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()});
 
       await expectPopup(popupPage).toBeVisible();
       const popupSize = await popupPage.getBoundingBox();
