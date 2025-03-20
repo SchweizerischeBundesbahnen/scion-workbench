@@ -98,6 +98,7 @@ export default class ModifyLayoutPageComponent {
           icon: activity.extras.icon,
           label: activity.extras.label,
           tooltip: activity.extras.tooltip,
+          title: activity.extras.title,
           cssClass: activity.extras.cssClass,
           ɵactivityId: activity.extras.ɵactivityId,
         });
@@ -109,7 +110,10 @@ export default class ModifyLayoutPageComponent {
           relativeTo: part.relativeTo.relativeTo,
           align: part.relativeTo.align!,
           ratio: part.relativeTo.ratio!,
-        }, {activate: part.options?.activate});
+        }, {
+          title: part.extras?.title,
+          activate: part.extras?.activate,
+        });
       }
 
       // Add views.

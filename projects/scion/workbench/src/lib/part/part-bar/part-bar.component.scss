@@ -17,6 +17,14 @@
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
   }
 
+  > span.title {
+    flex: none;
+    align-self: center;
+    user-select: none;
+    padding-inline: .5em;
+    @include workbench-mixins.ellipsis-on-overflow();
+  }
+
   > wb-view-tab-bar {
     // Use 'flex: initial' and not 'flex: none' to overflow if exceeding the maximum available space.
     flex: initial;

@@ -85,6 +85,7 @@ export class MPart {
   public readonly type = 'MPart';
   public id!: PartId;
   public alternativeId?: string;
+  public title?: string;
   public parent?: MTreeNode;
   public views!: MView[];
   public activeViewId?: ViewId;

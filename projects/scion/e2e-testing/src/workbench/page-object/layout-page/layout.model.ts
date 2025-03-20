@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ActivityId, Commands, DockingArea, NavigationData, NavigationState, PartExtras, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {ActivityId, Commands, DockingArea, NavigationData, NavigationState, DockedPartExtras, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory, PartExtras, Translatable} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -17,8 +17,8 @@ import {ActivatedRoute} from '@angular/router';
  */
 export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
 
-  public addPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
-    return new ɵWorkbenchLayout().addInitialPart(id, options);
+  public addPart(id: string | MAIN_AREA, extras?: PartExtras): WorkbenchLayout {
+    return new ɵWorkbenchLayout().addInitialPart(id, extras);
   }
 }
 
@@ -35,23 +35,23 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public activeParts = new Array<string>();
   public removeParts = new Array<string>();
 
-  public addInitialPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
-    this.parts.push({id, activate: options?.activate});
+  public addInitialPart(id: string | MAIN_AREA, extras?: PartExtras): WorkbenchLayout {
+    this.parts.push({id, title: extras?.title, activate: extras?.activate});
     return this;
   }
 
-  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout;
-  public addPart(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout;
-  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean} | PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout;
+  public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: PartExtras | DockedPartExtras): WorkbenchLayout {
     if ((reference as Partial<DockingArea>).dockTo) {
-      return this.addActivity(id, reference as DockingArea, extras as PartExtras & {cssClass?: string | string[]});
+      return this.addActivity(id, reference as DockingArea, extras as DockedPartExtras);
     }
     else {
-      return this._addPart(id, reference as ReferencePart, extras as {activate?: boolean});
+      return this._addPart(id, reference as ReferencePart, extras as PartExtras);
     }
   }
 
-  private _addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: {activate?: boolean}): WorkbenchLayout {
+  private _addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout {
     this.parts.push({
       id,
       relativeTo: relativeTo.relativeTo,
@@ -62,7 +62,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return this;
   }
 
-  private addActivity(id: string, dockTo: DockingArea, extras: PartExtras & {cssClass?: string | string[]}): WorkbenchLayout {
+  private addActivity(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout {
     this.activities.push({
       id,
       dockTo: dockTo.dockTo,
@@ -153,8 +153,8 @@ export interface ActivityDescriptor {
   id: string;
   dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
   icon: string;
-  label: string | `%${string}`;
-  tooltip?: string | `%${string}`;
+  label: Translatable;
+  tooltip?: Translatable;
   cssClass?: string | string[];
   ɵactivityId?: ActivityId;
 }
@@ -167,6 +167,7 @@ export interface PartDescriptor {
   relativeTo?: string;
   align?: 'left' | 'right' | 'top' | 'bottom';
   ratio?: number;
+  title?: Translatable;
   activate?: boolean;
 }
 

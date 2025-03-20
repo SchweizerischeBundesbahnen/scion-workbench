@@ -261,3 +261,8 @@ export interface ComponentDescriptor {
    */
   injector?: Injector;
 }
+
+/**
+ * Represents either a string or a translatable key starting with the `%` symbol.
+ */
+export type Translatable = string | `%${string}`;

@@ -14,7 +14,9 @@ import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
-import {ActivityId} from '@scion/workbench';
+import {ActivityId, Translatable} from '@scion/workbench';
+import {parseTypedString} from '../../../common/parse-typed-value.util';
+import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
   selector: 'app-add-activities',
@@ -37,7 +39,9 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
   private _cvaChangeFn: (value: ActivityDescriptor[]) => void = noop;
   private _cvaTouchedFn: () => void = noop;
 
-  protected form = this._formBuilder.group({
+  protected readonly titleList = `title-list-${UUID.randomUUID()}`;
+
+  protected readonly form = this._formBuilder.group({
     activities: this._formBuilder.array<FormGroup<{
       id: FormControl<string>;
       dockTo: FormGroup<{
@@ -45,8 +49,9 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
       }>;
       extras: FormGroup<{
         icon: FormControl<string>;
-        label: FormControl<string | `%${string}`>;
-        tooltip: FormControl<string | `%${string}` | undefined>;
+        label: FormControl<Translatable>;
+        tooltip: FormControl<Translatable | undefined>;
+        title: FormControl<Translatable | undefined>;
         cssClass: FormControl<string | string[] | undefined>;
         activityId: FormControl<ActivityId | undefined>;
       }>;
@@ -66,6 +71,7 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
             icon: activityFormGroup.controls.extras.controls.icon.value,
             label: activityFormGroup.controls.extras.controls.label.value,
             tooltip: activityFormGroup.controls.extras.controls.tooltip.value,
+            title: parseTypedString(activityFormGroup.controls.extras.controls.title.value)!,
             cssClass: activityFormGroup.controls.extras.controls.cssClass.value,
             ɵactivityId: activityFormGroup.controls.extras.controls.activityId.value,
           },
@@ -100,8 +106,9 @@ export class AddActivitiesComponent implements ControlValueAccessor, Validator {
         }),
         extras: this._formBuilder.group({
           icon: this._formBuilder.control<string>(activity.extras.icon, Validators.required),
-          label: this._formBuilder.control<string>(activity.extras.label, Validators.required),
-          tooltip: this._formBuilder.control<string | undefined>(activity.extras.tooltip),
+          label: this._formBuilder.control<Translatable>(activity.extras.label, Validators.required),
+          tooltip: this._formBuilder.control<Translatable | undefined>(activity.extras.tooltip),
+          title: this._formBuilder.control<Translatable | undefined>(activity.extras.title === false ? '<boolean>false</boolean>' : activity.extras.title),
           cssClass: this._formBuilder.control<string | string[] | undefined>(activity.extras.cssClass),
           activityId: this._formBuilder.control<ActivityId | undefined>(activity.extras.ɵactivityId, activityIdFormatValidator()),
         }),
@@ -149,8 +156,9 @@ export interface ActivityDescriptor {
   };
   extras: {
     icon: string;
-    label: string | `%${string}`;
-    tooltip?: string | `%${string}`;
+    label: Translatable;
+    tooltip?: Translatable;
+    title?: Translatable | false;
     cssClass?: string | string[];
     ɵactivityId?: ActivityId;
   };

@@ -73,6 +73,10 @@
 <section>
   <header>Part Properties</header>
 
+  <sci-form-field label="Title">
+    <input [ngModel]="part.title()" (ngModelChange)="part.title = $event" class="e2e-title">
+  </sci-form-field>
+
   <sci-form-field label="CSS Class(es)">
     <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
   </sci-form-field>

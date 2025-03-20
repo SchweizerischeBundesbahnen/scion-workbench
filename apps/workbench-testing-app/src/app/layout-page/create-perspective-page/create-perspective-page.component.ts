@@ -119,7 +119,7 @@ export default class CreatePerspectivePageComponent {
     return (factory: WorkbenchLayoutFactory): WorkbenchLayout => {
       // Add initial part.
       let layout = factory.addPart(initialPart.id, {
-        activate: initialPart.options?.activate,
+        activate: initialPart.extras?.activate,
       });
 
       // Add activities.
@@ -128,6 +128,7 @@ export default class CreatePerspectivePageComponent {
           icon: activity.extras.icon,
           label: activity.extras.label,
           tooltip: activity.extras.tooltip,
+          title: activity.extras.title,
           cssClass: activity.extras.cssClass,
           ɵactivityId: activity.extras.ɵactivityId,
         });
@@ -139,7 +140,7 @@ export default class CreatePerspectivePageComponent {
           relativeTo: part.relativeTo.relativeTo,
           align: part.relativeTo.align!,
           ratio: part.relativeTo.ratio,
-        }, {activate: part.options?.activate});
+        }, {activate: part.extras?.activate});
       }
 
       // Add views.

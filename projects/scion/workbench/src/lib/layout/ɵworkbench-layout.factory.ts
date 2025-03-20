@@ -12,7 +12,7 @@ import {isPartId, WorkbenchLayoutConstructConfig, ɵWorkbenchLayout} from './ɵw
 import {MPart} from './workbench-layout.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
-import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID} from './workbench-layout';
+import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras} from './workbench-layout';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 
 /**
@@ -26,13 +26,13 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
   /**
    * @inheritDoc
    */
-  public addPart(id: string | MAIN_AREA): ɵWorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, extras?: PartExtras): ɵWorkbenchLayout {
     const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
 
     return this.create({
       grids: {
-        main: {root: new MPart({id: partId, alternativeId, structural: true, views: []}), activePartId: partId},
+        main: {root: new MPart({id: partId, alternativeId, title: extras?.title, structural: true, views: []}), activePartId: partId},
       },
     });
   }

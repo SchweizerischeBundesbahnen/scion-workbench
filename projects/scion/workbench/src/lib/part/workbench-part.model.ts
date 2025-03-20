@@ -40,9 +40,20 @@ export abstract class WorkbenchPart {
   public abstract readonly alternativeId: string | undefined;
 
   /**
+   * Title displayed in the part bar.
+   */
+  public abstract get title(): Signal<string | undefined>;
+  public abstract set title(title: string | undefined);
+
+  /**
    * Indicates whether this part is located in the peripheral area of the workbench layout.
    */
   public abstract readonly peripheral: Signal<boolean>;
+
+  /**
+   * Indicates whether this part is the top-leftmost part.
+   */
+  public abstract readonly topLeft: Signal<boolean>;
 
   /**
    * Indicates whether this part is active or inactive.

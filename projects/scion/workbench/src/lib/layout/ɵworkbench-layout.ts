@@ -9,7 +9,7 @@
  */
 import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
 import {UID} from '../common/uid.util';
-import {DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras, ReferencePart, WorkbenchLayout} from './workbench-layout';
+import {DockedPartExtras, DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
@@ -411,19 +411,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param extras.activate - @inheritDoc
    * @param extras.structural - Specifies if this is a structural part. A structural part will not be removed when removing its last view. Defaults to `true`.
    */
-  public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, extras?: {activate?: boolean; structural?: boolean}): ɵWorkbenchLayout;
-  public addPart(id: string, dockTo: DockingArea, extras: PartExtras): WorkbenchLayout;
-  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: {activate?: boolean; structural?: boolean} | PartExtras): WorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, extras?: PartExtras & {structural?: boolean}): ɵWorkbenchLayout;
+  public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: (PartExtras & {structural?: boolean}) | DockedPartExtras): WorkbenchLayout {
     const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
-
     const workingCopy = this.workingCopy();
 
     if ((reference as Partial<DockingArea>).dockTo) {
-      workingCopy.__addActivity(partId, reference as DockingArea, {...extras, alternativeId} as PartExtras & {alternativeId?: string});
+      workingCopy.__addActivity(partId, reference as DockingArea, {...extras, alternativeId} as DockedPartExtras & {alternativeId?: string});
     }
     else {
-      workingCopy.__addPart(partId, reference as ReferencePart, {...extras, alternativeId});
+      workingCopy.__addPart(partId, reference as ReferencePart, {...extras, alternativeId} as PartExtras & {alternativeId?: string; structural?: boolean});
     }
     return workingCopy;
   }
@@ -676,7 +675,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addActivity(id: PartId, dockTo: DockingArea, extras: PartExtras & {alternativeId?: string}): void {
+  private __addActivity(id: PartId, dockTo: DockingArea, extras: DockedPartExtras & {alternativeId?: string}): void {
     if (this.hasPart(id)) {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
@@ -686,8 +685,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     const activityId = extras.ɵactivityId ?? WorkbenchLayouts.computeActivityId();
+    const title = extras.title === false ? undefined : extras.title ?? extras.label;
     this._grids[activityId] = {
-      root: new MPart({id, alternativeId: extras.alternativeId, structural: true, views: []}),
+      root: new MPart({id, alternativeId: extras.alternativeId, title, structural: true, views: []}),
       activePartId: id,
     };
 
@@ -697,7 +697,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       referencePartId: id,
       icon: extras.icon,
       label: extras.label,
-      tooltip: extras.tooltip,
+      tooltip: extras.tooltip ?? extras.label,
       cssClass: extras.cssClass,
     });
   }
@@ -840,12 +840,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __addPart(id: PartId, relativeTo: ReferenceElement, extras?: {alternativeId?: string; activate?: boolean; structural?: boolean}): void {
+  private __addPart(id: PartId, relativeTo: ReferenceElement, extras?: PartExtras & {alternativeId?: string; structural?: boolean}): void {
     if (this.hasPart(id)) {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const newPart = new MPart({id, alternativeId: extras?.alternativeId, structural: extras?.structural ?? true, views: []});
+    const newPart = new MPart({id, alternativeId: extras?.alternativeId, title: extras?.title, structural: extras?.structural ?? true, views: []});
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
     const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.grids.main.root;

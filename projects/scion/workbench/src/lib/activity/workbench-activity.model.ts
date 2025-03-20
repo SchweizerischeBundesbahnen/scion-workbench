@@ -10,6 +10,7 @@
 
 import {ACTIVITY_ID_PREFIX} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
+import {Translatable} from '../workbench.model';
 
 /**
  * Format of an activity identifier.
@@ -56,7 +57,7 @@ export interface MActivity {
    */
   referencePartId: PartId;
   icon: string;
-  label: string | `%${string}`;
-  tooltip?: string | `%${string}`;
+  label: Translatable;
+  tooltip?: Translatable;
   cssClass?: string | string[];
 }

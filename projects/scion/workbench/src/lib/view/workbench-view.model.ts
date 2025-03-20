@@ -69,13 +69,13 @@ export abstract class WorkbenchView {
   public abstract readonly part: Signal<WorkbenchPart>;
 
   /**
-   * Title to be displayed in the view tab.
+   * Title displayed in the view tab.
    */
   public abstract get title(): Signal<string | null>;
   public abstract set title(title: string | null);
 
   /**
-   * Specifies the subtitle to be displayed in the view tab.
+   * Subtitle displayed in the view tab.
    */
   public abstract get heading(): Signal<string | null>;
   public abstract set heading(heading: string | null);

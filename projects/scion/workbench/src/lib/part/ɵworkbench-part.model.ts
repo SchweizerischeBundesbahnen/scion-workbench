@@ -25,6 +25,8 @@ import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchGrids} from '../layout/workbench-grids.model';
+import {MPart, MTreeNode} from '../layout/workbench-layout.model';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -35,6 +37,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
+  private readonly _title = signal<string | undefined>(undefined);
+  private readonly _titleComputed = this.computeTitle();
 
   public readonly alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
@@ -43,6 +47,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly activeViewId = signal<ViewId | null>(null);
   public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
+  public readonly topLeft = this.computeTopLeft();
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
 
@@ -111,6 +116,37 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     }
   }
 
+  private computeTitle(): Signal<string | undefined> {
+    return computed(() => {
+      if (this._title()) {
+        return this._title();
+      }
+      const layout = this._workbenchLayoutService.layout();
+      if (!layout) {
+        return undefined;
+      }
+      const activity = layout.activity({partId: this.id}, {orElse: null});
+      if (activity != null) {
+        return this.topLeft() ? layout.part({partId: activity.referencePartId}).title : undefined;
+      }
+      else {
+        return layout.part({partId: this.id}).title;
+      }
+    });
+  }
+
+  private computeTopLeft(): Signal<boolean> {
+    return computed(() => {
+      const layout = this._workbenchLayoutService.layout();
+      if (!layout) {
+        return false;
+      }
+      const grid = layout.grid({partId: this.id}).grid;
+      const part = layout.part({partId: this.id});
+      return isTopLeft(grid.root, part);
+    });
+  }
+
   /**
    * Returns the component of this part. Returns `null` if not displaying navigated content.
    */
@@ -146,6 +182,16 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    */
   public get injector(): Injector {
     return this._partEnvironmentInjector;
+  }
+
+  /** @inheritDoc */
+  public get title(): Signal<string | undefined> {
+    return this._titleComputed;
+  }
+
+  /** @inheritDoc */
+  public set title(title: string | undefined) {
+    untracked(() => this._title.set(title));
   }
 
   /** @inheritDoc */
@@ -247,6 +293,20 @@ function computePeripheral(layout: ɵWorkbenchLayout, partId: PartId): boolean {
   else {
     return layout.hasPart(partId, {grid: 'main'}) && !!layout.grids.mainArea;
   }
+}
+
+function isTopLeft(element: MTreeNode | MPart, testee: MPart): boolean {
+  if (element instanceof MPart) {
+    return element.id === testee.id;
+  }
+
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(element.child2);
+
+  if (child1Visible && child2Visible) {
+    return isTopLeft(element.child1, testee);
+  }
+  return isTopLeft(child1Visible ? element.child1 : element.child2, testee);
 }
 
 /**
