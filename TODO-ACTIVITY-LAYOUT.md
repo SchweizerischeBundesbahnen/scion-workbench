@@ -25,6 +25,7 @@
   [x] Test: Navigate view with router should activate activity
   [] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
   [] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
+[x] add part include activity parts in part list
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)

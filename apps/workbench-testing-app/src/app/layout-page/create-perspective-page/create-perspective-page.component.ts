@@ -65,12 +65,14 @@ export default class CreatePerspectivePageComponent {
   protected registerError: string | false | undefined;
 
   private computePartProposals(): Signal<string[]> {
-    const partsFromUI = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
+    const dockedParts = toSignal(this.form.controls.activities.valueChanges, {initialValue: []});
+    const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
     const workbenchService = inject(WorkbenchService);
 
-    return computed(() => new Array<WorkbenchPart | PartDescriptor>()
+    return computed(() => new Array<WorkbenchPart | ActivityDescriptor | PartDescriptor>()
       .concat(workbenchService.parts())
-      .concat(partsFromUI())
+      .concat(dockedParts())
+      .concat(parts())
       .map(part => part.id)
       .filter(Boolean)
       .reduce((acc, partId) => acc.includes(partId) ? acc : acc.concat(partId), new Array<string>()),
