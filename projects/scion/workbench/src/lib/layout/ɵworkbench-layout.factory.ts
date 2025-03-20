@@ -14,6 +14,7 @@ import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras} from './workbench-layout';
 import {WorkbenchLayouts} from './workbench-layouts.util';
+import {Arrays} from '@scion/toolkit/util';
 
 /**
  * @inheritDoc
@@ -32,7 +33,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
 
     return this.create({
       grids: {
-        main: {root: new MPart({id: partId, alternativeId, title: extras?.title, structural: true, views: []}), activePartId: partId},
+        main: {root: new MPart({id: partId, alternativeId, title: extras?.title, structural: true, views: [], cssClass: Arrays.coerce(extras?.cssClass)}), activePartId: partId},
       },
     });
   }

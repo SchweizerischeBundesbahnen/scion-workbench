@@ -845,7 +845,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const newPart = new MPart({id, alternativeId: extras?.alternativeId, title: extras?.title, structural: extras?.structural ?? true, views: []});
+    const newPart = new MPart({id, alternativeId: extras?.alternativeId, title: extras?.title, structural: extras?.structural ?? true, views: [], cssClass: Arrays.coerce(extras?.cssClass)});
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
     const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.grids.main.root;

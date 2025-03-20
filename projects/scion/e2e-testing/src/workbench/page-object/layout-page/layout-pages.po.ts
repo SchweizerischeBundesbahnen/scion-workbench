@@ -47,6 +47,7 @@ export const LayoutPages = {
       if (part.ratio !== undefined) {
         await locator.locator('input.e2e-ratio').nth(i).fill(`${part.ratio ?? ''}`);
       }
+      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(part.cssClass).join(' '));
     }
   },
 

@@ -114,6 +114,7 @@ export default class ModifyLayoutPageComponent {
           ratio: part.relativeTo.ratio!,
         }, {
           title: part.extras?.title,
+          cssClass: part.extras?.cssClass,
           activate: part.extras?.activate,
         });
       }

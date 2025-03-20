@@ -16,6 +16,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MAIN_AREA, Translatable} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
+import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-add-parts',
@@ -25,6 +26,7 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciCheckboxComponent,
     SciMaterialIconDirective,
+    MultiValueInputComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => AddPartsComponent)},
@@ -52,6 +54,7 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
       }>;
       extras: FormGroup<{
         title: FormControl<Translatable | undefined>;
+        cssClass: FormControl<string | string[] | undefined>;
         activate: FormControl<boolean | undefined>;
       }>;
     }>>([]),
@@ -73,6 +76,7 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
           },
           extras: {
             title: partFormGroup.controls.extras.controls.title.value,
+            cssClass: partFormGroup.controls.extras.controls.cssClass.value,
             activate: partFormGroup.controls.extras.controls.activate.value,
           },
         })));
@@ -103,6 +107,7 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
         }),
         extras: this._formBuilder.group({
           title: part.extras?.title,
+          cssClass: this._formBuilder.control<string | string[] | undefined>(part.extras?.cssClass),
           activate: part.extras?.activate,
         }),
       }), {emitEvent: options?.emitEvent ?? true});
@@ -151,6 +156,7 @@ export interface PartDescriptor {
   };
   extras?: {
     title?: Translatable;
+    cssClass?: string | string[];
     activate?: boolean;
   };
 }

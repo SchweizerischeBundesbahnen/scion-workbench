@@ -239,4 +239,19 @@ test.describe('Workbench Part', () => {
       },
     );
   });
+
+  test('should locate part by css class', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.left', {cssClass: 'testee-1'})
+      .addPart('part.right', {relativeTo: 'part.left', align: 'right'}, {cssClass: 'testee-2'})
+      .navigatePart('part.left', ['test-part'])
+      .navigatePart('part.right', ['test-part']),
+    );
+
+    // Locate part by css class
+    await expectPart(appPO.part({cssClass: 'testee-1'})).toDisplayComponent(PartPagePO.selector);
+    await expectPart(appPO.part({cssClass: 'testee-2'})).toDisplayComponent(PartPagePO.selector);
+  });
 });

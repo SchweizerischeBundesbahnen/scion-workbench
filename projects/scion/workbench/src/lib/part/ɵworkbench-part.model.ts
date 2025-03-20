@@ -95,6 +95,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
 
+    this.classList.layout = mPart.cssClass;
+
     // Test if a new route has been activated for this part.
     const routeChanged = route && route.routeConfig !== previousRoute?.routeConfig;
     if (routeChanged) {

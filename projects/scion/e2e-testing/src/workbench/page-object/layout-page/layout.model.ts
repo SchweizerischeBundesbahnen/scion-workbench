@@ -36,7 +36,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public removeParts = new Array<string>();
 
   public addInitialPart(id: string | MAIN_AREA, extras?: PartExtras): WorkbenchLayout {
-    this.parts.push({id, title: extras?.title, activate: extras?.activate});
+    this.parts.push({id, title: extras?.title, activate: extras?.activate, cssClass: extras?.cssClass});
     return this;
   }
 
@@ -57,6 +57,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       relativeTo: relativeTo.relativeTo,
       align: relativeTo.align,
       ratio: relativeTo.ratio,
+      cssClass: extras?.cssClass,
       activate: extras?.activate,
     });
     return this;
@@ -169,6 +170,7 @@ export interface PartDescriptor {
   ratio?: number;
   title?: Translatable;
   activate?: boolean;
+  cssClass?: string | string[];
 }
 
 /**

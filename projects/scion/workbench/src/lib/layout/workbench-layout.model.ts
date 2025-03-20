@@ -90,6 +90,7 @@ export class MPart {
   public views!: MView[];
   public activeViewId?: ViewId;
   public structural!: boolean;
+  public cssClass?: string[];
   public navigation?: {
     id: string;
     hint?: string;

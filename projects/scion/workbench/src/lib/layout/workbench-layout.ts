@@ -242,6 +242,7 @@ export interface ReferencePart {
 
 export interface PartExtras {
   title?: Translatable;
+  cssClass?: string | string[];
   activate?: boolean;
 }
 
