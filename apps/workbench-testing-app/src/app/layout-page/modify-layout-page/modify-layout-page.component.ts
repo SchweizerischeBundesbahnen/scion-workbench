@@ -18,7 +18,7 @@ import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@
 import {stringifyError} from '../../common/stringify-error.util';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
-import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
+import {DockedPartDescriptor, AddDockedPartsComponent} from '../tables/add-docked-parts/add-docked-parts.component';
 import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
@@ -31,7 +31,7 @@ import {MultiValueInputComponent} from '../../multi-value-input/multi-value-inpu
     NavigateViewsComponent,
     ReactiveFormsModule,
     NavigatePartsComponent,
-    AddActivitiesComponent,
+    AddDockedPartsComponent,
     MultiValueInputComponent,
   ],
 })
@@ -42,7 +42,7 @@ export default class ModifyLayoutPageComponent {
   private readonly _workbenchRouter = inject(WorkbenchRouter);
 
   protected readonly form = this._formBuilder.group({
-    activities: this._formBuilder.control<ActivityDescriptor[]>([]),
+    dockedParts: this._formBuilder.control<DockedPartDescriptor[]>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([]),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
@@ -57,11 +57,11 @@ export default class ModifyLayoutPageComponent {
   protected modifyError: string | false | undefined;
 
   private computePartProposals(): Signal<string[]> {
-    const dockedParts = toSignal(this.form.controls.activities.valueChanges, {initialValue: []});
+    const dockedParts = toSignal(this.form.controls.dockedParts.valueChanges, {initialValue: []});
     const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
     const workbenchService = inject(WorkbenchService);
 
-    return computed(() => new Array<WorkbenchPart | ActivityDescriptor | PartDescriptor>()
+    return computed(() => new Array<WorkbenchPart | DockedPartDescriptor | PartDescriptor>()
       .concat(workbenchService.parts())
       .concat(dockedParts())
       .concat(parts())
@@ -94,15 +94,15 @@ export default class ModifyLayoutPageComponent {
 
   private navigate(): Promise<boolean> {
     return this._workbenchRouter.navigate(layout => {
-      // Add activities.
-      for (const activity of this.form.controls.activities.value) {
-        layout = layout.addPart(activity.id, activity.dockTo, {
-          icon: activity.extras.icon,
-          label: activity.extras.label,
-          tooltip: activity.extras.tooltip,
-          title: activity.extras.title,
-          cssClass: activity.extras.cssClass,
-          ɵactivityId: activity.extras.ɵactivityId,
+      // Add docked parts.
+      for (const dockedPart of this.form.controls.dockedParts.value) {
+        layout = layout.addPart(dockedPart.id, dockedPart.dockTo, {
+          icon: dockedPart.extras.icon,
+          label: dockedPart.extras.label,
+          tooltip: dockedPart.extras.tooltip,
+          title: dockedPart.extras.title,
+          cssClass: dockedPart.extras.cssClass,
+          ɵactivityId: dockedPart.extras.ɵactivityId,
         });
       }
 

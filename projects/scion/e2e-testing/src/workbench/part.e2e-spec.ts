@@ -15,6 +15,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {expectPart} from '../matcher/part-matcher';
 import {PartPagePO} from './page-object/part-page.po';
 import {MAIN_AREA} from '../workbench.model';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench Part', () => {
 
@@ -247,11 +248,11 @@ test.describe('Workbench Part', () => {
       .addPart('part.left', {cssClass: 'testee-1'})
       .addPart('part.right', {relativeTo: 'part.left', align: 'right'}, {cssClass: 'testee-2'})
       .navigatePart('part.left', ['test-part'])
-      .navigatePart('part.right', ['test-part']),
+      .navigatePart('part.right', ['test-router']),
     );
 
     // Locate part by css class
     await expectPart(appPO.part({cssClass: 'testee-1'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({cssClass: 'testee-2'})).toDisplayComponent(PartPagePO.selector);
+    await expectPart(appPO.part({cssClass: 'testee-2'})).toDisplayComponent(RouterPagePO.selector);
   });
 });

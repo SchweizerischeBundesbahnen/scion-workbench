@@ -27,7 +27,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
  */
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
-  public activities = new Array<ActivityDescriptor>();
+  public dockedParts = new Array<DockedPartDescriptor>();
   public parts = new Array<PartDescriptor>();
   public views = new Array<ViewDescriptor>();
   public partNavigations = new Array<PartNavigationDescriptor>();
@@ -44,7 +44,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
   public addPart(id: string, reference: ReferencePart | DockingArea, extras?: PartExtras | DockedPartExtras): WorkbenchLayout {
     if ((reference as Partial<DockingArea>).dockTo) {
-      return this.addActivity(id, reference as DockingArea, extras as DockedPartExtras);
+      return this.addDockedPart(id, reference as DockingArea, extras as DockedPartExtras);
     }
     else {
       return this._addPart(id, reference as ReferencePart, extras as PartExtras);
@@ -57,19 +57,21 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       relativeTo: relativeTo.relativeTo,
       align: relativeTo.align,
       ratio: relativeTo.ratio,
+      title: extras?.title,
       cssClass: extras?.cssClass,
       activate: extras?.activate,
     });
     return this;
   }
 
-  private addActivity(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout {
-    this.activities.push({
+  private addDockedPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout {
+    this.dockedParts.push({
       id,
       dockTo: dockTo.dockTo,
       icon: extras.icon,
       label: extras.label,
       tooltip: extras.tooltip,
+      title: extras.title,
       cssClass: extras.cssClass,
       ɵactivityId: extras.ɵactivityId,
     });
@@ -148,14 +150,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 }
 
 /**
- * Represents an activity to add to the layout.
+ * Represents a docked part to add to the layout.
  */
-export interface ActivityDescriptor {
+export interface DockedPartDescriptor {
   id: string;
   dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
   icon: string;
   label: Translatable;
   tooltip?: Translatable;
+  title?: Translatable | false;
   cssClass?: string | string[];
   ɵactivityId?: ActivityId;
 }

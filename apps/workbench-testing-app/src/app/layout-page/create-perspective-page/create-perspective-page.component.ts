@@ -21,7 +21,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {ActivityDescriptor, AddActivitiesComponent} from '../tables/add-activities/add-activities.component';
+import {DockedPartDescriptor, AddDockedPartsComponent} from '../tables/add-docked-parts/add-docked-parts.component';
 import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
@@ -37,7 +37,7 @@ import {MultiValueInputComponent} from '../../multi-value-input/multi-value-inpu
     SciCheckboxComponent,
     SciKeyValueFieldComponent,
     NavigatePartsComponent,
-    AddActivitiesComponent,
+    AddDockedPartsComponent,
     MultiValueInputComponent,
   ],
 })
@@ -51,7 +51,7 @@ export default class CreatePerspectivePageComponent {
     id: this._formBuilder.control('', Validators.required),
     transient: this._formBuilder.control<boolean | undefined>(undefined),
     data: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
-    activities: this._formBuilder.control<ActivityDescriptor[]>([]),
+    dockedParts: this._formBuilder.control<DockedPartDescriptor[]>([]),
     parts: this._formBuilder.control<PartDescriptor[]>([], Validators.required),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
@@ -65,11 +65,11 @@ export default class CreatePerspectivePageComponent {
   protected registerError: string | false | undefined;
 
   private computePartProposals(): Signal<string[]> {
-    const dockedParts = toSignal(this.form.controls.activities.valueChanges, {initialValue: []});
+    const dockedParts = toSignal(this.form.controls.dockedParts.valueChanges, {initialValue: []});
     const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
     const workbenchService = inject(WorkbenchService);
 
-    return computed(() => new Array<WorkbenchPart | ActivityDescriptor | PartDescriptor>()
+    return computed(() => new Array<WorkbenchPart | DockedPartDescriptor | PartDescriptor>()
       .concat(workbenchService.parts())
       .concat(dockedParts())
       .concat(parts())
@@ -112,7 +112,7 @@ export default class CreatePerspectivePageComponent {
   private createLayout(): WorkbenchLayoutFn {
     // Capture form values, since the `layout` function is evaluated independently of the form life-cycle
     const [initialPart, ...parts] = this.form.controls.parts.value as [PartDescriptor, ...PartDescriptor[]];
-    const activities = this.form.controls.activities.value;
+    const dockedParts = this.form.controls.dockedParts.value;
     const views = this.form.controls.views.value;
     const partNavigations = this.form.controls.partNavigations.value;
     const viewNavigations = this.form.controls.viewNavigations.value;
@@ -126,15 +126,15 @@ export default class CreatePerspectivePageComponent {
         activate: initialPart.extras?.activate,
       });
 
-      // Add activities.
-      for (const activity of activities) {
-        layout = layout.addPart(activity.id, activity.dockTo, {
-          icon: activity.extras.icon,
-          label: activity.extras.label,
-          tooltip: activity.extras.tooltip,
-          title: activity.extras.title,
-          cssClass: activity.extras.cssClass,
-          ɵactivityId: activity.extras.ɵactivityId,
+      // Add docked parts.
+      for (const dockedPart of dockedParts) {
+        layout = layout.addPart(dockedPart.id, dockedPart.dockTo, {
+          icon: dockedPart.extras.icon,
+          label: dockedPart.extras.label,
+          tooltip: dockedPart.extras.tooltip,
+          title: dockedPart.extras.title,
+          cssClass: dockedPart.extras.cssClass,
+          ɵactivityId: dockedPart.extras.ɵactivityId,
         });
       }
 
@@ -147,7 +147,7 @@ export default class CreatePerspectivePageComponent {
         }, {
           title: part.extras?.title,
           cssClass: part.extras?.cssClass,
-          activate: part.extras?.activate
+          activate: part.extras?.activate,
         });
       }
 

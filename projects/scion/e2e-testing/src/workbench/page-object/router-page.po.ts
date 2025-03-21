@@ -22,6 +22,8 @@ import {Commands, NavigationData, NavigationState, ViewId, WorkbenchNavigationEx
  */
 export class RouterPagePO implements WorkbenchViewPagePO {
 
+  public static readonly selector = 'app-router-page';
+
   public readonly locator: Locator;
   public readonly view: ViewPO;
 

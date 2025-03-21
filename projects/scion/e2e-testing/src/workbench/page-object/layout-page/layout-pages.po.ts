@@ -10,24 +10,25 @@
 
 import {Locator} from '@playwright/test';
 import {coerceArray, commandsToPath, toMatrixNotation} from '../../../helper/testing.util';
-import {ActivityDescriptor, PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
+import {DockedPartDescriptor, PartDescriptor, PartNavigationDescriptor, ViewDescriptor, ViewNavigationDescriptor} from './layout.model';
 import {SciCheckboxPO} from '../../../@scion/components.internal/checkbox.po';
 
 export const LayoutPages = {
 
   /**
-   * Enters activities into {@link AddActivitiesComponent}.
+   * Enters docked parts into {@link AddDockedPartsComponent}.
    */
-  enterActivities: async (locator: Locator, activities: ActivityDescriptor[]): Promise<void> => {
-    for (const [i, activity] of activities.entries()) {
+  enterDockedParts: async (locator: Locator, dockedParts: DockedPartDescriptor[]): Promise<void> => {
+    for (const [i, dockedPart] of dockedParts.entries()) {
       await locator.locator('button.e2e-add').click();
-      await locator.locator('input.e2e-part-id').nth(i).fill(activity.id);
-      await locator.locator('select.e2e-dock-to').nth(i).selectOption(activity.dockTo);
-      await locator.locator('input.e2e-icon').nth(i).fill(activity.icon);
-      await locator.locator('input.e2e-label').nth(i).fill(activity.label);
-      await locator.locator('input.e2e-tooltip').nth(i).fill(activity.tooltip ?? '');
-      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(activity.cssClass).join(' '));
-      await locator.locator('input.e2e-activity-id').nth(i).fill(activity.ɵactivityId ?? '');
+      await locator.locator('input.e2e-part-id').nth(i).fill(dockedPart.id);
+      await locator.locator('select.e2e-dock-to').nth(i).selectOption(dockedPart.dockTo);
+      await locator.locator('input.e2e-icon').nth(i).fill(dockedPart.icon);
+      await locator.locator('input.e2e-label').nth(i).fill(dockedPart.label);
+      await locator.locator('input.e2e-tooltip').nth(i).fill(dockedPart.tooltip ?? '');
+      await locator.locator('input.e2e-title').nth(i).fill(dockedPart.title === false ? '<boolean>false</boolean>' : (dockedPart.title ?? ''));
+      await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(dockedPart.cssClass).join(' '));
+      await locator.locator('input.e2e-activity-id').nth(i).fill(dockedPart.ɵactivityId ?? '');
     }
   },
   /**
@@ -47,6 +48,7 @@ export const LayoutPages = {
       if (part.ratio !== undefined) {
         await locator.locator('input.e2e-ratio').nth(i).fill(`${part.ratio ?? ''}`);
       }
+      await locator.locator('input.e2e-title').nth(i).fill(part.title ?? '');
       await locator.locator('app-multi-value-input.e2e-class input').nth(i).fill(coerceArray(part.cssClass).join(' '));
     }
   },
