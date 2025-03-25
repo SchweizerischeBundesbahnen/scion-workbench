@@ -9,8 +9,6 @@
 
   > span.title {
     @include workbench-mixins.ellipsis-on-overflow();
-    font-weight: 400;
-    font-size: 1em;
 
     > span.dirty {
       padding-right: .2em;
@@ -19,8 +17,9 @@
 
   > span.heading {
     @include workbench-mixins.ellipsis-on-overflow();
-    font-size: .9em;
-    font-weight: 300;
+    font-family: var(--sci-workbench-tab-heading-font-family), sans-serif;
+    font-size: var(--sci-workbench-tab-heading-font-size);
+    font-weight: var(--sci-workbench-tab-heading-font-weight);
   }
 
   &[context="tab"], &[context="drag-image"] {

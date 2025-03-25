@@ -42,6 +42,9 @@
   }
 
   > div.content {
+    font-family: var(--sci-workbench-tab-font-family), sans-serif;
+    font-size: var(--sci-workbench-tab-font-size);
+    font-weight: var(--sci-workbench-tab-font-weight);
     min-width: var(--sci-workbench-tab-min-width);
     max-width: var(--sci-workbench-tab-max-width);
     isolation: isolate; // stacking context to overlay the positioned 'hover' overlay
