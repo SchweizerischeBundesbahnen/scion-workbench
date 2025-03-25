@@ -275,6 +275,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
         case 'auto': {
           const urlSegments = Routing.commandsToSegments(commands, {relativeTo: extras.relativeTo});
           const views = layout.views({
+            peripheral: extras.partId ? undefined : false,
             partId: extras.partId,
             segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: false}),
             navigationHint: extras.hint ?? null,

@@ -831,6 +831,220 @@ test.describe('Workbench Router', () => {
     await expect(appPO.views()).toHaveCount(3);
   });
 
+  test('should not navigate view(s) of peripheral parts if not specifying view id and part id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.left', {align: 'left'})
+      .addView('view.100', {partId: 'part.left'}),
+    );
+
+    // Add state via separate navigation as not supported when adding views to the perspective.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}),
+    );
+
+    // Navigate to path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {state: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect new view to open in the main area.
+    const testView = appPO.part({partId: 'part.initial'}).activeView;
+    const testViewId = await testView.getViewId();
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: testViewId}], activeViewId: testViewId}),
+        },
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({id: 'part.left', views: [{id: 'view.100'}], activeViewId: 'view.100'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+        },
+      },
+    });
+
+    // Expect test view to be navigated.
+    await expect.poll(() => appPO.view({viewId: testViewId}).tab.getInfo()).toMatchObject(
+      {
+        viewId: testViewId,
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.100 not to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.100'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should not navigate view(s) of docked parts if not specifying view id and part id (layout with main area)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Create perspective with a docked part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+      .addView('view.100', {partId: 'part.activity'})
+      .activatePart('part.activity'),
+    );
+
+    // Add state via separate navigation as not supported when adding views to the perspective.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}),
+    );
+
+    // Navigate to path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {state: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect new view to open in the main area.
+    const testView = appPO.part({partId: 'part.initial'}).activeView;
+    const testViewId = await testView.getViewId();
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: testViewId}], activeViewId: testViewId}),
+        },
+        'activity.1': {
+          root: new MPart({id: 'part.activity-1', views: [{id: 'view.100'}], activeViewId: 'view.100'}),
+        },
+      },
+    });
+
+    // Expect test view to be navigated.
+    await expect.poll(() => appPO.view({viewId: testViewId}).tab.getInfo()).toMatchObject(
+      {
+        viewId: testViewId,
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.100 not to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.100'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should not navigate view(s) of docked parts if not specifying view id and part id (layout without main area)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a docked part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+      .addView('view.100', {partId: 'part.activity'})
+      .activatePart('part.activity'),
+    );
+
+    // Add state via separate navigation as not supported when adding views to the perspective.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}),
+    );
+
+    // Navigate to path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {state: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect new view to open in the main part.
+    const testView = appPO.part({partId: 'part.main'}).activeView;
+    const testViewId = await testView.getViewId();
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MPart({id: 'part.main', views: [{id: testViewId}], activeViewId: testViewId}),
+        },
+        'activity.1': {
+          root: new MPart({id: 'part.activity-1', views: [{id: 'view.100'}], activeViewId: 'view.100'}),
+        },
+      },
+    });
+
+    // Expect test view to be navigated.
+    await expect.poll(() => appPO.view({viewId: testViewId}).tab.getInfo()).toMatchObject(
+      {
+        viewId: testViewId,
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.100 not to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.100'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.100',
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should navigate non-peripheral view(s) if not specifying view id and part id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with left and right part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .navigateView('view.102', ['test-router']),
+    );
+
+    // Add state via separate navigation as not supported when adding views to the perspective.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .navigateView('view.101', ['test-view'], {state: {navigated: 'false'}}),
+    );
+
+    // Navigate to path 'test-view'.
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.102'});
+    await routerPage.navigate(['test-view'], {state: {navigated: 'true'}});
+
+    // Expect no new view to open.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+          }),
+        },
+      },
+    });
+
+    // Expect existing view.101 to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        urlSegments: 'test-view',
+        navigationState: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
   test('should activate a present view if setting `activate` to `true`', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
