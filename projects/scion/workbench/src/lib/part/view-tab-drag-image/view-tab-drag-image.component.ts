@@ -33,6 +33,9 @@ import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
   imports: [
     PortalModule,
   ],
+  host: {
+    '[class.view-drag]': 'true',
+  },
 })
 export class ViewTabDragImageComponent {
 

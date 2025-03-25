@@ -63,7 +63,7 @@
     }
   }
 
-  &.active, &:hover:not(.drag-over-tabbar) {
+  &.active, &:hover:not(.view-drag) {
     > button.close {
       visibility: visible;
     }
@@ -74,7 +74,7 @@
   }
 
   // Indicator when hovering the tab
-  &:hover:not(.active):not(.drag-over-tabbar):before {
+  &:hover:not(.active):not(.view-drag):before {
     content: '';
     background-color: var(--sci-workbench-tab-background-color-hover);
     position: absolute;

@@ -35,13 +35,15 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
   imports: [
     PortalModule,
   ],
+  host: {
+    '[class.view-drag]': 'viewDragService.dragging()',
+  },
 })
 export class ViewTabComponent {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-  private readonly _viewDragService = inject(ViewDragService);
   private readonly _viewMenuService = inject(ViewMenuService);
   private readonly _injector = inject(Injector);
 
@@ -50,20 +52,13 @@ export class ViewTabComponent {
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
+  protected readonly viewDragService = inject(ViewDragService);
 
   @HostBinding('attr.draggable')
   protected draggable = true;
 
   @HostBinding('attr.tabindex')
   protected tabindex = -1; // make the view focusable to install view menu accelerators
-
-  /**
-   * Indicates if dragging a view tab over this view tab's tabbar.
-   */
-  @HostBinding('class.drag-over-tabbar')
-  protected get isDragOverTabbar(): boolean {
-    return this._viewDragService.isDragOverTabbar === this.view().part().id;
-  }
 
   @HostBinding('attr.data-viewid')
   public get viewId(): ViewId {
@@ -129,7 +124,7 @@ export class ViewTabComponent {
     // Use an invisible <div> as the native drag image because the workbench renders the drag image in {@link ViewTabDragImageRenderer}.
     event.dataTransfer.setDragImage(createElement('div', {style: {display: 'none'}}), 0, 0);
 
-    this._viewDragService.setViewDragData({
+    this.viewDragService.setViewDragData({
       uid: UUID.randomUUID(),
       viewId: view.id,
       viewTitle: view.title(),
@@ -158,7 +153,7 @@ export class ViewTabComponent {
 
   @HostListener('dragend')
   protected onDragEnd(): void {
-    this._viewDragService.unsetViewDragData();
+    this.viewDragService.unsetViewDragData();
   }
 
   private addHostCssClasses(): void {
