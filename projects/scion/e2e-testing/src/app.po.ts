@@ -25,6 +25,8 @@ import {ActivityItemPO} from './activity-item.po';
 import {ActivityPanelPO} from './activity-panel.po';
 import {RequireOne} from './helper/utility-types';
 import {dasherize} from './helper/dasherize.util';
+import {GridPO} from './grid.po';
+import {DesktopPO} from './desktop.po';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -37,10 +39,16 @@ export class AppPO {
    * Handle for interacting with the header of the testing application.
    */
   public readonly header: AppHeaderPO;
+
   /**
    * Locates the workbench root element `<wb-workbench>`.
    */
   public readonly workbenchRoot: Locator;
+
+  /**
+   * Handle for interacting with the workbench desktop.
+   */
+  public readonly desktop: DesktopPO;
 
   /**
    * Locates workbench notifications.
@@ -60,6 +68,7 @@ export class AppPO {
   constructor(public readonly page: Page) {
     this.header = new AppHeaderPO(this.page.locator('app-header'));
     this.workbenchRoot = this.page.locator('wb-workbench');
+    this.desktop = new DesktopPO(this.page);
     this.notifications = this.page.locator('wb-notification');
     this.dialogs = this.page.locator('wb-dialog');
     this.workbench = new WorkbenchAccessor(this.page);
@@ -178,8 +187,8 @@ export class AppPO {
    * Handle to the specified part in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the part.
-   * @param locateBy.partId - Identifies the part by its id
-   * @param locateBy.cssClass - Identifies the part by its CSS class
+   * @param locateBy.partId - Identifies the part by its id.
+   * @param locateBy.cssClass - Identifies the part by its CSS class.
    */
   public part(locateBy: {partId?: PartId; cssClass?: string}): PartPO {
     if (locateBy.partId !== undefined && locateBy.cssClass !== undefined) {
@@ -217,8 +226,8 @@ export class AppPO {
    * Handle to the specified view in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the view. Either `viewId` or `cssClass`, or both must be set.
-   * @param locateBy.viewId - Identifies the view by its id
-   * @param locateBy.cssClass - Identifies the view by its CSS class
+   * @param locateBy.viewId - Identifies the view by its id.
+   * @param locateBy.cssClass - Identifies the view by its CSS class.
    */
   public view(locateBy: {viewId?: ViewId; cssClass?: string}): ViewPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
@@ -240,6 +249,16 @@ export class AppPO {
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
+  }
+
+  /**
+   * Handle to the specified grid in the workbench layout.
+   *
+   * @param locateBy - Specifies how to locate the grid.
+   * @param locateBy.grid - Identifies the grid by its id.
+   */
+  public grid(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): GridPO {
+    return new GridPO(this.page.locator(`wb-grid[data-grid="${locateBy.grid}"]`));
   }
 
   /**
@@ -267,7 +286,7 @@ export class AppPO {
    * @param panel - Specifies which activity panel to locate.
    */
   public activityPanel(panel: 'left' | 'right' | 'bottom'): ActivityPanelPO {
-    return new ActivityPanelPO(this.page.locator(`wb-activity-panel[data-panel="${panel}"]`), panel);
+    return new ActivityPanelPO(this.page.locator(`wb-activity-panel[data-panel="${panel}"]`));
   }
 
   /**
@@ -387,44 +406,6 @@ export class AppPO {
    */
   public getActivePerspectiveId(): Promise<string> {
     return this.page.locator('app-root').getAttribute('data-perspective-id').then(id => id!);
-  }
-
-  /**
-   * Gets the active drop zone of the specified grid.
-   *
-   * Drop zones of a grid are activated when dragging near the grid edge.
-   */
-  public async getActiveGridDropZone(locateBy: {grid: 'main' | 'main-area' | ActivityId}): Promise<'north' | 'east' | 'south' | 'west' | null> {
-    const dropZone = this.page.locator('wb-layout').locator(`div.e2e-grid-drop-zone[data-grid="${locateBy.grid}"]`);
-    if (!await dropZone.isVisible()) {
-      return null;
-    }
-
-    const dropZoneId = await dropZone.getAttribute('data-id');
-    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
-    if (!await dropPlaceholder.isVisible()) {
-      return null;
-    }
-
-    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
-  }
-
-  /**
-   * Gets the active drop zone when dragging a view over the desktop.
-   */
-  public async getActiveDesktopDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
-    const dropZone = this.page.locator('div.e2e-desktop-drop-zone');
-    if (!await dropZone.isVisible()) {
-      return null;
-    }
-
-    const dropZoneId = await dropZone.getAttribute('data-id');
-    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
-    if (!await dropPlaceholder.isVisible()) {
-      return null;
-    }
-
-    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
   }
 
   /**

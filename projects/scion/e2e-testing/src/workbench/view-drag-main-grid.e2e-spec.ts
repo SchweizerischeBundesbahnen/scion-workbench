@@ -728,7 +728,7 @@ test.describe('View Drag Main Grid', () => {
       await dragHandle.dragTo({x: 0, y: bottomTabbarBounds.vcenter});
 
       // Expect the drop zone to be active.
-      await expect.poll(() => appPO.getActiveGridDropZone({grid: 'main'})).toEqual('west');
+      await expect.poll(() => appPO.grid({grid: 'main'}).getActiveDropZone()).toEqual('west');
     });
   });
 });

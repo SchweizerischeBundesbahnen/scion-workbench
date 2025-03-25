@@ -30,7 +30,7 @@ describe('WorkbenchRouter', () => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
   });
 
-  fit('should not automatically activate part when opening view through `WorkbenchLayout.addView`', async () => {
+  it('should not automatically activate part when opening view through `WorkbenchLayout.addView`', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),

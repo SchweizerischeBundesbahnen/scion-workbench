@@ -27,7 +27,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {PartId} from '../part/workbench-part.model';
 
-fdescribe('WorkbenchLayout', () => {
+describe('WorkbenchLayout', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 
@@ -2586,7 +2586,7 @@ fdescribe('WorkbenchLayout', () => {
   it('should compute if part is located in the peripheral area (layout with parts in main grid and main area)', async () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.top'});
 
-    let layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.bottom', {align: 'bottom', relativeTo: 'part.top'})
       .addPart('part.left', {align: 'left'})

@@ -8,7 +8,7 @@
 [x] Test pages
 [x] View Conflict Resolver with activity grids OR make view ids random
 [x] Maximize (hide activities)
-[] Prevent view drag to edge of main grid for layouts with activities
+[x] Prevent view drag to edge of main grid for layouts with activities
 [] Icon & Tooltip
 [x] Testing App:
   [x] Drop Down for perspectives
@@ -26,6 +26,7 @@
   [] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
   [] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
 [x] add part include activity parts in part list
+[] add keystroke to maximize (ctrl+shift+F12)
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)

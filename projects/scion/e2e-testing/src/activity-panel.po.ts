@@ -16,7 +16,11 @@ import {DomRect, fromRect} from './helper/testing.util';
  */
 export class ActivityPanelPO {
 
-  constructor(public readonly locator: Locator, private readonly _panel: 'left' | 'right' | 'bottom') {
+  constructor(public readonly locator: Locator) {
+  }
+
+  public async getPanel(): Promise<'left' | 'right' | 'bottom'> {
+    return (await this.locator.getAttribute('data-panel')) as 'left' | 'right' | 'bottom';
   }
 
   /**
@@ -27,7 +31,7 @@ export class ActivityPanelPO {
     const steps = Math.ceil(Math.abs(distance) / 5);
 
     const panelBounds = fromRect(await this.locator.boundingBox());
-    switch (this._panel) {
+    switch (await this.getPanel()) {
       case 'left': {
         await mouse.move(panelBounds.right + 1, panelBounds.vcenter); // Move mouse slightly to the right of the panel to not target splitter separating this panel.
         await mouse.down();
@@ -60,7 +64,7 @@ export class ActivityPanelPO {
     const steps = Math.ceil(Math.abs(distance) / 5);
 
     const [activityBounds] = await this.getActivityBoundingBoxes();
-    switch (this._panel) {
+    switch (await this.getPanel()) {
       case 'left':
       case 'right': {
         await mouse.move(activityBounds.hcenter, activityBounds.bottom);
