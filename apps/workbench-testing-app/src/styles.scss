@@ -1,7 +1,7 @@
 @use '@scion/workbench';
 @use '@scion/components.internal/design' as sci-design;
 
-@import url('https://fonts.googleapis.com/css?family=Roboto:normal,bold,italic,bolditalic|Roboto+Mono');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
 
 html {
@@ -9,7 +9,8 @@ html {
 }
 
 body {
-  font-family: Roboto, Arial, sans-serif;
+  font-family: Roboto, sans-serif;
+  text-rendering: optimizeLegibility;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-primary);
   height: 100%;

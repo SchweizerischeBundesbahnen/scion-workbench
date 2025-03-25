@@ -24,6 +24,9 @@
     align-self: center;
     user-select: none;
     padding-inline: .5em;
+    font-family: var(--sci-workbench-part-title-font-family), sans-serif;
+    font-size: var(--sci-workbench-part-title-font-size);
+    font-weight: var(--sci-workbench-part-title-font-weight);
     @include workbench-mixins.ellipsis-on-overflow();
   }
 
