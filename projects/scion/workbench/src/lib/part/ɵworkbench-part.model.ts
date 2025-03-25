@@ -90,7 +90,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     const mPart = layout.part({partId: this.id});
     const {gridName, grid} = layout.grid({partId: this.id});
     this.gridName.set(gridName);
-    this.peripheral.set(computePeripheral(layout, this.id));
+    this.peripheral.set(layout.isPeripheralPart(this.id));
     this.active.set(grid.activePartId === this.id);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
@@ -282,18 +282,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     if (this.activeViewId()) {
       this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
     }
-  }
-}
-
-/**
- * Computes if the specified part is located in the peripheral area.
- */
-function computePeripheral(layout: ɵWorkbenchLayout, partId: PartId): boolean {
-  if (layout.hasActivities()) {
-    return layout.activity({partId}, {orElse: null}) !== null;
-  }
-  else {
-    return layout.hasPart(partId, {grid: 'main'}) && !!layout.grids.mainArea;
   }
 }
 

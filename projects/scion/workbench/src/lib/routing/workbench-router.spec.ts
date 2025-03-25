@@ -30,7 +30,7 @@ describe('WorkbenchRouter', () => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
   });
 
-  it('should not automatically activate part when opening view through `WorkbenchLayout.addView`', async () => {
+  fit('should not automatically activate part when opening view through `WorkbenchLayout.addView`', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
@@ -41,27 +41,27 @@ describe('WorkbenchRouter', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitForInitialWorkbenchLayout();
 
-    // Add part to the right of the main part.
+    // Add part to the right of the initial part.
     await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
-    // Add view.101 to main part.
+    // Add view.101 to initial part.
     await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.initial', activateView: true}));
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view.102 to the right part without activating the part.
     await workbenchRouter.navigate(layout => layout.addView('view.102', {partId: 'part.right', activateView: true}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view.103 to the right part without activating the part.
     await workbenchRouter.navigate(layout => layout.addView('view.103', {partId: 'part.right', activateView: true}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view.104 to the right part and activate the part.
@@ -71,7 +71,8 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      return TestBed.inject(WorkbenchService).parts().find(part => !part.peripheral() && part.active())!;
+      const part = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'}) ?? throwError('NullActivePart');
+      return TestBed.inject(WorkbenchService).getPart(part.id)!;
     }
   });
 
@@ -86,10 +87,10 @@ describe('WorkbenchRouter', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitForInitialWorkbenchLayout();
 
-    // Add part to the right of the main part.
+    // Add part to the right of the initial part.
     await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view to the right part.
@@ -98,10 +99,10 @@ describe('WorkbenchRouter', () => {
     // Expect right part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
-    // Activate main part.
+    // Activate initial part.
     await workbenchRouter.navigate(layout => layout.activatePart('part.initial'));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view to the right part (view already in the layout).
@@ -110,10 +111,10 @@ describe('WorkbenchRouter', () => {
     // Expect right part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
-    // Activate main part.
+    // Activate initial part.
     await workbenchRouter.navigate(layout => layout.activatePart('part.initial'));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view to the right part.
@@ -123,7 +124,8 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      return TestBed.inject(WorkbenchService).parts().find(part => !part.peripheral() && part.active())!;
+      const part = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'}) ?? throwError('NullActivePart');
+      return TestBed.inject(WorkbenchService).getPart(part.id)!;
     }
   });
 

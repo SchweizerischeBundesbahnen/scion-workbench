@@ -349,16 +349,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param findBy - Defines the search scope.
    * @param findBy.id - Searches for parts with the specified id.
    * @param findBy.viewId - Searches for parts that contain the specified view.
+   * @param findBy.peripheral - Searches for parts located in or out of the peripheral area.
    * @param findBy.grid - Searches for parts contained in the specified grid.
    * @param options - Controls the search.
    * @param options.throwIfEmpty - Controls to error if no part is found.
    * @param options.throwIfMulti - Controls to error if multiple parts are found.
    * @return parts matching the filter criteria.
    */
-  public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
-  public parts(findBy: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MPart, ...MPart[]];
-  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
-  public parts(findBy?: {id?: string; viewId?: string; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
+  public parts(findBy: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
+  public parts(findBy: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MPart, ...MPart[]];
+  public parts(findBy?: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
+  public parts(findBy?: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
     const parts = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
       if (!(element instanceof MPart)) {
         return false;
@@ -367,6 +368,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         return false;
       }
       if (findBy?.viewId !== undefined && !element.views.some(view => matchesViewId(findBy.viewId!, view))) {
+        return false;
+      }
+      if (findBy?.peripheral !== undefined && this.isPeripheralPart(element.id) !== findBy.peripheral) {
         return false;
       }
       return true;
@@ -412,8 +416,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param extras.structural - Specifies if this is a structural part. A structural part will not be removed when removing its last view. Defaults to `true`.
    */
   public addPart(id: string | MAIN_AREA, relativeTo: ReferenceElement, extras?: PartExtras & {structural?: boolean}): ɵWorkbenchLayout;
-  public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
-  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: (PartExtras & {structural?: boolean}) | DockedPartExtras): WorkbenchLayout {
+  public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): ɵWorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: (PartExtras & {structural?: boolean}) | DockedPartExtras): ɵWorkbenchLayout {
     const partId = isPartId(id) ? id : (id === MAIN_AREA_ALTERNATIVE_ID ? MAIN_AREA : WorkbenchLayouts.computePartId());
     const alternativeId = isPartId(id) ? (id === MAIN_AREA ? MAIN_AREA_ALTERNATIVE_ID : undefined) : id;
     const workingCopy = this.workingCopy();
@@ -495,11 +499,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple views are found.
    * @return views matching the filter criteria.
    */
-  public views(findBy: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MView];
-  public views(findBy: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MView, ...MView[]];
-  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[];
-  public views(findBy?: {id?: string; partId?: string; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
-    const views = this.parts({id: findBy?.partId, grid: findBy?.grid})
+  public views(findBy: {id?: string; partId?: string; peripheral?: boolean; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MView];
+  public views(findBy: {id?: string; partId?: string; peripheral?: boolean; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MView, ...MView[]];
+  public views(findBy?: {id?: string; partId?: string; peripheral?: boolean; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[];
+  public views(findBy?: {id?: string; partId?: string; peripheral?: boolean; segments?: UrlSegmentMatcher; navigationHint?: string | null; markedForRemoval?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MView[] {
+    const views = this.parts({id: findBy?.partId, grid: findBy?.grid, peripheral: findBy?.peripheral})
       .flatMap(part => part.views)
       .filter(view => {
         if (findBy?.id !== undefined && !matchesViewId(findBy.id, view)) {
@@ -1244,6 +1248,21 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     return gridName ? {gridName, grid: this._grids[gridName]!} : null;
+  }
+
+  /**
+   * Computes if the specified part is located in the peripheral area.
+   */
+  public isPeripheralPart(partId: PartId): boolean {
+    if (partId === MAIN_AREA) {
+      return false;
+    }
+    else if (this.hasActivities()) {
+      return this.activity({partId}, {orElse: null}) !== null;
+    }
+    else {
+      return this.hasPart(partId, {grid: 'main'}) && !!this.grids.mainArea;
+    }
   }
 
   /**

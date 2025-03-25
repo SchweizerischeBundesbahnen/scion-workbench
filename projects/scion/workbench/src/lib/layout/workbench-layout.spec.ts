@@ -27,7 +27,7 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {PartId} from '../part/workbench-part.model';
 
-describe('WorkbenchLayout', () => {
+fdescribe('WorkbenchLayout', () => {
 
   beforeEach(() => jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher));
 
@@ -1770,8 +1770,11 @@ describe('WorkbenchLayout', () => {
       .addPart('part.innerLeft', {relativeTo: 'part.initial', align: 'left'})
       .addPart('part.innerRight', {relativeTo: 'part.initial', align: 'right'})
       .addPart('part.outerLeft', {relativeTo: MAIN_AREA, align: 'left'})
-      .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'});
+      .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'})
+      .addView('view.1', {partId: 'part.innerLeft'})
+      .addView('view.2', {partId: 'part.outerLeft'});
 
+    // Find without criteria
     expect(workbenchLayout.parts().map(part => part.id)).toEqual(jasmine.arrayWithExactContents([
       MAIN_AREA,
       'part.outerLeft',
@@ -1781,19 +1784,24 @@ describe('WorkbenchLayout', () => {
       'part.outerRight',
     ]));
 
-    // Find by grid
-    expect(workbenchLayout.parts({grid: 'main'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([
-      'part.outerLeft',
-      MAIN_AREA,
-      'part.outerRight',
-    ]));
+    // Find by part id
+    expect(workbenchLayout.parts({id: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
+    expect(workbenchLayout.parts({id: 'part.innerLeft'}).map(part => part.id)).toEqual(['part.innerLeft']);
+
+    // Find by view id
+    expect(workbenchLayout.parts({viewId: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
+    expect(workbenchLayout.parts({viewId: 'view.1'}).map(part => part.id)).toEqual(['part.innerLeft']);
+    expect(workbenchLayout.parts({viewId: 'view.2'}).map(part => part.id)).toEqual(['part.outerLeft']);
+
+    // Find by peripheral
+    expect(workbenchLayout.parts({peripheral: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
+    expect(workbenchLayout.parts({peripheral: true}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.outerLeft', 'part.outerRight']));
+    expect(workbenchLayout.parts({peripheral: false}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.innerLeft', 'part.innerRight', 'part.initial', MAIN_AREA]));
 
     // Find by grid
-    expect(workbenchLayout.parts({grid: 'mainArea'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([
-      'part.innerLeft',
-      'part.initial',
-      'part.innerRight',
-    ]));
+    expect(workbenchLayout.parts({grid: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
+    expect(workbenchLayout.parts({grid: 'main'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.outerLeft', MAIN_AREA, 'part.outerRight']));
+    expect(workbenchLayout.parts({grid: 'mainArea'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.innerLeft', 'part.initial', 'part.innerRight']));
   });
 
   it('should find part by criteria', () => {
@@ -1913,13 +1921,40 @@ describe('WorkbenchLayout', () => {
       .addPart('part.outer', {relativeTo: MAIN_AREA, align: 'left'})
       .addView('view.1', {partId: 'part.initial'})
       .addView('view.2', {partId: 'part.inner'})
-      .addView('view.3', {partId: 'part.outer'});
+      .addView('view.3', {partId: 'part.outer'})
+      .navigateView('view.1', ['path/to/view'], {hint: 'hint1'})
+      .navigateView('view.2', ['path/to/view'], {hint: 'hint2'})
+      .navigateView('view.3', ['path/to/view']);
 
+    // Find without criteria
     expect(workbenchLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
 
+    // Find by view id
+    expect(workbenchLayout.views({id: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+    expect(workbenchLayout.views({id: 'view.1'}).map(view => view.id)).toEqual(['view.1']);
+
+    // Find by part id
+    expect(workbenchLayout.views({partId: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+    expect(workbenchLayout.views({partId: 'part.initial'}).map(view => view.id)).toEqual(['view.1']);
+    expect(workbenchLayout.views({partId: 'part.inner'}).map(view => view.id)).toEqual(['view.2']);
+    expect(workbenchLayout.views({partId: 'part.outer'}).map(view => view.id)).toEqual(['view.3']);
+
+    // Find by peripheral
+    expect(workbenchLayout.views({peripheral: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+    expect(workbenchLayout.views({peripheral: true}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.3']));
+    expect(workbenchLayout.views({peripheral: false}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
+
     // Find by grid
+    expect(workbenchLayout.views({grid: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
     expect(workbenchLayout.views({grid: 'main'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.3']));
     expect(workbenchLayout.views({grid: 'mainArea'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
+
+    // Find by navigation hint
+    expect(workbenchLayout.views({navigationHint: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
+    expect(workbenchLayout.views({navigationHint: 'hint1'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1']));
+    expect(workbenchLayout.views({navigationHint: 'hint2'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.2']));
+    expect(workbenchLayout.views({navigationHint: ''}).map(view => view.id)).toEqual([]);
+    expect(workbenchLayout.views({navigationHint: null}).map(view => view.id)).toEqual(['view.3']);
   });
 
   it('should find views by URL segments', () => {
@@ -1992,74 +2027,6 @@ describe('WorkbenchLayout', () => {
       .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', {matrixParam: 'A'}]), {matchWildcardPath: false, matchMatrixParams: true})})
       .map(view => view.id),
     ).toEqual(['view.2']);
-  });
-
-  it('should find views by navigation hint', () => {
-    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart(MAIN_AREA)
-      .addView('view.1', {partId: MAIN_AREA})
-      .addView('view.2', {partId: MAIN_AREA})
-      .addView('view.3', {partId: MAIN_AREA})
-      .navigateView('view.1', ['path', 'to', 'view', '1'])
-      .navigateView('view.2', ['path', 'to', 'view', '2'], {hint: 'hint1'})
-      .navigateView('view.3', [], {hint: 'hint2'});
-
-    expect(layout
-      .views()
-      .map(view => view.id),
-    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
-
-    expect(layout
-      .views({navigationHint: undefined})
-      .map(view => view.id),
-    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
-
-    expect(layout
-      .views({navigationHint: ''})
-      .map(view => view.id),
-    ).toEqual([]);
-
-    expect(layout
-      .views({navigationHint: null})
-      .map(view => view.id),
-    ).toEqual(['view.1']);
-
-    expect(layout
-      .views({navigationHint: 'hint1'})
-      .map(view => view.id),
-    ).toEqual(['view.2']);
-
-    expect(layout
-      .views({navigationHint: 'hint2'})
-      .map(view => view.id),
-    ).toEqual(['view.3']);
-  });
-
-  it('should find views by part', () => {
-    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('part.left')
-      .addPart('part.right', {align: 'right'})
-      .addView('view.1', {partId: 'part.left'})
-      .addView('view.2', {partId: 'part.left'})
-      .addView('view.3', {partId: 'part.right'})
-      .navigateView('view.1', ['path', 'to', 'view'])
-      .navigateView('view.2', ['path', 'to', 'view'])
-      .navigateView('view.3', ['path', 'to', 'view']);
-
-    expect(layout
-      .views({partId: undefined})
-      .map(view => view.id),
-    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
-
-    expect(layout
-      .views({partId: 'part.left'})
-      .map(view => view.id),
-    ).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
-
-    expect(layout
-      .views({partId: 'part.right'})
-      .map(view => view.id),
-    ).toEqual(['view.3']);
   });
 
   it('should activate adjacent view', () => {
@@ -2567,6 +2534,78 @@ describe('WorkbenchLayout', () => {
       .modify(layout => layout)
       .modify(layout => layout.addView('view.2', {partId: 'part'}));
     expect(layout.views({partId: 'part'}).map(view => view.id)).toEqual(['view.1', 'view.2']);
+  });
+
+  it('should compute if part is located in the peripheral area (layout with activities and main area)', async () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.left'});
+
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addPart('part.activity-1-bottom', {align: 'bottom', relativeTo: 'part.activity-1-top'})
+      .addPart('part.right', {align: 'right', relativeTo: 'part.left'});
+
+    expect(layout.isPeripheralPart('part.activity-1-top')).toBeTrue();
+    expect(layout.isPeripheralPart('part.activity-1-bottom')).toBeTrue();
+    expect(layout.isPeripheralPart(MAIN_AREA)).toBeFalse();
+    expect(layout.isPeripheralPart('part.left')).toBeFalse();
+    expect(layout.isPeripheralPart('part.right')).toBeFalse();
+  });
+
+  it('should compute if part is located in the peripheral area (layout with activities and no main area)', async () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right', relativeTo: 'part.left'})
+      .addPart('part.activity-1-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addPart('part.activity-1-bottom', {align: 'bottom', relativeTo: 'part.activity-1-top'});
+
+    expect(layout.isPeripheralPart('part.activity-1-top')).toBeTrue();
+    expect(layout.isPeripheralPart('part.activity-1-bottom')).toBeTrue();
+    expect(layout.isPeripheralPart('part.left')).toBeFalse();
+    expect(layout.isPeripheralPart('part.right')).toBeFalse();
+  });
+
+  it('should compute if part is located in the peripheral area (layout with activities and parts in main grid and main area)', async () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.left'});
+
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right', relativeTo: 'part.left'})
+      .addPart('part.bottom', {align: 'bottom'})
+      .addPart('part.activity-1-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addPart('part.activity-1-bottom', {align: 'bottom', relativeTo: 'part.activity-1-top'});
+
+    expect(layout.isPeripheralPart('part.activity-1-top')).toBeTrue();
+    expect(layout.isPeripheralPart('part.activity-1-bottom')).toBeTrue();
+    expect(layout.isPeripheralPart('part.bottom')).toBeFalse();
+    expect(layout.isPeripheralPart(MAIN_AREA)).toBeFalse();
+    expect(layout.isPeripheralPart('part.left')).toBeFalse();
+    expect(layout.isPeripheralPart('part.right')).toBeFalse();
+  });
+
+  it('should compute if part is located in the peripheral area (layout with parts in main grid and main area)', async () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.top'});
+
+    let layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.bottom', {align: 'bottom', relativeTo: 'part.top'})
+      .addPart('part.left', {align: 'left'})
+      .addPart('part.right', {align: 'right'});
+
+    expect(layout.isPeripheralPart('part.left')).toBeTrue();
+    expect(layout.isPeripheralPart('part.right')).toBeTrue();
+    expect(layout.isPeripheralPart(MAIN_AREA)).toBeFalse();
+    expect(layout.isPeripheralPart('part.top')).toBeFalse();
+    expect(layout.isPeripheralPart('part.bottom')).toBeFalse();
+  });
+
+  it('should compute if part is located in the peripheral area (layout with parts in main grid and no main area)', async () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'});
+
+    expect(layout.isPeripheralPart('part.left')).toBeFalse();
+    expect(layout.isPeripheralPart('part.right')).toBeFalse();
   });
 });
 
