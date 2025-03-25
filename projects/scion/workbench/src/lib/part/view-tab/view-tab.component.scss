@@ -15,9 +15,9 @@
   cursor: var(--sci-workbench-tab-cursor);
   box-sizing: border-box;
   outline: none;
-  border-top: 1px solid transparent;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-top: var(--sci-workbench-tab-border-width) solid transparent;
+  border-left: var(--sci-workbench-tab-border-width) solid transparent;
+  border-right: var(--sci-workbench-tab-border-width) solid transparent;
   border-top-left-radius: var(--sci-workbench-tab-border-radius);
   border-top-right-radius: var(--sci-workbench-tab-border-radius);
 
@@ -94,7 +94,7 @@
       height: calc(2 * var(--sci-workbench-tab-border-radius));
       border: var(--sci-workbench-tab-border-radius) solid var(--sci-workbench-view-background-color);
       border-radius: 50%;
-      box-shadow: inset 0 0 0 1px var(--sci-workbench-tab-border-color);
+      box-shadow: inset 0 0 0 var(--sci-workbench-tab-border-width) var(--sci-workbench-tab-border-color);
       box-sizing: content-box;
 
       wb-part[data-peripheral] & {

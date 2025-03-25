@@ -4,7 +4,9 @@
   display: flex;
   color: var(--sci-workbench-tab-text-color);
   background-color: var(--sci-workbench-part-bar-background-color);
-  border-top: var(--sci-workbench-part-bar-padding-top) solid transparent; // Set border-top instead of padding-top because the viewtab containment context would otherwise displace the tab content.
+  // Set border-top instead of padding-top because the viewtab containment context would otherwise displace the tab content;
+  // Add "tab border width" to maintain the specified "--sci-workbench-part-bar-padding-top" (see translateY of wb-view-tab-bar);
+  border-top: calc(var(--sci-workbench-part-bar-padding-top) + var(--sci-workbench-tab-border-width)) solid transparent;
   background-clip: border-box;
   height: var(--sci-workbench-tab-height);
   box-sizing: content-box;
@@ -28,6 +30,9 @@
   > wb-view-tab-bar {
     // Use 'flex: initial' and not 'flex: none' to overflow if exceeding the maximum available space.
     flex: initial;
+    // Move the tabbar by the "tab border width" to align tab titles with part titles and part actions.
+    transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-width)));
+    height: calc(100% + var(--sci-workbench-tab-border-width));
   }
 
   > div.actions {
