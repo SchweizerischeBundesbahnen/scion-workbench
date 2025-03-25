@@ -41,7 +41,7 @@ $tokens: (
   --sci-workbench-tab-border-radius: var(--sci-corner-small),
   --sci-workbench-tab-border-width: 1px,
   --sci-workbench-tab-padding-inline: .725em,
-  --sci-workbench-tab-background-color-hover: unset,
+  --sci-workbench-tab-background-color-hover: color-mix(in srgb, var(--sci-color-background-secondary-hover) 85%, var(--sci-color-background-secondary)),
   --sci-workbench-tab-font-family: inherit,
   --sci-workbench-tab-font-weight: 400,
   --sci-workbench-tab-font-size: 1rem,

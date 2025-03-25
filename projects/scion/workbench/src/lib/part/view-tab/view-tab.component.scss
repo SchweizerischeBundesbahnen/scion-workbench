@@ -79,6 +79,7 @@
     background-color: var(--sci-workbench-tab-background-color-hover);
     position: absolute;
     inset: 0 0 .125em .125em;
+    //inset: var(--sci-workbench-tab-border-width) var(--sci-workbench-tab-border-radius) var(--sci-workbench-tab-border-radius) var(--sci-workbench-tab-border-radius);
     border-radius: var(--sci-workbench-tab-border-radius);
     pointer-events: none;
   }
