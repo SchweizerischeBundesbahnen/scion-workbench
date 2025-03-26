@@ -34,6 +34,7 @@
       display: flex;
       position: relative; // positioning context for the :after pseudo element, which actually renders the divider as an overlay
       width: 0; // divider must not occupy space
+      transition: opacity 300ms ease-out; // Animate removal of divider when hovering adjacent tab.
 
       &:after {
         flex: none;
@@ -45,6 +46,16 @@
         height: 65%;
         background-color: var(--sci-workbench-part-bar-divider-color);
       }
+    }
+
+    // Hide divider following the hovered tab.
+    > wb-view-tab:hover + div.divider {
+      opacity: 0;
+    }
+
+    // Hide divider preceding the hovered tab
+    > div.divider:has(+ wb-view-tab:hover) {
+      opacity: 0;
     }
 
     > div.drag-placeholder {
