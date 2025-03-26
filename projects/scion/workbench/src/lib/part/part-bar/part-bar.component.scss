@@ -57,13 +57,15 @@
   > button.minimize {
     all: unset;
     flex: none;
+    align-self: center;
     display: grid;
     place-content: center;
-    padding-inline: .5em;
+    padding: .25em;
     user-select: none;
+    border-radius: var(--sci-corner);
 
-    &:hover {
-      color: var(--sci-color-accent);
+    &:hover, &:active {
+      background-color: var(--sci-color-background-secondary-hover);
     }
   }
 

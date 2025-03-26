@@ -34,7 +34,9 @@
   <wb-view-list-button/>
 }
 
+<!-- Minimize Button -->
 @if (part.canMinimize()) {
+  <!-- TODO [activity] localize Minimize-->
   <button (click)="onMinimize()" title="Minimize" class="minimize e2e-minimize">
     <span class="scion-workbench-icons">remove</span>
   </button>
