@@ -32,7 +32,7 @@
 [x] Minimize Part (-)
 [x] Part Title
 [] add keystroke to maximize (ctrl+shift+F12)
-[] Sashing right activity panel to the left should not overlap left activity panel (alignment left)
+[] Sashing right activity panel to the left should not overlap left activity panel (e.g. left panel alignment)
 [] part-bar border-top needs to be removed
 
 ## TODO Phase 2:
@@ -46,6 +46,7 @@
 
 ## TODO Phase 3:
 [] Merger
+[] Display actions and minimize button only on hover or when part has focus unless part is in main area (always visible)
 
 ## TO DISCUSS:
 
