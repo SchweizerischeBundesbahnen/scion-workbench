@@ -1,11 +1,11 @@
 :host {
   display: flex;
   flex-direction: column;
-  cursor: pointer;
-  padding: .5em;
+  padding: .25em;
   align-items: center;
   justify-content: center;
   user-select: none;
+  border-radius: var(--sci-corner);
 
   > span.chevron {
     flex: none;
@@ -14,10 +14,15 @@
   > span.count {
     flex: none;
     font-size: var(--sci-workbench-part-hidden-tab-count-size);
+    line-height: .75;
 
     // Display tab count only if font size is not 0 (style container query)
     @container style(--sci-workbench-part-hidden-tab-count-size: 0) {
       display: none;
     }
+  }
+
+  &:is(:hover, .active) {
+    background-color: var(--sci-color-background-secondary-hover);
   }
 }

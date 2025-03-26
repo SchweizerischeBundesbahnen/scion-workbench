@@ -4,7 +4,6 @@
   padding: .6em 1em;
   position: relative; // positioning context for the active indicator
   user-select: none;
-  cursor: pointer;
   gap: 1em;
 
   &.active {
@@ -30,7 +29,6 @@
   > button.close {
     all: unset;
     flex: none;
-    cursor: pointer;
     visibility: hidden;
     padding: .125em;
     border-radius: var(--sci-corner-small);
@@ -38,7 +36,7 @@
 
     &:hover {
       opacity: 1;
-      background-color: var(--sci-color-background-elevation-hover);
+      background-color: var(--sci-color-background-secondary-hover);
     }
   }
 
