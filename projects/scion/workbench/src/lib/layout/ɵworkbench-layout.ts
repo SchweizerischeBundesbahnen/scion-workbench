@@ -697,7 +697,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         title,
         structural: true,
         views: [],
-        cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+        cssClass: extras.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
       }),
       activePartId: id,
     };
