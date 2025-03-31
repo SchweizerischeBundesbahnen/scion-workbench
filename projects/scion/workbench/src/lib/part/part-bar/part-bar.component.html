@@ -1,6 +1,6 @@
 <!-- Title -->
-@if (part.title()) {
-  <span class="title e2e-title">{{part.title()}}</span>
+@if (partTitle()) {
+  <span class="title e2e-title">{{partTitle()}}</span>
 }
 
 <!-- View Tabs -->
@@ -38,6 +38,6 @@
 @if (part.canMinimize()) {
   <!-- TODO [activity] localize Minimize-->
   <button (click)="onMinimize()" title="Minimize" class="minimize e2e-minimize">
-    <span class="scion-workbench-icons">remove</span>
+    <span class="scion-workbench-icons">minimize</span>
   </button>
 }

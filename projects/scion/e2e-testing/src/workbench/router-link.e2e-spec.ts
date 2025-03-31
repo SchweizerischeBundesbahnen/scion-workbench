@@ -40,18 +40,14 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('part.left', {align: 'left'})
-      .addView('view.101', {partId: 'part.left'}),
-    );
-
-    // Add state via separate navigation as not supported when adding views to the perspective.
-    await workbenchNavigator.modifyLayout(layout => layout
-      .navigateView('view.101', ['test-router'], {state: {navigated: 'false'}}),
+      .addView('view.101', {partId: 'part.left'})
+      .navigateView('view.101', ['test-router'], {data: {navigated: 'false'}}),
     );
 
     // Open test view via router link.
     const routerPage = new RouterPagePO(appPO, {viewId: 'view.101'});
     await routerPage.navigateViaRouterLink(['/test-view'], {
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
     });
 
     // Expect router page to be replaced
@@ -59,7 +55,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.101',
         urlSegments: 'test-view',
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -423,11 +419,9 @@ test.describe('Workbench RouterLink', () => {
       .addPart('part.left')
       .addPart('part.right', {align: 'right'})
       .addView('view.101', {partId: 'part.left'})
-      .addView('view.102', {partId: 'part.right'}),
-    );
-    await workbenchNavigator.modifyLayout(layout => layout
-      .navigateView('view.101', ['test-router'], {state: {navigated: 'false'}})
-      .navigateView('view.102', ['test-view'], {state: {navigated: 'false'}}),
+      .addView('view.102', {partId: 'part.right'})
+      .navigateView('view.101', ['test-router'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}}),
     );
 
     const view1 = appPO.view({viewId: 'view.101'});
@@ -436,14 +430,14 @@ test.describe('Workbench RouterLink', () => {
     // Open test view via router link.
     const routerPage = new RouterPagePO(appPO, {viewId: 'view.101'});
     await routerPage.navigateViaRouterLink(['/test-view'], {
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
     });
 
     // Expect test view to replace the router page
     await expect.poll(() => view1.getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -451,7 +445,7 @@ test.describe('Workbench RouterLink', () => {
     await expect.poll(() => view2.getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -475,12 +469,8 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('part.left', {align: 'left'})
-      .addView('view.101', {partId: 'part.left'}),
-    );
-
-    // Add state via separate navigation as not supported when adding views to the perspective.
-    await workbenchNavigator.modifyLayout(layout => layout
-      .navigateView('view.101', ['test-router'], {state: {navigated: 'false'}}),
+      .addView('view.101', {partId: 'part.left'})
+      .navigateView('view.101', ['test-router'], {data: {navigated: 'false'}}),
     );
 
     const testView = appPO.view({viewId: 'view.1'});
@@ -489,7 +479,7 @@ test.describe('Workbench RouterLink', () => {
     const routerPage = new RouterPagePO(appPO, {viewId: 'view.101'});
     await routerPage.navigateViaRouterLink(['/test-view'], {
       target: 'blank',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
     });
 
     // Expect test view to be opened
@@ -497,7 +487,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.1',
         urlSegments: 'test-view',
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -506,7 +496,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.101',
         urlSegments: 'test-router',
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -536,12 +526,8 @@ test.describe('Workbench RouterLink', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       .addPart('part.left', {align: 'left'})
-      .addView('view.101', {partId: 'part.left'}),
-    );
-
-    // Add state via separate navigation as not supported when adding views to the perspective.
-    await workbenchNavigator.modifyLayout(layout => layout
-      .navigateView('view.101', ['test-router'], {state: {navigated: 'false'}}),
+      .addView('view.101', {partId: 'part.left'})
+      .navigateView('view.101', ['test-router'], {data: {navigated: 'false'}}),
     );
 
     const testView = appPO.view({viewId: 'view.102'});
@@ -550,7 +536,7 @@ test.describe('Workbench RouterLink', () => {
     const routerPage = new RouterPagePO(appPO, {viewId: 'view.101'});
     await routerPage.navigateViaRouterLink(['/test-view'], {
       target: 'view.102',
-      state: {navigated: true},
+      data: {navigated: true},
     });
 
     // Expect test view to be opened
@@ -558,7 +544,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.102',
         urlSegments: 'test-view',
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -567,7 +553,7 @@ test.describe('Workbench RouterLink', () => {
       {
         viewId: 'view.101',
         urlSegments: 'test-router',
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
 

@@ -583,7 +583,6 @@ interface ExpectedWorkbenchGrids {
  * Modified version of {@link MActivityLayout} to expect the workbench layout.
  */
 export interface MActivityLayout {
-  // TODO [activity] maybe make partial to only assert specified properties
   toolbars: Partial<{
     leftTop: MActivityGroup;
     leftBottom: MActivityGroup;

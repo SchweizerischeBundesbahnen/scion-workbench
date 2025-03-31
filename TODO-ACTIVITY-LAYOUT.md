@@ -33,7 +33,6 @@
 [x] Part Title
 [] add keystroke to maximize (ctrl+shift+F12)
 [] Sashing right activity panel to the left should not overlap left activity panel (e.g. left panel alignment)
-[] part-bar border-top needs to be removed
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)

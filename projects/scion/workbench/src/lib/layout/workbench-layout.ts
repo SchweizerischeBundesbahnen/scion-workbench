@@ -11,7 +11,7 @@
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
 import {ActivityId} from '../activity/workbench-activity.model';
-import {Translatable} from '../workbench.model';
+import {Translatable} from '../translation/workbench-translation.model';
 
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
@@ -247,6 +247,12 @@ export interface PartExtras {
 }
 
 export interface DockedPartExtras {
+  /**
+   * Specifies the icon ligature for the activity item.
+   *
+   * The icon is passed as argument to the configured icon provider {@link WorkbenchConfig.iconProvider},
+   * allowing for custom icons. If no provider is set, Material icons are used by default.
+   */
   icon: string;
   label: Translatable;
   tooltip?: Translatable;
