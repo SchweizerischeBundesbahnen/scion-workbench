@@ -9,32 +9,37 @@
 [x] View Conflict Resolver with activity grids OR make view ids random
 [x] Maximize (hide activities)
 [x] Prevent view drag to edge of main grid for layouts with activities
-[] Icon & Tooltip
+[x] Tooltip
 [x] Testing App:
   [x] Drop Down for perspectives
   [x] Provide 2 Perspectives with activities
 [x] @scion/components: Provide sash sizes as object literal instead of array
 [] Documentation (JSDoc)
 [] HowTo
-[] Add test if to have drop zone in main grid (Enabled for layouts without activities or layouts with activities but no main area.)
 [] Do not disable animations when starting locally and on CI (fix tests: e.g.: host-popup.e2e-spec.ts: should stick to the popup anchor)
 [x] remove activity part
 [x] css class on add part
-[] Router navigation if not specifying a part and no target should not navigate peripheral views.
-[] Tests:
+[x] Router navigation if not specifying a part and no target should not navigate peripheral views.
+[x] Tests:
   [x] Test: Navigate view with router should activate activity
-  [] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
-  [] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
+  [x] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
+  [x] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
+  [] part bar visible different conditions (part.title() || part.viewIds().length || part.actions().length || part.canMinimize())
+  [] activity reload page should restore layout (panel size and splitter ratio)
+[] i18n
+  [] minimize part action
 [x] add part include activity parts in part list
+[x] Minimize Part (-)
+[x] Part Title
 [] add keystroke to maximize (ctrl+shift+F12)
+[] Sashing right activity panel to the left should not overlap left activity panel (alignment left)
+[] part-bar border-top needs to be removed
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
 [] Part Portal (to not lose changes when closing activity)
-[] Part Title (consider implementing in phase 1 if choosing microfrontend integration instead of phase 2)
 [] Hide Activities & menu to show activities
 [] Show Labels toolbars: {showLabels: boolean};
-[] Minimize Part (-)
 [] Contribute part actions to specific activity (maybe with a context (key/value map))
 [] Remove outlets of hidden activities (maybe not for minimized parts to not reload on reopen, crucial for microfrontend preformance)
 [] activity item focus (keyboard navigation)
@@ -45,6 +50,7 @@
 ## TO DISCUSS:
 
 ## TO CONSIDER:
+[] part.isInMainArea still needed? use case check if views explicitly in main area
 [] Consider changing MPart class to interface
 [] Consider changing MNode class to interface
 [] Change expectView to expectView(ViewPO).toBeActive(selector), expectView(ViewPO).toBeInactive(), expectView(ViewPO).not.toBePresent()
@@ -58,11 +64,9 @@
 [] Add `WorkbenchService.getActivity` by any part contained in the activity to set component, title and tooltip
 
 
-## TESTS:
-
-
 ## BREAKING CHANGES:
 [] part.isInMainArea -> part.isPeripheral
+[] download new workbench icon font
 
 ## THINKTANK
 [] How to open part in specific activity? User may have moved views to other (dynamic) part in that activity,
@@ -71,5 +75,3 @@
   -> Variante: addView('view.id', {partId: 'project'})
      Falls Project Part nicht mehr sichtbar (weil keine View mehr drin), dann automatiscsher
      Fallback auf active View dieses Grids.
-[] Part Actions: How to contribute a part action to a specific activity. (see RegisterPartActionPageComponent)
-

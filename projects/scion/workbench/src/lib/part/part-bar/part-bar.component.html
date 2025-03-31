@@ -1,6 +1,6 @@
 <!-- Title -->
 @if (part.title()) {
-  <span class="title">{{part.title()}}</span>
+  <span class="title e2e-title">{{part.title()}}</span>
 }
 
 <!-- View Tabs -->
@@ -34,3 +34,8 @@
   <wb-view-list-button/>
 }
 
+@if (part.canMinimize()) {
+  <button (click)="onMinimize()" title="Minimize" class="minimize e2e-minimize">
+    <span class="scion-workbench-icons">remove</span>
+  </button>
+}

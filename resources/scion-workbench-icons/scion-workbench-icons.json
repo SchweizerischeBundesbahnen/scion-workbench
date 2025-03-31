@@ -2,13 +2,26 @@
   "metadata": {
     "name": "scion-workbench-icons",
     "lastOpened": 0,
-    "created": 1680895759388
+    "created": 1742835615085
   },
   "iconSets": [
     {
       "icons": [
         {
-          "id": 0,
+          "id": 4,
+          "paths": [
+            "M810 554h-596v-84h596v84z"
+          ],
+          "attrs": [],
+          "isMulticolor": false,
+          "isMulticolor2": false,
+          "tags": [
+            "remove"
+          ],
+          "grid": 24
+        },
+        {
+          "id": 5,
           "paths": [
             "M225.835 414.165l256 256c16.683 16.683 43.691 16.683 60.331 0l256-256c16.683-16.683 16.683-43.691 0-60.331s-43.691-16.683-60.331 0l-225.835 225.835-225.835-225.835c-16.683-16.683-43.691-16.683-60.331 0s-16.683 43.691 0 60.331z"
           ],
@@ -20,7 +33,8 @@
           "tags": [
             "chevron-down"
           ],
-          "grid": 24
+          "grid": 24,
+          "defaultCode": 59649
         },
         {
           "paths": [
@@ -35,7 +49,7 @@
             "search"
           ],
           "grid": 24,
-          "id": 1,
+          "id": 6,
           "defaultCode": 59648
         },
         {
@@ -50,7 +64,7 @@
           ],
           "defaultCode": 58829,
           "grid": 24,
-          "id": 2
+          "id": 7
         },
         {
           "paths": [
@@ -64,7 +78,7 @@
           ],
           "defaultCode": 57940,
           "grid": 24,
-          "id": 3
+          "id": 8
         }
       ],
       "height": 1024,
@@ -110,40 +124,49 @@
       },
       "selection": [
         {
-          "order": 22,
-          "id": 0,
-          "name": "chevron-down",
+          "ligatures": "remove",
+          "id": 4,
+          "order": 28,
           "prevSize": 24,
-          "code": 59649,
-          "tempChar": "",
-          "ligatures": "chevron_down"
+          "name": "minimize",
+          "code": 59648,
+          "tempChar": ""
         },
         {
-          "order": 26,
-          "id": 1,
+          "order": 29,
+          "id": 5,
+          "name": "chevron-down",
+          "prevSize": 24,
+          "tempChar": "",
+          "ligatures": "chevron_down",
+          "code": 59649
+        },
+        {
+          "order": 30,
+          "id": 6,
           "name": "search",
           "prevSize": 24,
-          "code": 59648,
-          "tempChar": "",
-          "ligatures": "search"
+          "tempChar": "",
+          "ligatures": "search",
+          "code": 59650
         },
         {
           "ligatures": "close, clear",
-          "id": 2,
-          "order": 24,
+          "id": 7,
+          "order": 31,
           "prevSize": 24,
-          "code": 58829,
           "name": "close",
-          "tempChar": ""
+          "tempChar": "",
+          "code": 58829
         },
         {
           "ligatures": "dirty",
-          "id": 3,
-          "order": 25,
+          "id": 8,
+          "order": 32,
           "prevSize": 24,
-          "code": 57940,
           "name": "edit",
-          "tempChar": ""
+          "tempChar": "",
+          "code": 57940
         }
       ],
       "prevSize": 24,
@@ -183,7 +206,8 @@
       "useClassSelector": true,
       "color": 0,
       "bgColor": 16777215,
-      "classSelector": ".icon"
+      "classSelector": ".icon",
+      "name": "icomoon"
     },
     "historySize": 50,
     "showLiga": true

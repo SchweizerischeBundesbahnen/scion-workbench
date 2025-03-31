@@ -27,6 +27,7 @@ import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {WorkbenchGrids} from '../layout/workbench-grids.model';
 import {MPart, MTreeNode} from '../layout/workbench-layout.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
+import {MActivity} from '../activity/workbench-activity.model';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -48,6 +49,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
   public readonly topLeft = this.computeTopLeft();
+  public readonly topRight = this.computeTopRight();
+  public readonly activity = this.computeActivity();
+  public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
 
@@ -120,20 +124,30 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   private computeTitle(): Signal<string | undefined> {
     return computed(() => {
-      if (this._title()) {
+      if (this._title() !== undefined) {
         return this._title();
       }
       const layout = this._workbenchLayoutService.layout();
       if (!layout) {
         return undefined;
       }
-      const activity = layout.activity({partId: this.id}, {orElse: null});
-      if (activity != null) {
-        return this.topLeft() ? layout.part({partId: activity.referencePartId}).title : undefined;
-      }
-      else {
+      const activity = this.activity();
+      if (!activity) {
         return layout.part({partId: this.id}).title;
       }
+
+      // This part is contained in an activity. Only show title if this part is the top-left part.
+      return this.topLeft() ? layout.part({partId: activity.referencePartId}).title : undefined;
+    });
+  }
+
+  private computeActivity(): Signal<MActivity | null> {
+    return computed(() => {
+      const layout = this._workbenchLayoutService.layout();
+      if (!layout) {
+        return null;
+      }
+      return layout.activity({partId: this.id}, {orElse: null});
     });
   }
 
@@ -146,6 +160,18 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       const grid = layout.grid({partId: this.id}).grid;
       const part = layout.part({partId: this.id});
       return isTopLeft(grid.root, part);
+    });
+  }
+
+  private computeTopRight(): Signal<boolean> {
+    return computed(() => {
+      const layout = this._workbenchLayoutService.layout();
+      if (!layout) {
+        return false;
+      }
+      const grid = layout.grid({partId: this.id}).grid;
+      const part = layout.part({partId: this.id});
+      return isTopRight(grid.root, part);
     });
   }
 
@@ -297,6 +323,20 @@ function isTopLeft(element: MTreeNode | MPart, testee: MPart): boolean {
     return isTopLeft(element.child1, testee);
   }
   return isTopLeft(child1Visible ? element.child1 : element.child2, testee);
+}
+
+function isTopRight(element: MTreeNode | MPart, testee: MPart): boolean {
+  if (element instanceof MPart) {
+    return element.id === testee.id;
+  }
+
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(element.child2);
+
+  if (child1Visible && child2Visible) {
+    return element.direction === 'column' ? isTopRight(element.child1, testee) : isTopRight(element.child2, testee);
+  }
+  return isTopRight(child1Visible ? element.child1 : element.child2, testee);
 }
 
 /**

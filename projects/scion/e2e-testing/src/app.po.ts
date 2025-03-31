@@ -367,6 +367,13 @@ export class AppPO {
   }
 
   /**
+   * Configures how to align the bottom activity panel.
+   */
+  public async setPanelAlignment(alignment: 'left' | 'right' | 'center' | 'justify'): Promise<void> {
+    await this.header.setPanelAlignment(alignment);
+  }
+
+  /**
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {

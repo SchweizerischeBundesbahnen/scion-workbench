@@ -12,6 +12,7 @@ import {expect} from '@playwright/test';
 import {toEqualIgnoreOrder} from './to-equal-ignore-order.matcher';
 import {ExpectedWorkbenchLayout, toEqualWorkbenchLayout} from './to-equal-workbench-layout.matcher';
 import {toBeBetween} from './to-be-between.matcher';
+import {ExpectedBoundingBox, toHaveBoundingBox} from './to-have-bounding-box.matcher';
 
 /**
  * Extends the Playwright expect API with project specific custom matchers.
@@ -51,6 +52,11 @@ declare global {
        * ```
        */
       toEqualWorkbenchLayout(expected: ExpectedWorkbenchLayout): Promise<R>;
+
+      /**
+       * Expects the specified locator to have the expected bounding box.
+       */
+      toHaveBoundingBox(expected: ExpectedBoundingBox): Promise<R>;
     }
   }
 }
@@ -69,6 +75,7 @@ export namespace CustomMatchers {
     expect.extend({
       toEqualIgnoreOrder,
       toEqualWorkbenchLayout,
+      toHaveBoundingBox,
       toBeBetween,
     });
   }

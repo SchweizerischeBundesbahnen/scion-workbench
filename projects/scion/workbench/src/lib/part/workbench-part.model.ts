@@ -51,9 +51,14 @@ export abstract class WorkbenchPart {
   public abstract readonly peripheral: Signal<boolean>;
 
   /**
-   * Indicates whether this part is the top-leftmost part.
+   * Indicates whether this part is the top-left part.
    */
   public abstract readonly topLeft: Signal<boolean>;
+
+  /**
+   * Indicates whether this part is the top-right part.
+   */
+  public abstract readonly topRight: Signal<boolean>;
 
   /**
    * Indicates whether this part is active or inactive.

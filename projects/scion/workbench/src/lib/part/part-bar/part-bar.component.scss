@@ -58,6 +58,19 @@
     flex: none;
   }
 
+  > button.minimize {
+    all: unset;
+    flex: none;
+    display: grid;
+    place-content: center;
+    padding-inline: .5em;
+    user-select: none;
+
+    &:hover {
+      color: var(--sci-color-accent);
+    }
+  }
+
   // Pseudo element for rendering the bottom border of the tabbar.
   // Must precede the viewport for the active tab to overlay it.
   &:before {

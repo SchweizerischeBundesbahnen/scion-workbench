@@ -14,7 +14,7 @@ import {HostPopupPagePO} from './page-object/host-popup-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from '../workbench/workbench-layout-constants';
 
 test.describe('Workbench Host Popup', () => {
 

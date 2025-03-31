@@ -23,6 +23,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-part-page',
@@ -51,13 +52,16 @@ export default class PartPageComponent {
   protected readonly route = inject(ActivatedRoute);
   protected readonly uuid = UUID.randomUUID();
   protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
+  protected readonly titleList = `title-list-${UUID.randomUUID()}`;
   protected readonly form = this._formBuilder.group({
+    title: this._formBuilder.control<string | '<undefined>'>(''),
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
   });
 
   constructor() {
     this.partActions = this.computePartActions();
+    this.installTitleUpdater();
     this.installCssClassUpdater();
   }
 
@@ -73,12 +77,16 @@ export default class PartPageComponent {
     });
   }
 
+  private installTitleUpdater(): void {
+    this.form.controls.title.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(title => this.part.title = parseTypedString(title)!);
+  }
+
   private installCssClassUpdater(): void {
     this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(cssClasses => {
-        this.part.cssClass = cssClasses;
-      });
+      .subscribe(cssClasses => this.part.cssClass = cssClasses);
   }
 }
 

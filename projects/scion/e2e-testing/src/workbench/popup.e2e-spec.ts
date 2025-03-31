@@ -18,10 +18,10 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {PopupPositionTestPagePO} from './page-object/test-pages/popup-position-test-page.po';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {MAIN_AREA} from '../workbench.model';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench-layout-constants';
 
 test.describe('Workbench Popup', () => {
 

@@ -255,4 +255,59 @@ test.describe('Workbench Part', () => {
     await expectPart(appPO.part({cssClass: 'testee-1'})).toDisplayComponent(PartPagePO.selector);
     await expectPart(appPO.part({cssClass: 'testee-2'})).toDisplayComponent(RouterPagePO.selector);
   });
+
+  test.describe('Title', () => {
+
+    test('should display part title (set via layout)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left', {title: 'testee-1'})
+        .addPart('part.right', {align: 'right'}, {title: 'testee-2'})
+        .navigatePart('part.left', ['test-part'])
+        .navigatePart('part.right', ['test-part']),
+      );
+
+      // Expect part title to display.
+      await expect(appPO.part({partId: 'part.left'}).bar.title).toHaveText('testee-1');
+      await expect(appPO.part({partId: 'part.right'}).bar.title).toHaveText('testee-2');
+    });
+
+    test('should display part title (set via part handle)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right'})
+        .navigatePart('part.left', ['test-part'])
+        .navigatePart('part.right', ['test-part']),
+      );
+
+      const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
+      const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
+
+      // Enter part title.
+      await leftPartPage.enterTitle('testee-1');
+      await rightPartPage.enterTitle('testee-2');
+
+      // Expect part title to display.
+      await expect(leftPartPage.part.bar.title).toHaveText('testee-1');
+      await expect(rightPartPage.part.bar.title).toHaveText('testee-2');
+    });
+
+    test('should display part title when part contains views', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left', {title: 'testee-1'})
+        .addPart('part.right', {align: 'right'}, {title: 'testee-2'})
+        .addView('view.101', {partId: 'part.left'})
+        .addView('view.102', {partId: 'part.right'}),
+      );
+
+      // Expect part title to display.
+      await expect(appPO.part({partId: 'part.left'}).bar.title).toHaveText('testee-1');
+      await expect(appPO.part({partId: 'part.right'}).bar.title).toHaveText('testee-2');
+    });
+  });
 });

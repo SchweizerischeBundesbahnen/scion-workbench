@@ -54,6 +54,10 @@ export class PartBarComponent {
     this.installActivityMinimizer();
   }
 
+  protected onMinimize(): void {
+    void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id));
+  }
+
   /**
    * Minimizes activities when double-clicking the tabbar or filler, but only if the first and second clicks target the same DOM element.
    * This prevents unintended maximization or minimization when double-clicking a tab's close button.

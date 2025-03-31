@@ -25,6 +25,7 @@ import {Arrays} from '@scion/toolkit/util';
   host: {
     '[class.active]': 'active()',
     '[attr.data-activityid]': 'activity().id',
+    '[attr.title]': 'activity().tooltip || activity().label',
   },
 })
 export class ActivityItemComponent {

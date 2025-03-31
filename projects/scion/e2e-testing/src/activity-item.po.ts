@@ -24,4 +24,8 @@ export class ActivityItemPO {
   public async click(): Promise<void> {
     await this.buttonLocator.click();
   }
+
+  public getTooltip(): Promise<string | null> {
+    return this.locator.getAttribute('title');
+  }
 }

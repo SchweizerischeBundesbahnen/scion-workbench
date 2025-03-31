@@ -16,12 +16,10 @@ import {PartPagePO} from './page-object/part-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectView} from '../matcher/view-matcher';
 import {RouterPagePO} from './page-object/router-page.po';
+import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH} from './workbench-layout-constants';
 
 test.describe('Activity Layout', () => {
-
-  // TODO
-  // maximize / minimize assert activity grids instead of part page
-  // - page reload (separate test? There are many cases. I would prefer to have it at the end of each test as an additional assertion instead)
 
   test('should contribute activities', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
@@ -29,34 +27,34 @@ test.describe('Activity Layout', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       // left-top
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       .navigatePart('part.activity-1', ['test-part'])
-      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
       .navigatePart('part.activity-2', ['test-part'])
       // left-bottom
-      .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-3', ɵactivityId: 'activity.3'})
+      .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
       .navigatePart('part.activity-3', ['test-part'])
-      .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-4', ɵactivityId: 'activity.4'})
+      .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
       .navigatePart('part.activity-4', ['test-part'])
       // right-top
-      .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-5', ɵactivityId: 'activity.5'})
+      .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
       .navigatePart('part.activity-5', ['test-part'])
-      .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-6', ɵactivityId: 'activity.6'})
+      .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'})
       .navigatePart('part.activity-6', ['test-part'])
       // right-bottom
-      .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-7', ɵactivityId: 'activity.7'})
+      .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 7', ɵactivityId: 'activity.7'})
       .navigatePart('part.activity-7', ['test-part'])
       .addPart('part.activity-8', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-8', ɵactivityId: 'activity.8'})
       .navigatePart('part.activity-8', ['test-part'])
       // bottom-left
-      .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-9', ɵactivityId: 'activity.9'})
+      .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 9', ɵactivityId: 'activity.9'})
       .navigatePart('part.activity-9', ['test-part'])
-      .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-10', ɵactivityId: 'activity.10'})
+      .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 10', ɵactivityId: 'activity.10'})
       .navigatePart('part.activity-10', ['test-part'])
       // bottom-right
-      .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-11', ɵactivityId: 'activity.11'})
+      .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 11', ɵactivityId: 'activity.11'})
       .navigatePart('part.activity-11', ['test-part'])
-      .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-12', ɵactivityId: 'activity.12'})
+      .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
       .navigatePart('part.activity-12', ['test-part']),
     );
 
@@ -66,43 +64,43 @@ test.describe('Activity Layout', () => {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-              {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+              {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
             ],
             activeActivityId: 'none',
           },
           leftBottom: {
             activities: [
-              {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-              {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+              {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+              {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
             ],
             activeActivityId: 'none',
           },
           rightTop: {
             activities: [
-              {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-              {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+              {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+              {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
             ],
             activeActivityId: 'none',
           },
           rightBottom: {
             activities: [
-              {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+              {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
               {id: 'activity.8', icon: 'folder', label: 'testee-8'},
             ],
             activeActivityId: 'none',
           },
           bottomLeft: {
             activities: [
-              {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-              {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+              {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+              {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
             ],
             activeActivityId: 'none',
           },
           bottomRight: {
             activities: [
-              {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-              {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+              {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+              {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
             ],
             activeActivityId: 'none',
           },
@@ -148,43 +146,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'activity.1',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -215,43 +213,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -284,43 +282,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'activity.4',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -351,43 +349,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -420,43 +418,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'activity.5',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -487,43 +485,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -556,43 +554,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -623,43 +621,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -692,43 +690,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -759,43 +757,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -828,43 +826,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
@@ -895,43 +893,43 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'none',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'none',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'none',
             },
@@ -948,18 +946,18 @@ test.describe('Activity Layout', () => {
       .addPart(MAIN_AREA)
       // part.activity-1-left
       .addPart('part.activity-1-left', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee', ɵactivityId: 'activity.1'})
-      .navigatePart('part.activity-1-left', ['test-part'])
       .addView('view.101', {partId: 'part.activity-1-left'})
       .addView('view.102', {partId: 'part.activity-1-left'})
       .navigateView('view.101', ['test-view'])
       .navigateView('view.102', ['test-view'])
       // part.activity-1-right
       .addPart('part.activity-1-right', {relativeTo: 'part.activity-1-left', align: 'right'})
-      .navigatePart('part.activity-1-right', ['test-part'])
       .addView('view.201', {partId: 'part.activity-1-right'})
       .addView('view.202', {partId: 'part.activity-1-right'})
       .navigateView('view.201', ['test-view'])
-      .navigateView('view.202', ['test-view']),
+      .navigateView('view.202', ['test-view'])
+      // activate activity.1
+      .activatePart('part.activity-1-left'),
     );
 
     const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
@@ -967,40 +965,7 @@ test.describe('Activity Layout', () => {
     const view201 = new ViewPagePO(appPO, {viewId: 'view.201'});
     const view202 = new ViewPagePO(appPO, {viewId: 'view.202'});
 
-    // Assert activity grid
-    await expectPart(appPO.part({partId: 'part.activity-1-left'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-1-right'})).not.toBeAttached();
-
-    await expectView(view101).not.toBeAttached();
-    await expectView(view102).not.toBeAttached();
-    await expectView(view201).not.toBeAttached();
-    await expectView(view202).not.toBeAttached();
-
-    // Assert activity layout
-    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      activityLayout: {
-        toolbars: {
-          leftTop: {
-            activities: [{id: 'activity.1'}],
-            activeActivityId: 'none',
-          },
-        },
-      },
-    });
-
-    // Activate activity
-    await appPO.activityItem({activityId: 'activity.1'}).click();
-
-    // Assert activity grid
-    await expectPart(appPO.part({partId: 'part.activity-1-left'})).not.toDisplayComponent();
-    await expectPart(appPO.part({partId: 'part.activity-1-right'})).not.toDisplayComponent();
-
-    await expectView(view101).toBeActive();
-    await expectView(view102).toBeInactive();
-    await expectView(view201).toBeActive();
-    await expectView(view202).toBeInactive();
-
-    // Assert activity layout
+    // Expect activity to display grid
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
@@ -1010,7 +975,33 @@ test.describe('Activity Layout', () => {
           },
         },
       },
+      grids: {
+        'activity.1': {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: ACTIVITY_PANEL_RATIO,
+            child1: new MPart({
+              id: 'part.activity-1-left',
+              views: [{id: 'view.101'}, {id: 'view.102'}],
+              activeViewId: 'view.101',
+            }),
+            child2: new MPart({
+              id: 'part.activity-1-right',
+              views: [{id: 'view.201'}, {id: 'view.202'}],
+              activeViewId: 'view.201',
+            }),
+          }),
+        },
+      },
     });
+
+    await expectPart(appPO.part({partId: 'part.activity-1-left'})).not.toDisplayComponent();
+    await expectPart(appPO.part({partId: 'part.activity-1-right'})).not.toDisplayComponent();
+
+    await expectView(view101).toBeActive();
+    await expectView(view102).toBeInactive();
+    await expectView(view201).toBeActive();
+    await expectView(view202).toBeInactive();
   });
 
   test('should activate activities specified in initial layout', async ({appPO, workbenchNavigator}) => {
@@ -1019,35 +1010,23 @@ test.describe('Activity Layout', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       // left-top
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
-      .navigatePart('part.activity-1', ['test-part'])
-      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-2', ɵactivityId: 'activity.2'})
-      .navigatePart('part.activity-2', ['test-part'])
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
       // left-bottom
-      .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-3', ɵactivityId: 'activity.3'})
-      .navigatePart('part.activity-3', ['test-part'])
-      .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-4', ɵactivityId: 'activity.4'})
-      .navigatePart('part.activity-4', ['test-part'])
+      .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+      .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
       // right-top
-      .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-5', ɵactivityId: 'activity.5'})
-      .navigatePart('part.activity-5', ['test-part'])
-      .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-6', ɵactivityId: 'activity.6'})
-      .navigatePart('part.activity-6', ['test-part'])
+      .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
+      .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'})
       // right-bottom
-      .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-7', ɵactivityId: 'activity.7'})
-      .navigatePart('part.activity-7', ['test-part'])
+      .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 7', ɵactivityId: 'activity.7'})
       .addPart('part.activity-8', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-8', ɵactivityId: 'activity.8'})
-      .navigatePart('part.activity-8', ['test-part'])
       // bottom-left
-      .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-9', ɵactivityId: 'activity.9'})
-      .navigatePart('part.activity-9', ['test-part'])
-      .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-10', ɵactivityId: 'activity.10'})
-      .navigatePart('part.activity-10', ['test-part'])
+      .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 9', ɵactivityId: 'activity.9'})
+      .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 10', ɵactivityId: 'activity.10'})
       // bottom-right
-      .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-11', ɵactivityId: 'activity.11'})
-      .navigatePart('part.activity-11', ['test-part'])
-      .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-12', ɵactivityId: 'activity.12'})
-      .navigatePart('part.activity-12', ['test-part'])
+      .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 11', ɵactivityId: 'activity.11'})
+      .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
       // activate activities
       .activatePart('part.activity-1')
       .activatePart('part.activity-4')
@@ -1057,69 +1036,55 @@ test.describe('Activity Layout', () => {
       .activatePart('part.activity-12'),
     );
 
-    // Assert activity layout
+    // Expect activities to be activated
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-              {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+              {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
             ],
             activeActivityId: 'activity.1',
           },
           leftBottom: {
             activities: [
-              {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-              {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+              {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+              {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
             ],
             activeActivityId: 'activity.4',
           },
           rightTop: {
             activities: [
-              {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-              {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+              {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+              {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
             ],
             activeActivityId: 'activity.5',
           },
           rightBottom: {
             activities: [
-              {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+              {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
               {id: 'activity.8', icon: 'folder', label: 'testee-8'},
             ],
             activeActivityId: 'activity.8',
           },
           bottomLeft: {
             activities: [
-              {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-              {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+              {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+              {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
             ],
             activeActivityId: 'activity.9',
           },
           bottomRight: {
             activities: [
-              {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-              {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+              {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+              {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
             ],
             activeActivityId: 'activity.12',
           },
         },
       },
     });
-
-    // Assert parts
-    await expectPart(appPO.part({partId: 'part.activity-1'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-4'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-5'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
   });
 
   test('should show activity panels', async ({appPO, workbenchNavigator}) => {
@@ -1128,32 +1093,26 @@ test.describe('Activity Layout', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       // left-top
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
-      .navigatePart('part.activity-1', ['test-part'])
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       // left-bottom
-      .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-2', ɵactivityId: 'activity.2'})
-      .navigatePart('part.activity-2', ['test-part'])
+      .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
       // right-top
-      .addPart('part.activity-3', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-3', ɵactivityId: 'activity.3'})
-      .navigatePart('part.activity-3', ['test-part'])
+      .addPart('part.activity-3', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
       // right-bottom
-      .addPart('part.activity-4', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-4', ɵactivityId: 'activity.4'})
-      .navigatePart('part.activity-4', ['test-part'])
+      .addPart('part.activity-4', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
       // bottom-left
-      .addPart('part.activity-5', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-5', ɵactivityId: 'activity.5'})
-      .navigatePart('part.activity-5', ['test-part'])
+      .addPart('part.activity-5', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
       // bottom-right
-      .addPart('part.activity-6', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-6', ɵactivityId: 'activity.6'})
-      .navigatePart('part.activity-6', ['test-part']),
+      .addPart('part.activity-6', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'}),
     );
 
     // Assert activity panels
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         panels: {
-          left: null,
-          right: null,
-          bottom: null,
+          left: 'closed',
+          right: 'closed',
+          bottom: 'closed',
         },
       },
     });
@@ -1166,9 +1125,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: {},
-            right: null,
-            bottom: null,
+            left: {width: ACTIVITY_PANEL_WIDTH},
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1180,9 +1139,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: null,
+            left: 'closed',
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1196,9 +1155,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: {},
-            right: null,
-            bottom: null,
+            left: {width: ACTIVITY_PANEL_WIDTH},
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1210,9 +1169,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: null,
+            left: 'closed',
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1226,9 +1185,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: {},
-            bottom: null,
+            left: 'closed',
+            right: {width: ACTIVITY_PANEL_WIDTH},
+            bottom: 'closed',
           },
         },
       });
@@ -1240,9 +1199,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: null,
+            left: 'closed',
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1256,9 +1215,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: {},
-            bottom: null,
+            left: 'closed',
+            right: {width: ACTIVITY_PANEL_WIDTH},
+            bottom: 'closed',
           },
         },
       });
@@ -1270,9 +1229,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: null,
+            left: 'closed',
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1286,9 +1245,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: {},
+            left: 'closed',
+            right: 'closed',
+            bottom: {height: ACTIVITY_PANEL_HEIGHT},
           },
         },
       });
@@ -1300,9 +1259,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: null,
+            left: 'closed',
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1316,9 +1275,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: {},
+            left: 'closed',
+            right: 'closed',
+            bottom: {height: ACTIVITY_PANEL_HEIGHT},
           },
         },
       });
@@ -1330,9 +1289,9 @@ test.describe('Activity Layout', () => {
       await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
         activityLayout: {
           panels: {
-            left: null,
-            right: null,
-            bottom: null,
+            left: 'closed',
+            right: 'closed',
+            bottom: 'closed',
           },
         },
       });
@@ -1345,23 +1304,17 @@ test.describe('Activity Layout', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       // left-top
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
-      .navigatePart('part.activity-1', ['test-part'])
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       // left-bottom
-      .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-2', ɵactivityId: 'activity.2'})
-      .navigatePart('part.activity-2', ['test-part'])
+      .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
       // right-top
-      .addPart('part.activity-3', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-3', ɵactivityId: 'activity.3'})
-      .navigatePart('part.activity-3', ['test-part'])
+      .addPart('part.activity-3', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
       // right-bottom
-      .addPart('part.activity-4', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-4', ɵactivityId: 'activity.4'})
-      .navigatePart('part.activity-4', ['test-part'])
+      .addPart('part.activity-4', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
       // bottom-left
-      .addPart('part.activity-5', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-5', ɵactivityId: 'activity.5'})
-      .navigatePart('part.activity-5', ['test-part'])
+      .addPart('part.activity-5', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
       // bottom-right
-      .addPart('part.activity-6', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-6', ɵactivityId: 'activity.6'})
-      .navigatePart('part.activity-6', ['test-part'])
+      .addPart('part.activity-6', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'})
       // activate activities
       .activatePart('part.activity-1')
       .activatePart('part.activity-2')
@@ -1376,13 +1329,13 @@ test.describe('Activity Layout', () => {
       activityLayout: {
         panels: {
           left: {
-            width: 200,
+            width: ACTIVITY_PANEL_WIDTH,
           },
           right: {
-            width: 200,
+            width: ACTIVITY_PANEL_WIDTH,
           },
           bottom: {
-            height: 150,
+            height: ACTIVITY_PANEL_HEIGHT,
           },
         },
       },
@@ -1400,10 +1353,10 @@ test.describe('Activity Layout', () => {
               width: 300,
             },
             right: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             bottom: {
-              height: 150,
+              height: ACTIVITY_PANEL_HEIGHT,
             },
           },
         },
@@ -1417,13 +1370,13 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             right: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             bottom: {
-              height: 150,
+              height: ACTIVITY_PANEL_HEIGHT,
             },
           },
         },
@@ -1439,13 +1392,13 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             right: {
               width: 300,
             },
             bottom: {
-              height: 150,
+              height: ACTIVITY_PANEL_HEIGHT,
             },
           },
         },
@@ -1459,13 +1412,13 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             right: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             bottom: {
-              height: 150,
+              height: ACTIVITY_PANEL_HEIGHT,
             },
           },
         },
@@ -1481,10 +1434,10 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             right: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             bottom: {
               height: 250,
@@ -1501,13 +1454,13 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             right: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
             },
             bottom: {
-              height: 150,
+              height: ACTIVITY_PANEL_HEIGHT,
             },
           },
         },
@@ -1521,23 +1474,17 @@ test.describe('Activity Layout', () => {
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       // left-top
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
-      .navigatePart('part.activity-1', ['test-part'])
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       // left-bottom
-      .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-2', ɵactivityId: 'activity.2'})
-      .navigatePart('part.activity-2', ['test-part'])
+      .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
       // right-top
-      .addPart('part.activity-3', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-3', ɵactivityId: 'activity.3'})
-      .navigatePart('part.activity-3', ['test-part'])
+      .addPart('part.activity-3', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
       // right-bottom
-      .addPart('part.activity-4', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-4', ɵactivityId: 'activity.4'})
-      .navigatePart('part.activity-4', ['test-part'])
+      .addPart('part.activity-4', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
       // bottom-left
-      .addPart('part.activity-5', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-5', ɵactivityId: 'activity.5'})
-      .navigatePart('part.activity-5', ['test-part'])
+      .addPart('part.activity-5', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
       // bottom-right
-      .addPart('part.activity-6', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-6', ɵactivityId: 'activity.6'})
-      .navigatePart('part.activity-6', ['test-part'])
+      .addPart('part.activity-6', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'})
       // activate activities
       .activatePart('part.activity-1')
       .activatePart('part.activity-2')
@@ -1552,16 +1499,16 @@ test.describe('Activity Layout', () => {
       activityLayout: {
         panels: {
           left: {
-            width: 200,
-            ratio: .5,
+            width: ACTIVITY_PANEL_WIDTH,
+            ratio: ACTIVITY_PANEL_RATIO,
           },
           right: {
-            width: 200,
-            ratio: .5,
+            width: ACTIVITY_PANEL_WIDTH,
+            ratio: ACTIVITY_PANEL_RATIO,
           },
           bottom: {
-            height: 150,
-            ratio: .5,
+            height: ACTIVITY_PANEL_HEIGHT,
+            ratio: ACTIVITY_PANEL_RATIO,
           },
         },
       },
@@ -1585,16 +1532,16 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
               ratio: expectedRatio,
             },
             right: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             bottom: {
-              height: 150,
-              ratio: .5,
+              height: ACTIVITY_PANEL_HEIGHT,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
           },
         },
@@ -1608,16 +1555,16 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             right: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             bottom: {
-              height: 150,
-              ratio: .5,
+              height: ACTIVITY_PANEL_HEIGHT,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
           },
         },
@@ -1642,16 +1589,16 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             right: {
-              width: 200,
+              width: ACTIVITY_PANEL_WIDTH,
               ratio: expectedRatio,
             },
             bottom: {
-              height: 150,
-              ratio: .5,
+              height: ACTIVITY_PANEL_HEIGHT,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
           },
         },
@@ -1665,16 +1612,16 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             right: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             bottom: {
-              height: 150,
-              ratio: .5,
+              height: ACTIVITY_PANEL_HEIGHT,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
           },
         },
@@ -1699,15 +1646,15 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             right: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             bottom: {
-              height: 150,
+              height: ACTIVITY_PANEL_HEIGHT,
               ratio: expectedRatio,
             },
           },
@@ -1722,16 +1669,16 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             right: {
-              width: 200,
-              ratio: .5,
+              width: ACTIVITY_PANEL_WIDTH,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
             bottom: {
-              height: 150,
-              ratio: .5,
+              height: ACTIVITY_PANEL_HEIGHT,
+              ratio: ACTIVITY_PANEL_RATIO,
             },
           },
         },
@@ -1741,38 +1688,27 @@ test.describe('Activity Layout', () => {
 
   test('should remove activities', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
+
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
       // left-top
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
-      .navigatePart('part.activity-1', ['test-part'])
-      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-2', ɵactivityId: 'activity.2'})
-      .navigatePart('part.activity-2', ['test-part'])
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
       // left-bottom
-      .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-3', ɵactivityId: 'activity.3'})
-      .navigatePart('part.activity-3', ['test-part'])
-      .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'testee-4', ɵactivityId: 'activity.4'})
-      .navigatePart('part.activity-4', ['test-part'])
+      .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+      .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
       // right-top
-      .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-5', ɵactivityId: 'activity.5'})
-      .navigatePart('part.activity-5', ['test-part'])
-      .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'testee-6', ɵactivityId: 'activity.6'})
-      .navigatePart('part.activity-6', ['test-part'])
+      .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
+      .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'})
       // right-bottom
-      .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-7', ɵactivityId: 'activity.7'})
-      .navigatePart('part.activity-7', ['test-part'])
+      .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 7', ɵactivityId: 'activity.7'})
       .addPart('part.activity-8', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-8', ɵactivityId: 'activity.8'})
-      .navigatePart('part.activity-8', ['test-part'])
       // bottom-left
-      .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-9', ɵactivityId: 'activity.9'})
-      .navigatePart('part.activity-9', ['test-part'])
-      .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'testee-10', ɵactivityId: 'activity.10'})
-      .navigatePart('part.activity-10', ['test-part'])
+      .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 9', ɵactivityId: 'activity.9'})
+      .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 10', ɵactivityId: 'activity.10'})
       // bottom-right
-      .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-11', ɵactivityId: 'activity.11'})
-      .navigatePart('part.activity-11', ['test-part'])
-      .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'testee-12', ɵactivityId: 'activity.12'})
-      .navigatePart('part.activity-12', ['test-part'])
+      .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 11', ɵactivityId: 'activity.11'})
+      .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
       // activate activities
       .activatePart('part.activity-1')
       .activatePart('part.activity-4')
@@ -1788,63 +1724,49 @@ test.describe('Activity Layout', () => {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
-              {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+              {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
             ],
             activeActivityId: 'activity.1',
           },
           leftBottom: {
             activities: [
-              {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-              {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+              {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+              {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
             ],
             activeActivityId: 'activity.4',
           },
           rightTop: {
             activities: [
-              {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-              {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+              {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+              {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
             ],
             activeActivityId: 'activity.5',
           },
           rightBottom: {
             activities: [
-              {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+              {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
               {id: 'activity.8', icon: 'folder', label: 'testee-8'},
             ],
             activeActivityId: 'activity.8',
           },
           bottomLeft: {
             activities: [
-              {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-              {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+              {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+              {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
             ],
             activeActivityId: 'activity.9',
           },
           bottomRight: {
             activities: [
-              {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-              {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+              {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+              {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
             ],
             activeActivityId: 'activity.12',
           },
         },
       },
     });
-
-    // Assert parts
-    await expectPart(appPO.part({partId: 'part.activity-1'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-4'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-5'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-    await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
     await test.step('remove left-top activities', async () => {
       // Remove activity.1
@@ -1856,62 +1778,48 @@ test.describe('Activity Layout', () => {
           toolbars: {
             leftTop: {
               activities: [
-                {id: 'activity.2', icon: 'folder', label: 'testee-2'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
               ],
               activeActivityId: 'none',
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'activity.4',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'activity.5',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-5'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
       // Remove activity.2
       await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-2'));
@@ -1926,56 +1834,42 @@ test.describe('Activity Layout', () => {
             },
             leftBottom: {
               activities: [
-                {id: 'activity.3', icon: 'folder', label: 'testee-3'},
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'activity.4',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'activity.5',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-5'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
     });
 
     await test.step('remove left-bottom activities', async () => {
@@ -1992,55 +1886,41 @@ test.describe('Activity Layout', () => {
             },
             leftBottom: {
               activities: [
-                {id: 'activity.4', icon: 'folder', label: 'testee-4'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
               ],
               activeActivityId: 'activity.4',
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'activity.5',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-5'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
       // Remove activity.4
       await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-4'));
@@ -2059,49 +1939,35 @@ test.describe('Activity Layout', () => {
             },
             rightTop: {
               activities: [
-                {id: 'activity.5', icon: 'folder', label: 'testee-5'},
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'activity.5',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
     });
 
     await test.step('remove right-top activities', async () => {
@@ -2122,48 +1988,34 @@ test.describe('Activity Layout', () => {
             },
             rightTop: {
               activities: [
-                {id: 'activity.6', icon: 'folder', label: 'testee-6'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
               ],
               activeActivityId: 'none',
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
       // Remove activity.6
       await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-6'));
@@ -2186,42 +2038,28 @@ test.describe('Activity Layout', () => {
             },
             rightBottom: {
               activities: [
-                {id: 'activity.7', icon: 'folder', label: 'testee-7'},
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
                 {id: 'activity.8', icon: 'folder', label: 'testee-8'},
               ],
               activeActivityId: 'activity.8',
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
     });
 
     await test.step('remove right-bottom activities', async () => {
@@ -2252,35 +2090,21 @@ test.describe('Activity Layout', () => {
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
       // Remove activity.8
       await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-8'));
@@ -2307,35 +2131,21 @@ test.describe('Activity Layout', () => {
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.9', icon: 'folder', label: 'testee-9'},
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'activity.9',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-9'})).toDisplayComponent(PartPagePO.selector);
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
     });
 
     await test.step('remove bottom-left activities', async () => {
@@ -2364,34 +2174,20 @@ test.describe('Activity Layout', () => {
             },
             bottomLeft: {
               activities: [
-                {id: 'activity.10', icon: 'folder', label: 'testee-10'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
               ],
               activeActivityId: 'none',
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-9'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
       // Remove activity.10
       await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-10'));
@@ -2422,28 +2218,14 @@ test.describe('Activity Layout', () => {
             },
             bottomRight: {
               activities: [
-                {id: 'activity.11', icon: 'folder', label: 'testee-11'},
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-9'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
     });
 
     await test.step('remove bottom-right activities', async () => {
@@ -2476,27 +2258,13 @@ test.describe('Activity Layout', () => {
             },
             bottomRight: {
               activities: [
-                {id: 'activity.12', icon: 'folder', label: 'testee-12'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
               ],
               activeActivityId: 'activity.12',
             },
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-9'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).toDisplayComponent(PartPagePO.selector);
 
       // Remove activity.12
       await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-12'));
@@ -2532,20 +2300,6 @@ test.describe('Activity Layout', () => {
           },
         },
       });
-
-      // Assert parts
-      await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-2'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-3'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-4'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-5'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-6'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-7'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-8'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-9'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-10'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-11'})).not.toBeAttached();
-      await expectPart(appPO.part({partId: 'part.activity-12'})).not.toBeAttached();
     });
   });
 
@@ -2554,16 +2308,16 @@ test.describe('Activity Layout', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'}),
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'}),
     );
 
-    // Assert activity layout
+    // Assert activity not to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'none',
           },
@@ -2575,18 +2329,17 @@ test.describe('Activity Layout', () => {
         },
       },
     });
-
-    // Expect part not to be attached
-    await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
 
     // Navigate part.activity-1
     await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.activity-1', ['test-part']));
+
+    // Assert activity not to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'none',
           },
@@ -2598,16 +2351,17 @@ test.describe('Activity Layout', () => {
         },
       },
     });
-    await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
 
     // Activate part.activity-1
     await workbenchNavigator.modifyLayout(layout => layout.activatePart('part.activity-1'));
+
+    // Expect activity to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'activity.1',
           },
@@ -2619,6 +2373,8 @@ test.describe('Activity Layout', () => {
         },
       },
     });
+
+    // Expect part to display
     await expectPart(appPO.part({partId: 'part.activity-1'})).toDisplayComponent(PartPagePO.selector);
   });
 
@@ -2627,16 +2383,16 @@ test.describe('Activity Layout', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'}),
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'}),
     );
 
-    // Assert activity layout
+    // Expect activity not to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'none',
           },
@@ -2649,20 +2405,17 @@ test.describe('Activity Layout', () => {
       },
     });
 
-    // Assert part
-    await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-
     // Open view.100
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {partId: 'part.activity-1', target: 'view.100'});
 
-    // Assert activity layout
+    // Expect activity to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'activity.1',
           },
@@ -2675,10 +2428,7 @@ test.describe('Activity Layout', () => {
       },
     });
 
-    // Assert part
-    await expectPart(appPO.part({partId: 'part.activity-1'})).not.toDisplayComponent();
-
-    // Assert view
+    // Expect view to be active
     const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expectView(viewPage).toBeActive();
   });
@@ -2688,17 +2438,17 @@ test.describe('Activity Layout', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart(MAIN_AREA)
-      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       .addView('view.100', {partId: 'part.activity-1'}),
     );
 
-    // Assert activity layout
+    // Expect activity not to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'none',
           },
@@ -2711,22 +2461,17 @@ test.describe('Activity Layout', () => {
       },
     });
 
-    // Assert view
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
-    await expectView(viewPage).not.toBeAttached();
-    await expectPart(appPO.part({partId: 'part.activity-1'})).not.toBeAttached();
-
     // Navigate view
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {partId: 'part.activity-1', target: 'view.100'});
 
-    // Assert activity layout
+    // Expect activity to be active
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       activityLayout: {
         toolbars: {
           leftTop: {
             activities: [
-              {id: 'activity.1', icon: 'folder', label: 'testee-1'},
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
             ],
             activeActivityId: 'activity.1',
           },
@@ -2739,8 +2484,194 @@ test.describe('Activity Layout', () => {
       },
     });
 
-    // Assert view
+    // Expect view to be active
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
     await expectView(viewPage).toBeActive();
     await expectPart(appPO.part({partId: 'part.activity-1'})).not.toDisplayComponent();
+  });
+
+  test('should restore activity layout when reloading application', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.modifyLayout(factory => factory
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .activatePart('part.activity-1'),
+    );
+
+    // Expect activity to be activated
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+            ],
+            activeActivityId: 'activity.1',
+          },
+          leftBottom: {activities: [], activeActivityId: 'none'},
+          rightTop: {activities: [], activeActivityId: 'none'},
+          rightBottom: {activities: [], activeActivityId: 'none'},
+          bottomLeft: {activities: [], activeActivityId: 'none'},
+          bottomRight: {activities: [], activeActivityId: 'none'},
+        },
+      },
+      grids: {
+        'activity.1': {
+          root: new MPart({id: 'part.activity-1'}),
+        },
+      },
+    });
+
+    // Reload the application
+    await appPO.reload();
+
+    // Expect activity layout to be restored
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [
+              {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+            ],
+            activeActivityId: 'activity.1',
+          },
+          leftBottom: {activities: [], activeActivityId: 'none'},
+          rightTop: {activities: [], activeActivityId: 'none'},
+          rightBottom: {activities: [], activeActivityId: 'none'},
+          bottomLeft: {activities: [], activeActivityId: 'none'},
+          bottomRight: {activities: [], activeActivityId: 'none'},
+        },
+      },
+      grids: {
+        'activity.1': {
+          root: new MPart({id: 'part.activity-1'}),
+        },
+      },
+    });
+  });
+
+  test.describe('Title', () => {
+
+    test('should display title', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {title: 'testee', icon: 'folder', label: 'Label'})
+        .navigatePart('part.activity', ['test-part'])
+        .activatePart('part.activity'),
+      );
+
+      const partPage = new PartPagePO(appPO, {partId: 'part.activity'});
+
+      // Expect title defined on the layout to display.
+      await expect(partPage.part.bar.title).toHaveText('testee');
+
+      // Set title via part handle.
+      await partPage.enterTitle('testee-1');
+      await expect(partPage.part.bar.title).toHaveText('testee-1');
+
+      // Enter empty title.
+      await partPage.enterTitle('');
+      await expect(partPage.part.bar.title).not.toBeAttached();
+
+      // Clear title. Expect title defined on the layout to display.
+      await partPage.enterTitle(undefined);
+      await expect(partPage.part.bar.title).toHaveText('testee');
+    });
+
+    test('should display title if not set (fall back to label)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Label', icon: 'folder'})
+        .activatePart('part.activity'),
+      );
+
+      // Expect title to display (fall back to label).
+      await expect(appPO.part({partId: 'part.activity'}).bar.title).toHaveText('Label');
+    });
+
+    test('should not display title if set to false', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {title: false, label: 'testee', icon: 'folder'})
+        .activatePart('part.activity'),
+      );
+
+      // Expect title not to display.
+      await expect(appPO.part({partId: 'part.activity'}).bar.title).not.toBeAttached();
+    });
+
+    test('should display title only in top-left part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1-bottom', {dockTo: 'left-top'}, {title: 'testee-1', icon: 'folder', label: 'Activity 1'})
+        .addPart('part.activity-1-top', {relativeTo: 'part.activity-1-bottom', align: 'top'}, {title: 'testee-2'})
+        .addPart('part.activity-1-left', {relativeTo: 'part.activity-1-top', align: 'left'}, {title: 'testee-3'})
+        .navigatePart('part.activity-1-bottom', ['test-part'])
+        .navigatePart('part.activity-1-top', ['test-part'])
+        .navigatePart('part.activity-1-left', ['test-part'])
+        .activatePart('part.activity-1-bottom'),
+      );
+
+      const partPageLeft = new PartPagePO(appPO, {partId: 'part.activity-1-left'});
+      const partPageTop = new PartPagePO(appPO, {partId: 'part.activity-1-top'});
+      const partPageBottom = new PartPagePO(appPO, {partId: 'part.activity-1-bottom'});
+
+      // Expect title to display only in top-left part.
+      await expect(partPageLeft.part.bar.title).toHaveText('testee-1');
+      await expect(partPageTop.part.bar.title).not.toBeAttached();
+      await expect(partPageBottom.part.bar.title).not.toBeAttached();
+
+      // Remove top-left part.
+      await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-1-left'));
+
+      // Expect title to display.
+      await expect(partPageTop.part.bar.title).toHaveText('testee-1');
+      await expect(partPageBottom.part.bar.title).not.toBeAttached();
+
+      // Remove top-left part.
+      await workbenchNavigator.modifyLayout(layout => layout.removePart('part.activity-1-top'));
+
+      // Expect title to display.
+      await expect(partPageBottom.part.bar.title).toHaveText('testee-1');
+    });
+  });
+
+  test.describe('Tooltip', () => {
+
+    test('should display tooltip', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {tooltip: 'Tooltip', label: 'Label', icon: 'folder', ɵactivityId: 'activity.1'}),
+      );
+
+      const activityItem = appPO.activityItem({activityId: 'activity.1'});
+
+      // Expect tooltip to display.
+      await expect.poll(() => activityItem.getTooltip()).toEqual('Tooltip');
+    });
+
+    test('should display tooltip if not set (fall back to label)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Label', icon: 'folder', ɵactivityId: 'activity.1'}),
+      );
+
+      const activityItem = appPO.activityItem({activityId: 'activity.1'});
+
+      // Expect tooltip to display (fall back to label).
+      await expect.poll(() => activityItem.getTooltip()).toEqual('Label');
+    });
   });
 });

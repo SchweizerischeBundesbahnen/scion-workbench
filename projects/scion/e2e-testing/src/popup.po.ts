@@ -10,8 +10,7 @@
 
 import {Locator} from '@playwright/test';
 import {DomRect, fromRect, getCssClasses, hasCssClass} from './helper/testing.util';
-
-export const POPUP_DIAMOND_ANCHOR_SIZE = 8;
+import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench/workbench-layout-constants';
 
 /**
  * Handle for interacting with a workbench popup.

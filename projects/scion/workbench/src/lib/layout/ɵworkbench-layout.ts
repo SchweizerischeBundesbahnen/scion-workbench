@@ -691,7 +691,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const activityId = extras.ɵactivityId ?? WorkbenchLayouts.computeActivityId();
     const title = extras.title === false ? undefined : extras.title ?? extras.label;
     this._grids[activityId] = {
-      root: new MPart({id, alternativeId: extras.alternativeId, title, structural: true, views: []}),
+      root: new MPart({
+        id,
+        alternativeId: extras.alternativeId,
+        title,
+        structural: true,
+        views: [],
+        cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+      }),
       activePartId: id,
     };
 
@@ -849,7 +856,14 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       throw Error(`[PartAddError] Part id must be unique. The layout already contains a part with the id '${id}'.`);
     }
 
-    const newPart = new MPart({id, alternativeId: extras?.alternativeId, title: extras?.title, structural: extras?.structural ?? true, views: [], cssClass: Arrays.coerce(extras?.cssClass)});
+    const newPart = new MPart({
+      id,
+      alternativeId: extras?.alternativeId,
+      title: extras?.title,
+      structural: extras?.structural ?? true,
+      views: [],
+      cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+    });
 
     // Find the reference element, if specified, or use the layout root as reference otherwise.
     const referenceElement = relativeTo.relativeTo ? this.findTreeElement({id: relativeTo.relativeTo}) : this.grids.main.root;
@@ -990,7 +1004,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._navigationStates.set(newPartId, this._navigationStates.get(part.id)!);
       this._navigationStates.delete(part.id);
     }
-
+    const activity = this.activity({partId: part.id}, {orElse: null});
+    if (activity?.referencePartId === part.id) {
+      activity.referencePartId = newPartId;
+    }
     const {grid} = this.grid({partId: part.id});
     if (grid.activePartId === part.id) {
       grid.activePartId = newPartId;

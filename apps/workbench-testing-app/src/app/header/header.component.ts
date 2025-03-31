@@ -223,21 +223,25 @@ export class HeaderComponent {
     return [
       new MenuItem({
         text: 'Left',
+        cssClass: 'e2e-change-panel-alignment-left',
         checked: this.workbenchService.panelAlignment() === 'left',
         onAction: () => this.workbenchService.panelAlignment.set('left'),
       }),
       new MenuItem({
         text: 'Right',
+        cssClass: 'e2e-change-panel-alignment-right',
         checked: this.workbenchService.panelAlignment() === 'right',
         onAction: () => this.workbenchService.panelAlignment.set('right'),
       }),
       new MenuItem({
         text: 'Center',
+        cssClass: 'e2e-change-panel-alignment-center',
         checked: this.workbenchService.panelAlignment() === 'center',
         onAction: () => this.workbenchService.panelAlignment.set('center'),
       }),
       new MenuItem({
         text: 'Justify',
+        cssClass: 'e2e-change-panel-alignment-justify',
         checked: this.workbenchService.panelAlignment() === 'justify',
         onAction: () => this.workbenchService.panelAlignment.set('justify'),
       }),

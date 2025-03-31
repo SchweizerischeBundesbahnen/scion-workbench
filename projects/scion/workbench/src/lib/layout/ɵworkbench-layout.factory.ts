@@ -33,7 +33,17 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
 
     return this.create({
       grids: {
-        main: {root: new MPart({id: partId, alternativeId, title: extras?.title, structural: true, views: [], cssClass: Arrays.coerce(extras?.cssClass)}), activePartId: partId},
+        main: {
+          root: new MPart({
+            id: partId,
+            alternativeId,
+            title: extras?.title,
+            structural: true,
+            views: [],
+            cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+          }),
+          activePartId: partId,
+        },
       },
     });
   }

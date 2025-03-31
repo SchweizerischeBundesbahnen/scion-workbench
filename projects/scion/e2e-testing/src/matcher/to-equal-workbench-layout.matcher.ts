@@ -108,33 +108,36 @@ async function assertActivityGroup(expectedGroup: MActivityGroup, locator: Locat
 }
 
 async function assertActivityPanels(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
-  await assertLeftActivityPanel(expectedActivityLayout, locator);
-  await assertRightActivityPanel(expectedActivityLayout, locator);
-  await assertBottomActivityPanel(expectedActivityLayout, locator);
+  if (!expectedActivityLayout.panels) {
+    return;
+  }
+  await assertLeftActivityPanel(expectedActivityLayout.panels.left, locator.locator('wb-layout wb-activity-panel[data-panel="left"]'));
+  await assertRightActivityPanel(expectedActivityLayout.panels.right, locator.locator('wb-layout wb-activity-panel[data-panel="right"]'));
+  await assertBottomActivityPanel(expectedActivityLayout.panels.bottom, locator.locator('wb-layout wb-activity-panel[data-panel="bottom"]'));
 }
 
-async function assertLeftActivityPanel(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
-  const panelLocator = locator.locator('wb-layout wb-activity-panel[data-panel="left"]');
-  if (expectedActivityLayout.panels?.left === null) {
+async function assertLeftActivityPanel(expectedPanel: MActivityLayout['panels']['left'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
     await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected left activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
   }
-  if (expectedActivityLayout.panels?.left) {
-    await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected element '${panelLocator}' to be in the DOM, but is not.`));
-  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected left activity panel '${panelLocator}' to be in the DOM, but is not.`));
+
   // Assert left activity panel width
-  if (expectedActivityLayout.panels?.left?.width) {
+  if (expectedPanel.width) {
     const panelBoundingBox = (await panelLocator.boundingBox())!;
     await throwIfBoundingBoxNotCloseTo({
       actual: panelBoundingBox,
       expected: {
         x: panelBoundingBox.x,
         y: panelBoundingBox.y,
-        width: expectedActivityLayout.panels.left.width,
+        width: expectedPanel.width,
         height: panelBoundingBox.height,
       },
-      context: () => `Width of left activity panel does not match expected. [actual=${panelBoundingBox.width}, expected=${expectedActivityLayout.panels!.left!.width}]`,
+      context: () => `Width of left activity panel does not match expected. [actual=${panelBoundingBox.width}, expected=${expectedPanel.width}]`,
     });
-    if (expectedActivityLayout.panels.left.ratio) {
+    if (expectedPanel.ratio) {
       // Assert top group
       const topGridLocator = panelLocator.locator('wb-grid').nth(0);
       const topGridBoundingBox = (await topGridLocator.boundingBox())!;
@@ -143,10 +146,10 @@ async function assertLeftActivityPanel(expectedActivityLayout: Partial<MActivity
         expected: {
           x: topGridBoundingBox.x,
           y: topGridBoundingBox.y,
-          width: expectedActivityLayout.panels.left.width,
-          height: (panelBoundingBox.height - 1) * expectedActivityLayout.panels.left.ratio, // subtract 1 to account for splitter size
+          width: expectedPanel.width,
+          height: (panelBoundingBox.height - 1) * expectedPanel.ratio, // subtract 1 to account for splitter size
         },
-        context: () => `Height of top group of left activity panel does not match expected. [actualTopGroupHeight=${topGridBoundingBox.height}, actualLeftPanelHeight=${panelBoundingBox.height}, expectedTopGroupHeight=${expectedActivityLayout.panels!.left!.ratio! * panelBoundingBox.height}, expectedRatio=${expectedActivityLayout.panels!.left!.ratio!}]`,
+        context: () => `Height of top group of left activity panel does not match expected. [actualTopGroupHeight=${topGridBoundingBox.height}, actualLeftPanelHeight=${panelBoundingBox.height}, expectedTopGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
       });
       // Assert bottom group
       const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
@@ -156,38 +159,37 @@ async function assertLeftActivityPanel(expectedActivityLayout: Partial<MActivity
         expected: {
           x: bottomGridBoundingBox.x,
           y: bottomGridBoundingBox.y,
-          width: expectedActivityLayout.panels.left.width,
-          height: (panelBoundingBox.height - 1) * (1 - expectedActivityLayout.panels.left.ratio), // subtract 1 to account for splitter size
+          width: expectedPanel.width,
+          height: (panelBoundingBox.height - 1) * (1 - expectedPanel.ratio), // subtract 1 to account for splitter size
         },
-        context: () => `Height of bottom group of left activity panel does not match expected. [actualBottomGroupHeight=${bottomGridBoundingBox.height}, actualLeftPanelHeight=${panelBoundingBox.height}, expectedBottomGroupHeight=${expectedActivityLayout.panels!.left!.ratio! * panelBoundingBox.height}, expectedRatio=${expectedActivityLayout.panels!.left!.ratio!}]`,
+        context: () => `Height of bottom group of left activity panel does not match expected. [actualBottomGroupHeight=${bottomGridBoundingBox.height}, actualLeftPanelHeight=${panelBoundingBox.height}, expectedBottomGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
       });
     }
   }
-
 }
 
-async function assertRightActivityPanel(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
-  const panelLocator = locator.locator('wb-layout wb-activity-panel[data-panel="right"]');
-  if (expectedActivityLayout.panels?.right === null) {
+async function assertRightActivityPanel(expectedPanel: MActivityLayout['panels']['right'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
     await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected right activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
   }
-  if (expectedActivityLayout.panels?.right) {
-    await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected element '${panelLocator}' to be in the DOM, but is not.`));
-  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected right activity panel '${panelLocator}' to be in the DOM, but is not.`));
+
   // Assert right activity panel width
-  if (expectedActivityLayout.panels?.right?.width) {
+  if (expectedPanel.width) {
     const panelBoundingBox = (await panelLocator.boundingBox())!;
     await throwIfBoundingBoxNotCloseTo({
       actual: panelBoundingBox,
       expected: {
         x: panelBoundingBox.x,
         y: panelBoundingBox.y,
-        width: expectedActivityLayout.panels.right.width,
+        width: expectedPanel.width,
         height: panelBoundingBox.height,
       },
-      context: () => `Right activity panel width does not match expected. [actual=${panelBoundingBox.width}, expected=${expectedActivityLayout.panels!.right!.width}]`,
+      context: () => `Right activity panel width does not match expected. [actual=${panelBoundingBox.width}, expected=${expectedPanel.width}]`,
     });
-    if (expectedActivityLayout.panels.right.ratio) {
+    if (expectedPanel.ratio) {
       // Assert top group
       const topGridLocator = panelLocator.locator('wb-grid').nth(0);
       const topGridBoundingBox = (await topGridLocator.boundingBox())!;
@@ -196,10 +198,10 @@ async function assertRightActivityPanel(expectedActivityLayout: Partial<MActivit
         expected: {
           x: topGridBoundingBox.x,
           y: topGridBoundingBox.y,
-          width: expectedActivityLayout.panels.right.width,
-          height: (panelBoundingBox.height - 1) * expectedActivityLayout.panels.right.ratio, // subtract 1 to account for splitter size
+          width: expectedPanel.width,
+          height: (panelBoundingBox.height - 1) * expectedPanel.ratio, // subtract 1 to account for splitter size
         },
-        context: () => `Height of top group of right activity panel does not match expected. [actualTopGroupHeight=${topGridBoundingBox.height}, actualRightPanelHeight=${panelBoundingBox.height}, expectedTopGroupHeight=${expectedActivityLayout.panels!.right!.ratio! * panelBoundingBox.height}, expectedRatio=${expectedActivityLayout.panels!.right!.ratio!}]`,
+        context: () => `Height of top group of right activity panel does not match expected. [actualTopGroupHeight=${topGridBoundingBox.height}, actualRightPanelHeight=${panelBoundingBox.height}, expectedTopGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
       });
 
       // Assert bottom group
@@ -210,25 +212,25 @@ async function assertRightActivityPanel(expectedActivityLayout: Partial<MActivit
         expected: {
           x: bottomGridBoundingBox.x,
           y: bottomGridBoundingBox.y,
-          width: expectedActivityLayout.panels.right.width,
-          height: (panelBoundingBox.height - 1) * (1 - expectedActivityLayout.panels.right.ratio), // subtract 1 to account for splitter size
+          width: expectedPanel.width,
+          height: (panelBoundingBox.height - 1) * (1 - expectedPanel.ratio), // subtract 1 to account for splitter size
         },
-        context: () => `Height of bottom group of right activity panel does not match expected. [actualBottomGroupHeight=${bottomGridBoundingBox.height}, actualRightPanelHeight=${panelBoundingBox.height}, expectedBottomGroupHeight=${expectedActivityLayout.panels!.right!.ratio! * panelBoundingBox.height}, expectedRatio=${expectedActivityLayout.panels!.right!.ratio!}]`,
+        context: () => `Height of bottom group of right activity panel does not match expected. [actualBottomGroupHeight=${bottomGridBoundingBox.height}, actualRightPanelHeight=${panelBoundingBox.height}, expectedBottomGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
       });
     }
   }
 }
 
-async function assertBottomActivityPanel(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
-  const panelLocator = locator.locator('wb-layout wb-activity-panel[data-panel="bottom"]');
-  if (expectedActivityLayout.panels?.bottom === null) {
+async function assertBottomActivityPanel(expectedPanel: MActivityLayout['panels']['bottom'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
     await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected bottom activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
   }
-  if (expectedActivityLayout.panels?.bottom) {
-    await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected element '${panelLocator}' to be in the DOM, but is not.`));
-  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected bottom activity panel '${panelLocator}' to be in the DOM, but is not.`));
+
   // Assert bottom activity panel height
-  if (expectedActivityLayout.panels?.bottom?.height) {
+  if (expectedPanel.height) {
     const panelBoundingBox = (await panelLocator.boundingBox())!;
     await throwIfBoundingBoxNotCloseTo({
       actual: panelBoundingBox,
@@ -236,11 +238,11 @@ async function assertBottomActivityPanel(expectedActivityLayout: Partial<MActivi
         x: panelBoundingBox.x,
         y: panelBoundingBox.y,
         width: panelBoundingBox.width,
-        height: expectedActivityLayout.panels.bottom.height,
+        height: expectedPanel.height,
       },
-      context: () => `Bottom activity panel height does not match expected. [actual=${panelBoundingBox.height}, expected=${expectedActivityLayout.panels!.bottom!.height}]`,
+      context: () => `Bottom activity panel height does not match expected. [actual=${panelBoundingBox.height}, expected=${expectedPanel.height}]`,
     });
-    if (expectedActivityLayout.panels.bottom.ratio) {
+    if (expectedPanel.ratio) {
       // Assert left group
       const leftGridLocator = panelLocator.locator('wb-grid').nth(0);
       const leftGridBoundingBox = (await leftGridLocator.boundingBox())!;
@@ -249,11 +251,10 @@ async function assertBottomActivityPanel(expectedActivityLayout: Partial<MActivi
         expected: {
           x: leftGridBoundingBox.x,
           y: leftGridBoundingBox.y,
-          width: (panelBoundingBox.width - 1) * expectedActivityLayout.panels.bottom.ratio, // subtract 1 to account for splitter size
-          height: expectedActivityLayout.panels.bottom.height,
+          width: (panelBoundingBox.width - 1) * expectedPanel.ratio, // subtract 1 to account for splitter size
+          height: expectedPanel.height,
         },
-        // context: () => `Width of left group of bottom activity panel does not match expected. [actualLeftGroupWidth=${leftGridBoundingBox.width}, actualBottomPanelWidth=${panelBoundingBox.width}, expectedLeftGroupWidth=${expectedActivityLayout.panels!.bottom!.ratio! * panelBoundingBox.width}, expectedRatio=${expectedActivityLayout.panels!.bottom!.ratio!}]`,
-        context: () => `Width of left group of bottom activity panel does not match expected. [actualRatio=${leftGridBoundingBox.width / panelBoundingBox.width}, expectedRatio=${expectedActivityLayout.panels!.bottom!.ratio!}]`,
+        context: () => `Width of left group of bottom activity panel does not match expected. [actualLeftGroupWidth=${leftGridBoundingBox.width}, actualBottomPanelWidth=${panelBoundingBox.width}, expectedLeftGroupWidth=${expectedPanel.ratio! * panelBoundingBox.width}, expectedRatio=${expectedPanel.ratio}]`,
       });
 
       // Assert right group
@@ -264,11 +265,10 @@ async function assertBottomActivityPanel(expectedActivityLayout: Partial<MActivi
         expected: {
           x: rightGridBoundingBox.x,
           y: rightGridBoundingBox.y,
-          width: (panelBoundingBox.width - 1) * (1 - expectedActivityLayout.panels.bottom.ratio), // subtract 1 to account for splitter size
-          height: expectedActivityLayout.panels.bottom.height,
+          width: (panelBoundingBox.width - 1) * (1 - expectedPanel.ratio), // subtract 1 to account for splitter size
+          height: expectedPanel.height,
         },
-        // context: () => `Width of right group of bottom activity panel does not match expected. [actualRightGroupWidth=${rightGridBoundingBox.width}, actualBottomPanelWidth=${panelBoundingBox.width}, expectedRightGroupWidth=${expectedActivityLayout.panels!.bottom!.ratio! * panelBoundingBox.width}, expectedRatio=${expectedActivityLayout.panels!.bottom!.ratio!}]`,
-        context: () => `Width of right group of bottom activity panel does not match expected. [actualRatio=${1 - (leftGridBoundingBox.width / panelBoundingBox.width)}, expectedRatio=${expectedActivityLayout.panels!.bottom!.ratio!}]`,
+        context: () => `Width of right group of bottom activity panel does not match expected. [actualRightGroupWidth=${rightGridBoundingBox.width}, actualBottomPanelWidth=${panelBoundingBox.width}, expectedRightGroupWidth=${expectedPanel.ratio! * panelBoundingBox.width}, expectedRatio=${expectedPanel.ratio}]`,
       });
     }
   }
@@ -594,17 +594,17 @@ export interface MActivityLayout {
   }>;
   panels: {
     left: {
-      width?: number;
+      width: number;
       ratio?: number;
-    } | null;
+    } | 'closed';
     right: {
-      width?: number;
+      width: number;
       ratio?: number;
-    } | null;
+    } | 'closed';
     bottom: {
-      height?: number;
+      height: number;
       ratio?: number;
-    } | null;
+    } | 'closed';
   };
 }
 

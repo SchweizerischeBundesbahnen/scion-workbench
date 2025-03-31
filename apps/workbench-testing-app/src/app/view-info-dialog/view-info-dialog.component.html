@@ -24,7 +24,7 @@
   </sci-form-field>
 
   <sci-form-field label="Part Title">
-    <input class="e2e-part-title" [ngModel]="view().part().title()" (ngModelChange)="view().part().title = $event">
+    <input class="e2e-part-title" [ngModel]="view().part().title() | appStringify" (ngModelChange)="onPartTitleChange($event)" [attr.list]="partTitleList">
   </sci-form-field>
 
   <sci-form-field label="Navigation Hint">
@@ -68,3 +68,7 @@
 <ng-template wbDialogAction>
   <button (click)="onClose()">Close</button>
 </ng-template>
+
+<datalist [attr.id]="partTitleList">
+  <option value="<undefined>">&lt;undefined&gt;</option>
+</datalist>
