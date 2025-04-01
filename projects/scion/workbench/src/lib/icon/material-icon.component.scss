@@ -1,0 +1,8 @@
+:host {
+  display: grid;
+
+  > span {
+    display: grid;
+    place-content: center;
+  }
+}

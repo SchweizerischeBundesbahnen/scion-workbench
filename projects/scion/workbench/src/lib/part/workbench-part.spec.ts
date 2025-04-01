@@ -17,10 +17,11 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {Component, DestroyRef, Directive, inject, OnDestroy} from '@angular/core';
+import {Component, DestroyRef, Directive, inject, OnDestroy, signal} from '@angular/core';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchPartNavigation} from './workbench-part.model';
+import {By} from '@angular/platform-browser';
 
 describe('WorkbenchPart', () => {
 
@@ -292,5 +293,33 @@ describe('WorkbenchPart', () => {
     // Expect properties not to be changed until destroyed previous component.
     expect(componentInstancePart7.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'part-7'}, state: {state: 'part-7'}, hint: 'part-7'}));
     expect(componentInstancePart7.navigationCssClassReadInDestroy).toEqual(['part-7']);
+  });
+
+  it('should set part title', async () => {
+    const texts = {
+      'title-1': 'TITLE-1',
+      'title-2': 'TITLE-2',
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => {
+            return factory
+              .addPart('part.left', {title: '%title-1'})
+              .addPart('part.right', {align: 'right'}, {title: 'title-2'})
+              .navigatePart('part.left', ['test-part'])
+              .navigatePart('part.right', ['test-part']);
+          },
+          textProvider: key => signal(texts[key as keyof typeof texts]),
+        }),
+      ],
+    });
+    const fixture = TestBed.createComponent(WorkbenchComponent);
+    await waitForInitialWorkbenchLayout();
+
+    // Expect title to be set.
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('TITLE-1');
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.right"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('title-2');
   });
 });

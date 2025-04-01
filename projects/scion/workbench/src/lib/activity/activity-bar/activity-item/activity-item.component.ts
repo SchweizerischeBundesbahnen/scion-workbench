@@ -9,29 +9,34 @@
  */
 
 import {Component, computed, ElementRef, inject, input} from '@angular/core';
-import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {MActivity} from '../../workbench-activity.model';
 import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
 import {synchronizeCssClasses} from '../../../common/css-class.util';
 import {Arrays} from '@scion/toolkit/util';
+import {NgComponentOutlet} from '@angular/common';
+import {provideText} from '../../../text/text-provider';
+import {provideIcon} from '../../../icon/icon-provider';
 
 @Component({
   selector: 'wb-activity-item',
   templateUrl: './activity-item.component.html',
   styleUrls: ['./activity-item.component.scss'],
   imports: [
-    SciMaterialIconDirective,
+    NgComponentOutlet,
   ],
   host: {
     '[class.active]': 'active()',
     '[attr.data-activityid]': 'activity().id',
-    '[attr.title]': 'activity().tooltip || activity().label',
+    '[attr.title]': 'tooltip()',
   },
 })
 export class ActivityItemComponent {
 
   public readonly activity = input.required<MActivity>();
   public readonly active = input.required<boolean>();
+
+  protected readonly tooltip = provideText(computed(() => this.activity().tooltip ?? this.activity().label));
+  protected readonly iconDescriptor = provideIcon(computed(() => this.activity().icon));
 
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 

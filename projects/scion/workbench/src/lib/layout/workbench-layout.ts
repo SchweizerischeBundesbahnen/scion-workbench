@@ -11,7 +11,7 @@
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
 import {ActivityId} from '../activity/workbench-activity.model';
-import {Translatable} from '../translation/workbench-translation.model';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is

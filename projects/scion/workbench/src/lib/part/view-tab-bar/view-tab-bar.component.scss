@@ -34,7 +34,7 @@
       display: flex;
       position: relative; // positioning context for the :after pseudo element, which actually renders the divider as an overlay
       width: 0; // divider must not occupy space
-      transition: opacity 300ms ease-out; // Animate removal of divider when hovering adjacent tab.
+      transition: opacity 200ms ease-out; // Animate removal of divider when hovering adjacent tab.
 
       &:after {
         flex: none;

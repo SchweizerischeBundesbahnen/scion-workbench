@@ -15,6 +15,7 @@
   [x] Provide 2 Perspectives with activities
 [x] @scion/components: Provide sash sizes as object literal instead of array
 [] Documentation (JSDoc)
+  [] Requires Material Icon Font if using default icon provider: @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
 [] HowTo
 [] Do not disable animations when starting locally and on CI (fix tests: e.g.: host-popup.e2e-spec.ts: should stick to the popup anchor)
 [x] remove activity part

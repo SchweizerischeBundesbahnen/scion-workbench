@@ -18,6 +18,7 @@ import {dimension} from '@scion/components/dimension';
 import {NgClass} from '@angular/common';
 import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
+import {provideText} from '../../text/text-provider';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -47,6 +48,7 @@ export class PartBarComponent {
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly startActions = computed(() => this.part.actions().filter(action => action.align === 'start'));
   protected readonly endActions = computed(() => this.part.actions().filter(action => action.align !== 'start'));
+  protected readonly partTitle = provideText(this.part.title);
   protected readonly maxViewTabBarWidth: Signal<number>;
 
   constructor() {

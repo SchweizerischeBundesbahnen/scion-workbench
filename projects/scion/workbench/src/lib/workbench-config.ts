@@ -15,7 +15,8 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
-import {ComponentDescriptor} from './workbench.model';
+import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
+import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
 
 /**
  * Configuration of the SCION Workbench.
@@ -132,10 +133,28 @@ export abstract class WorkbenchConfig {
     modalityScope?: 'workbench' | 'viewport';
   };
 
-  public abstract textProvider?: (key: string) => string | Signal<string>;
+  /**
+   * Provides texts to the SCION Workbench.
+   *
+   * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
+   * Otherwise, the text is returned as is.
+   *
+   * The function:
+   * - Can call `inject` to get any required dependencies.
+   * - Can call `toSignal` to convert an Observable to a Signal.
+   */
+  public abstract textProvider?: WorkbenchTextProviderFn;
 
-  // consider MaterialIconProvder as default provider
-  public abstract iconProvider?: (icon: string) => ComponentType<unknown> | ComponentDescriptor;
+  /**
+   * Provides icons to the SCION Workbench.
+   *
+   * The workbench calls this function to get a component to render the icon.
+   *
+   * Defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
+   *
+   * The function can call `inject` to get any required dependencies.
+   */
+  public abstract iconProvider?: WorkbenchIconProviderFn;
 
   /**
    * Configures logging for the workbench.

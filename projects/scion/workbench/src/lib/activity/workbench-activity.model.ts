@@ -10,7 +10,7 @@
 
 import {ACTIVITY_ID_PREFIX} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
-import {Translatable} from '../workbench.model';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Format of an activity identifier.
