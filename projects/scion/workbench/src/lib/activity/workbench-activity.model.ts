@@ -19,6 +19,15 @@ import {Translatable} from '../text/workbench-text-provider.model';
  */
 export type ActivityId = `${typeof ACTIVITY_ID_PREFIX}${string}`;
 
+/**
+ * Defines the layout of docked parts (also known as activities) in the workbench.
+ *
+ * A part can be docked to the left, right, or bottom side of the workbench. Each side allows for displaying
+ * two docked parts, with the left and right docking areas split vertically and the bottom docking area split horizontally.
+ *
+ * Docked parts can be minimized to the activity bar on either the left or right side of the workbench.
+ * A docked part may be navigated to display content, have views, or define a layout with multiple parts aligned relative to each other.
+ */
 export interface MActivityLayout {
   toolbars: {
     leftTop: MActivityGroup;
@@ -30,16 +39,16 @@ export interface MActivityLayout {
   };
   panels: {
     left: {
-      width?: string;
-      ratio?: number;
+      width: number;
+      ratio: number;
     };
     right: {
-      width?: string;
-      ratio?: number;
+      width: number;
+      ratio: number;
     };
     bottom: {
-      height?: string;
-      ratio?: number;
+      height: number;
+      ratio: number;
     };
   };
 }
@@ -50,14 +59,26 @@ export interface MActivityGroup {
   minimizedActivityId?: ActivityId;
 }
 
+/**
+ * Represents a docked part docked to the left, right, or bottom side of the workbench.
+ *
+ * A docked part may be navigated to display content, have views, or define a layout of multiple parts aligned relative to each other.
+ */
 export interface MActivity {
+  /** @see DockedPartExtras#ɵactivityId */
   id: ActivityId;
   /**
-   * References the part TODO [activity]
+   * References the initial part of this activity.
+   *
+   * If a view stack, the part is not removed when removing its last view. Explicitly removing this part removes the activity.
    */
   referencePartId: PartId;
+  /** @see DockedPartExtras#icon */
   icon: string;
+  /** @see DockedPartExtras#label */
   label: Translatable;
+  /** @see DockedPartExtras#tooltip */
   tooltip?: Translatable;
+  /** @see DockedPartExtras#cssClass */
   cssClass?: string | string[];
 }

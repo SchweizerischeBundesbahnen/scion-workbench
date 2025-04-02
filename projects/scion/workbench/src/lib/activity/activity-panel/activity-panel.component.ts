@@ -49,7 +49,7 @@ export class ActivityPanelComponent {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
   protected readonly workbenchLayout = computed(() => this._workbenchLayoutService.layout()!);
-  protected readonly sashSizes = computed(() => calculateSashSizes(this.workbenchLayout().activityLayout.panels[this.panel()].ratio ?? .5));
+  protected readonly sashSizes = computed(() => calculateSashSizes(this.workbenchLayout().activityLayout.panels[this.panel()].ratio));
   protected readonly direction = computed(() => this.panel() === 'bottom' ? 'row' : 'column');
 
   protected onSashStart(): void {

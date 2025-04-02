@@ -25,8 +25,9 @@
   [x] Test: Navigate view with router should activate activity
   [x] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
   [x] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
-  [] part bar visible different conditions (part.title() || part.viewIds().length || part.actions().length || part.canMinimize())
-  [] activity reload page should restore layout (panel size and splitter ratio)
+  [] Test: part bar visible different conditions (part.title() || part.viewIds().length || part.actions().length || part.canMinimize())
+  [] Test: activity reload page should restore layout (panel size and splitter ratio)
+  [] Test: Add docked part to test 'should have stable identifiers' when added support to Jasmine `toEqualWorkbenchLayout` matcher
 [] i18n
   [] minimize part action
 [x] add part include activity parts in part list
@@ -34,18 +35,20 @@
 [x] Part Title
 [] add keystroke to maximize (ctrl+shift+F12)
 [] Sashing right activity panel to the left should not overlap left activity panel (e.g. left panel alignment)
+[] Consider moving computed in PartHandle (computeTitle, computeActivity, computeTopLeft) to onLayoutChange
+[] Add activity support to Jasmine `toEqualWorkbenchLayout` matcher
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
 [] Part Portal (to not lose changes when closing activity)
 [] Hide Activities & menu to show activities
 [] Show Labels toolbars: {showLabels: boolean};
-[] Contribute part actions to specific activity (maybe with a context (key/value map))
+[] Contribute part actions to specific activity (maybe with a context (key/value map)) -> see thinktank
 [] Remove outlets of hidden activities (maybe not for minimized parts to not reload on reopen, crucial for microfrontend preformance)
 [] activity item focus (keyboard navigation)
 
 ## TODO Phase 3:
-[] Merger
+[] Intelligent Merger of activity layout
 [] Display actions and minimize button only on hover or when part has focus unless part is in main area (always visible)
 
 ## TO DISCUSS:
@@ -76,3 +79,6 @@
   -> Variante: addView('view.id', {partId: 'project'})
      Falls Project Part nicht mehr sichtbar (weil keine View mehr drin), dann automatiscsher
      Fallback auf active View dieses Grids.
+
+## Angular 20
+Use string interpolation in layout.component ([size]="panel.width + 'px'")

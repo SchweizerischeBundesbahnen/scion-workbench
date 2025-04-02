@@ -25,7 +25,7 @@ import {WorkbenchGrids} from './workbench-grids.model';
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
  *
- * TODO [activity] Rename to WorkbenchGridSerializer
+ * TODO [activity] Rename to WorkbenchGridSerializer, or keep in an move WorkbenchActivityLayoutSerializer into this class.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutSerializer {
@@ -44,15 +44,10 @@ export class WorkbenchLayoutSerializer {
    * @param flags - Controls how to serialize the grids.
    */
   public serializeGrids(grids: WorkbenchGrids, flags?: GridSerializationFlags): WorkbenchGrids<string> {
-    const entries = Object.entries(grids).reduce((acc, [gridName, grid]: [string, ɵMPartGrid | undefined]) => {
+    const serializedGrids = Object.entries(grids).reduce((acc, [gridName, grid]: [string, ɵMPartGrid | undefined]) => {
       if (grid === undefined) {
         return acc;
       }
-
-      if (flags?.undefinedIfEmpty && grid.root instanceof MPart && !grid.root.views.length && !grid.root.navigation && !grid.root.structural) {
-        return acc;
-      }
-
       const json = stringify(grid, {
         exclusions: new Array<string | Exclusion>()
           .concat('**/parent')
@@ -67,7 +62,7 @@ export class WorkbenchLayoutSerializer {
 
       return acc.set(gridName, serialized);
     }, new Map<string, string>());
-    return Object.fromEntries(entries) as unknown as WorkbenchGrids<string>;
+    return Object.fromEntries(serializedGrids) as unknown as WorkbenchGrids<string>;
   }
 
   /**
@@ -189,9 +184,4 @@ export interface GridSerializationFlags {
    * Stable sort order is required to compare the initial grid with the user-modified grid to detect layout changes.
    */
   sort?: true;
-
-  /**
-   * TODO [activity] Chose more specific name.
-   */
-  undefinedIfEmpty?: true;
 }

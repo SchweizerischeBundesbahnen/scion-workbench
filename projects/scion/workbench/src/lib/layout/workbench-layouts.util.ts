@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MTreeNode} from './workbench-layout.model';
+import {MPart, MPartGrid, MTreeNode} from './workbench-layout.model';
 import {MAIN_AREA} from './workbench-layout';
 import {ViewId} from '../view/workbench-view.model';
 import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
@@ -48,6 +48,15 @@ export const WorkbenchLayouts = {
       return element.id === MAIN_AREA || element.views.length > 0 || !!element.navigation;
     }
     return WorkbenchLayouts.isGridElementVisible(element.child1) || WorkbenchLayouts.isGridElementVisible(element.child2);
+  },
+
+  /**
+   * Tests if the given {@link MPartGrid} is empty.
+   *
+   * An empty grid has a single, non-structural part with no views and no navigation.
+   */
+  isGridEmpty: (grid: MPartGrid | undefined): boolean => {
+    return !grid || (grid.root instanceof MPart && !grid.root.views.length && !grid.root.navigation && !grid.root.structural);
   },
 
   /**

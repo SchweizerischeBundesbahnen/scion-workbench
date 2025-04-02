@@ -129,14 +129,14 @@ describe('WorkbenchLayoutSerializer', () => {
       mainGrid: {
         root: new MTreeNode({
           child1: new MPart({
-            id: 'part.1',
+            id: 'part.__1__',
           }),
           child2: new MTreeNode({
             child1: new MPart({
-              id: 'part.2',
+              id: 'part.__2__',
             }),
             child2: new MPart({
-              id: 'part.3',
+              id: 'part.__3__',
               alternativeId: 'right-bottom',
             }),
           }),

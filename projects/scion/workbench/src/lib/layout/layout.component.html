@@ -44,7 +44,7 @@
           <sci-sashbox [direction]="'row'" (sashEnd2)="onHorizontalSashEnd($event)">
             <!-- Left Activity Panel -->
             @if (leftActivityPanel(); as panel) {
-              <ng-template sciSash [size]="panel.width" key="left" [animate]="panelAnimation()">
+              <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
                 <wb-activity-panel [panel]="'left'" [activityId1]="toolbars().leftTop.activeActivityId" [activityId2]="toolbars().leftBottom.activeActivityId"/>
               </ng-template>
             }
@@ -56,7 +56,7 @@
         </ng-template>
         <!-- Bottom Activity Panel -->
         @if (bottomActivityPanel(); as panel) {
-          <ng-template sciSash [size]="panel.height" key="bottom" [animate]="panelAnimation()">
+          <ng-template sciSash [size]="panel.height + 'px'" key="bottom" [animate]="panelAnimation()">
             <wb-activity-panel [panel]="'bottom'" [activityId1]="toolbars().bottomLeft.activeActivityId" [activityId2]="toolbars().bottomRight.activeActivityId"/>
           </ng-template>
         }
@@ -64,7 +64,7 @@
     </ng-template>
     <!-- Right Activity Panel -->
     @if (rightActivityPanel(); as panel) {
-      <ng-template sciSash [size]="panel.width" key="right" [animate]="panelAnimation()">
+      <ng-template sciSash [size]="panel.width + 'px'" key="right" [animate]="panelAnimation()">
         <wb-activity-panel [panel]="'right'" [activityId1]="toolbars().rightTop.activeActivityId" [activityId2]="toolbars().rightBottom.activeActivityId"/>
       </ng-template>
     }
@@ -87,7 +87,7 @@
   <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
     <!-- Left Activity Panel -->
     @if (leftActivityPanel(); as panel) {
-      <ng-template sciSash [size]="panel.width" key="left" [animate]="panelAnimation()">
+      <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
         <wb-activity-panel [panel]="'left'" [activityId1]="toolbars().leftTop.activeActivityId" [activityId2]="toolbars().leftBottom.activeActivityId"/>
       </ng-template>
     }
@@ -101,7 +101,7 @@
             </ng-template>
             <!-- Right Activity Panel -->
             @if (rightActivityPanel(); as panel) {
-              <ng-template sciSash [size]="panel.width" key="right" [animate]="panelAnimation()">
+              <ng-template sciSash [size]="panel.width + 'px'" key="right" [animate]="panelAnimation()">
                 <wb-activity-panel [panel]="'right'" [activityId1]="toolbars().rightTop.activeActivityId" [activityId2]="toolbars().rightBottom.activeActivityId"/>
               </ng-template>
             }
@@ -109,7 +109,7 @@
         </ng-template>
         <!-- Bottom Activity Panel -->
         @if (bottomActivityPanel(); as panel) {
-          <ng-template sciSash [size]="panel.height" key="bottom" [animate]="panelAnimation()">
+          <ng-template sciSash [size]="panel.height + 'px'" key="bottom" [animate]="panelAnimation()">
             <wb-activity-panel [panel]="'bottom'" [activityId1]="toolbars().bottomLeft.activeActivityId" [activityId2]="toolbars().bottomRight.activeActivityId"/>
           </ng-template>
         }
@@ -132,7 +132,7 @@
   <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
     <!-- Left Activity Panel -->
     @if (leftActivityPanel(); as panel) {
-      <ng-template sciSash [size]="panel.width" key="left" [animate]="panelAnimation()">
+      <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
         <wb-activity-panel [panel]="'left'" [activityId1]="toolbars().leftTop.activeActivityId" [activityId2]="toolbars().leftBottom.activeActivityId"/>
       </ng-template>
     }
@@ -144,7 +144,7 @@
         </ng-template>
         <!-- Bottom Activity Panel -->
         @if (bottomActivityPanel(); as panel) {
-          <ng-template sciSash [size]="panel.height" key="bottom" [animate]="panelAnimation()">
+          <ng-template sciSash [size]="panel.height + 'px'" key="bottom" [animate]="panelAnimation()">
             <wb-activity-panel [panel]="'bottom'" [activityId1]="toolbars().bottomLeft.activeActivityId" [activityId2]="toolbars().bottomRight.activeActivityId"/>
           </ng-template>
         }
@@ -152,7 +152,7 @@
     </ng-template>
     <!-- Right Activity Panel -->
     @if (rightActivityPanel(); as panel) {
-      <ng-template sciSash [size]="panel.width" key="right" [animate]="panelAnimation()">
+      <ng-template sciSash [size]="panel.width + 'px'" key="right" [animate]="panelAnimation()">
         <wb-activity-panel [panel]="'right'" [activityId1]="toolbars().rightTop.activeActivityId" [activityId2]="toolbars().rightBottom.activeActivityId"/>
       </ng-template>
     }
@@ -177,7 +177,7 @@
       <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
         <!-- Left Activity Panel -->
         @if (leftActivityPanel(); as panel) {
-          <ng-template sciSash [size]="panel.width" key="left" [animate]="panelAnimation()">
+          <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
             <wb-activity-panel [panel]="'left'" [activityId1]="toolbars().leftTop.activeActivityId" [activityId2]="toolbars().leftBottom.activeActivityId"/>
           </ng-template>
         }
@@ -187,7 +187,7 @@
         </ng-template>
         <!-- Right Activity Panel -->
         @if (rightActivityPanel(); as panel) {
-          <ng-template sciSash [size]="panel.width" key="right" [animate]="panelAnimation()">
+          <ng-template sciSash [size]="panel.width + 'px'" key="right" [animate]="panelAnimation()">
             <wb-activity-panel [panel]="'right'" [activityId1]="toolbars().rightTop.activeActivityId" [activityId2]="toolbars().rightBottom.activeActivityId"/>
           </ng-template>
         }
@@ -195,7 +195,7 @@
     </ng-template>
     <!-- Bottom Activity Panel -->
     @if (bottomActivityPanel(); as panel) {
-      <ng-template sciSash [size]="panel.height" key="bottom" [animate]="panelAnimation()">
+      <ng-template sciSash [size]="panel.height + 'px'" key="bottom" [animate]="panelAnimation()">
         <wb-activity-panel [panel]="'bottom'" [activityId1]="toolbars().bottomLeft.activeActivityId" [activityId2]="toolbars().bottomRight.activeActivityId"/>
       </ng-template>
     }

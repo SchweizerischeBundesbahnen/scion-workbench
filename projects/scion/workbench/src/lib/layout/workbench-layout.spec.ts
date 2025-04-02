@@ -26,6 +26,8 @@ import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {PartId} from '../part/workbench-part.model';
+import {MActivityLayout} from '../activity/workbench-activity.model';
+import {WorkbenchGrids} from './workbench-grids.model';
 
 describe('WorkbenchLayout', () => {
 
@@ -1182,7 +1184,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.outlets({mainGrid: true})['view.1']).toBeUndefined();
   });
 
-  it('should also rename associated data when renaming view', () => {
+  it('should rename view', () => {
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.part')
       .addView('view.1', {partId: 'part.part'})
@@ -1196,6 +1198,21 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.navigationState({outlet: 'view.2'})).toEqual({some: 'state'});
     expect(workbenchLayout.urlSegments({outlet: 'view.2'})).toEqual(segments(['path/to/view']));
     expect(workbenchLayout.outlets({mainGrid: true})['view.2']).toEqual(segments(['path/to/view']));
+  });
+
+  it('should rename part', () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.1')
+      .navigatePart('part.1', ['path/to/part'], {state: {some: 'state'}})
+      .renamePart('part.1', 'part.2');
+
+    expect(workbenchLayout.navigationState({outlet: 'part.1'})).toEqual({});
+    expect(workbenchLayout.urlSegments({outlet: 'part.1'})).toEqual([]);
+    expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})['part.1']).toBeUndefined();
+
+    expect(workbenchLayout.navigationState({outlet: 'part.2'})).toEqual({some: 'state'});
+    expect(workbenchLayout.urlSegments({outlet: 'part.2'})).toEqual(segments(['path/to/part']));
+    expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})['part.2']).toEqual(segments(['path/to/part']));
   });
 
   it('should remove associated data when removing part', () => {
@@ -1774,7 +1791,7 @@ describe('WorkbenchLayout', () => {
       .addView('view.1', {partId: 'part.innerLeft'})
       .addView('view.2', {partId: 'part.outerLeft'});
 
-    // Find without criteria
+    // Find without criteria.
     expect(workbenchLayout.parts().map(part => part.id)).toEqual(jasmine.arrayWithExactContents([
       MAIN_AREA,
       'part.outerLeft',
@@ -1784,24 +1801,31 @@ describe('WorkbenchLayout', () => {
       'part.outerRight',
     ]));
 
-    // Find by part id
+    // Find by part id.
     expect(workbenchLayout.parts({id: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
     expect(workbenchLayout.parts({id: 'part.innerLeft'}).map(part => part.id)).toEqual(['part.innerLeft']);
 
-    // Find by view id
+    // Find by view id.
     expect(workbenchLayout.parts({viewId: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
     expect(workbenchLayout.parts({viewId: 'view.1'}).map(part => part.id)).toEqual(['part.innerLeft']);
     expect(workbenchLayout.parts({viewId: 'view.2'}).map(part => part.id)).toEqual(['part.outerLeft']);
 
-    // Find by peripheral
+    // Find by peripheral.
     expect(workbenchLayout.parts({peripheral: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
     expect(workbenchLayout.parts({peripheral: true}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.outerLeft', 'part.outerRight']));
     expect(workbenchLayout.parts({peripheral: false}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.innerLeft', 'part.innerRight', 'part.initial', MAIN_AREA]));
 
-    // Find by grid
+    // Find by grid.
     expect(workbenchLayout.parts({grid: undefined}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents([MAIN_AREA, 'part.outerLeft', 'part.innerLeft', 'part.initial', 'part.innerRight', 'part.outerRight']));
     expect(workbenchLayout.parts({grid: 'main'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.outerLeft', MAIN_AREA, 'part.outerRight']));
     expect(workbenchLayout.parts({grid: 'mainArea'}).map(part => part.id)).toEqual(jasmine.arrayWithExactContents(['part.innerLeft', 'part.initial', 'part.innerRight']));
+
+    // Expect to throw if finding multiple parts.
+    expect(() => workbenchLayout.parts({}, {throwIfMulti: true})).toThrowError(/MultiPartError/);
+    // Expect to throw if finding no part.
+    expect(() => workbenchLayout.parts({id: 'part.99'}, {throwIfEmpty: true})).toThrowError(/NullPartError/);
+    // Expect empty array if finding no part.
+    expect(workbenchLayout.parts({id: 'part.99'})).toEqual([]);
   });
 
   it('should find part by criteria', () => {
@@ -1818,98 +1842,165 @@ describe('WorkbenchLayout', () => {
       .addView('view.3', {partId: 'part.outerLeft'})
       .addView('view.4', {partId: 'part.outerRight'});
 
-    // Find by part id
+    // Find by part id.
     expect(workbenchLayout.part({partId: 'part.outerLeft'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({partId: 'part.innerLeft'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({partId: 'part.innerRight'}).id).toEqual('part.innerRight');
     expect(workbenchLayout.part({partId: 'part.outerRight'}).id).toEqual('part.outerRight');
 
-    // Find by grid and part id
+    // Find by grid and part id.
     expect(workbenchLayout.part({grid: 'main', partId: 'part.outerLeft'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerLeft'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerRight'}).id).toEqual('part.innerRight');
     expect(workbenchLayout.part({grid: 'main', partId: 'part.outerRight'}).id).toEqual('part.outerRight');
 
-    // Find by view id
+    // Find by view id.
     expect(workbenchLayout.part({viewId: 'view.1'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({viewId: 'view.2'}).id).toEqual('part.innerRight');
     expect(workbenchLayout.part({viewId: 'view.3'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({viewId: 'view.4'}).id).toEqual('part.outerRight');
 
-    // Find by grid and view id
+    // Find by grid and view id.
     expect(workbenchLayout.part({grid: 'mainArea', viewId: 'view.1'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', viewId: 'view.2'}).id).toEqual('part.innerRight');
     expect(workbenchLayout.part({grid: 'main', viewId: 'view.3'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({grid: 'main', viewId: 'view.4'}).id).toEqual('part.outerRight');
 
-    // Find by part id and view id
+    // Find by part id and view id.
     expect(workbenchLayout.part({partId: 'part.innerLeft', viewId: 'view.1'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({partId: 'part.innerRight', viewId: 'view.2'}).id).toEqual('part.innerRight');
     expect(workbenchLayout.part({partId: 'part.outerLeft', viewId: 'view.3'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({partId: 'part.outerRight', viewId: 'view.4'}).id).toEqual('part.outerRight');
 
-    // Find by grid, part id and view id
+    // Find by grid, part id and view id.
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerLeft', viewId: 'view.1'}).id).toEqual('part.innerLeft');
     expect(workbenchLayout.part({grid: 'mainArea', partId: 'part.innerRight', viewId: 'view.2'}).id).toEqual('part.innerRight');
     expect(workbenchLayout.part({grid: 'main', partId: 'part.outerLeft', viewId: 'view.3'}).id).toEqual('part.outerLeft');
     expect(workbenchLayout.part({grid: 'main', partId: 'part.outerRight', viewId: 'view.4'}).id).toEqual('part.outerRight');
+
+    // Expect to throw if finding no part.
+    expect(() => workbenchLayout.part({partId: 'part.99'})).toThrowError(/NullPartError/);
+    // Expect to return null if finding no part.
+    expect(workbenchLayout.part({partId: 'part.99'}, {orElse: null})).toBeNull();
   });
 
-  it('should throw an error if not finding the part', () => {
+  it('should find grid by criteria', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
-      .addView('view.1', {partId: 'part.initial'});
+      .addPart('part.innerLeft', {relativeTo: 'part.initial', align: 'left'})
+      .addPart('part.innerRight', {relativeTo: 'part.initial', align: 'right'})
+      .addPart('part.outerLeft', {relativeTo: MAIN_AREA, align: 'left'})
+      .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'})
+      .addView('view.1', {partId: 'part.innerLeft'})
+      .addView('view.2', {partId: 'part.innerRight'})
+      .addView('view.3', {partId: 'part.outerLeft'})
+      .addView('view.4', {partId: 'part.outerRight'})
+      .addView('view.5', {partId: 'part.activity-1'})
+      .addView('view.6', {partId: 'part.activity-2-top'})
+      .addView('view.7', {partId: 'part.activity-2-bottom'});
 
-    expect(() => workbenchLayout.part({partId: 'part.does-not-exist'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({partId: 'part.does-not-exist', viewId: 'view.1'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({partId: 'part.initial', viewId: 'view.2'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'main', partId: 'part.initial', viewId: 'view.1'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'main', viewId: 'view.1'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.part({grid: 'main', partId: 'part.initial'})).toThrowError(/NullPartError/);
-    expect(() => workbenchLayout.parts({id: 'part.does-not-exist'}, {throwIfEmpty: true})).toThrowError(/NullPartError/);
-    expect(workbenchLayout.parts({id: 'part.does-not-exist'})).toHaveSize(0);
+    // Find by part id.
+    expect(workbenchLayout.grid({partId: 'part.innerLeft'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
+    expect(workbenchLayout.grid({partId: 'part.innerRight'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
+    expect(workbenchLayout.grid({partId: 'part.outerLeft'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
+    expect(workbenchLayout.grid({partId: 'part.outerRight'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
+    expect(workbenchLayout.grid({partId: 'part.activity-1'})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']});
+    expect(workbenchLayout.grid({partId: 'part.activity-2-top'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+    expect(workbenchLayout.grid({partId: 'part.activity-2-bottom'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+
+    // Find by node id.
+    const rootNode = workbenchLayout.grids['activity.2']!.root;
+    expect(workbenchLayout.grid({nodeId: rootNode.id})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+
+    // Find by view id.
+    expect(workbenchLayout.grid({viewId: 'view.1'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
+    expect(workbenchLayout.grid({viewId: 'view.2'})).toEqual({gridName: 'mainArea', grid: workbenchLayout.grids.mainArea});
+    expect(workbenchLayout.grid({viewId: 'view.3'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
+    expect(workbenchLayout.grid({viewId: 'view.4'})).toEqual({gridName: 'main', grid: workbenchLayout.grids.main});
+    expect(workbenchLayout.grid({viewId: 'view.5'})).toEqual({gridName: 'activity.1', grid: workbenchLayout.grids['activity.1']});
+    expect(workbenchLayout.grid({viewId: 'view.6'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+    expect(workbenchLayout.grid({viewId: 'view.7'})).toEqual({gridName: 'activity.2', grid: workbenchLayout.grids['activity.2']});
+
+    // Expect to throw if finding no grid.
+    expect(() => workbenchLayout.grid({partId: 'part.99'})).toThrowError(/NullGridError/);
+    // Expect to return null if finding no grid.
+    expect(workbenchLayout.grid({partId: 'part.99'}, {orElse: null})).toBeNull();
   });
 
-  it('should throw an error if finding multiple parts', () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
-
-    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart('part')
-      .addPart('part', {align: 'right'});
-
-    expect(() => workbenchLayout.parts({id: 'part'}, {throwIfMulti: true})).toThrowError(/MultiPartError/);
-    expect(workbenchLayout.parts({id: 'part'})).toHaveSize(2);
-  });
-
-  it('should return `null` if not finding the part', () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
-
-    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart(MAIN_AREA)
-      .addView('view.1', {partId: 'part.initial'});
-
-    expect(workbenchLayout.part({partId: 'part.does-not-exist'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({partId: 'part.does-not-exist', viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({partId: 'part.initial', viewId: 'view.2'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'main', partId: 'part.initial', viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'main', viewId: 'view.1'}, {orElse: null})).toBeNull();
-    expect(workbenchLayout.part({grid: 'main', partId: 'part.initial'}, {orElse: null})).toBeNull();
-  });
-
-  it('should return whether a part is contained in the main area', () => {
+  it('should return whether a part is contained in the layout', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.inner', {relativeTo: 'part.initial', align: 'left'})
-      .addPart('part.outer', {relativeTo: MAIN_AREA, align: 'left'});
+      .addPart('part.outer', {relativeTo: MAIN_AREA, align: 'left'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'});
 
     expect(workbenchLayout.hasPart('part.initial', {grid: 'mainArea'})).toBeTrue();
     expect(workbenchLayout.hasPart('part.inner', {grid: 'mainArea'})).toBeTrue();
     expect(workbenchLayout.hasPart('part.outer', {grid: 'mainArea'})).toBeFalse();
     expect(workbenchLayout.hasPart(MAIN_AREA, {grid: 'mainArea'})).toBeFalse();
+
+    expect(workbenchLayout.hasPart('part.activity-1', {grid: 'activity.1'})).toBeTrue();
+    expect(workbenchLayout.hasPart('part.activity-1', {grid: 'activity.2'})).toBeFalse();
+    expect(workbenchLayout.hasPart('part.activity-1', {grid: 'mainArea'})).toBeFalse();
+
+    expect(workbenchLayout.hasPart('part.activity-2-top', {grid: 'activity.2'})).toBeTrue();
+    expect(workbenchLayout.hasPart('part.activity-2-top', {grid: 'activity.1'})).toBeFalse();
+    expect(workbenchLayout.hasPart('part.activity-2-top', {grid: 'mainArea'})).toBeFalse();
+
+    expect(workbenchLayout.hasPart('part.activity-2-bottom', {grid: 'activity.2'})).toBeTrue();
+    expect(workbenchLayout.hasPart('part.activity-2-bottom', {grid: 'activity.1'})).toBeFalse();
+    expect(workbenchLayout.hasPart('part.activity-2-bottom', {grid: 'mainArea'})).toBeFalse();
+  });
+
+  it('should return whether a view is contained in the layout', () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.inner', {relativeTo: 'part.initial', align: 'left'})
+      .addPart('part.outer', {relativeTo: MAIN_AREA, align: 'left'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'})
+      .addView('view.1', {partId: 'part.inner'})
+      .addView('view.2', {partId: 'part.outer'})
+      .addView('view.3', {partId: 'part.activity-1'})
+      .addView('view.4', {partId: 'part.activity-2-top'});
+
+    expect(workbenchLayout.hasView('view.1')).toBeTrue();
+    expect(workbenchLayout.hasView('view.1', {grid: 'mainArea'})).toBeTrue();
+    expect(workbenchLayout.hasView('view.1', {grid: 'main'})).toBeFalse();
+
+    expect(workbenchLayout.hasView('view.2')).toBeTrue();
+    expect(workbenchLayout.hasView('view.2', {grid: 'mainArea'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.2', {grid: 'main'})).toBeTrue();
+
+    expect(workbenchLayout.hasView('view.3')).toBeTrue();
+    expect(workbenchLayout.hasView('view.3', {grid: 'mainArea'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.3', {grid: 'main'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.3', {grid: 'activity.1'})).toBeTrue();
+    expect(workbenchLayout.hasView('view.3', {grid: 'activity.2'})).toBeFalse();
+
+    expect(workbenchLayout.hasView('view.4')).toBeTrue();
+    expect(workbenchLayout.hasView('view.4', {grid: 'mainArea'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.4', {grid: 'main'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.4', {grid: 'activity.1'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.4', {grid: 'activity.2'})).toBeTrue();
+
+    expect(workbenchLayout.hasView('view.99')).toBeFalse();
+    expect(workbenchLayout.hasView('view.99', {grid: 'mainArea'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.99', {grid: 'main'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.99', {grid: 'activity.1'})).toBeFalse();
+    expect(workbenchLayout.hasView('view.99', {grid: 'activity.2'})).toBeFalse();
   });
 
   it('should find views by criteria', () => {
@@ -1926,35 +2017,42 @@ describe('WorkbenchLayout', () => {
       .navigateView('view.2', ['path/to/view'], {hint: 'hint2'})
       .navigateView('view.3', ['path/to/view']);
 
-    // Find without criteria
+    // Find without criteria.
     expect(workbenchLayout.views().map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
 
-    // Find by view id
+    // Find by view id.
     expect(workbenchLayout.views({id: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
     expect(workbenchLayout.views({id: 'view.1'}).map(view => view.id)).toEqual(['view.1']);
 
-    // Find by part id
+    // Find by part id.
     expect(workbenchLayout.views({partId: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
     expect(workbenchLayout.views({partId: 'part.initial'}).map(view => view.id)).toEqual(['view.1']);
     expect(workbenchLayout.views({partId: 'part.inner'}).map(view => view.id)).toEqual(['view.2']);
     expect(workbenchLayout.views({partId: 'part.outer'}).map(view => view.id)).toEqual(['view.3']);
 
-    // Find by peripheral
+    // Find by peripheral.
     expect(workbenchLayout.views({peripheral: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
     expect(workbenchLayout.views({peripheral: true}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.3']));
     expect(workbenchLayout.views({peripheral: false}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
 
-    // Find by grid
+    // Find by grid.
     expect(workbenchLayout.views({grid: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
     expect(workbenchLayout.views({grid: 'main'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.3']));
     expect(workbenchLayout.views({grid: 'mainArea'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2']));
 
-    // Find by navigation hint
+    // Find by navigation hint.
     expect(workbenchLayout.views({navigationHint: undefined}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1', 'view.2', 'view.3']));
     expect(workbenchLayout.views({navigationHint: 'hint1'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.1']));
     expect(workbenchLayout.views({navigationHint: 'hint2'}).map(view => view.id)).toEqual(jasmine.arrayWithExactContents(['view.2']));
     expect(workbenchLayout.views({navigationHint: ''}).map(view => view.id)).toEqual([]);
     expect(workbenchLayout.views({navigationHint: null}).map(view => view.id)).toEqual(['view.3']);
+
+    // Expect to throw if finding multiple views.
+    expect(() => workbenchLayout.views({}, {throwIfMulti: true})).toThrowError(/MultiViewError/);
+    // Expect to throw if finding no view.
+    expect(() => workbenchLayout.views({id: 'view.99'}, {throwIfEmpty: true})).toThrowError(/NullViewError/);
+    // Expect empty array if finding no view.
+    expect(workbenchLayout.views({id: 'view.99'})).toEqual([]);
   });
 
   it('should find views by URL segments', () => {
@@ -2027,6 +2125,23 @@ describe('WorkbenchLayout', () => {
       .views({segments: new UrlSegmentMatcher(segments(['path', 'to', 'view', {matrixParam: 'A'}]), {matchWildcardPath: false, matchMatrixParams: true})})
       .map(view => view.id),
     ).toEqual(['view.2']);
+  });
+
+  it('should find view by criteria', () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addView('view.1', {partId: 'part.initial'})
+      .addView('view.2', {partId: 'part.initial'});
+
+    // Find by view id.
+    expect(workbenchLayout.view({viewId: 'view.1'}).id).toEqual('view.1');
+
+    // Expect to throw if finding no view.
+    expect(() => workbenchLayout.view({viewId: 'view.99'})).toThrowError(/NullViewError/);
+    // Expect to return null if finding no view.
+    expect(workbenchLayout.view({viewId: 'view.99'}, {orElse: null})).toBeNull();
   });
 
   it('should activate adjacent view', () => {
@@ -2225,6 +2340,7 @@ describe('WorkbenchLayout', () => {
    * - {@link MPart.navigation.id}
    */
   it('should have stable identifiers', async () => {
+    // TODO [Activity] Add docked part to test stable activity identifier when added support to Jasmine 'toEqualWorkbenchLayout' matcher
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
@@ -2606,6 +2722,903 @@ describe('WorkbenchLayout', () => {
 
     expect(layout.isPeripheralPart('part.left')).toBeFalse();
     expect(layout.isPeripheralPart('part.right')).toBeFalse();
+  });
+
+  it('should find active part by criteria', () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    let layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.innerLeft', {relativeTo: 'part.initial', align: 'left'})
+      .addPart('part.innerRight', {relativeTo: 'part.initial', align: 'right'})
+      .addPart('part.outerLeft', {relativeTo: MAIN_AREA, align: 'left'})
+      .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'});
+
+    // Assert active parts after layout creation.
+    expect(layout.activePart({grid: 'main'}).id).toEqual('part.main-area');
+    expect(layout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
+    expect(layout.activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout.activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2-top');
+
+    // Change active part in main grid.
+    layout = layout.activatePart('part.outerLeft');
+    expect(layout.activePart({grid: 'main'}).id).toEqual('part.outerLeft');
+    expect(layout.activePart({grid: 'mainArea'})!.id).toEqual('part.initial');
+    expect(layout.activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout.activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2-top');
+
+    // Change active part in main area grid.
+    layout = layout.activatePart('part.innerRight');
+    expect(layout.activePart({grid: 'main'}).id).toEqual('part.outerLeft');
+    expect(layout.activePart({grid: 'mainArea'})!.id).toEqual('part.innerRight');
+    expect(layout.activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout.activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2-top');
+
+    // Change active part in activity.2 grid.
+    layout = layout.activatePart('part.activity-2-bottom');
+    expect(layout.activePart({grid: 'main'}).id).toEqual('part.outerLeft');
+    expect(layout.activePart({grid: 'mainArea'})!.id).toEqual('part.innerRight');
+    expect(layout.activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout.activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2-bottom');
+
+    // Change active part in activity.2 grid.
+    layout = layout.activatePart('part.activity-2-top');
+    expect(layout.activePart({grid: 'main'}).id).toEqual('part.outerLeft');
+    expect(layout.activePart({grid: 'mainArea'})!.id).toEqual('part.innerRight');
+    expect(layout.activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout.activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2-top');
+  });
+
+  it('should return view outlets by criteria', async () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.innerLeft', {relativeTo: 'part.initial', align: 'left'})
+      .addPart('part.innerRight', {relativeTo: 'part.initial', align: 'right'})
+      .addPart('part.outerLeft', {relativeTo: MAIN_AREA, align: 'left'})
+      .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'})
+      .addView('view.1', {partId: 'part.innerLeft'})
+      .addView('view.2', {partId: 'part.innerLeft'})
+      .addView('view.3', {partId: 'part.outerLeft'})
+      .addView('view.4', {partId: 'part.outerLeft'})
+      .addView('view.5', {partId: 'part.activity-1'})
+      .addView('view.6', {partId: 'part.activity-1'})
+      .addView('view.7', {partId: 'part.activity-2-top'})
+      .addView('view.8', {partId: 'part.activity-2-top'})
+      .navigateView('view.1', ['path/to/view/1'])
+      .navigateView('view.3', ['path/to/view/3'])
+      .navigateView('view.5', ['path/to/view/5'])
+      .navigateView('view.7', ['path/to/view/7']);
+
+    // Find in all grids.
+    expect(layout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})).toEqual({
+      'view.1': segments(['path/to/view/1']),
+      'view.3': segments(['path/to/view/3']),
+      'view.5': segments(['path/to/view/5']),
+      'view.7': segments(['path/to/view/7']),
+    });
+
+    // Find in main area grid.
+    expect(layout.outlets({mainAreaGrid: true})).toEqual({
+      'view.1': segments(['path/to/view/1']),
+    });
+
+    // Find in main grid.
+    expect(layout.outlets({mainGrid: true})).toEqual({
+      'view.3': segments(['path/to/view/3']),
+    });
+
+    // Find in activity grids.
+    expect(layout.outlets({activityGrids: true})).toEqual({
+      'view.5': segments(['path/to/view/5']),
+      'view.7': segments(['path/to/view/7']),
+    });
+  });
+
+  it('should return part outlets by criteria', async () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.innerLeft', {relativeTo: 'part.initial', align: 'left'})
+      .addPart('part.innerRight', {relativeTo: 'part.initial', align: 'right'})
+      .addPart('part.outerLeft', {relativeTo: MAIN_AREA, align: 'left'})
+      .addPart('part.outerRight', {relativeTo: MAIN_AREA, align: 'right'})
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+      .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'})
+      .navigatePart('part.innerLeft', ['path/to/part/inner-left'])
+      .navigatePart('part.outerLeft', ['path/to/part/outer-left'])
+      .navigatePart('part.activity-1', ['path/to/part/activity-1'])
+      .navigatePart('part.activity-2-bottom', ['path/to/part/activity-2-bottom']);
+
+    // Find in all grids.
+    expect(layout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})).toEqual({
+      'part.innerLeft': segments(['path/to/part/inner-left']),
+      'part.outerLeft': segments(['path/to/part/outer-left']),
+      'part.activity-1': segments(['path/to/part/activity-1']),
+      'part.activity-2-bottom': segments(['path/to/part/activity-2-bottom']),
+    });
+
+    // Find in main area grid.
+    expect(layout.outlets({mainAreaGrid: true})).toEqual({
+      'part.innerLeft': segments(['path/to/part/inner-left']),
+    });
+
+    // Find in main grid.
+    expect(layout.outlets({mainGrid: true})).toEqual({
+      'part.outerLeft': segments(['path/to/part/outer-left']),
+    });
+
+    // Find in activity grids.
+    expect(layout.outlets({activityGrids: true})).toEqual({
+      'part.activity-1': segments(['path/to/part/activity-1']),
+      'part.activity-2-bottom': segments(['path/to/part/activity-2-bottom']),
+    });
+  });
+
+  describe('Activity (Docked Parts)', () => {
+
+    it('should return whether layout contains activities', async () => {
+      const layout1 = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart('part.main');
+      expect(layout1.hasActivities()).toBeFalse();
+
+      const layout2 = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart('part.main')
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'});
+      expect(layout2.hasActivities()).toBeTrue();
+    });
+
+    it('should return whether layout contains a specific activity', async () => {
+      const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart('part.main')
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'});
+      expect(layout.hasActivity('activity.1')).toBeTrue();
+      expect(layout.hasActivity('activity.2')).toBeTrue();
+      expect(layout.hasActivity('activity.99')).toBeFalse();
+    });
+
+    it('should find activities by criteria', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'})
+        .activatePart('part.activity-1')
+        .activatePart('part.activity-3-bottom');
+
+      // Find without criteria.
+      expect(workbenchLayout.activities().map(activity => activity.id)).toEqual(jasmine.arrayWithExactContents(['activity.1', 'activity.2', 'activity.3']));
+
+      // Find by id.
+      expect(workbenchLayout.activities({id: undefined}).map(activity => activity.id)).toEqual(jasmine.arrayWithExactContents(['activity.1', 'activity.2', 'activity.3']));
+      expect(workbenchLayout.activities({id: 'activity.1'}).map(activity => activity.id)).toEqual(['activity.1']);
+      expect(workbenchLayout.activities({id: 'activity.2'}).map(activity => activity.id)).toEqual(['activity.2']);
+      expect(workbenchLayout.activities({id: 'activity.3'}).map(activity => activity.id)).toEqual(['activity.3']);
+
+      // Find by active state.
+      expect(workbenchLayout.activities({active: undefined}).map(activity => activity.id)).toEqual(jasmine.arrayWithExactContents(['activity.1', 'activity.2', 'activity.3']));
+      expect(workbenchLayout.activities({active: true}).map(activity => activity.id)).toEqual(jasmine.arrayWithExactContents(['activity.1', 'activity.3']));
+      expect(workbenchLayout.activities({active: false}).map(activity => activity.id)).toEqual(['activity.2']);
+
+      // Find by part id.
+      expect(workbenchLayout.activities({partId: undefined}).map(activity => activity.id)).toEqual(jasmine.arrayWithExactContents(['activity.1', 'activity.2', 'activity.3']));
+      expect(workbenchLayout.activities({partId: 'part.activity-1'}).map(activity => activity.id)).toEqual(['activity.1']);
+      expect(workbenchLayout.activities({partId: 'part.activity-2'}).map(activity => activity.id)).toEqual(['activity.2']);
+      expect(workbenchLayout.activities({partId: 'part.activity-3-top'}).map(activity => activity.id)).toEqual(['activity.3']);
+      expect(workbenchLayout.activities({partId: 'part.activity-3-bottom'}).map(activity => activity.id)).toEqual(['activity.3']);
+
+      // Expect to throw if finding multiple activities.
+      expect(() => workbenchLayout.activities({}, {throwIfMulti: true})).toThrowError(/MultiActivityError/);
+      // Expect to throw if finding no activity.
+      expect(() => workbenchLayout.activities({id: 'activity.99'}, {throwIfEmpty: true})).toThrowError(/NullActivityError/);
+      // Expect empty array if finding no activity.
+      expect(workbenchLayout.activities({id: 'activity.99'})).toEqual([]);
+    });
+
+    it('should find activity by criteria', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'})
+        .activatePart('part.activity-3-bottom');
+
+      // Find by activity id.
+      expect(workbenchLayout.activity({id: 'activity.1'}).id).toEqual('activity.1');
+
+      // Find by active state.
+      expect(workbenchLayout.activity({active: true}).id).toEqual('activity.3');
+
+      // Find by part id.
+      expect(workbenchLayout.activity({partId: 'part.activity-1'}).id).toEqual('activity.1');
+      expect(workbenchLayout.activity({partId: 'part.activity-2'}).id).toEqual('activity.2');
+      expect(workbenchLayout.activity({partId: 'part.activity-3-top'}).id).toEqual('activity.3');
+      expect(workbenchLayout.activity({partId: 'part.activity-3-bottom'}).id).toEqual('activity.3');
+
+      // Expect to throw if finding multiple activities.
+      expect(() => workbenchLayout.activity({active: false})).toThrowError(/MultiActivityError/);
+      // Expect to throw if finding no activity.
+      expect(() => workbenchLayout.activity({id: 'activity.99'})).toThrowError(/NullActivityError/);
+      // Expect null if finding no activity.
+      expect(workbenchLayout.activity({id: 'activity.99'}, {orElse: null})).toBeNull();
+    });
+
+    it('should find activity groups by criteria', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'});
+
+      const leftTopGroup = workbenchLayout.activityLayout.toolbars.leftTop;
+      const leftBottomGroup = workbenchLayout.activityLayout.toolbars.leftBottom;
+      const rightTopGroup = workbenchLayout.activityLayout.toolbars.rightTop;
+      const rightBottomGroup = workbenchLayout.activityLayout.toolbars.rightBottom;
+      const bottomLeftGroup = workbenchLayout.activityLayout.toolbars.bottomLeft;
+      const bottomRightGroup = workbenchLayout.activityLayout.toolbars.bottomRight;
+
+      // Find without criteria.
+      expect(workbenchLayout.activityGroups()).toEqual(jasmine.arrayWithExactContents([leftTopGroup, leftBottomGroup, rightTopGroup, rightBottomGroup, bottomLeftGroup, bottomRightGroup]));
+
+      // Find by activityId id.
+      expect(workbenchLayout.activityGroups({activityId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopGroup, leftBottomGroup, rightTopGroup, rightBottomGroup, bottomLeftGroup, bottomRightGroup]));
+      expect(workbenchLayout.activityGroups({activityId: 'activity.1'})).toEqual([leftTopGroup]);
+      expect(workbenchLayout.activityGroups({activityId: 'activity.2'})).toEqual([leftBottomGroup]);
+      expect(workbenchLayout.activityGroups({activityId: 'activity.3'})).toEqual([rightTopGroup]);
+
+      // Find by docking area.
+      expect(workbenchLayout.activityGroups({dockTo: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopGroup, leftBottomGroup, rightTopGroup, rightBottomGroup, bottomLeftGroup, bottomRightGroup]));
+      expect(workbenchLayout.activityGroups({dockTo: {dockTo: 'left-top'}})).toEqual([leftTopGroup]);
+      expect(workbenchLayout.activityGroups({dockTo: {dockTo: 'left-bottom'}})).toEqual([leftBottomGroup]);
+      expect(workbenchLayout.activityGroups({dockTo: {dockTo: 'right-top'}})).toEqual([rightTopGroup]);
+      expect(workbenchLayout.activityGroups({dockTo: {dockTo: 'right-bottom'}})).toEqual([rightBottomGroup]);
+      expect(workbenchLayout.activityGroups({dockTo: {dockTo: 'bottom-left'}})).toEqual([bottomLeftGroup]);
+      expect(workbenchLayout.activityGroups({dockTo: {dockTo: 'bottom-right'}})).toEqual([bottomRightGroup]);
+
+      // Find by part id.
+      expect(workbenchLayout.activityGroups({partId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopGroup, leftBottomGroup, rightTopGroup, rightBottomGroup, bottomLeftGroup, bottomRightGroup]));
+      expect(workbenchLayout.activityGroups({partId: 'part.activity-1'})).toEqual([leftTopGroup]);
+      expect(workbenchLayout.activityGroups({partId: 'part.activity-2'})).toEqual([leftBottomGroup]);
+      expect(workbenchLayout.activityGroups({partId: 'part.activity-3-top'})).toEqual([rightTopGroup]);
+      expect(workbenchLayout.activityGroups({partId: 'part.activity-3-bottom'})).toEqual([rightTopGroup]);
+
+      // Expect to throw if finding multiple activity groups.
+      expect(() => workbenchLayout.activityGroups({}, {throwIfMulti: true})).toThrowError(/MultiActivityGroupError/);
+      // Expect to throw if finding no activity group.
+      expect(() => workbenchLayout.activityGroups({activityId: 'activity.99'}, {throwIfEmpty: true})).toThrowError(/NullActivityGroupError/);
+      // Expect empty array if finding no activity group.
+      expect(workbenchLayout.activityGroups({activityId: 'activity.99'})).toEqual([]);
+    });
+
+    it('should find activity group by criteria', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'});
+
+      const leftTopGroup = workbenchLayout.activityLayout.toolbars.leftTop;
+      const leftBottomGroup = workbenchLayout.activityLayout.toolbars.leftBottom;
+      const rightTopGroup = workbenchLayout.activityLayout.toolbars.rightTop;
+      const rightBottomGroup = workbenchLayout.activityLayout.toolbars.rightBottom;
+      const bottomLeftGroup = workbenchLayout.activityLayout.toolbars.bottomLeft;
+      const bottomRightGroup = workbenchLayout.activityLayout.toolbars.bottomRight;
+
+      // Find by activityId id.
+      expect(workbenchLayout.activityGroup({activityId: 'activity.1'})).toEqual(leftTopGroup);
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'})).toEqual(leftBottomGroup);
+      expect(workbenchLayout.activityGroup({activityId: 'activity.3'})).toEqual(rightTopGroup);
+
+      // Find by docking area.
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'left-top'}})).toEqual(leftTopGroup);
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'left-bottom'}})).toEqual(leftBottomGroup);
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'right-top'}})).toEqual(rightTopGroup);
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'right-bottom'}})).toEqual(rightBottomGroup);
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'bottom-left'}})).toEqual(bottomLeftGroup);
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'bottom-right'}})).toEqual(bottomRightGroup);
+
+      // Find by part id.
+      expect(workbenchLayout.activityGroup({partId: 'part.activity-1'})).toEqual(leftTopGroup);
+      expect(workbenchLayout.activityGroup({partId: 'part.activity-2'})).toEqual(leftBottomGroup);
+      expect(workbenchLayout.activityGroup({partId: 'part.activity-3-top'})).toEqual(rightTopGroup);
+      expect(workbenchLayout.activityGroup({partId: 'part.activity-3-bottom'})).toEqual(rightTopGroup);
+
+      // Expect to throw if finding no activity group.
+      expect(() => workbenchLayout.activityGroup({activityId: 'activity.99'})).toThrowError(/NullActivityGroupError/);
+      // Expect null if finding no activity group.
+      expect(workbenchLayout.activityGroup({activityId: 'activity.99'}, {orElse: null})).toBeNull();
+    });
+
+    it('should toggle activity', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'});
+
+      // Expect activities to be minimized.
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+
+      // Toggle activity.1.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+
+      // Toggle activity.2.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+
+      // Toggle activity.3.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toEqual('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+
+      // Toggle activity.3.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+
+      // Toggle activity.2.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+
+      // Toggle activity.1.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.activeActivityId).toBeUndefined();
+    });
+
+    it('should toggle maximized layout state', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+        .addPart('part.activity-4', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
+        .addPart('part.activity-5', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'});
+
+      // Expect activities to be minimized.
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Toggle activities.
+      workbenchLayout = workbenchLayout
+        .toggleActivity('activity.1')
+        .toggleActivity('activity.3')
+        .toggleActivity('activity.5');
+
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toEqual('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Toggle maximize => minimize activities.
+      workbenchLayout = workbenchLayout.toggleMaximized();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toEqual('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Toggle maximize => restore activities.
+      workbenchLayout = workbenchLayout.toggleMaximized();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toEqual('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Toggle maximize => minimize activities.
+      workbenchLayout = workbenchLayout.toggleMaximized();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toEqual('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Open activity 2 and activity 4.
+      workbenchLayout = workbenchLayout
+        .toggleActivity('activity.2')
+        .toggleActivity('activity.4');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toEqual('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toEqual('activity.4');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toEqual('activity.5');
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Toggle maximize => minimize activities.
+      workbenchLayout = workbenchLayout.toggleMaximized();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toEqual('activity.4');
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+
+      // Toggle maximize => restore activities.
+      workbenchLayout = workbenchLayout.toggleMaximized();
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toEqual('activity.4');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightBottom.minimizedActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomLeft.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.bottomRight.minimizedActivityId).toBeUndefined();
+    });
+
+    it('should open activity when activating contained part', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'});
+
+      // Expect activities to be minimized.
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+
+      // Activate part in activity 1.
+      workbenchLayout = workbenchLayout.activatePart('part.activity-1');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toBeUndefined();
+
+      // Close activity 1.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.1');
+
+      // Activate part in activity 2.
+      workbenchLayout = workbenchLayout.activatePart('part.activity-2-top');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toEqual('activity.2');
+
+      // Close activity 2.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.2');
+
+      // Activate part in activity 2.
+      workbenchLayout = workbenchLayout.activatePart('part.activity-2-bottom');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.rightTop.activeActivityId).toEqual('activity.2');
+    });
+
+    it('should have single activity active per activity group', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.3'})
+        .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.4'});
+
+      // Expect activities to be minimized.
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+
+      // Activate part in activity 1.
+      workbenchLayout = workbenchLayout.activatePart('part.activity-1');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.1');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+
+      // Activate part in activity 2.
+      workbenchLayout = workbenchLayout.activatePart('part.activity-2');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toBeUndefined();
+
+      // Toggle activity 3.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.3');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toEqual('activity.3');
+
+      // Toggle activity 4.
+      workbenchLayout = workbenchLayout.toggleActivity('activity.4');
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityLayout.toolbars.leftBottom.activeActivityId).toEqual('activity.4');
+    });
+
+    it('should have reference part', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'});
+
+      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-1');
+      expect(workbenchLayout.activity({id: 'activity.2'}).referencePartId).toEqual('part.activity-2-top');
+
+      // Expect reference part to be structural.
+      expect(workbenchLayout.part({partId: 'part.activity-1'}).structural).toBeTrue();
+      expect(workbenchLayout.part({partId: 'part.activity-2-top'}).structural).toBeTrue();
+    });
+
+    it('should not remove reference part when removing its last view', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addView('view.1', {partId: 'part.activity-1'})
+        .removeView('view.1', {force: true});
+
+      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-1');
+      expect(workbenchLayout.part({partId: 'part.activity-1'})).toBeDefined();
+    });
+
+    it('should not remove structural non-reference part when removing its last view', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'})
+        .addView('view.1', {partId: 'part.activity-2-bottom'})
+        .removeView('view.1', {force: true});
+
+      expect(workbenchLayout.part({partId: 'part.activity-2-bottom'})).toBeDefined();
+    });
+
+    it('should remove non-structural non-reference part when removing its last view', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+        .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'}, {structural: false})
+        .addView('view.1', {partId: 'part.activity-2-bottom'})
+        .removeView('view.1', {force: true});
+
+      expect(workbenchLayout.part({partId: 'part.activity-2-bottom'}, {orElse: null})).toBeNull();
+    });
+
+    it('should have metadata as configured', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'icon', label: 'Label', title: 'Title', tooltip: 'Tooltip', cssClass: 'class-1', ɵactivityId: 'activity.1'});
+
+      expect(workbenchLayout.activity({id: 'activity.1'}).icon).toEqual('icon');
+      expect(workbenchLayout.activity({id: 'activity.1'}).label).toEqual('Label');
+      expect(workbenchLayout.activity({id: 'activity.1'}).tooltip).toEqual('Tooltip');
+      expect(workbenchLayout.activity({id: 'activity.1'}).cssClass).toEqual('class-1');
+      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-1');
+      expect(workbenchLayout.part({partId: 'part.activity-1'}).title).toEqual('Title');
+      expect(workbenchLayout.part({partId: 'part.activity-1'}).cssClass).toEqual(['class-1']);
+      expect(workbenchLayout.part({partId: 'part.activity-1'}).structural).toBeTrue();
+    });
+
+    it('should change activity panel size', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
+
+      // Expect initial panel size.
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(200);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(200);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(150);
+
+      // Change size of left panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSize('left', 210);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(210);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(200);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(150);
+
+      // Change size of right panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSize('right', 220);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(210);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(220);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(150);
+
+      // Change size of bottom panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSize('bottom', 230);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(210);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(220);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(230);
+    });
+
+    it('should change activity panel split ratio', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
+
+      // Expect initial split ratio size.
+      expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.5);
+      expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.5);
+      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
+
+      // Change split ratio of left panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('left', .2);
+      expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
+      expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.5);
+      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
+
+      // Change split ratio of right panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('right', .4);
+      expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
+      expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.4);
+      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.5);
+
+      // Change split ratio of bottom panel.
+      workbenchLayout = workbenchLayout.setActivityPanelSplitRatio('bottom', .6);
+      expect(workbenchLayout.activityLayout.panels.left.ratio).toEqual(.2);
+      expect(workbenchLayout.activityLayout.panels.right.ratio).toEqual(.4);
+      expect(workbenchLayout.activityLayout.panels.bottom.ratio).toEqual(.6);
+    });
+
+    it('should remove activity (plus contained parts, views, outlets, states, ...) when removing reference part', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-bottom-left', {relativeTo: 'part.activity-top', align: 'bottom'})
+        .addPart('part.activity-bottom-right', {relativeTo: 'part.activity-bottom-left', align: 'right'})
+        .addView('view.1', {partId: 'part.activity-bottom-right'})
+        .navigatePart('part.activity-top', ['path/to/part'], {state: {some: 'state'}})
+        .navigatePart('part.activity-bottom-left', ['path/to/part'], {state: {some: 'state'}})
+        .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+        .activatePart('part.activity-top')
+        .toggleMaximized()
+        .activatePart('part.activity-top')
+        // Remove reference part (part.activity-top)
+        .removePart('part.activity-top');
+
+      // Expect activity to be removed.
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activities).toEqual([]);
+
+      // Expect grid to be removed.
+      expect(workbenchLayout.grids['activity.1']).toBeUndefined();
+
+      // Expect parts to be removed.
+      expect(workbenchLayout.part({partId: 'part.activity-top'}, {orElse: null})).toBeNull();
+      expect(workbenchLayout.part({partId: 'part.activity-bottom-left'}, {orElse: null})).toBeNull();
+      expect(workbenchLayout.part({partId: 'part.activity-bottom-right'}, {orElse: null})).toBeNull();
+
+      // Expect views to be removed.
+      expect(workbenchLayout.view({viewId: 'view.1'}, {orElse: null})).toBeNull();
+
+      // Expect outlets to be removed.
+      expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})).toEqual({});
+
+      // Expect states to be removed.
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-top'})).toEqual({});
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-bottom-left'})).toEqual({});
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-bottom-right'})).toEqual({});
+      expect(workbenchLayout.navigationState({outlet: 'view.1'})).toEqual({});
+
+      // Expect clean up of references in activity groups.
+      expect(workbenchLayout.activityGroup({dockTo: {dockTo: 'left-top'}}).activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityGroup(({dockTo: {dockTo: 'left-top'}})).minimizedActivityId).toBeUndefined();
+    });
+
+    it('should not remove activity when removing non-reference part', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .addPart('part.activity-bottom-left', {relativeTo: 'part.activity-top', align: 'bottom'})
+        .addPart('part.activity-bottom-right', {relativeTo: 'part.activity-bottom-left', align: 'right'})
+        .addView('view.1', {partId: 'part.activity-bottom-right'})
+        .navigatePart('part.activity-top', ['path/to/part'], {state: {some: 'state'}})
+        .navigatePart('part.activity-bottom-left', ['path/to/part'], {state: {some: 'state'}})
+        .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+        // Remove non-reference part (part.activity-bottom-left).
+        .removePart('part.activity-bottom-left');
+
+      // Expect activity not to be removed.
+      expect(workbenchLayout.activityLayout.toolbars.leftTop.activities).toHaveSize(1);
+
+      // Expect grid not to be removed.
+      expect(workbenchLayout.grids['activity.1']).toBeDefined();
+
+      // Expect non-reference part to be removed.
+      expect(workbenchLayout.part({partId: 'part.activity-top'})).toBeDefined();
+      expect(workbenchLayout.part({partId: 'part.activity-bottom-left'}, {orElse: null})).toBeNull();
+      expect(workbenchLayout.part({partId: 'part.activity-bottom-right'})).toBeDefined();
+
+      // Expect view of non-reference part to be removed.
+      expect(workbenchLayout.view({viewId: 'view.1'})).toBeDefined();
+
+      // Expect outlets of non-reference part to be removed.
+      expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})).toEqual({
+        'part.activity-top': segments(['path/to/part']),
+        'view.1': segments(['path/to/view']),
+      });
+
+      // Expect states of non-reference part to be removed.
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-top'})).toEqual({some: 'state'});
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-bottom-left'})).toEqual({});
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-bottom-right'})).toEqual({});
+      expect(workbenchLayout.navigationState({outlet: 'view.1'})).toEqual({some: 'state'});
+    });
+
+    it('should rename reference part of activity', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .addView('view.1', {partId: 'part.activity-1'})
+        .navigatePart('part.activity-1', ['path/to/part'], {state: {some: 'state'}})
+        .navigateView('view.1', ['path/to/view'], {state: {some: 'state'}})
+        .renamePart('part.activity-1', 'part.activity-2');
+
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-1'})).toEqual({});
+      expect(workbenchLayout.urlSegments({outlet: 'part.activity-1'})).toEqual([]);
+      expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})['part.activity-1']).toBeUndefined();
+
+      expect(workbenchLayout.navigationState({outlet: 'part.activity-2'})).toEqual({some: 'state'});
+      expect(workbenchLayout.urlSegments({outlet: 'part.activity-2'})).toEqual(segments(['path/to/part']));
+      expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})['part.activity-2']).toEqual(segments(['path/to/part']));
+      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-2');
+      expect(workbenchLayout.grids['activity.1']!.activePartId).toEqual('part.activity-2');
+    });
+
+    it('should rename activity (activity active)', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .activatePart('part.activity-1')
+        .renameActivity('activity.1', 'activity.2');
+
+      expect(workbenchLayout.grids['activity.1']).toBeUndefined();
+      expect(workbenchLayout.activity({id: 'activity.1'}, {orElse: null})).toBeNull();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.1'}, {orElse: null})).toBeNull();
+
+      expect(workbenchLayout.grids['activity.2']).toBeDefined();
+      expect(workbenchLayout.activity({id: 'activity.2'})).toBeDefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'})).toBeDefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'}).activeActivityId).toEqual('activity.2');
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'}).minimizedActivityId).toBeUndefined();
+    });
+
+    it('should rename activity (activity not active)', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .renameActivity('activity.1', 'activity.2');
+
+      expect(workbenchLayout.grids['activity.1']).toBeUndefined();
+      expect(workbenchLayout.activity({id: 'activity.1'}, {orElse: null})).toBeNull();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.1'}, {orElse: null})).toBeNull();
+
+      expect(workbenchLayout.grids['activity.2']).toBeDefined();
+      expect(workbenchLayout.activity({id: 'activity.2'})).toBeDefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'})).toBeDefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'}).activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'}).minimizedActivityId).toBeUndefined();
+    });
+
+    it('should rename activity (activity minimized)', () => {
+      const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+        .activatePart('part.activity-1')
+        .toggleMaximized()
+        .renameActivity('activity.1', 'activity.2');
+
+      expect(workbenchLayout.grids['activity.1']).toBeUndefined();
+      expect(workbenchLayout.activity({id: 'activity.1'}, {orElse: null})).toBeNull();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.1'}, {orElse: null})).toBeNull();
+
+      expect(workbenchLayout.grids['activity.2']).toBeDefined();
+      expect(workbenchLayout.activity({id: 'activity.2'})).toBeDefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'})).toBeDefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'}).activeActivityId).toBeUndefined();
+      expect(workbenchLayout.activityGroup({activityId: 'activity.2'}).minimizedActivityId).toEqual('activity.2');
+    });
+
+    it('should assert activity to have MPartGrid and MActivity', () => {
+      // Define the grid.
+      const grids: Partial<WorkbenchGrids> = {
+        'activity.1': {
+          root: new MPart({id: 'part.activity-1', structural: true, views: []}),
+          activePartId: 'part.activity-1',
+        },
+      };
+      // Define activity layout.
+      const activityLayout: MActivityLayout = {
+        toolbars: {
+          leftTop: {activities: [{id: 'activity.1', referencePartId: 'part.activity-1', label: 'Label', icon: 'icon'}]},
+          leftBottom: {activities: []},
+          rightTop: {activities: []},
+          rightBottom: {activities: []},
+          bottomLeft: {activities: []},
+          bottomRight: {activities: []},
+        },
+        panels: {
+          left: {width: 200, ratio: .5},
+          right: {width: 200, ratio: .5},
+          bottom: {height: 150, ratio: .5},
+        },
+      };
+
+      // Assert no error
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids, activityLayout})).not.toThrowError();
+
+      // Assert activity to have a MActivity.
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids})).toThrowError(/NullActivityError/);
+
+      // Assert activity to have a MPartGrid.
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({activityLayout})).toThrowError(/NullGridError/);
+
+      // Assert activity to have reference part.
+      const activityLayout2: MActivityLayout = {
+        ...activityLayout,
+        toolbars: {
+          ...activityLayout.toolbars,
+          leftTop: {activities: [{id: 'activity.1', referencePartId: 'part.99', label: 'Label', icon: 'icon'}]},
+        },
+      };
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids, activityLayout: activityLayout2})).toThrowError(/NullReferencePartError/);
+    });
   });
 });
 

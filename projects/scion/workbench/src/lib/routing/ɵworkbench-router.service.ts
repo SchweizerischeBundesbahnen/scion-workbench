@@ -351,7 +351,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
  */
 function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentLayout?: ɵWorkbenchLayout | undefined}, extras?: Omit<NavigationExtras, 'relativeTo' | 'state'>): NavigationExtras {
   const {newLayout, currentLayout} = layouts;
-  const newLayoutSerialized = newLayout.serialize({excludeViewMarkedForRemoval: true, undefinedIfEmpty: true});
+  const newLayoutSerialized = newLayout.serialize({excludeViewMarkedForRemoval: true});
 
   // IMPORTANT: Update `ɵWorkbenchLayout.equals` function when adding new state properties.
 
@@ -374,7 +374,10 @@ function createNavigationExtras(layouts: {newLayout: ɵWorkbenchLayout; currentL
       navigationStates: newLayout.navigationStates(),
     }),
     // Add the main area as query parameter.
-    queryParams: {...extras?.queryParams, [MAIN_AREA_LAYOUT_QUERY_PARAM]: newLayoutSerialized.grids.mainArea},
+    queryParams: {
+      ...extras?.queryParams,
+      [MAIN_AREA_LAYOUT_QUERY_PARAM]: WorkbenchLayouts.isGridEmpty(newLayout.grids.mainArea) ? undefined : newLayoutSerialized.grids.mainArea,
+    },
     // Merge with existing query params unless specified an explicit strategy, e.g., for migrating an outdated layout URL.
     // Note that `null` is a valid strategy for clearing existing query params, so do not use the nullish coalescing operator (??).
     queryParamsHandling: Defined.orElse(extras?.queryParamsHandling, 'merge'),

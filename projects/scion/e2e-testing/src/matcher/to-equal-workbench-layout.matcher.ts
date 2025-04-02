@@ -583,14 +583,14 @@ interface ExpectedWorkbenchGrids {
  * Modified version of {@link MActivityLayout} to expect the workbench layout.
  */
 export interface MActivityLayout {
-  toolbars: Partial<{
-    leftTop: MActivityGroup;
-    leftBottom: MActivityGroup;
-    rightTop: MActivityGroup;
-    rightBottom: MActivityGroup;
-    bottomLeft: MActivityGroup;
-    bottomRight: MActivityGroup;
-  }>;
+  toolbars: {
+    leftTop?: MActivityGroup;
+    leftBottom?: MActivityGroup;
+    rightTop?: MActivityGroup;
+    rightBottom?: MActivityGroup;
+    bottomLeft?: MActivityGroup;
+    bottomRight?: MActivityGroup;
+  };
   panels: {
     left: {
       width: number;
