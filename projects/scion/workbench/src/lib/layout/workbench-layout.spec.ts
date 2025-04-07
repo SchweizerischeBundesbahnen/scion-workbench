@@ -26,8 +26,9 @@ import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {PartId} from '../part/workbench-part.model';
-import {MActivityLayout} from '../activity/workbench-activity.model';
+import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, MActivityLayout} from '../activity/workbench-activity.model';
 import {WorkbenchGrids} from './workbench-grids.model';
+import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 
 describe('WorkbenchLayout', () => {
 
@@ -2939,6 +2940,753 @@ describe('WorkbenchLayout', () => {
 
   describe('Activity (Docked Parts)', () => {
 
+    it('should activate activities', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart(MAIN_AREA)
+              // left-top
+              .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+              .navigatePart('part.activity-1', ['test-part'])
+              .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
+              .navigatePart('part.activity-2', ['test-part'])
+              // left-bottom
+              .addPart('part.activity-3', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
+              .navigatePart('part.activity-3', ['test-part'])
+              .addPart('part.activity-4', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 4', ɵactivityId: 'activity.4'})
+              .navigatePart('part.activity-4', ['test-part'])
+              // right-top
+              .addPart('part.activity-5', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 5', ɵactivityId: 'activity.5'})
+              .navigatePart('part.activity-5', ['test-part'])
+              .addPart('part.activity-6', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 6', ɵactivityId: 'activity.6'})
+              .navigatePart('part.activity-6', ['test-part'])
+              // right-bottom
+              .addPart('part.activity-7', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'Activity 7', ɵactivityId: 'activity.7'})
+              .navigatePart('part.activity-7', ['test-part'])
+              .addPart('part.activity-8', {dockTo: 'right-bottom'}, {icon: 'folder', label: 'testee-8', ɵactivityId: 'activity.8'})
+              .navigatePart('part.activity-8', ['test-part'])
+              // bottom-left
+              .addPart('part.activity-9', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 9', ɵactivityId: 'activity.9'})
+              .navigatePart('part.activity-9', ['test-part'])
+              .addPart('part.activity-10', {dockTo: 'bottom-left'}, {icon: 'folder', label: 'Activity 10', ɵactivityId: 'activity.10'})
+              .navigatePart('part.activity-10', ['test-part'])
+              // bottom-right
+              .addPart('part.activity-11', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 11', ɵactivityId: 'activity.11'})
+              .navigatePart('part.activity-11', ['test-part'])
+              .addPart('part.activity-12', {dockTo: 'bottom-right'}, {icon: 'folder', label: 'Activity 12', ɵactivityId: 'activity.12'})
+              .navigatePart('part.activity-12', ['test-part']),
+            startup: {launcher: 'APP_INITIALIZER'},
+          }),
+          provideRouter([
+            {path: 'test-part', component: TestComponent},
+          ]),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitForInitialWorkbenchLayout();
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'none',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+        },
+      });
+
+      // Toggle activity.1
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.1'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.1',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {left: {width: ACTIVITY_PANEL_WIDTH}},
+        },
+      });
+
+      // Toggle activity.2
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.2'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {left: {width: ACTIVITY_PANEL_WIDTH}},
+        },
+      });
+
+      // Toggle activity.3
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.3'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.3',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO}},
+        },
+      });
+
+      // Toggle activity.4
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.4'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'none',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO}},
+        },
+      });
+
+      // Toggle activity.5
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.5'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.5',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH},
+          },
+        },
+      });
+
+      // Toggle activity.6
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.6'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH},
+          },
+        },
+      });
+
+      // Toggle activity.7
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.7'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.7',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+          },
+        },
+      });
+
+      // Toggle activity.8
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.8'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'none',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+          },
+        },
+      });
+
+      // Toggle activity.9
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.9'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.9',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT},
+          },
+        },
+      });
+
+      // Toggle activity.10
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.10'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'none',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT},
+          },
+        },
+      });
+
+      // Toggle activity.11
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.11'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'activity.11',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+          },
+        },
+      });
+
+      // Toggle activity.12
+      await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.toggleActivity('activity.12'));
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [
+                {id: 'activity.1', icon: 'folder', label: 'Activity 1'},
+                {id: 'activity.2', icon: 'folder', label: 'Activity 2'},
+              ],
+              activeActivityId: 'activity.2',
+            },
+            leftBottom: {
+              activities: [
+                {id: 'activity.3', icon: 'folder', label: 'Activity 3'},
+                {id: 'activity.4', icon: 'folder', label: 'Activity 4'},
+              ],
+              activeActivityId: 'activity.4',
+            },
+            rightTop: {
+              activities: [
+                {id: 'activity.5', icon: 'folder', label: 'Activity 5'},
+                {id: 'activity.6', icon: 'folder', label: 'Activity 6'},
+              ],
+              activeActivityId: 'activity.6',
+            },
+            rightBottom: {
+              activities: [
+                {id: 'activity.7', icon: 'folder', label: 'Activity 7'},
+                {id: 'activity.8', icon: 'folder', label: 'testee-8'},
+              ],
+              activeActivityId: 'activity.8',
+            },
+            bottomLeft: {
+              activities: [
+                {id: 'activity.9', icon: 'folder', label: 'Activity 9'},
+                {id: 'activity.10', icon: 'folder', label: 'Activity 10'},
+              ],
+              activeActivityId: 'activity.10',
+            },
+            bottomRight: {
+              activities: [
+                {id: 'activity.11', icon: 'folder', label: 'Activity 11'},
+                {id: 'activity.12', icon: 'folder', label: 'Activity 12'},
+              ],
+              activeActivityId: 'activity.12',
+            },
+          },
+          panels: {
+            left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+            bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
+          },
+        },
+      });
+    });
+
     it('should return whether layout contains activities', async () => {
       const layout1 = TestBed.inject(ɵWorkbenchLayoutFactory)
         .addPart('part.main');
@@ -3667,9 +4415,9 @@ describe('WorkbenchLayout', () => {
           bottomRight: {activities: []},
         },
         panels: {
-          left: {width: 200, ratio: .5},
-          right: {width: 200, ratio: .5},
-          bottom: {height: 150, ratio: .5},
+          left: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+          right: {width: ACTIVITY_PANEL_WIDTH, ratio: ACTIVITY_PANEL_RATIO},
+          bottom: {height: ACTIVITY_PANEL_HEIGHT, ratio: ACTIVITY_PANEL_RATIO},
         },
       };
 

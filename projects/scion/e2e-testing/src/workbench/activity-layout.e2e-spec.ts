@@ -21,7 +21,7 @@ import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH} from 
 
 test.describe('Activity Layout', () => {
 
-  test('should contribute activities', async ({appPO, workbenchNavigator}) => {
+  test('should toggle activities', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory

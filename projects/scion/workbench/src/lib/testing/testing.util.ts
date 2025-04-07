@@ -104,3 +104,17 @@ export function segments(commands: Commands): UrlSegment[] {
 export function anything<T>(): T {
   return jasmine.anything() as unknown as T;
 }
+
+/**
+ * Returns a copy of the given object with specified properties set to 'none' if they are `undefined`.
+ * Useful in unit tests, where `undefined` properties are not serialized and thus cannot be asserted reliably.
+ */
+export function noneIfUndefined<T extends object>(object: T, ...properties: Array<keyof T>): T {
+  const workingCopy: T = {...object};
+  for (const property of properties) {
+    if (workingCopy[property] === undefined) {
+      (workingCopy as Record<keyof T, unknown>)[property] = 'none';
+    }
+  }
+  return workingCopy;
+}
