@@ -64,21 +64,23 @@ describe('WorkbenchLayout Component', () => {
 
     // Assert initial workbench layout
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
-          direction: 'row',
-          ratio: .2,
-        }),
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+            direction: 'row',
+            ratio: .2,
+          }),
+        },
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -88,21 +90,23 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect the layout not to be discarded.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
-          direction: 'row',
-          ratio: .2,
-        }),
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+            direction: 'row',
+            ratio: .2,
+          }),
+        },
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -112,21 +116,23 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect the layout to be changed.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
-          direction: 'row',
-          ratio: .2,
-        }),
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+            direction: 'row',
+            ratio: .2,
+          }),
+        },
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.2'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
   });
@@ -269,8 +275,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -282,8 +290,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -309,13 +319,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -343,8 +355,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -356,8 +370,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -383,13 +399,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -417,8 +435,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -430,8 +450,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -457,13 +479,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -491,8 +515,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -504,8 +530,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -531,13 +559,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -565,8 +595,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -578,8 +610,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -603,8 +637,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -633,8 +669,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -646,8 +684,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -661,8 +701,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -690,13 +732,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -723,13 +767,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -755,8 +801,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.EAST', views: [{id: 'view.3'}, {id: 'view.2'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
 
@@ -787,8 +835,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -800,8 +850,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -827,13 +879,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -860,13 +914,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -894,8 +950,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -907,8 +965,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -934,13 +994,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -967,13 +1029,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1001,8 +1065,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1014,8 +1080,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1041,13 +1109,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1073,13 +1143,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1107,8 +1179,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1120,8 +1194,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1147,13 +1223,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1179,13 +1257,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1214,8 +1294,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1227,8 +1309,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1242,8 +1326,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1271,13 +1357,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -1306,18 +1394,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.SOUTH-EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.SOUTH-EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1345,18 +1435,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: 'part.SOUTH-WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: 'part.SOUTH-WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1386,8 +1478,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1399,8 +1493,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1426,13 +1522,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1456,8 +1554,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1485,8 +1585,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1498,8 +1600,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1525,13 +1629,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1557,13 +1663,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1591,8 +1699,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1604,8 +1714,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1631,13 +1743,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1663,13 +1777,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'column',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1697,8 +1813,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
 
@@ -1711,8 +1829,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1725,8 +1845,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1754,8 +1876,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1767,8 +1891,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1782,8 +1908,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1815,8 +1943,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.1', 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1828,8 +1958,10 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.2', 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
@@ -1855,13 +1987,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1875,13 +2009,15 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.3', 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1909,18 +2045,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'row',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1936,18 +2074,20 @@ describe('WorkbenchLayout Component', () => {
     enterComponentState(fixture, 'view.4', 'D');
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+              direction: 'row',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -1977,23 +2117,25 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'row',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            direction: 'row',
-            ratio: .5,
-          }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -2023,23 +2165,25 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             child1: new MTreeNode({
-              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              child1: new MTreeNode({
+                child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+                child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+                direction: 'row',
+                ratio: .5,
+              }),
+              child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
               direction: 'row',
               ratio: .5,
             }),
-            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -2069,23 +2213,25 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              direction: 'column',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            direction: 'column',
-            ratio: .5,
-          }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
@@ -2103,18 +2249,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').not.toBeRegistered({partId: 'part.initial', active: true});
@@ -2130,13 +2278,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').not.toBeRegistered({partId: 'part.initial', active: true});
@@ -2151,8 +2301,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.1').not.toBeRegistered({partId: 'part.initial', active: true});
@@ -2217,13 +2369,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2248,18 +2402,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.top-right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.top-right', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.right', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2322,13 +2478,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2353,13 +2511,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2428,13 +2588,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.3'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2460,18 +2622,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'row',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2497,23 +2661,25 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'row',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            direction: 'row',
-            ratio: .5,
-          }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2539,23 +2705,25 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             child1: new MTreeNode({
-              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              child1: new MTreeNode({
+                child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+                child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+                direction: 'row',
+                ratio: .5,
+              }),
+              child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
               direction: 'row',
               ratio: .5,
             }),
-            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'part.EAST-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2581,23 +2749,25 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              direction: 'column',
+              ratio: .5,
+            }),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            direction: 'column',
-            ratio: .5,
-          }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2610,18 +2780,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.WEST-2', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
             direction: 'row',
             ratio: .5,
           }),
-          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.2').toHaveComponentState('B');
@@ -2633,13 +2805,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
-          child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST-1', views: [{id: 'view.4'}], activeViewId: 'view.4'}),
+            child2: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.2').toHaveComponentState('B');
@@ -2650,8 +2824,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.NORTH-1', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+        },
       },
     });
     expect('view.2').toHaveComponentState('B');
@@ -2712,13 +2888,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2743,18 +2921,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2779,18 +2959,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2853,13 +3035,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2884,18 +3068,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.EAST', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2920,18 +3106,20 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MTreeNode({
-            child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-            child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
-            direction: 'column',
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MTreeNode({
+              child1: new MPart({id: 'part.NORTH', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              child2: new MPart({id: 'part.SOUTH', views: [{id: 'view.3'}], activeViewId: 'view.3'}),
+              direction: 'column',
+              ratio: .5,
+            }),
+            direction: 'row',
             ratio: .5,
           }),
-          direction: 'row',
-          ratio: .5,
-        }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -2988,13 +3176,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.EAST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -3018,13 +3208,15 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.WEST', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
     expect('view.1').toHaveComponentState('A');
@@ -3091,11 +3283,13 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect DOM not to be updated.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MPart({id: MAIN_AREA}),
-      },
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+      grids: {
+        main: {
+          root: new MPart({id: MAIN_AREA}),
+        },
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        },
       },
     });
 
@@ -3106,11 +3300,13 @@ describe('WorkbenchLayout Component', () => {
 
     // Expect DOM to be updated.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MPart({id: MAIN_AREA}),
-      },
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+      grids: {
+        main: {
+          root: new MPart({id: MAIN_AREA}),
+        },
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        },
       },
     });
   });

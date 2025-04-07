@@ -64,14 +64,16 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: 'part.left-bottom', views: []}),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: 'part.left-bottom', views: []}),
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -81,14 +83,16 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: 'part.left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: 'part.left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -101,20 +105,22 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({
-            id: 'part.left',
-            navigation: {id: any()},
-          }),
-          child2: new MTreeNode({
-            child1: new MTreeNode({
-              child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-              child2: new MPart({id: 'part.left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({
+              id: 'part.left',
+              navigation: {id: any()},
             }),
-            child2: new MPart({id: MAIN_AREA}),
+            child2: new MTreeNode({
+              child1: new MTreeNode({
+                child1: new MPart({id: 'part.left-top', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+                child2: new MPart({id: 'part.left-bottom', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+              }),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
           }),
-        }),
+        },
       },
     });
   });
@@ -204,18 +210,20 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // Expect the most recent layout to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective')).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MPart({
-          id: 'part.part',
-          views: [
-            {id: 'view.1'},
-            {id: 'view.2'},
-            {id: 'view.3'},
-            {id: 'view.4'},
-            {id: 'view.5'},
-          ],
-          activeViewId: 'view.5',
-        }),
+      grids: {
+        main: {
+          root: new MPart({
+            id: 'part.part',
+            views: [
+              {id: 'view.1'},
+              {id: 'view.2'},
+              {id: 'view.3'},
+              {id: 'view.4'},
+              {id: 'view.5'},
+            ],
+            activeViewId: 'view.5',
+          }),
+        },
       },
     });
   });
@@ -261,18 +269,20 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: MAIN_AREA}),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
+            child2: new MPart({
+              id: 'part.right',
+              navigation: {id: any()},
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            navigation: {id: any()},
-            views: [],
-          }),
-        }),
+        },
       },
     });
 
@@ -291,25 +301,27 @@ describe('WorkbenchPerspectiveStorage', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             child1: new MTreeNode({
-              child1: new MPart({id: 'part.left', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
-              child2: new MPart({id: MAIN_AREA}),
+              child1: new MTreeNode({
+                child1: new MPart({id: 'part.left', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+                child2: new MPart({id: MAIN_AREA}),
+              }),
+              child2: new MPart({
+                id: 'part.right',
+                navigation: {id: any()},
+                views: [],
+              }),
             }),
             child2: new MPart({
-              id: 'part.right',
+              id: 'part.bottom',
               navigation: {id: any()},
               views: [],
             }),
           }),
-          child2: new MPart({
-            id: 'part.bottom',
-            navigation: {id: any()},
-            views: [],
-          }),
-        }),
+        },
       },
     });
 
@@ -326,18 +338,20 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the perspective to have the stored layout.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: MAIN_AREA}),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
+            child2: new MPart({
+              id: 'part.right',
+              navigation: {id: any()},
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            navigation: {id: any()},
-            views: [],
-          }),
-        }),
+        },
       },
     });
   });
@@ -384,18 +398,20 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout of perspective-1 to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective-1')).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-            child2: new MPart({id: MAIN_AREA}),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
+            child2: new MPart({
+              id: 'part.bottom',
+              navigation: {id: any()},
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: 'part.bottom',
-            navigation: {id: any()},
-            views: [],
-          }),
-        }),
+        },
       },
     });
     // THEN: Expect the layout of perspective-2 not to be stored.
@@ -414,11 +430,13 @@ describe('WorkbenchPerspectiveStorage', () => {
 
     // THEN: Expect the layout of perspective-2 to be stored.
     expect(await loadPerspectiveLayoutFromStorage('perspective-2')).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+        },
       },
     });
     // THEN: Expect the layout of perspective-1 not to be stored.

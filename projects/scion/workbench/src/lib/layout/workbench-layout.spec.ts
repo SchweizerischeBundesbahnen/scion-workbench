@@ -92,18 +92,20 @@ describe('WorkbenchLayout', () => {
       .addPart('part.C', {relativeTo: 'part.B', align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child2: new MPart({id: 'part.C'}),
-            child1: new MPart({id: 'part.B'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child2: new MPart({id: 'part.C'}),
+              child1: new MPart({id: 'part.B'}),
+            }),
+            child2: new MPart({id: 'part.A'}),
           }),
-          child2: new MPart({id: 'part.A'}),
-        }),
+        },
       },
     });
   });
@@ -127,21 +129,23 @@ describe('WorkbenchLayout', () => {
       .addPart('part.B', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'column',
-          ratio: .25,
-          child1: new MPart({id: 'part.A'}),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'column',
-            ratio: .5,
-            child1: new MPart({id: MAIN_AREA}),
-            child2: new MPart({id: 'part.B'}),
+            ratio: .25,
+            child1: new MPart({id: 'part.A'}),
+            child2: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({id: MAIN_AREA}),
+              child2: new MPart({id: 'part.B'}),
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial'}),
+        },
+        mainArea: {
+          root: new MPart({id: 'part.initial'}),
+        },
       },
     });
   });
@@ -165,21 +169,23 @@ describe('WorkbenchLayout', () => {
       .addPart('part.B', {relativeTo: MAIN_AREA, align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'column',
-          ratio: .25,
-          child1: new MPart({id: 'part.A'}),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'column',
-            ratio: .5,
-            child1: new MPart({id: MAIN_AREA}),
-            child2: new MPart({id: 'part.B'}),
+            ratio: .25,
+            child1: new MPart({id: 'part.A'}),
+            child2: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({id: MAIN_AREA}),
+              child2: new MPart({id: 'part.B'}),
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial'}),
+        },
+        mainArea: {
+          root: new MPart({id: 'part.initial'}),
+        },
       },
     });
   });
@@ -201,18 +207,20 @@ describe('WorkbenchLayout', () => {
       .addPart('part.C', {relativeTo: 'part.B', align: 'bottom', ratio: .5});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'column',
-          ratio: .25,
-          child1: new MPart({id: 'part.A'}),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'column',
-            ratio: .5,
-            child1: new MPart({id: 'part.B'}),
-            child2: new MPart({id: 'part.C'}),
+            ratio: .25,
+            child1: new MPart({id: 'part.A'}),
+            child2: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({id: 'part.B'}),
+              child2: new MPart({id: 'part.C'}),
+            }),
           }),
-        }),
+        },
       },
     });
 
@@ -238,8 +246,10 @@ describe('WorkbenchLayout', () => {
       .removePart('part.C');
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.C'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.C'}),
+        },
       },
     });
   });
@@ -258,8 +268,10 @@ describe('WorkbenchLayout', () => {
       .removePart('part.A');
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.B'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.B'}),
+        },
       },
     });
     expect(workbenchLayout.part({partId: 'part.B'}).parent).toBeUndefined();
@@ -282,36 +294,99 @@ describe('WorkbenchLayout', () => {
     const workbenchLayout = createComplexMainAreaLayout();
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
-            direction: 'column',
-            child1: new MPart({id: 'part.A'}),
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            child1: new MTreeNode({
+              direction: 'column',
+              child1: new MPart({id: 'part.A'}),
+              child2: new MTreeNode({
+                direction: 'row',
+                child1: new MPart({id: 'part.B'}),
+                child2: new MPart({id: 'part.C'}),
+              }),
+            }),
             child2: new MTreeNode({
+              direction: 'column',
+              child1: new MTreeNode({
+                direction: 'row',
+                child1: new MTreeNode({
+                  direction: 'column',
+                  child1: new MPart({id: 'part.initial'}),
+                  child2: new MPart({id: 'part.G'}),
+                }),
+                child2: new MTreeNode({
+                  direction: 'column',
+                  child1: new MPart({id: 'part.E'}),
+                  child2: new MPart({id: 'part.F'}),
+                }),
+              }),
+              child2: new MPart({id: 'part.D'}),
+            }),
+          }),
+        },
+      },
+    });
+  });
+
+  /**
+   * Initial layout:
+   *
+   * +-------+------+---+
+   * | A     | main | E |
+   * |---+---|      |   |
+   * | B | C |      +---+
+   * |   |   +------+ F |
+   * |   |   |   G  |   |
+   * |   |   +------+---+
+   * |   |   |     D    |
+   * +---+---+----------+
+   *
+   * Expected layout after removing parts A and F:
+   *
+   * +-------+------+---+
+   * |   |   | main | E |
+   * |   |   |      |   |
+   * | B | C |      +   +
+   * |   |   +------+   |
+   * |   |   |   G  |   |
+   * |   |   +------+---+
+   * |   |   |     D    |
+   * +---+---+----------+
+   */
+  it('should allow removing parts \'A\' and \'F\'', () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    const workbenchLayout = createComplexMainAreaLayout()
+      .removePart('part.A')
+      .removePart('part.F');
+
+    expect(workbenchLayout).toEqualWorkbenchLayout({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            child1: new MTreeNode({
               direction: 'row',
               child1: new MPart({id: 'part.B'}),
               child2: new MPart({id: 'part.C'}),
             }),
-          }),
-          child2: new MTreeNode({
-            direction: 'column',
-            child1: new MTreeNode({
-              direction: 'row',
+            child2: new MTreeNode({
+              direction: 'column',
               child1: new MTreeNode({
-                direction: 'column',
-                child1: new MPart({id: 'part.initial'}),
-                child2: new MPart({id: 'part.G'}),
+                direction: 'row',
+                child1: new MTreeNode({
+                  direction: 'column',
+                  child1: new MPart({id: 'part.initial'}),
+                  child2: new MPart({id: 'part.G'}),
+                }),
+                child2: new MPart({id: 'part.E'}),
               }),
-              child2: new MTreeNode({
-                direction: 'column',
-                child1: new MPart({id: 'part.E'}),
-                child2: new MPart({id: 'part.F'}),
-              }),
+              child2: new MPart({id: 'part.D'}),
             }),
-            child2: new MPart({id: 'part.D'}),
           }),
-        }),
+        },
       },
     });
   });
@@ -349,87 +424,30 @@ describe('WorkbenchLayout', () => {
       .removePart('part.F');
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             direction: 'row',
-            child1: new MPart({id: 'part.B'}),
-            child2: new MPart({id: 'part.C'}),
-          }),
-          child2: new MTreeNode({
-            direction: 'column',
             child1: new MTreeNode({
               direction: 'row',
-              child1: new MTreeNode({
-                direction: 'column',
-                child1: new MPart({id: 'part.initial'}),
-                child2: new MPart({id: 'part.G'}),
-              }),
-              child2: new MPart({id: 'part.E'}),
+              child1: new MPart({id: 'part.B'}),
+              child2: new MPart({id: 'part.C'}),
             }),
-            child2: new MPart({id: 'part.D'}),
-          }),
-        }),
-      },
-    });
-  });
-
-  /**
-   * Initial layout:
-   *
-   * +-------+------+---+
-   * | A     | main | E |
-   * |---+---|      |   |
-   * | B | C |      +---+
-   * |   |   +------+ F |
-   * |   |   |   G  |   |
-   * |   |   +------+---+
-   * |   |   |     D    |
-   * +---+---+----------+
-   *
-   * Expected layout after removing parts A and F:
-   *
-   * +-------+------+---+
-   * |   |   | main | E |
-   * |   |   |      |   |
-   * | B | C |      +   +
-   * |   |   +------+   |
-   * |   |   |   G  |   |
-   * |   |   +------+---+
-   * |   |   |     D    |
-   * +---+---+----------+
-   */
-  it('should allow removing parts \'A\' and \'F\'', () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
-
-    const workbenchLayout = createComplexMainAreaLayout()
-      .removePart('part.A')
-      .removePart('part.F');
-
-    expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
-            direction: 'row',
-            child1: new MPart({id: 'part.B'}),
-            child2: new MPart({id: 'part.C'}),
-          }),
-          child2: new MTreeNode({
-            direction: 'column',
-            child1: new MTreeNode({
-              direction: 'row',
+            child2: new MTreeNode({
+              direction: 'column',
               child1: new MTreeNode({
-                direction: 'column',
-                child1: new MPart({id: 'part.initial'}),
-                child2: new MPart({id: 'part.G'}),
+                direction: 'row',
+                child1: new MTreeNode({
+                  direction: 'column',
+                  child1: new MPart({id: 'part.initial'}),
+                  child2: new MPart({id: 'part.G'}),
+                }),
+                child2: new MPart({id: 'part.E'}),
               }),
-              child2: new MPart({id: 'part.E'}),
+              child2: new MPart({id: 'part.D'}),
             }),
-            child2: new MPart({id: 'part.D'}),
           }),
-        }),
+        },
       },
     });
   });
@@ -457,55 +475,59 @@ describe('WorkbenchLayout', () => {
       .addPart('part.Z', {relativeTo: 'part.Y', align: 'bottom', ratio: .25});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
-            direction: 'column',
-            child1: new MPart({id: 'part.B'}),
-            child2: new MPart({id: 'part.C'}),
-          }),
-          child2: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             direction: 'row',
-            ratio: .5,
-            child1: new MPart({id: 'part.A'}),
-            child2: new MTreeNode({
+            child1: new MTreeNode({
               direction: 'column',
-              ratio: .75,
-              child1: new MPart({id: 'part.X'}),
+              child1: new MPart({id: 'part.B'}),
+              child2: new MPart({id: 'part.C'}),
+            }),
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({id: 'part.A'}),
               child2: new MTreeNode({
                 direction: 'column',
                 ratio: .75,
-                child1: new MPart({id: 'part.Y'}),
-                child2: new MPart({id: 'part.Z'}),
+                child1: new MPart({id: 'part.X'}),
+                child2: new MTreeNode({
+                  direction: 'column',
+                  ratio: .75,
+                  child1: new MPart({id: 'part.Y'}),
+                  child2: new MPart({id: 'part.Z'}),
+                }),
               }),
             }),
           }),
-        }),
+        },
       },
     });
 
     const modifiedLayout = workbenchLayout.removePart('part.Y');
     expect(modifiedLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
-            direction: 'column',
-            child1: new MPart({id: 'part.B'}),
-            child2: new MPart({id: 'part.C'}),
-          }),
-          child2: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             direction: 'row',
-            child1: new MPart({id: 'part.A'}),
-            child2: new MTreeNode({
+            child1: new MTreeNode({
               direction: 'column',
-              ratio: .75,
-              child1: new MPart({id: 'part.X'}),
-              child2: new MPart({id: 'part.Z'}),
+              child1: new MPart({id: 'part.B'}),
+              child2: new MPart({id: 'part.C'}),
+            }),
+            child2: new MTreeNode({
+              direction: 'row',
+              child1: new MPart({id: 'part.A'}),
+              child2: new MTreeNode({
+                direction: 'column',
+                ratio: .75,
+                child1: new MPart({id: 'part.X'}),
+                child2: new MPart({id: 'part.Z'}),
+              }),
             }),
           }),
-        }),
+        },
       },
     });
   });
@@ -549,55 +571,57 @@ describe('WorkbenchLayout', () => {
       .addPart('part.TOP', {align: 'top'});
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
-            direction: 'column',
-            child1: new MPart({id: 'part.A'}),
-            child2: new MTreeNode({
-              direction: 'row',
-              child1: new MPart({id: 'part.B'}),
-              child2: new MPart({id: 'part.C'}),
-            }),
-          }),
-          child2: new MTreeNode({
-            direction: 'column',
-            child1: new MTreeNode({
-              direction: 'row',
-              child1: new MTreeNode({
-                direction: 'column',
-                child1: new MPart({id: 'part.initial'}),
-                child2: new MPart({id: 'part.G'}),
-              }),
-              child2: new MTreeNode({
-                direction: 'column',
-                child1: new MPart({id: 'part.E'}),
-                child2: new MPart({id: 'part.F'}),
-              }),
-            }),
-            child2: new MPart({id: 'part.D'}),
-          }),
-        }),
-      },
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'column',
-          child1: new MPart({id: 'part.TOP'}),
-          child2: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             direction: 'row',
             child1: new MTreeNode({
               direction: 'column',
+              child1: new MPart({id: 'part.A'}),
+              child2: new MTreeNode({
+                direction: 'row',
+                child1: new MPart({id: 'part.B'}),
+                child2: new MPart({id: 'part.C'}),
+              }),
+            }),
+            child2: new MTreeNode({
+              direction: 'column',
               child1: new MTreeNode({
                 direction: 'row',
-                child1: new MPart({id: 'part.LEFT'}),
-                child2: new MPart({id: MAIN_AREA}),
+                child1: new MTreeNode({
+                  direction: 'column',
+                  child1: new MPart({id: 'part.initial'}),
+                  child2: new MPart({id: 'part.G'}),
+                }),
+                child2: new MTreeNode({
+                  direction: 'column',
+                  child1: new MPart({id: 'part.E'}),
+                  child2: new MPart({id: 'part.F'}),
+                }),
               }),
-              child2: new MPart({id: 'part.BOTTOM'}),
+              child2: new MPart({id: 'part.D'}),
             }),
-            child2: new MPart({id: 'part.RIGHT'}),
           }),
-        }),
+        },
+        main: {
+          root: new MTreeNode({
+            direction: 'column',
+            child1: new MPart({id: 'part.TOP'}),
+            child2: new MTreeNode({
+              direction: 'row',
+              child1: new MTreeNode({
+                direction: 'column',
+                child1: new MTreeNode({
+                  direction: 'row',
+                  child1: new MPart({id: 'part.LEFT'}),
+                  child2: new MPart({id: MAIN_AREA}),
+                }),
+                child2: new MPart({id: 'part.BOTTOM'}),
+              }),
+              child2: new MPart({id: 'part.RIGHT'}),
+            }),
+          }),
+        },
       },
     });
   });
@@ -634,24 +658,26 @@ describe('WorkbenchLayout', () => {
       .removePart('part.E');
 
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MTreeNode({
-            direction: 'column',
-            child1: new MPart({id: 'part.A'}),
-            child2: new MPart({id: 'part.C'}),
-          }),
-          child2: new MTreeNode({
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
             direction: 'row',
             child1: new MTreeNode({
               direction: 'column',
-              child1: new MPart({id: 'part.initial'}),
-              child2: new MPart({id: 'part.G'}),
+              child1: new MPart({id: 'part.A'}),
+              child2: new MPart({id: 'part.C'}),
             }),
-            child2: new MPart({id: 'part.F'}),
+            child2: new MTreeNode({
+              direction: 'row',
+              child1: new MTreeNode({
+                direction: 'column',
+                child1: new MPart({id: 'part.initial'}),
+                child2: new MPart({id: 'part.G'}),
+              }),
+              child2: new MPart({id: 'part.F'}),
+            }),
           }),
-        }),
+        },
       },
     });
   });
@@ -669,8 +695,10 @@ describe('WorkbenchLayout', () => {
       .addPart('part.other', {relativeTo: MAIN_AREA, align: 'right', ratio: .5})
       .removePart(MAIN_AREA);
     expect(workbenchLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MPart({id: 'part.other'}),
+      grids: {
+        main: {
+          root: new MPart({id: 'part.other'}),
+        },
       },
     });
   });
@@ -2398,47 +2426,49 @@ describe('WorkbenchLayout', () => {
 
     // Expect initial layout.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          id: workbenchLayoutRoot.id,
-          direction: 'row',
-          ratio: .5,
-          child1: new MTreeNode({
-            id: mainAreaParentNode.id,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            id: workbenchLayoutRoot.id,
             direction: 'row',
             ratio: .5,
-            child1: new MPart({
-              id: 'part.left',
-              views: [{id: 'view.100', navigation: {id: view100.navigation!.id}}],
-              activeViewId: 'view.100',
+            child1: new MTreeNode({
+              id: mainAreaParentNode.id,
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.left',
+                views: [{id: 'view.100', navigation: {id: view100.navigation!.id}}],
+                activeViewId: 'view.100',
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+              }),
             }),
             child2: new MPart({
-              id: MAIN_AREA,
+              id: 'part.right',
+              navigation: {id: partRight.navigation!.id},
+              views: [],
             }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            navigation: {id: partRight.navigation!.id},
-            views: [],
+        },
+        mainArea: {
+          root: new MTreeNode({
+            id: mainAreaLayoutRoot.id,
+            direction: 'column',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.top',
+              views: [{id: 'view.101', navigation: {id: view101.navigation!.id}}],
+              activeViewId: 'view.101',
+            }),
+            child2: new MPart({
+              id: 'part.bottom',
+              views: [{id: 'view.102', navigation: {id: view102.navigation!.id}}],
+              activeViewId: 'view.102',
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          id: mainAreaLayoutRoot.id,
-          direction: 'column',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.top',
-            views: [{id: 'view.101', navigation: {id: view101.navigation!.id}}],
-            activeViewId: 'view.101',
-          }),
-          child2: new MPart({
-            id: 'part.bottom',
-            views: [{id: 'view.102', navigation: {id: view102.navigation!.id}}],
-            activeViewId: 'view.102',
-          }),
-        }),
+        },
       },
     });
 
@@ -2451,50 +2481,52 @@ describe('WorkbenchLayout', () => {
 
     // Expect ids not to have changed.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          id: workbenchLayoutRoot.id,
-          direction: 'row',
-          ratio: .5,
-          child1: new MTreeNode({
-            id: mainAreaParentNode.id,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            id: workbenchLayoutRoot.id,
             direction: 'row',
             ratio: .5,
-            child1: new MPart({
-              id: 'part.left',
-              views: [{id: 'view.100', navigation: {id: view100.navigation!.id}}],
-              activeViewId: 'view.100',
+            child1: new MTreeNode({
+              id: mainAreaParentNode.id,
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.left',
+                views: [{id: 'view.100', navigation: {id: view100.navigation!.id}}],
+                activeViewId: 'view.100',
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+              }),
             }),
             child2: new MPart({
-              id: MAIN_AREA,
+              id: 'part.right',
+              navigation: {id: partRight.navigation!.id},
+              views: [],
             }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            navigation: {id: partRight.navigation!.id},
-            views: [],
+        },
+        mainArea: {
+          root: new MTreeNode({
+            id: mainAreaLayoutRoot.id,
+            direction: 'column',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.top',
+              views: [{id: 'view.101', navigation: {id: view101.navigation!.id}}],
+              activeViewId: 'view.101',
+            }),
+            child2: new MPart({
+              id: 'part.bottom',
+              views: [
+                {id: 'view.102', navigation: {id: view102.navigation!.id}},
+                {id: 'view.103', navigation: {id: any()}},
+              ],
+              activeViewId: 'view.102',
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          id: mainAreaLayoutRoot.id,
-          direction: 'column',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.top',
-            views: [{id: 'view.101', navigation: {id: view101.navigation!.id}}],
-            activeViewId: 'view.101',
-          }),
-          child2: new MPart({
-            id: 'part.bottom',
-            views: [
-              {id: 'view.102', navigation: {id: view102.navigation!.id}},
-              {id: 'view.103', navigation: {id: any()}},
-            ],
-            activeViewId: 'view.102',
-          }),
-        }),
+        },
       },
     });
 
@@ -2505,50 +2537,52 @@ describe('WorkbenchLayout', () => {
 
     // Expect ids not to have changed.
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          id: workbenchLayoutRoot.id,
-          direction: 'row',
-          ratio: .5,
-          child1: new MTreeNode({
-            id: mainAreaParentNode.id,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            id: workbenchLayoutRoot.id,
             direction: 'row',
             ratio: .5,
-            child1: new MPart({
-              id: 'part.left',
-              views: [{id: 'view.100', navigation: {id: view100.navigation!.id}}],
-              activeViewId: 'view.100',
+            child1: new MTreeNode({
+              id: mainAreaParentNode.id,
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.left',
+                views: [{id: 'view.100', navigation: {id: view100.navigation!.id}}],
+                activeViewId: 'view.100',
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+              }),
             }),
             child2: new MPart({
-              id: MAIN_AREA,
+              id: 'part.right',
+              navigation: {id: partRight.navigation!.id},
+              views: [],
             }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            navigation: {id: partRight.navigation!.id},
-            views: [],
+        },
+        mainArea: {
+          root: new MTreeNode({
+            id: mainAreaLayoutRoot.id,
+            direction: 'column',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.top',
+              views: [{id: 'view.101', navigation: {id: view101.navigation!.id}}],
+              activeViewId: 'view.101',
+            }),
+            child2: new MPart({
+              id: 'part.bottom',
+              views: [
+                {id: 'view.102', navigation: {id: view102.navigation!.id}},
+                {id: 'view.103', navigation: {id: any()}},
+              ],
+              activeViewId: 'view.102',
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          id: mainAreaLayoutRoot.id,
-          direction: 'column',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.top',
-            views: [{id: 'view.101', navigation: {id: view101.navigation!.id}}],
-            activeViewId: 'view.101',
-          }),
-          child2: new MPart({
-            id: 'part.bottom',
-            views: [
-              {id: 'view.102', navigation: {id: view102.navigation!.id}},
-              {id: 'view.103', navigation: {id: any()}},
-            ],
-            activeViewId: 'view.102',
-          }),
-        }),
+        },
       },
     });
   });
@@ -2619,26 +2653,28 @@ describe('WorkbenchLayout', () => {
     layout = layout.navigatePart('part', ['test-part']);
 
     expect(layout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'row',
             ratio: .5,
-            child1: new MPart({
+            child1: new MTreeNode({
+              direction: 'row',
+              ratio: .5,
+              child1: new MPart({
+                alternativeId: 'part',
+                navigation: {id: any()},
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+              }),
+            }),
+            child2: new MPart({
               alternativeId: 'part',
               navigation: {id: any()},
             }),
-            child2: new MPart({
-              id: MAIN_AREA,
-            }),
           }),
-          child2: new MPart({
-            alternativeId: 'part',
-            navigation: {id: any()},
-          }),
-        }),
+        },
       },
     });
   });

@@ -68,14 +68,16 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
 
     // Expect view.1 in perspective-1 to be renamed to view.2
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
-      },
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+        },
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.2'}], activeViewId: 'view.2'}),
+            child2: new MPart({id: MAIN_AREA}),
+          }),
+        },
       },
     });
 

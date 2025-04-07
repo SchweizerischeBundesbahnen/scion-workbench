@@ -51,45 +51,47 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes not to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.left',
-              navigation: {id: any()},
-            }),
-            child2: new MPart({
-              id: 'part.left-bottom',
-              navigation: {id: any()},
-            }),
-          }),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'row',
             ratio: .25,
             child1: new MTreeNode({
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: 'part.topLeft',
-                views: [
-                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-                  {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-                ],
+                id: 'part.left',
+                navigation: {id: any()},
               }),
               child2: new MPart({
-                id: 'part.bottomLeft',
-                views: [
-                  {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
-                ],
+                id: 'part.left-bottom',
+                navigation: {id: any()},
               }),
             }),
-            child2: new MPart({id: MAIN_AREA}),
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .25,
+              child1: new MTreeNode({
+                direction: 'column',
+                ratio: .5,
+                child1: new MPart({
+                  id: 'part.topLeft',
+                  views: [
+                    {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                    {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                  ],
+                }),
+                child2: new MPart({
+                  id: 'part.bottomLeft',
+                  views: [
+                    {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
+                  ],
+                }),
+              }),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
           }),
-        }),
+        },
       },
     });
 
@@ -135,29 +137,31 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.topLeft',
-              views: [
-                {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.topLeft',
+                views: [
+                  {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
+              child2: new MPart({
+                id: 'part.bottomLeft',
+                views: [
+                  {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
+                  {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
             }),
-            child2: new MPart({
-              id: 'part.bottomLeft',
-              views: [
-                {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
-                {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
-            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -192,28 +196,30 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.topLeft',
-              views: [
-                {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.topLeft',
+                views: [
+                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
+              child2: new MPart({
+                id: 'part.bottomLeft',
+                views: [
+                  {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
             }),
-            child2: new MPart({
-              id: 'part.bottomLeft',
-              views: [
-                {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
-            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -248,28 +254,30 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.topLeft',
-              views: [
-                {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.topLeft',
+                views: [
+                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
+              child2: new MPart({
+                id: 'part.bottomLeft',
+                views: [
+                  {id: 'view.2', navigation: {id: any(), hint: 'hint-2b'}},
+                ],
+              }),
             }),
-            child2: new MPart({
-              id: 'part.bottomLeft',
-              views: [
-                {id: 'view.2', navigation: {id: any(), hint: 'hint-2b'}},
-              ],
-            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -297,16 +305,18 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            navigation: {id: any()},
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              navigation: {id: any()},
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -331,18 +341,20 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+              navigation: {id: any()},
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-            navigation: {id: any()},
-          }),
-        }),
+        },
       },
     });
 

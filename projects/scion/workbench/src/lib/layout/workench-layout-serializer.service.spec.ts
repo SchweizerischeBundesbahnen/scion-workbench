@@ -126,21 +126,23 @@ describe('WorkbenchLayoutSerializer', () => {
     const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
 
     expect(deserializedLayout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({
-            id: 'part.__1__',
-          }),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             child1: new MPart({
-              id: 'part.__2__',
+              id: 'part.__1__',
             }),
-            child2: new MPart({
-              id: 'part.__3__',
-              alternativeId: 'right-bottom',
+            child2: new MTreeNode({
+              child1: new MPart({
+                id: 'part.__2__',
+              }),
+              child2: new MPart({
+                id: 'part.__3__',
+                alternativeId: 'right-bottom',
+              }),
             }),
           }),
-        }),
+        },
       },
     });
   });
@@ -178,53 +180,55 @@ describe('WorkbenchLayoutSerializer', () => {
     const [_6f09e6e2] = layout.parts({id: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'}, {throwIfEmpty: true});
 
     expect(layout).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          id: any(),
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: leftPart.id,
-            alternativeId: 'left',
-            views: [{id: 'view.2'}, {id: 'view.3', navigation: {id: any(), hint: 'test-view'}}],
-            activeViewId: 'view.2',
-          }),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             id: any(),
             direction: 'row',
-            ratio: .75,
+            ratio: .25,
             child1: new MPart({
-              id: MAIN_AREA,
+              id: leftPart.id,
+              alternativeId: 'left',
+              views: [{id: 'view.2'}, {id: 'view.3', navigation: {id: any(), hint: 'test-view'}}],
+              activeViewId: 'view.2',
+            }),
+            child2: new MTreeNode({
+              id: any(),
+              direction: 'row',
+              ratio: .75,
+              child1: new MPart({
+                id: MAIN_AREA,
+              }),
+              child2: new MPart({
+                id: rightPart.id,
+                alternativeId: 'right',
+                views: [{id: 'view.4', navigation: {id: any()}}],
+                activeViewId: 'view.4',
+              }),
+            }),
+          }),
+          activePartId: leftPart.id,
+        },
+        mainArea: {
+          root: new MTreeNode({
+            id: any(),
+            direction: 'column',
+            ratio: .5,
+            child1: new MPart({
+              id: _6f09e6e2.id,
+              alternativeId: _6f09e6e2.alternativeId,
+              views: [{id: 'view.1', navigation: {id: any()}}],
+              activeViewId: 'view.1',
             }),
             child2: new MPart({
-              id: rightPart.id,
-              alternativeId: 'right',
-              views: [{id: 'view.4', navigation: {id: any()}}],
-              activeViewId: 'view.4',
+              id: _1d94dcb6Part.id,
+              alternativeId: _1d94dcb6Part.alternativeId,
+              views: [{id: 'view.5', navigation: {id: any()}}],
+              activeViewId: 'view.5',
             }),
           }),
-        }),
-        activePartId: leftPart.id,
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          id: any(),
-          direction: 'column',
-          ratio: .5,
-          child1: new MPart({
-            id: _6f09e6e2.id,
-            alternativeId: _6f09e6e2.alternativeId,
-            views: [{id: 'view.1', navigation: {id: any()}}],
-            activeViewId: 'view.1',
-          }),
-          child2: new MPart({
-            id: _1d94dcb6Part.id,
-            alternativeId: _1d94dcb6Part.alternativeId,
-            views: [{id: 'view.5', navigation: {id: any()}}],
-            activeViewId: 'view.5',
-          }),
-        }),
-        activePartId: _1d94dcb6Part.id,
+          activePartId: _1d94dcb6Part.id,
+        },
       },
     });
   });

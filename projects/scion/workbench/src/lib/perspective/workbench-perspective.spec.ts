@@ -72,11 +72,13 @@ describe('Workbench Perspective', () => {
     expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MPart({id: MAIN_AREA}),
-      },
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial'}),
+      grids: {
+        main: {
+          root: new MPart({id: MAIN_AREA}),
+        },
+        mainArea: {
+          root: new MPart({id: 'part.initial'}),
+        },
       },
     });
   });
@@ -97,11 +99,13 @@ describe('Workbench Perspective', () => {
     expectPerspectives([{id: 'default', active: true}]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left'}),
-          child2: new MPart({id: 'part.right'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+          }),
+        },
       },
     });
   });
@@ -140,11 +144,13 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left'}),
-          child2: new MPart({id: 'part.right'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+          }),
+        },
       },
     });
   });
@@ -187,11 +193,13 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.top'}),
-          child2: new MPart({id: 'part.bottom'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.top'}),
+            child2: new MPart({id: 'part.bottom'}),
+          }),
+        },
       },
     });
   });
@@ -241,11 +249,13 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.top'}),
-          child2: new MPart({id: 'part.bottom'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.top'}),
+            child2: new MPart({id: 'part.bottom'}),
+          }),
+        },
       },
     });
     expect(perspectivesForActivation).toEqual(['perspective-1', 'perspective-2', 'perspective-3']);
@@ -283,11 +293,13 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left'}),
-          child2: new MPart({id: 'part.right'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+          }),
+        },
       },
     });
   });
@@ -325,11 +337,13 @@ describe('Workbench Perspective', () => {
     ]);
 
     expect(TestBed.inject(WorkbenchService).layout()).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left'}),
-          child2: new MPart({id: 'part.right'}),
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+          }),
+        },
       },
     });
   });
@@ -515,13 +529,15 @@ describe('Workbench Perspective', () => {
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: MAIN_AREA}),
-          direction: 'row',
-          ratio: .25,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: MAIN_AREA}),
+            direction: 'row',
+            ratio: .25,
+          }),
+        },
       },
     });
   });
@@ -552,13 +568,15 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
 
@@ -568,13 +586,15 @@ describe('Workbench Perspective', () => {
 
     // empty-path view should be opened in the active part (right) of the main grid
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
   });
@@ -601,13 +621,15 @@ describe('Workbench Perspective', () => {
     await waitForInitialWorkbenchLayout();
 
     expect(fixture).toEqualWorkbenchLayout({
-      mainGrid: {
-        root: new MTreeNode({
-          child1: new MPart({id: 'part.left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
-          child2: new MPart({id: 'part.right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),
-          direction: 'row',
-          ratio: .5,
-        }),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.101'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}], activeViewId: 'view.202'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+        },
       },
     });
   });

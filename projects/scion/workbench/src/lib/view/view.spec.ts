@@ -2786,14 +2786,16 @@ describe('View', () => {
 
       // Expect view to be moved.
       expect(fixture).toEqualWorkbenchLayout({
-        mainGrid: {
-          root: new MPart({id: MAIN_AREA}),
-        },
-        mainAreaGrid: {
-          root: new MTreeNode({
-            child1: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
-          }),
+        grids: {
+          main: {
+            root: new MPart({id: MAIN_AREA}),
+          },
+          mainArea: {
+            root: new MTreeNode({
+              child1: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+              child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+            }),
+          },
         },
       });
     });
