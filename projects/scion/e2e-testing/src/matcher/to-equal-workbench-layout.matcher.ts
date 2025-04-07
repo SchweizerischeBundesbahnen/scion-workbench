@@ -13,6 +13,7 @@ import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
 import {ActivityId, PartId, ViewId} from '@scion/workbench';
+import {SASHBOX_SPLITTER_SIZE} from '../workbench/workbench-layout-constants';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -91,7 +92,7 @@ async function assertActivityGroups(expectedActivityLayout: Partial<MActivityLay
 async function assertActivityGroup(expectedGroup: MActivityGroup, locator: Locator): Promise<void> {
   if (expectedGroup.activities.length === 0) {
     const activityLocator = locator.locator('wb-activity-item');
-    await throwIfPresent(activityLocator, () => Error(`[DOMAssertError] Expected activity group to not have activities, but it has. [locator=${activityLocator}]`));
+    await throwIfPresent(activityLocator, () => Error(`[DOMAssertError] Expected activity group to not have activities, but it has. [locator=${locator}]`));
   }
   for (const [i, activity] of expectedGroup.activities.entries()) {
     const activityLocator = locator.locator('wb-activity-item').nth(i).locator(`:scope[data-activityid="${activity.id}"]`);
@@ -125,46 +126,44 @@ async function assertLeftActivityPanel(expectedPanel: MActivityLayout['panels'][
   await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected left activity panel '${panelLocator}' to be in the DOM, but is not.`));
 
   // Assert left activity panel width
-  if (expectedPanel.width) {
-    const panelBoundingBox = (await panelLocator.boundingBox())!;
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: expectedPanel.width,
+      height: panelBoundingBox.height,
+    },
+    context: () => 'Width of left activity panel does not match expected.',
+  });
+  if (expectedPanel.ratio) {
+    // Assert top group
+    const topGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const topGridBoundingBox = (await topGridLocator.boundingBox())!;
     await throwIfBoundingBoxNotCloseTo({
-      actual: panelBoundingBox,
+      actual: topGridBoundingBox,
       expected: {
-        x: panelBoundingBox.x,
-        y: panelBoundingBox.y,
+        x: topGridBoundingBox.x,
+        y: topGridBoundingBox.y,
         width: expectedPanel.width,
-        height: panelBoundingBox.height,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
       },
-      context: () => `Width of left activity panel does not match expected. [actual=${panelBoundingBox.width}, expected=${expectedPanel.width}]`,
+      context: () => 'Height of top group of left activity panel does not match expected.',
     });
-    if (expectedPanel.ratio) {
-      // Assert top group
-      const topGridLocator = panelLocator.locator('wb-grid').nth(0);
-      const topGridBoundingBox = (await topGridLocator.boundingBox())!;
-      await throwIfBoundingBoxNotCloseTo({
-        actual: topGridBoundingBox,
-        expected: {
-          x: topGridBoundingBox.x,
-          y: topGridBoundingBox.y,
-          width: expectedPanel.width,
-          height: (panelBoundingBox.height - 1) * expectedPanel.ratio, // subtract 1 to account for splitter size
-        },
-        context: () => `Height of top group of left activity panel does not match expected. [actualTopGroupHeight=${topGridBoundingBox.height}, actualLeftPanelHeight=${panelBoundingBox.height}, expectedTopGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
-      });
-      // Assert bottom group
-      const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
-      const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
-      await throwIfBoundingBoxNotCloseTo({
-        actual: bottomGridBoundingBox,
-        expected: {
-          x: bottomGridBoundingBox.x,
-          y: bottomGridBoundingBox.y,
-          width: expectedPanel.width,
-          height: (panelBoundingBox.height - 1) * (1 - expectedPanel.ratio), // subtract 1 to account for splitter size
-        },
-        context: () => `Height of bottom group of left activity panel does not match expected. [actualBottomGroupHeight=${bottomGridBoundingBox.height}, actualLeftPanelHeight=${panelBoundingBox.height}, expectedBottomGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
-      });
-    }
+    // Assert bottom group
+    const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: bottomGridBoundingBox,
+      expected: {
+        x: bottomGridBoundingBox.x,
+        y: bottomGridBoundingBox.y,
+        width: expectedPanel.width,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+      },
+      context: () => 'Height of bottom group of left activity panel does not match expected.',
+    });
   }
 }
 
@@ -177,47 +176,45 @@ async function assertRightActivityPanel(expectedPanel: MActivityLayout['panels']
   await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected right activity panel '${panelLocator}' to be in the DOM, but is not.`));
 
   // Assert right activity panel width
-  if (expectedPanel.width) {
-    const panelBoundingBox = (await panelLocator.boundingBox())!;
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: expectedPanel.width,
+      height: panelBoundingBox.height,
+    },
+    context: () => 'Right activity panel width does not match expected.',
+  });
+  if (expectedPanel.ratio) {
+    // Assert top group
+    const topGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const topGridBoundingBox = (await topGridLocator.boundingBox())!;
     await throwIfBoundingBoxNotCloseTo({
-      actual: panelBoundingBox,
+      actual: topGridBoundingBox,
       expected: {
-        x: panelBoundingBox.x,
-        y: panelBoundingBox.y,
+        x: topGridBoundingBox.x,
+        y: topGridBoundingBox.y,
         width: expectedPanel.width,
-        height: panelBoundingBox.height,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
       },
-      context: () => `Right activity panel width does not match expected. [actual=${panelBoundingBox.width}, expected=${expectedPanel.width}]`,
+      context: () => 'Height of top group of right activity panel does not match expected.',
     });
-    if (expectedPanel.ratio) {
-      // Assert top group
-      const topGridLocator = panelLocator.locator('wb-grid').nth(0);
-      const topGridBoundingBox = (await topGridLocator.boundingBox())!;
-      await throwIfBoundingBoxNotCloseTo({
-        actual: topGridBoundingBox,
-        expected: {
-          x: topGridBoundingBox.x,
-          y: topGridBoundingBox.y,
-          width: expectedPanel.width,
-          height: (panelBoundingBox.height - 1) * expectedPanel.ratio, // subtract 1 to account for splitter size
-        },
-        context: () => `Height of top group of right activity panel does not match expected. [actualTopGroupHeight=${topGridBoundingBox.height}, actualRightPanelHeight=${panelBoundingBox.height}, expectedTopGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
-      });
 
-      // Assert bottom group
-      const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
-      const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
-      await throwIfBoundingBoxNotCloseTo({
-        actual: bottomGridBoundingBox,
-        expected: {
-          x: bottomGridBoundingBox.x,
-          y: bottomGridBoundingBox.y,
-          width: expectedPanel.width,
-          height: (panelBoundingBox.height - 1) * (1 - expectedPanel.ratio), // subtract 1 to account for splitter size
-        },
-        context: () => `Height of bottom group of right activity panel does not match expected. [actualBottomGroupHeight=${bottomGridBoundingBox.height}, actualRightPanelHeight=${panelBoundingBox.height}, expectedBottomGroupHeight=${expectedPanel.ratio! * panelBoundingBox.height}, expectedRatio=${expectedPanel.ratio}]`,
-      });
-    }
+    // Assert bottom group
+    const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: bottomGridBoundingBox,
+      expected: {
+        x: bottomGridBoundingBox.x,
+        y: bottomGridBoundingBox.y,
+        width: expectedPanel.width,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+      },
+      context: () => 'Height of bottom group of right activity panel does not match expected.',
+    });
   }
 }
 
@@ -230,47 +227,45 @@ async function assertBottomActivityPanel(expectedPanel: MActivityLayout['panels'
   await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected bottom activity panel '${panelLocator}' to be in the DOM, but is not.`));
 
   // Assert bottom activity panel height
-  if (expectedPanel.height) {
-    const panelBoundingBox = (await panelLocator.boundingBox())!;
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: panelBoundingBox.width,
+      height: expectedPanel.height,
+    },
+    context: () => 'Bottom activity panel height does not match expected.',
+  });
+  if (expectedPanel.ratio) {
+    // Assert left group
+    const leftGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const leftGridBoundingBox = (await leftGridLocator.boundingBox())!;
     await throwIfBoundingBoxNotCloseTo({
-      actual: panelBoundingBox,
+      actual: leftGridBoundingBox,
       expected: {
-        x: panelBoundingBox.x,
-        y: panelBoundingBox.y,
-        width: panelBoundingBox.width,
+        x: leftGridBoundingBox.x,
+        y: leftGridBoundingBox.y,
+        width: (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
         height: expectedPanel.height,
       },
-      context: () => `Bottom activity panel height does not match expected. [actual=${panelBoundingBox.height}, expected=${expectedPanel.height}]`,
+      context: () => 'Width of left group of bottom activity panel does not match expected.',
     });
-    if (expectedPanel.ratio) {
-      // Assert left group
-      const leftGridLocator = panelLocator.locator('wb-grid').nth(0);
-      const leftGridBoundingBox = (await leftGridLocator.boundingBox())!;
-      await throwIfBoundingBoxNotCloseTo({
-        actual: leftGridBoundingBox,
-        expected: {
-          x: leftGridBoundingBox.x,
-          y: leftGridBoundingBox.y,
-          width: (panelBoundingBox.width - 1) * expectedPanel.ratio, // subtract 1 to account for splitter size
-          height: expectedPanel.height,
-        },
-        context: () => `Width of left group of bottom activity panel does not match expected. [actualLeftGroupWidth=${leftGridBoundingBox.width}, actualBottomPanelWidth=${panelBoundingBox.width}, expectedLeftGroupWidth=${expectedPanel.ratio! * panelBoundingBox.width}, expectedRatio=${expectedPanel.ratio}]`,
-      });
 
-      // Assert right group
-      const rightGridLocator = panelLocator.locator('wb-grid').nth(1);
-      const rightGridBoundingBox = (await rightGridLocator.boundingBox())!;
-      await throwIfBoundingBoxNotCloseTo({
-        actual: rightGridBoundingBox,
-        expected: {
-          x: rightGridBoundingBox.x,
-          y: rightGridBoundingBox.y,
-          width: (panelBoundingBox.width - 1) * (1 - expectedPanel.ratio), // subtract 1 to account for splitter size
-          height: expectedPanel.height,
-        },
-        context: () => `Width of right group of bottom activity panel does not match expected. [actualRightGroupWidth=${rightGridBoundingBox.width}, actualBottomPanelWidth=${panelBoundingBox.width}, expectedRightGroupWidth=${expectedPanel.ratio! * panelBoundingBox.width}, expectedRatio=${expectedPanel.ratio}]`,
-      });
-    }
+    // Assert right group
+    const rightGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const rightGridBoundingBox = (await rightGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: rightGridBoundingBox,
+      expected: {
+        x: rightGridBoundingBox.x,
+        y: rightGridBoundingBox.y,
+        width: (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+        height: expectedPanel.height,
+      },
+      context: () => 'Width of right group of bottom activity panel does not match expected.',
+    });
   }
 }
 
