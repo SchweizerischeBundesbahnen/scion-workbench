@@ -1117,6 +1117,14 @@ test.describe('Activity Layout', () => {
       },
     });
 
+    /**
+     * +-------+-----------+
+     * |       |           |
+     * | left  | MAIN_AREA |
+     * | panel |           |
+     * |       |           |
+     * +-------+-----------+
+     */
     await test.step('toggle activity.1 (left-top)', async () => {
       // Activate activity.1
       await appPO.activityItem({activityId: 'activity.1'}).click();
@@ -1147,6 +1155,14 @@ test.describe('Activity Layout', () => {
       });
     });
 
+    /**
+     * +-------+-----------+
+     * |       |           |
+     * | left  | MAIN_AREA |
+     * | panel |           |
+     * |       |           |
+     * +-------+-----------+
+     */
     await test.step('toggle activity.2 (left-bottom)', async () => {
       // Activate activity.2
       await appPO.activityItem({activityId: 'activity.2'}).click();
@@ -1177,6 +1193,14 @@ test.describe('Activity Layout', () => {
       });
     });
 
+    /**
+     * +-----------+-------+
+     * |           |       |
+     * | MAIN_AREA | right |
+     * |           | panel |
+     * |           |       |
+     * +-----------+-------+
+     */
     await test.step('toggle activity.3 (right-top)', async () => {
       // Activate activity.3
       await appPO.activityItem({activityId: 'activity.3'}).click();
@@ -1207,6 +1231,14 @@ test.describe('Activity Layout', () => {
       });
     });
 
+    /**
+     * +-----------+-------+
+     * |           |       |
+     * | MAIN_AREA | right |
+     * |           | panel |
+     * |           |       |
+     * +-----------+-------+
+     */
     await test.step('toggle activity.4 (right-bottom)', async () => {
       // Activate activity.4
       await appPO.activityItem({activityId: 'activity.4'}).click();
@@ -1237,6 +1269,15 @@ test.describe('Activity Layout', () => {
       });
     });
 
+    /**
+     * +-------------------+
+     * |                   |
+     * |     MAIN_AREA     |
+     * |                   |
+     * +-------------------+
+     * |   bottom panel    |
+     * +-------------------+
+     */
     await test.step('toggle activity.5 (bottom-left)', async () => {
       // Activate activity.5
       await appPO.activityItem({activityId: 'activity.5'}).click();
@@ -1267,6 +1308,15 @@ test.describe('Activity Layout', () => {
       });
     });
 
+    /**
+     * +-------------------+
+     * |                   |
+     * |     MAIN_AREA     |
+     * |                   |
+     * +-------------------+
+     * |   bottom panel    |
+     * +-------------------+
+     */
     await test.step('toggle activity.6 (bottom-right)', async () => {
       // Activate activity.6
       await appPO.activityItem({activityId: 'activity.6'}).click();
@@ -1301,8 +1351,7 @@ test.describe('Activity Layout', () => {
   test('should resize activity panels', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.createPerspective(factory => factory
-      .addPart(MAIN_AREA)
+    await workbenchNavigator.modifyLayout(factory => factory
       // left-top
       .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       // left-bottom
@@ -1350,7 +1399,7 @@ test.describe('Activity Layout', () => {
         activityLayout: {
           panels: {
             left: {
-              width: 300,
+              width: ACTIVITY_PANEL_WIDTH + 100,
             },
             right: {
               width: ACTIVITY_PANEL_WIDTH,
@@ -1360,6 +1409,28 @@ test.describe('Activity Layout', () => {
             },
           },
         },
+      });
+
+      await test.step('reload application', async () => {
+        // Reload the application.
+        await appPO.reload();
+
+        // Assert activity panels
+        await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+          activityLayout: {
+            panels: {
+              left: {
+                width: ACTIVITY_PANEL_WIDTH + 100,
+              },
+              right: {
+                width: ACTIVITY_PANEL_WIDTH,
+              },
+              bottom: {
+                height: ACTIVITY_PANEL_HEIGHT,
+              },
+            },
+          },
+        });
       });
 
       // Sash left activity panel 100px to the left
@@ -1395,13 +1466,35 @@ test.describe('Activity Layout', () => {
               width: ACTIVITY_PANEL_WIDTH,
             },
             right: {
-              width: 300,
+              width: ACTIVITY_PANEL_WIDTH + 100,
             },
             bottom: {
               height: ACTIVITY_PANEL_HEIGHT,
             },
           },
         },
+      });
+
+      await test.step('reload application', async () => {
+        // Reload the application.
+        await appPO.reload();
+
+        // Assert activity panels
+        await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+          activityLayout: {
+            panels: {
+              left: {
+                width: ACTIVITY_PANEL_WIDTH,
+              },
+              right: {
+                width: ACTIVITY_PANEL_WIDTH + 100,
+              },
+              bottom: {
+                height: ACTIVITY_PANEL_HEIGHT,
+              },
+            },
+          },
+        });
       });
 
       // Sash right activity panel 100px to the right
@@ -1440,10 +1533,32 @@ test.describe('Activity Layout', () => {
               width: ACTIVITY_PANEL_WIDTH,
             },
             bottom: {
-              height: 250,
+              height: ACTIVITY_PANEL_HEIGHT + 100,
             },
           },
         },
+      });
+
+      await test.step('reload application', async () => {
+        // Reload the application.
+        await appPO.reload();
+
+        // Assert activity panels
+        await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+          activityLayout: {
+            panels: {
+              left: {
+                width: ACTIVITY_PANEL_WIDTH,
+              },
+              right: {
+                width: ACTIVITY_PANEL_WIDTH,
+              },
+              bottom: {
+                height: ACTIVITY_PANEL_HEIGHT + 100,
+              },
+            },
+          },
+        });
       });
 
       // Sash bottom activity panel 100px to the bottom
@@ -1471,8 +1586,7 @@ test.describe('Activity Layout', () => {
   test('should move splitter in activity panel', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.createPerspective(factory => factory
-      .addPart(MAIN_AREA)
+    await workbenchNavigator.modifyLayout(factory => factory
       // left-top
       .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
       // left-bottom
@@ -1547,6 +1661,31 @@ test.describe('Activity Layout', () => {
         },
       });
 
+      await test.step('reload application', async () => {
+        // Reload the application.
+        await appPO.reload();
+
+        // Assert activity panels
+        await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+          activityLayout: {
+            panels: {
+              left: {
+                width: ACTIVITY_PANEL_WIDTH,
+                ratio: expectedRatio,
+              },
+              right: {
+                width: ACTIVITY_PANEL_WIDTH,
+                ratio: ACTIVITY_PANEL_RATIO,
+              },
+              bottom: {
+                height: ACTIVITY_PANEL_HEIGHT,
+                ratio: ACTIVITY_PANEL_RATIO,
+              },
+            },
+          },
+        });
+      });
+
       // Move splitter 100px to the bottom
       await activityPanel.moveSplitter(100);
 
@@ -1604,6 +1743,31 @@ test.describe('Activity Layout', () => {
         },
       });
 
+      await test.step('reload application', async () => {
+        // Reload the application.
+        await appPO.reload();
+
+        // Assert activity panels
+        await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+          activityLayout: {
+            panels: {
+              left: {
+                width: ACTIVITY_PANEL_WIDTH,
+                ratio: ACTIVITY_PANEL_RATIO,
+              },
+              right: {
+                width: ACTIVITY_PANEL_WIDTH,
+                ratio: expectedRatio,
+              },
+              bottom: {
+                height: ACTIVITY_PANEL_HEIGHT,
+                ratio: ACTIVITY_PANEL_RATIO,
+              },
+            },
+          },
+        });
+      });
+
       // Move splitter 100px to the bottom
       await activityPanel.moveSplitter(100);
 
@@ -1659,6 +1823,31 @@ test.describe('Activity Layout', () => {
             },
           },
         },
+      });
+
+      await test.step('reload application', async () => {
+        // Reload the application.
+        await appPO.reload();
+
+        // Assert activity panels
+        await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+          activityLayout: {
+            panels: {
+              left: {
+                width: ACTIVITY_PANEL_WIDTH,
+                ratio: ACTIVITY_PANEL_RATIO,
+              },
+              right: {
+                width: ACTIVITY_PANEL_WIDTH,
+                ratio: ACTIVITY_PANEL_RATIO,
+              },
+              bottom: {
+                height: ACTIVITY_PANEL_HEIGHT,
+                ratio: expectedRatio,
+              },
+            },
+          },
+        });
       });
 
       // Move splitter 100px to the right
