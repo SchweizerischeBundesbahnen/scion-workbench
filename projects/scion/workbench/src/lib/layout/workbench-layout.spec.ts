@@ -2366,9 +2366,9 @@ describe('WorkbenchLayout', () => {
    * - {@link MView.id}
    * - {@link MView.navigation.id}
    * - {@link MPart.navigation.id}
+   * - {@link MActivity.id}
    */
   it('should have stable identifiers', async () => {
-    // TODO [Activity] Add docked part to test stable activity identifier when added support to Jasmine 'toEqualWorkbenchLayout' matcher
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
@@ -2379,6 +2379,9 @@ describe('WorkbenchLayout', () => {
                 id: 'perspective-1',
                 layout: factory => factory
                   .addPart(MAIN_AREA)
+                  .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+                  .navigatePart('part.activity', ['test-part'])
+                  .activatePart('part.activity')
                   .addPart('part.left', {align: 'left'})
                   .addPart('part.right', {align: 'right'})
                   .addView('view.100', {partId: 'part.left'})
@@ -2418,6 +2421,7 @@ describe('WorkbenchLayout', () => {
     // Capture model objects. The ids should not change when serializing and deserializing the layout.
     const workbenchLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().grids.main.root;
     const mainAreaLayoutRoot = TestBed.inject(ɵWorkbenchService).layout().grids.mainArea!.root;
+    const activityPart = TestBed.inject(ɵWorkbenchService).layout().part({partId: 'part.activity'});
     const view100 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.100'});
     const view101 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.101'});
     const view102 = TestBed.inject(ɵWorkbenchService).layout().view({viewId: 'view.102'});
@@ -2426,6 +2430,14 @@ describe('WorkbenchLayout', () => {
 
     // Expect initial layout.
     expect(fixture).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
       grids: {
         main: {
           root: new MTreeNode({
@@ -2469,6 +2481,9 @@ describe('WorkbenchLayout', () => {
             }),
           }),
         },
+        'activity.1': {
+          root: new MPart({id: 'part.activity', navigation: {id: activityPart.navigation!.id}}),
+        },
       },
     });
 
@@ -2481,6 +2496,14 @@ describe('WorkbenchLayout', () => {
 
     // Expect ids not to have changed.
     expect(fixture).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
       grids: {
         main: {
           root: new MTreeNode({
@@ -2526,6 +2549,9 @@ describe('WorkbenchLayout', () => {
               activeViewId: 'view.102',
             }),
           }),
+        },
+        'activity.1': {
+          root: new MPart({id: 'part.activity', navigation: {id: activityPart.navigation!.id}}),
         },
       },
     });
@@ -2537,6 +2563,14 @@ describe('WorkbenchLayout', () => {
 
     // Expect ids not to have changed.
     expect(fixture).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
       grids: {
         main: {
           root: new MTreeNode({
@@ -2582,6 +2616,9 @@ describe('WorkbenchLayout', () => {
               activeViewId: 'view.102',
             }),
           }),
+        },
+        'activity.1': {
+          root: new MPart({id: 'part.activity', navigation: {id: activityPart.navigation!.id}}),
         },
       },
     });
