@@ -22,6 +22,8 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchPartNavigation} from './workbench-part.model';
 import {By} from '@angular/platform-browser';
+import {WorkbenchService} from '../workbench.service';
+import {MAIN_AREA} from '../layout/workbench-layout';
 
 describe('WorkbenchPart', () => {
 
@@ -321,5 +323,117 @@ describe('WorkbenchPart', () => {
     // Expect title to be set.
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('TITLE-1');
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.right"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('title-2');
+  });
+
+  describe('Part Bar', () => {
+
+    it('should show part bar if part has title', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => {
+              return factory
+                .addPart('part.testee', {title: 'Title'})
+                .navigatePart('part.testee', ['test-part']);
+            },
+          }),
+        ],
+      });
+      const fixture = TestBed.createComponent(WorkbenchComponent);
+      await waitForInitialWorkbenchLayout();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should show part bar if part has views', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => {
+              return factory
+                .addPart('part.testee')
+                .addView('view.100', {partId: 'part.testee'});
+            },
+          }),
+        ],
+        teardown: {destroyAfterEach: false},
+      });
+      const fixture = TestBed.createComponent(WorkbenchComponent);
+      await waitForInitialWorkbenchLayout();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should show part bar if part has actions', async () => {
+      @Component({
+        selector: 'spec-action',
+        template: 'spec-action',
+      })
+      class SpecActionComponent {
+      }
+
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => {
+              return factory
+                .addPart('part.testee')
+                .navigatePart('part.testee', ['test-part']);
+            },
+          }),
+        ],
+      });
+      const fixture = TestBed.createComponent(WorkbenchComponent);
+      await waitForInitialWorkbenchLayout();
+
+      // Register part action.
+      TestBed.inject(WorkbenchService).registerPartAction(() => SpecActionComponent);
+      await waitUntilStable();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should show part bar if part has minimize action (part in activity and top-right part)', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => {
+              return factory
+                .addPart(MAIN_AREA)
+                .addPart('part.testee', {dockTo: 'left-top'}, {title: false, label: 'Activity', icon: 'folder'})
+                .navigatePart('part.testee', ['test-part'])
+                .activatePart('part.testee');
+            },
+          }),
+        ],
+      });
+      const fixture = TestBed.createComponent(WorkbenchComponent);
+      await waitForInitialWorkbenchLayout();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should not show part bar if part has no title, no views, no actions and not in activity', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => {
+              return factory
+                .addPart('part.testee')
+                .navigatePart('part.testee', ['test-part']);
+            },
+          }),
+        ],
+      });
+      const fixture = TestBed.createComponent(WorkbenchComponent);
+      await waitForInitialWorkbenchLayout();
+
+      // Expect part bar not to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).toBeNull();
+    });
   });
 });
