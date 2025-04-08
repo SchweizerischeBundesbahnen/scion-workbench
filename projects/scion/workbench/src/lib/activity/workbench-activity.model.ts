@@ -82,3 +82,10 @@ export interface MActivity {
   /** @see DockedPartExtras#cssClass */
   cssClass?: string | string[];
 }
+
+/** Specifies the default width of the left or right activity panel. */
+export const ACTIVITY_PANEL_WIDTH = 200;
+/** Specifies the default height of the bottom activity panel. */
+export const ACTIVITY_PANEL_HEIGHT = 150;
+/** Specifies the default split ratio of the activity panels. */
+export const ACTIVITY_PANEL_RATIO = .5;

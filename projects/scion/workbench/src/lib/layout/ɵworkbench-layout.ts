@@ -24,7 +24,7 @@ import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
 import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
-import {ActivityId, MActivity, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
+import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, ActivityId, MActivity, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
 import {WorkbenchActivityLayoutSerializer} from './workench-activity-layout-serializer.service';
 import {Objects} from '../common/objects.util';
 import {WorkbenchGrids} from './workbench-grids.model';
@@ -1397,16 +1397,16 @@ function createDefaultActivityLayout(): MActivityLayout {
     },
     panels: {
       left: {
-        width: 200,
-        ratio: .5,
+        width: ACTIVITY_PANEL_WIDTH,
+        ratio: ACTIVITY_PANEL_RATIO,
       },
       right: {
-        width: 200,
-        ratio: .5,
+        width: ACTIVITY_PANEL_WIDTH,
+        ratio: ACTIVITY_PANEL_RATIO,
       },
       bottom: {
-        height: 150,
-        ratio: .5,
+        height: ACTIVITY_PANEL_HEIGHT,
+        ratio: ACTIVITY_PANEL_RATIO,
       },
     },
   };
