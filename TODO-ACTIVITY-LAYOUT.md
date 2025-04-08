@@ -25,9 +25,9 @@
   [x] Test: Navigate view with router should activate activity
   [x] Test Panel Alignment: consider property in toEqualWorkbenchLayout matcher
   [x] Test that main grid drop zone is only enabled for layouts without activities or layouts with activities but no main area. (canDropInMainGrid)
-  [] Test: part bar visible different conditions (part.title() || part.viewIds().length || part.actions().length || part.canMinimize())
-  [] Test: activity reload page should restore layout (panel size and splitter ratio)
-  [] Test: Add docked part to test 'should have stable identifiers' when added support to Jasmine `toEqualWorkbenchLayout` matcher
+  [x] part bar visible different conditions (part.title() || part.viewIds().length || part.actions().length || part.canMinimize())
+  [x] activity reload page should restore layout (panel size and splitter ratio)
+  [x] Test: Add docked part to test 'should have stable identifiers' when added support to Jasmine `toEqualWorkbenchLayout` matcher
 [] i18n
   [] minimize part action
 [x] add part include activity parts in part list
@@ -36,7 +36,7 @@
 [] add keystroke to maximize (ctrl+shift+F12)
 [] Sashing right activity panel to the left should not overlap left activity panel (e.g. left panel alignment)
 [] Consider moving computed in PartHandle (computeTitle, computeActivity, computeTopLeft) to onLayoutChange
-[] Add activity support to Jasmine `toEqualWorkbenchLayout` matcher
+[x] Add activity support to Jasmine `toEqualWorkbenchLayout` matcher
 
 ## TODO Phase 2:
 [] Drag and Drop (including restrictions)
