@@ -48,9 +48,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly activeViewId = signal<ViewId | null>(null);
   public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
-  public readonly topLeft = this.computeTopLeft();
-  public readonly topRight = this.computeTopRight();
-  public readonly activity = this.computeActivity();
+  public readonly topLeft = signal(false);
+  public readonly topRight = signal(false);
+  public readonly activity = signal<MActivity | null>(null);
   public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
@@ -98,6 +98,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.active.set(grid.activePartId === this.id);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
+    this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
+    this.topLeft.set(isTopLeft(grid.root, layout.part({partId: this.id})));
+    this.topRight.set(isTopRight(grid.root, layout.part({partId: this.id})));
 
     this.classList.layout = mPart.cssClass;
 
@@ -138,40 +141,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
       // This part is contained in an activity. Only show title if this part is the top-left part.
       return this.topLeft() ? layout.part({partId: activity.referencePartId}).title : undefined;
-    });
-  }
-
-  private computeActivity(): Signal<MActivity | null> {
-    return computed(() => {
-      const layout = this._workbenchLayoutService.layout();
-      if (!layout) {
-        return null;
-      }
-      return layout.activity({partId: this.id}, {orElse: null});
-    });
-  }
-
-  private computeTopLeft(): Signal<boolean> {
-    return computed(() => {
-      const layout = this._workbenchLayoutService.layout();
-      if (!layout) {
-        return false;
-      }
-      const grid = layout.grid({partId: this.id}).grid;
-      const part = layout.part({partId: this.id});
-      return isTopLeft(grid.root, part);
-    });
-  }
-
-  private computeTopRight(): Signal<boolean> {
-    return computed(() => {
-      const layout = this._workbenchLayoutService.layout();
-      if (!layout) {
-        return false;
-      }
-      const grid = layout.grid({partId: this.id}).grid;
-      const part = layout.part({partId: this.id});
-      return isTopRight(grid.root, part);
     });
   }
 

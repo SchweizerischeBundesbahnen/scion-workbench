@@ -35,7 +35,7 @@
 [x] Part Title
 [] add keystroke to maximize (ctrl+shift+F12)
 [] Sashing right activity panel to the left should not overlap left activity panel (e.g. left panel alignment)
-[] Consider moving computed in PartHandle (computeTitle, computeActivity, computeTopLeft) to onLayoutChange
+[x] Consider moving computed in PartHandle (computeTitle, computeActivity, computeTopLeft) to onLayoutChange
 [x] Add activity support to Jasmine `toEqualWorkbenchLayout` matcher
 
 ## TODO Phase 2:
