@@ -147,6 +147,34 @@ describe('WorkbenchLayoutSerializer', () => {
     });
   });
 
+  it('should serialize activity identifiers into logical identifiers based on their order in the layout', async () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder'})
+      .addPart('part.activity-2', {dockTo: 'right-top'}, {label: 'Activity 2', icon: 'folder'});
+
+    // Serialize and deserialize the layout.
+    const serializedLayout = workbenchLayout.serialize({assignStableActivityIdentifier: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids, activityLayout: serializedLayout.activityLayout});
+
+    expect(deserializedLayout).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {activities: [{id: 'activity.__1__'}]},
+          rightTop: {activities: [{id: 'activity.__2__'}]},
+        },
+      },
+      grids: {
+        'activity.__1__': {
+          root: new MPart({id: 'part.activity-1'}),
+        },
+        'activity.__2__': {
+          root: new MPart({id: 'part.activity-2'}),
+        },
+      },
+    });
+  });
+
   /**
    * ## Given layout in version 4:
    *
