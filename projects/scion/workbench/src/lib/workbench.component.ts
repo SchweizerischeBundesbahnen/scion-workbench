@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Provider, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
 import {WorkbenchConfig} from './workbench-config';
@@ -25,6 +25,9 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Routing} from './routing/routing.util';
 import {LayoutComponent} from './layout/layout.component';
 import {ɵWorkbenchService} from './ɵworkbench.service';
+import {fromEvent} from 'rxjs';
+import {ɵWorkbenchRouter} from './routing/ɵworkbench-router.service';
+import {subscribeIn} from '@scion/toolkit/operators';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -47,6 +50,7 @@ export class WorkbenchComponent {
 
   private _workbenchLauncher = inject(WorkbenchLauncher);
   private _logger = inject(Logger);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
   private _iframeOverlayHost = viewChild('iframe_overlay_host', {read: ViewContainerRef});
   private _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
@@ -62,6 +66,23 @@ export class WorkbenchComponent {
     this.startWorkbench();
     this.disableChangeDetectionDuringNavigation();
     this.provideWorkbenchElementReferences();
+    this.installMaximizeShortcutListener();
+  }
+
+  /**
+   * Toggles layout maximization by pressing Ctrl+Shift+F12.
+   */
+  private installMaximizeShortcutListener(): void {
+    const zone = inject(NgZone);
+    fromEvent<KeyboardEvent>(window, 'keydown', {capture: true})
+      .pipe(subscribeIn(fn => zone.runOutsideAngular(fn)))
+      .subscribe(event => {
+        if (event.ctrlKey && event.shiftKey && event.key === 'F12') {
+          event.preventDefault();
+          event.stopPropagation();
+          void this._workbenchRouter.navigate(layout => layout.toggleMaximized());
+        }
+      });
   }
 
   /**

@@ -891,4 +891,56 @@ test.describe('Activity Layout Maximize', () => {
     await expect(partRight.bar.minimizeButton).not.toBeAttached();
     await expect(partBottom.bar.minimizeButton).toBeVisible();
   });
+
+  test('should minimize / maximize activities by pressing Ctrl+Shift+F12', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
+      .activatePart('part.activity-1'),
+    );
+
+    // Expect activities to be active
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1', icon: 'folder', label: 'Activity 1'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
+    });
+
+    // Minimize activities
+    await page.keyboard.press('Control+Shift+F12');
+
+    // Expect activities to be minimized
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1', icon: 'folder', label: 'Activity 1'}],
+            activeActivityId: 'none',
+          },
+        },
+      },
+    });
+
+    // Restore minimized activities
+    await page.keyboard.press('Control+Shift+F12');
+
+    // Expect minimized activities to be restored
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1', icon: 'folder', label: 'Activity 1'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
+    });
+  });
 });
