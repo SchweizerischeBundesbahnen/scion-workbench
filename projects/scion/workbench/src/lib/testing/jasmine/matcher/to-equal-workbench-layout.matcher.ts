@@ -159,7 +159,7 @@ function assertActivityGroupDOM(expectedGroup: MActivityGroup, actualElement: El
   if (expectedGroup.activities.length === 0) {
     const activity = actualElement.querySelector('wb-activity-item');
     if (activity) {
-      throw Error(`[DOMAssertError] Expected activity group to not have activities, but it has. [element=${actualElement}]`);
+      throw Error(`[DOMAssertError] Expected activity group to not have activities, but it has. [group=${group}]`);
     }
   }
   for (const [i, activity] of expectedGroup.activities.entries()) {

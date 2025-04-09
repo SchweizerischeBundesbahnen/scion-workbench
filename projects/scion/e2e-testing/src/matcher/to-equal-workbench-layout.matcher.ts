@@ -70,26 +70,26 @@ async function assertActivityLayout(expectedActivityLayout: Partial<MActivityLay
 
 async function assertActivityGroups(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
   if (expectedActivityLayout.toolbars?.leftTop) {
-    await assertActivityGroup(expectedActivityLayout.toolbars.leftTop, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-group[data-group="left-top"]'));
+    await assertActivities(expectedActivityLayout.toolbars.leftTop, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-group[data-group="left-top"]'));
   }
   if (expectedActivityLayout.toolbars?.leftBottom) {
-    await assertActivityGroup(expectedActivityLayout.toolbars.leftBottom, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-group[data-group="left-bottom"]'));
+    await assertActivities(expectedActivityLayout.toolbars.leftBottom, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-group[data-group="left-bottom"]'));
   }
   if (expectedActivityLayout.toolbars?.rightTop) {
-    await assertActivityGroup(expectedActivityLayout.toolbars.rightTop, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-group[data-group="right-top"]'));
+    await assertActivities(expectedActivityLayout.toolbars.rightTop, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-group[data-group="right-top"]'));
   }
   if (expectedActivityLayout.toolbars?.rightBottom) {
-    await assertActivityGroup(expectedActivityLayout.toolbars.rightBottom, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-group[data-group="right-bottom"]'));
+    await assertActivities(expectedActivityLayout.toolbars.rightBottom, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-group[data-group="right-bottom"]'));
   }
   if (expectedActivityLayout.toolbars?.bottomLeft) {
-    await assertActivityGroup(expectedActivityLayout.toolbars.bottomLeft, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-group[data-group="bottom-left"]'));
+    await assertActivities(expectedActivityLayout.toolbars.bottomLeft, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-group[data-group="bottom-left"]'));
   }
   if (expectedActivityLayout.toolbars?.bottomRight) {
-    await assertActivityGroup(expectedActivityLayout.toolbars.bottomRight, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-group[data-group="bottom-right"]'));
+    await assertActivities(expectedActivityLayout.toolbars.bottomRight, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-group[data-group="bottom-right"]'));
   }
 }
 
-async function assertActivityGroup(expectedGroup: MActivityGroup, locator: Locator): Promise<void> {
+async function assertActivities(expectedGroup: MActivityGroup, locator: Locator): Promise<void> {
   if (expectedGroup.activities.length === 0) {
     const activityLocator = locator.locator('wb-activity-item');
     await throwIfPresent(activityLocator, () => Error(`[DOMAssertError] Expected activity group to not have activities, but it has. [locator=${locator}]`));
@@ -527,6 +527,13 @@ async function throwIfBoundingBoxNotCloseTo(args: {actual: BoundingBox | null | 
   }
 }
 
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 /**
  * Compares given two Arrays for shallow equality.
  */
@@ -602,26 +609,21 @@ export interface MActivityLayout {
   };
 }
 
+/**
+ * Modified version of {@link MActivityGroup} to expect the workbench layout.
+ */
 export interface MActivityGroup {
   activities: Array<Partial<MActivity>>;
   activeActivityId: ActivityId | 'none';
 }
 
+/**
+ * Modified version of {@link MActivity} to expect the workbench layout.
+ */
 export interface MActivity {
   id: ActivityId;
-  // TODO [activity] remove for now
-  icon: string;
-  // TODO [activity] remove for now
   label: string;
-  // TODO [activity] can tooltip be asserted?
-  tooltip?: string;
-}
-
-interface BoundingBox {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  icon: string;
 }
 
 /**
