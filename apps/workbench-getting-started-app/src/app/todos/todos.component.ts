@@ -9,7 +9,7 @@
  */
 
 import {Component, inject} from '@angular/core';
-import {WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
+import {WorkbenchRouterLinkDirective} from '@scion/workbench';
 import {TodoService} from '../todo.service';
 
 @Component({
@@ -22,12 +22,4 @@ import {TodoService} from '../todo.service';
 export default class TodosComponent {
 
   protected readonly todoService = inject(TodoService);
-
-  constructor() {
-    const view = inject(WorkbenchView);
-
-    view.title = 'Todos';
-    view.heading = 'What to do today?';
-    view.closable = false;
-  }
 }

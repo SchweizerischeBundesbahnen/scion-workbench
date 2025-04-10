@@ -7,8 +7,6 @@
 
 We will create a simple TODO app to introduce you to the SCION Workbench. This short tutorial helps to install the SCION Workbench and explains how to arrange and open views.
 
-The application lists TODOs on the left side. When the user clicks a TODO, a new view opens displaying the TODO. Different TODOs open a different view. To open a TODO multiple times, the Ctrl key can be pressed. The user can size and arrange views by drag and drop.
-
 ***
 - After you complete this guide, the application will look like this: https://workbench-getting-started.scion.vercel.app.
 - The source code of the application can be found <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/apps/workbench-getting-started-app/src">here</a>.
@@ -42,7 +40,7 @@ npm install @scion/workbench @scion/workbench-client @scion/toolkit @scion/compo
     <summary><strong>Register SCION Workbench Providers</strong></summary>
     <br>
 
-Open `app.config.ts` and register SCION Workbench providers. Added lines are marked with `[+]`.
+Open `app.config.ts` and register SCION Workbench providers.
 
 ```ts
     import {ApplicationConfig} from '@angular/core';
@@ -73,6 +71,26 @@ Open `app.component.html` and change it as follows:
 <wb-workbench/>
 ```
 
+Import the SCION Workbench component in `app.component.ts`. Added lines are marked with `[+]`.
+
+```ts
+    import {Component} from '@angular/core';
+[+] import {WorkbenchComponent} from '@scion/workbench';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [
+[+]     WorkbenchComponent
+      ],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.scss'
+    })
+    export class AppComponent {
+      title = 'workbench-getting-started';
+    }
+```
+
 The workbench itself does not position nor lay out the `<wb-workbench>` component. Depending on your requirements, you may want the workbench to fill the entire page viewport or only parts of it, for example, if you have a header, footer, or navigation panel.
 
 For a quick start, position the workbench absolutely and align it with the page viewport. Open `app.component.scss` and change it as follows:
@@ -92,9 +110,21 @@ The workbench requires some styles to be imported into `styles.scss`, as follows
 
 ```scss
 @use '@scion/workbench';
-``` 
+```
 
 Also, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip">GitHub</a>, unzip the font files, and place the extracted files in the `/public/fonts` folder.
+
+</details>
+
+<details>
+    <summary><strong>Import Material Icons</strong></summary>
+    <br>
+
+In this getting started guide we will be using Material icons. Import them in `styles.scss` as follows:
+
+```scss
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+```
 
 </details>
 
@@ -133,8 +163,6 @@ In this step, we will create a component that displays a welcome message when no
 
 4. Register a route in `app.config.ts` for the component.
 
-   In this step, we bind the component to the empty path route to display it when the application is opened.
-
     ```ts
         import {ApplicationConfig} from '@angular/core';
         import {provideWorkbench} from '@scion/workbench';
@@ -145,12 +173,40 @@ In this step, we will create a component that displays a welcome message when no
           providers: [
             provideWorkbench(),
             provideRouter([
-    [+]       {path: '', loadComponent: () => import('./welcome/welcome.component')},
+    [+]       {path: 'welcome', loadComponent: () => import('./welcome/welcome.component')},
             ], withComponentInputBinding()),
             provideAnimations(),
           ],
        };
     ```
+   
+5. Add the welcome page to the workbench layout.
+
+   Open `app.config.ts` and configure the workbench layout.
+
+   ```ts
+       import {ApplicationConfig} from '@angular/core';
+       import {provideWorkbench} from '@scion/workbench';
+       import {provideRouter, withComponentInputBinding} from '@angular/router';
+       import {provideAnimations} from '@angular/platform-browser/animations';
+   [+] import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
+   
+       export const appConfig: ApplicationConfig = {
+         providers: [
+           provideWorkbench({
+   [+]       layout: (factory: WorkbenchLayoutFactory) => factory
+   [+]         .addPart(MAIN_AREA)
+   [+]         .navigatePart(MAIN_AREA, ['welcome']),
+           }),
+           provideRouter([
+             {path: 'welcome', loadComponent: () => import('./welcome/welcome.component')},
+           ], withComponentInputBinding()),
+           provideAnimations(),
+         ],
+      };
+   ```
+
+   We create a layout with the main area and display the `welcome` message. The `welcome` message is only displayed when no views are open in the main area.
 
    Run `ng serve` and open a browser to http://localhost:4200. You should see the welcome message.
 
@@ -170,7 +226,7 @@ In this step, we will create the TODO list and place it to the left of the main 
 
     ```ts
         import {Component} from '@angular/core';
-    [+] import {WorkbenchRouterLinkDirective, WorkbenchView} from '@scion/workbench';
+    [+] import {WorkbenchRouterLinkDirective} from '@scion/workbench';
     [+] import {TodoService} from '../todo.service';
     
         @Component({
@@ -183,19 +239,11 @@ In this step, we will create the TODO list and place it to the left of the main 
     [+] export default class TodosComponent {
 
     [+]   protected todoService = inject(TodoService);
-
-    [+]   constructor() {
-    [+]     const view = inject(WorkbenchView);
-
-    [+]     view.title = 'Todos';
-    [+]     view.heading = 'What to do today?';
-    [+]     view.closable = false;
-    [+]   }
         }
     ```
-   In the constructor, we inject the view handle `WorkbenchView`. Using this handle, we can interact with the view, for example, set the title or make the view non-closable. We also inject a reference to the `TodoService` to iterate over the todos in the template.
+   We inject the `TodoService` to iterate over the todos in the template.
 
-   We also change the component to be exported by default, making it easier to register the route for the component.
+   We change the component to be exported by default, making it easier to register the route for the component.
 
 3. Open `todos.component.html` and change it as follows:
 
@@ -224,7 +272,7 @@ In this step, we will create the TODO list and place it to the left of the main 
           providers: [
             provideWorkbench(),
             provideRouter([
-              {path: '', loadComponent: () => import('./welcome/welcome.component')},
+              {path: 'welcome', loadComponent: () => import('./welcome/welcome.component')},
     [+]       {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
             ], withComponentInputBinding()),
             provideAnimations(),
@@ -234,26 +282,27 @@ In this step, we will create the TODO list and place it to the left of the main 
 
 5. Add the TODO list to the workbench layout.
 
-   Open `app.config.ts` and configure the workbench with the initial layout.
+   Open `app.config.ts` and configure the workbench layout.
 
    ```ts
        import {ApplicationConfig} from '@angular/core';
        import {provideWorkbench} from '@scion/workbench';
        import {provideRouter, withComponentInputBinding} from '@angular/router';
        import {provideAnimations} from '@angular/platform-browser/animations';
-   [+] import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
+       import {MAIN_AREA, WorkbenchLayoutFactory} from '@scion/workbench';
    
        export const appConfig: ApplicationConfig = {
          providers: [
            provideWorkbench({
-   [+]       layout: (factory: WorkbenchLayoutFactory) => factory
-   [+]         .addPart(MAIN_AREA)
-   [+]         .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-   [+]         .addView('todos', {partId: 'left'})
-   [+]         .navigateView('todos', ['todos'])
+             layout: (factory: WorkbenchLayoutFactory) => factory
+               .addPart(MAIN_AREA)
+               .navigatePart(MAIN_AREA, ['welcome']),
+   [+]         .addPart('todos', {dockTo: 'top-left'}, {label: 'Todos', icon: 'checklist'})
+   [+]         .navigatePart('todos', ['todos'])
+   [+]         .activatePart('todos'),
            }),
            provideRouter([
-             {path: '', loadComponent: () => import('./welcome/welcome.component')},
+             {path: 'welcome', loadComponent: () => import('./welcome/welcome.component')},
              {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
            ], withComponentInputBinding()),
            provideAnimations(),
@@ -261,9 +310,9 @@ In this step, we will create the TODO list and place it to the left of the main 
       };
    ```
 
-   In the above code snippet, we create a layout with two parts, the main area and a part left to it. We align the `left` part to the left of the main area. We want it to take up 25% of the available space. Next, we add the `todos` view to the left part. Finally, we navigate the `todos` view to the `todos` component.
+   We dock the `todos` part to the top left, display the `todos` component and activate it. For the `todos` component, we use the `checklist` icon. By default, Material icons are used.
 
-   For detailed explanations on defining the workbench layout, refer to [Defining the initial workbench layout][link-how-to-define-initial-workbench-layout].
+   For detailed explanations on defining the workbench layout, refer to [Defining the workbench layout][link-how-to-define-workbench-layout].
 
    Open a browser to http://localhost:4200. You should see the TODO list left to the main area.
 </details>
@@ -361,7 +410,7 @@ In this step, we will create a component to open a TODO in a view in the main ar
                .navigateView('todos', ['todos'])
            }),
          provideRouter([
-           {path: '', loadComponent: () => import('./welcome/welcome.component')},
+           {path: 'welcome', loadComponent: () => import('./welcome/welcome.component')},
            {path: 'todos', loadComponent: () => import('./todos/todos.component')},
    [+]     {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},  
          ], withComponentInputBinding()),
@@ -393,7 +442,7 @@ This short guide has introduced you to the basics of SCION Workbench. For more a
 
 </details>
 
-[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-define-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
 
 [menu-home]: /README.md
 [menu-projects-overview]: /docs/site/projects-overview.md
