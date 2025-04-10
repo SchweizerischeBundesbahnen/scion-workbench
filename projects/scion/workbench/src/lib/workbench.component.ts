@@ -10,7 +10,8 @@
 
 import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Provider, viewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
-import {WorkbenchLauncher, WorkbenchStartup} from './startup/workbench-launcher.service';
+import {WorkbenchLauncher} from './startup/workbench-launcher.service';
+import {WorkbenchStartup} from './startup/workbench-startup.service';
 import {WorkbenchConfig} from './workbench-config';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
@@ -66,7 +67,7 @@ export class WorkbenchComponent {
    * Starts the SCION Workbench. Has no effect if already started, e.g., in an app initializer or route guard.
    */
   private startWorkbench(): void {
-    if (!this.workbenchStartup.isStarted()) {
+    if (!this.workbenchStartup.done()) {
       this._workbenchLauncher.launch().catch((error: unknown) => this._logger.error('Failed to start SCION Workbench', error));
     }
   }

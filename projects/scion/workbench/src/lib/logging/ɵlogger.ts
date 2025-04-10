@@ -16,7 +16,7 @@ import {Logger} from './logger';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {WorkbenchConfig} from '../workbench-config';
 
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `Logger` DI token. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as registered under `Logger` DI token. */)
 export class ɵLogger implements Logger {
 
   // TODO [Angular 20] Remove cast when Angular supports type safety for multi-injection with abstract class DI tokens.

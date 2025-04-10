@@ -36,7 +36,7 @@ export abstract class WorkbenchStorage {
  *
  * @internal
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered conditionally under `WorkbenchStorage` DI token. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as registered conditionally under `WorkbenchStorage` DI token. */)
 export class DefaultWorkbenchStorage implements WorkbenchStorage {
 
   public load(key: string): string | null {

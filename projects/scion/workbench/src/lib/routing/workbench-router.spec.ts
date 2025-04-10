@@ -13,7 +13,7 @@ import {Component, inject, OnDestroy} from '@angular/core';
 import {provideRouter, Router} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
@@ -39,7 +39,7 @@ describe('WorkbenchRouter', () => {
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add part to the right of the main part.
     await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
@@ -84,7 +84,7 @@ describe('WorkbenchRouter', () => {
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add part to the right of the main part.
     await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
@@ -166,7 +166,7 @@ describe('WorkbenchRouter', () => {
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.101'});
@@ -206,7 +206,7 @@ describe('WorkbenchRouter', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
@@ -305,7 +305,7 @@ describe('WorkbenchRouter', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
@@ -398,7 +398,7 @@ describe('WorkbenchRouter', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
@@ -585,7 +585,7 @@ describe('WorkbenchRouter', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 

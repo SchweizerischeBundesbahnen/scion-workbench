@@ -38,7 +38,7 @@ import {WorkbenchLayout} from './layout/workbench-layout';
 export abstract class WorkbenchService {
 
   /**
-   * Provides the snapshot of the current workbench layout.
+   * Provides the layout of the workbench.
    *
    * The layout is an immutable object. Modifications have no side effects. The layout can be modified using {@link WorkbenchRouter.navigate}.
    */

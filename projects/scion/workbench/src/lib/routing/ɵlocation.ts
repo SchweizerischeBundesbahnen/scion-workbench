@@ -37,7 +37,7 @@ export function provideLocationPatch(): EnvironmentProviders {
  * navigation as state and not as a query parameter. By default, an unchanged URL does not create a new entry in the
  * browsing history stack, but replaces the current entry. See Angular router.ts#setBrowserUrl
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `Location` DI token. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as registered under `Location` DI token. */)
 class ɵLocation extends Location {
 
   private _appRef = inject(ApplicationRef);

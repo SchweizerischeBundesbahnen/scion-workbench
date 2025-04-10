@@ -41,7 +41,7 @@ export const Routing = {
   /**
    * Constructs URL segments from given commands, resolving any relative navigational symbols.
    *
-   * This function must be called inside an injection context.
+   * This function must be called within an injection context.
    */
   commandsToSegments: (commands: Commands, options?: {relativeTo?: ActivatedRoute | null}): UrlSegment[] => {
     // Ignore `relativeTo` for absolute commands.
@@ -63,7 +63,7 @@ export const Routing = {
   /**
    * Parses the given path and matrix parameters into an array of commands that can be passed to the Angular router for navigation.
    *
-   * This function must be called inside an injection context.
+   * This function must be called within an injection context.
    */
   pathToCommands: (path: string): Commands => {
     const urlTree = inject(Router).parseUrl(path);

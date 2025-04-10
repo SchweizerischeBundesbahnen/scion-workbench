@@ -9,9 +9,9 @@
  */
 
 import {Capability, CapabilityInterceptor, QualifierMatcher} from '@scion/microfrontend-platform';
-import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
+import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
 import {WorkbenchCapabilities} from '@scion/workbench-client';
-import {MICROFRONTEND_PLATFORM_PRE_STARTUP, WorkbenchInitializer} from '@scion/workbench';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer} from '@scion/workbench';
 import {Beans} from '@scion/toolkit/bean-manager';
 
 /**
@@ -22,13 +22,7 @@ const DEVTOOLS_QUALIFIER_MATCHER = new QualifierMatcher({component: 'devtools', 
 /**
  * Intercepts the DevTools view capability to pin it to the desktop.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
-class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, WorkbenchInitializer {
-
-  public async init(): Promise<void> {
-    // Register this interceptor in the microfrontend platform.
-    Beans.register(CapabilityInterceptor, {useValue: this, multi: true});
-  }
+class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {
     if (capability.type !== WorkbenchCapabilities.View) {
@@ -53,10 +47,6 @@ class DevToolsViewCapabilityInterceptor implements CapabilityInterceptor, Workbe
  */
 export function provideDevToolsInterceptor(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    {
-      provide: MICROFRONTEND_PLATFORM_PRE_STARTUP,
-      useClass: DevToolsViewCapabilityInterceptor,
-      multi: true,
-    },
+    provideMicrofrontendPlatformInitializer(() => void Beans.register(CapabilityInterceptor, {useClass: DevToolsViewCapabilityInterceptor, multi: true}), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
   ]);
 }

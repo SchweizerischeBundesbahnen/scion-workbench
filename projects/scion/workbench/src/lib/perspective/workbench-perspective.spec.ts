@@ -9,7 +9,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchService} from '../workbench.service';
 import {TestComponent, withComponentContent} from '../testing/test.component';
@@ -25,7 +25,7 @@ import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchPerspective, canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchPerspective} from './workbench-perspective.model';
-import {WORKBENCH_STARTUP} from '../startup/workbench-initializer';
+import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
 import {WorkbenchDesktopDirective} from '../desktop/desktop.directive';
 
@@ -40,7 +40,7 @@ describe('Workbench Perspective', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Register perspective.
     await TestBed.inject(WorkbenchService).registerPerspective({id: 'perspective', layout: factory => factory.addPart('part.part')});
@@ -68,7 +68,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([{id: 'default', active: true}]);
 
@@ -93,7 +93,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([{id: 'default', active: true}]);
 
@@ -133,7 +133,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([
       {id: 'perspective-1', data: {label: 'Perspective 1'}, active: true},
@@ -179,7 +179,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([
       {id: 'perspective-1', active: false},
@@ -233,7 +233,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([
       {id: 'perspective-1', active: false},
@@ -276,7 +276,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([
       {id: 'perspective-1', active: true},
@@ -318,7 +318,7 @@ describe('Workbench Perspective', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expectPerspectives([
       {id: 'perspective-1', active: true},
@@ -370,7 +370,7 @@ describe('Workbench Perspective', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
     const workbenchService = TestBed.inject(WorkbenchService);
 
     expect(fixture.debugElement.query(By.css('router-outlet + spec-test-component')).nativeElement.innerText).toEqual('Start Page Perspective 1');
@@ -456,7 +456,7 @@ describe('Workbench Perspective', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
     const workbenchService = TestBed.inject(WorkbenchService);
 
     // Expect perspective-1
@@ -508,7 +508,7 @@ describe('Workbench Perspective', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Delay activation of the perspective.
     await firstValueFrom(timer(1000));
@@ -550,7 +550,7 @@ describe('Workbench Perspective', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
@@ -599,7 +599,7 @@ describe('Workbench Perspective', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expect(fixture).toEqualWorkbenchLayout({
       workbenchGrid: {
@@ -619,26 +619,22 @@ describe('Workbench Perspective', () => {
         provideWorkbenchForTest({
           startup: {launcher: 'APP_INITIALIZER'},
         }),
-        {
-          provide: WORKBENCH_STARTUP,
-          multi: true,
-          useValue: async () => {
-            const workbenchService = inject(WorkbenchService);
-            // Wait some time to simulate late perspective registration.
-            await firstValueFrom(timer(500));
+        provideWorkbenchInitializer(async () => {
+          const workbenchService = inject(WorkbenchService);
+          // Wait some time to simulate late perspective registration.
+          await firstValueFrom(timer(500));
 
-            await workbenchService.registerPerspective({
-              id: 'perspective',
-              layout: factory => factory
-                .addPart('part.left')
-                .addPart('part.right', {align: 'right'}),
-            });
-          },
-        },
+          await workbenchService.registerPerspective({
+            id: 'perspective',
+            layout: factory => factory
+              .addPart('part.left')
+              .addPart('part.right', {align: 'right'}),
+          });
+        }),
       ],
     });
 
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Expect only the contributed perspective to be registered (and not the default perspective too).
     expectPerspectives([{id: 'perspective', active: true}]);
@@ -663,24 +659,20 @@ describe('Workbench Perspective', () => {
             },
           },
         }),
-        {
-          provide: WORKBENCH_STARTUP,
-          multi: true,
-          useValue: async () => {
-            const workbenchServie = inject(WorkbenchService);
-            // Wait some time to simulate late perspective registration.
-            await firstValueFrom(timer(500));
+        provideWorkbenchInitializer(async () => {
+          const workbenchServie = inject(WorkbenchService);
+          // Wait some time to simulate late perspective registration.
+          await firstValueFrom(timer(500));
 
-            await workbenchServie.registerPerspective({
-              id: 'perspective-2',
-              layout: factory => factory.addPart(MAIN_AREA),
-            });
-          },
-        },
+          await workbenchServie.registerPerspective({
+            id: 'perspective-2',
+            layout: factory => factory.addPart(MAIN_AREA),
+          });
+        }),
       ],
     });
 
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     expect(perspectivesForActivation).toEqual(['perspective-2', 'perspective-1']);
 

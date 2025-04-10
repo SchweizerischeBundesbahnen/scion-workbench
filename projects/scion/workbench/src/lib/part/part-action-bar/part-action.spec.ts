@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
-import {styleFixture, waitForInitialWorkbenchLayout} from '../../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {WorkbenchComponent} from '../../workbench.component';
 import {WorkbenchService} from '../../workbench.service';
 import {Component, effect, inject, InjectionToken, Injector, input, signal, TemplateRef, viewChild} from '@angular/core';
@@ -31,7 +31,7 @@ describe('PartAction', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Register action 1.
     TestBed.inject(WorkbenchService).registerPartAction(() => ({
@@ -85,7 +85,7 @@ describe('PartAction', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Track actions.
     effect(() => TestBed.inject(WorkbenchService).parts().forEach(part => part.actions()), {injector: TestBed.inject(Injector)});
@@ -181,7 +181,7 @@ describe('PartAction', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const part = TestBed.inject(WorkbenchService).getPart('part.part')!;
     const actionsRef = part.actions();
@@ -214,7 +214,7 @@ describe('PartAction', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const input1 = signal<string>('value 1');
     const input2 = signal<string>('value 2');
@@ -266,7 +266,7 @@ describe('PartAction', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const align = signal<'start' | 'end' | undefined>(undefined);
 
@@ -307,7 +307,7 @@ describe('PartAction', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const partFilter = signal<'part.left' | 'part.right' | undefined>(undefined);
     const leftPart = TestBed.inject(WorkbenchService).getPart('part.left')!;
@@ -353,7 +353,7 @@ describe('PartAction', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const partFilter = signal<'part.left' | 'part.right' | undefined>(undefined);
     const leftPart = TestBed.inject(WorkbenchService).getPart('part.left')!;
@@ -420,7 +420,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register action.
       const action1 = TestBed.inject(WorkbenchService).registerPartAction(() => fixture.componentInstance.actionTemplate());
@@ -483,7 +483,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register action.
       TestBed.inject(WorkbenchService).registerPartAction(() => ({
@@ -540,7 +540,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Create custom injector.
       const diToken = new InjectionToken('token');
@@ -608,7 +608,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register action.
       TestBed.inject(WorkbenchService).registerPartAction(() => ({
@@ -648,7 +648,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register action.
       const action1 = TestBed.inject(WorkbenchService).registerPartAction(() => SpecActionComponent);
@@ -700,7 +700,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register action.
       TestBed.inject(WorkbenchService).registerPartAction(() => ({
@@ -739,7 +739,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Create custom injector.
       const diToken = new InjectionToken('token');
@@ -786,7 +786,7 @@ describe('PartAction', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register action.
       TestBed.inject(WorkbenchService).registerPartAction(() => ({

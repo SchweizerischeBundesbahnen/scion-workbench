@@ -17,11 +17,12 @@ import {ViewMoveHandler} from './view/view-move-handler.service';
 import {provideWorkbenchMicrofrontendSupport} from './microfrontend-platform/workbench-microfrontend-support';
 import {provideWorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideLogging} from './logging';
-import {WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP} from './startup/workbench-initializer';
+import {provideWorkbenchInitializer, WorkbenchStartupPhase} from './startup/workbench-initializer';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
 import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-storage';
 import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
+import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
 
 /**
  * Enables and configures the SCION Workbench in an application, returning a set of dependency-injection providers to be registered in Angular.
@@ -70,26 +71,11 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
       provide: WorkbenchStorage,
       useClass: config.storage ?? DefaultWorkbenchStorage,
     },
-    {
-      provide: WORKBENCH_PRE_STARTUP,
-      useExisting: WorkbenchThemeSwitcher,
-      multi: true,
-    },
-    {
-      provide: WORKBENCH_POST_STARTUP,
-      multi: true,
-      useExisting: WorkbenchPerspectiveService,
-    },
-    {
-      provide: WORKBENCH_POST_STARTUP,
-      useExisting: ViewMenuService,
-      multi: true,
-    },
-    {
-      provide: WORKBENCH_POST_STARTUP,
-      useClass: ViewMoveHandler,
-      multi: true,
-    },
+    provideWorkbenchInitializer(() => void inject(WorkbenchThemeSwitcher), {phase: WorkbenchStartupPhase.PreStartup}),
+    provideWorkbenchInitializer(() => void inject(ViewMenuService)),
+    provideWorkbenchInitializer(() => void inject(ViewMoveHandler)),
+    provideWorkbenchInitializer(() => void inject(ViewTabDragImageRenderer)),
+    provideWorkbenchInitializer(() => inject(WorkbenchPerspectiveService).init(), {phase: WorkbenchStartupPhase.PostStartup}),
     provideEnvironmentInitializer(() => inject(WorkbenchUrlObserver)),
     provideEnvironmentInitializer(() => {
       if (inject(WorkbenchService, {optional: true, skipSelf: true})) {
