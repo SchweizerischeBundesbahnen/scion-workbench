@@ -13,7 +13,7 @@ import {Component} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {firstValueFrom, Subject} from 'rxjs';
 import {toShowCustomMatcher} from '../../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../../testing/testing.util';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -65,7 +65,7 @@ describe('Microfrontend Host Message Box', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Start navigation in host message box 1.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box-1'});
@@ -121,7 +121,7 @@ describe('Microfrontend Host Message Box', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Start navigation in a host message-box.
     void TestBed.inject(WorkbenchMessageBoxService).open({component: 'message-box'});
@@ -177,7 +177,7 @@ describe('Microfrontend Host Message Box', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Start navigation in a view.
     void TestBed.inject(WorkbenchRouter).navigate(['path/to/view']);

@@ -1,5 +1,5 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, Type} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -24,7 +24,7 @@ describe('Popup', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open popup.
     void TestBed.inject(PopupService).open({component: SpecPopupComponent, anchor: {x: 0, y: 0}});
@@ -56,7 +56,7 @@ describe('Popup', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create custom injector.
     const diToken1 = new InjectionToken('token1');

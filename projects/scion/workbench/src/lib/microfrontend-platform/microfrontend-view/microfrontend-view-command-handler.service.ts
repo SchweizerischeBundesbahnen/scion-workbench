@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, OnDestroy} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders, OnDestroy} from '@angular/core';
 import {Message, MessageClient, MessageHeaders} from '@scion/microfrontend-platform';
 import {Logger} from '../../logging';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
@@ -16,14 +16,10 @@ import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {ɵWorkbenchCommands} from '@scion/workbench-client';
 import {Subscription} from 'rxjs';
 import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
+import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
 
-/**
- * Handles commands of microfrontends loaded into workbench views, such as setting view tab properties or closing the view.
- *
- * This class is constructed after connected to the SCION Microfrontend Platform via {@link MICROFRONTEND_PLATFORM_POST_STARTUP} DI token.
- */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
-export class MicrofrontendViewCommandHandler implements OnDestroy {
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+class MicrofrontendViewCommandHandler implements OnDestroy {
 
   private readonly _messageClient = inject(MessageClient);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
@@ -116,4 +112,14 @@ export class MicrofrontendViewCommandHandler implements OnDestroy {
   public ngOnDestroy(): void {
     this._subscriptions.forEach(subscription => subscription.unsubscribe());
   }
+}
+
+/**
+ * Provides a set of DI providers registering message handlers for view microfrontends to interact with a workbench view.
+ */
+export function provideViewCommandHandlers(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    MicrofrontendViewCommandHandler,
+    provideMicrofrontendPlatformInitializer(() => void inject(MicrofrontendViewCommandHandler)),
+  ]);
 }

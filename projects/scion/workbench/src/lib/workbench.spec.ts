@@ -12,7 +12,7 @@ import {TestBed} from '@angular/core/testing';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {provideWorkbenchForTest} from './testing/workbench.provider';
-import {waitForInitialWorkbenchLayout} from './testing/testing.util';
+import {waitUntilWorkbenchStarted} from './testing/testing.util';
 import {Arrays} from '@scion/toolkit/util';
 
 describe('Workbench', () => {
@@ -37,7 +37,7 @@ describe('Workbench', () => {
       providers: [provideWorkbenchForTest()],
     });
     const fixture = TestBed.createComponent(WorkbenchComponent);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Expect document root to be positioned and to fill the page viewport.
     expect(getComputedStyle(document.documentElement)).toEqual(jasmine.objectContaining({
@@ -62,7 +62,7 @@ describe('Workbench', () => {
       providers: [provideWorkbenchForTest()],
     });
     const fixture = TestBed.createComponent(WorkbenchComponent);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Override positioning of root element.
     const styleSheet = new CSSStyleSheet();

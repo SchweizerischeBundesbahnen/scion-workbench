@@ -97,7 +97,7 @@ describe('Lazily loaded view', () => {
 
 const DI_TOKEN = new InjectionToken<string>('TOKEN');
 
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered only in this test. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as registered only in this test. */)
 class FeatureService {
 }
 

@@ -27,7 +27,7 @@ import {MicrofrontendHostDialogComponent} from '../microfrontend-host-dialog/mic
  * Dialog intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
  * that are not connected to the SCION Workbench.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendDialogIntentHandler implements IntentInterceptor {
 
   private readonly _dialogService = inject(WorkbenchDialogService);

@@ -14,7 +14,7 @@ import {provideRouter, Routes} from '@angular/router';
 import {WorkbenchRouter} from './workbench-router.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {advance, clickElement, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {advance, clickElement, styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WorkbenchRouterLinkDirective} from '../routing/workbench-router-link.directive';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -310,7 +310,7 @@ describe('Router', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
 
     // Start navigation in view 1.

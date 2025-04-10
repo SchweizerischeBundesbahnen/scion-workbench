@@ -106,7 +106,7 @@ export class WorkbenchUrlObserver {
   private createWorkbenchNavigationContext(url: string): WorkbenchNavigationContext {
     const urlTree = this._router.parseUrl(url);
     const workbenchNavigationalState = WorkbenchNavigationalStates.fromNavigation(this._router.getCurrentNavigation()!);
-    const previousLayout = this._workbenchLayoutService.layout();
+    const previousLayout = this._workbenchLayoutService.hasLayout() ? this._workbenchLayoutService.layout() : null;
     const previousUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
 
     const newLayout = this._workbenchLayoutFactory.create({

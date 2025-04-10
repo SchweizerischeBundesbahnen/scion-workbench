@@ -8,7 +8,7 @@ import {TEXT_MESSAGE_BOX_CAPABILITY_IDENTITY, TEXT_MESSAGE_BOX_CAPABILITY_IDENTI
  *
  * @internal
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class WorkbenchHostManifestInterceptor implements HostManifestInterceptor {
 
   public intercept(hostManifest: Manifest): void {

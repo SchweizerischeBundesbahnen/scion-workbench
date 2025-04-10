@@ -10,7 +10,7 @@
 import {TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {withComponentContent} from '../testing/test.component';
 import {WorkbenchComponent} from '../workbench.component';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -61,7 +61,7 @@ describe('Desktop', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect desktop to display
@@ -108,7 +108,7 @@ describe('Desktop', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect desktop to display
@@ -163,7 +163,7 @@ describe('Desktop', () => {
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
       fixture.debugElement.nativeElement.style.height = '500px';
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Change height of desktop to 5000px
       fixture.debugElement.query(By.css('div.desktop')).nativeElement.style.height = '5000px';
@@ -190,7 +190,7 @@ describe('Desktop', () => {
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
       fixture.debugElement.nativeElement.style.height = '500px';
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Change height of desktop to 5000px
       fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';
@@ -238,7 +238,7 @@ describe('Desktop', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect desktop to display
@@ -284,7 +284,7 @@ describe('Desktop', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
       const wbRouter = TestBed.inject(WorkbenchRouter);
 
       // Expect desktop to display
@@ -338,7 +338,7 @@ describe('Desktop', () => {
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
       fixture.debugElement.nativeElement.style.height = '500px';
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Change height of desktop to 5000px
       fixture.debugElement.query(By.css('div.desktop')).nativeElement.style.height = '5000px';
@@ -365,7 +365,7 @@ describe('Desktop', () => {
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
       fixture.debugElement.nativeElement.style.height = '500px';
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Change height of desktop to 5000px
       fixture.debugElement.query(By.css('spec-test-component')).nativeElement.style.height = '5000px';

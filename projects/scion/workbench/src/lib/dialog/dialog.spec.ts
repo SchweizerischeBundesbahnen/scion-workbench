@@ -1,6 +1,6 @@
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, Type} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -30,7 +30,7 @@ describe('Dialog', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open dialog.
     void TestBed.inject(WorkbenchDialogService).open(TestComponent, {cssClass: 'testee'});
@@ -62,7 +62,7 @@ describe('Dialog', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create custom injector.
     const diToken = new InjectionToken('token');
@@ -98,7 +98,7 @@ describe('Dialog', () => {
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open dialog.
     void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
@@ -130,7 +130,7 @@ describe('Dialog', () => {
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open dialog.
     void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent);
@@ -179,7 +179,7 @@ describe('Dialog', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Spy console.
     const errors = new Array<any>();
@@ -218,7 +218,7 @@ describe('Dialog', () => {
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Spy console.
     const errors = new Array<any>();
@@ -269,7 +269,7 @@ describe('Dialog', () => {
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Spy console.
     const errors = new Array<any>();
@@ -320,7 +320,7 @@ describe('Dialog', () => {
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const body = fixture.debugElement.parent!;
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Spy console.
     const errors = new Array<any>();

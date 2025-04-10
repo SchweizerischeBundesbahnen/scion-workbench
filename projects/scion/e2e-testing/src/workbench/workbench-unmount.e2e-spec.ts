@@ -43,7 +43,7 @@ test.describe('Workbench Component', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Expect the workbench to be started.
-    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger#init.*WORKBENCH_STARTUP/})).toHaveLength(1);
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger.*WORKBENCH_STARTUP/})).toHaveLength(1);
     consoleLogs.clear();
 
     // Unmount the workbench component by navigating the primary router outlet.
@@ -53,7 +53,7 @@ test.describe('Workbench Component', () => {
     await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
 
     // Expect the workbench not to be started again.
-    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger#init.*WORKBENCH_STARTUP/})).toHaveLength(0);
+    await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger.*WORKBENCH_STARTUP/})).toHaveLength(0);
   });
 
   test('should re-mount the workbench component without errors', async ({appPO, consoleLogs}) => {

@@ -14,8 +14,8 @@ import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../tes
 import {TestComponent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {MAIN_AREA, WorkbenchLayout} from '../layout/workbench-layout';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchService} from '../workbench.service';
 import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
@@ -56,7 +56,7 @@ describe('WorkbenchPerspectiveStorage', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // WHEN: Opening view.1 in part 'left-top'
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'part.left-top', target: 'view.1'});
@@ -177,7 +177,7 @@ describe('WorkbenchPerspectiveStorage', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     const storage = TestBed.inject(WorkbenchStorage) as TestStorage;
@@ -247,7 +247,7 @@ describe('WorkbenchPerspectiveStorage', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.1 in perspective-1.
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {partId: 'part.left', target: 'view.1'});
@@ -369,7 +369,7 @@ describe('WorkbenchPerspectiveStorage', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // WHEN: Opening view.1 in perspective-1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {partId: 'part.left', target: 'view.1'});

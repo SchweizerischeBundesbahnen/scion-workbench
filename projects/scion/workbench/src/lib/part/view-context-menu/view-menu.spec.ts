@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../../testing/testing.util';
 import {By} from '@angular/platform-browser';
 import {Component, DebugElement, effect, inject, InjectionToken, Injector, input, signal, TemplateRef, viewChild} from '@angular/core';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -39,7 +39,7 @@ describe('View Menu', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Register menu item 1.
     TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -98,7 +98,7 @@ describe('View Menu', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Track menu items.
     effect(() => {
@@ -203,7 +203,7 @@ describe('View Menu', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view = TestBed.inject(WorkbenchService).getView('view.100')!;
     const menuItemsRef = view.menuItems();
@@ -237,7 +237,7 @@ describe('View Menu', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const input1 = signal<string>('value 1');
     const input2 = signal<string>('value 2');
@@ -294,7 +294,7 @@ describe('View Menu', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const viewFilter = signal<'view.101' | 'view.102' | undefined>(undefined);
     const partFilter = signal<'part.left' | 'part.right' | undefined>(undefined);
@@ -361,7 +361,7 @@ describe('View Menu', () => {
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const viewFilter = signal<'view.101' | 'view.102' | undefined>(undefined);
     const view1 = TestBed.inject(WorkbenchService).getView('view.101')!;
@@ -408,7 +408,7 @@ describe('View Menu', () => {
     });
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const disabled = signal<boolean | undefined>(undefined);
 
@@ -482,7 +482,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register menu item.
       const menuItem = TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -539,7 +539,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register menu item.
       TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -601,7 +601,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Create custom injector.
       const diToken = new InjectionToken('token');
@@ -677,7 +677,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(SpecRootComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register menu item.
       TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -722,7 +722,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register menu item.
       const menuItem = TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -768,7 +768,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register menu item.
       TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -812,7 +812,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Create custom injector.
       const diToken = new InjectionToken('token');
@@ -867,7 +867,7 @@ describe('View Menu', () => {
       }
 
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Register menu item.
       TestBed.inject(WorkbenchService).registerViewMenuItem(() => ({
@@ -914,7 +914,7 @@ describe('View Menu', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Open view context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
@@ -954,7 +954,7 @@ describe('View Menu', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Open view context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
@@ -994,7 +994,7 @@ describe('View Menu', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Open view context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
@@ -1045,7 +1045,7 @@ describe('View Menu', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Open view context menu.
       const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
@@ -1099,7 +1099,7 @@ describe('View Menu', () => {
         ],
       });
       styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       const view = TestBed.inject(WorkbenchService).getView('view.100')!;
       expect(view.menuItems()).toEqual([]);
@@ -1120,7 +1120,7 @@ describe('View Menu', () => {
         ],
       });
       styleFixture(TestBed.createComponent(WorkbenchComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       const view = TestBed.inject(WorkbenchService).getView('view.100')!;
       expect(view.menuItems()).toEqual(jasmine.arrayWithExactContents([

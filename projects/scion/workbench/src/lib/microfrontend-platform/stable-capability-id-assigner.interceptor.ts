@@ -16,7 +16,7 @@ import {Injectable} from '@angular/core';
 /**
  * Assigns perspective and view capabilities a stable identifer based on the qualifier and application.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class StableCapabilityIdAssigner implements CapabilityInterceptor {
 
   private readonly _types = new Set<string>()

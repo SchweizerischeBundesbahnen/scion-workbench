@@ -12,7 +12,7 @@ import {Routing} from './routing.util';
 import {ComponentFixtureAutoDetect, TestBed} from '@angular/core/testing';
 import {ActivatedRoute, ActivatedRouteSnapshot, ChildrenOutletContexts, provideRouter, Router, RouterOutlet, UrlSegment} from '@angular/router';
 import {TestComponent} from '../testing/test.component';
-import {styleFixture, waitForInitialWorkbenchLayout} from '../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchRouter} from './workbench-router.service';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -76,7 +76,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.100'});
@@ -98,7 +98,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
@@ -120,7 +120,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
@@ -149,7 +149,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
@@ -171,7 +171,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.100'});
@@ -193,7 +193,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate([], {hint: 'test-view', target: 'view.100'});
@@ -215,7 +215,7 @@ describe('Routing.commandsToSegments', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view to use as 'relativeTo'.
     await TestBed.inject(WorkbenchRouter).navigate(['relative/to'], {target: 'view.100'});
@@ -257,7 +257,7 @@ describe('Routing.parseOutlets', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view outlets view.101 and view.103 to the URL.
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => {
@@ -308,7 +308,7 @@ describe('Routing.hasEmptyPathFromRoot', () => {
         ]),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const rootRoute = TestBed.inject(Router).routerState.root;
     expect(Routing.hasEmptyPathFromRoot(Routing.resolveEffectiveRoute(rootRoute))).toBeTrue();
@@ -337,7 +337,7 @@ describe('Routing.resolveEffectiveRoute', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.100'});
@@ -373,7 +373,7 @@ describe('Routing.resolveEffectiveRoute', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
@@ -409,7 +409,7 @@ describe('Routing.resolveEffectiveRoute', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});

@@ -17,7 +17,7 @@ import {Objects} from '../../common/objects.util';
 /**
  * Asserts dialog capabilities to have required properties.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendDialogCapabilityValidator implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {

@@ -8,56 +8,23 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, InjectionToken, makeEnvironmentProviders} from '@angular/core';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, WORKBENCH_POST_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_STARTUP, WorkbenchInitializer, WorkbenchStartup} from '@scion/workbench';
+import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {MicrofrontendPlatformStartupPhase, provideMicrofrontendPlatformInitializer, provideWorkbenchInitializer, WorkbenchStartup, WorkbenchStartupPhase} from '@scion/workbench';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 
 /**
- * Provides a set of DI providers to enable logging of workbench lifecycle hooks.
+ * Provides a set of DI providers to log invocation of workbench lifecycle hooks.
  */
 export function provideWorkbenchLifecycleHookLoggers(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    {
-      provide: WORKBENCH_PRE_STARTUP,
-      multi: true,
-      useFactory: () => new WorkbenchLifecycleHookLogger(WORKBENCH_PRE_STARTUP),
-    },
-    {
-      provide: WORKBENCH_STARTUP,
-      multi: true,
-      useFactory: () => new WorkbenchLifecycleHookLogger(WORKBENCH_STARTUP),
-    },
-    {
-      provide: WORKBENCH_POST_STARTUP,
-      multi: true,
-      useFactory: () => new WorkbenchLifecycleHookLogger(WORKBENCH_POST_STARTUP),
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_PRE_STARTUP,
-      multi: true,
-      useFactory: () => new WorkbenchLifecycleHookLogger(MICROFRONTEND_PLATFORM_PRE_STARTUP),
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      multi: true,
-      useFactory: () => new WorkbenchLifecycleHookLogger(MICROFRONTEND_PLATFORM_POST_STARTUP),
-    },
+    provideWorkbenchInitializer(() => log('WORKBENCH_PRE_STARTUP'), {phase: WorkbenchStartupPhase.PreStartup}),
+    provideWorkbenchInitializer(() => log('WORKBENCH_STARTUP'), {phase: WorkbenchStartupPhase.Startup}),
+    provideWorkbenchInitializer(() => log('WORKBENCH_POST_STARTUP'), {phase: WorkbenchStartupPhase.PostStartup}),
+    provideMicrofrontendPlatformInitializer(() => log('MICROFRONTEND_PLATFORM_PRE_STARTUP'), {phase: MicrofrontendPlatformStartupPhase.PreStartup}),
+    provideMicrofrontendPlatformInitializer(() => log('MICROFRONTEND_PLATFORM_POST_STARTUP'), {phase: MicrofrontendPlatformStartupPhase.PostStartup}),
   ]);
 }
 
-/**
- * Represents an initializer that logs its construction and invocation.
- */
-class WorkbenchLifecycleHookLogger implements WorkbenchInitializer {
-
-  private _workbenchStartup: WorkbenchStartup;
-
-  constructor(private _lifecycleHook: InjectionToken<WorkbenchInitializer | any>) {
-    this._workbenchStartup = inject(WorkbenchStartup);
-    console.debug(`[WorkbenchLifecycleHookLogger#construct][${this._lifecycleHook}] [microfrontendPlatformState=${PlatformState[MicrofrontendPlatform.state]}, workbenchStarted=${this._workbenchStartup.isStarted()}]`);
-  }
-
-  public async init(): Promise<void> {
-    console.debug(`[WorkbenchLifecycleHookLogger#init][${this._lifecycleHook}] [microfrontendPlatformState=${PlatformState[MicrofrontendPlatform.state]}, workbenchStarted=${this._workbenchStartup.isStarted()}]`);
-  }
+function log(phase: string): void {
+  console.debug(`[WorkbenchLifecycleHookLogger][${phase}] [microfrontendPlatformState=${PlatformState[MicrofrontendPlatform.state]}, workbenchStarted=${inject(WorkbenchStartup).done()}]`);
 }

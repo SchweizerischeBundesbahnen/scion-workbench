@@ -12,7 +12,7 @@ import {TestBed} from '@angular/core/testing';
 import {PlatformRef} from '@angular/core';
 import {MicrofrontendPlatform, PlatformState} from '@scion/microfrontend-platform';
 import {WorkbenchLauncher} from '../startup/workbench-launcher.service';
-import {waitForInitialWorkbenchLayout} from '../testing/testing.util';
+import {waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {provideRouter} from '@angular/router';
 
@@ -36,7 +36,7 @@ describe('Microfrontend Platform Lifecycle', () => {
     expect(MicrofrontendPlatform.state).toEqual(PlatformState.Started);
 
     // Delay test execution (destroy) until layout is initialized.
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Destroy the current Angular platform.
     TestBed.inject(PlatformRef).destroy();

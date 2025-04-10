@@ -14,7 +14,7 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter, RouterOutlet} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {Component} from '@angular/core';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchComponent} from '../workbench.component';
@@ -37,7 +37,7 @@ describe('CanMatchWorkbenchView Guard', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to empty path route.
     await workbenchRouter.navigate([], {hint: 'ignored'});
@@ -59,7 +59,7 @@ describe('CanMatchWorkbenchView Guard', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to view 1
     await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.100'});
@@ -100,7 +100,7 @@ describe('CanMatchWorkbenchView Guard', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to view 1
     await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.100'});
@@ -128,7 +128,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to 'path/to/view'.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -147,7 +147,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to 'path/to/view'.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -166,7 +166,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to 'path/to/view' passing matching hint.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -185,7 +185,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to 'path/to/view' without passing a hint.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -204,7 +204,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to 'path/to/view' passing non-matching hint.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -225,7 +225,7 @@ describe('CanMatchWorkbenchView Guard', () => {
         ],
       });
       const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
-      await waitForInitialWorkbenchLayout();
+      await waitUntilWorkbenchStarted();
 
       // Navigate to the empty path route.
       const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -248,7 +248,7 @@ describe('CanMatchWorkbenchView Guard', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to the empty path route.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
@@ -276,7 +276,7 @@ describe('CanMatchNotFoundPage', () => {
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Navigate to empty path route.
     await workbenchRouter.navigate([], {hint: 'hint', target: 'view.100'});

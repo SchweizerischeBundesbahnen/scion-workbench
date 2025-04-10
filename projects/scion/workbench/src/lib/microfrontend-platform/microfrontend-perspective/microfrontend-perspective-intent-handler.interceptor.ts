@@ -18,7 +18,7 @@ import {WorkbenchService} from '../../workbench.service';
 /**
  * Handles perspective intents, instructing the workbench to switch perspective.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPerspectiveIntentHandler implements IntentInterceptor {
 
   private readonly _workbenchService = inject(WorkbenchService);

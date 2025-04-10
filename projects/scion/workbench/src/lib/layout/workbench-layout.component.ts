@@ -70,7 +70,7 @@ export class WorkbenchLayoutComponent {
   protected readonly desktop = inject(DESKTOP);
   protected readonly grid = computed((): MPartGrid | undefined => {
     const layout = this._workbenchLayoutService.layout();
-    return layout && layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid : layout?.workbenchGrid;
+    return layout.maximized && layout.mainAreaGrid ? layout.mainAreaGrid : layout.workbenchGrid;
   });
 
   protected onViewDrop(event: WbViewDropEvent): void {

@@ -20,7 +20,7 @@ import {ViewDragService} from '../view-dnd/view-drag.service';
 import {MAIN_AREA} from './workbench-layout';
 import {toHaveComponentStateCustomMatcher} from '../testing/jasmine/matcher/to-have-component-state.matcher';
 import {enterComponentState, TestComponent, withComponentContent, withComponentStateInputElement} from '../testing/test.component';
-import {segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {segments, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {WORKBENCH_ID} from '../workbench-id';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -51,7 +51,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(RouterOutletPlusWorkbenchTestFixtureComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -142,7 +142,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // GIVEN four views (view.1, view.2, view.3, view.4).
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
@@ -262,7 +262,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -336,7 +336,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -410,7 +410,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -484,7 +484,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -558,7 +558,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -626,7 +626,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -780,7 +780,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -887,7 +887,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -994,7 +994,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1100,7 +1100,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1207,7 +1207,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1379,7 +1379,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1478,7 +1478,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1584,7 +1584,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1690,7 +1690,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1747,7 +1747,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -1808,7 +1808,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add view 1
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
@@ -2173,7 +2173,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -2278,7 +2278,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -2378,7 +2378,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -2668,7 +2668,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -2809,7 +2809,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -2950,7 +2950,7 @@ describe('WorkbenchLayout Component', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Create initial workbench layout.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout
@@ -3069,7 +3069,7 @@ describe('WorkbenchLayout Component', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view 1.
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.101'});

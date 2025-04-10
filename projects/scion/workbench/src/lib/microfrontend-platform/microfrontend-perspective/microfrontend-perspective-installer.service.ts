@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable, IterableDiffers} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, IterableDiffers, makeEnvironmentProviders} from '@angular/core';
 import {ManifestService, Qualifier} from '@scion/microfrontend-platform';
 import {WorkbenchCapabilities, WorkbenchPerspectiveCapability, WorkbenchViewCapability} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
@@ -22,22 +22,16 @@ import {Logger, LoggerNames} from '../../logging';
 import {filterArray} from '@scion/toolkit/operators';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchPerspectiveData} from './workbench-perspective-data';
+import {provideMicrofrontendPlatformInitializer} from '../microfrontend-platform-initializer.provider';
 
-/**
- * Registers perspectives for workbench perspective capabilities.
- */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendPerspectiveInstaller {
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+class MicrofrontendPerspectiveInstaller {
 
   private readonly _manifestService = inject(ManifestService);
   private readonly _workbenchService = inject(WorkbenchService);
   private readonly _logger = inject(Logger);
 
   constructor() {
-    this.installPerspectiveCapabilityListener();
-  }
-
-  private installPerspectiveCapabilityListener(): void {
     const differ = inject(IterableDiffers).find([]).create<WorkbenchPerspectiveCapability>((_index, perspectiveCapability) => perspectiveCapability.metadata!.id);
     this._manifestService.lookupCapabilities$<WorkbenchPerspectiveCapability>({type: WorkbenchCapabilities.Perspective})
       .pipe(takeUntilDestroyed())
@@ -127,4 +121,14 @@ export class MicrofrontendPerspectiveInstaller {
       }));
     return firstValueFrom(viewCapabilities$);
   }
+}
+
+/**
+ * Provides a set of DI providers registering perspectives provided via workbench perspective capabilities.
+ */
+export function providePerspectiveInstaller(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    MicrofrontendPerspectiveInstaller,
+    provideMicrofrontendPlatformInitializer(() => void inject(MicrofrontendPerspectiveInstaller)),
+  ]);
 }

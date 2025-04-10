@@ -8,18 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import './microfrontend-platform.config'; // DO NOT REMOVE to augment `MicrofrontendPlatformConfig` with `splash` property.
-import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
+import './microfrontend-platform.config'; // DO NOT remove to augment `MicrofrontendPlatformConfig` with `splash` property.
 import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {MicrofrontendPlatformInitializer} from './initialization/microfrontend-platform-initializer.service';
 import {IntentClient, ManifestService, MessageClient, MicrofrontendPlatformConfig, OutletRouter, PlatformPropertyService} from '@scion/microfrontend-platform';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_STARTUP} from '../startup/workbench-initializer';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {WorkbenchDialogService, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopupService, WorkbenchRouter} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './initialization/ng-zone-observable-decorator';
 import {WorkbenchConfig} from '../workbench-config';
-import {MicrofrontendViewCommandHandler} from './microfrontend-view/microfrontend-view-command-handler.service';
-import {MicrofrontendNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler.service';
+import {provideViewCommandHandlers} from './microfrontend-view/microfrontend-view-command-handler.service';
+import {provideNotificationIntentHandler} from './microfrontend-notification/microfrontend-notification-intent-handler';
 import {MicrofrontendViewIntentHandler} from './microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
@@ -33,16 +31,18 @@ import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfron
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {Defined} from '@scion/toolkit/util';
 import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 import {Routing} from '../routing/routing.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
-import {MicrofrontendPerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
+import {providePerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
 import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
-import {ManifestObjectCache} from './manifest-object-cache.service';
+import {provideManifestObjectCache} from './manifest-object-cache.service';
+import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
+import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
+import {Defined} from '@scion/toolkit/util';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -53,40 +53,12 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
   }
 
   return makeEnvironmentProviders([
-    {
-      provide: WORKBENCH_STARTUP,
-      useExisting: MicrofrontendPlatformInitializer,
-      multi: true,
-    },
-    {
-      provide: MicrofrontendPlatformConfigLoader,
-      useClass: typeof workbenchConfig.microfrontendPlatform === 'function' ? workbenchConfig.microfrontendPlatform : StaticMicrofrontendPlatformConfigLoader,
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: MicrofrontendViewCommandHandler,
-      multi: true,
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: MicrofrontendNotificationIntentHandler,
-      multi: true,
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useClass: MicrofrontendPerspectiveInstaller,
-      multi: true,
-    },
-    {
-      provide: MICROFRONTEND_PLATFORM_POST_STARTUP,
-      useExisting: ManifestObjectCache,
-      multi: true,
-    },
-    {
-      provide: MicrofrontendPlatformConfig,
-      useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Illegal state: Microfrontend platform configuration not loaded.')),
-    },
-    MicrofrontendPlatformInitializer,
+    provideMicrofrontendPlatformHost(),
+    provideMicrofrontendPlatformConfig(workbenchConfig),
+    provideViewCommandHandlers(),
+    provideNotificationIntentHandler(),
+    providePerspectiveInstaller(),
+    provideManifestObjectCache(),
     MicrofrontendPerspectiveIntentHandler,
     MicrofrontendViewIntentHandler,
     MicrofrontendPopupIntentHandler,
@@ -99,7 +71,6 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendDialogCapabilityValidator,
     MicrofrontendMessageBoxCapabilityValidator,
     StableCapabilityIdAssigner,
-    ManifestObjectCache,
     NgZoneObservableDecorator,
     WorkbenchHostManifestInterceptor,
     provideBuiltInTextMessageBoxCapabilityRoute(),
@@ -110,16 +81,29 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
 }
 
 /**
- * Provides {@link WorkbenchConfig.microfrontendPlatform} config as passed to {@link provideWorkbench}.
+ * Provides a set of DI providers to configure and start the SCION Microfrontend Platform in host mode.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `MicrofrontendPlatformConfigLoader` DI token. */)
-class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformConfigLoader {
+function provideMicrofrontendPlatformHost(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    provideWorkbenchInitializer(() => inject(MicrofrontendPlatformInitializer).init()),
+    MicrofrontendPlatformInitializer,
+  ]);
+}
 
-  private readonly _workbenchConfig = inject(WorkbenchConfig);
-
-  public async load(): Promise<MicrofrontendPlatformConfig> {
-    return this._workbenchConfig.microfrontendPlatform! as MicrofrontendPlatformConfig;
-  }
+/**
+ * Provides the {@link MicrofrontendPlatformConfig} for DI.
+ */
+function provideMicrofrontendPlatformConfig(config: WorkbenchConfig): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    {
+      provide: MicrofrontendPlatformConfigLoader,
+      useClass: typeof config.microfrontendPlatform === 'function' ? config.microfrontendPlatform : StaticMicrofrontendPlatformConfigLoader,
+    },
+    {
+      provide: MicrofrontendPlatformConfig,
+      useFactory: () => Defined.orElseThrow(inject(MicrofrontendPlatformInitializer).config, () => Error('[MicrofrontendPlatformError] Microfrontend platform configuration not found.')),
+    },
+  ]);
 }
 
 /**
@@ -166,7 +150,7 @@ function provideMicrofrontendViewRoute(): EnvironmentProviders {
 }
 
 /**
- * Provides route for built-in {@link WorkbenchMessageBoxCapability}.
+ * Provides the route for the built-in {@link WorkbenchMessageBoxCapability}.
  */
 function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
   return makeEnvironmentProviders([
@@ -190,4 +174,17 @@ function canMatchWorkbenchMessageBox(): CanMatchFn {
     const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
     return Routing.isMessageBoxOutlet(outlet);
   };
+}
+
+/**
+ * Provides {@link WorkbenchConfig.microfrontendPlatform} config as passed to {@link provideWorkbench}.
+ */
+@Injectable(/* DO NOT provide via 'providedIn' metadata as contributed conditionally. */)
+class StaticMicrofrontendPlatformConfigLoader implements MicrofrontendPlatformConfigLoader {
+
+  private readonly _workbenchConfig = inject(WorkbenchConfig);
+
+  public async load(): Promise<MicrofrontendPlatformConfig> {
+    return this._workbenchConfig.microfrontendPlatform! as MicrofrontendPlatformConfig;
+  }
 }

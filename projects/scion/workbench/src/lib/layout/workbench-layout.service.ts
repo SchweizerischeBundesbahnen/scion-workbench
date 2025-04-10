@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {BehaviorSubject, Observable, skip} from 'rxjs';
 import {computed, inject, Injectable, signal} from '@angular/core';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
-import {filterNull} from '../common/operators';
-import {toSignal} from '@angular/core/rxjs-interop';
+import {throwError} from '../common/throw-error.util';
+import {resolveWhen} from '../common/resolve-when.util';
 
 /**
  * Provides access to the workbench layout.
@@ -22,28 +21,24 @@ import {toSignal} from '@angular/core/rxjs-interop';
 export class WorkbenchLayoutService {
 
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _layout$ = new BehaviorSubject<ɵWorkbenchLayout | null>(null);
+  private readonly _layout = signal<ɵWorkbenchLayout | null>(null);
   private readonly _moving = signal(false);
   private readonly _resizing = signal(false);
 
   /**
-   * Provides the current {@link WorkbenchLayout}, or `null` until Angular has performed the initial navigation.
+   * Provides the layout of the workbench, throwing an error if the initial layout is not yet available.
    */
-  public layout = toSignal(this._layout$, {requireSync: true});
+  public readonly layout = computed(() => this._layout() ?? throwError('[NullLayoutError] Workbench layout not available yet.'));
 
   /**
-   * Emits the current {@link WorkbenchLayout}.
-   *
-   * Upon subscription, emits the current layout, and then emits the updated layout every time it changes.
-   *
-   * The Observable will not emit until Angular has performed the initial navigation.
+   * Indicates whether the layout is available, i.e., after Angular has performed the initial navigation.
    */
-  public readonly layout$: Observable<ɵWorkbenchLayout> = this._layout$.pipe(filterNull());
+  public readonly hasLayout = computed(() => this._layout() !== null);
 
   /**
-   * Notifies when the workbench layout has changed.
+   * Resolves when the layout is available, i.e., after Angular has performed the initial navigation.
    */
-  public readonly onLayoutChange$: Observable<ɵWorkbenchLayout> = this._layout$.pipe(skip(1), filterNull());
+  public readonly whenLayoutAvailable = resolveWhen(this.hasLayout);
 
   /**
    * Indicates if a drag operation is active, such as moving a view or dialog, or resizing a part.
@@ -68,6 +63,6 @@ export class WorkbenchLayoutService {
    * Sets the given {@link WorkbenchLayout}.
    */
   public setLayout(layout: ɵWorkbenchLayout): void {
-    this._layout$.next(layout);
+    this._layout.set(layout);
   }
 }

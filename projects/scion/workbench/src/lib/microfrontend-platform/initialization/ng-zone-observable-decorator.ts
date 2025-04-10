@@ -16,7 +16,7 @@ import {ObservableDecorator} from '@scion/microfrontend-platform';
 /**
  * Mirrors the source, but ensures subscription and emission {@link NgZone} to be identical.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class NgZoneObservableDecorator implements ObservableDecorator {
 
   private readonly _zone = inject(NgZone);

@@ -56,7 +56,7 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
           }
 
           // Assert model.
-          assertWorkbenchLayoutModel(expected, TestBed.inject(WorkbenchLayoutService).layout()!, util);
+          assertWorkbenchLayoutModel(expected, TestBed.inject(WorkbenchLayoutService).layout(), util);
           // Assert DOM.
           assertWorkbenchLayoutDOM(expected, debugElement.nativeElement as HTMLElement);
           return pass();

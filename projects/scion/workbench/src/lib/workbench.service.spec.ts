@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {WorkbenchRouter} from './routing/workbench-router.service';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from './testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from './testing/testing.util';
 import {TestComponent} from './testing/test.component';
 import {WorkbenchComponent} from './workbench.component';
 import {WorkbenchService} from './workbench.service';
@@ -30,7 +30,7 @@ describe('Workbench Service', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.1
     await TestBed.inject(WorkbenchRouter).navigate(['view'], {target: 'view.1'});
@@ -75,7 +75,7 @@ describe('Workbench Service', () => {
         }),
       ],
     });
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
     const workbenchService = TestBed.inject(WorkbenchService);
 
     // Expect initial perspective.

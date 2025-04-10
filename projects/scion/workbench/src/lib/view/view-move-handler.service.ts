@@ -27,7 +27,7 @@ import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 /**
  * Updates the workbench layout when receiving a {@link ViewMoveEvent} event relevant for this application.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
+@Injectable({providedIn: 'root'})
 export class ViewMoveHandler {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);

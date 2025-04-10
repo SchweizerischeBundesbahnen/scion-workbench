@@ -14,7 +14,7 @@ import {LogAppender, LogEvent, LogLevel} from './logging.model';
 /**
  * Logs messages to the console, if available.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered under `LogAppender` DI token. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as registered under `LogAppender` DI token. */)
 export class ConsoleAppender implements LogAppender {
 
   public onLogMessage(event: LogEvent): void {

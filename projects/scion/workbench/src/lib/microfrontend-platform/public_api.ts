@@ -10,4 +10,5 @@
 
 export {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 export {WorkbenchPerspectiveData} from './microfrontend-perspective/workbench-perspective-data';
+export {provideMicrofrontendPlatformInitializer, type MicrofrontendPlatformInitializerOptions, MicrofrontendPlatformStartupPhase, MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP} from './microfrontend-platform-initializer.provider';
 export * from './microfrontend-platform.config';

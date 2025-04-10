@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, Injectable, makeEnvironmentProviders} from '@angular/core';
-import {WORKBENCH_PRE_STARTUP, WorkbenchInitializer} from '@scion/workbench';
+import {EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
+import {provideWorkbenchInitializer, WorkbenchStartupPhase} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Handler, MessageHeaders, MessageInterceptor, TopicMessage} from '@scion/microfrontend-platform';
@@ -17,17 +17,7 @@ import {firstValueFrom, timer} from 'rxjs';
 
 /**
  * Simulates the slow retrieval of the microfrontend's current view capability by delaying capability lookups by 2000ms.
- *
- * This initializer is only installed if the query parameter {@link WorkbenchStartupQueryParams#SIMULATE_SLOW_CAPABILITY_LOOKUP} is set.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered via workbench startup hook. */)
-class ThrottleCapabilityLookupInitializer implements WorkbenchInitializer {
-
-  public async init(): Promise<void> {
-    Beans.register(MessageInterceptor, {multi: true, useClass: CapabilityLookupMessageInterceptor});
-  }
-}
-
 class CapabilityLookupMessageInterceptor implements MessageInterceptor {
 
   public async intercept(message: TopicMessage, next: Handler<TopicMessage>): Promise<void> {
@@ -45,11 +35,9 @@ class CapabilityLookupMessageInterceptor implements MessageInterceptor {
 }
 
 /**
- * Provides a set of DI providers to configure the speed of capability lookups.
+ * Provides a set of DI providers to simulate slow capability retrievals.
  *
- * Provides a {@link WorkbenchInitializer} to throttle capability lookups to simulate slow capability retrievals.
- *
- * Returns an empty provider array if the query parameter {@link WorkbenchStartupQueryParams#SIMULATE_SLOW_CAPABILITY_LOOKUP} is not set.
+ * Has no effect if the query parameter {@link WorkbenchStartupQueryParams#SIMULATE_SLOW_CAPABILITY_LOOKUP} is not set.
  */
 export function provideThrottleCapabilityLookupInterceptor(): EnvironmentProviders | [] {
   if (WorkbenchStartupQueryParams.standalone()) {
@@ -57,11 +45,9 @@ export function provideThrottleCapabilityLookupInterceptor(): EnvironmentProvide
   }
   if (WorkbenchStartupQueryParams.simulateSlowCapabilityLookup()) {
     return makeEnvironmentProviders([
-      {
-        provide: WORKBENCH_PRE_STARTUP,
-        multi: true,
-        useClass: ThrottleCapabilityLookupInitializer,
-      },
+      provideWorkbenchInitializer(() => {
+        Beans.register(MessageInterceptor, {multi: true, useClass: CapabilityLookupMessageInterceptor});
+      }, {phase: WorkbenchStartupPhase.PreStartup}),
     ]);
   }
   return [];

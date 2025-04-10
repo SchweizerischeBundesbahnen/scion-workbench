@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {TestComponent} from '../testing/test.component';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -31,7 +31,7 @@ describe('WorkbenchPart', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add part to the right.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addPart('part.right', {align: 'right'}));
@@ -69,7 +69,7 @@ describe('WorkbenchPart', () => {
       ],
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Expect part 'left-top' to be active.
     expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.left-top').active()).toBeTrue();
@@ -200,7 +200,7 @@ describe('WorkbenchPart', () => {
     });
     styleFixture(TestBed.createComponent(WorkbenchComponent));
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Add part.
     await workbenchRouter.navigate(layout => layout.addPart('part.testee', {align: 'left'}));
