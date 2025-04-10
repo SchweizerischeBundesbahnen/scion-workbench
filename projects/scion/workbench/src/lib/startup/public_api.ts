@@ -8,5 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export {WorkbenchLauncher, WorkbenchStartup} from './workbench-launcher.service';
-export {type WorkbenchInitializer, type WorkbenchInitializerFn, WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, MICROFRONTEND_PLATFORM_POST_STARTUP, WORKBENCH_POST_STARTUP} from './workbench-initializer';
+export {WorkbenchLauncher} from './workbench-launcher.service';
+export {WorkbenchStartup} from './workbench-startup.service';
+export {type WorkbenchInitializer, type WorkbenchInitializerFn, provideWorkbenchInitializer, type WorkbenchInitializerOptions, WorkbenchStartupPhase} from './workbench-initializer';
+// TODO [Angular 21] Remove from Public API.
+export {WORKBENCH_STARTUP, WORKBENCH_PRE_STARTUP, WORKBENCH_POST_STARTUP} from './workbench-initializer';

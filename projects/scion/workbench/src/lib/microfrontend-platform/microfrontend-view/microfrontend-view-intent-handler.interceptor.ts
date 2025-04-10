@@ -26,7 +26,7 @@ import {Objects} from '../../common/objects.util';
  * View intents are handled in this interceptor and are not transported to the providing application, enabling support for applications
  * that are not connected to the SCION Workbench.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
   private readonly _workbenchRouter = inject(WorkbenchRouter);

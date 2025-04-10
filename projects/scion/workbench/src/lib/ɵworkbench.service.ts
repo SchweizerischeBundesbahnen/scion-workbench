@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, computed, inject, Injectable, Signal} from '@angular/core';
+import {assertNotInReactiveContext, inject, Injectable, Signal} from '@angular/core';
 import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
@@ -26,7 +26,6 @@ import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewId} from './view/workbench-view.model';
 import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
-import {throwError} from './common/throw-error.util';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
 
@@ -51,7 +50,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
 
   constructor() {
-    this.layout = computed(() => this._layoutService.layout() ?? throwError('[NullLayoutError] Workbench layout not created yet.'));
+    this.layout = this._layoutService.layout;
     this.perspectives = this._perspectiveRegistry.objects;
     this.parts = this._partRegistry.objects;
     this.views = this._viewRegistry.objects;

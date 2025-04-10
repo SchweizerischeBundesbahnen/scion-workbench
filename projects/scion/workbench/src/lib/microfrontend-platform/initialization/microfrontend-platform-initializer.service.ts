@@ -13,7 +13,8 @@ import {CapabilityInterceptor, HostManifestInterceptor, IntentInterceptor, Micro
 import {Beans} from '@scion/toolkit/bean-manager';
 import {Logger, LoggerNames} from '../../logging';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
-import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP, runWorkbenchInitializers, WorkbenchInitializer} from '../../startup/workbench-initializer';
+import {MICROFRONTEND_PLATFORM_POST_STARTUP, MICROFRONTEND_PLATFORM_PRE_STARTUP} from '../microfrontend-platform-initializer.provider';
+import {runWorkbenchInitializers} from '../../startup/workbench-initializer';
 import {MicrofrontendPlatformConfigLoader} from '../microfrontend-platform-config-loader';
 import {MicrofrontendViewIntentHandler} from '../microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './workbench-host-manifest-interceptor.service';
@@ -33,8 +34,8 @@ import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspectiv
 /**
  * Initializes and starts the SCION Microfrontend Platform in host mode.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class MicrofrontendPlatformInitializer implements WorkbenchInitializer, OnDestroy {
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+export class MicrofrontendPlatformInitializer implements OnDestroy {
 
   private readonly _microfrontendPlatformConfigLoader = inject(MicrofrontendPlatformConfigLoader);
   private readonly _hostManifestInterceptor = inject(WorkbenchHostManifestInterceptor);

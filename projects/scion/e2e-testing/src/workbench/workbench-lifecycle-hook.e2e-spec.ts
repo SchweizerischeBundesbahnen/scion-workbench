@@ -18,24 +18,19 @@ test.describe('Workbench Lifecycle Hook', () => {
 
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([
       // WORKBENCH_PRE_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
       // WORKBENCH_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
       // MICROFRONTEND_PLATFORM_PRE_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken MICROFRONTEND_PLATFORM_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken MICROFRONTEND_PLATFORM_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][MICROFRONTEND_PLATFORM_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
       // MICROFRONTEND_PLATFORM_POST_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken MICROFRONTEND_PLATFORM_POST_STARTUP] [microfrontendPlatformState=Starting, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken MICROFRONTEND_PLATFORM_POST_STARTUP] [microfrontendPlatformState=Starting, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][MICROFRONTEND_PLATFORM_POST_STARTUP] [microfrontendPlatformState=Starting, workbenchStarted=false]`,
 
       // WORKBENCH_POST_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Started, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Started, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Started, workbenchStarted=false]`,
     ]);
   });
 
@@ -44,16 +39,13 @@ test.describe('Workbench Lifecycle Hook', () => {
 
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([
       // WORKBENCH_PRE_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][WORKBENCH_PRE_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
       // WORKBENCH_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][WORKBENCH_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
 
       // WORKBENCH_POST_STARTUP
-      `[WorkbenchLifecycleHookLogger#construct][InjectionToken WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
-      `[WorkbenchLifecycleHookLogger#init][InjectionToken WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
+      `[WorkbenchLifecycleHookLogger][WORKBENCH_POST_STARTUP] [microfrontendPlatformState=Stopped, workbenchStarted=false]`,
     ]);
   });
 });

@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
-import {styleFixture, waitForInitialWorkbenchLayout} from '../../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {WorkbenchComponent} from '../../workbench.component';
 import {Component, inject, signal} from '@angular/core';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -59,7 +59,7 @@ describe('ViewMenuItemDirective', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
     expect(view.menuItems()).toEqual([
@@ -112,7 +112,7 @@ describe('ViewMenuItemDirective', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
 
@@ -167,7 +167,7 @@ describe('ViewMenuItemDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(SpecRootComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view1 = TestBed.inject(WorkbenchService).getView('view.101')!;
     const view2 = TestBed.inject(WorkbenchService).getView('view.102')!;
@@ -234,7 +234,7 @@ describe('ViewMenuItemDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(SpecRootComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view1 = TestBed.inject(WorkbenchService).getView('view.101')!;
     const view2 = TestBed.inject(WorkbenchService).getView('view.102')!;
@@ -312,7 +312,7 @@ describe('ViewMenuItemDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view1 = TestBed.inject(ɵWorkbenchService).getView('view.101')!;
     const view2 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;

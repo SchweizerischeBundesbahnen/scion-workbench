@@ -45,35 +45,32 @@ export abstract class WorkbenchConfig {
   public abstract viewMenuItems?: ViewMenuItemsConfig | false;
 
   /**
-   * Configures the workbench startup.
+   * Configures startup of the SCION Workbench.
    *
-   * The {@link WorkbenchLauncher} is used to start the workbench. During startup, it runs registered workbench initializers
-   * and waits for them to complete. You can inject {@link WorkbenchStartup} to get notified when the startup is complete.
+   * The application can hook into the startup process of the SCION Workbench by providing one or more initializers to {@link provideWorkbenchInitializer}.
+   * Initializers execute at defined points during startup, enabling the application's controlled initialization. The workbench is fully started once
+   * all initializers have completed.
    *
-   * Refer to {@link WorkbenchInitializer} to learn how to register a workbench initializer.
+   * The application can inject {@link WorkbenchStartup} to check if the workbench has completed startup.
    */
   public abstract startup?: {
     /**
-     * Configures the workbench launching strategy. Defaults to `LAZY`.
-     *
-     *  - **APP_INITIALIZER**
-     *   Starts the workbench during application bootstrap, blocking the app startup until the workbench is ready. No splash is displayed with this strategy.
+     * Controls when to start the SCION Workbench. Defaults to `LAZY`.
      *
      * - **LAZY**
-     *   Starts the workbench at the latest when bootstrapping the workbench root component `<wb-workbench>`.
+     *   Starts the workbench when the `<wb-workbench>` component is added to the DOM or manually via {@link WorkbenchLauncher#launch},
+     *   e.g., from a route guard or app initializer.
      *
-     *   With this strategy, you are flexible when to start the workbench. You can start the workbench explicitly by
-     *   calling {@link WorkbenchLauncher#launch}, e.g., to launch the workbench from a route guard or app initializer,
-     *   or start it automatically when adding the workbench root component `<wb-workbench>` to the Angular component
-     *   tree.
+     *  - **APP_INITIALIZER**
+     *   Starts the workbench during application bootstrapping, blocking Angular's app startup until the workbench is ready.
+     *   No splash is displayed.
      */
-    launcher?: 'APP_INITIALIZER' | 'LAZY';
+    launcher?: 'LAZY' | 'APP_INITIALIZER';
 
     /**
-     * Specifies the component to display when mounting the workbench root component `<wb-workbench>` to the DOM before the
-     * workbench startup has finished.
+     * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
      *
-     * Note that when launching the workbench in an app initializer, no splash will display since the workbench will start upfront.
+     * Note: No splash screen is displayed when using the app initializer strategy.
      */
     splash?: ComponentType<unknown>;
   };

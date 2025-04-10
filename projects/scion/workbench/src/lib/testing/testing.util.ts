@@ -12,8 +12,7 @@ import {ComponentFixture, TestBed, tick} from '@angular/core/testing';
 import {DebugElement, NgZone, Type} from '@angular/core';
 import {By} from '@angular/platform-browser';
 import {animationFrameScheduler, exhaustMap, firstValueFrom, timer} from 'rxjs';
-import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {WorkbenchStartup} from '../startup/workbench-launcher.service';
+import {WorkbenchStartup} from '../startup/workbench-startup.service';
 import {filter} from 'rxjs/operators';
 import {Commands} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
@@ -29,12 +28,10 @@ export function advance(fixture: ComponentFixture<any>): void {
 }
 
 /**
- * Waits for the workbench to be started and the initial layout to be applied.
+ * Waits until the workbench has completed startup and applied the initial layout.
  */
-export async function waitForInitialWorkbenchLayout(): Promise<void> {
-  await TestBed.inject(WorkbenchStartup).whenStarted;
-  // Wait for the first layout emission.
-  await firstValueFrom(TestBed.inject(WorkbenchLayoutService).layout$);
+export async function waitUntilWorkbenchStarted(): Promise<void> {
+  await TestBed.inject(WorkbenchStartup).whenDone;
   // Wait for Angular to update the DOM.
   await waitUntilStable();
 }

@@ -42,7 +42,7 @@ export interface LogEvent {
 /**
  * Delivers log events to a destination, e.g., writing logs to the console.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as used as DI token for the actual appenders. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as used as DI token for the actual appenders. */)
 export abstract class LogAppender {
 
   /**

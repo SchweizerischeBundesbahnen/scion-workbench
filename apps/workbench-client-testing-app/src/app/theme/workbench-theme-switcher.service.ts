@@ -7,7 +7,7 @@ import {WORKBENCH_POST_CONNECT} from '../workbench-client/workbench-client.provi
 /**
  * Switches the theme when changed in the workbench.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as associated with the {@link WORKBENCH_POST_CONNECT} DI token. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as associated with the {@link WORKBENCH_POST_CONNECT} DI token. */)
 class WorkbenchThemeSwitcher {
 
   constructor() {

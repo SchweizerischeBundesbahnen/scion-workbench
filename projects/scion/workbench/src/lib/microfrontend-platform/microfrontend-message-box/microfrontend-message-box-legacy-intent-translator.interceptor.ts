@@ -5,7 +5,7 @@ import {eMESSAGE_BOX_MESSAGE_PARAM, WorkbenchCapabilities, WorkbenchMessageBoxLe
 /**
  * @deprecated since workbench version 17.0.0-beta.9; provides backward compatibility for {@link WorkbenchMessageBoxLegacyOptions}; interceptor will be removed in a future release.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendMessageBoxLegacyIntentTranslator implements IntentInterceptor {
 
   public intercept(intentMessage: IntentMessage<WorkbenchMessageBoxLegacyOptions>, next: Handler<IntentMessage>): Promise<void> {

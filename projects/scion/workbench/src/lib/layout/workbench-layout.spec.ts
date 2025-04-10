@@ -16,7 +16,7 @@ import {TestBed} from '@angular/core/testing';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
-import {anything, segments, styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {anything, segments, styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
 import {MPart as _MPart, MTreeNode as _MTreeNode, MView} from './workbench-layout.model';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
@@ -2276,7 +2276,7 @@ describe('WorkbenchLayout', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Prepare main area to have to parts split vertically.
     await TestBed.inject(WorkbenchRouter).navigate(layout => layout

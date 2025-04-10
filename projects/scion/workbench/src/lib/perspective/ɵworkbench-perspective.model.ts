@@ -15,15 +15,16 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchGridMerger} from './workbench-grid-merger.service';
 import {WorkbenchPerspectiveStorageService} from './workbench-perspective-storage.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {filter} from 'rxjs/operators';
 import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
 import {LatestTaskExecutor} from '../executor/latest-task-executor';
 import {UrlSegment} from '@angular/router';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './workbench-perspective.registry';
-import {WorkbenchStartup} from '../startup/workbench-launcher.service';
+import {WorkbenchStartup} from '../startup/workbench-startup.service';
 import {Objects} from '../common/objects.util';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
+import {filter, skip, switchMap} from 'rxjs/operators';
+import {from} from 'rxjs';
 
 /**
  * @inheritDoc
@@ -154,15 +155,16 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    */
   private installLayoutPersister(): void {
     const executor = new LatestTaskExecutor();
+    const injector = inject(Injector);
 
-    this._workbenchLayoutService.onLayoutChange$
+    from(this._workbenchLayoutService.whenLayoutAvailable)
       .pipe(
+        switchMap(() => toObservable(this._workbenchLayoutService.layout, {injector})),
+        skip(1), // Skip immediate layout emission to only persist on layout change.
         filter(() => this.active()),
         takeUntilDestroyed(),
       )
-      .subscribe(layout => {
-        executor.submit(() => this.storePerspectiveLayout(layout));
-      });
+      .subscribe(layout => executor.submit(() => this.storePerspectiveLayout(layout)));
   }
 
   /**
@@ -241,11 +243,11 @@ export const ACTIVE_PERSPECTIVE = new InjectionToken<Signal<ɵWorkbenchPerspecti
 
     return computed(() => {
       // Perspectives are not registered until the workbench startup is complete.
-      if (!workbenchStartup.isStarted()) {
+      if (!workbenchStartup.done()) {
         return undefined;
       }
 
-      const perspectiveId = workbenchLayoutService.layout()?.perspectiveId;
+      const perspectiveId = workbenchLayoutService.layout().perspectiveId;
       if (!perspectiveId) {
         return undefined; // The initial perspective has not been activated yet.
       }

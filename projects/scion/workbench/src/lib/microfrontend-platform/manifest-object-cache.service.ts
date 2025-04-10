@@ -8,28 +8,31 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable} from '@angular/core';
+import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {Capability, ManifestService} from '@scion/microfrontend-platform';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {BehaviorSubject, firstValueFrom, Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, map, startWith} from 'rxjs/operators';
-import {WorkbenchInitializer} from '../startup/workbench-initializer';
+import {tapFirst} from '@scion/toolkit/operators';
+import {provideMicrofrontendPlatformInitializer} from './microfrontend-platform-initializer.provider';
 
-/**
- * Provides cached access to manifest objects.
- */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
-export class ManifestObjectCache implements WorkbenchInitializer {
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+export class ManifestObjectCache {
 
   private readonly _manifestService = inject(ManifestService);
   private readonly _capabilities$ = new BehaviorSubject(new Map<string, Capability>());
 
-  constructor() {
-    this.installCapabilityLookup();
-  }
-
   public async init(): Promise<void> {
-    await firstValueFrom(this._capabilities$);
+    return new Promise<void>(resolve => {
+      this._manifestService.lookupCapabilities$()
+        .pipe(
+          tapFirst(() => resolve()),
+          takeUntilDestroyed(),
+        )
+        .subscribe(capabilities => {
+          this._capabilities$.next(capabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, Capability>()));
+        });
+    });
   }
 
   /**
@@ -65,12 +68,14 @@ export class ManifestObjectCache implements WorkbenchInitializer {
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       );
   }
+}
 
-  private installCapabilityLookup(): void {
-    this._manifestService.lookupCapabilities$()
-      .pipe(takeUntilDestroyed())
-      .subscribe(capabilities => {
-        this._capabilities$.next(capabilities.reduce((acc, capability) => acc.set(capability.metadata!.id, capability), new Map<string, Capability>()));
-      });
-  }
+/**
+ * Provides cached access to manifest objects.
+ */
+export function provideManifestObjectCache(): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    ManifestObjectCache,
+    provideMicrofrontendPlatformInitializer(() => inject(ManifestObjectCache).init()),
+  ]);
 }

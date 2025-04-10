@@ -17,7 +17,7 @@ import {MAIN_AREA} from '../../layout/workbench-layout';
 /**
  * Asserts perspective capabilities to have required properties.
  */
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as only registered if microfrontend support is enabled. */)
 export class MicrofrontendPerspectiveCapabilityValidator implements CapabilityInterceptor {
 
   public async intercept(capability: Capability): Promise<Capability> {

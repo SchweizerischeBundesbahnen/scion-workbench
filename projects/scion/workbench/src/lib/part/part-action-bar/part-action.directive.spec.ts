@@ -10,7 +10,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
-import {styleFixture, waitForInitialWorkbenchLayout} from '../../testing/testing.util';
+import {styleFixture, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {WorkbenchComponent} from '../../workbench.component';
 import {WorkbenchService} from '../../workbench.service';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
@@ -58,7 +58,7 @@ describe('PartActionDirective', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const part = TestBed.inject(WorkbenchService).getPart('part.part')!;
     const view = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
@@ -112,7 +112,7 @@ describe('PartActionDirective', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const part = TestBed.inject(WorkbenchService).getPart('part.part')!;
     const view = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
@@ -166,7 +166,7 @@ describe('PartActionDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(SpecRootComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const leftPart = TestBed.inject(WorkbenchService).getPart('part.left')!;
     const rightPart = TestBed.inject(WorkbenchService).getPart('part.right')!;
@@ -221,7 +221,7 @@ describe('PartActionDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(SpecRootComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const leftPart = TestBed.inject(WorkbenchService).getPart('part.left')!;
     const rightPart = TestBed.inject(WorkbenchService).getPart('part.right')!;
@@ -271,7 +271,7 @@ describe('PartActionDirective', () => {
     }
 
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const view = TestBed.inject(ɵWorkbenchService).getView('view.100')!;
 
@@ -335,7 +335,7 @@ describe('PartActionDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const leftPart = TestBed.inject(WorkbenchService).getPart('part.left')!;
     const rightPart = TestBed.inject(WorkbenchService).getPart('part.right')!;
@@ -406,7 +406,7 @@ describe('PartActionDirective', () => {
     }
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     const leftPart = TestBed.inject(WorkbenchService).getPart('part.left')!;
     const rightPart = TestBed.inject(WorkbenchService).getPart('part.right')!;

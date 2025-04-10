@@ -16,7 +16,7 @@ import {TestComponent, withComponentContent} from '../testing/test.component';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {WorkbenchService} from '../workbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {styleFixture, waitForInitialWorkbenchLayout, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchLayoutComponent} from '../layout/workbench-layout.component';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -48,7 +48,7 @@ describe('WorkbenchPerspectiveViewConflictResolver', () => {
       ],
     });
     const fixture = styleFixture(TestBed.createComponent(WorkbenchLayoutComponent));
-    await waitForInitialWorkbenchLayout();
+    await waitUntilWorkbenchStarted();
 
     // Open view.1 in perspective-1
     await TestBed.inject(WorkbenchRouter).navigate(['view-1'], {partId: 'part.left', target: 'view.1'});

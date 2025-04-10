@@ -12,11 +12,11 @@ import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders} from 
 import {provideRouter, withHashLocation} from '@angular/router';
 import {routes} from './app.routes';
 import {workbenchConfig} from './workbench.config';
-import {provideConfirmWorkbenchStartupInitializer} from './workbench/confirm-workbench-startup-initializer.service';
-import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup-initializer.service';
+import {provideConfirmWorkbenchStartup} from './workbench/confirm-workbench-startup';
+import {provideThrottleCapabilityLookupInterceptor} from './workbench/throttle-capability-lookup';
 import {provideWorkbenchLifecycleHookLoggers} from './workbench/workbench-lifecycle-hook-loggers';
-import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor.service';
-import {provideNotificationPage} from './notification-page/notification-page-intent-handler.service';
+import {provideDevToolsInterceptor} from './devtools/devtools-capability-interceptor';
+import {provideCustomNotificationIntentHandler} from './notification-page/notification-page-intent-handler';
 import {Perspectives} from './workbench.perspectives';
 import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
@@ -30,12 +30,12 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withHashLocation()),
     provideWorkbench(workbenchConfig),
-    provideConfirmWorkbenchStartupInitializer(),
+    provideConfirmWorkbenchStartup(),
     provideThrottleCapabilityLookupInterceptor(),
     provideMainAreaInitialPartId(),
     provideWorkbenchLifecycleHookLoggers(),
     provideDevToolsInterceptor(),
-    provideNotificationPage(),
+    provideCustomNotificationIntentHandler(),
     provideAnimationsIfEnabled(),
     Perspectives.provideRoutes(),
   ],

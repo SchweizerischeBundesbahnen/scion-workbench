@@ -53,7 +53,7 @@ export function provideWorkbenchForTest(config?: WorkbenchConfig & {mainAreaInit
   ]);
 }
 
-@Injectable(/* DO NOT PROVIDE via 'providedIn' metadata as registered only if using `WorkbenchTestingModule`. */)
+@Injectable(/* DO NOT provide via 'providedIn' metadata as registered only if using `WorkbenchTestingModule`. */)
 class SequenceInstantProvider implements ActivationInstantProvider {
 
   private _sequence = 0;
