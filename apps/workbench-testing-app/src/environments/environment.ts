@@ -21,7 +21,7 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {workbenchManifest} from '../app/workbench.manifest';
 
 /**
- * Environment used when starting the app locally.
+ * Environment used if starting the app locally.
  */
 const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
   host: {

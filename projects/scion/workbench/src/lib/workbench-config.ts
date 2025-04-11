@@ -22,6 +22,15 @@ import {WorkbenchStorage} from './storage/workbench-storage';
 export abstract class WorkbenchConfig {
 
   /**
+   * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
+   *
+   * Defaults to a splash showing a loading indicator (ellipsis throbber).
+   *
+   * Note: No splash screen is displayed if starting the workbench in an app initializer.
+   */
+  public abstract splashComponent?: ComponentType<unknown>;
+
+  /**
    * Specifies the component to display a view tab, enabling custom design or functionality.
    *
    * The component can inject {@link WorkbenchView} and {@link VIEW_TAB_RENDERING_CONTEXT} to get a reference to the view and the rendering context.
@@ -76,6 +85,8 @@ export abstract class WorkbenchConfig {
      * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
      *
      * Note: No splash screen is displayed when using the app initializer strategy.
+     *
+     * @deprecated since version 19.0.0-beta.3. Property has been moved. Configure the splash in `WorkbenchConfig.splashComponent`. Property will be removed in version 21.
      */
     splash?: ComponentType<unknown>;
   };
