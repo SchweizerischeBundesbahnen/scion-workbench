@@ -5,7 +5,7 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-Right-clicking on a view tab opens a context menu to interact with the view and its content.
+Right-clicking on a view tab opens a context menu for interacting with the view and its contents.
 
 ### How to contribute to the view context menu
 Context menu items can be added declaratively in an HTML template or via `WorkbenchService`.
@@ -159,16 +159,14 @@ inject(WorkbenchService).registerViewMenuItem(() => ({
 ```
 
 ### Built-in context menu items
-Built-in context menu items can be customized or removed via configuration passed to `provideWorkbench()`. For example, to translate menu items or use different accelerators.
+Built-in context menu items can be customized or removed via configuration passed to the `provideWorkbench` function. For example, to use a different accelerator.
 
 ```ts
-import {inject} from '@angular/core';
-import {provideWorkbench, WorkbenchService} from '@scion/workbench';
+import {provideWorkbench} from '@scion/workbench';
 
 provideWorkbench({
   viewMenuItems: {
     close: {
-      text: () => inject(TranslateService).translate('close'), // translate menu item
       accelerator: ['F4'], // use different accelerator
     },
     closeAll: false, // remove from context menu
@@ -176,6 +174,10 @@ provideWorkbench({
 });
 ```
 
+Menu item texts can be changed or localized using a text provider registered via configuration passed to the `provideWorkbench` function. Learn more about localizing the SCION Workbench in [How to Localize][link-how-to-localize].
+
+
+[link-how-to-localize]: /docs/site/howto/how-to-localize.md
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

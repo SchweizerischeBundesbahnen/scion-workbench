@@ -6,14 +6,14 @@
 @let message = this.message();
 <div class="message e2e-message" [class.text]="message | wbTypeof:'string'" sciDimension (sciDimensionChange)="onContentDimensionChange($event)">
   @if (message | wbTypeof:'string') {
-    {{message}}
+    {{($any(message) | wbText)()}}
   } @else {
     <ng-container *ngComponentOutlet="message; inputs: options.inputs"/>
   }
 </div>
 
 <ng-template wbDialogFooter>
-  <wb-message-box-footer [actions]="options.actions ?? {ok: 'OK'}"
+  <wb-message-box-footer [actions]="options.actions ?? {ok: '%workbench.ok.action'}"
                          [severity]="options.severity ?? 'info'"
                          (action)="onAction($event)"
                          (keydown.escape)="onEscape()"

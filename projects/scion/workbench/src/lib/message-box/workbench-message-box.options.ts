@@ -9,6 +9,7 @@
  */
 import {Injector} from '@angular/core';
 import {ViewId} from '../view/workbench-view.model';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Controls the appearance and behavior of a message box.
@@ -18,10 +19,10 @@ export interface WorkbenchMessageBoxOptions {
   /**
    * Specifies the title of the message box.
    */
-  title?: string;
+  title?: Translatable;
 
   /**
-   * Defines buttons of the message box. If not set, an OK button is displayed by default.
+   * Defines buttons of the message box. Defaults to an 'OK' button (translation key: `workbench.ok.action`).
    *
    * Each property in the object literal represents a button, with the property value used as the button label.
    * Clicking a button closes the message box and returns the property key to the message box opener.
@@ -37,7 +38,7 @@ export interface WorkbenchMessageBoxOptions {
    * }
    * ```
    */
-  actions?: {[key: string]: string};
+  actions?: {[key: string]: Translatable};
 
   /**
    * Specifies the severity of the message. Defaults to `info`.

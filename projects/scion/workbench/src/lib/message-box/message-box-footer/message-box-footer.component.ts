@@ -12,6 +12,7 @@ import {KeyValuePipe} from '@angular/common';
 import {observeOn} from 'rxjs/operators';
 import {animationFrameScheduler, firstValueFrom} from 'rxjs';
 import {fromResize$} from '@scion/toolkit/observable';
+import {TextPipe} from '../../text/text.pipe';
 
 @Component({
   selector: 'wb-message-box-footer',
@@ -19,6 +20,7 @@ import {fromResize$} from '@scion/toolkit/observable';
   styleUrls: ['./message-box-footer.component.scss'],
   imports: [
     KeyValuePipe,
+    TextPipe,
   ],
   host: {
     '[attr.data-severity]': 'severity()',

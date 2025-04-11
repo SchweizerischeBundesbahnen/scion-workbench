@@ -1,6 +1,6 @@
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {Component, DestroyRef, EnvironmentInjector, inject, InjectionToken, Injector, Type} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -347,6 +347,36 @@ describe('Dialog', () => {
 
     // Expect not to throw `ExpressionChangedAfterItHasBeenCheckedError`.
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
+  });
+
+  it('should display translated title', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          textProvider: text => `${text.toUpperCase()} (translated)`,
+        }),
+      ],
+    });
+
+    @Component({selector: 'spec-dialog', template: ''})
+    class SpecDialogComponent {
+
+      constructor(dialog: WorkbenchDialog) {
+        dialog.title = '%title';
+        dialog.size.width = '500px';
+      }
+    }
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Open dialog.
+    void TestBed.inject(WorkbenchDialogService).open(SpecDialogComponent, {cssClass: 'testee'});
+    await waitUntilStable();
+
+    // Expect dialog title to be translated.
+    const titleElement = document.querySelector<HTMLElement>('wb-dialog.testee wb-dialog-header div.e2e-title')!;
+    expect(titleElement.innerText).toEqual('TITLE (translated)');
   });
 });
 

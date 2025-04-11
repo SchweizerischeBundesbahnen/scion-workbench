@@ -14,6 +14,7 @@ import {noop} from 'rxjs';
 import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
+import {TextPipe} from '../text/text.pipe';
 
 /**
  * Provides a filter control.
@@ -23,7 +24,10 @@ import {UUID} from '@scion/toolkit/uuid';
   templateUrl: './filter-field.component.html',
   styleUrls: ['./filter-field.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    TextPipe,
+  ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => FilterFieldComponent)},
   ],

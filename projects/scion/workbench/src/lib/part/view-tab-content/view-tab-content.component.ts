@@ -8,19 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
+import {TextPipe} from '../../text/text.pipe';
 
 @Component({
   selector: 'wb-view-tab-content',
   templateUrl: './view-tab-content.component.html',
   styleUrls: ['./view-tab-content.component.scss'],
+  imports: [
+    TextPipe,
+  ],
+  host: {
+    '[attr.context]': 'context',
+  },
 })
 export class ViewTabContentComponent {
 
   protected readonly view = inject(WorkbenchView);
-
-  @HostBinding('attr.context')
   protected readonly context = inject<ViewTabRenderingContext>(VIEW_TAB_RENDERING_CONTEXT);
 }

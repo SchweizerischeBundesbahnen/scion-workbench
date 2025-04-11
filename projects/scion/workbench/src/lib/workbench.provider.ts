@@ -23,6 +23,7 @@ import {DefaultWorkbenchStorage, WorkbenchStorage} from './storage/workbench-sto
 import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
+import {provideTextProviders} from './text/text-providers';
 
 /**
  * Enables and configures the SCION Workbench in an application, returning a set of dependency-injection providers to be registered in Angular.
@@ -115,15 +116,18 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
     provideWorkbenchInitializer(() => void inject(ViewTabDragImageRenderer)),
     provideWorkbenchInitializer(() => inject(WorkbenchPerspectiveService).init(), {phase: WorkbenchStartupPhase.PostStartup}),
     provideEnvironmentInitializer(() => inject(WorkbenchUrlObserver)),
-    provideEnvironmentInitializer(() => {
-      if (inject(WorkbenchService, {optional: true, skipSelf: true})) {
-        throw Error('[ProvideWorkbenchError] SCION Workbench must be provided in root environment.');
-      }
-      return 'root';
-    }),
+    provideEnvironmentInitializer(() => rejectIfNotRootEnvironment()),
     provideWorkbenchLauncher(config),
+    provideTextProviders(config),
     provideLogging(config),
     provideLocationPatch(),
     provideWorkbenchMicrofrontendSupport(config),
   ]);
+}
+
+function rejectIfNotRootEnvironment(): string {
+  if (inject(WorkbenchService, {optional: true, skipSelf: true})) {
+    throw Error('[ProvideWorkbenchError] SCION Workbench must be provided in root environment.');
+  }
+  return 'root';
 }

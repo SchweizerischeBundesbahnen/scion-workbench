@@ -25,6 +25,7 @@ import {Disposable} from '../common/disposable';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {throwError} from '../common/throw-error.util';
 import {UUID} from '@scion/toolkit/uuid';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export type ConstrainFn = (rect: DOMRect) => DOMRect;
 
@@ -207,8 +208,8 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly navigationData: Signal<NavigationData>;
   public readonly navigationState: Signal<NavigationState>;
   public readonly part: Signal<WorkbenchPart>;
-  public readonly title: Signal<string | null>;
-  public readonly heading: Signal<string | null>;
+  public readonly title: Signal<Translatable | null>;
+  public readonly heading: Signal<Translatable | null>;
   public readonly dirty: Signal<boolean>;
   public readonly closable: Signal<boolean>;
   public readonly destroyed = false;

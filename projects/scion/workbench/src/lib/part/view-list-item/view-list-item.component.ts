@@ -15,6 +15,7 @@ import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.comp
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
+import {TextPipe} from '../../text/text.pipe';
 
 @Component({
   selector: 'wb-view-list-item',
@@ -23,9 +24,11 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PortalModule,
+    TextPipe,
   ],
   host: {
     '[class.active]': 'view().active()',
+    '[attr.data-viewid]': 'view().id',
   },
 })
 export class ViewListItemComponent {

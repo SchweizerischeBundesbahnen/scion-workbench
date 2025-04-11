@@ -21,6 +21,8 @@ import {TypeofPipe} from '../common/typeof.pipe';
 import {throwError} from '../common/throw-error.util';
 import {Dimension} from '@scion/toolkit/observable';
 import {SciDimensionDirective} from '@scion/components/dimension';
+import {TextPipe} from '../text/text.pipe';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Renders the workbench message box.
@@ -39,6 +41,7 @@ import {SciDimensionDirective} from '@scion/components/dimension';
     MessageBoxHeaderComponent,
     MessageBoxFooterComponent,
     TypeofPipe,
+    TextPipe,
   ],
   providers: [
     // Prevent injecting the dialog handle in message box context.
@@ -95,6 +98,6 @@ export class WorkbenchMessageBoxComponent {
   }
 }
 
-function nullIfEmptyMessage(message: string | ComponentType<unknown>): string | ComponentType<unknown> | null {
+function nullIfEmptyMessage(message: Translatable | ComponentType<unknown>): Translatable | ComponentType<unknown> | null {
   return message || null;
 }

@@ -16,7 +16,7 @@ import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
@@ -2878,6 +2878,55 @@ describe('View', () => {
       expect(view2.part().id).toEqual('part.left');
       expect(viewportView2.scrollTop).toBe(scrollTop);
     });
+  });
+
+  it('should display translated title', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addView('view.100', {partId: 'part.main'}),
+          textProvider: text => `${text.toUpperCase()} (translated)`,
+        }),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Set view title.
+    TestBed.inject(WorkbenchService).getView('view.100')!.title = '%title';
+    await fixture.whenStable();
+
+    // Expect view title to be translated.
+    const titleElement = fixture.debugElement.query(By.css('wb-view-tab[data-viewid="view.100"] span.e2e-title')).nativeElement as HTMLElement;
+    expect(titleElement.innerText).toEqual('TITLE (translated)');
+  });
+
+  it('should display translated heading', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addView('view.100', {partId: 'part.main'}),
+          textProvider: text => `${text.toUpperCase()} (translated)`,
+        }),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    setDesignToken(fixture, '--sci-workbench-tab-height', '3.5rem');
+    await waitUntilWorkbenchStarted();
+
+    // Set view heading.
+    TestBed.inject(WorkbenchService).getView('view.100')!.heading = '%heading';
+    await fixture.whenStable();
+
+    // Expect view heading to be translated.
+    const headingElement = fixture.debugElement.query(By.css('wb-view-tab[data-viewid="view.100"] span.e2e-heading')).nativeElement as HTMLElement;
+    expect(headingElement.innerText).toEqual('HEADING (translated)');
   });
 });
 
