@@ -11,13 +11,14 @@
 import {ChangeDetectionStrategy, Component, computed, effect, HostBinding, HostListener, inject, input, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {WorkbenchView} from '../../view/workbench-view.model';
+import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {PartId, WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
 import {toSignal} from '@angular/core/rxjs-interop';
+import {text} from '../../text/text';
 
 /**
  * Reference to inputs of {@link ViewListComponent}.
@@ -64,18 +65,18 @@ export class ViewListComponent {
   }
 
   constructor() {
-    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
     const filterText = toSignal(this.filterFormControl.valueChanges, {initialValue: this.filterFormControl.value});
+    const views = this._part.viewIds().map(viewId => new FilterableView(viewId));
 
-    this.viewsInsideTabbar = computed(() => this._part.viewIds()
-      .map(viewId => viewRegistry.get(viewId))
-      .filter(view => view.scrolledIntoView())
-      .filter(view => matchesView(filterText(), view)),
+    this.viewsInsideTabbar = computed(() => views
+      .filter(view => view.ref.scrolledIntoView())
+      .filter(view => view.matches(filterText()))
+      .map(view => view.ref),
     );
-    this.viewsOutsideTabbar = computed(() => this._part.viewIds()
-      .map(viewId => viewRegistry.get(viewId))
-      .filter(view => !view.scrolledIntoView())
-      .filter(view => matchesView(filterText(), view)),
+    this.viewsOutsideTabbar = computed(() => views
+      .filter(view => !view.ref.scrolledIntoView())
+      .filter(view => view.matches(filterText()))
+      .map(view => view.ref),
     );
 
     const effectRef = effect(() => {
@@ -108,18 +109,34 @@ export class ViewListComponent {
 }
 
 /**
- * Tests if given filter matches given view.
- */
-function matchesView(filterText: string, view: WorkbenchView): boolean {
-  const viewText = `${view.title() ?? ''} ${view.heading() ?? ''}`;
-  return !filterText || !!viewText.match(toFilterRegExp(filterText));
-}
-
-/**
  * Creates a regular expression of the given filter text.
  */
 function toFilterRegExp(filterText: string): RegExp {
   // Escape the user input
   const escapedString = filterText.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
   return new RegExp(escapedString, 'i');
+}
+
+/**
+ * Represents a {@link WorkbenchView} that can be filtered by its translated title and heading.
+ */
+class FilterableView {
+
+  public readonly ref: WorkbenchView;
+  private readonly _title: Signal<string | null>;
+  private readonly _heading: Signal<string | null>;
+
+  constructor(public readonly viewId: ViewId) {
+    this.ref = inject(WORKBENCH_VIEW_REGISTRY).get(viewId);
+    this._title = text(this.ref.title);
+    this._heading = text(this.ref.heading);
+  }
+
+  /**
+   * Checks if this view matches the specified filter text.
+   */
+  public matches(filterText: string): boolean {
+    const viewText = `${this._title() ?? ''} ${this._heading() ?? ''}`;
+    return !filterText || !!viewText.match(toFilterRegExp(filterText));
+  }
 }

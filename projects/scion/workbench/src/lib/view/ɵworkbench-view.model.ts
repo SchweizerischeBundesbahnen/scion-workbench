@@ -36,6 +36,7 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {Arrays, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -53,8 +54,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
 
-  private readonly _title = signal<string | null>(null);
-  private readonly _heading = signal<string | null>(null);
+  private readonly _title = signal<Translatable | null>(null);
+  private readonly _heading = signal<Translatable | null>(null);
   private readonly _dirty = signal(false);
   private readonly _closable = signal(true);
   private readonly _closableComputed = computed(() => this._closable() && !this._blockedBy());
@@ -166,22 +167,22 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public get title(): Signal<string | null> {
+  public get title(): Signal<Translatable | null> {
     return this._title;
   }
 
   /** @inheritDoc */
-  public set title(title: string | null) {
+  public set title(title: Translatable | null) {
     untracked(() => this._title.set(title));
   }
 
   /** @inheritDoc */
-  public get heading(): Signal<string | null> {
+  public get heading(): Signal<Translatable | null> {
     return this._heading;
   }
 
   /** @inheritDoc */
-  public set heading(heading: string | null) {
+  public set heading(heading: Translatable | null) {
     untracked(() => this._heading.set(heading));
   }
 

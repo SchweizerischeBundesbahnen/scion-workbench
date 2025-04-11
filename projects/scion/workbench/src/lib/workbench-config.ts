@@ -15,6 +15,7 @@ import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
 import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
+import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
 
 /**
  * Configuration of the SCION Workbench.
@@ -145,6 +146,42 @@ export abstract class WorkbenchConfig {
   };
 
   /**
+   * Provides texts to the SCION Workbench.
+   *
+   * A text provider is a function that returns the text for a translation key.
+   *
+   * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
+   * Otherwise, the text is returned as is.
+   *
+   * The SCION Workbench uses the following translation keys for built-in texts:
+   * - workbench.clear.tooltip
+   * - workbench.close.action
+   * - workbench.close_all_tabs.action
+   * - workbench.close_other_tabs.action
+   * - workbench.close_tab.action
+   * - workbench.close_tabs_to_the_left.action
+   * - workbench.close_tabs_to_the_right.action
+   * - workbench.close.tooltip
+   * - workbench.move_tab_down.action
+   * - workbench.move_tab_to_new_window.action
+   * - workbench.move_tab_to_the_left.action
+   * - workbench.move_tab_to_the_right.action
+   * - workbench.move_tab_up.action
+   * - workbench.ok.action
+   * - workbench.page_not_found.message
+   * - workbench.page_not_found.title
+   * - workbench.page_not_found_developer_hint.message
+   * - workbench.show_open_tabs.tooltip
+   *
+   * The function:
+   * - Can call `inject` to get any required dependencies.
+   * - Can call `toSignal` to convert an Observable to a Signal.
+   *
+   * @see WorkbenchTextProviderFn
+   */
+  public abstract textProvider?: WorkbenchTextProviderFn;
+
+  /**
    * Configures logging for the workbench.
    */
   public abstract logging?: {
@@ -164,20 +201,100 @@ export abstract class WorkbenchConfig {
 /**
  * Configuration of built-in menu items in the view's context menu.
  *
- * Each property represents a menu item, allowing customization of visibility, text, accelerators, and more.
+ * Each property represents a menu item, allowing customization of visibility, accelerators, and more.
  *
- * Set a built-in menu item to `false` to exclude it.
+ * Texts can be changed or localized using a {@link WorkbenchTextProviderFn text provider} passed to {@link provideWorkbench} via the workbench config object.
  */
 export interface ViewMenuItemsConfig {
+  /**
+   * Configures the menu item for closing a view tab.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.close_tab.action`
+   */
   close?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for closing other view tabs.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.close_other_tabs.action`
+   */
   closeOthers?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for closing all view tabs.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.close_all_tabs.action`
+   */
   closeAll?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for closing view tabs to the right.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.close_tabs_to_the_right.action`
+   */
   closeToTheRight?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for closing view tabs to the left.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.close_tabs_to_the_left.action`
+   */
   closeToTheLeft?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for moving a view up.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.move_tab_up.action`
+   */
   moveUp?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for moving a view to the right.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.move_tab_to_the_right.action`
+   */
   moveRight?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for moving a view down.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbenchworkbench.move_tab_down.action`
+   */
   moveDown?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for moving a view to the left.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.move_tab_to_the_left.action`
+   */
   moveLeft?: MenuItemConfig | false;
+  /**
+   * Configures the menu item for moving a view to a new window.
+   *
+   * Set to `false` to exclude it.
+   *
+   * The menu item text can be changed or localized using a {@link WorkbenchTextProviderFn}.
+   * Translation key: `workbench.move_tab_to_new_window.action`
+   */
   moveToNewWindow?: MenuItemConfig | false;
 }
 
@@ -195,6 +312,8 @@ export interface MenuItemConfig {
    * Can be a string or a function that returns a string or a {@link Signal}.
    *
    * The function can call `inject` to get any required dependencies, or use `toSignal` to convert an observable to a signal.
+   *
+   * @deprecated since version 19.0.0-beta.3. Register a text provider to change or localize menu item texts. Register the text provider via workbench configuration passed to the `provideWorkbench` function. API will be removed in version 21.
    */
   text?: string | (() => string | Signal<string>);
   accelerator?: string[];

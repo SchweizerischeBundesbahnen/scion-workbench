@@ -34,6 +34,7 @@ import {Blockable} from '../glass-pane/blockable';
 import {Blocking} from '../glass-pane/blocking';
 import {provideViewContext} from '../view/view-context-provider';
 import {boundingClientRect} from '@scion/components/dimension';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
@@ -47,7 +48,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _blink$ = new Subject<void>();
   private readonly _attached: Signal<boolean>;
-  private readonly _title = signal<string | undefined>(undefined);
+  private readonly _title = signal<Translatable | undefined>(undefined);
   private readonly _closable = signal(true);
   private readonly _resizable = signal(true);
   private readonly _padding = signal(true);
@@ -176,12 +177,12 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
   }
 
   /** @inheritDoc */
-  public get title(): Signal<string | undefined> {
+  public get title(): Signal<Translatable | undefined> {
     return this._title;
   }
 
   /** @inheritDoc */
-  public set title(title: string | undefined) {
+  public set title(title: Translatable | undefined) {
     untracked(() => this._title.set(title));
   }
 

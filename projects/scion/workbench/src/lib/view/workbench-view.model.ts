@@ -4,6 +4,7 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
 import {ViewOutlet} from '../workbench.constants';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Handle to interact with a view opened via {@link WorkbenchRouter}.
@@ -71,14 +72,14 @@ export abstract class WorkbenchView {
   /**
    * Title to be displayed in the view tab.
    */
-  public abstract get title(): Signal<string | null>;
-  public abstract set title(title: string | null);
+  public abstract get title(): Signal<Translatable | null>;
+  public abstract set title(title: Translatable | null);
 
   /**
    * Specifies the subtitle to be displayed in the view tab.
    */
-  public abstract get heading(): Signal<string | null>;
-  public abstract set heading(heading: string | null);
+  public abstract get heading(): Signal<Translatable | null>;
+  public abstract set heading(heading: Translatable | null);
 
   /**
    * Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.

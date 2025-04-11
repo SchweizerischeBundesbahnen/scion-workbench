@@ -11,11 +11,15 @@
 import {Component, computed, inject, isDevMode} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
+import {TextPipe} from '../text/text.pipe';
 
 @Component({
   selector: 'wb-page-not-found',
   templateUrl: './page-not-found.component.html',
   styleUrls: ['./page-not-found.component.scss'],
+  imports: [
+    TextPipe,
+  ],
 })
 export default class PageNotFoundComponent {
 

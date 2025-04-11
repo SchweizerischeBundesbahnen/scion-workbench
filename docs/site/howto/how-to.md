@@ -15,13 +15,13 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to install the SCION Workbench](how-to-install-workbench.md)
 - [How to start the SCION Workbench](how-to-start-workbench.md)
 
-#### Layout
+#### Workbench Layout
 - [How to define the initial workbench layout](how-to-define-initial-layout.md)
 - [How to modify the workbench layout](how-to-modify-layout.md)
 - [How to provide a perspective](how-to-provide-perspective.md)
 - [How to work with perspectives](how-to-perspective.md)
 
-#### View
+#### Workbench View
 - [How to provide a view](how-to-provide-view.md)
 - [How to open a view](how-to-open-view.md)
 - [How to interact with a view](how-to-interact-with-view.md)
@@ -30,23 +30,23 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to contribute to the view's context menu](how-to-provide-view-menu-item.md)
 - [How to provide a "Not Found" page](how-to-provide-not-found-page.md)
 
-#### Part
+#### Workbench Part
 - [How to display content in a part](how-to-navigate-part.md)
 - [How to provide a part action](how-to-provide-part-action.md)
 
-#### Desktop
+#### Workbench Desktop
 - [How to provide a desktop](how-to-provide-desktop.md)
 
-#### Dialog, Popup, Messagebox, Notification
+#### Other Workbench Elements
 - [How to open a dialog](how-to-open-dialog.md)
 - [How to open a popup](how-to-open-popup.md)
 - [How to open a message box](how-to-open-message-box.md)
 - [How to show a notification](how-to-show-notification.md)
  
-#### Theming & Icons
+#### Miscellaneous
 - [How to theme the SCION Workbench](how-to-theme-workbench.md)
+- [How to localize the SCION Workbench](how-to-localize.md)
 - [How to change the workbench icons](how-to-icons.md)
-
 
 ***
 

@@ -11,6 +11,7 @@ import {WorkbenchMessageBoxOptions} from './workbench-message-box.options';
 import {ComponentType} from '@angular/cdk/portal';
 import {Injectable} from '@angular/core';
 import {ɵWorkbenchMessageBoxService} from './ɵworkbench-message-box.service';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Provides a standardized dialog for presenting a message to the user, such as an info, warning or alert,
@@ -64,7 +65,7 @@ export abstract class WorkbenchMessageBoxService {
    * @param options - Controls the appearance and behavior of the message box.
    * @return Promise that resolves to the key of the action button that the user clicked to close the message box.
    */
-  public abstract open(message: string, options?: WorkbenchMessageBoxOptions): Promise<string>;
+  public abstract open(message: Translatable, options?: WorkbenchMessageBoxOptions): Promise<string>;
 
   /**
    * Displays the specified component in a message box.
