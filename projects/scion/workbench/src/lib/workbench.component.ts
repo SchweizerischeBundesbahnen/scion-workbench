@@ -52,7 +52,7 @@ export class WorkbenchComponent {
   private _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
 
   /** Splash to display during workbench startup. */
-  protected splash = inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
+  protected splash = inject(WorkbenchConfig).splashComponent ?? inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
   protected workbenchStartup = inject(WorkbenchStartup);
 
   constructor() {
