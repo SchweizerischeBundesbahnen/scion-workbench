@@ -62,6 +62,42 @@ provideWorkbench({
 
 > The `AuthService` is illustrative and not part of the Workbench API. 
 
+### How to determine if perspective can be activated
+A `canActivate` function can be configured to determine if the perspective can be activated, for example based on the user's permissions.
+
+```ts
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideWorkbench({
+      layout: {
+        perspectives: [
+          {
+            id: 'admin',
+            layout: (factory: WorkbenchLayoutFactory) => {...},
+            data: {
+              label: 'Administrator',
+            },
+            canActivate: () => inject(AuthService).hasRole('admin'),
+          },
+          {
+            id: 'manager',
+            layout: (factory: WorkbenchLayoutFactory) => {...},
+            data: {
+              label: 'Manager',
+            },
+          },
+        ],
+      },
+    }),
+  ],
+});
+```
+
+> The `AuthService` is illustrative and not part of the Workbench API.
+
 [link-how-to-provide-perspective]: /docs/site/howto/how-to-provide-perspective.md
 
 [menu-how-to]: /docs/site/howto/how-to.md
