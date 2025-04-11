@@ -5,7 +5,7 @@
           (keydown.arrowRight)="onArrowKey($index, 'right')"
           [attr.data-action]="action.key"
           class="action e2e-action">
-    {{action.value}}
+    {{(action.value | wbText)()}}
   </button>
 
   @if (!$last) {

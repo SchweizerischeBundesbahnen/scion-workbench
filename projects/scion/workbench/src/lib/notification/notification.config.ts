@@ -11,6 +11,7 @@
 import {Injector, ViewContainerRef} from '@angular/core';
 import {ComponentType} from '@angular/cdk/portal';
 import {Observable} from 'rxjs';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Configures the content and appearance of a notification presented to the user.
@@ -26,7 +27,7 @@ export interface NotificationConfig {
   /**
    * Optional title of the notification; can be a string literal or an Observable.
    */
-  title?: string | Observable<string>;
+  title?: Translatable | Observable<string>;
 
   /**
    * Content of the notification, can be either a plain text message or a component.
@@ -34,7 +35,7 @@ export interface NotificationConfig {
    * Consider using a component when displaying structured content. You can pass data to the component using the
    * {@link componentInput} property or by providing a custom injector in {@link componentConstructOptions.injector}.
    */
-  content: string | ComponentType<unknown>;
+  content: Translatable | ComponentType<unknown>;
 
   /**
    * If using a component as the notification content, optionally instruct Angular how to construct the component.

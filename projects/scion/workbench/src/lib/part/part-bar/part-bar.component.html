@@ -26,6 +26,6 @@
 
 <!-- View List Dropdown -->
 @if (part.viewIds().length) {
-  <wb-view-list-button/>
+  <wb-view-list-button [title]="('%workbench.show_open_tabs.tooltip' | wbText)()"/>
 }
 

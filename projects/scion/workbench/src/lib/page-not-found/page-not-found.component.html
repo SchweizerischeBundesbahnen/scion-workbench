@@ -1,17 +1,13 @@
-<header>Page Not Found</header>
+<header>{{('%workbench.page_not_found.title' | wbText)()}}</header>
 
-<section class="message">
-  The requested page <span class="path">{{path()}}</span> was not found.
-  <br>
-  The URL may have changed. Try to open the page again.
-</section>
+@let message = '%workbench.page_not_found.message;path=' + path() | wbText;
+<section class="message" [innerHTML]="message()"></section>
 
 @if (view) {
-  <button (click)="view.close()">Close</button>
+  <button (click)="view.close()">{{('%workbench.close.action' | wbText)()}}</button>
 }
 
 @if (isDevMode) {
-  <section class="developer-hint">
-    You can create a custom "Not Found" page component and register it in the workbench configuration to personalize this page.
-  </section>
+  @let hint = '%workbench.page_not_found_developer_hint.message' | wbText;
+  <section class="developer-hint">{{hint()}}</section>
 }

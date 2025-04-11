@@ -9,6 +9,7 @@
  */
 
 import {signal, Signal, untracked} from '@angular/core';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Handle to interact with a dialog opened via {@link WorkbenchDialogService}.
@@ -22,8 +23,8 @@ export abstract class WorkbenchDialog<R = unknown> {
   /**
    * Sets the title of the dialog.
    */
-  public abstract get title(): Signal<string | undefined>;
-  public abstract set title(title: string | undefined);
+  public abstract get title(): Signal<Translatable | undefined>;
+  public abstract set title(title: Translatable | undefined);
 
   /**
    * Specifies the preferred dialog size.

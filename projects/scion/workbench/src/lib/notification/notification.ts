@@ -9,6 +9,7 @@
  */
 
 import {Observable} from 'rxjs';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Represents a handle that a notification component can inject to interact with the notification, for example,
@@ -27,7 +28,7 @@ export abstract class Notification<T = any> {
   /**
    * Sets the title of the notification; can be a string literal or an Observable.
    */
-  public abstract setTitle(title: string | undefined | Observable<string | undefined>): void;
+  public abstract setTitle(title: Translatable | undefined | Observable<string | undefined>): void;
 
   /**
    * Sets the severity of the notification.

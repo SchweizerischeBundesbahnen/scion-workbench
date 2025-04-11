@@ -20,6 +20,7 @@ import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
 import {MAIN_AREA} from '../../layout/workbench-layout';
+import {TextPipe} from '../../text/text.pipe';
 
 /**
  * @see ViewTabComponent
@@ -33,6 +34,7 @@ import {MAIN_AREA} from '../../layout/workbench-layout';
   ],
   imports: [
     PortalModule,
+    TextPipe,
   ],
 })
 export class ViewTabDragImageComponent {

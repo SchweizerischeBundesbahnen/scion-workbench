@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {effect, ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, signal, Signal, untracked} from '@angular/core';
+import {effect, ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
@@ -166,10 +166,9 @@ export class ViewMenuService {
 
   private registerCloseMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Close');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.close_tab.action'},
         accelerator: config.accelerator ?? ['ctrl', 'k'],
         group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close',
@@ -181,10 +180,9 @@ export class ViewMenuService {
 
   private registerCloseOtherTabsMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Close other tabs');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.close_other_tabs.action'},
         accelerator: config.accelerator ?? ['ctrl', 'shift', 'k'],
         group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close-other-tabs',
@@ -196,10 +194,9 @@ export class ViewMenuService {
 
   private registerCloseAllTabsMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Close all tabs');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.close_all_tabs.action'},
         accelerator: config.accelerator ?? ['ctrl', 'shift', 'alt', 'k'],
         group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close-all-tabs',
@@ -210,10 +207,9 @@ export class ViewMenuService {
 
   private registerCloseRightTabsMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Close tabs to the right');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.close_tabs_to_the_right.action'},
         group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close-right-tabs',
         disabled: view.last(),
@@ -224,10 +220,9 @@ export class ViewMenuService {
 
   private registerCloseLeftTabsMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Close tabs to the left');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.close_tabs_to_the_left.action'},
         group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close-left-tabs',
         disabled: view.first(),
@@ -238,10 +233,9 @@ export class ViewMenuService {
 
   private registerMoveRightMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Move right');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.move_tab_to_the_right.action'},
         accelerator: ['ctrl', 'alt', 'end'],
         group: config.group ?? 'move',
         cssClass: config.cssClass ?? 'e2e-move-right',
@@ -253,10 +247,9 @@ export class ViewMenuService {
 
   private registerMoveLeftMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Move left');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.move_tab_to_the_left.action'},
         group: config.group ?? 'move',
         cssClass: config.cssClass ?? 'e2e-move-left',
         disabled: view.first() && view.last(),
@@ -267,10 +260,9 @@ export class ViewMenuService {
 
   private registerMoveUpMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Move up');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.move_tab_up.action'},
         group: config.group ?? 'move',
         cssClass: config.cssClass ?? 'e2e-move-up',
         disabled: view.first() && view.last(),
@@ -281,10 +273,9 @@ export class ViewMenuService {
 
   private registerMoveDownMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Move down');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.move_tab_down.action'},
         group: config.group ?? 'move',
         cssClass: config.cssClass ?? 'e2e-move-down',
         disabled: view.first() && view.last(),
@@ -295,10 +286,9 @@ export class ViewMenuService {
 
   private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      const text = toTextSignal(config.text ?? 'Move to new window');
       this._workbenchService.registerViewMenuItem(view => ({
         content: TextComponent,
-        inputs: {text: text()},
+        inputs: {text: '%workbench.move_tab_to_new_window.action'},
         group: config.group ?? 'open',
         cssClass: config.cssClass ?? 'e2e-move-to-new-window',
         onAction: () => view.move('new-window'),
@@ -312,11 +302,6 @@ export class ViewMenuService {
  */
 function isEnabled(config: MenuItemConfig | false): config is MenuItemConfig {
   return config && (config.visible ?? true);
-}
-
-function toTextSignal(value: string | (() => string | Signal<string>)): Signal<string> {
-  const text = typeof value === 'function' ? value() : value;
-  return isSignal(text) ? text : signal(text);
 }
 
 /**

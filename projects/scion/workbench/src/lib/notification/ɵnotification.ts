@@ -14,11 +14,12 @@ import {Arrays} from '@scion/toolkit/util';
 import {Notification} from './notification';
 import {NotificationConfig} from './notification.config';
 import {TextNotificationComponent} from './text-notification.component';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 export class ɵNotification implements Notification {
 
   public readonly input: unknown;
-  public readonly title$: BehaviorSubject<string | undefined | Observable<string>>;
+  public readonly title$: BehaviorSubject<Translatable | undefined | Observable<string>>;
   public readonly severity$: BehaviorSubject<'info' | 'warn' | 'error'>;
   public readonly duration$: BehaviorSubject<'short' | 'medium' | 'long' | 'infinite' | number>;
   public readonly cssClass$: BehaviorSubject<string[]>;
@@ -39,7 +40,7 @@ export class ɵNotification implements Notification {
     }
   }
 
-  public setTitle(title: string | undefined | Observable<string>): void {
+  public setTitle(title: Translatable | undefined | Observable<string>): void {
     this.title$.next(title);
   }
 

@@ -16,6 +16,7 @@ import {ViewListButtonComponent} from '../view-list-button/view-list-button.comp
 import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
 import {NgClass} from '@angular/common';
+import {TextPipe} from '../../text/text.pipe';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -31,6 +32,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
     PartActionComponent,
     ViewListButtonComponent,
     NgClass,
+    TextPipe,
   ],
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},
