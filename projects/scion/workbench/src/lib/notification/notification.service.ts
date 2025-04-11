@@ -17,6 +17,7 @@ import {filter, map} from 'rxjs/operators';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Allows displaying a notification to the user.
@@ -56,7 +57,7 @@ export class NotificationService {
    *
    * @param  notification - Configures the content and appearance of the notification.
    */
-  public notify(notification: string | NotificationConfig): void {
+  public notify(notification: Translatable | NotificationConfig): void {
     assertNotInReactiveContext(this.notify, 'Call NotificationService.notify() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the notification even when called from outside the Angular zone, e.g. from an error handler.

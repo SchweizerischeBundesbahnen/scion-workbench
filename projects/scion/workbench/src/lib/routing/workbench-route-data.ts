@@ -17,11 +17,15 @@ export const WorkbenchRouteData = {
 
   /**
    * Property to set the title of a view in {@link Route.data}.
+   *
+   * Use a {@link Translatable} to localize the title.
    */
   title: 'ɵworkbenchViewTitle',
 
   /**
    * Property to set the heading of a view in {@link Route.data}.
+   *
+   * Use a {@link Translatable} to localize the heading.
    */
   heading: 'ɵworkbenchViewHeading',
 

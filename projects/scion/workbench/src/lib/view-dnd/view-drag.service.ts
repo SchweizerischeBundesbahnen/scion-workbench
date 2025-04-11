@@ -18,6 +18,7 @@ import {ViewId, WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {PartId} from '../part/workbench-part.model';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * Coordinates cross application drag and drop of views.
@@ -287,8 +288,8 @@ export interface ViewDragData {
   viewTabPointerOffsetY: number;
   viewId: ViewId;
   alternativeViewId?: string;
-  viewTitle: string | null;
-  viewHeading: string | null;
+  viewTitle: Translatable | null;
+  viewHeading: Translatable | null;
   navigation?: Omit<WorkbenchViewNavigation, 'id' | 'state'>;
   viewClosable: boolean;
   viewDirty: boolean;

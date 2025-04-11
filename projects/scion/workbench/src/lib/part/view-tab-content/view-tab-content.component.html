@@ -2,11 +2,11 @@
   @if (view.dirty()) {
     <span class="scion-workbench-icons dirty e2e-dirty">dirty</span>
   }
-  {{view.title()}}
+  {{(view.title() | wbText)()}}
 </span>
 
 @if (view.heading()) {
   <span class="heading e2e-heading">
-    {{view.heading()}}
+    {{(view.heading() | wbText)()}}
   </span>
 }

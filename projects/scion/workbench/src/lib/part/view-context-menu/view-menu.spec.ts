@@ -9,7 +9,7 @@
  */
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {By} from '@angular/platform-browser';
 import {Component, DebugElement, effect, inject, InjectionToken, Injector, input, signal, TemplateRef, viewChild} from '@angular/core';
 import {expect} from '../../testing/jasmine/matcher/custom-matchers.definition';
@@ -891,7 +891,52 @@ describe('View Menu', () => {
 
   describe('Built-in view menu items', () => {
 
-    it('should display configured text (string)', async () => {
+    it('should translate menu items', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart('part.part')
+              .addView('view.100', {partId: 'part.part'}),
+            textProvider: key => texts[key],
+          }),
+        ],
+      });
+
+      const texts: Record<string, string> = {
+        'workbench.close_tab.action': 'CLOSE',
+        'workbench.close_other_tabs.action': 'CLOSE OTHER TABS',
+        'workbench.close_all_tabs.action': 'CLOSE ALL TABS',
+        'workbench.close_tabs_to_the_right.action': 'CLOSE TABS TO THE RIGHT',
+        'workbench.close_tabs_to_the_left.action': 'CLOSE TABS TO THE LEFT',
+        'workbench.move_tab_to_the_right.action': 'MOVE RIGHT',
+        'workbench.move_tab_to_the_left.action': 'MOVE LEFT',
+        'workbench.move_tab_up.action': 'MOVE UP',
+        'workbench.move_tab_down.action': 'MOVE DOWN',
+        'workbench.move_tab_to_new_window.action': 'MOVE TO NEW WINDOW',
+      };
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Open view context menu.
+      const contextMenu = await openViewContextMenu(fixture, {viewId: 'view.100'});
+
+      // Expect menu items to be translated.
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-close'})).toEqual('CLOSE');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-close-other-tabs'})).toEqual('CLOSE OTHER TABS');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-close-all-tabs'})).toEqual('CLOSE ALL TABS');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-close-right-tabs'})).toEqual('CLOSE TABS TO THE RIGHT');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-close-left-tabs'})).toEqual('CLOSE TABS TO THE LEFT');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-right'})).toEqual('MOVE RIGHT');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-left'})).toEqual('MOVE LEFT');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-up'})).toEqual('MOVE UP');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-down'})).toEqual('MOVE DOWN');
+      expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-to-new-window'})).toEqual('MOVE TO NEW WINDOW');
+    });
+
+    // @deprecated since version 19.0.0-beta.3. Remove when dropping support for {@link MenuItemConfig.text}.
+    it('should display configured text (string) (legacy)', async () => {
       TestBed.configureTestingModule({
         providers: [
           provideWorkbenchForTest({
@@ -931,7 +976,8 @@ describe('View Menu', () => {
       expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-to-new-window'})).toEqual('moveToNewWindow-testee');
     });
 
-    it('should display configured text (() => string))', async () => {
+    // @deprecated since version 19.0.0-beta.3. Remove when dropping support for {@link MenuItemConfig.text}.
+    it('should display configured text (() => string)) (legacy)', async () => {
       TestBed.configureTestingModule({
         providers: [
           provideWorkbenchForTest({
@@ -971,7 +1017,8 @@ describe('View Menu', () => {
       expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-to-new-window'})).toEqual('moveToNewWindow-testee');
     });
 
-    it('should display configured text (() => Signal))', async () => {
+    // @deprecated since version 19.0.0-beta.3. Remove when dropping support for {@link MenuItemConfig.text}.
+    it('should display configured text (() => Signal)) (legacy)', async () => {
       TestBed.configureTestingModule({
         providers: [
           provideWorkbenchForTest({
@@ -1011,7 +1058,8 @@ describe('View Menu', () => {
       expect(getMenuItemText(contextMenu, {cssClass: 'e2e-move-to-new-window'})).toEqual('moveToNewWindow-testee');
     });
 
-    it('should display text provided as Observable (() => Signal))', async () => {
+    // @deprecated since version 19.0.0-beta.3. Remove when dropping support for {@link MenuItemConfig.text}.
+    it('should display text provided as Observable (() => Signal)) (legacy)', async () => {
       const closeText$ = new BehaviorSubject('close-testee-1');
       const closeOthersText$ = new BehaviorSubject('closeOthers-testee-1');
       const closeAllText$ = new BehaviorSubject('closeAll-testee-1');

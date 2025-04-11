@@ -27,6 +27,7 @@ import {WORKBENCH_ID} from '../../workbench-id';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {synchronizeCssClasses} from '../../common/css-class.util';
+import {TextPipe} from '../../text/text.pipe';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -39,6 +40,7 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
   styleUrls: ['./view-tab.component.scss'],
   imports: [
     PortalModule,
+    TextPipe,
   ],
 })
 export class ViewTabComponent {

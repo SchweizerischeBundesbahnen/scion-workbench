@@ -17,8 +17,9 @@
 }
 
 @if (view().closable()) {
-  <button class="close e2e-close scion-workbench-icons"
-          (click)="onClose($event)">
+  <button (click)="onClose($event)"
+          [title]="('%workbench.close.tooltip' | wbText)()"
+          class="close e2e-close scion-workbench-icons">
     close
   </button>
 }

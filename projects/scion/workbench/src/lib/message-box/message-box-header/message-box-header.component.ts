@@ -8,17 +8,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Component, input} from '@angular/core';
+import {Translatable} from '../../text/workbench-text-provider.model';
+import {TextPipe} from '../../text/text.pipe';
 
 @Component({
   selector: 'wb-message-box-header',
   templateUrl: './message-box-header.component.html',
   styleUrls: ['./message-box-header.component.scss'],
+  imports: [
+    TextPipe,
+  ],
   host: {
     '[attr.data-severity]': 'severity()',
   },
 })
 export class MessageBoxHeaderComponent {
 
-  public readonly title = input<string>();
+  public readonly title = input<Translatable>();
   public readonly severity = input.required<'info' | 'warn' | 'error'>();
 }

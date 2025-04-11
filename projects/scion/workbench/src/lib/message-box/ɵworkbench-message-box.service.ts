@@ -13,6 +13,7 @@ import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchMessageBoxComponent} from './workbench-message-box.component';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchMessageBoxService} from './workbench-message-box.service';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -24,7 +25,7 @@ export class ɵWorkbenchMessageBoxService implements WorkbenchMessageBoxService 
   /**
    * @inheritDoc
    */
-  public async open(message: string | ComponentType<unknown>, options?: WorkbenchMessageBoxOptions): Promise<string> {
+  public async open(message: Translatable | ComponentType<unknown>, options?: WorkbenchMessageBoxOptions): Promise<string> {
     assertNotInReactiveContext(this.open, 'Call WorkbenchMessageBoxService.open() in a non-reactive (non-tracking) context, such as within the untracked() function.');
 
     // Ensure to run in Angular zone to display the message box even if called from outside the Angular zone, e.g. from an error handler.
