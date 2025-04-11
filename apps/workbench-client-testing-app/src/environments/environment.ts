@@ -18,7 +18,7 @@
 // import 'zone.js/plugins/zone-error';  // Included with Angular CLI.
 
 /**
- * Environment used when starting the app locally.
+ * Environment used if starting the app locally.
  */
 export const environment = {
   animationEnabled: false,

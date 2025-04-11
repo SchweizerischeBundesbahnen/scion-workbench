@@ -25,7 +25,8 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-Starting the workbench in an app initializer will block Angular's app startup until the workbench is ready.
+> [!NOTE]
+> Starting the workbench in an app initializer will block Angular's app startup until the workbench is ready.
 
 #### Startup Progress
 The application can inject `WorkbenchStartup` to check if the workbench has completed startup.
@@ -50,7 +51,7 @@ import {Component} from '@angular/core';
 bootstrapApplication(AppComponent, {
   providers: [
     provideWorkbench({
-      startup: {splash: CustomSplashComponent}
+      splashComponent: CustomSplashComponent
     })
   ],
 });

@@ -44,7 +44,7 @@ Make sure to use Node.js version `22.11.0` for contributing to SCION. We recomme
 
 **Disable Angular Cache**
 
-When working with the workbench testing application, we recommend disabling the Angular cache because we have experienced unexpected caching errors when starting multiple applications at once.
+When working with the workbench testing application, we recommend disabling the Angular cache because we have experienced unexpected caching errors if starting multiple applications at once.
 ```console
 ng cache disable
 ```
