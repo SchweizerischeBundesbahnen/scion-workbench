@@ -34,7 +34,7 @@ test.describe('Workbench Lifecycle Hook', () => {
     ]);
   });
 
-  test('should not invoke microfrontend-related lifecycle hooks when starting the workbench with microfrontend support disabled [microfrontendSupport=disabled]', async ({appPO, consoleLogs}) => {
+  test('should not invoke microfrontend-related lifecycle hooks if starting the workbench with microfrontend support disabled [microfrontendSupport=disabled]', async ({appPO, consoleLogs}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await expect.poll(() => consoleLogs.get({severity: 'debug', message: /WorkbenchLifecycleHookLogger/})).toEqual([

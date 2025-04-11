@@ -44,10 +44,10 @@ import {SciTabbarComponent, SciTabDirective} from '@scion/components.internal/ta
 export default class StartPageComponent {
 
   private readonly _view = inject(WorkbenchView, {optional: true}); // not available on entry point page
-  private readonly _workbenchClientRouter = inject(WorkbenchClientRouter, {optional: true}); // not available when starting the workbench standalone
-  private readonly _intentClient = inject(IntentClient, {optional: true}); // not available when starting the workbench standalone
-  private readonly _manifestService = inject(ManifestService, {optional: true}); // not available when starting the workbench standalone
-  private readonly _workbenchClientPopupService = inject(WorkbenchClientPopupService, {optional: true}); // not available when starting the workbench standalone
+  private readonly _workbenchClientRouter = inject(WorkbenchClientRouter, {optional: true}); // not available if starting the workbench standalone
+  private readonly _intentClient = inject(IntentClient, {optional: true}); // not available if starting the workbench standalone
+  private readonly _manifestService = inject(ManifestService, {optional: true}); // not available if starting the workbench standalone
+  private readonly _workbenchClientPopupService = inject(WorkbenchClientPopupService, {optional: true}); // not available if starting the workbench standalone
   private readonly _workbenchService = inject(WorkbenchService);
   private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _cd = inject(ChangeDetectorRef);

@@ -58,6 +58,44 @@ import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.
  *   ],
  * });
  * ```
+ *
+ * ### Startup
+ * The SCION Workbench starts automatically when the `<wb-workbench>` component is added to the DOM. Alternatively, the workbench can be
+ * started manually using the {@link WorkbenchLauncher}, such as in an app initializer or a route guard.
+ *
+ * Example of starting the workbench in an app initializer:
+ *
+ * ```ts
+ * import {provideWorkbench, WorkbenchLauncher} from '@scion/workbench';
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {inject, provideAppInitializer} from '@angular/core';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideWorkbench(),
+ *     provideAppInitializer(() => inject(WorkbenchLauncher).launch())
+ *   ]
+ * });
+ * ```
+ *
+ * Starting the workbench in an app initializer will block Angular's app startup until the workbench is ready.
+ *
+ * ### Startup Hooks
+ * The application can hook into the startup process of the SCION Workbench by providing one or more initializers to the `provideWorkbenchInitializer()` function.
+ * Initializers execute at defined points during startup, enabling the application's controlled initialization.
+ *
+ * ```ts
+ * import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {inject} from '@angular/core';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideWorkbench(),
+ *     provideWorkbenchInitializer(() => inject(SomeService).init()),
+ *   ],
+ * });
+ * ```
  */
 export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders {
   config ??= {};
