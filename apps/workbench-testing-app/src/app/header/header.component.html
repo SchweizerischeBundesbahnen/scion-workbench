@@ -2,7 +2,7 @@
 @let activePerspective = workbenchService.activePerspective()!;
 <button (click)="onPerspectiveSwitcherMenuOpen(perspective_switcher_menu_button)"
         title="Switch Perspective"
-        class="e2e-perspective-switcher-menu-button perspective-switcher menu-button" [class.open]="perspectiveSwitcherMenuOpen()"
+        class="e2e-perspective-switcher-menu-button perspective-switcher" [class.menu-open]="perspectiveSwitcherMenuOpen()"
         #perspective_switcher_menu_button>
   {{activePerspective.data[PerspectiveData.label] ?? activePerspective.id}}
   <span sciMaterialIcon>keyboard_arrow_down</span>
@@ -12,18 +12,18 @@
 
 <!-- Theme Switcher -->
 <div class="theme-switcher">
-  <button (click)="onActivateDarkTheme()" class="menu-button">
-    <span sciMaterialIcon>dark_mode</span>
+  <button (click)="onActivateDarkTheme()" sciMaterialIcon>
+    dark_mode
   </button>
   <sci-toggle-button [formControl]="lightThemeActiveFormControl" class="e2e-color-scheme"/>
-  <button (click)="onActivateLightTheme()" class="menu-button">
-    <span sciMaterialIcon>light_mode</span>
+  <button (click)="onActivateLightTheme()" sciMaterialIcon>
+    light_mode
   </button>
 </div>
 
 <!-- Settings Menu -->
 <button (click)="onSettingsMenuOpen(settings_menu_button)"
-        class="e2e-settings-menu-button settings menu-button" [class.open]="settingsMenuOpen()"
-        #settings_menu_button>
-  <span sciMaterialIcon>more_vert</span>
+        class="e2e-settings-menu-button settings" [class.menu-open]="settingsMenuOpen()"
+        #settings_menu_button sciMaterialIcon>
+  more_vert
 </button>

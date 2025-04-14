@@ -261,6 +261,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
       const urlSegments = Routing.commandsToSegments(commands, {relativeTo: extras.relativeTo});
       return layout
         .views({
+          peripheral: extras.partId ? undefined : false,
           partId: extras.partId,
           segments: new UrlSegmentMatcher(urlSegments, {matchMatrixParams: false, matchWildcardPath: true}),
           navigationHint: extras.hint ?? null,
@@ -395,15 +396,15 @@ function computeNavigationCommands(currentOutlets: Outlets, newOutlets: Outlets)
   const outlets = new Set<WorkbenchOutlet>([...currentOutletMap.keys(), ...newOutletMap.keys()]);
 
   outlets.forEach(outlet => {
-    // Test if the outlet was added to the layout.
+    // Test if the outlet has been added to the layout.
     if (!currentOutletMap.has(outlet)) {
       commands.set(outlet, Routing.segmentsToCommands(newOutletMap.get(outlet)!));
     }
-    // Test if the outlet was removed from the layout.
+    // Test if the outlet has been removed from the layout.
     else if (!newOutletMap.has(outlet)) {
       commands.set(outlet, null);
     }
-    // Test if the outlet was changed.
+    // Test if the outlet has been changed.
     else if (!new UrlSegmentMatcher(currentOutletMap.get(outlet)!, {matchMatrixParams: true, matchWildcardPath: false}).matches(newOutletMap.get(outlet)!)) {
       commands.set(outlet, Routing.segmentsToCommands(newOutletMap.get(outlet)!));
     }

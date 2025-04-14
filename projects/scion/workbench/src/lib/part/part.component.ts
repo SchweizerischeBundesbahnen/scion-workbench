@@ -9,7 +9,6 @@
  */
 
 import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnInit, untracked} from '@angular/core';
-import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
@@ -18,7 +17,6 @@ import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
 import {ViewPortalPipe} from '../view/view-portal.pipe';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
@@ -26,6 +24,7 @@ import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
 import {PartId} from './workbench-part.model';
 import {dasherize} from '../common/dasherize.util';
+import {FocusTracker, registerFocusTracker} from '../focus/focus-tracker.service';
 
 @Component({
   selector: 'wb-part',
@@ -71,9 +70,11 @@ export class PartComponent implements OnInit {
 
   constructor() {
     this.installComponentLifecycleLogger();
-    this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
     this.addHostCssClasses();
+    this.activateOnFocus();
+    this.focusIfActive();
+    registerFocusTracker(inject(ElementRef).nativeElement, this.part.id);
   }
 
   public ngOnInit(): void {
@@ -122,19 +123,30 @@ export class PartComponent implements OnInit {
   }
 
   /**
+   * Focuses this part if active.
+   */
+  public focusIfActive(): void {
+    const host = inject(ElementRef).nativeElement as HTMLElement;
+    if (!this.part.active()) {
+      return;
+    }
+
+    requestAnimationFrame(() => host.focus());
+  }
+
+  /**
    * Activates this part when it gains focus.
    */
-  private activatePartOnFocusIn(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-
-    toObservable(this.part.active)
-      .pipe(
-        switchMap(active => active ? EMPTY : merge(fromEvent<FocusEvent>(host, 'focusin', {once: true}), fromEvent(host, 'sci-microfrontend-focusin', {once: true}))),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        void this.part.activate();
+  private activateOnFocus(): void {
+    const focusTracker = inject(FocusTracker);
+    effect(() => {
+      const activeElement = focusTracker.activeElement();
+      untracked(() => {
+        if (activeElement === this.part.id) {
+          void this.part.activate();
+        }
       });
+    });
   }
 
   private addHostCssClasses(): void {

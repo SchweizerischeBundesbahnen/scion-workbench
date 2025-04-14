@@ -10,3 +10,36 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+/**
+ * Styles a flat button.
+ *
+ * Content is included at the end, allowing for additional styles or overrides.
+ */
+@mixin flat-button {
+  all: unset;
+  display: inline-grid;
+  place-content: center;
+  place-items: center;
+  padding: .25em;
+  user-select: none;
+  border-radius: var(--sci-corner);
+
+  &:hover {
+    background-color: var(--sci-workbench-button-background-color-hover);
+  }
+
+  &:active {
+    background-color: var(--sci-workbench-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sci-color-accent);
+  }
+
+  @content;
+}

@@ -1,3 +1,5 @@
+@use '../common/workbench-mixins';
+
 :host {
   display: inline-flex;
   flex-direction: row;
@@ -22,14 +24,13 @@
   }
 
   > button.clear {
-    all: unset;
-    flex: none;
-    align-self: center;
-    opacity: .75;
-    cursor: pointer;
+    @include workbench-mixins.flat-button() {
+      flex: none;
+      align-self: center;
 
-    &:hover {
-      opacity: 1;
+      &:not(:hover) {
+        opacity: .75;
+      }
     }
   }
 

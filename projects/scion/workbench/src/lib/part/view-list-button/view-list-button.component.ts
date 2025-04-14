@@ -21,6 +21,7 @@ import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
   styleUrls: ['./view-list-button.component.scss'],
   host: {
     '[class.active]': 'active()',
+    '[attr.tabindex]': '0',
   },
 })
 export class ViewListButtonComponent {
@@ -46,6 +47,8 @@ export class ViewListButtonComponent {
   }
 
   @HostListener('click')
+  @HostListener('keydown.enter')
+  @HostListener('keydown.space')
   protected onClick(): void {
     this.active.set(true);
     void this.openMenu().finally(() => this.active.set(false));

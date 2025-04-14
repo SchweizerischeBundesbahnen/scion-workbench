@@ -61,19 +61,7 @@
       background-color: var(--sci-color-background-elevation); // to cover the content of the menu item when the actions overlay the menu item content
 
       > button {
-        all: unset;
-        display: flex;
-        align-items: center;
-        padding: .25em;
-        border-radius: var(--sci-corner);
-
-        > span {
-          font-size: 1.5em;
-        }
-
-        &:hover {
-          background-color: var(--sci-color-background-secondary-hover);
-        }
+        font-size: 1.5em;
       }
     }
 

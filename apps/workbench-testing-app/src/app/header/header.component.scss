@@ -3,18 +3,24 @@
   align-items: stretch;
   padding: .5em;
   user-select: none;
+  gap: .25em;
 
   > button.perspective-switcher {
+    all: unset;
     flex: none;
-    padding: .25em .5em .25em .75em;
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    padding: .4em .5em .4em .75em;
+    border-radius: var(--sci-corner);
     background-color: var(--sci-color-accent);
     color: var(--sci-color-background-accent);
 
     > span {
-      font-size: 16px;
+      font-size: 20px;
     }
 
-    &:hover, &.open {
+    &:hover, &.menu-open {
       background-color: color-mix(in srgb, var(--sci-color-accent) 95%, var(--sci-static-color-black));
     }
   }
@@ -36,18 +42,5 @@
 
   > button.settings {
     flex: none;
-  }
-
-  button:where(.menu-button) {
-    all: unset;
-    display: flex;
-    align-items: center;
-    gap: .5em;
-    padding: .25em;
-    border-radius: var(--sci-corner);
-
-    &:hover, &.open {
-      background-color: var(--sci-color-background-secondary-hover);
-    }
   }
 }

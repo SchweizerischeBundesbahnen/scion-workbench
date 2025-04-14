@@ -60,17 +60,9 @@
   }
 
   > button.minimize {
-    all: unset;
-    flex: none;
-    align-self: center;
-    display: grid;
-    place-content: center;
-    padding: .25em;
-    user-select: none;
-    border-radius: var(--sci-corner);
-
-    &:hover, &:active {
-      background-color: var(--sci-color-background-secondary-hover);
+    @include workbench-mixins.flat-button() {
+      flex: none;
+      align-self: center;
     }
   }
 

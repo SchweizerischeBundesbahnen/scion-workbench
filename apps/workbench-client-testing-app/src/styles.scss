@@ -26,12 +26,43 @@ a {
   @include sci-design.style-link();
 }
 
+// TODO [Angular 20] Change style in @scion/components.internal
 button[class*="material-icons"], button[class*="material-symbols"] {
-  @include sci-design.style-mat-icon-button();
+  display: inline-grid;
+  place-content: center;
+  place-items: center;
+  padding: .125em;
+  font-size: 20px;
+  border-radius: var(--sci-corner);
+  border: unset;
+  background-color: unset;
+
+  &:hover, &.menu-open {
+    background-color: var(--sci-workbench-button-background-color-hover);
+  }
+
+  &:active {
+    background-color: var(--sci-workbench-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sci-color-accent);
+  }
 }
 
+// TODO [Angular 20] Change style in @scion/components.internal
 button:not([class*="material-icons"]):not([class*="material-symbols"]) {
   @include sci-design.style-button();
+  cursor: auto;
+}
+
+// TODO [Angular 20] Change style in @scion/components.internal
+:where(sci-checkbox, sci-toggle-button) label {
+  cursor: auto !important;
 }
 
 // Install Angular CDK styles

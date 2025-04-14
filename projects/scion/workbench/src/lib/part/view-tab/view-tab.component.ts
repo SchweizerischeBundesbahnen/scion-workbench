@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostBinding, HostListener, inject, Injector, input, Signal} from '@angular/core';
+import {Component, computed, effect, ElementRef, HostBinding, HostListener, inject, Injector, input, Signal, untracked} from '@angular/core';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
@@ -22,6 +22,7 @@ import {WORKBENCH_ID} from '../../workbench-id';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {synchronizeCssClasses} from '../../common/css-class.util';
+import {FocusTracker, registerFocusTracker} from '../../focus/focus-tracker.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -37,6 +38,7 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
   ],
   host: {
     '[class.view-drag]': 'viewDragService.dragging()',
+    '[class.focus-within-view]': 'focusTracker.activeElement() === view().id',
   },
 })
 export class ViewTabComponent {
@@ -53,6 +55,7 @@ export class ViewTabComponent {
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   protected readonly viewDragService = inject(ViewDragService);
+  protected readonly focusTracker = inject(FocusTracker);
 
   @HostBinding('attr.draggable')
   protected draggable = true;
@@ -69,16 +72,20 @@ export class ViewTabComponent {
     this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
+
+    effect(onCleanup => {
+      const viewId = this.view().id;
+
+      untracked(() => {
+        const tracker = registerFocusTracker(this.host, viewId, {injector: this._injector});
+        onCleanup(() => tracker.dispose());
+      });
+    });
   }
 
   @HostBinding('class.active')
   public get active(): boolean {
     return this.view().active();
-  }
-
-  @HostBinding('class.part-active')
-  protected get partActive(): boolean {
-    return this.view().part().active();
   }
 
   @HostBinding('class.e2e-dirty')

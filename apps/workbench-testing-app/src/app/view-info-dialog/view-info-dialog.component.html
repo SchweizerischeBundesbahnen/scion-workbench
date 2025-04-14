@@ -24,7 +24,7 @@
   </sci-form-field>
 
   <sci-form-field label="Part Title">
-    <input class="e2e-part-title" [ngModel]="view().part().title() | appStringify" (ngModelChange)="onPartTitleChange($event)" [attr.list]="partTitleList">
+    <input class="e2e-part-title" [ngModel]="view().part().title()" (ngModelChange)="onPartTitleChange($event)" [attr.list]="partTitleList">
   </sci-form-field>
 
   <sci-form-field label="Navigation Hint">

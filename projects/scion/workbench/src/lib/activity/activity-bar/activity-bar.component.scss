@@ -1,9 +1,9 @@
 :host {
   display: flex;
   flex-direction: column;
-  gap: .5em;
+  gap: var(--sci-workbench-activity-item-gap);
   user-select: none;
-  padding: .25em;
+  padding: var(--sci-workbench-activity-bar-padding);
   background-color: var(--sci-workbench-activity-bar-background-color);
 
   &[data-align="left"] {

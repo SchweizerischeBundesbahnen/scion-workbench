@@ -1,28 +1,43 @@
 :host {
-  display: grid;
-  background-color: var(--sci-workbench-activity-item-background-color);
-  color: var(--sci-workbench-activity-item-text-color);
-  border: var(--sci-workbench-activity-item-border-width) solid var(--sci-workbench-activity-item-border-color);
-  border-radius: var(--sci-workbench-activity-item-border-radius);
-  cursor: var(--sci-workbench-activity-item-cursor);
+  display: inline-grid;
 
-  &:hover {
-    background-color: var(--sci-workbench-activity-item-background-color-hover);
-    color: var(--sci-workbench-activity-item-text-color-hover);
-  }
-
-  &.active {
-    background-color: var(--sci-workbench-activity-item-background-color-active);
-    color: var(--sci-workbench-activity-item-text-color-active);
-  }
-
-  > button {
+  > button:is(button, #af) {
     all: unset;
-    display: grid;
+    display: inline;
     place-content: center;
     overflow: hidden;
     height: 24px;
     width: 24px;
     padding: var(--sci-workbench-activity-item-padding);
+    background-color: var(--sci-workbench-activity-item-background-color);
+    color: var(--sci-workbench-activity-item-text-color);
+    border: var(--sci-workbench-activity-item-border-width) solid var(--sci-workbench-activity-item-border-color);
+    border-radius: var(--sci-workbench-activity-item-border-radius);
+    cursor: var(--sci-workbench-activity-item-cursor);
+    outline: none;
+
+    &:hover {
+      background-color: var(--sci-workbench-activity-item-background-color-hover);
+      color: var(--sci-workbench-activity-item-text-color-hover);
+    }
+
+    &.active, &:active {
+      background-color: var(--sci-workbench-activity-item-background-color-active);
+      color: var(--sci-workbench-activity-item-text-color-active);
+    }
+
+    &.focus-within-activity {
+      background-color: var(--sci-workbench-activity-item-background-color-focus);
+      color: var(--sci-workbench-activity-item-text-color-focus);
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    &:focus-visible {
+      //border-color: var(--sci-workbench-activity-item-background-color-focus);
+      outline: 2px solid var(--sci-workbench-activity-item-background-color-focus);
+    }
   }
 }

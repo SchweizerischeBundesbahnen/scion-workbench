@@ -12,8 +12,8 @@
       @if (menuItem.actions?.length) {
         <div class="actions">
           @for (action of menuItem.actions; track action) {
-            <button (click)="onMenuItemActionClick(action, $event)" [title]="action.tooltip">
-              <span sciMaterialIcon>{{action.icon}}</span>
+            <button (click)="onMenuItemActionClick(action, $event)" [title]="action.tooltip" sciMaterialIcon>
+              {{action.icon}}
             </button>
           }
         </div>

@@ -2,7 +2,12 @@
 @use '@scion/components.internal/design' as sci-design;
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+//@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+//@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300&GRAD@20,100,1,200');
+//@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:GRAD');
+//@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD,ROND@20..48,100..700,0..1,-50..200,0..100');
+//@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
 
 html {
   font-size: 14px; // defines 1rem as 14px
@@ -25,28 +30,47 @@ a {
   @include sci-design.style-link();
 }
 
+// TODO [Angular 20] Change style in @scion/components.internal
 button[class*="material-icons"], button[class*="material-symbols"] {
-  @include sci-design.style-mat-icon-button();
+  display: inline-grid;
+  place-content: center;
+  place-items: center;
+  padding: .125em;
+  font-size: 20px;
+  border-radius: var(--sci-corner);
+  border: unset;
+  background-color: unset;
+
+  &:hover, &.menu-open {
+    background-color: var(--sci-workbench-button-background-color-hover);
+  }
+
+  &:active {
+    background-color: var(--sci-workbench-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sci-color-accent);
+  }
 }
 
+// TODO [Angular 20] Change style in @scion/components.internal
 button:not([class*="material-icons"]):not([class*="material-symbols"]) {
   @include sci-design.style-button();
+  cursor: auto;
+}
+
+// TODO [Angular 20] Change style in @scion/components.internal
+:where(sci-checkbox, sci-toggle-button) label {
+  cursor: auto !important;
 }
 
 :root {
   --workbench-client-testing-app1-color: rgb(0, 49, 83);
   --workbench-client-testing-app2-color: rgb(0, 112, 187);
   --devtools-app-color: rgb(72, 72, 72);
-
-  //--sci-workbench-part-bar-padding-top: 0px;
-  //--sci-workbench-part-bar-padding-inline: 0px;
-  //--sci-workbench-part-bar-border-bottom-width: 0px;
-
-  //--sci-workbench-tab-border-top-width: 0px;
-  //--sci-workbench-tab-border-width: 0px;
-  //--sci-workbench-tab-border-radius: 0px;
-  //--sci-workbench-tab-padding-inline-hover: 0px;
-  //--sci-workbench-tab-padding-block-hover: 0px;
-
-  //--sci-workbench-tab-height: 3.5rem;
 }

@@ -1635,7 +1635,7 @@ export function isPartId(partId: string | undefined | null): partId is PartId {
 /**
  * Tests if the given id matches the format of a view identifier.
  */
-function isViewId(viewId: string | undefined | null): viewId is ViewId {
+export function isViewId(viewId: string | undefined | null): viewId is ViewId {
   return Routing.isViewOutlet(viewId);
 }
 

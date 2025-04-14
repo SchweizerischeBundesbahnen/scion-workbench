@@ -204,7 +204,7 @@
 
 <!-- Main Grid -->
 <ng-template #main_grid>
-  @if (layout().grids.main.root | wbGridElementIfVisible; as root) {
+  @if (layout().grids.main.root | wbGridElementIfVisible) {
     <wb-grid [grid]="layout().grids.main"
              [gridDropZone]="canDropInMainGrid() && {
                dropRegionSize: 50,

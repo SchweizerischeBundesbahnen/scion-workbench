@@ -18,7 +18,7 @@
   [] Requires Material Icon Font if using default icon provider: @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
 [] HowTo
 [] Do not disable animations when starting locally and on CI (fix tests: e.g.: host-popup.e2e-spec.ts: should stick to the popup anchor)
-[x] remove activity part
+[x] remove activity part08:00
 [x] css class on add part
 [x] Router navigation if not specifying a part and no target should not navigate peripheral views.
 [x] Tests:
@@ -38,7 +38,22 @@
 [x] Consider moving computed in PartHandle (computeTitle, computeActivity, computeTopLeft) to onLayoutChange
 [x] Add activity support to Jasmine `toEqualWorkbenchLayout` matcher
 
+## TODO Phase 1a:
+[ ] Should we display [+] button only in main area or is non-peripheral good enough?
+[ ] revert isInMainArea
+[ ] larger padding for title left
+[ ] close activity when removing last view? Do we need a confg property on the layout for that independent of having a navigation? e.g., closeWhenRemovingLastView?
+[ ] Implement pinned feature
+[ ] Double click on part bar should minimize activity
+[x] Microfrontend Navigation
+    - do not navigate/close peripheral views
+[ ] Translation
+    - allow for parameters in translatabe (matrix notation)
+    - do we really need a signal to pass to the text function?
+    - when do we translate other workbench elements (view title, dialog title, message box buttons, ...)
+    - we should export text fn or text pipe (custom tabs)
 ## TODO Phase 2:
+[] Pin Feature
 [] Drag and Drop (including restrictions)
 [] Part Portal (to not lose changes when closing activity)
 [] Hide Activities & menu to show activities

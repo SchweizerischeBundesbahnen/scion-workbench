@@ -1,3 +1,5 @@
+@use '../../common/workbench-mixins';
+
 :host {
   display: flex;
   align-items: center;
@@ -27,16 +29,16 @@
   }
 
   > button.close {
-    all: unset;
-    flex: none;
-    visibility: hidden;
-    padding: .125em;
-    border-radius: var(--sci-corner-small);
-    opacity: .75;
+    @include workbench-mixins.flat-button() {
+      flex: none;
+      visibility: hidden;
+      padding: .125em;
+      border-radius: var(--sci-corner-small);
+      color: var(--sci-color-text);
 
-    &:hover {
-      opacity: 1;
-      background-color: var(--sci-color-background-secondary-hover);
+      &:not(:hover) {
+        opacity: .75;
+      }
     }
   }
 

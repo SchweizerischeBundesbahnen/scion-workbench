@@ -21,6 +21,7 @@ import {ViewId, WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
+import {registerFocusTracker} from '../focus/focus-tracker.service';
 
 /**
  * Renders the workbench view, using a router-outlet to display view content.
@@ -66,6 +67,7 @@ export class ViewComponent implements OnAttach, OnDetach {
     this.installMenuAccelerators();
     this.installOnActivateView();
     this.addHostCssClasses();
+    registerFocusTracker(inject(ElementRef).nativeElement, this._view.id);
   }
 
   /**

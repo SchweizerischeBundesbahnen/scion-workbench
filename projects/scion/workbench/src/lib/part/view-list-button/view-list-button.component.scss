@@ -1,11 +1,10 @@
+@use '../../common/workbench-mixins';
+
 :host {
-  display: flex;
-  flex-direction: column;
-  padding: .25em;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  border-radius: var(--sci-corner);
+  @include workbench-mixins.flat-button() {
+    display: flex;
+    flex-direction: column;
+  }
 
   > span.chevron {
     flex: none;
@@ -20,9 +19,5 @@
     @container style(--sci-workbench-part-hidden-tab-count-size: 0) {
       display: none;
     }
-  }
-
-  &:is(:hover, .active) {
-    background-color: var(--sci-color-background-secondary-hover);
   }
 }

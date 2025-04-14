@@ -36,7 +36,7 @@
       color: var(--sci-workbench-tab-text-color-active);
     }
 
-    &.part-active > div.content {
+    &.focus-within-view > div.content {
       color: var(--sci-workbench-part-active-tab-text-color-active);
     }
   }
@@ -53,22 +53,19 @@
   }
 
   > button.close {
-    $padding: .125em;
-    all: unset;
-    position: absolute;
-    visibility: hidden;
-    padding: $padding;
-    border-radius: var(--sci-corner-small);
-    right: calc(var(--sci-workbench-tab-padding-inline) - $padding);
-    // Subtract tab border to align tab content with part title and part actions.
-    transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
+    @include workbench-mixins.flat-button() {
+      $padding: .125em;
+      position: absolute;
+      right: calc(var(--sci-workbench-tab-padding-inline) - $padding);
+      visibility: hidden;
+      padding: $padding;
+      border-radius: var(--sci-corner-small);
+      // Subtract tab border to align tab content with part title and part actions.
+      transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
 
-    &:not(:hover) {
-      opacity: .75;
-    }
-
-    &:hover {
-      background-color: var(--sci-workbench-tab-background-color-hover);
+      &:not(:hover) {
+        opacity: .75;
+      }
     }
   }
 

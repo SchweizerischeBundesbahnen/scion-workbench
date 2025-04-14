@@ -18,7 +18,6 @@ import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {FormsModule} from '@angular/forms';
 import {UUID} from '@scion/toolkit/uuid';
 import {parseTypedString} from '../common/parse-typed-value.util';
-import {StringifyPipe} from '../common/stringify.pipe';
 
 @Component({
   selector: 'app-view-info-dialog',
@@ -32,7 +31,6 @@ import {StringifyPipe} from '../common/stringify.pipe';
     SciKeyValueComponent,
     NullIfEmptyPipe,
     FormsModule,
-    StringifyPipe,
   ],
 })
 export class ViewInfoDialogComponent {

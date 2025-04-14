@@ -15,7 +15,7 @@ import {Objects} from '@scion/toolkit/util';
  * Matches an array of URL segments against another array of URL segments.
  *
  * Flags:
- * - matchWildcardPath: Indicates if wildcard path matching is enabled. If enabled, the asterisk `*` path matches any path of a segment.
+ * - matchWildcardPath: Indicates if wildcard path matching is enabled. If enabled, the asterisk `*` path matches any path of the segment.
  * - matchMatrixParams: Controls whether to match matrix parameters.
  */
 export class UrlSegmentMatcher {

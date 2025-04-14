@@ -141,7 +141,7 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
     .navigatePart('project', ['project'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('search', ['search'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('bookmarks', ['bookmarks'], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
-    .navigatePart('terminal', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
+    // .navigatePart('terminal', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('notifications', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('database', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
     .navigatePart('error', [], {hint: 'sample-part', data: {style: 'form'} satisfies PartSkeletonNavigationData})
