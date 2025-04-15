@@ -4188,27 +4188,27 @@ describe('WorkbenchLayout', () => {
       let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
 
       // Expect initial panel size.
-      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(200);
-      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(200);
-      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(150);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(ACTIVITY_PANEL_WIDTH);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(ACTIVITY_PANEL_WIDTH);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(ACTIVITY_PANEL_HEIGHT);
 
       // Change size of left panel.
-      workbenchLayout = workbenchLayout.setActivityPanelSize('left', 210);
-      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(210);
-      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(200);
-      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(150);
+      workbenchLayout = workbenchLayout.setActivityPanelSize('left', 410);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(410);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(ACTIVITY_PANEL_WIDTH);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(ACTIVITY_PANEL_HEIGHT);
 
       // Change size of right panel.
-      workbenchLayout = workbenchLayout.setActivityPanelSize('right', 220);
-      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(210);
-      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(220);
-      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(150);
+      workbenchLayout = workbenchLayout.setActivityPanelSize('right', 420);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(410);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(420);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(ACTIVITY_PANEL_HEIGHT);
 
       // Change size of bottom panel.
-      workbenchLayout = workbenchLayout.setActivityPanelSize('bottom', 230);
-      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(210);
-      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(220);
-      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(230);
+      workbenchLayout = workbenchLayout.setActivityPanelSize('bottom', 430);
+      expect(workbenchLayout.activityLayout.panels.left.width).toEqual(410);
+      expect(workbenchLayout.activityLayout.panels.right.width).toEqual(420);
+      expect(workbenchLayout.activityLayout.panels.bottom.height).toEqual(430);
     });
 
     it('should change activity panel split ratio', () => {

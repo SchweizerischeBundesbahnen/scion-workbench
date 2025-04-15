@@ -74,7 +74,7 @@ export class PartComponent implements OnInit {
     this.addHostCssClasses();
     this.activateOnFocus();
     this.focusIfActive();
-    registerFocusTracker(inject(ElementRef).nativeElement, this.part.id);
+    registerFocusTracker(inject(ElementRef).nativeElement as HTMLElement, this.part.id);
   }
 
   public ngOnInit(): void {

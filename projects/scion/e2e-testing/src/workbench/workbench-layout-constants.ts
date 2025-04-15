@@ -10,8 +10,8 @@
 
 export const SASHBOX_SPLITTER_SIZE = 1;
 
-export const ACTIVITY_PANEL_WIDTH = 200;
-export const ACTIVITY_PANEL_HEIGHT = 150;
+export const ACTIVITY_PANEL_WIDTH = 400;
+export const ACTIVITY_PANEL_HEIGHT = 350;
 export const ACTIVITY_PANEL_RATIO = .5;
 
 export const POPUP_DIAMOND_ANCHOR_SIZE = 8;

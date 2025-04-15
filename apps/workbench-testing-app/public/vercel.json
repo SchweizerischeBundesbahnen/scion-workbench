@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "alias": "scion-workbench-preview.vercel.app",
+  "github": {
+    "enabled": false
+  }
+}

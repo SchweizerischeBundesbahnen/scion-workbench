@@ -61,6 +61,15 @@ export const Perspectives = {
         },
       },
       {
+        id: 'system-demo',
+        layout: provideSystemDemoPerspectiveLayout,
+        data: {
+          [PerspectiveData.label]: 'Kapazitätsplaner (Beispiel für System Demo)',
+          [PerspectiveData.menuItemLabel]: 'Kapazitätsplaner (Beispiel für System Demo)',
+          [PerspectiveData.menuGroup]: 'default',
+        },
+      },
+      {
         id: 'activity-perspective-1',
         layout: provideActivityPerspectiveLayout1,
         data: {
@@ -127,6 +136,34 @@ export const Perspectives = {
     ]);
   },
 } as const;
+
+function provideSystemDemoPerspectiveLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+    .addPart('scenarios', {dockTo: 'left-top'}, {icon: 'work', label: 'Szenarien & Varianten'})
+    .addPart('planning-objects', {dockTo: 'left-bottom'}, {icon: 'category', label: 'Planungsobjekte'})
+    .addPart('find', {dockTo: 'bottom-left'}, {icon: 'search', label: 'Suche'})
+    .addPart('progress', {dockTo: 'bottom-right'}, {icon: 'overview', label: 'Verarbeitung'})
+    .addPart('problems', {dockTo: 'bottom-right'}, {icon: 'error', label: 'Probleme'})
+    .addPart('tasks', {dockTo: 'right-top'}, {icon: 'checklist', label: 'Aufgaben'})
+    .addPart('notifications', {dockTo: 'right-top'}, {icon: 'notifications', label: 'Benachrichtigungen'})
+    .addPart('solutions', {dockTo: 'right-bottom'}, {icon: 'calculate', label: 'Lösungen'})
+    .addView('find-1', {partId: 'find'})
+    .addView('find-2', {partId: 'find'})
+    .addView('find-3', {partId: 'find'})
+    .navigatePart('scenarios', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+    .navigatePart('planning-objects', [], {hint: 'sample-part', data: {style: 'list'} satisfies PartSkeletonNavigationData})
+    .navigatePart('find', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('progress', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('problems', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('tasks', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('notifications', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigatePart('solutions', [], {hint: 'sample-part', data: {style: 'table'} satisfies PartSkeletonNavigationData})
+    .navigateView('find-1', [], {hint: 'sample-view', data: {style: 'list', title: 'Suche nach \'Szenario 343\''} satisfies ViewSkeletonNavigationData})
+    .navigateView('find-2', [], {hint: 'sample-view', data: {style: 'list', title: 'Suche nach \'Zug 43\''} satisfies ViewSkeletonNavigationData})
+    .navigateView('find-3', [], {hint: 'sample-view', data: {style: 'list', title: 'Suche nach \'Abstellungen\''} satisfies ViewSkeletonNavigationData})
+    .activatePart('scenarios');
+}
 
 function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
   return factory

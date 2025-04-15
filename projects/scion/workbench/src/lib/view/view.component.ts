@@ -67,7 +67,7 @@ export class ViewComponent implements OnAttach, OnDetach {
     this.installMenuAccelerators();
     this.installOnActivateView();
     this.addHostCssClasses();
-    registerFocusTracker(inject(ElementRef).nativeElement, this._view.id);
+    registerFocusTracker(inject(ElementRef).nativeElement as HTMLElement, this._view.id);
   }
 
   /**

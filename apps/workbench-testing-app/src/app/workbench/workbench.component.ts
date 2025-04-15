@@ -16,7 +16,7 @@ import {WorkbenchComponent as ScionWorkbenchComponent, WorkbenchDesktopDirective
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
 import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.component';
-import StartPageComponent from '../start-page/start-page.component';
+import {ViewSkeletonNavigationData} from '../sample-view/sample-view.component';
 
 @Component({
   selector: 'app-workbench',
@@ -29,12 +29,17 @@ import StartPageComponent from '../start-page/start-page.component';
     WorkbenchRouterLinkDirective,
     WorkbenchViewMenuItemDirective,
     WorkbenchDesktopDirective,
-    StartPageComponent,
   ],
+  host: {
+    '(document:keydown.control.1)': 'onOpenSampleView1($event, "Szenario 421 - Variante 1", "table");',
+    '(document:keydown.control.2)': 'onOpenSampleView1($event, "Szenario 324 - Variante 3", "table");',
+    '(document:keydown.control.3)': 'onOpenSampleView1($event, "Zug 2012", "form");',
+    '(document:keydown.control.4)': 'onOpenSampleView1($event, "Abstellung 1012", "form");',
+  },
 })
 export class WorkbenchComponent implements OnDestroy {
 
-  private readonly _wbRouter = inject(WorkbenchRouter);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _dialogService = inject(WorkbenchDialogService);
 
   protected readonly workbenchService = inject(WorkbenchService);
@@ -45,6 +50,11 @@ export class WorkbenchComponent implements OnDestroy {
   constructor() {
     console.debug('[WorkbenchComponent#construct]');
     this.installStickyViewTab();
+  }
+
+  protected onOpenSampleView1(event: Event, title: string, style: 'list' | 'table' | 'form'): void {
+    this._workbenchRouter.navigate(['sample-view'], {target: 'blank', data: {style, title} satisfies ViewSkeletonNavigationData});
+    event.preventDefault();
   }
 
   /**
@@ -76,7 +86,7 @@ export class WorkbenchComponent implements OnDestroy {
     const stickyViewTab = this.readQueryParamFlag('stickyViewTab');
     effect(() => {
       if (stickyViewTab() && !this.workbenchService.views().length) {
-        untracked(() => void this._wbRouter.navigate(['/start-page']));
+        untracked(() => void this._workbenchRouter.navigate(['/start-page']));
       }
     });
   }

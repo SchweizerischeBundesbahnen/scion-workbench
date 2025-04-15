@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {ActivityBarComponent} from '../activity/activity-bar/activity-bar.component';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
@@ -29,7 +29,6 @@ import {Logger} from '../logging';
 import {WORKBENCH_ID} from '../workbench-id';
 import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.service';
 import {MAIN_AREA} from './workbench-layout';
-import {FocusTracker} from '../focus/focus-tracker.service';
 
 @Component({
   selector: 'wb-layout',
@@ -76,13 +75,6 @@ export class LayoutComponent {
   protected readonly panelAnimation = inject(WorkbenchService).panelAnimation;
 
   protected readonly perspectiveService = inject(WorkbenchPerspectiveService);
-
-  constructor() {
-    const focusTracker = inject(FocusTracker);
-    effect(() => {
-      console.log(`>>> activeElemnet=${focusTracker.activeElement()}`);
-    });
-  }
 
   /**
    * Determines if dropping at the boundaries of the main grid is enabled.

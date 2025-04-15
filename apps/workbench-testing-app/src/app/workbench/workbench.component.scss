@@ -1,3 +1,8 @@
 :host {
   display: grid;
+
+  span.desktop {
+    display: grid;
+    place-content: center;
+  }
 }

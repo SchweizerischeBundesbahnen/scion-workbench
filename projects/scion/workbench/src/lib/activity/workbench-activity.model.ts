@@ -84,8 +84,8 @@ export interface MActivity {
 }
 
 /** Specifies the default width of the left or right activity panel. */
-export const ACTIVITY_PANEL_WIDTH = 200;
+export const ACTIVITY_PANEL_WIDTH = 400;
 /** Specifies the default height of the bottom activity panel. */
-export const ACTIVITY_PANEL_HEIGHT = 150;
+export const ACTIVITY_PANEL_HEIGHT = 350;
 /** Specifies the default split ratio of the activity panels. */
 export const ACTIVITY_PANEL_RATIO = .5;
