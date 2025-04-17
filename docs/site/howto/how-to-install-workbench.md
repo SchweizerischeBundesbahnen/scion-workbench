@@ -25,7 +25,7 @@ npm install @scion/workbench @scion/workbench-client @scion/toolkit @scion/compo
     <summary><strong>Register SCION Workbench Providers</strong></summary>
     <br>
 
-Open `app.config.ts` and register SCION Workbench providers.
+Add `provideWorkbench()` to the list of providers in your `app.config.ts`.
 
 ```ts
 import {ApplicationConfig} from '@angular/core';
@@ -71,14 +71,34 @@ Open `app.component.html` and replace it with the following content:
 <wb-workbench/>
 ```
 
+Import the SCION Workbench component in `app.component.ts`. Added lines are marked with `[+]`.
+
+```ts
+    import {Component} from '@angular/core';
+[+] import {WorkbenchComponent} from '@scion/workbench';
+
+    @Component({
+      selector: 'app-root',
+      standalone: true,
+      imports: [
+[+]     WorkbenchComponent
+      ],
+      templateUrl: './app.component.html',
+      styleUrl: './app.component.scss'
+    })
+    export class AppComponent {
+      title = 'workbench-getting-started';
+    }
+```
+
 The workbench itself does not position nor lay out the `<wb-workbench>` component. Depending on your requirements, you may want the workbench to fill the entire page viewport or only parts of it, for example, if you have a header, footer, or navigation panel.
 
 For a quick start, position the workbench absolutely and align it with the page viewport. Open `app.component.scss` and replace it with the following content:
 ```scss
-  wb-workbench {
-    position: absolute;
-    inset: 0;
-  }
+wb-workbench {
+  position: absolute;
+  inset: 0;
+}
 ```
 </details>
 
@@ -92,7 +112,7 @@ The workbench requires some styles to be imported into `styles.scss`, as follows
 @use '@scion/workbench';
 ``` 
 
-Also, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip">GitHub</a>, unzip the font files, and place the extracted files in the `/public/fonts` folder.
+Next, download the workbench icon font from <a href="https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/resources/scion-workbench-icons/fonts/fonts.zip">GitHub</a>. After downloading, unzip the font files and place the extracted files in the `/public/fonts` folder.
 
 > Deploying the application in a subdirectory requires the additional steps described [here][link-how-to-configure-icons-if-deploying-app-in-subdirectory].
 
@@ -100,9 +120,9 @@ Also, download the workbench icon font from <a href="https://github.com/Schweize
 
 After completing the above steps, start your application by running `ng serve`. Open a browser at http://localhost:4200. You should see a blank page.
 
-Continue with the guide [How to define the initial workbench layout][link-how-to-define-initial-workbench-layout] to define an initial layout for the workbench.
+Continue with the guide [How to define the workbench layout][link-how-to-define-workbench-layout] to define the layout for the workbench.
 
-[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-define-workbench-layout]: /docs/site/howto/how-to-define-layout
 [link-how-to-configure-icons-if-deploying-app-in-subdirectory]: /docs/site/howto/how-to-icons.md#deploying-the-app-in-a-subdirectory
 
 [menu-how-to]: /docs/site/howto/how-to.md

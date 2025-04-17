@@ -32,3 +32,8 @@ export type MAIN_AREA = 'part.main-area';
  * @see MAIN_AREA
  */
 export const MAIN_AREA_ALTERNATIVE_ID = 'main-area';
+
+/**
+ * Format of an activity identifier.
+ */
+export type ActivityId = `activity.${string}`;

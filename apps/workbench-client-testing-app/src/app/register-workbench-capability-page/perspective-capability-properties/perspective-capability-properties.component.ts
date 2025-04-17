@@ -20,8 +20,8 @@ import {RecordComponent} from '../../record/record.component';
 import {filterArray, mapArray} from '@scion/toolkit/operators';
 import {AsyncPipe} from '@angular/common';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
-import {CssClassComponent} from '../../css-class/css-class.component';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-perspective-capability-properties',
@@ -34,8 +34,8 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     RecordComponent,
     AsyncPipe,
     SciKeyValueFieldComponent,
-    CssClassComponent,
     SciCheckboxComponent,
+    MultiValueInputComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => PerspectiveCapabilityPropertiesComponent)},

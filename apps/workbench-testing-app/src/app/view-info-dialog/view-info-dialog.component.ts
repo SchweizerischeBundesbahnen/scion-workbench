@@ -16,6 +16,8 @@ import {JoinPipe} from '../common/join.pipe';
 import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
 import {FormsModule} from '@angular/forms';
+import {UUID} from '@scion/toolkit/uuid';
+import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-view-info-dialog',
@@ -41,7 +43,8 @@ export class ViewInfoDialogComponent {
   /**
    * Activated route, or `undefined` if not navigated yet.
    */
-  protected route = this.computeRoute();
+  protected readonly route = this.computeRoute();
+  protected readonly partTitleList = `title-list-${UUID.randomUUID()}`;
 
   constructor() {
     this._dialog.title = 'View Info';
@@ -50,6 +53,10 @@ export class ViewInfoDialogComponent {
 
   protected onClose(): void {
     this._dialog.close();
+  }
+
+  protected onPartTitleChange(title: string): void {
+    this.view().part().title = parseTypedString(title)!;
   }
 
   private computeRoute(): Signal<ActivatedRoute | undefined> {

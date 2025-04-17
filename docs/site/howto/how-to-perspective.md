@@ -5,7 +5,7 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-This chapter requires a perspective to be registered. See [Providing a Perspective][link-how-to-provide-perspective] to learn how to provide a perspective.
+This chapter requires a perspective to be registered. See [How to Provide Multiple Layouts (Perspectives)][link-how-to-provide-perspective] to learn how to provide a perspective.
 
 ### How to query perspectives
 Query perspectives using the `WorkbenchService.perspectives` signal.
@@ -62,7 +62,43 @@ provideWorkbench({
 
 > The `AuthService` is illustrative and not part of the Workbench API. 
 
-[link-how-to-provide-perspective]: /docs/site/howto/how-to-provide-perspective.md
+### How to configure if perspective can be activated
+A `canActivate` function can be configured to determine if the perspective can be activated, for example based on the user's permissions.
+
+```ts
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideWorkbench({
+      layout: {
+        perspectives: [
+          {
+            id: 'admin',
+            layout: (factory: WorkbenchLayoutFactory) => {...},
+            data: {
+              label: 'Administrator',
+            },
+            canActivate: () => inject(AuthService).hasRole('admin'),
+          },
+          {
+            id: 'manager',
+            layout: (factory: WorkbenchLayoutFactory) => {...},
+            data: {
+              label: 'Manager',
+            },
+          },
+        ],
+      },
+    }),
+  ],
+});
+```
+
+> The `AuthService` is illustrative and not part of the Workbench API.
+
+[link-how-to-provide-perspective]: /docs/site/howto/how-to-define-layout.md#how-to-provide-multiple-layouts-perspectives
 
 [menu-how-to]: /docs/site/howto/how-to.md
 

@@ -12,6 +12,7 @@ import {assertType} from '../common/asserts.util';
 import {ViewId} from '../view/workbench-view.model';
 import {NavigationData} from '../routing/routing.model';
 import {PartId} from '../part/workbench-part.model';
+// TODO [activity] Rename to workbench-grid.model.ts
 
 /**
  * Represents the arrangement of parts as grid.
@@ -84,10 +85,12 @@ export class MPart {
   public readonly type = 'MPart';
   public id!: PartId;
   public alternativeId?: string;
+  public title?: string;
   public parent?: MTreeNode;
   public views!: MView[];
   public activeViewId?: ViewId;
   public structural!: boolean;
+  public cssClass?: string[];
   public navigation?: {
     id: string;
     hint?: string;

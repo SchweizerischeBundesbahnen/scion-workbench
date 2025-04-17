@@ -10,6 +10,8 @@
 
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
+import {ActivityId} from '../activity/workbench-activity.model';
+import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
@@ -33,11 +35,12 @@ export interface WorkbenchLayout {
    *
    * @param id - The id of the part to add.  Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
-   * @param options - Controls how to add the part to the layout.
-   * @param options.activate - Controls whether to activate the part. Defaults to `false`.
+   * @param extras - Controls how to add the part to the layout.
    * @return a copy of this layout with the part added.
    */
-  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
+  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout;
+
+  addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
 
   /**
    * Navigates the specified part based on the provided array of commands and extras.
@@ -96,14 +99,15 @@ export interface WorkbenchLayout {
    * Adds a view to the specified part.
    *
    * @param id - The id of the view to add.
-   * @param options - Controls how to add the view to the layout.
-   * @param options.partId - References the part to which to add the view.
-   * @param options.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
-   * @param options.activateView - Controls whether to activate the view. Defaults to `false`.
-   * @param options.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
+   * @param extras - Controls how to add the view to the layout.
+   * @param extras.partId - References the part to which to add the view.
+   * @param extras.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
+   * @param extras.activateView - Controls whether to activate the view. Defaults to `false`.
+   * @param extras.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
+   * @param extras.cssClass - Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    * @return a copy of this layout with the view added.
    */
-  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
+  addView(id: string, extras: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Navigates the specified view based on the provided array of commands and extras.
@@ -234,6 +238,86 @@ export interface ReferencePart {
    * The ratio is the closed interval [0,1]. If not set, defaults to `0.5`.
    */
   ratio?: number;
+}
+
+/**
+ * Controls the appearance and behavior of a part.
+ */
+export interface PartExtras {
+  /**
+   * Title displayed in the part bar.
+   *
+   * Has no effect for parts aligned relative to a docked part.
+   */
+  title?: Translatable;
+  /**
+   * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.
+   */
+  cssClass?: string | string[];
+  /**
+   * Controls whether to activate the part. Defaults to `false`.
+   */
+  activate?: boolean;
+}
+
+/**
+ * Controls the appearance and behavior of a docked part.
+ *
+ * A docked part, also referred to as an activity, is a part docked to the left, right, or bottom side of the workbench
+ * that can be minimized to the activity bar displayed on the left or right side.
+ */
+export interface DockedPartExtras {
+  /**
+   * Icon for the activity displayed in the activity bar, toggling the activity when clicked.
+   *
+   * The actual icon is resolved through an {@link WorkbenchConfig.iconProvider icon provider}.
+   * If no provider is configured, the icon defaults to a Material Icon font ligature.
+   */
+  icon: string;
+  /**
+   * Label displayed below the activity icon in the activity bar.
+   */
+  label: Translatable;
+  /**
+   * Tooltip displayed when hovering over the activity icon.
+   */
+  tooltip?: Translatable;
+  /**
+   * Title displayed in the activity's part bar.
+   *
+   * For activities with multiple parts, the title is displayed only in the first (top-left) part.
+   * If not provided, defaults to the part's label. Set to `false` to not display a title.
+   */
+  title?: Translatable | false;
+  /**
+   * CSS class(es) to add to the activity item and the activity's part(s), e.g., to locate the activity in tests.
+   */
+  cssClass?: string | string[];
+  /**
+   * Internal identifier for the activity.
+   *
+   * @docs-private Not public API, intended for internal use only.
+   */
+  ɵactivityId?: ActivityId;
+}
+
+/**
+ * Area where a part can be docked.
+ *
+ * A part can be docked to the left, right, or bottom side of the workbench. Each side allows for displaying
+ * two docked parts, split vertically (left and right docking areas) or horizontally (bottom docking area).
+ */
+export interface DockingArea {
+  /**
+   * Controls where to dock a part.
+   * - `left-top`: Dock to the top on the left side.
+   * - `left-bottom`: Dock to the bottom on the left side.
+   * - `right-top`: Dock to the top on the right side.
+   * - `right-bottom`: Dock to the bottom on the right side.
+   * - `bottom-left`: Dock to the left on the bottom side.
+   * - `bottom-right`: Dock to the right on the bottom side.
+   */
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
 }
 
 /**

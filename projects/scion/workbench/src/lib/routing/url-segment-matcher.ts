@@ -15,7 +15,7 @@ import {Objects} from '@scion/toolkit/util';
  * Matches an array of URL segments against another array of URL segments.
  *
  * Flags:
- * - matchWildcardPath: Indicates if wildcard path matching is enabled. If enabled, the asterisk `*` path matches any path of a segment.
+ * - matchWildcardPath: Indicates if wildcard path matching is enabled. If enabled, the asterisk `*` path matches any path of the segment.
  * - matchMatrixParams: Controls whether to match matrix parameters.
  */
 export class UrlSegmentMatcher {
@@ -37,12 +37,12 @@ export class UrlSegmentMatcher {
 
     return segments.every((segment, index) => {
       const checkMatrixParams = this._flags.matchMatrixParams;
-      const checkPath = !this._flags.matchWildcardPath || this._pattern[index].path !== '*';
+      const checkPath = !this._flags.matchWildcardPath || this._pattern[index]!.path !== '*';
 
-      if (checkPath && segment.path !== this._pattern[index].path) {
+      if (checkPath && segment.path !== this._pattern[index]!.path) {
         return false;
       }
-      if (checkMatrixParams && !Objects.isEqual(segment.parameters, this._pattern[index].parameters)) {
+      if (checkMatrixParams && !Objects.isEqual(segment.parameters, this._pattern[index]!.parameters)) {
         return false;
       }
       return true;

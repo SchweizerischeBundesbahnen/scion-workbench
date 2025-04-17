@@ -56,8 +56,7 @@ export const Routing = {
     }
 
     const urlTree = inject(Router).createUrlTree(commands, {relativeTo});
-    const segmentGroup = urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET] as UrlSegmentGroup | undefined;
-    return segmentGroup?.segments ?? [];
+    return urlTree.root.children[relativeTo?.pathFromRoot[1]?.outlet ?? PRIMARY_OUTLET]?.segments ?? [];
   },
 
   /**
@@ -243,28 +242,28 @@ export const Routing = {
   },
 } as const;
 
-function parseOutlets(url: UrlTree, filter: {view: true}): Map<ViewOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, filter: {part: true}): Map<PartOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, filter: {dialog: true}): Map<DialogOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, filter: {popup: true}): Map<PopupOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, filter: {messagebox: true}): Map<MessageBoxOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, filter: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, filter: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
+function parseOutlets(url: UrlTree, selector: {view: true}): Map<ViewOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {part: true}): Map<PartOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {dialog: true}): Map<DialogOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {popup: true}): Map<PopupOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {messagebox: true}): Map<MessageBoxOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
   const outlets = new Map<WorkbenchOutlet, UrlSegment[]>();
   Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
-    if (filter.view && Routing.isViewOutlet(outlet)) {
+    if (selector.view && Routing.isViewOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter.part && Routing.isPartOutlet(outlet)) {
+    if (selector.part && Routing.isPartOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter.dialog && Routing.isDialogOutlet(outlet)) {
+    if (selector.dialog && Routing.isDialogOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter.popup && Routing.isPopupOutlet(outlet)) {
+    if (selector.popup && Routing.isPopupOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
-    if (filter.messagebox && Routing.isMessageBoxOutlet(outlet)) {
+    if (selector.messagebox && Routing.isMessageBoxOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
   });

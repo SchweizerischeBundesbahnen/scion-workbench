@@ -50,6 +50,13 @@ export class AppHeaderPO {
   }
 
   /**
+   * Configures how to align the bottom activity panel.
+   */
+  public async setPanelAlignment(alignment: 'left' | 'right' | 'center' | 'justify'): Promise<void> {
+    await this.clickSettingMenuItem({cssClass: `e2e-change-panel-alignment-${alignment}`});
+  }
+
+  /**
    * Clicks specified setting in settings menu.
    */
   public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {

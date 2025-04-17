@@ -159,7 +159,7 @@ export default class StartPageComponent {
    */
   private memoizeContextualPart(): void {
     effect(() => {
-      this.partId = this._view?.part().id ?? this._workbenchService.parts().filter(part => part.active()).sort(a => a.isInMainArea ? -1 : 1).at(0)?.id;
+      this.partId = this._view?.part().id ?? this._workbenchService.parts().filter(part => part.active()).sort(a => a.peripheral() ? 1 : -1).at(0)?.id;
       this._cd.markForCheck();
     });
   }

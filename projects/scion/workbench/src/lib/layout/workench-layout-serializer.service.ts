@@ -20,9 +20,12 @@ import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration
 import {Exclusion, stringify} from './stringifier';
 import {WorkbenchOutlet} from '../workbench.constants';
 import {WorkbenchLayoutMigrationV7} from './migration/workbench-layout-migration-v7.service';
+import {WorkbenchGrids} from './workbench-grids.model';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
+ *
+ * TODO [activity] Rename to WorkbenchGridSerializer, or keep in an move WorkbenchActivityLayoutSerializer into this class.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutSerializer {
@@ -35,29 +38,31 @@ export class WorkbenchLayoutSerializer {
     .registerMigration(6, inject(WorkbenchLayoutMigrationV7));
 
   /**
-   * Serializes the given grid into a URL-safe base64 string.
+   * Serializes given grids into a URL-safe base64 string.
    *
-   * @param grid - Specifies the grid to be serialized.
-   * @param flags - Controls how to serialize the grid.
+   * @param grids - Specifies the grids to serialize.
+   * @param flags - Controls how to serialize the grids.
    */
-  public serializeGrid(grid: MPartGrid, flags?: GridSerializationFlags): string;
-  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): null | string;
-  public serializeGrid(grid: MPartGrid | undefined | null, flags?: GridSerializationFlags): string | null {
-    if (grid === null || grid === undefined) {
-      return null;
-    }
+  public serializeGrids(grids: WorkbenchGrids, flags?: GridSerializationFlags): WorkbenchGrids<string> {
+    const serializedGrids = Object.entries(grids).reduce((acc, [gridName, grid]: [string, ɵMPartGrid | undefined]) => {
+      if (grid === undefined) {
+        return acc;
+      }
+      const json = stringify(grid, {
+        exclusions: new Array<string | Exclusion>()
+          .concat('**/parent')
+          .concat('migrated')
+          .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
+          .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
+          .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
+          .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
+        sort: flags?.sort,
+      });
+      const serialized = window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
 
-    const json = stringify(grid, {
-      exclusions: new Array<string | Exclusion>()
-        .concat('**/parent')
-        .concat('migrated')
-        .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
-        .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
-        .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
-        .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
-      sort: flags?.sort,
-    });
-    return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_LAYOUT_VERSION}`);
+      return acc.set(gridName, serialized);
+    }, new Map<string, string>());
+    return Object.fromEntries(serializedGrids) as unknown as WorkbenchGrids<string>;
   }
 
   /**
@@ -66,7 +71,7 @@ export class WorkbenchLayoutSerializer {
   public deserializeGrid(serialized: string): ɵMPartGrid {
     const [jsonGrid, jsonGridVersion] = window.atob(serialized).split(VERSION_SEPARATOR, 2);
     const gridVersion = Number.isNaN(Number(jsonGridVersion)) ? 1 : Number(jsonGridVersion);
-    const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
+    const migratedJsonGrid = this._workbenchLayoutMigrator.migrate(jsonGrid!, {from: gridVersion, to: WORKBENCH_LAYOUT_VERSION});
 
     // Parse the JSON.
     const grid = JSON.parse(migratedJsonGrid, (key: string, value: unknown) => {
@@ -167,6 +172,12 @@ export interface GridSerializationFlags {
    * Stable part identifiers are required to compare the initial grid with the user-modified grid to detect layout changes.
    */
   assignStablePartIdentifier?: true;
+  /**
+   * Assigns each activity a stable id based on its position in the activity layout.
+   *
+   * Stable activity identifiers are required to compare the initial activity layout with the user-modified activity layout to detect layout changes.
+   */
+  assignStableActivityIdentifier?: true;
   /**
    * Controls if to sort the fields of the grid by name. Defaults to `false`.
    *

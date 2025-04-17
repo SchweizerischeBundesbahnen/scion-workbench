@@ -25,7 +25,7 @@ test.describe('Workbench Part', () => {
     const rightTestPage = await MicrofrontendInputFieldTestPagePO.openInNewTab(appPO, microfrontendNavigator);
     // Move test view to the right
     const dragHandle = await rightTestPage.view.tab.startDrag();
-    await dragHandle.dragToPart(await appPO.activePart({inMainArea: true}).getPartId(), {region: 'east'});
+    await dragHandle.dragToPart(await appPO.activePart({grid: 'mainArea'}).getPartId(), {region: 'east'});
     await dragHandle.drop();
 
     // Capture part and view identities.
@@ -36,22 +36,24 @@ test.describe('Workbench Part', () => {
 
     // Expect right part to be activated.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: leftPartId,
-            views: [{id: leftViewId}],
-            activeViewId: leftViewId,
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: leftPartId,
+              views: [{id: leftViewId}],
+              activeViewId: leftViewId,
+            }),
+            child2: new MPart({
+              id: rightPartId,
+              views: [{id: rightViewId}],
+              activeViewId: rightViewId,
+            }),
           }),
-          child2: new MPart({
-            id: rightPartId,
-            views: [{id: rightViewId}],
-            activeViewId: rightViewId,
-          }),
-        }),
-        activePartId: rightPartId,
+          activePartId: rightPartId,
+        },
       },
     });
 
@@ -60,22 +62,24 @@ test.describe('Workbench Part', () => {
 
     // Expect left part to be activated.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: leftPartId,
-            views: [{id: leftViewId}],
-            activeViewId: leftViewId,
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: leftPartId,
+              views: [{id: leftViewId}],
+              activeViewId: leftViewId,
+            }),
+            child2: new MPart({
+              id: rightPartId,
+              views: [{id: rightViewId}],
+              activeViewId: rightViewId,
+            }),
           }),
-          child2: new MPart({
-            id: rightPartId,
-            views: [{id: rightViewId}],
-            activeViewId: rightViewId,
-          }),
-        }),
-        activePartId: leftPartId,
+          activePartId: leftPartId,
+        },
       },
     });
   });

@@ -5,7 +5,15 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
+The SCION Workbench provides a layout for displaying content side-by-side or stacked, all personalizable by the user via drag & drop.
+
+The layout defines an arrangement of parts and views. Parts can be docked to the side or aligned relative to each other, and views are contained within parts. Content can be displayed in both parts and views.
+
+Users can drag views to different parts or place them side-by-side, horizontally or vertically, even across windows. Docked parts can be minimized to the side to create more space for the main content.
+
+A typical workbench application features a main area part, and several parts docked to the side, providing navigation and context-sensitive assistance to support the user's workflow. Multiple layouts, referred to as perspectives, can be created. Users can switch between perspectives. Views in the main area can be pinned to remain open when switching perspectives.
+
+The SCION Workbench remembers the last layout used and will restore it the next time the application is opened.
 
 ### How to modify the workbench layout
 

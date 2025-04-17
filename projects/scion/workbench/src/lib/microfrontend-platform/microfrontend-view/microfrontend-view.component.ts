@@ -72,6 +72,7 @@ export class MicrofrontendViewComponent {
   private readonly _unsubscribeParamsUpdater$ = new Subject<void>();
   private readonly _universalKeystrokes = [
     ['escape'], // allows closing notifications
+    ['ctrl', 'shift', 'F12'], // maximize activities
   ];
 
   protected readonly view = inject(ɵWorkbenchView);

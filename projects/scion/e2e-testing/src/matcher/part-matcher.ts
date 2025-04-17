@@ -27,6 +27,9 @@ export function expectPart(part: PartPO): PartMatcher {
         await expect(part.locator.locator('.e2e-part-content')).not.toBeAttached();
         await expect(part.locator.locator('.e2e-view-content')).toBeVisible();
       },
+      toBeAttached: async (): Promise<void> => {
+        await expect(part.locator).not.toBeAttached();
+      },
     },
   };
 }
@@ -45,5 +48,9 @@ export interface PartMatcher {
      * Expects the part not to display any component.
      */
     toDisplayComponent(): Promise<void>;
+    /**
+     * Expects the part not to be in the DOM.
+     */
+    toBeAttached(): Promise<void>;
   };
 }

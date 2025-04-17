@@ -34,7 +34,7 @@ export class BulkNavigationTestPagePO implements MicrofrontendViewPagePO {
   }
 
   public async enterCssClass(cssClass: string): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(cssClass);
+    await this.locator.locator('app-multi-value-input.e2e-class input').fill(cssClass);
   }
 
   /**

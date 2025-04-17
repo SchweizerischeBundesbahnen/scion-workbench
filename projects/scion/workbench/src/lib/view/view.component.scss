@@ -1,12 +1,10 @@
-@use '../common/workbench.mixin';
-
 :host {
   display: flex;
   flex-direction: column;
   background-color: var(--sci-workbench-view-background-color);
   color: var(--sci-color-text);
 
-  @include workbench.peripheral-workbench-parts-selector {
+  wb-part[data-peripheral] & {
     background-color: var(--sci-workbench-view-peripheral-background-color);
   }
 

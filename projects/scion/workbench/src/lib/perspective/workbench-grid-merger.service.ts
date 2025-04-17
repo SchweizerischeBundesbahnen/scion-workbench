@@ -14,6 +14,7 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
  * Performs a three-way merge of the local and remote layouts, using the base layout (common ancestor) as the base of the merge operation.
  *
  * TODO [#452] This implementation discards local changes when a new layout is available.
+ * TODO [activity] Consider renaming to WorkbenchLayoutMerger
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMerger {
@@ -22,7 +23,8 @@ export class WorkbenchGridMerger {
    * Performs a merge of given local and remote layouts, using the base layout as the common ancestor.
    */
   public merge(grids: {local: ɵWorkbenchLayout; remote: ɵWorkbenchLayout; base: ɵWorkbenchLayout}): ɵWorkbenchLayout {
-    if (!grids.base.equals(grids.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, sort: true})) {
+    // TODO [activity] Consider not to reset the whole layout when adding/removing an activity.
+    if (!grids.base.equals(grids.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, assignStableActivityIdentifier: true, sort: true})) {
       return grids.remote;
     }
 

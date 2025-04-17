@@ -18,8 +18,19 @@
     padding-left: calc(var(--sci-workbench-part-bar-padding-inline) - var(--sci-workbench-tab-border-radius));
   }
 
-  @include workbench.peripheral-workbench-parts-selector {
+  wb-part[data-peripheral] & {
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
+  }
+
+  > span.title {
+    flex: none;
+    align-self: center;
+    user-select: none;
+    margin-right: .5em;
+    font-family: var(--sci-workbench-part-title-font-family), sans-serif;
+    font-size: var(--sci-workbench-part-title-font-size);
+    font-weight: var(--sci-workbench-part-title-font-weight);
+    @include workbench.ellipsis-on-overflow();
   }
 
   > wb-view-tab-bar {
@@ -46,6 +57,13 @@
   > wb-view-list-button {
     flex: none;
     align-self: center;
+  }
+
+  > button.minimize:is(button, #sci-reset) {
+    @include workbench.icon-button-element-states() {
+      flex: none;
+      align-self: center;
+    }
   }
 
   // Pseudo element for rendering the bottom border of the tabbar.

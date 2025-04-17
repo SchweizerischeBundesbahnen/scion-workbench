@@ -41,27 +41,27 @@ describe('WorkbenchRouter', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitUntilWorkbenchStarted();
 
-    // Add part to the right of the main part.
+    // Add part to the right of the initial part.
     await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
-    // Add view.101 to main part.
+    // Add view.101 to initial part.
     await workbenchRouter.navigate(layout => layout.addView('view.101', {partId: 'part.initial', activateView: true}));
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view.102 to the right part without activating the part.
     await workbenchRouter.navigate(layout => layout.addView('view.102', {partId: 'part.right', activateView: true}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view.103 to the right part without activating the part.
     await workbenchRouter.navigate(layout => layout.addView('view.103', {partId: 'part.right', activateView: true}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view.104 to the right part and activate the part.
@@ -71,7 +71,8 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      return TestBed.inject(WorkbenchService).parts().find(part => part.isInMainArea && part.active())!;
+      const part = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'}) ?? throwError('NullActivePart');
+      return TestBed.inject(WorkbenchService).getPart(part.id)!;
     }
   });
 
@@ -86,10 +87,10 @@ describe('WorkbenchRouter', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitUntilWorkbenchStarted();
 
-    // Add part to the right of the main part.
+    // Add part to the right of the initial part.
     await workbenchRouter.navigate(layout => layout.addPart('part.right', {relativeTo: 'part.initial', align: 'right'}));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view to the right part.
@@ -98,10 +99,10 @@ describe('WorkbenchRouter', () => {
     // Expect right part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
-    // Activate main part.
+    // Activate initial part.
     await workbenchRouter.navigate(layout => layout.activatePart('part.initial'));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view to the right part (view already in the layout).
@@ -110,10 +111,10 @@ describe('WorkbenchRouter', () => {
     // Expect right part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
-    // Activate main part.
+    // Activate initial part.
     await workbenchRouter.navigate(layout => layout.activatePart('part.initial'));
     await waitUntilStable();
-    // Expect main part to be active.
+    // Expect initial part to be active.
     expect(findActiveMainAreaPart().id).toEqual('part.initial');
 
     // Add view to the right part.
@@ -123,7 +124,8 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      return TestBed.inject(WorkbenchService).parts().find(part => part.isInMainArea && part.active())!;
+      const part = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'}) ?? throwError('NullActivePart');
+      return TestBed.inject(WorkbenchService).getPart(part.id)!;
     }
   });
 
@@ -214,8 +216,10 @@ describe('WorkbenchRouter', () => {
     await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        },
       },
     });
 
@@ -224,8 +228,10 @@ describe('WorkbenchRouter', () => {
     await workbenchRouter.navigate(['path/to/view/2'], {target: 'view.102'});
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        },
       },
     });
 
@@ -239,8 +245,10 @@ describe('WorkbenchRouter', () => {
     await workbenchRouter.navigate(['path/to/view/2', {param: 'A'}], {target: 'view.102'});
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        },
       },
     });
     const view102 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
@@ -257,8 +265,10 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        },
       },
     });
     // Expect view.102 not to be navigated.
@@ -275,8 +285,10 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
+        },
       },
     });
     expect(view102.navigation()!.id).not.toEqual(navigationId);
@@ -313,8 +325,10 @@ describe('WorkbenchRouter', () => {
     await workbenchRouter.navigate(['path/to/view/1'], {target: 'view.101'});
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        },
       },
     });
 
@@ -324,8 +338,10 @@ describe('WorkbenchRouter', () => {
     await expectAsync(navigation2).toBeRejectedWithError('navigation error');
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+        },
       },
     });
     expect(TestBed.inject(WorkbenchService).getView('view.102')).toBeNull();
@@ -336,8 +352,10 @@ describe('WorkbenchRouter', () => {
     await workbenchRouter.navigate(['path/to/view/2', {param: 'A'}], {target: 'view.102'});
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        },
       },
     });
     const view102 = TestBed.inject(ɵWorkbenchService).getView('view.102')!;
@@ -355,8 +373,10 @@ describe('WorkbenchRouter', () => {
     await expectAsync(navigation3).toBeRejectedWithError('navigation error');
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}], activeViewId: 'view.102'}),
+        },
       },
     });
     // Expect view.102 not to be navigated.
@@ -373,8 +393,10 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
+      grids: {
+        mainArea: {
+          root: new MPart({id: 'part.initial', views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}], activeViewId: 'view.102'}),
+        },
       },
     });
     expect(view102.navigation()!.id).not.toEqual(navigationId);
@@ -409,19 +431,21 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MPart({
-            id: 'part.101',
-            views: [],
-            navigation: {id: any()},
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            child1: new MPart({
+              id: 'part.101',
+              views: [],
+              navigation: {id: any()},
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-            views: [],
-          }),
-        }),
+        },
       },
     });
 
@@ -433,19 +457,21 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MPart({
-            id: 'part.101',
-            views: [],
-            navigation: {id: any()},
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            child1: new MPart({
+              id: 'part.101',
+              views: [],
+              navigation: {id: any()},
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-            views: [],
-          }),
-        }),
+        },
       },
     });
 
@@ -462,82 +488,9 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            direction: 'row',
-            child1: new MPart({
-              id: 'part.101',
-              views: [],
-              navigation: {id: any()},
-            }),
-            child2: new MPart({
-              id: MAIN_AREA,
-              views: [],
-            }),
-          }),
-          child2: new MPart({
-            id: 'part.102',
-            views: [],
-            navigation: {id: any()},
-          }),
-        }),
-      },
-    });
-
-    const part102 = TestBed.inject(ɵWorkbenchService).getPart('part.102')!;
-    const navigationId = part102.navigation()!.id;
-
-    // Navigate multiple parts:
-    // - Navigate part.102 [canActivate=true]
-    // - Add and navigate part.103 [canActivate=false]
-    canActivate3 = false;
-    await workbenchRouter.navigate(layout => layout
-      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addPart('part.103', {align: 'bottom'})
-      .navigatePart('part.103', ['path/to/part/3']),
-    );
-    await waitUntilStable();
-    expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            direction: 'row',
-            child1: new MPart({
-              id: 'part.101',
-              views: [],
-              navigation: {id: any()},
-            }),
-            child2: new MPart({
-              id: MAIN_AREA,
-              views: [],
-            }),
-          }),
-          child2: new MPart({
-            id: 'part.102',
-            views: [],
-            navigation: {id: any()},
-          }),
-        }),
-      },
-    });
-    // Expect part.102 not to be navigated.
-    expect(part102.navigation()!.id).toEqual(navigationId);
-
-    // Navigate multiple parts:
-    // - Navigate part.102 [canActivate=true]
-    // - Open and navigate part.103 [canActivate=true]
-    canActivate3 = true;
-    await workbenchRouter.navigate(layout => layout
-      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addPart('part.103', {align: 'bottom'})
-      .navigatePart('part.103', ['path/to/part/3']),
-    );
-    await waitUntilStable();
-    expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             child1: new MTreeNode({
               direction: 'row',
               child1: new MPart({
@@ -556,12 +509,91 @@ describe('WorkbenchRouter', () => {
               navigation: {id: any()},
             }),
           }),
-          child2: new MPart({
-            id: 'part.103',
-            views: [],
-            navigation: {id: any()},
+        },
+      },
+    });
+
+    const part102 = TestBed.inject(ɵWorkbenchService).getPart('part.102')!;
+    const navigationId = part102.navigation()!.id;
+
+    // Navigate multiple parts:
+    // - Navigate part.102 [canActivate=true]
+    // - Add and navigate part.103 [canActivate=false]
+    canActivate3 = false;
+    await workbenchRouter.navigate(layout => layout
+      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
+      .addPart('part.103', {align: 'bottom'})
+      .navigatePart('part.103', ['path/to/part/3']),
+    );
+    await waitUntilStable();
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              direction: 'row',
+              child1: new MPart({
+                id: 'part.101',
+                views: [],
+                navigation: {id: any()},
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+                views: [],
+              }),
+            }),
+            child2: new MPart({
+              id: 'part.102',
+              views: [],
+              navigation: {id: any()},
+            }),
           }),
-        }),
+        },
+      },
+    });
+    // Expect part.102 not to be navigated.
+    expect(part102.navigation()!.id).toEqual(navigationId);
+
+    // Navigate multiple parts:
+    // - Navigate part.102 [canActivate=true]
+    // - Open and navigate part.103 [canActivate=true]
+    canActivate3 = true;
+    await workbenchRouter.navigate(layout => layout
+      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
+      .addPart('part.103', {align: 'bottom'})
+      .navigatePart('part.103', ['path/to/part/3']),
+    );
+    await waitUntilStable();
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MTreeNode({
+                direction: 'row',
+                child1: new MPart({
+                  id: 'part.101',
+                  views: [],
+                  navigation: {id: any()},
+                }),
+                child2: new MPart({
+                  id: MAIN_AREA,
+                  views: [],
+                }),
+              }),
+              child2: new MPart({
+                id: 'part.102',
+                views: [],
+                navigation: {id: any()},
+              }),
+            }),
+            child2: new MPart({
+              id: 'part.103',
+              views: [],
+              navigation: {id: any()},
+            }),
+          }),
+        },
       },
     });
     expect(part102.navigation()!.id).not.toEqual(navigationId);
@@ -596,19 +628,21 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MPart({
-            id: 'part.101',
-            views: [],
-            navigation: {id: any()},
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            child1: new MPart({
+              id: 'part.101',
+              views: [],
+              navigation: {id: any()},
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-            views: [],
-          }),
-        }),
+        },
       },
     });
 
@@ -621,19 +655,21 @@ describe('WorkbenchRouter', () => {
     await expectAsync(navigation2).toBeRejectedWithError('navigation error');
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          child1: new MPart({
-            id: 'part.101',
-            views: [],
-            navigation: {id: any()},
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            child1: new MPart({
+              id: 'part.101',
+              views: [],
+              navigation: {id: any()},
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+              views: [],
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-            views: [],
-          }),
-        }),
+        },
       },
     });
 
@@ -650,83 +686,9 @@ describe('WorkbenchRouter', () => {
     );
     await waitUntilStable();
     expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            direction: 'row',
-            child1: new MPart({
-              id: 'part.101',
-              views: [],
-              navigation: {id: any()},
-            }),
-            child2: new MPart({
-              id: MAIN_AREA,
-              views: [],
-            }),
-          }),
-          child2: new MPart({
-            id: 'part.102',
-            views: [],
-            navigation: {id: any()},
-          }),
-        }),
-      },
-    });
-
-    const part102 = TestBed.inject(ɵWorkbenchService).getPart('part.102')!;
-    const navigationId = part102.navigation()!.id;
-
-    // Navigate multiple parts:
-    // - Navigate part.102 [canActivate=true]
-    // - Add and navigate part.103 [canActivate=false]
-    canActivate3 = () => throwError('navigation error');
-    const navigation3 = workbenchRouter.navigate(layout => layout
-      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addPart('part.103', {align: 'bottom'})
-      .navigatePart('part.103', ['path/to/part/3']),
-    );
-    await expectAsync(navigation3).toBeRejectedWithError('navigation error');
-    await waitUntilStable();
-    expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
-            direction: 'row',
-            child1: new MPart({
-              id: 'part.101',
-              views: [],
-              navigation: {id: any()},
-            }),
-            child2: new MPart({
-              id: MAIN_AREA,
-              views: [],
-            }),
-          }),
-          child2: new MPart({
-            id: 'part.102',
-            views: [],
-            navigation: {id: any()},
-          }),
-        }),
-      },
-    });
-    // Expect part.102 not to be navigated.
-    expect(part102.navigation()!.id).toEqual(navigationId);
-
-    // Navigate multiple parts:
-    // - Navigate part.102 [canActivate=true]
-    // - Open and navigate part.103 [canActivate=true]
-    canActivate3 = () => true;
-    await workbenchRouter.navigate(layout => layout
-      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
-      .addPart('part.103', {align: 'bottom'})
-      .navigatePart('part.103', ['path/to/part/3']),
-    );
-    await waitUntilStable();
-    expect(fixture).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          child1: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             child1: new MTreeNode({
               direction: 'row',
               child1: new MPart({
@@ -745,12 +707,92 @@ describe('WorkbenchRouter', () => {
               navigation: {id: any()},
             }),
           }),
-          child2: new MPart({
-            id: 'part.103',
-            views: [],
-            navigation: {id: any()},
+        },
+      },
+    });
+
+    const part102 = TestBed.inject(ɵWorkbenchService).getPart('part.102')!;
+    const navigationId = part102.navigation()!.id;
+
+    // Navigate multiple parts:
+    // - Navigate part.102 [canActivate=true]
+    // - Add and navigate part.103 [canActivate=false]
+    canActivate3 = () => throwError('navigation error');
+    const navigation3 = workbenchRouter.navigate(layout => layout
+      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
+      .addPart('part.103', {align: 'bottom'})
+      .navigatePart('part.103', ['path/to/part/3']),
+    );
+    await expectAsync(navigation3).toBeRejectedWithError('navigation error');
+    await waitUntilStable();
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              direction: 'row',
+              child1: new MPart({
+                id: 'part.101',
+                views: [],
+                navigation: {id: any()},
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+                views: [],
+              }),
+            }),
+            child2: new MPart({
+              id: 'part.102',
+              views: [],
+              navigation: {id: any()},
+            }),
           }),
-        }),
+        },
+      },
+    });
+    // Expect part.102 not to be navigated.
+    expect(part102.navigation()!.id).toEqual(navigationId);
+
+    // Navigate multiple parts:
+    // - Navigate part.102 [canActivate=true]
+    // - Open and navigate part.103 [canActivate=true]
+    canActivate3 = () => true;
+    await workbenchRouter.navigate(layout => layout
+      .navigatePart('part.102', ['path/to/part/2', {param: 'B'}], {data: {some: 'data'}, state: {some: 'state'}})
+      .addPart('part.103', {align: 'bottom'})
+      .navigatePart('part.103', ['path/to/part/3']),
+    );
+    await waitUntilStable();
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MTreeNode({
+              child1: new MTreeNode({
+                direction: 'row',
+                child1: new MPart({
+                  id: 'part.101',
+                  views: [],
+                  navigation: {id: any()},
+                }),
+                child2: new MPart({
+                  id: MAIN_AREA,
+                  views: [],
+                }),
+              }),
+              child2: new MPart({
+                id: 'part.102',
+                views: [],
+                navigation: {id: any()},
+              }),
+            }),
+            child2: new MPart({
+              id: 'part.103',
+              views: [],
+              navigation: {id: any()},
+            }),
+          }),
+        },
       },
     });
     expect(part102.navigation()!.id).not.toEqual(navigationId);

@@ -10,6 +10,7 @@
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {Signal} from '@angular/core';
+import {ActivityId} from '../activity/workbench-activity.model';
 
 /**
  * Represents a workbench perspective.
@@ -91,7 +92,7 @@ export interface WorkbenchPerspectiveDefinition {
 /**
  * Signature of a function to provide a workbench layout.
  *
- * The workbench will invoke this function with a factory to create the layout. The layout is immutable, so each modification creates a new instance.
+ * The workbench will invoke this function with a factory object to create the layout. The layout is immutable, so each modification creates a new instance.
  * Use the instance for further modifications and finally return it.
  *
  * The function can call `inject` to get any required dependencies.
@@ -105,9 +106,8 @@ export interface WorkbenchPerspectiveDefinition {
  * area for user interaction.
  *
  * ## Steps to create the layout
- * Start by adding the first part. From there, you can gradually add more parts and align them relative to each other.
- * Next, add views to the layout, specifying to which part to add the views.
- * The final step is to navigate the views. A view can be navigated to any route.
+ * Start by adding parts to the layout. Parts can be docked to a specific region, or aligned relative to each other. Views can be added to any part (except the main area part).
+ * To display content, navigate parts and views to registered routes.
  *
  * To maintain a clean URL, we recommend navigating the parts and views of the initial layout to empty path routes and using a navigation hint to differentiate.
  *
@@ -201,7 +201,11 @@ export interface MPerspectiveLayout {
      * @see WorkbenchLayoutSerializer.serializeGrid
      * @see WorkbenchLayoutSerializer.deserializeGrid
      */
-    workbenchGrid: string;
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    activityLayout: string;
     /**
      * @see WorkbenchLayoutSerializer.serializeOutlets
      * @see WorkbenchLayoutSerializer.deserializeOutlets
@@ -216,7 +220,11 @@ export interface MPerspectiveLayout {
      * @see WorkbenchLayoutSerializer.serializeGrid
      * @see WorkbenchLayoutSerializer.deserializeGrid
      */
-    workbenchGrid: string;
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    activityLayout: string;
     /**
      * @see WorkbenchLayoutSerializer.serializeOutlets
      * @see WorkbenchLayoutSerializer.deserializeOutlets

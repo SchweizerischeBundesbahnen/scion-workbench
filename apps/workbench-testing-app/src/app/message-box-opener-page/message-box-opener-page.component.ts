@@ -16,7 +16,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {MessageBoxPageComponent} from '../message-box-page/message-box-page.component';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -27,7 +27,7 @@ import {CssClassComponent} from '../css-class/css-class.component';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class MessageBoxOpenerPageComponent {

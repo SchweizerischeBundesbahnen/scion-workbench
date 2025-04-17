@@ -1,0 +1,3 @@
+@for (activity of group().activities; track activity.id) {
+  <wb-activity-item [activity]="activity" [active]="group().activeActivityId === activity.id"/>
+}

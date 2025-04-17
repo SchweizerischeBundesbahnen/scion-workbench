@@ -67,11 +67,13 @@ The SCION Workbench requires the following icons, which can be replaced using an
 
 | Icon Key            | Usage                                            |
 |---------------------|--------------------------------------------------|
-| workbench.menu_down | Menu button of drop down menus                   |
-| workbench.search    | Visual indicator in search or filter fields      |
-| workbench.dirty     | Visual indicator for view with unsaved content   |
-| workbench.close     | Close button of views, dialogs and notifications |
 | workbench.clear     | Clear button in input fields                     |
+| workbench.close     | Close button in views, dialogs and notifications |
+| workbench.dirty     | Visual indicator for view with unsaved content   |
+| workbench.menu_down | Menu button of drop down menus                   |
+| workbench.minimize  | Minimize button in docked parts                  |
+| workbench.pin       | Visual indicator for a pinned view               |
+| workbench.search    | Visual indicator in search or filter fields      |
 
 To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
 

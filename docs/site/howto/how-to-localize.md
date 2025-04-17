@@ -63,11 +63,15 @@ The SCION Workbench uses the following translation keys for built-in texts. Usin
 | workbench.close_tabs_to_the_left.action         | Close Tabs to the Left                                                                                                      |
 | workbench.close_tabs_to_the_right.action        | Close Tabs to the Right                                                                                                     |
 | workbench.close.tooltip                         | Close                                                                                                                       |
+| workbench.developer_hint.tooltip                | This hint is only displayed in dev mode.                                                                                    |
+| workbench.minimize.tooltip                      | Minimize                                                                                                                    |
 | workbench.move_tab_down.action                  | Move Down                                                                                                                   |
 | workbench.move_tab_to_new_window.action         | Move to New Window                                                                                                          |
 | workbench.move_tab_to_the_left.action           | Move Left                                                                                                                   |
 | workbench.move_tab_to_the_right.action          | Move Right                                                                                                                  |
 | workbench.move_tab_up.action                    | Move Up                                                                                                                     |
+| workbench.null_content.message                  | Nothing to show.                                                                                                            |
+| workbench.null_view_developer_hint.message      | This view has not been navigated. Navigate the view "{{view}}" to display content.                                          |
 | workbench.ok.action                             | OK                                                                                                                          |
 | workbench.page_not_found.message                | The requested page {{path}} was not found. The URL may have changed. Try to open the page again.                            |
 | workbench.page_not_found.title                  | Page Not Found                                                                                                              |

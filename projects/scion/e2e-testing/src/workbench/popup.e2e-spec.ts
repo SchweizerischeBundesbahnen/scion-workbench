@@ -18,9 +18,10 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {PopupPositionTestPagePO} from './page-object/test-pages/popup-position-test-page.po';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectView} from '../matcher/view-matcher';
+import {MAIN_AREA} from '../workbench.model';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench-layout-constants';
 
 test.describe('Workbench Popup', () => {
 
@@ -156,7 +157,7 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).toBeVisible();
       await expect.poll(() => popup.getAlign()).toEqual('north');
 
-      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
       await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
       await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
     });
@@ -178,7 +179,7 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).toBeVisible();
       await expect.poll(() => popup.getAlign()).toEqual('north');
 
-      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
       await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
       await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
     });
@@ -200,7 +201,7 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).toBeVisible();
       await expect.poll(() => popup.getAlign()).toEqual('south');
 
-      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
       await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.top + 300, 0);
       await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(viewBounds.left + 300, 0);
     });
@@ -222,7 +223,7 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).toBeVisible();
       await expect.poll(() => popup.getAlign()).toEqual('east');
 
-      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
       await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(viewBounds.top + 300, 0);
       await expect.poll(() => popup.getBoundingBox().then(box => box.left - POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.left + 300, 0);
     });
@@ -244,7 +245,7 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).toBeVisible();
       await expect.poll(() => popup.getAlign()).toEqual('west');
 
-      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
       await expect.poll(() => popup.getBoundingBox().then(box => box.vcenter)).toBeCloseTo(viewBounds.top + 300, 0);
       await expect.poll(() => popup.getBoundingBox().then(box => box.right + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(viewBounds.left + 300, 0);
     });
@@ -426,7 +427,7 @@ test.describe('Workbench Popup', () => {
 
       const popup = appPO.popup({cssClass: 'testee'});
 
-      const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+      const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
       await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
       await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 
@@ -470,18 +471,19 @@ test.describe('Workbench Popup', () => {
     test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+        .addView('view.100', {partId: 'part.activity-1'})
+        .navigateView('view.100', ['test-popup-opener'])
+        .activatePart('part.activity-1'),
+      );
+
       // Open view in main area.
       const viewPageInMainArea = await workbenchNavigator.openInNewTab(ViewPagePO);
 
-      // Open popup opener view.
-      const popupOpenerView = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
-
-      // Drag popup opener view into peripheral area.
-      const dragHandle = await popupOpenerView.view.tab.startDrag();
-      await dragHandle.dragToEdge('east');
-      await dragHandle.drop();
-
       // Open popup.
+      const popupOpenerView = new PopupOpenerPagePO(appPO.view({viewId: 'view.100'}));
       await popupOpenerView.selectPopupComponent('popup-page');
       await popupOpenerView.enterCssClass('testee');
       await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
@@ -506,7 +508,7 @@ test.describe('Workbench Popup', () => {
 
       // Open view 1 with popup.
       const popupPage = await SizeTestPagePO.openInPopup(appPO, {position: 'element'});
-      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()}));
+      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()}));
 
       await expectPopup(popupPage).toBeVisible();
       const popupSize = await popupPage.getBoundingBox();
@@ -536,7 +538,7 @@ test.describe('Workbench Popup', () => {
 
       // Open view 1 with popup.
       const popupPage = await SizeTestPagePO.openInPopup(appPO, {position: 'coordinate'});
-      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()}));
+      const viewPage1 = new PopupOpenerPagePO(appPO.view({viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()}));
 
       await expectPopup(popupPage).toBeVisible();
       const popupSize = await popupPage.getBoundingBox();

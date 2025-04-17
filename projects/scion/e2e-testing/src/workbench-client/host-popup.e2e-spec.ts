@@ -14,7 +14,7 @@ import {HostPopupPagePO} from './page-object/host-popup-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {expectPopup} from '../matcher/popup-matcher';
 import {waitUntilBoundingBoxStable} from '../helper/testing.util';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from '../workbench/workbench-layout-constants';
 
 test.describe('Workbench Host Popup', () => {
 
@@ -233,7 +233,7 @@ test.describe('Workbench Host Popup', () => {
 
     await popupPage.enterComponentSize({height: '100px', width: '100px'});
 
-    const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+    const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
     await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
     await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 

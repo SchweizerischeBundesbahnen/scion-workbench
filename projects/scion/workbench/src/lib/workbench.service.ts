@@ -13,7 +13,7 @@ import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {PartId, WorkbenchPart} from './part/workbench-part.model';
-import {Injectable, Signal} from '@angular/core';
+import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
 
@@ -181,4 +181,14 @@ export abstract class WorkbenchService {
    * Provides the current workbench theme, if any.
    */
   public abstract readonly theme: Signal<WorkbenchTheme | null>;
+
+  /**
+   * Configures how to align the bottom activity panel. Defaults to 'justify'.
+   */
+  public abstract readonly panelAlignment: WritableSignal<'left' | 'right' | 'center' | 'justify'>;
+
+  /**
+   * Configures if to animate activity panels.
+   */
+  public abstract readonly panelAnimation: WritableSignal<boolean>;
 }

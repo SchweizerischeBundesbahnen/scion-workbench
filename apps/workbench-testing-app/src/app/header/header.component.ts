@@ -62,6 +62,9 @@ export class HeaderComponent {
   protected onSettingsMenuOpen(element: Element): void {
     void runIfMenuClosed(async () => {
       await this._menuService.openMenu(element, [
+        ...this.contributePanelAnimation(),
+        new MenuItemSeparator('Panel Alignment'),
+        ...this.contributePanelAlignment(),
         new MenuItemSeparator('Log Level'),
         ...this.contributeLogLevelMenuItems(),
         new MenuItemSeparator(),
@@ -208,9 +211,49 @@ export class HeaderComponent {
     ];
   }
 
+  private contributePanelAnimation(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Enable Panel Animation',
+        checked: this.workbenchService.panelAnimation(),
+        onAction: () => this.workbenchService.panelAnimation.update(enabled => !enabled),
+      }),
+    ];
+  }
+
+  private contributePanelAlignment(): MenuItem[] {
+    return [
+      new MenuItem({
+        text: 'Left',
+        cssClass: 'e2e-change-panel-alignment-left',
+        checked: this.workbenchService.panelAlignment() === 'left',
+        onAction: () => this.workbenchService.panelAlignment.set('left'),
+      }),
+      new MenuItem({
+        text: 'Right',
+        cssClass: 'e2e-change-panel-alignment-right',
+        checked: this.workbenchService.panelAlignment() === 'right',
+        onAction: () => this.workbenchService.panelAlignment.set('right'),
+      }),
+      new MenuItem({
+        text: 'Center',
+        cssClass: 'e2e-change-panel-alignment-center',
+        checked: this.workbenchService.panelAlignment() === 'center',
+        onAction: () => this.workbenchService.panelAlignment.set('center'),
+      }),
+      new MenuItem({
+        text: 'Justify',
+        cssClass: 'e2e-change-panel-alignment-justify',
+        checked: this.workbenchService.panelAlignment() === 'justify',
+        onAction: () => this.workbenchService.panelAlignment.set('justify'),
+      }),
+    ];
+  }
+
   private findPerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
     const groupLabels = new Map<string, string>()
-      .set('peripheral-part-layout', 'Layout with Peripheral Parts');
+      .set('docked-parts-layout', 'Layout with Parts Docked to the Side')
+      .set('peripheral-part-layout', 'Layout with Parts Around the Main Area');
 
     const menuItems = new Array<MenuItem | MenuItemSeparator>();
 

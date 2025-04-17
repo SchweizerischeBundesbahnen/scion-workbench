@@ -114,11 +114,11 @@ Prepend the path with a forward slash `/` to navigate absolutely, or set `relati
 ***
 #### Related Links:
 - [Learn how to provide a view.][link-how-to-provide-view]
-- [Learn how to define the initial workbench layout.][link-how-to-define-initial-workbench-layout]
+- [Learn how to define the workbench layout.][link-how-to-define-workbench-layout]
 ***
 
 [link-how-to-provide-view]: /docs/site/howto/how-to-provide-view.md
-[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-define-workbench-layout]: /docs/site/howto/how-to-define-layout
 
 [menu-how-to]: /docs/site/howto/how-to.md
 [menu-home]: /README.md

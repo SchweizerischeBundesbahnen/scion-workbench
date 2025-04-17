@@ -81,11 +81,11 @@ Alternatively, the above data can be set in the view by injecting the view handl
 ***
 #### Related Links:
 - [Learn how to open a view.][link-how-to-open-view] 
-- [Learn how to define the initial workbench layout.][link-how-to-define-initial-workbench-layout] 
+- [Learn how to define the workbench layout.][link-how-to-define-workbench-layout] 
 ***
 
 [link-how-to-open-view]: /docs/site/howto/how-to-open-view.md
-[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
+[link-how-to-define-workbench-layout]: /docs/site/howto/how-to-define-layout
 [how-to-interact-with-view]: /docs/site/howto/how-to-interact-with-view.md
 
 [menu-how-to]: /docs/site/howto/how-to.md

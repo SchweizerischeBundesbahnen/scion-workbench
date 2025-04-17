@@ -164,11 +164,15 @@ export abstract class WorkbenchConfig {
    * - workbench.close_tabs_to_the_left.action
    * - workbench.close_tabs_to_the_right.action
    * - workbench.close.tooltip
+   * - workbench.developer_hint.tooltip
+   * - workbench.minimize.tooltip
    * - workbench.move_tab_down.action
    * - workbench.move_tab_to_new_window.action
    * - workbench.move_tab_to_the_left.action
    * - workbench.move_tab_to_the_right.action
    * - workbench.move_tab_up.action
+   * - workbench.null_content.message
+   * - workbench.null_view_developer_hint.message
    * - workbench.ok.action
    * - workbench.page_not_found.message
    * - workbench.page_not_found.title
@@ -196,6 +200,8 @@ export abstract class WorkbenchConfig {
    * - `workbench.close`: Close button in views, dialogs and notifications
    * - `workbench.dirty`: Visual indicator for view with unsaved content
    * - `workbench.menu_down`: Menu button of drop down menus
+   * - `workbench.minimize`: Minimize button in docked parts
+   * - `workbench.pin`: Visual indicator for a pinned view
    * - `workbench.search`: Visual indicator in search or filter fields
    *
    * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.

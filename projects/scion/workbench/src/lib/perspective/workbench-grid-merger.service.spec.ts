@@ -51,45 +51,47 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes not to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.left',
-              navigation: {id: any()},
-            }),
-            child2: new MPart({
-              id: 'part.left-bottom',
-              navigation: {id: any()},
-            }),
-          }),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'row',
             ratio: .25,
             child1: new MTreeNode({
               direction: 'column',
               ratio: .5,
               child1: new MPart({
-                id: 'part.topLeft',
-                views: [
-                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-                  {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-                ],
+                id: 'part.left',
+                navigation: {id: any()},
               }),
               child2: new MPart({
-                id: 'part.bottomLeft',
-                views: [
-                  {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
-                ],
+                id: 'part.left-bottom',
+                navigation: {id: any()},
               }),
             }),
-            child2: new MPart({id: MAIN_AREA}),
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .25,
+              child1: new MTreeNode({
+                direction: 'column',
+                ratio: .5,
+                child1: new MPart({
+                  id: 'part.topLeft',
+                  views: [
+                    {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                    {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                  ],
+                }),
+                child2: new MPart({
+                  id: 'part.bottomLeft',
+                  views: [
+                    {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
+                  ],
+                }),
+              }),
+              child2: new MPart({id: MAIN_AREA}),
+            }),
           }),
-        }),
+        },
       },
     });
 
@@ -97,7 +99,7 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.1': segments(['PATH/TO/VIEW/1']),
       'view.100': segments(['path/to/view/100']),
       'part.left': segments(['PATH/TO/PART']),
@@ -135,29 +137,31 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.topLeft',
-              views: [
-                {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.topLeft',
+                views: [
+                  {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
+              child2: new MPart({
+                id: 'part.bottomLeft',
+                views: [
+                  {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
+                  {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
             }),
-            child2: new MPart({
-              id: 'part.bottomLeft',
-              views: [
-                {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
-                {id: 'view.100', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
-            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -165,7 +169,7 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.100'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.2': segments(['path/to/view/2']),
       'view.100': segments(['PATH/TO/VIEW/100']),
     });
@@ -192,28 +196,30 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.topLeft',
-              views: [
-                {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.topLeft',
+                views: [
+                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
+              child2: new MPart({
+                id: 'part.bottomLeft',
+                views: [
+                  {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
             }),
-            child2: new MPart({
-              id: 'part.bottomLeft',
-              views: [
-                {id: 'view.2', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
-            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -221,7 +227,7 @@ describe('WorkbenchGridMerger', () => {
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
     expect(mergedLayout.view({viewId: 'view.2'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.1': segments(['path/to/view/1']),
       'view.2': segments(['path/to/view/2b']),
     });
@@ -248,35 +254,37 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
-            child1: new MPart({
-              id: 'part.topLeft',
-              views: [
-                {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
-              ],
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.topLeft',
+                views: [
+                  {id: 'view.1', navigation: {id: any()}}, // additional assertion below to assert the hint not to be present
+                ],
+              }),
+              child2: new MPart({
+                id: 'part.bottomLeft',
+                views: [
+                  {id: 'view.2', navigation: {id: any(), hint: 'hint-2b'}},
+                ],
+              }),
             }),
-            child2: new MPart({
-              id: 'part.bottomLeft',
-              views: [
-                {id: 'view.2', navigation: {id: any(), hint: 'hint-2b'}},
-              ],
-            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
     // Expect hint not to be present.
     expect(mergedLayout.view({viewId: 'view.1'}).navigation!.hint).toBeUndefined();
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'view.1': segments(['path/to/view/1']),
     });
   });
@@ -297,20 +305,22 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            navigation: {id: any()},
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              navigation: {id: any()},
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       'part.left': segments(['path/to/part']),
     });
   });
@@ -331,22 +341,24 @@ describe('WorkbenchGridMerger', () => {
 
     // Expect local changes to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+              navigation: {id: any()},
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-            navigation: {id: any()},
-          }),
-        }),
+        },
       },
     });
 
-    expect(mergedLayout.outlets()).toEqual({
+    expect(mergedLayout.outlets({mainGrid: true, mainAreaGrid: true})).toEqual({
       [MAIN_AREA]: segments(['path/to/desktop']),
     });
   });

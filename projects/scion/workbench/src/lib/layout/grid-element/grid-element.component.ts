@@ -62,10 +62,10 @@ export class GridElementComponent {
     this._workbenchLayoutService.signalResizing(true);
   }
 
-  protected onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
-    const ratio = sashSize1 / (sashSize1 + sashSize2);
+  protected onSashEnd(treeNode: MTreeNode, {sash1, sash2}: {[sashKey: string]: number}): void {
+    const ratio = sash1! / (sash1! + sash2!);
     this._workbenchLayoutService.signalResizing(false);
-    void this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio));
+    void this._workbenchRouter.navigate(layout => layout.setTreeNodeSplitRatio(treeNode.id, ratio));
   }
 
   private computeChildren(): Signal<ChildElement[]> {
