@@ -16,6 +16,7 @@ import {WorkbenchConfig} from '../../workbench-config';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {TextPipe} from '../../text/text.pipe';
+import {IconComponent} from '../../icon/icon.component';
 
 @Component({
   selector: 'wb-view-list-item',
@@ -25,6 +26,7 @@ import {TextPipe} from '../../text/text.pipe';
   imports: [
     PortalModule,
     TextPipe,
+    IconComponent,
   ],
   host: {
     '[class.active]': 'view().active()',

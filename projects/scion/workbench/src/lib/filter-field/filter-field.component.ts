@@ -15,6 +15,7 @@ import {FocusMonitor, FocusOrigin} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {UUID} from '@scion/toolkit/uuid';
 import {TextPipe} from '../text/text.pipe';
+import {IconComponent} from '../icon/icon.component';
 
 /**
  * Provides a filter control.
@@ -27,6 +28,7 @@ import {TextPipe} from '../text/text.pipe';
   imports: [
     ReactiveFormsModule,
     TextPipe,
+    IconComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => FilterFieldComponent)},
