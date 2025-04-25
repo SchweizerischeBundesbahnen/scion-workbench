@@ -11,10 +11,9 @@
     @include workbench-mixins.ellipsis-on-overflow();
     font-weight: 400;
     font-size: 1em;
-
-    > span.dirty {
-      padding-right: .2em;
-    }
+    display: flex;
+    align-items: center;
+    gap: .25em;
   }
 
   > span.heading {

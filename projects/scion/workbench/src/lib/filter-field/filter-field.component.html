@@ -1,10 +1,12 @@
-<label [for]="id" class="filter-icon scion-workbench-icons">search</label>
+<label [for]="id" class="filter-icon">
+  <wb-icon icon="workbench.search"/>
+</label>
 <input #input
        [attr.id]="id"
        autocomplete="off"
        [formControl]="formControl"
        [tabindex]="tabindex() ?? 0"
        [placeholder]="placeholder() ?? ''">
-<button class="clear scion-workbench-icons" tabindex="-1" (click)="onClear()" [title]="('%workbench.clear.tooltip' | wbText)()">
-  clear
+<button class="clear" tabindex="-1" (click)="onClear()" [title]="('%workbench.clear.tooltip' | wbText)()">
+  <wb-icon icon="workbench.clear"/>
 </button>

@@ -16,11 +16,15 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {observeIn} from '@scion/toolkit/operators';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {IconComponent} from '../../icon/icon.component';
 
 @Component({
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
   styleUrls: ['./view-list-button.component.scss'],
+  imports: [
+    IconComponent,
+  ],
 })
 export class ViewListButtonComponent implements OnDestroy {
 

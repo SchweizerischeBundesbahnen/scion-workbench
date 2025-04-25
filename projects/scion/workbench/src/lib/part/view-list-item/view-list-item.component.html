@@ -3,9 +3,7 @@
 </div>
 
 @if (view().closable()) {
-  <button class="close e2e-close scion-workbench-icons"
-          (click)="onClose()"
-          [title]="('%workbench.close.tooltip' | wbText)()">
-    close
+  <button (click)="onClose()" class="close e2e-close" [title]="('%workbench.close.tooltip' | wbText)()">
+    <wb-icon icon="workbench.close"/>
   </button>
 }

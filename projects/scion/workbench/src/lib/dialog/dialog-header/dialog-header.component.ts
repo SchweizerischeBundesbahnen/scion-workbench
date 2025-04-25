@@ -11,6 +11,7 @@
 import {Component, inject} from '@angular/core';
 import {ɵWorkbenchDialog} from '../ɵworkbench-dialog';
 import {TextPipe} from '../../text/text.pipe';
+import {IconComponent} from '../../icon/icon.component';
 
 /**
  * Renders the dialog header with a close button and optional title.
@@ -21,6 +22,7 @@ import {TextPipe} from '../../text/text.pipe';
   styleUrls: ['./dialog-header.component.scss'],
   imports: [
     TextPipe,
+    IconComponent,
   ],
 })
 export class DialogHeaderComponent {

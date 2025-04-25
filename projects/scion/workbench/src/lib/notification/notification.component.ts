@@ -17,6 +17,7 @@ import {Notification} from './notification';
 import {AsyncPipe} from '@angular/common';
 import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
 import {TextPipe} from '../text/text.pipe';
+import {IconComponent} from '../icon/icon.component';
 
 /**
  * A notification is a closable message that appears in the upper-right corner and disappears automatically after a few seconds.
@@ -32,6 +33,7 @@ import {TextPipe} from '../text/text.pipe';
     PortalModule,
     CoerceObservablePipe,
     TextPipe,
+    IconComponent,
   ],
 })
 export class NotificationComponent {
