@@ -21,6 +21,7 @@ import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
 import {MAIN_AREA} from '../../layout/workbench-layout';
 import {TextPipe} from '../../text/text.pipe';
+import {IconComponent} from '../../icon/icon.component';
 
 /**
  * @see ViewTabComponent
@@ -35,6 +36,7 @@ import {TextPipe} from '../../text/text.pipe';
   imports: [
     PortalModule,
     TextPipe,
+    IconComponent,
   ],
 })
 export class ViewTabDragImageComponent {

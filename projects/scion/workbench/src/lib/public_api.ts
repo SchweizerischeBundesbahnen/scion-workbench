@@ -32,3 +32,4 @@ export * from './startup/public_api';
 export * from './logging/public_api';
 export * from './storage/public_api';
 export * from './text/public_api';
+export * from './icon/public_api';

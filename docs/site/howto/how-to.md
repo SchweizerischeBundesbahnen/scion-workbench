@@ -46,7 +46,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 #### Miscellaneous
 - [How to theme the SCION Workbench](how-to-theme-workbench.md)
 - [How to localize the SCION Workbench](how-to-localize.md)
-- [How to change the workbench icons](how-to-icons.md)
+- [How to customize icons in the SCION Workbench](how-to-icons.md)
 
 ***
 

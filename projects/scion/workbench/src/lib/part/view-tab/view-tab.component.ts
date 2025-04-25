@@ -28,6 +28,7 @@ import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {synchronizeCssClasses} from '../../common/css-class.util';
 import {TextPipe} from '../../text/text.pipe';
+import {IconComponent} from '../../icon/icon.component';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -41,6 +42,7 @@ import {TextPipe} from '../../text/text.pipe';
   imports: [
     PortalModule,
     TextPipe,
+    IconComponent,
   ],
 })
 export class ViewTabComponent {

@@ -5,7 +5,7 @@ The following steps explain how to manage the icon font.
 
 1. Open IcoMoon 'https://icomoon.io/app/#/projects' web application.
 2. Click 'Import Project' from the file 'scion-workbench-icons.json' and click 'Load'
-3. Open 'Selection' tab and select the items to include in the icon font
+3. Open 'Selection' tab and select the items to include in the icon font (Material icons)
 4. Open 'Generate Font' tab and set the ligatures
    DO NOT USE HYPHENS IN LIGATURES!
 5. When done, download the font and unzip it.

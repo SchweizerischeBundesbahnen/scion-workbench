@@ -12,6 +12,7 @@ import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {TextPipe} from '../../text/text.pipe';
+import {IconComponent} from '../../icon/icon.component';
 
 @Component({
   selector: 'wb-view-tab-content',
@@ -19,6 +20,7 @@ import {TextPipe} from '../../text/text.pipe';
   styleUrls: ['./view-tab-content.component.scss'],
   imports: [
     TextPipe,
+    IconComponent,
   ],
   host: {
     '[attr.context]': 'context',

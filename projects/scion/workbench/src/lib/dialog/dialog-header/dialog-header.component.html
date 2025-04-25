@@ -5,10 +5,10 @@
 }
 
 @if (dialog.closable()) {
-  <button tabindex="-1" class="close scion-workbench-icons e2e-close"
+  <button tabindex="-1" class="close e2e-close"
           [title]="('%workbench.close.tooltip' | wbText)()"
           (mousedown)="onCloseMouseDown($event)"
           (click)="onCloseClick()">
-    close
+    <wb-icon icon="workbench.close"/>
   </button>
 }
