@@ -16,6 +16,7 @@ import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microf
 import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
 import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
+import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
 
 /**
  * Configuration of the SCION Workbench.
@@ -180,6 +181,29 @@ export abstract class WorkbenchConfig {
    * @see WorkbenchTextProviderFn
    */
   public abstract textProvider?: WorkbenchTextProviderFn;
+
+  /**
+   * Provides icons to the SCION Workbench.
+   *
+   * An icon provider is a function that returns a component for an icon. The component renders the icon.
+   *
+   * Defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
+   * The default icon provider requires the application to include the Material icon font in the HTML.
+   *
+   * The SCION Workbench uses the following icons:
+   * - `workbench.clear`: Clear button in input fields
+   * - `workbench.close`: Close button in views, dialogs and notifications
+   * - `workbench.dirty`: Visual indicator for view with unsaved content
+   * - `workbench.menu_down`: Menu button of drop down menus
+   * - `workbench.search`: Visual indicator in search or filter fields
+   *
+   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
+   *
+   * The function can call `inject` to get any required dependencies.
+   *
+   * @see WorkbenchIconProviderFn
+   */
+  public abstract iconProvider?: WorkbenchIconProviderFn;
 
   /**
    * Configures logging for the workbench.

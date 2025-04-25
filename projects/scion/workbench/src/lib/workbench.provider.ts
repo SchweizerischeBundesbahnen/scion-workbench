@@ -24,6 +24,7 @@ import {provideLocationPatch} from './routing/ɵlocation';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewTabDragImageRenderer} from './view-dnd/view-tab-drag-image-renderer.service';
 import {provideTextProviders} from './text/text-providers';
+import {provideIconProviders} from './icon/icon-providers';
 
 /**
  * Enables and configures the SCION Workbench in an application, returning a set of dependency-injection providers to be registered in Angular.
@@ -119,6 +120,7 @@ export function provideWorkbench(config?: WorkbenchConfig): EnvironmentProviders
     provideEnvironmentInitializer(() => rejectIfNotRootEnvironment()),
     provideWorkbenchLauncher(config),
     provideTextProviders(config),
+    provideIconProviders(config),
     provideLogging(config),
     provideLocationPatch(),
     provideWorkbenchMicrofrontendSupport(config),
