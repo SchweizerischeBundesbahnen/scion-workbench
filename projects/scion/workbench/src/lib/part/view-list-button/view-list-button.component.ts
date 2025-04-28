@@ -8,14 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ComponentRef, computed, DestroyRef, ElementRef, HostListener, inject, Injector, NgZone, OnDestroy, Signal, signal} from '@angular/core';
-import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
+import {Component, computed, DestroyRef, ElementRef, HostListener, inject, Injector, signal, Signal} from '@angular/core';
+import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
-import {ViewListComponent, ViewListComponentInputs} from '../view-list/view-list.component';
+import {ViewListComponent} from '../view-list/view-list.component';
 import {WorkbenchPart} from '../workbench-part.model';
-import {observeIn} from '@scion/toolkit/operators';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {IconComponent} from '../../icon/icon.component';
 
 @Component({
@@ -30,17 +28,16 @@ import {IconComponent} from '../../icon/icon.component';
     IconComponent,
   ],
 })
-export class ViewListButtonComponent implements OnDestroy {
+export class ViewListButtonComponent {
 
-  private static readonly SOUTH: ConnectedPosition = {originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top'};
-  private static readonly NORTH: ConnectedPosition = {originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom'};
+  private static readonly SOUTH: ConnectedPosition = {originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', panelClass: 'wb-south'};
+  private static readonly NORTH: ConnectedPosition = {originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', panelClass: 'wb-north'};
 
   private readonly _host = inject(ElementRef);
   private readonly _overlay = inject(Overlay);
   private readonly _injector = inject(Injector);
-  private readonly _zone = inject(NgZone);
+  private readonly _destroyRef = inject(DestroyRef);
 
-  private _overlayRef: OverlayRef | undefined;
   /** Number of views that are scrolled out of the tab bar. */
   protected readonly scrolledOutOfViewTabCount: Signal<number>;
   protected readonly menuState = signal<'open' | 'closed'>('closed');
@@ -67,45 +64,19 @@ export class ViewListButtonComponent implements OnDestroy {
       .withFlexibleDimensions(false)
       .withPositions([ViewListButtonComponent.SOUTH, ViewListButtonComponent.NORTH]);
 
-    this._overlayRef = this._overlay.create(new OverlayConfig({
+    const overlayRef = this._overlay.create(new OverlayConfig({
       scrollStrategy: this._overlay.scrollStrategies.noop(),
       disposeOnNavigation: true,
+      panelClass: 'wb-view-list-menu',
       positionStrategy,
     }));
 
-    const componentRef = this._overlayRef.attach(new ComponentPortal(ViewListComponent, null, Injector.create({
+    const componentRef = overlayRef.attach(new ComponentPortal(ViewListComponent, null, Injector.create({
       parent: this._injector,
-      providers: [{provide: OverlayRef, useValue: this._overlayRef}],
+      providers: [{provide: OverlayRef, useValue: overlayRef}],
     })));
 
-    this.updatePositionInputOnPositionChange(componentRef, positionStrategy);
+    this._destroyRef.onDestroy(() => overlayRef.dispose());
     return new Promise<void>(resolve => componentRef.onDestroy(resolve));
-  }
-
-  /**
-   * Updates 'position' input of {@link ViewListComponent} when the overlay position changes.
-   */
-  private updatePositionInputOnPositionChange(componentRef: ComponentRef<ViewListComponent>, positionStrategy: FlexibleConnectedPositionStrategy): void {
-    positionStrategy.positionChanges
-      .pipe(
-        // Ensure running inside Angular as Angular CDK emits position changes outside the Angular zone.
-        // Otherwise, Angular would not invoke the `ngOnChanges` lifecycle hook when updating component input.
-        observeIn(fn => this._zone.run(fn)),
-        takeUntilDestroyed(componentRef.injector.get(DestroyRef)),
-      )
-      .subscribe(positionChange => {
-        switch (positionChange.connectionPair) {
-          case ViewListButtonComponent.NORTH:
-            componentRef.setInput(ViewListComponentInputs.POSITION, 'north');
-            break;
-          case ViewListButtonComponent.SOUTH:
-            componentRef.setInput(ViewListComponentInputs.POSITION, 'south');
-            break;
-        }
-      });
-  }
-
-  public ngOnDestroy(): void {
-    this._overlayRef?.dispose();
   }
 }
