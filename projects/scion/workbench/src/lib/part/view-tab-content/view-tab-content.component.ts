@@ -24,6 +24,7 @@ import {IconComponent} from '../../icon/icon.component';
   ],
   host: {
     '[attr.context]': 'context',
+    '[attr.data-non-closable]': `!view.closable() ? '' : undefined`,
   },
 })
 export class ViewTabContentComponent {

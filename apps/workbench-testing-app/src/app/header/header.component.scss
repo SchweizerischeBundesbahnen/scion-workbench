@@ -1,7 +1,7 @@
 :host {
   display: flex;
   align-items: center;
-  height: 45px;
+  height: 43px;
   padding: .5em;
   user-select: none;
   gap: .25em;
@@ -12,7 +12,7 @@
     display: flex;
     align-items: center;
     gap: .5em;
-    padding: .4em .5em .4em .75em;
+    padding: .3em .5em .3em .75em;
     border-radius: var(--sci-corner);
     background-color: var(--sci-color-accent);
     color: var(--sci-color-background-accent);

@@ -1,4 +1,4 @@
-@use '../common/workbench-mixins';
+@use '../common/workbench.mixin';
 
 :host {
   display: flex;
@@ -6,7 +6,7 @@
   background-color: var(--sci-workbench-view-background-color);
   color: var(--sci-color-text);
 
-  @include workbench-mixins.peripheral-workbench-parts-selector {
+  @include workbench.peripheral-workbench-parts-selector {
     background-color: var(--sci-workbench-view-peripheral-background-color);
   }
 

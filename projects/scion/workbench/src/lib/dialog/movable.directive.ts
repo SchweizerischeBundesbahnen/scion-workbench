@@ -9,7 +9,6 @@
  */
 
 import {Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
-import {DOCUMENT} from '@angular/common';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {getCssTranslation} from '../common/dom.util';
 import {fromMoveHandle$, HandleMoveEvent} from '../common/observables';
@@ -29,7 +28,6 @@ export class MovableDirective {
   public readonly wbMove = output<WbMoveEvent>({alias: 'wbMovableMove'});
 
   private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
-  private readonly _document = inject(DOCUMENT);
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
 
   private _x = 0;
@@ -84,19 +82,11 @@ export class MovableDirective {
   }
 
   private createMoveHandle(element: HTMLElement): Disposable {
-    // Apply 'move' cursor.
-    const prevHandleCursor = element.style.cursor;
-    element.style.setProperty('cursor', 'move');
-
     // Subscribe to move events.
-    let prevBodyCursor: string | undefined;
     const subscription = fromMoveHandle$(element)
       .subscribe((event: HandleMoveEvent) => {
         switch (event.type) {
           case 'mousestart': {
-            // Apply cursor on document level to prevent flickering while moving the handle.
-            prevBodyCursor = this._document.body.style.cursor;
-            this._document.body.style.cursor = 'move';
             this.onMoveStart(event.mouseEvent);
             break;
           }
@@ -113,7 +103,6 @@ export class MovableDirective {
             break;
           }
           case 'mouseend': {
-            this._document.body.style.cursor = prevBodyCursor!;
             this.onMoveEnd();
             break;
           }
@@ -125,10 +114,7 @@ export class MovableDirective {
       });
 
     return {
-      dispose: () => {
-        element.style.setProperty('cursor', prevHandleCursor);
-        subscription.unsubscribe();
-      },
+      dispose: () => subscription.unsubscribe(),
     };
   }
 }

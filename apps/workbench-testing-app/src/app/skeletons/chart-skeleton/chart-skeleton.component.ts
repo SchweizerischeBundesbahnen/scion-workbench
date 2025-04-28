@@ -8,40 +8,35 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostListener, inject, signal, WritableSignal} from '@angular/core';
+import {Component, HostListener, inject, signal} from '@angular/core';
 import {Skeletons} from '../skeletons.util';
-import {NgClass} from '@angular/common';
 import {WorkbenchPart, WorkbenchView} from '@scion/workbench';
 import {Chart} from './chart';
 
 /**
  * Represents a skeleton for a chart.
  *
- * The component supports the rendering of a line and area chart.
+ * The component supports the rendering of a line chart.
  */
 @Component({
   selector: 'app-chart-skeleton',
   templateUrl: './chart-skeleton.component.html',
   styleUrls: ['./chart-skeleton.component.scss'],
-  imports: [
-    NgClass,
-  ],
+  host: {
+    '[attr.title]': `'Click to generate a new chart series.'`,
+  },
 })
 export class ChartSkeletonComponent {
 
   protected chart = new Chart({paddingTop: 2, paddingBottom: 2});
-  protected chartType: WritableSignal<ChartType>;
   protected active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   constructor() {
-    this.chartType = signal(chartTypes[Skeletons.random(0, chartTypes.length - 1)]);
     this.chart.setDataSeries(this.generateDataSeries({n: 250, maxValue: 50}));
   }
 
   @HostListener('click')
   protected onReload(): void {
-    // Select next chart type.
-    this.chartType.set(chartTypes[(chartTypes.indexOf(this.chartType()) + 1) % chartTypes.length]);
     // Update the chart with a new data series.
     this.chart.setDataSeries(this.generateDataSeries({n: 250, maxValue: 50}));
   }
@@ -63,6 +58,3 @@ export class ChartSkeletonComponent {
     return dataSeries;
   }
 }
-
-type ChartType = 'line' | 'area';
-const chartTypes: ChartType[] = ['line', 'area'];

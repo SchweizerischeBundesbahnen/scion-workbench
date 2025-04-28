@@ -31,6 +31,7 @@
 
     > wb-view-list-item {
       position: relative; // positioning context for the separator
+      cursor: var(--sci-workbench-button-cursor);
 
       &:hover {
         background-color: var(--sci-color-background-elevation-hover);

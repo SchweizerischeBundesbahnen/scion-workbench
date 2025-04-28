@@ -37,14 +37,18 @@
       }
 
       > section.component-size {
-        grid-row: 2/8;
+        grid-column: 1;
+      }
+
+      > section.properties {
+        grid-column: 2;
       }
 
       > sci-accordion.return-value {
         grid-column: 1/-1;
       }
 
-      > sci-accordion {
+      sci-accordion {
         header {
           font-weight: bold;
         }

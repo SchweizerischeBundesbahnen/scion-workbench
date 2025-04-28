@@ -1,4 +1,4 @@
-@use '../../common/workbench-mixins';
+@use '../../common/workbench.mixin';
 
 :host {
   display: flex;
@@ -13,7 +13,12 @@
   position: relative; // Positioning context for the bottom border pseudo element.
   padding-inline: var(--sci-workbench-part-bar-padding-inline);
 
-  @include workbench-mixins.peripheral-workbench-parts-selector {
+  // Subtract the "tab border radius" from the left padding if the first element is the tabbar.
+  &:has(wb-view-tab-bar:first-child) {
+    padding-left: calc(var(--sci-workbench-part-bar-padding-inline) - var(--sci-workbench-tab-border-radius));
+  }
+
+  @include workbench.peripheral-workbench-parts-selector {
     background-color: var(--sci-workbench-part-peripheral-bar-background-color);
   }
 
@@ -40,6 +45,7 @@
 
   > wb-view-list-button {
     flex: none;
+    align-self: center;
   }
 
   // Pseudo element for rendering the bottom border of the tabbar.
@@ -50,7 +56,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 1px;
+    height: var(--sci-workbench-part-bar-border-bottom-width);
     background-color: var(--sci-workbench-tab-border-color);
   }
 }

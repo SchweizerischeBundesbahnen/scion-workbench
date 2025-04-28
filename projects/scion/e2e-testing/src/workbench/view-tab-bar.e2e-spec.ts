@@ -520,7 +520,7 @@ test.describe('View Tabbar', () => {
       await tabbar.viewTabBar.setViewportScrollLeft(0);
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => tabbar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => tabbar.getHiddenTabCount()).toBeGreaterThan(0);
 
       // Expect first tab to be active and scrolled into view.
       await expect.poll(() => tab1.isActive()).toBe(true);

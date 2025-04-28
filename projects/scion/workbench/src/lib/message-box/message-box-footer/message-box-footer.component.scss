@@ -1,4 +1,4 @@
-@use '../../common/workbench-mixins';
+@use '../../common/workbench.mixin';
 
 :host {
   --ɵmessage-box-severity-color: initial;
@@ -23,24 +23,28 @@
     position: absolute; // out of document flow in order to calculate the minimal width
   }
 
-  > button.action {
+  > button.action:is(button, #sci-reset) {
     all: unset;
     flex: 1;
     margin: 2px;
     border: 1px solid transparent;
     border-radius: var(--sci-corner-small);
     transition: border-color ease-in-out .15s;
-    cursor: pointer;
+    cursor: var(--sci-workbench-messagebox-action-cursor);
     user-select: none;
     text-align: center;
     min-width: 7.5em;
     padding-inline: .5em;
-    @include workbench-mixins.ellipsis-on-overflow();
+    @include workbench.ellipsis-on-overflow();
 
     &:focus, &:active {
       outline: none;
       color: var(--ɵmessage-box-severity-color);
       border-color: var(--ɵmessage-box-severity-color);
+    }
+
+    &:hover {
+      background-color: var(--sci-workbench-messagebox-action-background-color-hover);
     }
   }
 
