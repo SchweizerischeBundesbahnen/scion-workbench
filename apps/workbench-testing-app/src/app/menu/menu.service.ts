@@ -26,16 +26,18 @@ export class MenuService {
   /**
    * Shows a menu with passed menu items.
    */
-  public openMenu(event: MouseEvent, menuItems: Array<MenuItem | MenuItemSeparator>): void {
+  public openMenu(element: Element, menuItems: Array<MenuItem | MenuItemSeparator>): Promise<void> {
     const overlayRef = this._overlay.create(new OverlayConfig({
       scrollStrategy: this._overlay.scrollStrategies.noop(),
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
       panelClass: 'e2e-application-menu',
       disposeOnNavigation: true,
+      minWidth: element.getBoundingClientRect().width,
       positionStrategy: this._overlay.position()
-        .flexibleConnectedTo(event.target as HTMLElement)
+        .flexibleConnectedTo(element)
         .withPositions([END, START])
+        .withDefaultOffsetY(2)
         .withFlexibleDimensions(false),
     }));
     const injector = Injector.create({
@@ -45,6 +47,7 @@ export class MenuService {
         {provide: MENU_ITEMS, useValue: menuItems},
       ],
     });
-    overlayRef.attach(new ComponentPortal(MenuComponent, null, injector));
+    const componentRef = overlayRef.attach(new ComponentPortal(MenuComponent, null, injector));
+    return new Promise<void>(resolve => componentRef.onDestroy(resolve));
   }
 }

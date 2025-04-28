@@ -17,11 +17,21 @@ import {SettingsService} from './settings.service';
 import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
 
 /**
- * Keys to associate data with a perspective.
+ * Keys for associating data with a perspective.
  */
 export const PerspectiveData = {
+  /**
+   * Label displayed for the selected perspective in the perspective switcher.
+   */
   label: 'label',
-  tooltip: 'tooltip',
+  /**
+   * Label displayed in the perspective switcher menu.
+   */
+  menuItemLabel: 'menuItemLabel',
+  /**
+   * Enables grouping in the perspective switcher menu.
+   */
+  menuGroup: 'menuGroup',
 } as const;
 
 /**
@@ -41,28 +51,34 @@ export const Perspectives = {
       {
         id: 'blank',
         layout: factory => factory.addPart(MAIN_AREA),
+        data: {
+          [PerspectiveData.label]: 'Default Layout',
+          [PerspectiveData.menuItemLabel]: 'Default Layout',
+          [PerspectiveData.menuGroup]: 'default',
+        },
       },
       {
         id: 'perspective-1',
         layout: providePerspective1Layout,
         data: {
-          [PerspectiveData.label]: 'Perspective 1',
-          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+          [PerspectiveData.label]: 'Sample Layout 1 (Peripheral Parts)',
+          [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
+          [PerspectiveData.menuGroup]: 'peripheral-part-layout',
         },
       },
       {
         id: 'perspective-2',
         layout: providePerspective2Layout,
         data: {
-          [PerspectiveData.label]: 'Perspective 2',
-          [PerspectiveData.tooltip]: 'Sample Workbench Perspective',
+          [PerspectiveData.label]: 'Sample Layout 2 (Peripheral Parts)',
+          [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
+          [PerspectiveData.menuGroup]: 'peripheral-part-layout',
         },
       },
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
-      ...WorkbenchStartupQueryParams.perspectives().map(perspective => ({
-        id: perspective,
+      ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => ({
+        id: perspectiveId,
         layout: factory => factory.addPart(MAIN_AREA),
-        data: {[PerspectiveData.label]: perspective.toUpperCase()},
       } satisfies WorkbenchPerspectiveDefinition)),
     ];
   },

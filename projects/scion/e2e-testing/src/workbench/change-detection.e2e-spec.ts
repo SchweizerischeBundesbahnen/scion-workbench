@@ -22,7 +22,7 @@ test.describe('Angular Change Detection', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Enable logging of Angular change detection cycles.
-    await appPO.header.clickMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
 
     // Open new tab to trigger change detection cycles.
     await appPO.openNewViewTab();
@@ -38,7 +38,7 @@ test.describe('Angular Change Detection', () => {
     const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
 
     // Enable logging of Angular change detection cycles.
-    await appPO.header.clickMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
     await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 
@@ -55,7 +55,7 @@ test.describe('Angular Change Detection', () => {
     const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
 
     // Enable logging of Angular change detection cycles.
-    await appPO.header.clickMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
     await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 
@@ -74,7 +74,7 @@ test.describe('Angular Change Detection', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Enable logging of Angular change detection cycles.
-    await appPO.header.clickMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
+    await appPO.header.clickSettingMenuItem({cssClass: 'e2e-log-angular-change-detection-cycles'}, {check: true});
     await waitUntilStable(() => consoleLogs.get().length);
     consoleLogs.clear();
 

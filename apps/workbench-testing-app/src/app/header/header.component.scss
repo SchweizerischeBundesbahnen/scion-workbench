@@ -1,43 +1,47 @@
 :host {
   display: flex;
   align-items: center;
+  height: 45px;
   padding: .5em;
+  user-select: none;
+  gap: .25em;
+
+  > button.perspective-switcher {
+    all: unset;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    padding: .4em .5em .4em .75em;
+    border-radius: var(--sci-corner);
+    background-color: var(--sci-color-accent);
+    color: var(--sci-color-background-accent);
+
+    > span.icon {
+      font-size: 20px;
+    }
+
+    &:hover, &.menu-open {
+      background-color: color-mix(in srgb, var(--sci-color-accent) 95%, var(--sci-static-color-black));
+    }
+  }
+
+  > div.filler {
+    flex: auto;
+  }
 
   > div.theme-switcher {
-    flex: auto;
+    flex: none;
     display: flex;
     gap: .25em;
     align-items: center;
-    user-select: none;
   }
 
-  > div.toggle-buttons {
+  > button.settings {
     flex: none;
-    display: flex;
-    border-radius: var(--sci-corner);
-    border: 1px solid var(--sci-color-border);
-    overflow: hidden;
 
-    > button {
-      border: none;
-      border-radius: 0;
-      user-select: none;
-      background-color: var(--sci-color-background-primary);
-      color: var(--sci-color-text);
-
-      &:active, &:focus {
-        box-shadow: none;
-        outline: none;
-      }
-    }
-
-    > button:not(:first-child) {
-      border-left: 1px solid var(--sci-color-border);
-    }
-
-    > button.active {
-      background-color: var(--sci-color-accent);
-      color: var(--sci-color-accent-inverse);
+    &.menu-open {
+      background-color: var(--sci-workbench-button-background-color-hover);
     }
   }
 }
