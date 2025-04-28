@@ -19,8 +19,9 @@
       "private": false,
       "properties": {
         "data": {
-          "label": "Microfrontend Perspective 2",
-          "tooltip": "Sample Microfrontend Perspective Contributed by App 2"
+          "label": "Sample Layout 4 - Micro App 2 (Peripheral Parts)",
+          "menuItemLabel": "Sample Layout 4 - Micro App 2",
+          "menuGroup": "peripheral-part-layout"
         },
         "layout": [
           {

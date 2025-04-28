@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, effect, inject, Signal, untracked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, signal, WritableSignal} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
@@ -20,7 +20,8 @@ import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciToggleButtonComponent} from '@scion/components.internal/toggle-button';
 import {SettingsService} from '../settings.service';
-import {sortPerspectives} from './sort-perspectives.util';
+import {Maps} from '@scion/toolkit/util';
+import {comparePerspectives} from './perspective-comparator.util';
 
 @Component({
   selector: 'app-header',
@@ -44,67 +45,56 @@ export class HeaderComponent {
   protected readonly workbenchService = inject(WorkbenchService);
   protected readonly PerspectiveData = PerspectiveData;
   protected readonly lightThemeActiveFormControl = inject(NonNullableFormBuilder).control(true);
-  protected readonly perspectives = this.computePerspectives();
+  protected readonly perspectiveSwitcherMenuState = signal<'open' | 'closed'>('closed');
+  protected readonly settingsMenuState = signal<'open' | 'closed'>('closed');
 
   constructor() {
     this.installThemeSwitcher();
   }
 
-  protected async onTogglePerspective(perspective: WorkbenchPerspective): Promise<void> {
-    await this.workbenchService.switchPerspective(perspective.active() ? 'blank' : perspective.id);
+  protected onPerspectiveSwitcherMenuOpen(element: Element): void {
+    void runIfMenuClosed(async () => {
+      const menuItems = this.findPerspectiveSwitcherMenuItems();
+      await this._menuService.openMenu(element, menuItems);
+    }, this.perspectiveSwitcherMenuState);
+  };
+
+  protected onSettingsMenuOpen(element: Element): void {
+    void runIfMenuClosed(async () => {
+      await this._menuService.openMenu(element, [
+        new MenuItemSeparator('Log Level'),
+        ...this.contributeLogLevelMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeViewMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeStartupMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeNavigationMenuItems(),
+        new MenuItemSeparator(),
+        ...this.contributeSettingsMenuItems(),
+      ]);
+    }, this.settingsMenuState);
   }
 
-  protected onMenuOpen(event: MouseEvent): void {
-    this._menuService.openMenu(event, [
-      ...this.contributePerspectiveMenuItems(),
-      new MenuItemSeparator(),
-      ...this.contributeLoggerMenuItems(),
-      new MenuItemSeparator(),
-      ...this.contributeViewMenuItems(),
-      new MenuItemSeparator(),
-      ...this.contributeStartupMenuItems(),
-      new MenuItemSeparator(),
-      ...this.contributeNavigationMenuItems(),
-      new MenuItemSeparator(),
-      ...this.contributeSettingsMenuItems(),
-    ]);
-  }
-
-  private computePerspectives(): Signal<WorkbenchPerspective[]> {
-    return computed(() => {
-      const perspectives = this.workbenchService.perspectives();
-      return untracked(() => sortPerspectives(perspectives));
-    });
-  }
-
-  private contributePerspectiveMenuItems(): MenuItem[] {
+  private contributeLogLevelMenuItems(): MenuItem[] {
     return [
       new MenuItem({
-        text: 'Reset Perspective',
-        onAction: () => this.workbenchService.resetPerspective(),
-      }),
-    ];
-  }
-
-  private contributeLoggerMenuItems(): MenuItem[] {
-    return [
-      new MenuItem({
-        text: 'Change log level to DEBUG',
+        text: 'Debug',
         checked: this._logger.logLevel === LogLevel.DEBUG,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'debug'}, queryParamsHandling: 'merge'}),
       }),
       new MenuItem({
-        text: 'Change log level to INFO',
+        text: 'Info',
         checked: this._logger.logLevel === LogLevel.INFO,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'info'}, queryParamsHandling: 'merge'}),
       }),
       new MenuItem({
-        text: 'Change log level to WARN',
+        text: 'Warn',
         checked: this._logger.logLevel === LogLevel.WARN,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'warn'}, queryParamsHandling: 'merge'}),
       }),
       new MenuItem({
-        text: 'Change log level to ERROR',
+        text: 'Error',
         checked: this._logger.logLevel === LogLevel.ERROR,
         onAction: () => this._router.navigate([], {queryParams: {loglevel: 'error'}, queryParamsHandling: 'merge'}),
       }),
@@ -128,19 +118,19 @@ export class HeaderComponent {
   private contributeStartupMenuItems(): MenuItem[] {
     return [
       new MenuItem({
-        text: 'Open workbench in new browser tab (LAZY)',
+        text: 'Open in new Browser Tab',
         onAction: () => this.openInNewWindow({standalone: false, launcher: 'LAZY'}),
       }),
       new MenuItem({
-        text: 'Open workbench in new browser tab (APP_INITIALIZER)',
-        onAction: () => this.openInNewWindow({standalone: false, launcher: 'APP_INITIALIZER'}),
-      }),
-      new MenuItem({
-        text: 'Open standalone workbench in new browser tab (LAZY)',
+        text: 'Open in new Browser Tab (No Micro Apps)',
         onAction: () => this.openInNewWindow({standalone: true, launcher: 'LAZY'}),
       }),
       new MenuItem({
-        text: 'Open standalone workbench in new browser tab (APP_INITIALIZER)',
+        text: 'Open in new Browser Tab (App Initializer)',
+        onAction: () => this.openInNewWindow({standalone: false, launcher: 'APP_INITIALIZER'}),
+      }),
+      new MenuItem({
+        text: 'Open in new Browser Tab (App Initializer, No Micro Apps)',
         onAction: () => this.openInNewWindow({standalone: true, launcher: 'APP_INITIALIZER'}),
       }),
     ];
@@ -149,13 +139,13 @@ export class HeaderComponent {
   private contributeNavigationMenuItems(): MenuItem[] {
     return [
       new MenuItem({
-        text: 'Navigate to workbench page',
+        text: 'Navigate to Workbench Page',
         cssClass: 'e2e-navigate-to-workbench-page',
         disabled: !this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'}),
         onAction: () => this._router.navigate(['workbench-page']), // Do not navigate to the root page so Angular does not remove the view outlets from the URL.
       }),
       new MenuItem({
-        text: 'Navigate to blank page',
+        text: 'Navigate to Blank Page',
         cssClass: 'e2e-navigate-to-blank-page',
         disabled: this._router.isActive('test-pages/blank-test-page', {paths: 'subset', queryParams: 'ignored', fragment: 'ignored', matrixParams: 'ignored'}),
         onAction: () => this._router.navigate(['test-pages/blank-test-page']),
@@ -196,12 +186,12 @@ export class HeaderComponent {
   private contributeSettingsMenuItems(): MenuItem[] {
     return [
       new MenuItem({
-        text: 'Reset forms on submit',
+        text: 'Reset Forms on Submit',
         checked: this._settingsService.isEnabled('resetFormsOnSubmit'),
         onAction: () => this._settingsService.toggle('resetFormsOnSubmit'),
       }),
       new MenuItem({
-        text: 'Display skeletons in sample view',
+        text: 'Display Skeletons in Sample View',
         checked: this._settingsService.isEnabled('displaySkeletons'),
         onAction: () => {
           this._settingsService.toggle('displaySkeletons');
@@ -210,11 +200,53 @@ export class HeaderComponent {
         },
       }),
       new MenuItem({
-        text: 'Log Angular change detection cycles',
+        text: 'Log Angular Change Detection Cycles',
         cssClass: 'e2e-log-angular-change-detection-cycles',
         checked: this._settingsService.isEnabled('logAngularChangeDetectionCycles'),
         onAction: () => this._settingsService.toggle('logAngularChangeDetectionCycles'),
       }),
     ];
+  }
+
+  private findPerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
+    const groupLabels = new Map<string, string>()
+      .set('peripheral-part-layout', 'Layout with Peripheral Parts');
+
+    const menuItems = new Array<MenuItem | MenuItemSeparator>();
+
+    [...this.workbenchService.perspectives()]
+      // Sort perspectives.
+      .sort(comparePerspectives)
+      // Group perspectives.
+      .reduce((grouped, perspective) => {
+        const group = (perspective.data[PerspectiveData.menuGroup] ?? 'default') as string;
+        return Maps.addListValue(grouped, group, perspective);
+      }, new Map<string, WorkbenchPerspective[]>())
+      // Add perspectives by group.
+      .forEach((perspectives, group) => {
+        menuItems.push(new MenuItemSeparator(groupLabels.get(group)));
+        perspectives.forEach(perspective => menuItems.push(new MenuItem({
+          text: (perspective.data[PerspectiveData.menuItemLabel] ?? perspective.id) as string,
+          onAction: () => void this.workbenchService.switchPerspective(perspective.id),
+          checked: perspective.active(),
+          attributes: {'data-perspectiveid': perspective.id},
+          actions: perspective.active() ? [{icon: 'undo', tooltip: 'Reset Perspective', onAction: () => this.workbenchService.resetPerspective()}] : [],
+        })));
+      });
+    return menuItems;
+  }
+}
+
+async function runIfMenuClosed(openFn: () => Promise<void>, state: WritableSignal<'open' | 'closed'>): Promise<void> {
+  if (state() === 'open') {
+    return;
+  }
+
+  state.set('open');
+  try {
+    await openFn();
+  }
+  finally {
+    state.set('closed');
   }
 }

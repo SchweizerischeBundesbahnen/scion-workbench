@@ -11,11 +11,12 @@
 import {Component, DestroyRef, HostListener, inject, InjectionToken, Injector, OnInit, runInInjectionContext} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {fromEvent} from 'rxjs';
-import {MenuItem, MenuItemSeparator} from './menu-item';
+import {MenuAction, MenuItem, MenuItemSeparator} from './menu-item';
 import {NgClass} from '@angular/common';
 import {InstanceofPipe} from '../common/instanceof.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
+import {AttributesDirective} from '../common/attributes.directive';
 
 /**
  * DI token to provide menu items to the menu.
@@ -30,6 +31,7 @@ export const MENU_ITEMS = new InjectionToken<Array<MenuItem | MenuItemSeparator>
     NgClass,
     InstanceofPipe,
     SciMaterialIconDirective,
+    AttributesDirective,
   ],
 })
 export class MenuComponent implements OnInit {
@@ -40,6 +42,7 @@ export class MenuComponent implements OnInit {
 
   protected readonly menuItems = inject(MENU_ITEMS);
   protected readonly MenuItem = MenuItem;
+  protected readonly MenuItemSeparator = MenuItemSeparator;
 
   public ngOnInit(): void {
     // Run in `ngOnInit` because the backdrop element is not available until initial change detection.
@@ -54,6 +57,12 @@ export class MenuComponent implements OnInit {
     }
 
     runInInjectionContext(this._injector, () => void menuItem.onAction());
+    this.closeMenu();
+  }
+
+  protected onMenuItemActionClick(action: MenuAction, event: Event): void {
+    runInInjectionContext(this._injector, () => void action.onAction());
+    event.stopPropagation();
     this.closeMenu();
   }
 
