@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, computed, effect, HostBinding, HostListener, inject, input, Signal, viewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, HostBinding, HostListener, inject, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
@@ -19,13 +19,6 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewListItemComponent} from '../view-list-item/view-list-item.component';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {text} from '../../text/text';
-
-/**
- * Reference to inputs of {@link ViewListComponent}.
- */
-export const ViewListComponentInputs = {
-  POSITION: 'position',
-};
 
 @Component({
   selector: 'wb-view-list',
@@ -41,9 +34,6 @@ export const ViewListComponentInputs = {
 })
 export class ViewListComponent {
 
-  /** @see ViewListComponentInputs.POSITION */
-  public readonly position = input<'north' | 'south'>();
-
   private readonly _filterFieldComponent = viewChild.required(FilterFieldComponent);
   private readonly _part = inject(WorkbenchPart);
   private readonly _overlayRef = inject(OverlayRef);
@@ -53,11 +43,6 @@ export class ViewListComponent {
   /** Views that are scrolled out of the tab bar. */
   protected readonly viewsOutsideTabbar: Signal<WorkbenchView[]>;
   protected readonly filterFormControl = inject(NonNullableFormBuilder).control('');
-
-  @HostBinding('class.south')
-  protected get isSouthPosition(): boolean {
-    return this.position() === 'south';
-  }
 
   @HostBinding('attr.data-partid')
   protected get partId(): PartId {
