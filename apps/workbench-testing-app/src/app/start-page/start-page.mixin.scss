@@ -1,0 +1,10 @@
+/**
+ * Applies specified background color and applies a hover color based on light or dark mode.
+ */
+@mixin tile-background-color($background-color) {
+  background-color: $background-color;
+  &:hover {
+    background-color: color-mix(in srgb, $background-color 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+    border-color: unset;
+  }
+}

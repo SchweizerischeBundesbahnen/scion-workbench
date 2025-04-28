@@ -96,8 +96,12 @@
     border-radius: 50%;
     transition: opacity ease-in-out .15s;
 
+    &:active {
+      background-color: var(--sci-workbench-button-background-color-active);
+    }
+
     &:hover {
-      border-color: var(--sci-color-accent);
+      background-color: var(--sci-workbench-button-background-color-hover);
     }
   }
 

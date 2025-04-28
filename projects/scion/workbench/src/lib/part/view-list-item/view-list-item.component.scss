@@ -1,10 +1,11 @@
+@use '../../common/workbench.mixin';
+
 :host {
   display: flex;
   align-items: center;
   padding: .6em 1em;
   position: relative; // positioning context for the active indicator
   user-select: none;
-  cursor: pointer;
   gap: 1em;
 
   &.active {
@@ -27,22 +28,17 @@
     position: relative; // positioning context for the portal
   }
 
-  > button.close {
-    all: unset;
-    flex: none;
-    cursor: pointer;
-    visibility: hidden;
-    padding: .125em;
-    border-radius: var(--sci-corner-small);
-    opacity: .75;
-
-    &:hover {
-      opacity: 1;
-      background-color: var(--sci-color-background-elevation-hover);
+  > button.close:is(button, #sci-reset) {
+    @include workbench.icon-button-element-states() {
+      flex: none;
+      visibility: hidden;
+      padding: .125em;
+      border-radius: var(--sci-corner-small);
+      color: var(--sci-color-text);
     }
   }
 
-  &:hover > button.close {
+  &:hover > button.close:is(button, #sci-reset) {
     visibility: visible;
   }
 }

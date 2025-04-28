@@ -1,38 +1,25 @@
 :host {
   display: grid;
-  cursor: pointer;
 
   > svg {
-    border-bottom: .5em solid var(--sci-color-skeleton-subtle);
-    border-left: .5em solid var(--sci-color-skeleton-subtle);
+    border-bottom: .5em solid var(--sci-color-skeleton);
+    border-left: .5em solid var(--sci-color-skeleton);
     padding-left: .5em;
     padding-bottom: .5em;
 
-    &.line {
-      > path {
-        stroke-width: 1.5;
-        stroke: var(--sci-color-skeleton-subtle);
-        fill: transparent;
-        vector-effect: non-scaling-stroke;
-      }
-
-      &.active > path {
-        stroke: var(--sci-color-accent);
-      }
+    > path {
+      stroke-width: 1.5;
+      stroke: var(--sci-color-skeleton);
+      fill: transparent;
+      vector-effect: non-scaling-stroke;
     }
 
-    &.area {
-      > path {
-        stroke-width: 1;
-        stroke: var(--sci-color-skeleton);
-        fill: var(--sci-color-skeleton-subtle);
-        vector-effect: non-scaling-stroke;
-      }
+    &.active > path {
+      stroke: var(--sci-color-accent);
+    }
 
-      &.active > path {
-        stroke: var(--sci-color-accent);
-        fill: var(--sci-color-background-accent);
-      }
+    &:hover > path {
+      stroke-width: 3;
     }
   }
 }

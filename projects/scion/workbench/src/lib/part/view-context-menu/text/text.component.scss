@@ -1,6 +1,6 @@
-@use '../../../common/workbench-mixins';
+@use '../../../common/workbench.mixin';
 
 :host {
   display: block;
-  @include workbench-mixins.ellipsis-on-overflow();
+  @include workbench.ellipsis-on-overflow();
 }

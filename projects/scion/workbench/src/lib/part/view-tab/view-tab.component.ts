@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostBinding, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
+import {Component, computed, ElementRef, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
 import {fromEvent, merge, withLatestFrom} from 'rxjs';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {map} from 'rxjs/operators';
@@ -44,6 +44,15 @@ import {IconComponent} from '../../icon/icon.component';
     TextPipe,
     IconComponent,
   ],
+  host: {
+    '[class.view-drag]': 'viewDragService.dragging()',
+    '[class.active]': 'view().active()',
+    '[class.part-active]': 'view().part().active()',
+    '[class.e2e-dirty]': 'view().dirty()',
+    '[attr.data-viewid]': 'view().id',
+    '[attr.draggable]': 'true',
+    '[attr.tabindex]': '-1', // make the view focusable to install view menu accelerators
+  },
 })
 export class ViewTabComponent {
 
@@ -51,7 +60,6 @@ export class ViewTabComponent {
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _router = inject(ɵWorkbenchRouter);
-  private readonly _viewDragService = inject(ViewDragService);
   private readonly _viewMenuService = inject(ViewMenuService);
   private readonly _injector = inject(Injector);
 
@@ -60,46 +68,13 @@ export class ViewTabComponent {
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
-
-  @HostBinding('attr.draggable')
-  protected draggable = true;
-
-  @HostBinding('attr.tabindex')
-  protected tabindex = -1; // make the view focusable to install view menu accelerators
-
-  /**
-   * Indicates if dragging a view tab over this view tab's tabbar.
-   */
-  @HostBinding('class.drag-over-tabbar')
-  protected get isDragOverTabbar(): boolean {
-    return this._viewDragService.isDragOverTabbar === this.view().part().id;
-  }
-
-  @HostBinding('attr.data-viewid')
-  public get viewId(): ViewId {
-    return this.view().id;
-  }
+  protected readonly viewDragService = inject(ViewDragService);
 
   constructor() {
     this.installMaximizeListener();
     this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
-  }
-
-  @HostBinding('class.active')
-  public get active(): boolean {
-    return this.view().active();
-  }
-
-  @HostBinding('class.part-active')
-  protected get partActive(): boolean {
-    return this.view().part().active();
-  }
-
-  @HostBinding('class.e2e-dirty')
-  protected get dirty(): boolean {
-    return this.view().dirty();
   }
 
   @HostListener('click')
@@ -140,7 +115,7 @@ export class ViewTabComponent {
     // Use an invisible <div> as the native drag image because the workbench renders the drag image in {@link ViewTabDragImageRenderer}.
     event.dataTransfer.setDragImage(createElement('div', {style: {display: 'none'}}), 0, 0);
 
-    this._viewDragService.setViewDragData({
+    this.viewDragService.setViewDragData({
       uid: UUID.randomUUID(),
       viewId: view.id,
       viewTitle: view.title(),
@@ -169,7 +144,7 @@ export class ViewTabComponent {
 
   @HostListener('dragend')
   protected onDragEnd(): void {
-    this._viewDragService.unsetViewDragData();
+    this.viewDragService.unsetViewDragData();
   }
 
   /**

@@ -22,7 +22,8 @@ export function undefinedIfEmpty<T>(value: T | null | undefined): T | undefined 
     return value.length ? value : undefined;
   }
   else if (typeof value === 'object') {
-    return Object.keys(value).length ? value : undefined;
+    // Consider empty if no properties or only `undefined` properties.
+    return Object.values(value).some(value => value !== undefined) ? value : undefined;
   }
   return value;
 }

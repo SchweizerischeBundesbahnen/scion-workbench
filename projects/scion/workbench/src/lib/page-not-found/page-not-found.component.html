@@ -4,7 +4,7 @@
 <section class="message" [innerHTML]="message()"></section>
 
 @if (view) {
-  <button (click)="view.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  <button (click)="view.close()" class="close">{{('%workbench.close.action' | wbText)()}}</button>
 }
 
 @if (isDevMode) {

@@ -201,7 +201,7 @@ export class ViewTabBarComponent implements OnDestroy {
     // Set drag source, but only if started the drag operation in this part.
     // We do not set the drag source in `dragstart` to not break the drag operation (in Chrome and Edge, but not Firefox).
     if (this._host.classList.contains('on-drag-start')) {
-      this.dragSourceViewTab.set(this._viewTabs().find(viewTab => viewTab.viewId === dragData.viewId) ?? null);
+      this.dragSourceViewTab.set(this._viewTabs().find(viewTab => viewTab.view().id === dragData.viewId) ?? null);
       setCssVariable(this._host, {'--ɵpart-bar-drag-placeholder-width': `${dragData.viewTabWidth}px`});
     }
 
@@ -232,10 +232,10 @@ export class ViewTabBarComponent implements OnDestroy {
 
     // Activate the adjacent tab, only if the drag operation is not canceled.
     // The drag event does not provide information about cancelation. Therefore, we wait for a macrotask, canceling it when receiving `dragend`, i.e., the drag operation has been canceled.
-    if (this.dragSourceViewTab()?.active) {
+    if (this.dragSourceViewTab()?.view().active) {
       timer(0)
         .pipe(takeUntil(fromEvent(window, 'dragend')))
-        .subscribe(() => void this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab()!.viewId), {skipLocationChange: true}));
+        .subscribe(() => void this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab()!.view().id), {skipLocationChange: true}));
     }
 
     // Clean up drag state.
@@ -436,7 +436,7 @@ export class ViewTabBarComponent implements OnDestroy {
       const viewTabs = untracked(() => this._viewTabs());
 
       // Get a reference to the currently rendered active tab, waiting if necessary by tracking the rendered tabs.
-      const activeViewTab = viewTabs.find(viewTab => viewTab.viewId === activeViewId);
+      const activeViewTab = viewTabs.find(viewTab => viewTab.view().id === activeViewId);
       if (!activeViewTab) {
         this._viewTabs(); // Track rendered tabs to re-execute once rendered.
         return;

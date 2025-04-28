@@ -47,6 +47,23 @@
       }
     }
 
+    // Hide adjacent dividers when hovering over a tab.
+    @container style(--sci-workbench-tab-background-color-hover) {
+      > div.divider {
+        transition: opacity 200ms ease-out; // Animate removal of divider when hovering adjacent tab.
+      }
+
+      // Hide divider following the hovered tab.
+      > wb-view-tab:hover + div.divider {
+        opacity: 0;
+      }
+
+      // Hide divider preceding the hovered tab
+      > div.divider:has(+ wb-view-tab:hover) {
+        opacity: 0;
+      }
+    }
+
     > div.drag-placeholder {
       flex: none;
       width: var(--ɵpart-bar-drag-placeholder-width);

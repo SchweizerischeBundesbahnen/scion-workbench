@@ -1,5 +1,5 @@
 :host {
-  --sci-workbench-tab-active-text-color: var(--sci-workbench-tab-drag-text-color);
+  --sci-workbench-tab-text-color-active: var(--sci-workbench-tab-drag-text-color);
 
   &.drag-over-peripheral-tabbar {
     --sci-workbench-view-background-color: var(--sci-workbench-view-peripheral-background-color);
@@ -15,10 +15,10 @@
   }
 
   &:not(.can-drop) {
-    --sci-workbench-tab-active-text-color: var(--sci-workbench-tab-drag-text-color-disabled);
+    --sci-workbench-tab-text-color-active: var(--sci-workbench-tab-drag-text-color-disabled);
     --sci-workbench-tab-drag-border-color: var(--sci-workbench-tab-drag-border-color-disabled);
 
-    button.close {
+    button.close:is(button, #sci-reset) {
       color: var(--sci-workbench-tab-drag-text-color-disabled);
     }
   }

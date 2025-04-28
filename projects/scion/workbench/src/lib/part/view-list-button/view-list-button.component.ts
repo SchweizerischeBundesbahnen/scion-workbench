@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, ComponentRef, computed, DestroyRef, ElementRef, HostListener, inject, Injector, NgZone, OnDestroy, Signal} from '@angular/core';
+import {Component, ComponentRef, computed, DestroyRef, ElementRef, HostListener, inject, Injector, NgZone, OnDestroy, Signal, signal} from '@angular/core';
 import {ConnectedPosition, FlexibleConnectedPositionStrategy, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent, ViewListComponentInputs} from '../view-list/view-list.component';
@@ -22,6 +22,10 @@ import {IconComponent} from '../../icon/icon.component';
   selector: 'wb-view-list-button',
   templateUrl: './view-list-button.component.html',
   styleUrls: ['./view-list-button.component.scss'],
+  host: {
+    '[class.menu-open]': `menuState() === 'open'`,
+    '[attr.tabindex]': '0',
+  },
   imports: [
     IconComponent,
   ],
@@ -39,6 +43,7 @@ export class ViewListButtonComponent implements OnDestroy {
   private _overlayRef: OverlayRef | undefined;
   /** Number of views that are scrolled out of the tab bar. */
   protected readonly scrolledOutOfViewTabCount: Signal<number>;
+  protected readonly menuState = signal<'open' | 'closed'>('closed');
 
   constructor() {
     const part = inject(WorkbenchPart);
@@ -49,7 +54,14 @@ export class ViewListButtonComponent implements OnDestroy {
   }
 
   @HostListener('click')
+  @HostListener('keydown.enter')
+  @HostListener('keydown.space')
   protected onClick(): void {
+    this.menuState.set('open');
+    void this.openMenu().finally(() => this.menuState.set('closed'));
+  }
+
+  private openMenu(): Promise<void> {
     const positionStrategy = this._overlay.position()
       .flexibleConnectedTo(this._host)
       .withFlexibleDimensions(false)
@@ -67,6 +79,7 @@ export class ViewListButtonComponent implements OnDestroy {
     })));
 
     this.updatePositionInputOnPositionChange(componentRef, positionStrategy);
+    return new Promise<void>(resolve => componentRef.onDestroy(resolve));
   }
 
   /**

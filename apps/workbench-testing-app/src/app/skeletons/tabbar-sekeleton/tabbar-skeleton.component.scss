@@ -6,27 +6,34 @@
     flex: none;
     padding: .5em 1.5em;
     width: 150px;
-    border-bottom: .3em solid var(--sci-color-skeleton-subtle);
-    cursor: pointer;
+    border-bottom: .3em solid var(--sci-color-skeleton);
 
     > div.label {
-      background-color: var(--sci-color-skeleton-subtle);
+      background-color: var(--sci-color-skeleton);
       border-radius: var(--sci-corner-small);
       height: 1em;
     }
 
     &.selected {
-      border-bottom-color: var(--sci-color-skeleton);
+      border-bottom-color: var(--sci-color-skeleton-active);
 
       > div.label {
-        background-color: var(--sci-color-skeleton);
+        background-color: var(--sci-color-skeleton-active);
+      }
+    }
+
+    &:hover {
+      border-bottom-color: var(--sci-color-skeleton-hover);
+
+      > div.label {
+        background-color: var(--sci-color-skeleton-hover);
       }
     }
   }
 
   > div.filler {
     flex: auto;
-    border-bottom: .3em solid var(--sci-color-skeleton-subtle);
+    border-bottom: .3em solid var(--sci-color-skeleton);
   }
 
   &.active > button.tab.selected {

@@ -1,3 +1,5 @@
+@use './start-page.mixin';
+
 :host {
   display: flex;
   flex-direction: column;
@@ -35,40 +37,34 @@
         grid-column: 1/-1;
       }
 
-      > a {
-        background-color: var(--sci-color-accent);
-        border: 1px solid var(--sci-color-accent);
+      > button {
+        all: unset;
         border-radius: var(--sci-corner);
         padding: 1em;
-        display: flex;
+        display: inline-flex;
+        place-content: center;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
+        gap: .5em;
         color: var(--sci-color-accent-inverse);
         font-size: 24px;
         text-align: center;
-        cursor: pointer;
         user-select: none;
+        @include start-page.tile-background-color(var(--sci-color-accent));
 
         > span.description {
-          margin-top: 1.5em;
           font-size: .5em;
         }
 
         &.microfrontend.devtools {
-          background-color: var(--devtools-app-color);
-          border-color: unset;
+          @include start-page.tile-background-color(var(--devtools-app-color));
         }
 
         &:is(.microfrontend, .test-capability).workbench-client-testing-app1 {
-          background-color: var(--workbench-client-testing-app1-color);
-          border-color: unset;
+          @include start-page.tile-background-color(var(--workbench-client-testing-app1-color));
         }
 
         &:is(.microfrontend, .test-capability).workbench-client-testing-app2 {
-          background-color: var(--workbench-client-testing-app2-color);
-          border-color: unset;
+          @include start-page.tile-background-color(var(--workbench-client-testing-app2-color));
         }
       }
     }

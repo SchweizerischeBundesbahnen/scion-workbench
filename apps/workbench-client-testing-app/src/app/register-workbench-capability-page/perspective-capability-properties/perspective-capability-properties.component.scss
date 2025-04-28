@@ -1,5 +1,5 @@
 @use '@scion/components.internal/design' as sci-design;
-@use '../../common/fieldset.mixins';
+@use '../../common/fieldset.mixin';
 
 :host {
   display: grid;

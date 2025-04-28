@@ -1,11 +1,14 @@
+@use '../../common/workbench.mixin';
+
 :host {
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  padding: .5em;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
+  @include workbench.icon-button-element-states() {
+    display: flex;
+    flex-direction: column;
+
+    &.menu-open {
+      background-color: var(--sci-workbench-button-background-color-hover);
+    }
+  }
 
   > wb-icon.menu-down {
     flex: none;
@@ -14,12 +17,11 @@
   > span.count {
     flex: none;
     font-size: var(--sci-workbench-part-hidden-tab-count-size);
+    line-height: .75;
 
-    // @formatter:off - Disable formatting because IntelliJ does not support style container queries.
     // Display tab count only if font size is not 0 (style container query)
     @container style(--sci-workbench-part-hidden-tab-count-size: 0) {
       display: none;
     }
-    // @formatter:on
   }
 }
