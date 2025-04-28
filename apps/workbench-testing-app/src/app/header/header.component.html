@@ -1,23 +1,25 @@
+<!-- Perspective Switcher -->
+@let activePerspective = workbenchService.activePerspective();
+<button (click)="onPerspectiveSwitcherMenuOpen(perspective_switcher_menu_button)"
+        title="Switch Perspective"
+        class="e2e-perspective-switcher-menu-button perspective-switcher" [class.menu-open]="perspectiveSwitcherMenuState() === 'open'"
+        #perspective_switcher_menu_button>
+  {{activePerspective?.data?.[PerspectiveData.label] ?? activePerspective?.id ?? 'unkown'}}
+  <span sciMaterialIcon class="icon">keyboard_arrow_down</span>
+</button>
+
+<div class="filler"></div>
+
+<!-- Theme Switcher -->
 <div class="theme-switcher">
   <button (click)="onActivateDarkTheme()" sciMaterialIcon>dark_mode</button>
   <sci-toggle-button [formControl]="lightThemeActiveFormControl" class="e2e-color-scheme"/>
   <button (click)="onActivateLightTheme()" sciMaterialIcon>light_mode</button>
 </div>
 
-<div class="toggle-buttons e2e-perspective-toggles">
-  @for (perspective of perspectives(); track perspective.id) {
-    @if (perspective.id !== 'blank') {
-      <button (click)="onTogglePerspective(perspective)"
-              class="e2e-perspective"
-              [title]="perspective.data[PerspectiveData.tooltip]"
-              [attr.data-perspectiveid]="perspective.id"
-              [class.active]="perspective.active()"
-              [class.e2e-active]="perspective.active()">
-        {{perspective.data[PerspectiveData.label] ?? perspective.id}}
-      </button>
-    }
-  }
-</div>
-<button (click)="onMenuOpen($event)" class="menu-button e2e-menu-button" sciMaterialIcon>
+<!-- Settings Menu -->
+<button (click)="onSettingsMenuOpen(settings_menu_button)"
+        class="e2e-settings-menu-button settings" [class.menu-open]="settingsMenuState() ==='open'"
+        #settings_menu_button sciMaterialIcon>
   more_vert
 </button>

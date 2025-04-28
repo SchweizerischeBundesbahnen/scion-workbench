@@ -1,14 +1,32 @@
-@for (menuItem of menuItems; track menuItem) {
+@for (menuItem of menuItems; track menuItem; let index = $index) {
   @if (menuItem | appInstanceof:MenuItem; as menuItem) {
     <button class="menu-item e2e-menu-item"
             [ngClass]="menuItem.cssClass"
+            [appAttributes]="menuItem.attributes"
             [class.disabled]="menuItem.disabled"
             [class.checked]="menuItem.checked"
             (click)="onMenuItemClick(menuItem)">
       <span sciMaterialIcon class="check-mark e2e-check-mark">check</span>
       {{menuItem.text}}
+
+      @if (menuItem.actions?.length) {
+        <div class="actions">
+          @for (action of menuItem.actions; track action) {
+            <button (click)="onMenuItemActionClick(action, $event)" [title]="action.tooltip" sciMaterialIcon>
+              {{action.icon}}
+            </button>
+          }
+        </div>
+      }
     </button>
-  } @else {
-    <hr>
+  }
+  @if (menuItem | appInstanceof:MenuItemSeparator; as separator) {
+    @if (index) {
+      <hr>
+    }
+
+    @if (separator.heading) {
+      <header>{{separator.heading}}</header>
+    }
   }
 }

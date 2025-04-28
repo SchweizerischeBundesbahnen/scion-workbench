@@ -12,22 +12,16 @@ import {WorkbenchPerspective, WorkbenchPerspectiveData} from '@scion/workbench';
 import {PerspectiveData} from '../workbench.perspectives';
 
 /**
- * Sorts perspectives by display text, with non-microfrontend perspectives preceding microfrontend perspectives.
+ * Sorts two perspectives by display text, with non-microfrontend perspectives preceding microfrontend perspectives.
  */
-export function sortPerspectives(perspectives: WorkbenchPerspective[]): WorkbenchPerspective[] {
-  if (!perspectives.length) {
-    return [];
+export function comparePerspectives(a: WorkbenchPerspective, b: WorkbenchPerspective): number {
+  if (isMicrofrontendPerspective(a) && !isMicrofrontendPerspective(b)) {
+    return 1;
   }
-
-  return [...perspectives].sort((a, b) => {
-    if (isMicrofrontendPerspective(a) && !isMicrofrontendPerspective(b)) {
-      return 1;
-    }
-    if (isMicrofrontendPerspective(b) && !isMicrofrontendPerspective(a)) {
-      return -1;
-    }
-    return getLabel(a).localeCompare(getLabel(b));
-  });
+  if (isMicrofrontendPerspective(b) && !isMicrofrontendPerspective(a)) {
+    return -1;
+  }
+  return getLabel(a).localeCompare(getLabel(b));
 }
 
 function isMicrofrontendPerspective(perspective: WorkbenchPerspective): boolean {
@@ -35,5 +29,5 @@ function isMicrofrontendPerspective(perspective: WorkbenchPerspective): boolean 
 }
 
 function getLabel(perspective: WorkbenchPerspective): string {
-  return perspective.data[PerspectiveData.label] as string | undefined ?? '';
+  return (perspective.data[PerspectiveData.menuItemLabel] ?? '') as string;
 }

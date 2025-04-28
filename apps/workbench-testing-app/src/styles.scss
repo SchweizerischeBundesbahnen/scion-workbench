@@ -2,14 +2,15 @@
 @use '@scion/components.internal/design' as sci-design;
 
 @import url('https://fonts.googleapis.com/css?family=Roboto:normal,bold,italic,bolditalic|Roboto+Mono');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@300..400');
 
 html {
   font-size: 14px; // defines 1rem as 14px
 }
 
 body {
-  font-family: Roboto, Arial, sans-serif;
+  font-family: Roboto, sans-serif;
+  text-rendering: optimizeLegibility;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-primary);
   height: 100%;

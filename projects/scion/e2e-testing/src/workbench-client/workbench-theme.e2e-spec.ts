@@ -19,10 +19,10 @@ test.describe('WorkbenchClient', () => {
 
     const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
-    await appPO.changeColorScheme('light');
+    await appPO.header.changeColorScheme('light');
     await expect(testPage.theme).toHaveText('scion-light');
 
-    await appPO.changeColorScheme('dark');
+    await appPO.header.changeColorScheme('dark');
     await expect(testPage.theme).toHaveText('scion-dark');
   });
 
@@ -31,10 +31,10 @@ test.describe('WorkbenchClient', () => {
 
     const testPage = await WorkbenchThemeTestPagePO.openInNewTab(appPO, microfrontendNavigator);
 
-    await appPO.changeColorScheme('light');
+    await appPO.header.changeColorScheme('light');
     await expect(testPage.colorScheme).toHaveText('light');
 
-    await appPO.changeColorScheme('dark');
+    await appPO.header.changeColorScheme('dark');
     await expect(testPage.colorScheme).toHaveText('dark');
   });
 
@@ -46,10 +46,10 @@ test.describe('WorkbenchClient', () => {
     // Open new tab to deactivate testPage.
     await appPO.openNewViewTab();
 
-    await appPO.changeColorScheme('light');
+    await appPO.header.changeColorScheme('light');
     await expect(testPage.theme).toHaveText('scion-light');
 
-    await appPO.changeColorScheme('dark');
+    await appPO.header.changeColorScheme('dark');
     await expect(testPage.theme).toHaveText('scion-dark');
   });
 });

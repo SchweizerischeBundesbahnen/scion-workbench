@@ -1,25 +1,35 @@
 :host {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns:
+    // === Menu Item Subgrid ===
+    auto // Checkmark
+    1fr; // Label
+  gap: 1px .5em; // 1px space for top/bottom borders when hovering the menu item
   border: 1px solid var(--sci-color-border);
   background-color: var(--sci-color-background-elevation);
   border-radius: var(--sci-corner);
-  gap: 1px; // space for top/bottom borders when hovering the menu item
   overflow: hidden;
+  width: 100%; // fill overlay horizontally
+  height: 100%; // fill overlay vertically
+  user-select: none;
 
   > button.menu-item {
     all: unset;
-    padding: .6em 1.5em .6em .6em;
-    font-size: smaller;
-    user-select: none;
-    position: relative; // positioning context for separator pseudo element
-    display: inline-flex;
+    grid-column: 1/-1;
+    display: grid;
+    grid-template-columns: subgrid;
     align-items: center;
-    gap: .5em;
+    padding: .5em 1.5em .5em .6em;
+    font-size: smaller;
+    position: relative; // positioning context for separator pseudo element and actions
 
     &:hover {
       background-color: var(--sci-color-background-elevation-hover);
       box-shadow: 0 0 0 1px var(--sci-color-border);
+
+      > div.actions {
+        background-color: var(--sci-color-background-elevation-hover); // to cover the content of the menu item when the actions overlay the menu item content
+      }
     }
 
     &.disabled {
@@ -29,11 +39,30 @@
 
     > span.check-mark {
       font-size: 1.5em;
-      user-select: none;
     }
 
     &:not(.checked) > span.check-mark {
       visibility: hidden;
+    }
+
+    &:not(:hover):not(.checked) > div.actions {
+      display: none;
+    }
+
+    > div.actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 .25em;
+      gap: .25em;
+      background-color: var(--sci-color-background-elevation); // to cover the content of the menu item when the actions overlay the menu item content
+
+      > button {
+        font-size: 1.5em;
+      }
     }
 
     // separator
@@ -49,6 +78,14 @@
   }
 
   > hr {
+    grid-column: 1/-1;
     display: none; // remove from flex container to not render the gap between flex items
+  }
+
+  > header {
+    grid-column: 2/-1;
+    padding: .6em 1.5em .25em 0;
+    font-size: .8em;
+    color: var(--sci-color-text-subtlest);
   }
 }

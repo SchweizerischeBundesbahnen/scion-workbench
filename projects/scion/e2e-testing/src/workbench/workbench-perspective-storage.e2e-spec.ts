@@ -139,6 +139,6 @@ test.describe('Workbench Perspective Storage', () => {
       },
     });
 
-    await expect.poll(() => appPO.header.perspectiveToggleButton({perspectiveId: 'testee-2'}).isActive()).toBe(true);
+    await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
   });
 });
