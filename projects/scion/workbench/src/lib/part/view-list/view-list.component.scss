@@ -9,8 +9,12 @@
   border-radius: var(--sci-corner);
   overflow: hidden;
 
-  &.south {
-    border-top: none;
+  .cdk-overlay-pane.wb-view-list-menu.wb-south & {
+    margin-top: 1px;
+  }
+
+  .cdk-overlay-pane.wb-view-list-menu.wb-north & {
+    margin-bottom: 1px;
   }
 
   > wb-filter-field {
