@@ -9,7 +9,6 @@
  */
 
 import {Locator} from '@playwright/test';
-import {PerspectiveTogglePO} from './perspective-toggle-button.po';
 import {SciToggleButtonPO} from './@scion/components.internal/toggle-button.po';
 
 /**
@@ -21,13 +20,25 @@ export class AppHeaderPO {
   }
 
   /**
-   * Handle to the specified perspective toggle button.
-   *
-   * @param locateBy - Specifies how to locate the perspective toggle button.
-   * @param locateBy.perspectiveId - Identifies the toggle button by the perspective id
+   * Switches to the specified perspective.
    */
-  public perspectiveToggleButton(locateBy: {perspectiveId: string}): PerspectiveTogglePO {
-    return new PerspectiveTogglePO(this._locator.locator('div.e2e-perspective-toggles').locator(`button.e2e-perspective[data-perspectiveid="${locateBy.perspectiveId}"]`));
+  public async switchPerspective(perspectiveId: string): Promise<void> {
+    await this._locator.locator('button.e2e-perspective-switcher-menu-button').click();
+
+    const menuItem = this._locator.page()
+      .locator('.e2e-application-menu') // CDK overlay
+      .locator('app-menu')
+      .locator(`button.e2e-menu-item[data-perspectiveid="${perspectiveId}"]`);
+
+    // Wait until the menu is attached.
+    await menuItem.waitFor({state: 'attached'});
+
+    // Do not switch perspective if already active.
+    if (await menuItem.locator('span.e2e-check-mark').isVisible()) {
+      return this._locator.page().keyboard.press('Escape');
+    }
+
+    return menuItem.click();
   }
 
   /**
@@ -39,10 +50,10 @@ export class AppHeaderPO {
   }
 
   /**
-   * Opens the application menu and clicks the specified menu item.
+   * Clicks specified setting in settings menu.
    */
-  public async clickMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
-    await this._locator.locator('button.e2e-menu-button').click();
+  public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
+    await this._locator.locator('button.e2e-settings-menu-button').click();
 
     const menuItem = this._locator.page()
       .locator('.e2e-application-menu') // CDK overlay

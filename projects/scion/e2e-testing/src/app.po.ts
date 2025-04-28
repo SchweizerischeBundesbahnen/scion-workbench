@@ -295,7 +295,7 @@ export class AppPO {
    */
   public async openNewViewTab(): Promise<StartPagePO> {
     const navigationId = await this.getCurrentNavigationId();
-    await this.header.clickMenuItem({cssClass: 'e2e-open-start-page'});
+    await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
     const inMainArea = await this.hasMainArea();
@@ -308,16 +308,9 @@ export class AppPO {
   public async switchPerspective(perspectiveId: string): Promise<void> {
     if (perspectiveId !== await this.getActivePerspectiveId()) {
       const navigationId = await this.getCurrentNavigationId();
-      await this.header.perspectiveToggleButton({perspectiveId}).click();
+      await this.header.switchPerspective(perspectiveId);
       await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
     }
-  }
-
-  /**
-   * Changes the color scheme of the workbench.
-   */
-  public async changeColorScheme(colorScheme: 'light' | 'dark'): Promise<void> {
-    await this.header.changeColorScheme(colorScheme);
   }
 
   /**

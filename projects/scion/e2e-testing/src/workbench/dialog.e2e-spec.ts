@@ -359,11 +359,11 @@ test.describe('Workbench Dialog', () => {
       await expectDialog(dialogPage).toBeVisible();
 
       // Unmount the workbench component by navigating the primary router outlet.
-      await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
       await expectDialog(dialogPage).toBeHidden();
 
       // Re-mount the workbench component by navigating the primary router.
-      await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
       await expectDialog(dialogPage).toBeVisible();
       await expect.poll(() => appPO.isViewBlocked(dialogOpenerPage.view.getViewId())).toBe(true);
       await expect.poll(() => appPO.isWorkbenchBlocked()).toBe(true);
@@ -461,11 +461,11 @@ test.describe('Workbench Dialog', () => {
       await expect(focusTestPage.middleField).toBeFocused();
 
       // Unmount the workbench component by navigating the primary router outlet.
-      await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-blank-page'});
       await expect(focusTestPage.middleField).not.toBeFocused();
 
       // Re-mount the workbench component by navigating the primary router.
-      await appPO.header.clickMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
+      await appPO.header.clickSettingMenuItem({cssClass: 'e2e-navigate-to-workbench-page'});
       await expect(focusTestPage.middleField).toBeFocused();
     });
 
