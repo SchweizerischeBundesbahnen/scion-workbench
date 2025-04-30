@@ -259,7 +259,8 @@ export class PopupService {
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
-    const hostBounds = boundingClientRect(contextualView?.portal.componentRef.location.nativeElement as HTMLElement | undefined ?? document.documentElement, {injector});
+    const partBounds = boundingClientRect(computed(() => contextualView?.part().partComponent), {injector});
+    const viewBounds = boundingClientRect(computed(() => contextualView?.portal.componentRef.location.nativeElement as HTMLElement | undefined), {injector});
 
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       const anchor = coerceElement(config.anchor) as HTMLElement;
@@ -277,10 +278,11 @@ export class PopupService {
         // with the view boundaries. Therefore, we read the anchor's bounding box directly from the DOM.
         anchorBounds();
 
-        return constrainClientRect(anchor.getBoundingClientRect(), hostBounds());
+        return constrainClientRect(constrainClientRect(anchor.getBoundingClientRect(), viewBounds()), partBounds());
       }, {equal: isEqualDomRect});
     }
     else {
+      const documentBounds = boundingClientRect(document.documentElement, {injector});
       const anchorBounds = toSignal(Observables.coerce(config.anchor), {injector});
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
@@ -293,9 +295,9 @@ export class PopupService {
           return undefined;
         }
 
-        const {x, y} = mapToPageCoordinates(anchorBounds()!, hostBounds());
+        const {x, y} = mapToPageCoordinates(anchorBounds()!, viewBounds() ?? documentBounds());
         const {width, height} = anchorBounds()!;
-        return constrainClientRect(new DOMRect(x, y, width, height), hostBounds());
+        return constrainClientRect(constrainClientRect(new DOMRect(x, y, width, height), viewBounds()), partBounds());
       }, {equal: isEqualDomRect});
     }
   }
@@ -356,7 +358,10 @@ function mapToPageCoordinates(origin: PopupOrigin, relativeTo: DOMRect): Point {
   throw Error('[PopupOriginError] Illegal popup origin; must be "Point", "TopLeftPoint", "TopRightPoint", "BottomLeftPoint" or "BottomRightPoint".');
 }
 
-function constrainClientRect(clientRect: DOMRect, constraints: DOMRect): DOMRect {
+function constrainClientRect(clientRect: DOMRect, constraints: DOMRect | undefined): DOMRect {
+  if (!constraints) {
+    return clientRect;
+  }
   const top = clamp(clientRect.top, {min: constraints.top, max: constraints.bottom});
   const right = clamp(clientRect.right, {min: constraints.left, max: constraints.right});
   const bottom = clamp(clientRect.bottom, {min: constraints.top, max: constraints.bottom});

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, ElementRef, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {GridElementComponent} from '../../layout/grid-element/grid-element.component';
@@ -72,6 +72,10 @@ export class MainAreaPartComponent {
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly mainAreaGrid = computed(() => this._workbenchLayoutService.layout().mainAreaGrid!);
   protected readonly desktop = inject(DESKTOP);
+
+  constructor() {
+    inject(ɵWorkbenchPart).partComponent = inject(ElementRef).nativeElement as HTMLElement;
+  }
 
   protected onViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
