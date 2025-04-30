@@ -59,6 +59,7 @@ The SCION Workbench uses the following translation keys for built-in texts. Usin
 | workbench.close_all_tabs.action                 | Close All Tabs                                                                                                              |
 | workbench.close_other_tabs.action               | Close Other Tabs                                                                                                            |
 | workbench.close_tab.action                      | Close                                                                                                                       |
+| workbench.close_tab.tooltip                     | Close. {{close_others_modifier}}+Click to Close Others.                                                                     |                                                                    
 | workbench.close_tabs_to_the_left.action         | Close Tabs to the Left                                                                                                      |
 | workbench.close_tabs_to_the_right.action        | Close Tabs to the Right                                                                                                     |
 | workbench.close.tooltip                         | Close                                                                                                                       |

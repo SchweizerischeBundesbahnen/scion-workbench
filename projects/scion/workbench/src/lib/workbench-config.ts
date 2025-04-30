@@ -160,6 +160,7 @@ export abstract class WorkbenchConfig {
    * - workbench.close_all_tabs.action
    * - workbench.close_other_tabs.action
    * - workbench.close_tab.action
+   * - workbench.close_tab.tooltip
    * - workbench.close_tabs_to_the_left.action
    * - workbench.close_tabs_to_the_right.action
    * - workbench.close.tooltip
