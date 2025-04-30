@@ -17,7 +17,7 @@ import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workben
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
-import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
+import {WorkbenchView} from '../../view/workbench-view.model';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
@@ -60,7 +60,9 @@ export class ViewTabComponent {
   private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef).nativeElement as HTMLElement;
-  public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
+  // public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
+  public readonly viewId = input.required();
+  public readonly view = computed(() => this._viewRegistry.objects().find(view => view.id === this.viewId())!);
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;

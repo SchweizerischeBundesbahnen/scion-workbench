@@ -69,6 +69,7 @@ export class WbComponentPortal<T = any> {
    * - If already attached to a different view container, detaches it first.
    */
   public attach(viewContainerRef: ViewContainerRef): void {
+    console.log('>>> WbComponentPortal.attach', this._options?.logContext);
     assertNotInReactiveContext(this.attach);
     if (this.isAttachedTo(viewContainerRef)) {
       return;
@@ -94,6 +95,7 @@ export class WbComponentPortal<T = any> {
    * so it will not be checked for changes until it is reattached.
    */
   public detach(): void {
+    console.log('>>> WbComponentPortal.detach', this._options?.logContext);
     assertNotInReactiveContext(this.detach);
     if (!this.attached()) {
       return;
@@ -129,6 +131,13 @@ export class WbComponentPortal<T = any> {
     return this._componentRef;
   }
 
+  /**
+   * The HTML element of this portal.
+   */
+  public get element(): HTMLElement | undefined {
+    return this._componentRef?.location.nativeElement as HTMLElement | undefined;
+  }
+
   public get attached(): Signal<boolean> {
     return this._attached;
   }
@@ -155,6 +164,8 @@ export interface PortalOptions {
    * Providers registered with the injector for the instantiation of the component.
    */
   providers?: Provider[];
+
+  logContext?: string;
 }
 
 /**

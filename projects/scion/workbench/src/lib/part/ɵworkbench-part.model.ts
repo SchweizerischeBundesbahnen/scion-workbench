@@ -12,7 +12,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
+import {ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -27,6 +27,7 @@ import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MActivity} from '../activity/workbench-activity.model';
+import {WbComponentPortal} from '../portal/wb-component-portal';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -36,7 +37,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
-  private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
 
@@ -51,39 +51,33 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly topRight = signal(false);
   public readonly activity = signal<MActivity | null>(null);
   public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
+  public readonly attached = computed(() => this.portal.attached());
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
+  public readonly portal: WbComponentPortal;
 
   private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
 
-  /**
-   * Reference to the HTML element of {@link PartComponent} or {@link MainAreaPartComponent}.
-   */
-  public partComponent: HTMLElement | undefined;
-
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
     this.alternativeId = layout.part({partId: this.id}).alternativeId;
-    this._partComponent = options.component;
+    this.portal = this.createPortal(options.component);
     this.gridName = signal(layout.grid({partId: id}).gridName);
     this.actions = this.computePartActions();
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
+    console.log('>>> ɵWorkbenchPart.construct', this.id);
   }
 
-  /**
-   * Constructs the portal using the given injection context.
-   */
-  public createPortalFromInjectionContext(injectionContext: Injector): ComponentPortal<PartComponent | MainAreaPartComponent> { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
-    const injector = Injector.create({
-      parent: injectionContext,
+  private createPortal(viewComponent: ComponentType<PartComponent>): WbComponentPortal {
+    return new WbComponentPortal(viewComponent, {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
       ],
+      logContext: this.id,
     });
-    return new ComponentPortal(this._partComponent, null, injector, null, null);
   }
 
   /**
@@ -285,6 +279,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     if (this.activeViewId()) {
       this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
     }
+    this.portal.destroy();
+    console.log('>>> ɵWorkbenchPart.destroy', this.id);
   }
 }
 
