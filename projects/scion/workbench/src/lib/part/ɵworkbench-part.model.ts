@@ -43,6 +43,11 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
 
+  /**
+   * Reference to the HTML element of {@link PartComponent} or {@link MainAreaPartComponent}.
+   */
+  public partComponent: HTMLElement | undefined;
+
   private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
 
