@@ -72,6 +72,7 @@ export class PartComponent implements OnInit {
   }
 
   constructor() {
+    this.part.partComponent = inject(ElementRef).nativeElement as HTMLElement;
     this.installComponentLifecycleLogger();
     this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
