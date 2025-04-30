@@ -32,6 +32,11 @@ export class PartPO {
   public readonly activeView: ViewPO;
 
   /**
+   * Locates the content displayed in the part.
+   */
+  public readonly content: Locator;
+
+  /**
    * Handle to resize this part.
    */
   public readonly sash: PartSashPO;
@@ -44,6 +49,7 @@ export class PartPO {
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
     this.activeView = new ViewPO(this.locator.locator('wb-view'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
+    this.content = this.locator.locator(':scope > .e2e-content');
     this.sash = new PartSashPO(this.locator);
     this.nullPartMessage = this.locator.locator('wb-null-content');
   }

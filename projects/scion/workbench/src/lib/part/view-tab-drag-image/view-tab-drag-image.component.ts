@@ -41,6 +41,7 @@ import {PartId} from '../workbench-part.model';
   host: {
     '[class.view-drag]': 'true',
     '[class.drag-image]': 'true',
+    '[attr.data-active]': 'true',
     '[class.active]': 'true',
     '[class.can-drop]': 'canDrop()',
     '[class.drag-over-tabbar]': 'isDragOverTabbar()',

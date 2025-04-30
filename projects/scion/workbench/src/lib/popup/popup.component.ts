@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, HostBinding, inject, Injector, Provider, viewChild} from '@angular/core';
+import {Component, effect, ElementRef, HostBinding, inject, Injector, Provider, viewChild} from '@angular/core';
 import {ɵPopup} from './popup.config';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
+import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -36,56 +37,57 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
   providers: [
     configurePopupGlassPane(),
   ],
+  host: {
+    '[attr.data-popupid]': 'popup.id',
+    '[attr.data-focus]': `focusTracker.activeElement() === popup.id ? '' : null`,
+  },
 })
 export class PopupComponent {
 
-  private readonly _popup = inject(ɵPopup);
   private readonly _cdkTrapFocus = viewChild.required('focus_trap', {read: CdkTrapFocus});
 
-  protected portal = new ComponentPortal(this._popup.component, this._popup.viewContainerRef, inject(Injector));
+  protected readonly popup = inject(ɵPopup);
+  protected readonly portal = new ComponentPortal(this.popup.component, this.popup.viewContainerRef, inject(Injector));
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   @HostBinding('style.width')
   protected get popupWidth(): string | undefined {
-    return this._popup.size?.width;
+    return this.popup.size?.width;
   }
 
   @HostBinding('style.min-width')
   protected get popupMinWidth(): string | undefined {
-    return this._popup.size?.minWidth;
+    return this.popup.size?.minWidth;
   }
 
   @HostBinding('style.max-width')
   protected get popupMaxWidth(): string | undefined {
-    return this._popup.size?.maxWidth;
+    return this.popup.size?.maxWidth;
   }
 
   @HostBinding('style.height')
   protected get popupHeight(): string | undefined {
-    return this._popup.size?.height;
+    return this.popup.size?.height;
   }
 
   @HostBinding('style.min-height')
   protected get popupMinHeight(): string | undefined {
-    return this._popup.size?.minHeight;
+    return this.popup.size?.minHeight;
   }
 
   @HostBinding('style.max-height')
   protected get popupMaxHeight(): string | undefined {
-    return this._popup.size?.maxHeight;
+    return this.popup.size?.maxHeight;
   }
 
   @HostBinding('attr.class')
   protected get cssClasses(): string {
-    return this._popup.cssClasses.join(' ');
-  }
-
-  @HostBinding('attr.data-popupid')
-  protected get id(): string {
-    return this._popup.id;
+    return this.popup.cssClasses.join(' ');
   }
 
   constructor() {
     this.focusInitialElement();
+    registerFocusTracker(inject(ElementRef), this.popup.id);
   }
 
   private focusInitialElement(): void {

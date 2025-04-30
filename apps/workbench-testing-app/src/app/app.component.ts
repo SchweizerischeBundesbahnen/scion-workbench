@@ -8,11 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DoCheck, HostBinding, inject, NgZone} from '@angular/core';
-import {filter} from 'rxjs/operators';
+import {Component, DoCheck, effect, inject, NgZone, Renderer2, Signal} from '@angular/core';
+import {filter, map} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {DOCUMENT} from '@angular/common';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
@@ -28,59 +28,59 @@ import {SettingsService} from './settings.service';
     RouterOutlet,
     HeaderComponent,
   ],
+  host: {
+    '[attr.data-workbench-id]': 'workbenchId',
+    '[attr.data-perspective-id]': 'activePerspective()?.id',
+    '[attr.data-navigationid]': 'navigationId()',
+    // '[attr.data-highlight-focus]': `highlightFocus() ? '' : null`, // applies styles in styles.scss
+  },
 })
 export class AppComponent implements DoCheck {
 
-  private readonly _router = inject(Router);
-  private readonly _workbenchService = inject(WorkbenchService);
   private readonly _zone = inject(NgZone);
+  private readonly _logAngularChangeDetectionCycles = toSignal(inject(SettingsService).observe$('logAngularChangeDetectionCycles'));
 
   protected readonly workbenchStartup = inject(WorkbenchStartup);
-
-  private _logAngularChangeDetectionCycles = false;
-
-  @HostBinding('attr.data-workbench-id')
-  protected workbenchId = inject(WORKBENCH_ID);
-
-  @HostBinding('attr.data-perspective-id')
-  protected get activePerspectiveId(): string | undefined {
-    return this._workbenchService.activePerspective()?.id;
-  }
-
+  // protected readonly highlightFocus = toSignal(inject(SettingsService).observe$('highlightFocus'));
+  protected readonly activePerspective = inject(WorkbenchService).activePerspective;
+  protected readonly workbenchId = inject(WORKBENCH_ID);
   /**
    * Unique id that is set after a navigation has been performed.
    *
    * Used in end-to-end tests to detect when the navigation has completed.
    * @see RouterPagePO
    */
-  @HostBinding('attr.data-navigationid')
-  protected navigationId: string | undefined;
+  protected readonly navigationId = this.computeNavigationId();
 
   constructor() {
-    this.installRouterEventListeners();
     this.installPropagatedKeyboardEventLogger();
     this.provideWorkbenchService();
 
-    inject(SettingsService).observe$('logAngularChangeDetectionCycles')
-      .pipe(takeUntilDestroyed())
-      .subscribe(enabled => this._logAngularChangeDetectionCycles = enabled);
+    const highlightFocus = toSignal(inject(SettingsService).observe$('highlightFocus'));
+    const renderer = inject(Renderer2);
+    effect(() => {
+      if (highlightFocus()) {
+        renderer.setAttribute(document.documentElement, 'data-highlight-focus', '');
+      }
+      else {
+        renderer.removeAttribute(document.documentElement, 'data-highlight-focus');
+      }
+    });
   }
 
   public ngDoCheck(): void {
-    if (this._logAngularChangeDetectionCycles) {
+    if (this._logAngularChangeDetectionCycles()) {
       console.log('[AppComponent] Angular change detection cycle');
     }
   }
 
-  private installRouterEventListeners(): void {
-    this._router.events
+  private computeNavigationId(): Signal<string | undefined> {
+    const navigationId$ = inject(Router).events
       .pipe(
         filter(event => event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        this.navigationId = UUID.randomUUID();
-      });
+        map(() => UUID.randomUUID()),
+      );
+    return toSignal(navigationId$, {initialValue: undefined});
   }
 
   /**

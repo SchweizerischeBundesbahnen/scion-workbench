@@ -8,27 +8,27 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Page} from '@playwright/test';
+import {Locator} from '@playwright/test';
 
 /**
  * Handle for interacting with the workbench desktop.
  */
 export class DesktopPO {
 
-  constructor(public readonly page: Page) {
+  constructor(public readonly locator: Locator) {
   }
 
   /**
    * Gets the active drop zone when dragging a view over the desktop.
    */
   public async getActiveDropZone(): Promise<'north' | 'east' | 'south' | 'west' | 'center' | null> {
-    const dropZone = this.page.locator('div.e2e-desktop-drop-zone');
+    const dropZone = this.locator.locator('div.e2e-desktop-drop-zone');
     if (!await dropZone.isVisible()) {
       return null;
     }
 
     const dropZoneId = await dropZone.getAttribute('data-id');
-    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
+    const dropPlaceholder = this.locator.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
     if (!await dropPlaceholder.isVisible()) {
       return null;
     }

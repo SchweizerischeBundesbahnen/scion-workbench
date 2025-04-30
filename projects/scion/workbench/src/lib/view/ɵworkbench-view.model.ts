@@ -17,9 +17,8 @@ import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
 import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
+import {AbstractType, assertNotInReactiveContext, computed, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
-import {ActivationInstantProvider} from '../activation-instant.provider';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
@@ -37,6 +36,8 @@ import {Arrays, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
+import {Focusable} from './focusable';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -48,8 +49,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _logger = inject(Logger);
 
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
@@ -63,7 +64,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _scrolledIntoView = signal(true);
   private readonly _classBasedCanCloseGuard = this.constructClassBasedCanCloseGuard();
 
-  private _activationInstant: number | undefined;
   private _canCloseFn: (() => Promise<boolean>) | undefined;
 
   public alternativeId: string | undefined;
@@ -77,6 +77,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly last = computed(() => this.position() === this.part().viewIds().length - 1);
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
+  public readonly activationInstant = signal(0);
   public readonly active = signal<boolean>(false);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
@@ -89,7 +90,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.menuItems = this.computeMenuItems();
     this._blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
     this.blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
-    this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
   }
@@ -120,6 +120,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     this.part.set(this._partRegistry.get(mPart.id));
     this.active.set(mPart.activeViewId === this.id);
+    this.activationInstant.set(mView.activationInstant ?? 0);
 
     // TODO [#626]: Remove assignment and change `alternativeId` to read only when resolved the issue #626
     this.alternativeId = mView.alternativeId;
@@ -156,6 +157,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     if (!this.active() && this.portal.isConstructed && routeChanged) {
       this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.portal.componentRef.changeDetectorRef.detectChanges());
     }
+  }
+
+  public focus(): void {
+    assertNotInReactiveContext(this.activate, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    this.adapt(Focusable)?.focus();
   }
 
   /**
@@ -226,21 +232,17 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
+  public async activate(options?: {force?: true; skipLocationChange?: boolean}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchView.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (this.active() && this.part().active()) {
+    if (!options?.force && this.active() && this.part().active() && this._focusTracker.activeElement() === this.id) {
       return true;
     }
 
     const currentLayout = this._layout();
     return this._workbenchRouter.navigate(
-      layout => currentLayout === layout ? layout.activateView(this.id, {activatePart: true}) : null, // cancel navigation if the layout has become stale
+      layout => currentLayout === layout ? layout.activateView(this.id, {activatePart: !this.part().active()}) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: options?.skipLocationChange},
     );
-  }
-
-  public get activationInstant(): number | undefined {
-    return this._activationInstant;
   }
 
   /** @inheritDoc */
@@ -366,17 +368,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   /** @inheritDoc */
   public get destroyed(): boolean {
     return this.portal.isDestroyed;
-  }
-
-  /**
-   * Updates the activation instant when this view is activated.
-   */
-  private touchOnActivate(): void {
-    effect(() => {
-      if (this.active()) {
-        this._activationInstant = this._activationInstantProvider.now();
-      }
-    });
   }
 
   /**

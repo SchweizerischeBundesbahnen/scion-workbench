@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {MAIN_AREA_INITIAL_PART_ID, PartActivationInstantProvider, ViewActivationInstantProvider, ɵWorkbenchLayout} from './ɵworkbench-layout';
+import {MAIN_AREA_INITIAL_PART_ID, ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {MAIN_AREA, WorkbenchLayout} from './workbench-layout';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
@@ -1419,22 +1419,18 @@ describe('WorkbenchLayout', () => {
   it('should activate the most recently activated view when removing a view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
-    const viewActivationInstantProviderSpyObj = installViewActivationInstantProviderSpyObj();
     let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addView('view.1', {partId: 'part.initial'})
       .addView('view.5', {partId: 'part.initial'})
       .addView('view.2', {partId: 'part.initial'})
       .addView('view.3', {partId: 'part.initial'})
-      .addView('view.4', {partId: 'part.initial'});
-
-    // prepare the activation history
-    viewActivationInstantProviderSpyObj.getActivationInstant
-      .withArgs('view.1').and.returnValue(5)
-      .withArgs('view.2').and.returnValue(3)
-      .withArgs('view.3').and.returnValue(1)
-      .withArgs('view.4').and.returnValue(4)
-      .withArgs('view.5').and.returnValue(2);
+      .addView('view.4', {partId: 'part.initial'})
+      .activateView('view.3')
+      .activateView('view.5')
+      .activateView('view.2')
+      .activateView('view.4')
+      .activateView('view.1');
 
     workbenchLayout = workbenchLayout
       .activateView('view.1')
@@ -1461,21 +1457,17 @@ describe('WorkbenchLayout', () => {
   it('should activate the most recently activated part when removing a part', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.A'});
 
-    const partActivationInstantProviderSpyObj = installPartActivationInstantProviderSpyObj();
     let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.B', {relativeTo: 'part.A', align: 'right'})
       .addPart('part.C', {relativeTo: 'part.B', align: 'right'})
       .addPart('part.D', {relativeTo: 'part.C', align: 'right'})
-      .addPart('part.E', {relativeTo: 'part.D', align: 'right'}, {activate: true});
-
-    // prepare the activation history
-    partActivationInstantProviderSpyObj.getActivationInstant
-      .withArgs('part.A').and.returnValue(3)
-      .withArgs('part.B').and.returnValue(1)
-      .withArgs('part.C').and.returnValue(4)
-      .withArgs('part.D').and.returnValue(2)
-      .withArgs('part.E').and.returnValue(5);
+      .addPart('part.E', {relativeTo: 'part.D', align: 'right'}, {activate: true})
+      .activatePart('part.B')
+      .activatePart('part.D')
+      .activatePart('part.A')
+      .activatePart('part.C')
+      .activatePart('part.E');
 
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.E');
 
@@ -4581,22 +4573,4 @@ function createComplexMainAreaLayout(): WorkbenchLayout {
     .addPart('part.E', {relativeTo: mainAreaInitialPartId, align: 'right'})
     .addPart('part.F', {relativeTo: 'part.E', align: 'bottom'})
     .addPart('part.G', {relativeTo: mainAreaInitialPartId, align: 'bottom'});
-}
-
-/**
- * Installs a {@link SpyObj} for {@link PartActivationInstantProvider}.
- */
-function installPartActivationInstantProviderSpyObj(): jasmine.SpyObj<PartActivationInstantProvider> {
-  const spyObj = jasmine.createSpyObj<PartActivationInstantProvider>('PartActivationInstantProvider', ['getActivationInstant']);
-  TestBed.overrideProvider(PartActivationInstantProvider, {useValue: spyObj});
-  return spyObj;
-}
-
-/**
- * Installs a {@link SpyObj} for {@link ViewActivationInstantProvider}.
- */
-function installViewActivationInstantProviderSpyObj(): jasmine.SpyObj<ViewActivationInstantProvider> {
-  const spyObj = jasmine.createSpyObj<ViewActivationInstantProvider>('ViewActivationInstantProvider', ['getActivationInstant']);
-  TestBed.overrideProvider(ViewActivationInstantProvider, {useValue: spyObj});
-  return spyObj;
 }

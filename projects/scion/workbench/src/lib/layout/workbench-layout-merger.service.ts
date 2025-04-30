@@ -9,6 +9,7 @@
  */
 import {Injectable} from '@angular/core';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
+import {GridSerializationFlags} from '../layout/workench-layout-serializer.service';
 
 /**
  * Performs a three-way merge of the local and remote layouts, using the base layout (common ancestor) as the base of the merge operation.
@@ -22,10 +23,21 @@ export class WorkbenchLayoutMerger {
    * Performs a merge of given local and remote layouts, using the base layout as the common ancestor.
    */
   public merge(layouts: {local: ɵWorkbenchLayout; remote: ɵWorkbenchLayout; base: ɵWorkbenchLayout}): ɵWorkbenchLayout {
-    if (!layouts.base.equals(layouts.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, assignStableActivityIdentifier: true, sort: true})) {
+    if (!layouts.base.equals(layouts.remote, compareFlags)) {
       return layouts.remote;
     }
 
     return layouts.local;
   }
 }
+
+const compareFlags: GridSerializationFlags = {
+  excludeTreeNodeId: true,
+  excludePartNavigationId: true,
+  excludeViewNavigationId: true,
+  excludePartActivationInstant: true,
+  excludeViewActivationInstant: true,
+  assignStablePartIdentifier: true,
+  assignStableActivityIdentifier: true,
+  sort: true,
+};

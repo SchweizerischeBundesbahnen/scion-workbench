@@ -15,6 +15,7 @@ import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras} from './workbench-layout';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Arrays} from '@scion/toolkit/util';
+import {ActivationInstantProvider} from '../activation-instant.provider';
 
 /**
  * @inheritDoc
@@ -23,6 +24,7 @@ import {Arrays} from '@scion/toolkit/util';
 export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
 
   private readonly _injector = inject(Injector);
+  private readonly _instantProvider = inject(ActivationInstantProvider);
 
   /**
    * @inheritDoc
@@ -41,6 +43,7 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
             structural: true,
             views: [],
             cssClass: extras?.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
+            activationInstant: this._instantProvider.next(),
           }),
           activePartId: partId,
         },

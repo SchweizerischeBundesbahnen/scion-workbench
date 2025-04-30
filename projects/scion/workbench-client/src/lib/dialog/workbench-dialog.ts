@@ -52,3 +52,10 @@ export abstract class WorkbenchDialog<R = unknown> {
    */
   public abstract close(result?: R | Error): void;
 }
+
+/**
+ * Format of a dialog identifier.
+ *
+ * @category Dialog
+ */
+export type DialogId = `dialog.${string}`;

@@ -15,6 +15,7 @@ export {WORKBENCH_ID} from './workbench-id';
 export {type WorkbenchPartAction, type WorkbenchPartActionFn, type WorkbenchMenuItem, type WorkbenchViewMenuItemFn, type WorkbenchTheme, type CanClose, type CanCloseFn, type CanCloseRef} from './workbench.model';
 export {WorkbenchComponent} from './workbench.component';
 export {VIEW_TAB_RENDERING_CONTEXT, type ViewTabRenderingContext} from './workbench.constants';
+export {type DialogId, type PopupId} from './workbench-elements';
 
 export * from './layout/public_api';
 export * from './desktop/public_api';

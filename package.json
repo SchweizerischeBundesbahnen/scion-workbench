@@ -96,7 +96,7 @@
     "@angular-devkit/build-angular": "19.0.4",
     "@angular/cli": "19.0.4",
     "@angular/compiler-cli": "19.0.3",
-    "@playwright/test": "1.49.1",
+    "@playwright/test": "1.52.0",
     "@types/jasmine": "5.1.5",
     "conventional-changelog-cli": "5.0.0",
     "cpx2": "8.0.0",

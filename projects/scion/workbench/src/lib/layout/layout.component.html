@@ -218,7 +218,9 @@
                   wbViewDropZone
                   [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
                   [wbViewDropZoneCssClass]="'e2e-desktop-drop-zone'"
-                  (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
+                  (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
+                  tabindex="-1"
+                  #desktop_element>
       @if (desktop()) {
         <ng-container *ngTemplateOutlet="desktop()!"/>
       } @else {

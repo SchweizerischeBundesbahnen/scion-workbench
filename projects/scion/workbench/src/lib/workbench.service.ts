@@ -16,6 +16,7 @@ import {PartId, WorkbenchPart} from './part/workbench-part.model';
 import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
+import {WorkbenchElementId} from './workbench-elements';
 
 /**
  * The central class of the SCION Workbench.
@@ -191,4 +192,9 @@ export abstract class WorkbenchService {
    * Configures if to animate activity panels.
    */
   public abstract readonly panelAnimation: WritableSignal<boolean>;
+
+  /**
+   * Gets the id of the active (focused) workbench element, or `null` if no element is active.
+   */
+  public abstract readonly activeWorkbenchElement: Signal<WorkbenchElementId | null>;
 }

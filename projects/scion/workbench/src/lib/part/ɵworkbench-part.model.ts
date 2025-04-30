@@ -7,13 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
+import {assertNotInReactiveContext, computed, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
-import {ActivationInstantProvider} from '../activation-instant.provider';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {ViewId} from '../view/workbench-view.model';
@@ -27,6 +26,7 @@ import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MActivity} from '../activity/workbench-activity.model';
+import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -35,13 +35,14 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-  private readonly _activationInstantProvider = inject(ActivationInstantProvider);
+  private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
 
   public readonly alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
+  public readonly activationInstant = signal(0);
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId = signal<ViewId | null>(null);
@@ -55,7 +56,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly classList = new ClassList();
 
   private _isInMainArea: boolean | undefined;
-  private _activationInstant: number | undefined;
 
   /**
    * Reference to the HTML element of {@link PartComponent} or {@link MainAreaPartComponent}.
@@ -67,7 +67,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._partComponent = options.component;
     this.gridName = signal(layout.grid({partId: id}).gridName);
     this.actions = this.computePartActions();
-    this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
   }
@@ -102,6 +101,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.gridName.set(gridName);
     this.peripheral.set(layout.isPeripheralPart(this.id));
     this.active.set(grid.activePartId === this.id);
+    this.activationInstant.set(mPart.activationInstant ?? 0);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
     this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
@@ -160,9 +160,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public async activate(): Promise<boolean> {
+  public async activate(options?: {force?: true}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (this.active()) {
+    if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
       return true;
     }
 
@@ -171,10 +171,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       layout => currentLayout === layout ? layout.activatePart(this.id) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: true}, // do not add part activation into browser history stack
     );
-  }
-
-  public get activationInstant(): number | undefined {
-    return this._activationInstant;
   }
 
   /** @inheritDoc */
@@ -240,17 +236,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       }
       return action;
     }
-  }
-
-  /**
-   * Updates the activation instant when this part is activated.
-   */
-  private touchOnActivate(): void {
-    effect(() => {
-      if (this.active()) {
-        this._activationInstant = this._activationInstantProvider.now();
-      }
-    });
   }
 
   /**

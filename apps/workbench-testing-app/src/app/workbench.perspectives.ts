@@ -35,6 +35,10 @@ export const PerspectiveData = {
    * Enables grouping in the perspective switcher menu.
    */
   menuGroup: 'menuGroup',
+  /**
+   * Indicates that a perspective is used in end-to-end tests, displayed only if 'Show Test Perspectives' setting is enabled.
+   */
+  isTestPerspective: 'isTestPerspective',
 } as const;
 
 /**
@@ -94,6 +98,16 @@ export const Perspectives = {
           [PerspectiveData.label]: 'Sample Layout 2 (Peripheral Parts)',
           [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
           [PerspectiveData.menuGroup]: 'peripheral-part-layout',
+        },
+      },
+      {
+        id: 'e2e-focus-test-perspective',
+        layout: provideFocusTestPerspective,
+        data: {
+          [PerspectiveData.label]: 'Focus Test Perspective',
+          [PerspectiveData.menuItemLabel]: 'Focus Test Perspective',
+          [PerspectiveData.menuGroup]: 'test-perspectives',
+          [PerspectiveData.isTestPerspective]: true,
         },
       },
       // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
@@ -242,4 +256,57 @@ function providePerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLa
     .navigateView('sample-view-9', [], {hint: 'sample-view', data: {style: 'table', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
     .navigateView('sample-view-10', [], {hint: 'sample-view', data: {style: 'form', title: 'Sample View'} satisfies ViewSkeletonNavigationData})
     .activateView('sample-view-6');
+}
+
+function provideFocusTestPerspective(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+  return factory
+    .addPart(MAIN_AREA)
+    .navigatePart(MAIN_AREA, ['test-pages/focus-test-page'])
+
+    // Add Activity 1 (grid)
+    .addPart('part.activity-1a', {dockTo: 'left-top'}, {label: 'Activity 1', tooltip: 'Activity with a grid', icon: 'folder', ɵactivityId: 'activity.1'})
+    .addPart('part.activity-1b', {align: 'bottom', relativeTo: 'part.activity-1a', ratio: .8})
+    .addPart('part.activity-1c', {align: 'bottom', relativeTo: 'part.activity-1b', ratio: .7})
+    .addPart('part.activity-1d', {align: 'bottom', relativeTo: 'part.activity-1c'})
+    .addView('view.101', {partId: 'part.activity-1c'})
+    .addView('view.102', {partId: 'part.activity-1c'})
+    .addView('view.103', {partId: 'part.activity-1d'})
+    .addView('view.104', {partId: 'part.activity-1d'})
+    .navigatePart('part.activity-1a', ['test-pages/focus-test-page'])
+    .navigatePart('part.activity-1b', ['test-pages/focus-test-page'])
+    .navigateView('view.101', ['test-pages/focus-test-page'])
+    .navigateView('view.102', ['test-pages/focus-test-page'])
+    .navigateView('view.103', ['test-pages/focus-test-page'])
+    .navigateView('view.104', ['test-pages/focus-test-page'])
+
+    // Add Activity 2 (part)
+    .addPart('part.activity-2', {dockTo: 'left-bottom'}, {label: 'Activity 2', tooltip: 'Activity with a single part', icon: 'folder', ɵactivityId: 'activity.2'})
+    .navigatePart('part.activity-2', ['test-pages/focus-test-page'])
+
+    // Add Activity 3 (views)
+    .addPart('part.activity-3', {dockTo: 'bottom-left'}, {label: 'Activity 3', tooltip: 'Activity with views', icon: 'folder', ɵactivityId: 'activity.3'})
+    .addView('view.301', {partId: 'part.activity-3'})
+    .addView('view.302', {partId: 'part.activity-3'})
+    .navigateView('view.301', ['test-pages/focus-test-page'])
+    .navigateView('view.302', ['test-pages/focus-test-page'])
+
+    // Add Activity logging the active workbench element.
+    .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', cssClass: 'e2e-log'})
+    .navigatePart('part.log', ['active-workbench-element-log'])
+
+    // Add peripheral parts on the right
+    .addPart('part.right-1', {align: 'right', ratio: .25}, {title: 'Part 1'})
+    .addPart('part.right-2', {align: 'bottom', relativeTo: 'part.right-1', ratio: .8}, {title: 'Part 2'})
+    .addPart('part.right-3', {align: 'bottom', relativeTo: 'part.right-2', ratio: .7}, {title: 'Part 3'})
+    .addPart('part.right-4', {align: 'bottom', relativeTo: 'part.right-3'}, {title: 'Part 4'})
+    .addView('view.201', {partId: 'part.right-3'})
+    .addView('view.202', {partId: 'part.right-3'})
+    .addView('view.203', {partId: 'part.right-4'})
+    .addView('view.204', {partId: 'part.right-4'})
+    .navigatePart('part.right-1', ['test-pages/focus-test-page'])
+    .navigatePart('part.right-2', ['test-pages/focus-test-page'])
+    .navigateView('view.201', ['test-pages/focus-test-page'])
+    .navigateView('view.202', ['test-pages/focus-test-page'])
+    .navigateView('view.203', ['test-pages/focus-test-page'])
+    .navigateView('view.204', ['test-pages/focus-test-page']);
 }

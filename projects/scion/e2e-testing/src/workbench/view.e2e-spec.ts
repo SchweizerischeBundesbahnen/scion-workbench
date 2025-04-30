@@ -458,7 +458,7 @@ test.describe('Workbench View', () => {
     // Close view via router (target) (prevent).
     // Do not wait for the navigation to complete because the message box blocks navigation.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
-    await routerPage.navigate([], {target: await testeeViewPage.view.getViewId(), close: true, waitForNavigation: false});
+    await routerPage.navigate([], {target: await testeeViewPage.view.getViewId(), close: true, noWaitAfter: false});
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeHidden();
 
     // Activate test view.
@@ -472,7 +472,7 @@ test.describe('Workbench View', () => {
 
     // Close view via router (path) (prevent).
     // Do not wait for the navigation to complete because the message box blocks navigation.
-    await routerPage.navigate(['test-view'], {close: true, waitForNavigation: false});
+    await routerPage.navigate(['test-view'], {close: true, noWaitAfter: false});
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeHidden();
 
     // Activate test view.

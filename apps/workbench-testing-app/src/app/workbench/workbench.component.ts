@@ -34,7 +34,7 @@ import StartPageComponent from '../start-page/start-page.component';
 })
 export class WorkbenchComponent implements OnDestroy {
 
-  private readonly _wbRouter = inject(WorkbenchRouter);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _dialogService = inject(WorkbenchDialogService);
 
   protected readonly workbenchService = inject(WorkbenchService);
@@ -76,7 +76,7 @@ export class WorkbenchComponent implements OnDestroy {
     const stickyViewTab = this.readQueryParamFlag('stickyViewTab');
     effect(() => {
       if (stickyViewTab() && !this.workbenchService.views().length) {
-        untracked(() => void this._wbRouter.navigate(['/start-page']));
+        untracked(() => void this._workbenchRouter.navigate(['/start-page']));
       }
     });
   }

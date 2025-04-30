@@ -1,4 +1,4 @@
-import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
+import {WorkbenchCapabilities, WorkbenchDialogCapability, WorkbenchMessageBoxCapability, WorkbenchPopupCapability} from '@scion/workbench-client';
 import {Capability, Manifest} from '@scion/microfrontend-platform';
 
 /**
@@ -30,6 +30,18 @@ export const workbenchManifest: Manifest = {
       ],
       properties: {
         path: 'test-host-popup;matrixParam=:param',
+      },
+    } satisfies WorkbenchPopupCapability,
+    // TODO [#271]: Remove this messagebox capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Popup,
+      qualifier: {
+        component: 'host-popup-focus-page',
+      },
+      private: false,
+      description: 'Represents a popup provided by the host app that displays the focus test page.',
+      properties: {
+        path: 'test-pages/focus-test-page',
       },
     } satisfies WorkbenchPopupCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271
@@ -121,6 +133,18 @@ export const workbenchManifest: Manifest = {
         },
       },
     },
+    // TODO [#271]: Remove this messagebox capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'host-message-box-focus-page',
+      },
+      private: false,
+      description: 'Represents a message box provided by the host app that displays the focus test page.',
+      properties: {
+        path: 'test-pages/focus-test-page',
+      },
+    } satisfies WorkbenchMessageBoxCapability,
   ],
   intentions: [
     // allow opening test views

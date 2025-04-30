@@ -27,6 +27,7 @@ import {ViewId} from './view/workbench-view.model';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
+import {WorkbenchFocusTracker} from './focus/workbench-focus-tracker.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -48,6 +49,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly panelAlignment = inject(WorkbenchLayoutService).panelAlignment;
   public readonly panelAnimation = inject(WorkbenchLayoutService).panelAnimation;
   public readonly activePerspective = inject(WorkbenchPerspectiveService).activePerspective;
+  public readonly activeWorkbenchElement = inject(WorkbenchFocusTracker).activeElement;
 
   /** @inheritDoc */
   public getPerspective(perspectiveId: string): ɵWorkbenchPerspective | null {

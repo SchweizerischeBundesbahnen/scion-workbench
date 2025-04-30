@@ -25,6 +25,7 @@ export class ViewPO {
    * Handle to the tab of the view in the tab bar.
    */
   public readonly tab: ViewTabPO;
+  public readonly viewport: Locator;
 
   /**
    * Locates the message displayed if not navigated this view.
@@ -38,10 +39,11 @@ export class ViewPO {
 
   constructor(public readonly locator: Locator, tab: ViewTabPO) {
     this.tab = tab;
+    this.viewport = this.locator.locator(':scope > sci-viewport');
     this.nullViewMessage = this.locator.locator('wb-null-content');
     this.scrollbars = {
-      vertical: new ScrollbarPO(this.locator.locator(':scope > sci-viewport > sci-scrollbar.e2e-vertical')),
-      horizontal: new ScrollbarPO(this.locator.locator(':scope > sci-viewport > sci-scrollbar.e2e-horizontal')),
+      vertical: new ScrollbarPO(this.viewport.locator(':scope > sci-scrollbar.e2e-vertical')),
+      horizontal: new ScrollbarPO(this.viewport.locator(':scope > sci-scrollbar.e2e-horizontal')),
     };
   }
 
@@ -76,7 +78,7 @@ export class ViewPO {
    * Returns the scroll position as closed interval [0,1].
    */
   public getScrollPosition(orientation: 'horizontal' | 'vertical'): Promise<number> {
-    return this.locator.locator(':scope > sci-viewport > div.viewport').evaluate((viewport: HTMLElement, orientation: 'horizontal' | 'vertical') => {
+    return this.viewport.locator(':scope > div.viewport').evaluate((viewport: HTMLElement, orientation: 'horizontal' | 'vertical') => {
       if (orientation === 'horizontal') {
         return viewport.scrollLeft / (viewport.scrollWidth - viewport.clientWidth);
       }

@@ -25,6 +25,7 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
+import {registerFocusTrackerExclude, WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -42,7 +43,9 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
   ],
   host: {
     '[class.view-drag]': 'viewDragService.dragging()',
+    '[attr.data-focus-within-view]': `focusTracker.activeElement() === view().id ? '' : null`,
     '[class.active]': 'view().active()',
+    '[attr.data-active]': `view().active() ? '' : null`,
     '[class.part-active]': 'view().part().active()',
     '[class.e2e-dirty]': 'view().dirty()',
     '[attr.data-viewid]': 'view().id',
@@ -65,11 +68,13 @@ export class ViewTabComponent {
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   protected readonly viewDragService = inject(ViewDragService);
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   constructor() {
     this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
+    registerFocusTrackerExclude(inject(ElementRef));
   }
 
   @HostListener('click')

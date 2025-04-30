@@ -11,9 +11,7 @@ import {MPart, MPartGrid, MTreeNode, MView, WorkbenchGrids, ɵMPartGrid} from '.
 import {UID} from '../common/uid.util';
 import {DockedPartExtras, DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
-import {inject, Injectable, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
+import {inject, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
@@ -27,6 +25,7 @@ import {PartId} from '../part/workbench-part.model';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, ActivityId, MActivity, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
 import {Objects} from '../common/objects.util';
 import {RequireOne} from '../common/utility-types';
+import {ActivationInstantProvider} from '../activation-instant.provider';
 import {readCssVariable} from '../common/dom.util';
 import {DOCUMENT} from '@angular/common';
 
@@ -49,8 +48,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private readonly _activityLayout: MActivityLayout;
   private readonly _outlets: Map<WorkbenchOutlet, UrlSegment[]>;
   private readonly _navigationStates: Map<WorkbenchOutlet, NavigationState>;
-  private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
-  private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
+  private readonly _instantProvider = inject(ActivationInstantProvider);
   private readonly _workbenchLayoutSerializer = inject(WorkbenchLayoutSerializer);
   private readonly _injector = inject(Injector);
 
@@ -760,6 +758,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
     else {
       group.activeActivityId = id;
+
+      // Activate part (and view) to update activation instant.
+      const activePart = this.activePart({grid: id})!;
+      if (activePart.activeViewId) {
+        this.__activateView(this.view({viewId: activePart.activeViewId}), {activatePart: true});
+      }
+      else {
+        this.__activatePart(activePart);
+      }
     }
   }
 
@@ -947,11 +954,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (grid.activePartId === part.id) {
       const [activePart] = parts
         .filter(mPart => mPart.id !== part.id)
-        .sort((part1, part2) => {
-          const activationInstantPart1 = this._partActivationInstantProvider.getActivationInstant(part1.id);
-          const activationInstantPart2 = this._partActivationInstantProvider.getActivationInstant(part2.id);
-          return activationInstantPart2 - activationInstantPart1;
-        });
+        .sort((part1, part2) => (part2.activationInstant ?? 0) - (part1.activationInstant ?? 0));
       grid.activePartId = activePart!.id;
     }
   }
@@ -1037,11 +1040,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const position = coerceViewPosition(options.position ?? 'end', part);
     part.views.splice(position, 0, view);
 
+    const activationInstant = this._instantProvider.next();
     if (options.activateView) {
-      this.__activateView(view);
+      this.__activateView(view, {activationInstant});
     }
     if (options.activatePart) {
-      this.__activatePart(part);
+      this.__activatePart(part, {activationInstant});
     }
     if (options.cssClass) {
       view.cssClass = Arrays.coerce(options.cssClass);
@@ -1102,11 +1106,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     // Activate view and part.
-    if (options?.activatePart) {
-      this.__activatePart(targetPart);
-    }
+    const activationInstant = this._instantProvider.next();
     if (options?.activateView) {
-      this.__activateView(view);
+      this.__activateView(view, {activationInstant});
+    }
+    if (options?.activatePart) {
+      this.__activatePart(targetPart, {activationInstant});
     }
   }
 
@@ -1136,14 +1141,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Activate the last used view if this view was active.
     if (part.activeViewId === view.id) {
-      const [lastUsedViewId] = part.views
-        .map(view => view.id)
-        .sort((viewId1, viewId2) => {
-          const activationInstantView1 = this._viewActivationInstantProvider.getActivationInstant(viewId1);
-          const activationInstantView2 = this._viewActivationInstantProvider.getActivationInstant(viewId2);
-          return activationInstantView2 - activationInstantView1;
-        });
-      part.activeViewId = lastUsedViewId;
+      const [lastUsedView] = part.views.sort((view1, view2) => (view2.activationInstant ?? 0) - (view1.activationInstant ?? 0));
+      if (lastUsedView) {
+        this.__activateView(lastUsedView);
+      }
+      else {
+        delete part.activeViewId;
+      }
     }
 
     // Remove the part when removing its last view, but only if the part has no navigation and is not a structural part.
@@ -1162,14 +1166,15 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __activateView(view: MView, options?: {activatePart?: boolean}): void {
+  private __activateView(view: MView, options?: {activatePart?: boolean; activationInstant?: number}): void {
     // Activate the view.
     const part = this.part({viewId: view.id});
     part.activeViewId = view.id;
+    view.activationInstant = options?.activationInstant ?? this._instantProvider.next();
 
     // Activate the part.
     if (options?.activatePart) {
-      this.__activatePart(part);
+      this.__activatePart(part, {activationInstant: view.activationInstant});
     }
   }
 
@@ -1179,11 +1184,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private __activateAdjacentView(view: MView, options?: {activatePart?: boolean}): void {
     const part = this.part({viewId: view.id});
     const viewIndex = part.views.indexOf(view);
-    part.activeViewId = ((part.views[viewIndex - 1] ?? part.views[viewIndex + 1]) as MView | undefined)?.id; // is `undefined` if it is the last view of the part
-
-    // Activate the part.
-    if (options?.activatePart) {
-      this.__activatePart(part);
+    const adjacentView = part.views[viewIndex - 1] ?? part.views[viewIndex + 1];
+    if (adjacentView) {
+      this.__activateView(adjacentView, {activatePart: options?.activatePart});
     }
   }
 
@@ -1200,9 +1203,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
-  private __activatePart(part: MPart): void {
+  private __activatePart(part: MPart, options?: {activationInstant?: number}): void {
     // Activate part.
     this.grid({partId: part.id}).grid.activePartId = part.id;
+    part.activationInstant = options?.activationInstant ?? this._instantProvider.next();
 
     // Activate activity.
     const activity = this.activity({partId: part.id}, {orElse: null});
@@ -1569,48 +1573,6 @@ export const MAIN_AREA_INITIAL_PART_ID = new InjectionToken<PartId>('MAIN_AREA_I
 });
 
 /**
- * Provides the instant when a part was last activated.
- *
- * Overwrite DI token in tests to control part activation instants.
- * ```
- * TestBed.overrideProvider(PartActivationInstantProvider, {useValue: ...});
- * ```
- */
-@Injectable({providedIn: 'root'})
-export class PartActivationInstantProvider {
-
-  private _partRegistry = inject(WORKBENCH_PART_REGISTRY);
-
-  /**
-   * Returns the instant when the specified part was last activated.
-   */
-  public getActivationInstant(partId: PartId): number {
-    return this._partRegistry.get(partId, {orElse: null})?.activationInstant ?? 0;
-  }
-}
-
-/**
- * Provides the instant when a view was last activated.
- *
- * Overwrite DI token in tests to control view activation instants.
- * ```
- * TestBed.overrideProvider(ViewActivationInstantProvider, {useValue: ...});
- * ```
- */
-@Injectable({providedIn: 'root'})
-export class ViewActivationInstantProvider {
-
-  private _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-
-  /**
-   * Returns the instant when the specified view was last activated.
-   */
-  public getActivationInstant(viewId: ViewId): number {
-    return this._viewRegistry.get(viewId, {orElse: null})?.activationInstant ?? 0;
-  }
-}
-
-/**
  * Matches given view by its primary or alternative id, depending on the type of the passed id.
  */
 function matchesViewId(id: ViewId | string, view: MView): boolean {
@@ -1651,7 +1613,7 @@ export function isPartId(partId: string | undefined | null): partId is PartId {
 /**
  * Tests if the given id matches the format of a view identifier.
  */
-function isViewId(viewId: string | undefined | null): viewId is ViewId {
+export function isViewId(viewId: string | undefined | null): viewId is ViewId {
   return Routing.isViewOutlet(viewId);
 }
 

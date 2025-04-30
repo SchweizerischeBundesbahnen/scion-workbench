@@ -60,7 +60,7 @@ export class WorkbenchPopupService {
    */
   public async open<T>(qualifier: Qualifier, config: WorkbenchPopupConfig): Promise<T | undefined> {
     const popupCommand: ɵWorkbenchPopupCommand = {
-      popupId: UUID.randomUUID(),
+      popupId: `popup.${UUID.randomUUID()}`,
       align: config.align,
       closeStrategy: config.closeStrategy,
       cssClass: config.cssClass,

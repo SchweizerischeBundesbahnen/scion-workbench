@@ -8,13 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, inject, input} from '@angular/core';
+import {Component, computed, ElementRef, inject, input, Signal} from '@angular/core';
 import {MActivity} from '../../workbench-activity.model';
 import {ɵWorkbenchRouter} from '../../../routing/ɵworkbench-router.service';
 import {synchronizeCssClasses} from '../../../common/css-class.util';
 import {Arrays} from '@scion/toolkit/util';
 import {IconComponent} from '../../../icon/icon.component';
 import {text} from '../../../text/text';
+import {registerFocusTrackerExclude, WorkbenchFocusTracker} from '../../../focus/workbench-focus-tracker.service';
+import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
+import {isPartId, isViewId} from '../../../layout/ɵworkbench-layout';
 
 @Component({
   selector: 'wb-activity-item',
@@ -35,11 +38,13 @@ export class ActivityItemComponent {
   public readonly active = input.required<boolean>();
 
   protected readonly tooltip = text(computed(() => this.activity().tooltip ?? this.activity().label));
+  protected readonly focusWithinActivity = this.computeFocusWithinActivity();
 
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
   constructor() {
     this.addHostCssClasses();
+    registerFocusTrackerExclude(inject(ElementRef));
   }
 
   protected onToggle(): void {
@@ -49,5 +54,27 @@ export class ActivityItemComponent {
   private addHostCssClasses(): void {
     const host = inject(ElementRef).nativeElement as HTMLElement;
     synchronizeCssClasses(host, computed(() => Arrays.coerce(this.activity().cssClass)));
+  }
+
+  private computeFocusWithinActivity(): Signal<boolean> {
+    const focusTracker = inject(WorkbenchFocusTracker);
+    const layoutService = inject(WorkbenchLayoutService);
+
+    return computed(() => {
+      const activeElement = focusTracker.activeElement();
+      const activity = this.activity();
+      const layout = layoutService.layout();
+
+      if (isPartId(activeElement)) {
+        return layout.activity({partId: activeElement}, {orElse: null})?.id === activity.id;
+      }
+      if (isViewId(activeElement)) {
+        const part = layout.part({viewId: activeElement}, {orElse: null}); // why? when closing multiple tabs
+        if (part) {
+          return layout.activity({partId: part.id}, {orElse: null})?.id === activity.id;
+        }
+      }
+      return false;
+    });
   }
 }

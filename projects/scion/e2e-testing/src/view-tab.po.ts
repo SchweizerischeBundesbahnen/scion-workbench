@@ -62,9 +62,18 @@ export class ViewTabPO {
     await this.locator.dblclick();
   }
 
-  public async close(): Promise<void> {
+  /**
+   * Closes the view tab, optionally performing a programmatic click to not gain focus.
+   */
+  public async close(options?: {programmatic?: true}): Promise<void> {
+    const closeButton = this.locator.locator('.e2e-close');
     await this.locator.hover();
-    await this.locator.locator('.e2e-close').click();
+    if (options?.programmatic) {
+      await closeButton.evaluate((button: HTMLElement) => button.click());
+    }
+    else {
+      await closeButton.click();
+    }
   }
 
   public isDirty(): Promise<boolean> {
@@ -73,6 +82,15 @@ export class ViewTabPO {
 
   public isActive(): Promise<boolean> {
     return hasCssClass(this.locator, 'active');
+  }
+
+  public state(state: 'active' | 'focus-within-view'): Locator {
+    switch (state) {
+      case 'active':
+        return this.locator.locator(':scope[data-active]');
+      case 'focus-within-view':
+        return this.locator.locator(':scope[data-focus-within-view]');
+    }
   }
 
   /**

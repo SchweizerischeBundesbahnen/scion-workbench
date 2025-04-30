@@ -9,9 +9,9 @@
  */
 
 import {Component, computed, inject, Signal} from '@angular/core';
-import {WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
+import {PartId, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
-import {AsyncPipe} from '@angular/common';
+import {AsyncPipe, DOCUMENT} from '@angular/common';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {JoinPipe} from '../common/join.pipe';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
@@ -24,6 +24,9 @@ import {Arrays} from '@scion/toolkit/util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {parseTypedString} from '../common/parse-typed-value.util';
+import {fromMutation$} from '@scion/toolkit/observable';
+import {map, startWith, switchMap} from 'rxjs/operators';
+import {animationFrameScheduler, Observable, timer} from 'rxjs';
 
 @Component({
   selector: 'app-part-page',
@@ -48,19 +51,19 @@ export default class PartPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected readonly part = inject(WorkbenchPart);
-  protected readonly route = inject(ActivatedRoute);
-  protected readonly uuid = UUID.randomUUID();
-  protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
-  protected readonly titleList = `title-list-${UUID.randomUUID()}`;
   protected readonly form = this._formBuilder.group({
     title: this._formBuilder.control<string | '<undefined>'>(''),
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
   });
+  protected readonly part = inject(WorkbenchPart);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly uuid = UUID.randomUUID();
+  protected readonly partActions = this.computePartActions();
+  protected readonly activationInstant = this.computeActivationInstant();
+  protected readonly titleList = `title-list-${UUID.randomUUID()}`;
 
   constructor() {
-    this.partActions = this.computePartActions();
     this.installTitleUpdater();
     this.installCssClassUpdater();
   }
@@ -75,6 +78,21 @@ export default class PartPageComponent {
         return [];
       }
     });
+  }
+
+  private computeActivationInstant(): Signal<number | null> {
+    const document = inject(DOCUMENT);
+
+    return toSignal(timer(0, animationFrameScheduler).pipe(switchMap(() => partActivationInstant$(this.part.id))), {initialValue: null});
+
+    function partActivationInstant$(partId: PartId): Observable<number | null> {
+      const partElement = document.querySelector(`wb-part[data-partid="${partId}"]`)!;
+      return fromMutation$(partElement, {attributeFilter: ['data-activation-instant'], subtree: false})
+        .pipe(
+          startWith(null),
+          map(() => partElement.getAttribute('data-activation-instant') as number | null),
+        );
+    }
   }
 
   private installTitleUpdater(): void {
