@@ -70,6 +70,10 @@ export class ViewTabPO {
     await this.locator.click();
   }
 
+  public async hover(): Promise<void> {
+    await this.locator.hover();
+  }
+
   public async dblclick(): Promise<void> {
     await this.locator.dblclick();
   }

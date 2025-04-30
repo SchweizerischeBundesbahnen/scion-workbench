@@ -21,6 +21,7 @@ import {StartPagePO} from '../start-page.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
+import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -303,13 +304,119 @@ test.describe('Workbench View', () => {
     consoleLogs.clear();
   });
 
-  test('should close a view', async ({appPO, workbenchNavigator}) => {
+  test('should close view via close button', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
-    await viewPage.clickClose();
 
+    // Click the close button.
+    await viewPage.view.tab.closeButton.click();
     await expect(appPO.views()).toHaveCount(0);
-    await expectView(viewPage).not.toBeAttached();
+  });
+
+  test('should close view via Ctrl+K keystroke', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    await testPage.clickInputField();
+
+    // Close view by pressing Ctrl+K.
+    await page.keyboard.press('Control+K');
+    await expect(appPO.views()).toHaveCount(0);
+  });
+
+  test('should close view via middle mouse button', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    const testPage = await InputFieldTestPagePO.openInNewTab(appPO, workbenchNavigator);
+    await testPage.clickInputField();
+
+    // Close view by pressing the middle mouse button.
+    await testPage.view.tab.locator.click({button: 'middle'});
+    await expect(appPO.views()).toHaveCount(0);
+  });
+
+  test('should close view via context menu', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Open context menu and click 'Close' menu item.
+    const contextMenu = await viewPage.view.tab.openContextMenu();
+    await contextMenu.menuItems.closeTab.click();
+    await expect(appPO.views()).toHaveCount(0);
+  });
+
+  test('should close other views when pressing Alt and clicking close', async ({appPO, page, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.left', activateView: true})
+      .addView('view.103', {partId: 'part.left'})
+      .addView('view.201', {partId: 'part.right'})
+      .addView('view.202', {partId: 'part.right'})
+      .addView('view.203', {partId: 'part.right'}),
+    );
+
+    // Press Alt + Click close.
+    await appPO.view({viewId: 'view.102'}).tab.closeButton.click({modifiers: ['Alt']});
+
+    // Expect all views except 'view.102' to be closed in 'part.left'.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MTreeNode({
+          direction: 'row',
+          ratio: .5,
+          child1: new MPart({
+            id: 'part.left',
+            views: [{id: 'view.102'}],
+            activeViewId: 'view.102',
+          }),
+          child2: new MPart({
+            id: 'part.right',
+            views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}],
+          }),
+        }),
+      },
+    });
+  });
+
+  test('should activate view when closing other tabs', async ({appPO, page, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main'})
+      .addView('view.103', {partId: 'part.main'}),
+    );
+
+    // Expect view.101 to be active.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({
+          id: 'part.main',
+          views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}],
+          activeViewId: 'view.101',
+        }),
+      },
+    });
+
+    // Press Alt + Click close.
+    await appPO.view({viewId: 'view.102'}).tab.hover();
+    await appPO.view({viewId: 'view.102'}).tab.closeButton.click({modifiers: ['Alt']});
+
+    // Expect all views except 'view.102' to be closed in 'part.left'.
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      workbenchGrid: {
+        root: new MPart({
+          id: 'part.main',
+          views: [{id: 'view.102'}],
+          activeViewId: 'view.102',
+        }),
+      },
+    });
   });
 
   test('should prevent closing a view (via view tab, view handle, keystroke, router)', async ({appPO, page, workbenchNavigator}) => {

@@ -18,7 +18,7 @@
 
 @if (view().closable()) {
   <button (click)="onClose($event)"
-          [title]="('%workbench.close.tooltip' | wbText)()"
+          [title]="('%workbench.close_tab.tooltip;close_others_modifier=Alt' | wbText)()"
           [disabled]="!view().isClosable()"
           class="close e2e-close">
     <wb-icon icon="workbench.close"/>

@@ -84,9 +84,15 @@ export class ViewTabComponent {
     void this.view().activate();
   }
 
-  protected onClose(event: Event): void {
+  protected onClose(event: MouseEvent): void {
     event.stopPropagation(); // prevent the view from being activated
-    void this.view().close();
+
+    if (event.altKey) {
+      void this.view().close('other-views');
+    }
+    else {
+      void this.view().close();
+    }
   }
 
   @HostListener('mousedown', ['$event'])
