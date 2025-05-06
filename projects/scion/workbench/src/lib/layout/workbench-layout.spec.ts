@@ -1709,48 +1709,6 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.B');
   });
 
-  it('should compute next view id', async () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
-
-    let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
-
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.1');
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.1');
-
-    workbenchLayout = workbenchLayout.addView('view.1', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.2');
-
-    workbenchLayout = workbenchLayout.addView('view.2', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
-    workbenchLayout = workbenchLayout.addView('view.3', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.4');
-
-    workbenchLayout = workbenchLayout.addView('view.4', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.5');
-
-    workbenchLayout = workbenchLayout.addView('view.5', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.6');
-
-    workbenchLayout = workbenchLayout.addView('view.6', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
-
-    workbenchLayout = workbenchLayout.removeView('view.3'); // marked for removal
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
-
-    workbenchLayout = workbenchLayout.removeView('view.3', {force: true});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
-    workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.1');
-
-    workbenchLayout = workbenchLayout.addView('view.1', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
-    workbenchLayout = workbenchLayout.addView('view.3', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
-  });
-
   it('should remove view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 

@@ -542,7 +542,7 @@ describe('Workbench Perspective', () => {
     });
   });
 
-  it('should open a empty-path view in the active part of perspective without main area', async () => {
+  it('should open a view in the active part of perspective without main area', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
@@ -559,7 +559,7 @@ describe('Workbench Perspective', () => {
         provideRouter([
           {path: '', canMatch: [canMatchWorkbenchView('list')], component: TestComponent},
           {path: '', canMatch: [canMatchWorkbenchView('overview')], component: TestComponent},
-          {path: 'details/:id', component: TestComponent},
+          {path: 'testee', component: TestComponent},
         ]),
       ],
     });
@@ -580,8 +580,8 @@ describe('Workbench Perspective', () => {
       },
     });
 
-    // open new details view
-    await TestBed.inject(WorkbenchRouter).navigate(['details/1']);
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['testee'], {target: 'view.201'});
     await waitUntilStable();
 
     // empty-path view should be opened in the active part (right) of the main grid
@@ -590,7 +590,7 @@ describe('Workbench Perspective', () => {
         main: {
           root: new MTreeNode({
             child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.201'}], activeViewId: 'view.201'}),
             direction: 'row',
             ratio: .5,
           }),

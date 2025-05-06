@@ -254,6 +254,12 @@ export interface LayoutSerializationFlags {
    */
   excludePartNavigationId?: true;
   /**
+   * Assigns each view a stable id based on its position in the grid.
+   *
+   * Stable view identifiers are required to compare the initial grid with the user-modified grid to detect layout changes.
+   */
+  assignStableViewIdentifier?: true;
+  /**
    * Assigns each part a stable id based on its position in the grid.
    *
    * Stable identifiers may be required to compare two layouts for equality.

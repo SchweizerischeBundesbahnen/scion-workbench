@@ -259,7 +259,7 @@ test.describe('Navigational CSS Classes', () => {
 
       // Move view to new window.
       const newAppPO = await viewPage.view.tab.moveToNewWindow();
-      const newViewPage = new ViewPagePO(newAppPO, {viewId: 'view.1'});
+      const newViewPage = new ViewPagePO(newAppPO, {cssClass: 'testee-navigation'});
 
       // Expect CSS classes of the navigation to be retained
       await expect.poll(() => newViewPage.view.getCssClasses()).toContain('testee-navigation');
@@ -289,11 +289,11 @@ test.describe('Navigational CSS Classes', () => {
 
       // Move view 1 to new window.
       const newAppPO = await viewPage1.view.tab.moveToNewWindow();
-      const newViewPage1 = new ViewPagePO(newAppPO, {viewId: 'view.1'});
+      const newViewPage1 = new ViewPagePO(newAppPO, {cssClass: 'testee-navigation-1'});
 
       // Move view 2 to the window.
       await viewPage2.view.tab.moveTo(await newViewPage1.view.part.getPartId(), {workbenchId: await newAppPO.getWorkbenchId()});
-      const newViewPage2 = new ViewPagePO(newAppPO, {viewId: 'view.2'});
+      const newViewPage2 = new ViewPagePO(newAppPO, {cssClass: 'testee-navigation-2'});
 
       // Expect CSS classes of the navigation to be retained
       await expect.poll(() => newViewPage2.view.getCssClasses()).toContain('testee-navigation-2');

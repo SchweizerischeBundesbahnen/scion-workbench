@@ -35,17 +35,17 @@ test.describe('Workbench Layout Migration', () => {
    * +--------------------------------------------+ +--------------------------------------------+ +--------------------------------------------+
    * view.1:      [path='test-view']
    * view.2:      [path='test-view']
+   * view.3:      [path='test-view']
    * test-view:   [path='', outlet='test-view']
    * test-router: [path='', outlet='test-router']
-   * view.3:      [path='test-view']
    *
    * ## Migrated layout:
    *
    *          PERIPHERAL AREA                                       MAIN AREA                                PERIPHERAL AREA
    * +--------------------------------------------+ +--------------------------------------------+ +--------------------------------------------+
    * | Part: 33b22f60-bf34-4704-885d-7de0d707430f | | Part: a25eb4cf-9da7-43e7-8db2-302fd38e59a1 | | Part: 9bc4c09f-67a7-4c69-a28b-532781a1c98f |
-   * | Views: [view.3]                            | | Views: [view.1, view.4]                    | | Views: [view.5]                            |
-   * | Active View: view.3                        | | Active View: view.4                        | | Active View: view.5                        |
+   * | Views: [view.3]                            | | Views: [view.1, test-view (random id)]     | | Views: [test-router (random id)]           |
+   * | Active View: view.3                        | | Active View: test-view (random id)         | | Active View: test-router (random id)       |
    * |                                            | +--------------------------------------------+ |                                            |
    * |                                            | | Part: 2b534d97-ed7d-43b3-bb2c-0e59d9766e86 | |                                            |
    * |                                            | | Views: [view.2]                            | |                                            |
@@ -54,8 +54,8 @@ test.describe('Workbench Layout Migration', () => {
    * view.1: [path='test-view']
    * view.2: [path='test-view']
    * view.3: [path='test-view']
-   * view.4: [path='', navigationHint='test-view']
-   * view.5: [path='', navigationHint='test-router']
+   * test-view: [path='', navigationHint='test-view']
+   * test-router: [path='', navigationHint='test-router']
    */
   test('should migrate workbench layout v2 to the latest version', async ({appPO}) => {
     await appPO.navigateTo({
@@ -73,6 +73,10 @@ test.describe('Workbench Layout Migration', () => {
     const _9bc4c09fPart = parts.find(part => part.alternativeId === '9bc4c09f-67a7-4c69-a28b-532781a1c98f') ?? throwError(`Part not found with alternativeId '9bc4c09f-67a7-4c69-a28b-532781a1c98f'`);
     const _a25eb4cfPart = parts.find(part => part.alternativeId === 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1') ?? throwError(`Part not found with alternativeId 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1'`);
     const _2b534d97Part = parts.find(part => part.alternativeId === '2b534d97-ed7d-43b3-bb2c-0e59d9766e86') ?? throwError(`Part not found with alternativeId '2b534d97-ed7d-43b3-bb2c-0e59d9766e86'`);
+
+    const views = await appPO.workbench.views();
+    const testRouterView = views.find(view => view.alternativeId === 'test-router') ?? throwError(`View not found with alternativeId 'test-router'`);
+    const testView = views.find(view => view.alternativeId === 'test-view') ?? throwError(`View not found with alternativeId 'test-view'`);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -97,8 +101,8 @@ test.describe('Workbench Layout Migration', () => {
             child2: new MPart({
               id: _9bc4c09fPart.id,
               alternativeId: _9bc4c09fPart.alternativeId,
-              views: [{id: 'view.5'}],
-              activeViewId: 'view.5',
+              views: [{id: testRouterView.id}],
+              activeViewId: testRouterView.id,
             }),
           }),
           activePartId: _33b22f60Part.id,
@@ -110,8 +114,8 @@ test.describe('Workbench Layout Migration', () => {
             child1: new MPart({
               id: _a25eb4cfPart.id,
               alternativeId: _a25eb4cfPart.alternativeId,
-              views: [{id: 'view.1'}, {id: 'view.4'}],
-              activeViewId: 'view.4',
+              views: [{id: 'view.1'}, {id: testView.id}],
+              activeViewId: testView.id,
             }),
             child2: new MPart({
               id: _2b534d97Part.id,
@@ -155,7 +159,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage4 = new ViewPagePO(appPO, {viewId: 'view.4'});
+    const viewPage4 = new ViewPagePO(appPO, {viewId: testView.id});
     await viewPage4.view.tab.click();
     await expectView(viewPage4).toBeActive();
     await expect.poll(() => viewPage4.view.getInfo()).toMatchObject(
@@ -165,7 +169,7 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
 
-    const viewPage5 = new RouterPagePO(appPO, {viewId: 'view.5'});
+    const viewPage5 = new RouterPagePO(appPO, {viewId: testRouterView.id});
     await viewPage5.view.tab.click();
     await expectView(viewPage5).toBeActive();
     await expect.poll(() => viewPage5.view.getInfo()).toMatchObject(

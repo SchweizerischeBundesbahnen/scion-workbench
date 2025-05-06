@@ -404,7 +404,10 @@ test.describe('Workbench View', () => {
     await testee2ViewPage.checkConfirmClosing(true); // prevent the view from closing
 
     // Open test view 3.
-    const testee3ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'view', app: 'app1'}, {target: 'view.3'});
+    await routerPage.view.tab.close();
+    const testee3ViewPage = new ViewPagePO(appPO, {viewId: 'view.3'});
     await testee3ViewPage.checkConfirmClosing(true); // prevent the view from closing
 
     // Open test view 4.
