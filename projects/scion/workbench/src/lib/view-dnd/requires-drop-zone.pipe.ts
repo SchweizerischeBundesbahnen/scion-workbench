@@ -9,7 +9,7 @@
  */
 
 import {Pipe, PipeTransform} from '@angular/core';
-import {MPart, MTreeNode} from '../layout/workbench-layout.model';
+import {MPart, MTreeNode} from '../layout/workbench-grid.model';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 

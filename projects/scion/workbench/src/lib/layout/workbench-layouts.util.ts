@@ -7,14 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MPartGrid, MTreeNode} from './workbench-layout.model';
+import {MPart, MPartGrid, MTreeNode, WorkbenchGrids} from './workbench-grid.model';
 import {MAIN_AREA} from './workbench-layout';
 import {ViewId} from '../view/workbench-view.model';
 import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
 import {UID} from '../common/uid.util';
 import {PartId} from '../part/workbench-part.model';
 import {ActivityId} from '../activity/workbench-activity.model';
-import {WorkbenchGrids} from './workbench-grids.model';
 import {isActivityId} from './ɵworkbench-layout';
 
 /**

@@ -10,9 +10,9 @@
 
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchStorage} from '../storage/workbench-storage';
-import {MPerspectiveLayout} from './workbench-perspective.model';
-import {WorkbenchPerspectiveSerializer} from './workench-perspective-serializer.service';
 import {Logger} from '../logging';
+import {WorkbenchLayoutSerializer} from '../layout/workench-layout-serializer.service';
+import {MWorkbenchLayout} from '../layout/workbench-layout';
 
 /**
  * Provides API to read/write perspective data from/to {@link WorkbenchStorage}.
@@ -21,17 +21,17 @@ import {Logger} from '../logging';
 export class WorkbenchPerspectiveStorageService {
 
   private readonly _storage = inject(WorkbenchStorage);
-  private readonly _workbenchPerspectiveSerializer = inject(WorkbenchPerspectiveSerializer);
+  private readonly _workbenchLayoutSerializer = inject(WorkbenchLayoutSerializer);
   private readonly _logger = inject(Logger);
 
   /**
    * Reads the layout of given perspective from storage, applying necessary migrations if the serialized layout is outdated.
    */
-  public async loadPerspectiveLayout(perspectiveId: string): Promise<MPerspectiveLayout | null> {
-    const storageKey = storageKeys.perspectiveLayout(perspectiveId);
+  public async loadLayout(perspectiveId: string): Promise<MWorkbenchLayout | null> {
+    const storageKey = storageKeys.layout(perspectiveId);
     const serialized = await this._storage.load(storageKey);
     try {
-      return this._workbenchPerspectiveSerializer.deserialize(serialized);
+      return this._workbenchLayoutSerializer.deserialize(serialized);
     }
     catch (error) {
       this._logger.error(`[SerializeError] Failed to deserialize perspective '${perspectiveId}'. Please clear your browser storage and reload the application.`, error);
@@ -42,9 +42,9 @@ export class WorkbenchPerspectiveStorageService {
   /**
    * Writes the layout of a perspective to storage.
    */
-  public async storePerspectiveLayout(perspectiveId: string, data: MPerspectiveLayout): Promise<void> {
-    const serialized = this._workbenchPerspectiveSerializer.serialize(data);
-    const storageKey = storageKeys.perspectiveLayout(perspectiveId);
+  public async storeLayout(perspectiveId: string, data: MWorkbenchLayout): Promise<void> {
+    const serialized = this._workbenchLayoutSerializer.serialize(data);
+    const storageKey = storageKeys.layout(perspectiveId);
     await this._storage.store(storageKey, serialized);
   }
 
@@ -67,6 +67,6 @@ export class WorkbenchPerspectiveStorageService {
  * Represents keys to associate data in the storage.
  */
 const storageKeys = {
-  perspectiveLayout: (perspectiveId: string): string => `scion.workbench.perspectives.${perspectiveId}`,
+  layout: (perspectiveId: string): string => `scion.workbench.perspectives.${perspectiveId}`,
   activePerspectiveId: 'scion.workbench.perspective',
 };

@@ -13,10 +13,11 @@ import {Signal, Type} from '@angular/core';
 import {LogAppender, LogLevel} from './logging';
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
-import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
+import {WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
 import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
 import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
+import {WorkbenchLayoutFn} from './layout/workbench-layout';
 
 /**
  * Configuration of the SCION Workbench.

@@ -1,7 +1,7 @@
 ## TODO Phase 1:
-[] Separate model layout and serializer for activity layout
-[] Rename workbench-layout-xy (serializer, model, version) => workbench-grid-layout
-[] Rename workbench-perspective -> workbench-layout
+[x] Separate model layout and serializer for activity layout
+[x] Rename workbench-layout-xy (serializer, model, version) => workbench-grid-layout
+[x] Rename workbench-perspective -> workbench-layout
 [x] Icon Provider
 [x] Text Provider
 [x] Activate activities in initial layout? -> activatePart
@@ -64,7 +64,7 @@
 -> workbench should open view in currently active part of that activity
 
 ## TODO Phase 3:
-[] Intelligent Merger of activity layout
+[] Intelligent Merger of activity layout (Consider not to reset the whole layout when adding/removing an activity).
 [] Display actions and minimize button only on hover or when part has focus unless part is in main area (always visible)
 
 ## TODO MICROFRONTEND ACTIVITIES

@@ -24,7 +24,7 @@ import {text} from '../../../text/text';
     IconComponent,
   ],
   host: {
-    '[class.active]': 'active()', // TODO [Activity] remove as set on button
+    '[class.active]': 'active()',
     '[attr.data-activityid]': 'activity().id',
     '[attr.title]': 'tooltip()',
   },

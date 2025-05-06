@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {MPart, MPartGrid, MTreeNode, MView, ɵMPartGrid} from './workbench-layout.model';
+import {MPart, MPartGrid, MTreeNode, MView, WorkbenchGrids, ɵMPartGrid} from './workbench-grid.model';
 import {UID} from '../common/uid.util';
 import {DockedPartExtras, DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras, ReferencePart, WorkbenchLayout} from './workbench-layout';
 import {GridSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
@@ -25,9 +25,7 @@ import {Logger} from '../logging';
 import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, ActivityId, MActivity, MActivityGroup, MActivityLayout} from '../activity/workbench-activity.model';
-import {WorkbenchActivityLayoutSerializer} from './workench-activity-layout-serializer.service';
 import {Objects} from '../common/objects.util';
-import {WorkbenchGrids} from './workbench-grids.model';
 import {RequireOne} from '../common/utility-types';
 import {readCssVariable} from '../common/dom.util';
 import {DOCUMENT} from '@angular/common';
@@ -53,8 +51,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private readonly _navigationStates: Map<WorkbenchOutlet, NavigationState>;
   private readonly _partActivationInstantProvider = inject(PartActivationInstantProvider);
   private readonly _viewActivationInstantProvider = inject(ViewActivationInstantProvider);
-  private readonly _gridSerializer = inject(WorkbenchLayoutSerializer);
-  private readonly _activityLayoutSerializer = inject(WorkbenchActivityLayoutSerializer);
+  private readonly _workbenchLayoutSerializer = inject(WorkbenchLayoutSerializer);
   private readonly _injector = inject(Injector);
 
   /** Identifies the perspective of this layout, if any. */
@@ -650,10 +647,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     return {
-      grids: this._gridSerializer.serializeGrids(workingCopy.grids, flags),
-      activityLayout: this._activityLayoutSerializer.serializeActivityLayout(workingCopy.activityLayout),
+      grids: this._workbenchLayoutSerializer.serializeGrids(workingCopy.grids, flags),
+      activityLayout: this._workbenchLayoutSerializer.serializeActivityLayout(workingCopy.activityLayout),
       outlets: (selector: RequireOne<{mainGrid: true; mainAreaGrid: true; activityGrids: true}>): string => {
-        return this._gridSerializer.serializeOutlets(workingCopy.outlets(selector));
+        return this._workbenchLayoutSerializer.serializeOutlets(workingCopy.outlets(selector));
       },
     };
   }
@@ -1391,8 +1388,8 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    */
   private workingCopy(): ɵWorkbenchLayout {
     return runInInjectionContext(this._injector, () => new ɵWorkbenchLayout({
-      grids: this._gridSerializer.serializeGrids(this._grids),
-      activityLayout: this._activityLayoutSerializer.serializeActivityLayout(this._activityLayout),
+      grids: this._workbenchLayoutSerializer.serializeGrids(this._grids),
+      activityLayout: this._workbenchLayoutSerializer.serializeActivityLayout(this._activityLayout),
       perspectiveId: this.perspectiveId,
       outlets: Object.fromEntries(this._outlets),
       navigationStates: Object.fromEntries(this._navigationStates),
@@ -1465,7 +1462,7 @@ function coerceMActivityLayout(layout: string | MActivityLayout | undefined, opt
   }
 
   try {
-    return inject(WorkbenchActivityLayoutSerializer).deserializeActivityLayout(layout);
+    return inject(WorkbenchLayoutSerializer).deserializeActivityLayout(layout);
   }
   catch (error) {
     inject(Logger).error('[SerializeError] Failed to deserialize "MActivityLayout". Please clear your browser storage and reload the application.', error);

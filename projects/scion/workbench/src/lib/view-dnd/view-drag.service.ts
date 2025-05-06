@@ -20,7 +20,7 @@ import {toSignal} from '@angular/core/rxjs-interop';
 import {PartId} from '../part/workbench-part.model';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {ActivityId, MActivity} from '../activity/workbench-activity.model';
-import {MPartGrid} from '../layout/workbench-layout.model';
+import {MPartGrid} from '../layout/workbench-grid.model';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {isActivityId, ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';

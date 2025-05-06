@@ -445,7 +445,7 @@ describe('WorkbenchPerspectiveStorage', () => {
 });
 
 async function loadPerspectiveLayoutFromStorage(perspectiveId: string): Promise<WorkbenchLayout | null> {
-  const perspectiveLayout = await TestBed.inject(WorkbenchPerspectiveStorageService).loadPerspectiveLayout(perspectiveId);
+  const perspectiveLayout = await TestBed.inject(WorkbenchPerspectiveStorageService).loadLayout(perspectiveId);
   if (!perspectiveLayout) {
     return null;
   }

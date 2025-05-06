@@ -9,8 +9,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {MPartGridV5, MPartV5, MTreeNodeV5, MViewV5} from './model/workbench-layout-migration-v5.model';
-import {MPartGridV6, MPartV6, MTreeNodeV6, MViewV6} from './model/workbench-layout-migration-v6.model';
+import {MPartGridV5, MPartV5, MTreeNodeV5, MViewV5} from './model/workbench-grid-migration-v5.model';
+import {MPartGridV6, MPartV6, MTreeNodeV6, MViewV6} from './model/workbench-grid-migration-v6.model';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
@@ -19,7 +19,7 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
  * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchLayoutMigrationV6 implements WorkbenchMigration {
+export class WorkbenchGridMigrationV6 implements WorkbenchMigration {
 
   public migrate(json: string): string {
     const partGridV5 = JSON.parse(json) as MPartGridV5;

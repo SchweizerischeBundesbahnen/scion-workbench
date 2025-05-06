@@ -10,13 +10,13 @@
 
 import {TestBed} from '@angular/core/testing';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {MAIN_AREA} from '../layout/workbench-layout';
-import {WorkbenchGridMerger} from './workbench-grid-merger.service';
+import {MAIN_AREA} from './workbench-layout';
+import {WorkbenchLayoutMerger} from './workbench-layout-merger.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
+import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {segments} from '../testing/testing.util';
 
-describe('WorkbenchGridMerger', () => {
+describe('WorkbenchLayoutMerger', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(toEqualWorkbenchLayoutCustomMatcher);
@@ -36,7 +36,7 @@ describe('WorkbenchGridMerger', () => {
       .navigateView('view.2', ['path/to/view/2'])
       .navigateView('view.3', [], {hint: 'hint-3'});
 
-    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+    const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
       local: base
         .removeView('view.2', {force: true})
         .addView('view.100', {partId: 'part.topLeft'})
@@ -108,7 +108,7 @@ describe('WorkbenchGridMerger', () => {
   });
 
   /**
-   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   * TODO [#452] The current implementation of 'WorkbenchLayoutMerger' discards local changes when a new layout is available.
    */
   it('should discard local changes when diff between base and remote grids', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
@@ -122,7 +122,7 @@ describe('WorkbenchGridMerger', () => {
       .navigateView('view.2', ['path/to/view/2'])
       .navigateView('view.3', [], {hint: 'hint-3'});
 
-    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+    const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
       local: base
         .removeView('view.2', {force: true})
         .addView('view.100', {partId: 'part.topLeft'})
@@ -176,7 +176,7 @@ describe('WorkbenchGridMerger', () => {
   });
 
   /**
-   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   * TODO [#452] The current implementation of 'WorkbenchLayoutMerger' discards local changes when a new layout is available.
    */
   it('should discard local changes when diff between base and remote paths', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
@@ -188,7 +188,7 @@ describe('WorkbenchGridMerger', () => {
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', ['path/to/view/2']);
 
-    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+    const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
       local: base.navigateView('view.2', ['path/to/view/2a']),
       base,
       remote: base.navigateView('view.2', ['path/to/view/2b']),
@@ -234,7 +234,7 @@ describe('WorkbenchGridMerger', () => {
   });
 
   /**
-   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   * TODO [#452] The current implementation of 'WorkbenchLayoutMerger' discards local changes when a new layout is available.
    */
   it('should discard local changes when diff between base and remote hints', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
@@ -246,7 +246,7 @@ describe('WorkbenchGridMerger', () => {
       .navigateView('view.1', ['path/to/view/1'])
       .navigateView('view.2', [], {hint: 'hint-2'});
 
-    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+    const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
       local: base.navigateView('view.2', [], {hint: 'hint-2a'}),
       base,
       remote: base.navigateView('view.2', [], {hint: 'hint-2b'}),
@@ -290,14 +290,14 @@ describe('WorkbenchGridMerger', () => {
   });
 
   /**
-   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   * TODO [#452] The current implementation of 'WorkbenchLayoutMerger' discards local changes when a new layout is available.
    */
   it('should discard local changes when diff between base and remote parts (navigate part in remote)', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.left', {align: 'left', ratio: .25});
 
-    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+    const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
       local: base.addPart('part.right', {align: 'right'}),
       base,
       remote: base.navigatePart('part.left', ['path/to/part']),
@@ -326,14 +326,14 @@ describe('WorkbenchGridMerger', () => {
   });
 
   /**
-   * TODO [#452] The current implementation of 'WorkbenchGridMerger' discards local changes when a new layout is available.
+   * TODO [#452] The current implementation of 'WorkbenchLayoutMerger' discards local changes when a new layout is available.
    */
   it('should discard local changes when diff between base and remote parts (navigate main area part in remote)', () => {
     const base = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.left', {align: 'left', ratio: .25});
 
-    const mergedLayout = TestBed.inject(WorkbenchGridMerger).merge({
+    const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
       local: base.addPart('part.right', {align: 'right'}),
       base,
       remote: base.navigatePart(MAIN_AREA, ['path/to/desktop']),

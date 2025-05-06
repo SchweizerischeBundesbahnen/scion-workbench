@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, inject, input, Signal, untracked} from '@angular/core';
-import {MPart, MTreeNode} from '../workbench-layout.model';
+import {MPart, MTreeNode} from '../workbench-grid.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';

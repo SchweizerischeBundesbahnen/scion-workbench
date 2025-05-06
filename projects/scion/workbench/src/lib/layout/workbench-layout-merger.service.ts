@@ -8,26 +8,24 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Injectable} from '@angular/core';
-import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 
 /**
  * Performs a three-way merge of the local and remote layouts, using the base layout (common ancestor) as the base of the merge operation.
  *
  * TODO [#452] This implementation discards local changes when a new layout is available.
- * TODO [activity] Consider renaming to WorkbenchLayoutMerger
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchGridMerger {
+export class WorkbenchLayoutMerger {
 
   /**
    * Performs a merge of given local and remote layouts, using the base layout as the common ancestor.
    */
-  public merge(grids: {local: ɵWorkbenchLayout; remote: ɵWorkbenchLayout; base: ɵWorkbenchLayout}): ɵWorkbenchLayout {
-    // TODO [activity] Consider not to reset the whole layout when adding/removing an activity.
-    if (!grids.base.equals(grids.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, assignStableActivityIdentifier: true, sort: true})) {
-      return grids.remote;
+  public merge(layouts: {local: ɵWorkbenchLayout; remote: ɵWorkbenchLayout; base: ɵWorkbenchLayout}): ɵWorkbenchLayout {
+    if (!layouts.base.equals(layouts.remote, {excludeTreeNodeId: true, excludePartNavigationId: true, excludeViewNavigationId: true, assignStablePartIdentifier: true, assignStableActivityIdentifier: true, sort: true})) {
+      return layouts.remote;
     }
 
-    return grids.local;
+    return layouts.local;
   }
 }

@@ -9,8 +9,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {PerspectiveDataV1} from './model/workbench-perspective-migration-v1.model';
-import {MPerspectiveLayoutV2} from './model/workbench-perspective-migration-v2.model';
+import {PerspectiveDataV1} from './model/workbench-layout-migration-v1.model';
+import {MPerspectiveLayoutV2} from './model/workbench-layout-migration-v2.model';
 import {Commands} from '../../routing/routing.model';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 
@@ -20,7 +20,7 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
  * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchPerspectiveMigrationV2 implements WorkbenchMigration {
+export class WorkbenchLayoutMigrationV2 implements WorkbenchMigration {
 
   public migrate(json: string): string {
     const perspectiveDataV1 = JSON.parse(json) as PerspectiveDataV1;

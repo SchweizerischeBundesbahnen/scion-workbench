@@ -21,33 +21,33 @@ import {Objects} from '../common/objects.util';
 export class WorkbenchPerspectiveViewConflictResolver {
 
   /**
-   * Detects and resolves id clashes between views defined by the perspective and views contained in the main area,
-   * assigning views of the perspective a new identity.
+   * Detects and resolves id clashes between views defined by the new layout and views contained in the main area,
+   * assigning views of the new layout a new identity.
    *
    * @param currentLayout - The current workbench layout.
-   * @param perspectiveLayout - The layout of the perspective to activate.
+   * @param newLayout - The new layout to activate.
    * @return layout of the perspective with conflicts resolved.
    */
-  public resolve(currentLayout: ɵWorkbenchLayout, perspectiveLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
-    const activityGrids = WorkbenchLayouts.pickActivityGrids(perspectiveLayout.grids);
-    const activityViewIds = perspectiveLayout.views({grid: Objects.keys(activityGrids)}).map(view => view.id);
-    const mainViewIds = perspectiveLayout.views({grid: 'main'}).map(view => view.id);
+  public resolve(currentLayout: ɵWorkbenchLayout, newLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
+    const activityGrids = WorkbenchLayouts.pickActivityGrids(newLayout.grids);
+    const activityViewIds = newLayout.views({grid: Objects.keys(activityGrids)}).map(view => view.id);
+    const mainViewIds = newLayout.views({grid: 'main'}).map(view => view.id);
     const mainAreaViewIds = currentLayout.views({grid: 'mainArea'}).map(view => view.id);
 
     // Test if there are conflicts.
     const conflictingViewIds = Arrays.intersect([...activityViewIds, ...mainViewIds], mainAreaViewIds);
     if (!conflictingViewIds.length) {
-      return perspectiveLayout;
+      return newLayout;
     }
 
     // Rename conflicting views.
     const usedViewIds = new Set<ViewId>(activityViewIds.concat(mainViewIds).concat(mainAreaViewIds));
     conflictingViewIds.forEach(conflictingViewId => {
       const newViewId = WorkbenchLayouts.computeNextViewId(usedViewIds);
-      perspectiveLayout = perspectiveLayout.renameView(conflictingViewId, newViewId);
+      newLayout = newLayout.renameView(conflictingViewId, newViewId);
       usedViewIds.add(newViewId);
     });
 
-    return perspectiveLayout;
+    return newLayout;
   }
 }

@@ -12,6 +12,7 @@ import {Commands, NavigationData, NavigationState} from '../routing/routing.mode
 import {ActivatedRoute} from '@angular/router';
 import {ActivityId} from '../activity/workbench-activity.model';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 
 /**
  * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
@@ -338,3 +339,138 @@ export type MAIN_AREA = 'part.main-area';
  * @see MAIN_AREA
  */
 export const MAIN_AREA_ALTERNATIVE_ID = 'main-area';
+
+/**
+ * Contains different versions of a workbench layout.
+ *
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
+ */
+export interface MWorkbenchLayout {
+  /**
+   * Layout before any user personalization (initial layout).
+   */
+  referenceLayout: {
+    /**
+     * @see WorkbenchLayoutSerializer.serializeGrid
+     * @see WorkbenchLayoutSerializer.deserializeGrid
+     */
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    activityLayout: string;
+    /**
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
+     */
+    outlets: string;
+  };
+  /**
+   * Layout personalized by the user.
+   */
+  userLayout: {
+    /**
+     * @see WorkbenchLayoutSerializer.serializeGrid
+     * @see WorkbenchLayoutSerializer.deserializeGrid
+     */
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    activityLayout: string;
+    /**
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
+     */
+    outlets: string;
+  };
+}
+
+/**
+ * Signature of a function to provide a workbench layout.
+ *
+ * The workbench will invoke this function with a factory object to create the layout. The layout is immutable, so each modification creates a new instance.
+ * Use the instance for further modifications and finally return it.
+ *
+ * The function can call `inject` to get any required dependencies.
+ *
+ * ## Workbench Layout
+ * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
+ *
+ * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
+ * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
+ * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
+ * area for user interaction.
+ *
+ * ## Steps to create the layout
+ * Start by adding parts to the layout. Parts can be docked to a specific region, or aligned relative to each other. Views can be added to any part (except the main area part).
+ * To display content, navigate parts and views to registered routes.
+ *
+ * To maintain a clean URL, we recommend navigating the parts and views of the initial layout to empty path routes and using a navigation hint to differentiate.
+ *
+ * ## Example
+ * The following example defines a layout with a main area and three parts in the peripheral area:
+ *
+ * ```plain
+ * +--------+----------------+
+ * |  top   |   main area    |
+ * |  left  |                |
+ * |--------+                |
+ * | bottom |                |
+ * |  left  |                |
+ * +--------+----------------+
+ * |          bottom         |
+ * +-------------------------+
+ * ```
+ *
+ * ```ts
+ * function defineLayout(factory: WorkbenchLayoutFactory): WorkbenchLayout {
+ *   return factory
+ *     // Add parts to the layout.
+ *     .addPart(MAIN_AREA)
+ *     .addPart('topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
+ *     .addPart('bottomLeft', {relativeTo: 'topLeft', align: 'bottom', ratio: .5})
+ *     .addPart('bottom', {align: 'bottom', ratio: .3})
+ *
+ *     // Add views to the layout.
+ *     .addView('navigator', {partId: 'topLeft'})
+ *     .addView('explorer', {partId: 'bottomLeft'})
+ *     .addView('console', {partId: 'bottom'})
+ *     .addView('problems', {partId: 'bottom'})
+ *     .addView('search', {partId: 'bottom'})
+ *
+ *     // Navigate views.
+ *     .navigateView('navigator', ['path/to/navigator'])
+ *     .navigateView('explorer', ['path/to/explorer'])
+ *     .navigateView('console', [], {hint: 'console'}) // Set hint to differentiate between routes with an empty path.
+ *     .navigateView('problems', [], {hint: 'problems'}) // Set hint to differentiate between routes with an empty path.
+ *     .navigateView('search', ['path/to/search']);
+ * }
+ * ```
+ *
+ * The layout requires the following routes.
+ *
+ * ```ts
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {provideRouter} from '@angular/router';
+ * import {canMatchWorkbenchView} from '@scion/workbench';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideRouter([
+ *       // Navigator View
+ *       {path: 'path/to/navigator', loadComponent: () => import('./navigator/navigator.component')},
+ *       // Explorer View
+ *       {path: 'path/to/explorer', loadComponent: () => import('./explorer/explorer.component')},
+ *       // Search view
+ *       {path: 'path/to/search', loadComponent: () => import('./search/search.component')},
+ *       // Console view
+ *       {path: '', canMatch: [canMatchWorkbenchView('console')], loadComponent: () => import('./console/console.component')},
+ *       // Problems view
+ *       {path: '', canMatch: [canMatchWorkbenchView('problems')], loadComponent: () => import('./problems/problems.component')},
+ *     ]),
+ *   ],
+ * });
+ * ```
+ */
+export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<WorkbenchLayout> | WorkbenchLayout;

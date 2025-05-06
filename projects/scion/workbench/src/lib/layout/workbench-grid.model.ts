@@ -12,7 +12,7 @@ import {assertType} from '../common/asserts.util';
 import {ViewId} from '../view/workbench-view.model';
 import {NavigationData} from '../routing/routing.model';
 import {PartId} from '../part/workbench-part.model';
-// TODO [activity] Rename to workbench-grid.model.ts
+import {ActivityId} from '../activity/workbench-activity.model';
 
 /**
  * Represents the arrangement of parts as grid.
@@ -127,4 +127,20 @@ export interface MView {
     data?: NavigationData;
     cssClass?: string[];
   };
+}
+
+/**
+ * Grids referenced in the workbench layout.
+ */
+export interface WorkbenchGrids<T = ɵMPartGrid> {
+  /**
+   * Reference to the "root" grid of the workbench layout.
+   */
+  main: T;
+  /**
+   * Reference to the main area grid, a sub-grid embedded by the main area part contained in the main grid.
+   */
+  mainArea?: T;
+
+  [activityId: ActivityId]: T;
 }

@@ -9,7 +9,7 @@
  */
 
 import {Pipe, PipeTransform} from '@angular/core';
-import {MPartGrid} from '../layout/workbench-layout.model';
+import {MPartGrid} from '../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**

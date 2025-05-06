@@ -24,8 +24,7 @@ import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
-import {WorkbenchGrids} from '../layout/workbench-grids.model';
-import {MPart, MTreeNode} from '../layout/workbench-layout.model';
+import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MActivity} from '../activity/workbench-activity.model';
 

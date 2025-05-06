@@ -17,7 +17,7 @@ import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {anything, segments, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
-import {MPart as _MPart, MTreeNode as _MTreeNode, MView} from './workbench-layout.model';
+import {MPart as _MPart, MTreeNode as _MTreeNode, MView, WorkbenchGrids} from './workbench-grid.model';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {provideRouter} from '@angular/router';
 import {TestComponent} from '../testing/test.component';
@@ -27,7 +27,6 @@ import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {WorkbenchService} from '../workbench.service';
 import {PartId} from '../part/workbench-part.model';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, MActivityLayout} from '../activity/workbench-activity.model';
-import {WorkbenchGrids} from './workbench-grids.model';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 
 describe('WorkbenchLayout', () => {

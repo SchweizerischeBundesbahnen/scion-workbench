@@ -11,7 +11,7 @@
 import {TestBed} from '@angular/core/testing';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
-import {ɵMPartGrid} from './workbench-layout.model';
+import {ɵMPartGrid} from './workbench-grid.model';
 import {MAIN_AREA} from './workbench-layout';
 import {any, MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 

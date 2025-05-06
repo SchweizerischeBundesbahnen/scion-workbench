@@ -36,7 +36,7 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {PartId} from '../part/workbench-part.model';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
-import {MPartGrid} from '../layout/workbench-layout.model';
+import {MPartGrid} from '../layout/workbench-grid.model';
 
 /**
  * Tracks the browser URL for workbench layout changes.

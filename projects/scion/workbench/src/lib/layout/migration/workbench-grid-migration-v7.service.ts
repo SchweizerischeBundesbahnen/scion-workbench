@@ -9,16 +9,16 @@
  */
 
 import {Injectable} from '@angular/core';
-import {MPartGridV6, MPartV6, MTreeNodeV6} from './model/workbench-layout-migration-v6.model';
+import {MPartGridV6, MPartV6, MTreeNodeV6} from './model/workbench-grid-migration-v6.model';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
-import {MPartGridV7, MPartV7, MTreeNodeV7, PartIdV7} from './model/workbench-layout-migration-v7.model';
+import {MPartGridV7, MPartV7, MTreeNodeV7, PartIdV7} from './model/workbench-grid-migration-v7.model';
 import {UID} from '../../common/uid.util';
 
 /**
  * Migrates the workbench layout from version 6 to version 7.
  */
 @Injectable({providedIn: 'root'})
-export class WorkbenchLayoutMigrationV7 implements WorkbenchMigration {
+export class WorkbenchGridMigrationV7 implements WorkbenchMigration {
 
   public migrate(json: string): string {
     const partGridV6 = JSON.parse(json) as MPartGridV6;

@@ -9,7 +9,7 @@
  */
 
 import {isPartId, WorkbenchLayoutConstructConfig, ɵWorkbenchLayout} from './ɵworkbench-layout';
-import {MPart} from './workbench-layout.model';
+import {MPart} from './workbench-grid.model';
 import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 import {inject, Injectable, Injector, runInInjectionContext} from '@angular/core';
 import {MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, PartExtras} from './workbench-layout';
