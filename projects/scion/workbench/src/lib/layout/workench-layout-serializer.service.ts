@@ -24,6 +24,7 @@ import {MActivityLayout} from '../activity/workbench-activity.model';
 import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration-v2.service';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
+import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
 import {MWorkbenchLayout} from './workbench-layout';
 
 /**
@@ -38,7 +39,8 @@ export class WorkbenchLayoutSerializer {
   private _workbenchLayoutMigrator = new WorkbenchMigrator()
     .registerMigration(1, inject(WorkbenchLayoutMigrationV2))
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
-    .registerMigration(3, inject(WorkbenchLayoutMigrationV4));
+    .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
+    .registerMigration(4, inject(WorkbenchLayoutMigrationV5));
 
   /**
    * Migrates a serialized {@link MPartGrid} to the latest version.

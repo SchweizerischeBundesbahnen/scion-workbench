@@ -8,11 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {MPartGridV2, MPartV2, MTreeNodeV2, MViewV2} from './model/workbench-grid-migration-v2.model';
 import {MPartGridV3, MPartV3, MTreeNodeV3, MViewV3, VIEW_ID_PREFIX_V3, ViewIdV3} from './model/workbench-grid-migration-v3.model';
+import {Router, UrlTree} from '@angular/router';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
-import {UID} from '../../common/uid.util';
+import {Routing} from '../../routing/routing.util';
 
 /**
  * Migrates the workbench layout from version 2 to version 3.
@@ -22,8 +23,17 @@ import {UID} from '../../common/uid.util';
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
 
+  private readonly _router = inject(Router);
+
   public migrate(json: string): string {
     const partGridV2 = JSON.parse(json) as MPartGridV2;
+
+    // Consider the ids of views contained in the URL as already used.
+    // Otherwise, when migrating the main area and using a view id already present in the perspective,
+    // the view outlet would not be removed from the URL, resulting the migrated view to display
+    // "Not Found" page or incorrect content.
+    const viewOutlets = Routing.parseOutlets(this.getCurrentUrl(), {view: true});
+    const usedViewIds = new Set<ViewIdV3>([...viewOutlets.keys(), ...collectViewIds(partGridV2.root)]);
 
     // Migrate the grid.
     const partGridV3: MPartGridV3 = {
@@ -69,6 +79,7 @@ export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
           partV3.activeViewId = viewV3.id;
         }
         partV3.views.push(viewV3);
+        usedViewIds.add(viewV3.id);
       });
 
       return partV3;
@@ -79,12 +90,38 @@ export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
         return {id: viewV2.id, navigation: {}};
       }
       else {
-        return {id: `view.${UID.randomUID()}`, alternativeId: viewV2.id, navigation: {hint: viewV2.id}};
+        return {id: computeNextViewId(usedViewIds), alternativeId: viewV2.id, navigation: {hint: viewV2.id}};
       }
     }
   }
+
+  private getCurrentUrl(): UrlTree {
+    return this._router.getCurrentNavigation()?.initialUrl ?? this._router.parseUrl(this._router.url);
+  }
+}
+
+function computeNextViewId(viewIds: Iterable<ViewIdV3>): ViewIdV3 {
+  const ids = Array.from(viewIds)
+    .map(viewId => Number(viewId.substring(VIEW_ID_PREFIX_V3.length)))
+    .reduce((set, id) => set.add(id), new Set<number>());
+
+  for (let i = 1; i <= ids.size; i++) {
+    if (!ids.has(i)) {
+      return VIEW_ID_PREFIX_V3.concat(`${i}`) as ViewIdV3;
+    }
+  }
+  return VIEW_ID_PREFIX_V3.concat(`${ids.size + 1}`) as ViewIdV3;
 }
 
 function isViewId(viewId: string): viewId is ViewIdV3 {
   return viewId.startsWith(VIEW_ID_PREFIX_V3);
+}
+
+function collectViewIds(node: MPartV2 | MTreeNodeV2): Set<ViewIdV3> {
+  if (node.type === 'MPart') {
+    return new Set(node.views.map(view => view.id).filter(isViewId));
+  }
+  else {
+    return new Set([...collectViewIds(node.child1), ...collectViewIds(node.child2)]);
+  }
 }
