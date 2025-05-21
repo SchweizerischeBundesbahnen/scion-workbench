@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectionStrategy, Component, effect, inject, signal, WritableSignal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, signal, untracked, WritableSignal} from '@angular/core';
 import {PerspectiveData} from '../workbench.perspectives';
 import {MenuItem, MenuItemSeparator} from '../menu/menu-item';
 import {WorkbenchStartupQueryParams} from '../workbench/workbench-startup-query-params';
@@ -44,7 +44,7 @@ export class HeaderComponent {
 
   protected readonly workbenchService = inject(WorkbenchService);
   protected readonly PerspectiveData = PerspectiveData;
-  protected readonly lightThemeActiveFormControl = inject(NonNullableFormBuilder).control(true);
+  protected readonly lightThemeActiveFormControl = inject(NonNullableFormBuilder).control<boolean | undefined>(undefined);
   protected readonly perspectiveSwitcherMenuState = signal<'open' | 'closed'>('closed');
   protected readonly settingsMenuState = signal<'open' | 'closed'>('closed');
 
@@ -173,13 +173,16 @@ export class HeaderComponent {
 
   private installThemeSwitcher(): void {
     effect(() => {
-      this.lightThemeActiveFormControl.setValue(this.workbenchService.theme()?.colorScheme === 'light', {emitEvent: false});
+      const theme = this.workbenchService.settings.theme();
+      untracked(() => {
+        this.lightThemeActiveFormControl.setValue(theme === 'scion-light', {emitEvent: false});
+      });
     });
 
     this.lightThemeActiveFormControl.valueChanges
       .pipe(takeUntilDestroyed())
       .subscribe(lightTheme => {
-        void this.workbenchService.switchTheme(lightTheme ? 'scion-light' : 'scion-dark');
+        this.workbenchService.settings.theme.set(lightTheme ? 'scion-light' : 'scion-dark');
       });
   }
 

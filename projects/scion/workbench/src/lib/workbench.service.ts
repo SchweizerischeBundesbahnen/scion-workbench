@@ -13,7 +13,7 @@ import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './
 import {ViewId, WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {PartId, WorkbenchPart} from './part/workbench-part.model';
-import {Injectable, Signal} from '@angular/core';
+import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
 
@@ -174,11 +174,31 @@ export abstract class WorkbenchService {
    * See the documentation of `@scion/workbench` SCSS module for more information.
    *
    * @param theme - The name of the theme to switch to.
+   *
+   * @deprecated since version 19.0.0-beta.3. Switch theme using `WorkbenchService.settings.theme` signal. API will be removed in version 21.
    */
   public abstract switchTheme(theme: string): Promise<void>;
 
   /**
+   * Defines settings to adapt the workbench to personal preferences and working styles.
+   *
+   * Settings are stored in {@link WorkbenchConfig.storage} (defaults to local storage).
+   */
+  public abstract readonly settings: {
+    /**
+     * Specifies the workbench theme.
+     *
+     * Defaults to the `sci-theme` attribute set on the HTML root element, or to the user's OS color scheme preference if not set.
+     *
+     * Built-in themes: `scion-light` and `scion-dark`.
+     */
+    theme: WritableSignal<string | null>;
+  };
+
+  /**
    * Provides the current workbench theme, if any.
+   *
+   * @deprecated since version 19.0.0-beta.3. Read the theme from `WorkbenchService.settings.theme` signal, and the color scheme from 'getComputedStyle(inject(DOCUMENT).documentElement).colorScheme'. API will be removed in version 21.
    */
   public abstract readonly theme: Signal<WorkbenchTheme | null>;
 }

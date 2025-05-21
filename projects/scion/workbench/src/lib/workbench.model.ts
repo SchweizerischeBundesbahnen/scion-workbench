@@ -221,6 +221,8 @@ export type WorkbenchViewMenuItemFn = (view: WorkbenchView) => WorkbenchMenuItem
 
 /**
  * Information about a workbench theme.
+ *
+ * @deprecated since version 19.0.0-beta.3. Read the theme from `WorkbenchService.settings.theme` signal, and the color scheme from 'getComputedStyle(inject(DOCUMENT).documentElement).colorScheme'. API will be removed in version 21.
  */
 export interface WorkbenchTheme {
   /**
