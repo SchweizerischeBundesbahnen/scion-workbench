@@ -3,7 +3,10 @@
 </div>
 
 @if (view().closable()) {
-  <button (click)="onClose()" class="close e2e-close" [title]="('%workbench.close.tooltip' | wbText)()">
+  <button (click)="onClose()"
+          [title]="('%workbench.close.tooltip' | wbText)()"
+          [disabled]="!view().isClosable()"
+          class="close e2e-close">
     <wb-icon icon="workbench.close"/>
   </button>
 }

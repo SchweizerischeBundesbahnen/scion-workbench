@@ -172,7 +172,7 @@ export class ViewMenuService {
         accelerator: config.accelerator ?? ['ctrl', 'k'],
         group: config.group ?? 'close',
         cssClass: config.cssClass ?? 'e2e-close',
-        disabled: !view.closable(),
+        disabled: !view.isClosable(),
         onAction: () => void view.close(),
       }));
     }

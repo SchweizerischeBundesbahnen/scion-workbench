@@ -89,7 +89,7 @@
       }
 
       // Use a darker hover background for the close button than for the tab hover background.
-      > button.close:is(button, #sci-reset):hover {
+      > button.close:is(button, #sci-reset):not(:disabled):hover {
         background-color: color-mix(in srgb, var(--sci-workbench-tab-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
       }
     }

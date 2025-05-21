@@ -352,10 +352,11 @@ export interface ViewDragData {
   viewTitle: Translatable | null;
   viewHeading: Translatable | null;
   navigation?: Omit<WorkbenchViewNavigation, 'id' | 'state'>;
-  viewClosable: boolean;
+  viewClosable: boolean | 'disabled';
   viewDirty: boolean;
   viewTabWidth: number;
   viewTabHeight: number;
+  viewTitleOffsetRight: string | undefined;
   workbenchId: string;
   classList?: ClassListMap;
 }

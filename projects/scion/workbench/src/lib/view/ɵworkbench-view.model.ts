@@ -58,7 +58,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _heading = signal<Translatable | null>(null);
   private readonly _dirty = signal(false);
   private readonly _closable = signal(true);
-  private readonly _closableComputed = computed(() => this._closable() && !this._blockedBy());
   private readonly _blockedBy: Signal<ɵWorkbenchDialog | null>;
   private readonly _scrolledIntoView = signal(true);
   private readonly _classBasedCanCloseGuard = this.constructClassBasedCanCloseGuard();
@@ -82,6 +81,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
+  public readonly isClosable = computed(() => this._closable() && !this._blockedBy());
 
   constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout, options: {component: ComponentType<ViewComponent>}) {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
@@ -222,7 +222,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get closable(): Signal<boolean> {
-    return this._closableComputed;
+    return this._closable;
   }
 
   /** @inheritDoc */
