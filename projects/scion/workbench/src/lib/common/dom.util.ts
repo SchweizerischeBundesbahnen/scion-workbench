@@ -1,5 +1,5 @@
 import {coerceElement} from '@angular/cdk/coercion';
-import {ElementRef} from '@angular/core';
+import {booleanAttribute, ElementRef, numberAttribute} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 
 /**
@@ -72,6 +72,24 @@ export function setCssVariable(element: HTMLElement | ElementRef<HTMLElement>, v
 export function unsetCssVariable(element: HTMLElement | ElementRef<HTMLElement>, ...names: string[]): void {
   const target = coerceElement(element);
   names.forEach(name => target.style.removeProperty(name));
+}
+
+/**
+ * Reads and parses specified CSS variable from given element. Defaults to the specified value if not available.
+ */
+export function readCssVariable<T extends string | number | boolean | null>(element: Element, variable: string, defaultValue: T): T {
+  const value = getComputedStyle(element).getPropertyValue(variable) || defaultValue; // empty string if not set
+  switch (typeof defaultValue) {
+    case 'number': {
+      return numberAttribute(value, defaultValue) as T;
+    }
+    case 'boolean': {
+      return booleanAttribute(value) as T;
+    }
+    default: {
+      return value as T;
+    }
+  }
 }
 
 /**

@@ -8,9 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, Signal, untracked} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WorkbenchService} from '@scion/workbench';
+import {DOCUMENT} from '@angular/common';
 
 @Component({
   selector: 'app-workbench-theme-test-page',
@@ -22,5 +23,18 @@ import {WorkbenchService} from '@scion/workbench';
 })
 export default class WorkbenchThemeTestPageComponent {
 
-  protected readonly workbenchService = inject(WorkbenchService);
+  protected readonly theme = inject(WorkbenchService).settings.theme;
+  protected readonly colorScheme = this.computeColorScheme();
+
+  private computeColorScheme(): Signal<'light' | 'dark'> {
+    const documentElement = inject(DOCUMENT).documentElement;
+
+    return computed(() => {
+      // Track theme.
+      this.theme();
+
+      // Compute the color scheme when the theme has changed.
+      return untracked(() => getComputedStyle(documentElement).colorScheme as 'light' | 'dark');
+    });
+  }
 }

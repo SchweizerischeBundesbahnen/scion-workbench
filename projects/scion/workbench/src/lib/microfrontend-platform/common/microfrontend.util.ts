@@ -10,12 +10,12 @@
 
 import {Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
 import {effect, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
-import {ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
+import {WorkbenchTheme, ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
-import {WorkbenchTheme} from '../../workbench.model';
 import {Crypto} from '@scion/toolkit/crypto';
 import {coerceElement} from '@angular/cdk/coercion';
 import {first} from 'rxjs/operators';
+import {DOCUMENT} from '@angular/common';
 
 /**
  * Provides functions related to workbench themes.
@@ -30,15 +30,18 @@ export const Microfrontends = {
    */
   propagateTheme: (routerOutletElement: Signal<SciRouterOutletElement | ElementRef<SciRouterOutletElement>>, options?: {injector?: Injector}): void => {
     const injector = options?.injector ?? inject(Injector);
+    const documentRoot = injector.get(DOCUMENT).documentElement;
+    const settings = injector.get(WorkbenchService).settings;
 
     effect(() => {
       const routerOutlet = coerceElement(routerOutletElement());
-      const theme = injector.get(WorkbenchService).theme();
+      const theme = settings.theme();
 
       untracked(() => {
         if (theme) {
-          routerOutlet.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, theme);
-          routerOutlet.setContextValue('color-scheme', theme.colorScheme);
+          const colorScheme = getComputedStyle(documentRoot).colorScheme as 'light' | 'dark';
+          routerOutlet.setContextValue<WorkbenchTheme>(ɵTHEME_CONTEXT_KEY, {name: theme, colorScheme});
+          routerOutlet.setContextValue('color-scheme', colorScheme);
         }
         else {
           routerOutlet.removeContextValue(ɵTHEME_CONTEXT_KEY);

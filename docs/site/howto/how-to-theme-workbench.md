@@ -1,13 +1,13 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Theming
 
 SCION Workbench provides a set of design tokens to enable consistent design of the workbench. Design tokens are provided by the `@scion/workbench` SCSS module.
 
-An application can define a custom theme to change the default look of the SCION Workbench. Multiple themes are supported. A theme is a collection of design tokens, defining specific design aspects such as colors, spacings, etc. A design token can have a different value per theme.
+The application can define a custom theme to change the default look of the SCION Workbench. Multiple themes are supported. A theme is a collection of design tokens, defining specific design aspects such as colors, spacings, etc. A design token can have a different value per theme.
 
 An application typically loads the SCSS module `@scion/workbench` in the `styles.scss` file.
 
@@ -59,13 +59,19 @@ SCION provides a light and a dark theme, `scion-light` and `scion-dark`. Custom 
 ```
 
 ### Theme Selection
-A theme is selected based on the user's OS color scheme preference, or selected manually using the `WorkbenchService`.
+A theme is selected based on the user's OS color scheme preference or can be explicitly set using the `sci-theme` attribute on the HTML root element.
+
+```html
+<html sci-theme="scion-light">
+   ...
+</html>
+```
+
+The application may provide a user interface to change the theme via `WorkbenchService.settings.theme` property. The selected theme is restored when the application is reopened.
 
 ```ts
-inject(WorkbenchService).switchTheme('dark');
-
+inject(WorkbenchService).settings.theme.set('scion-light');
 ```
-The selected theme is stored in workbench storage and will be selected when loading the application the next time.
 
 ### Design Tokens
 SCION Workbench supports the following design tokens:
@@ -113,7 +119,6 @@ Tokens specific to the SCION Workbench.
 ### Examples
 
 The following listings illustrate how to customize the look of the SCION Workbench.
-
 
 <details>
   <summary><strong>Change of Background Color</strong></summary>

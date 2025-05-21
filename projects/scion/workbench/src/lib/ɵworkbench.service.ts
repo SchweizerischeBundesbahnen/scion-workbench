@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, inject, Injectable, Signal} from '@angular/core';
+import {assertNotInReactiveContext, computed, inject, Injectable, Signal, untracked} from '@angular/core';
 import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
@@ -28,6 +28,7 @@ import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
+import {DOCUMENT} from '@angular/common';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -40,21 +41,22 @@ export class ɵWorkbenchService implements WorkbenchService {
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
   private readonly _layoutService = inject(WorkbenchLayoutService);
-  private readonly _workbenchThemeSwitcher = inject(WorkbenchThemeSwitcher);
 
   public readonly layout: Signal<ɵWorkbenchLayout>;
   public readonly perspectives: Signal<ɵWorkbenchPerspective[]>;
   public readonly parts: Signal<ɵWorkbenchPart[]>;
   public readonly views: Signal<ɵWorkbenchView[]>;
-  public readonly theme: Signal<WorkbenchTheme | null>;
   public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
+  public readonly theme = this.computeLegacyThemeObject();
+  public readonly settings = {
+    theme: inject(WorkbenchThemeSwitcher).theme,
+  };
 
   constructor() {
     this.layout = this._layoutService.layout;
     this.perspectives = this._perspectiveRegistry.objects;
     this.parts = this._partRegistry.objects;
     this.views = this._viewRegistry.objects;
-    this.theme = this._workbenchThemeSwitcher.theme;
     this.activePerspective = this._perspectiveService.activePerspective;
   }
 
@@ -116,8 +118,27 @@ export class ɵWorkbenchService implements WorkbenchService {
   }
 
   /** @inheritDoc */
-  public switchTheme(theme: string): Promise<void> {
+  public async switchTheme(theme: string): Promise<void> {
     assertNotInReactiveContext(this.switchTheme, 'Call WorkbenchService.switchTheme() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    return this._workbenchThemeSwitcher.switchTheme(theme);
+    this.settings.theme.set(theme);
+  }
+
+  private computeLegacyThemeObject(): Signal<WorkbenchTheme | null> {
+    const documentElement = inject(DOCUMENT).documentElement;
+
+    return computed(() => {
+      const theme = this.settings.theme();
+
+      return untracked(() => {
+        if (!theme) {
+          return null;
+        }
+
+        return {
+          name: theme,
+          colorScheme: getComputedStyle(documentElement).colorScheme as 'light' | 'dark',
+        };
+      });
+    });
   }
 }
