@@ -1,11 +1,9 @@
-@if (workbenchService.theme(); as theme) {
-  <section>
-    <sci-form-field label="Theme">
-      <span class="e2e-theme">{{theme.name}}</span>
-    </sci-form-field>
+<section>
+  <sci-form-field label="Theme">
+    <span class="e2e-theme">{{theme()}}</span>
+  </sci-form-field>
 
-    <sci-form-field label="Color Scheme">
-      <span class="e2e-color-scheme">{{theme.colorScheme}}</span>
-    </sci-form-field>
-  </section>
-}
+  <sci-form-field label="Color Scheme">
+    <span class="e2e-color-scheme">{{colorScheme()}}</span>
+  </sci-form-field>
+</section>
