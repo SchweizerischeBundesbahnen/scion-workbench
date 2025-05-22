@@ -1,11 +1,11 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## SCION Workbench
 
-SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop. The workbench layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel. Examples include specialized business applications, scientific or development tools, as well as command & control interfaces.
+SCION Workbench enables the creation of Angular web applications that require a flexible layout to display content side-by-side or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel. Examples include business applications, scientific or development tools, and command & control interfaces.
 
 [Learn more about the SCION Workbench.][link-overview]
 

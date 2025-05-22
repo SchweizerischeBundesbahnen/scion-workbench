@@ -48,7 +48,7 @@ export class MessageBoxFooterComponent {
   protected onArrowKey(index: number, direction: 'left' | 'right'): void {
     const actionButtonCount = this._actionButtons().length;
     const newIndex = (direction === 'left' ? index - 1 : index + 1);
-    this._actionButtons()[(newIndex + actionButtonCount) % actionButtonCount].nativeElement.focus();
+    this._actionButtons()[(newIndex + actionButtonCount) % actionButtonCount]!.nativeElement.focus();
   }
 
   private async emitPreferredSize(): Promise<void> {

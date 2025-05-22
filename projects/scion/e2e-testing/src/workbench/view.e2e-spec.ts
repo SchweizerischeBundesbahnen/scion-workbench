@@ -364,20 +364,22 @@ test.describe('Workbench View', () => {
 
     // Expect all views except 'view.102' to be closed in 'part.left'.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.102'}],
-            activeViewId: 'view.102',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.102'}],
+              activeViewId: 'view.102',
+            }),
+            child2: new MPart({
+              id: 'part.right',
+              views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}],
+            }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            views: [{id: 'view.201'}, {id: 'view.202'}, {id: 'view.203'}],
-          }),
-        }),
+        },
       },
     });
   });
@@ -394,12 +396,14 @@ test.describe('Workbench View', () => {
 
     // Expect view.101 to be active.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MPart({
-          id: 'part.main',
-          views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}],
-          activeViewId: 'view.101',
-        }),
+      grids: {
+        main: {
+          root: new MPart({
+            id: 'part.main',
+            views: [{id: 'view.101'}, {id: 'view.102'}, {id: 'view.103'}],
+            activeViewId: 'view.101',
+          }),
+        },
       },
     });
 
@@ -409,12 +413,14 @@ test.describe('Workbench View', () => {
 
     // Expect all views except 'view.102' to be closed in 'part.left'.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MPart({
-          id: 'part.main',
-          views: [{id: 'view.102'}],
-          activeViewId: 'view.102',
-        }),
+      grids: {
+        main: {
+          root: new MPart({
+            id: 'part.main',
+            views: [{id: 'view.102'}],
+            activeViewId: 'view.102',
+          }),
+        },
       },
     });
   });
@@ -1069,19 +1075,21 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            views: [{id: testee1ViewId}],
-            activeViewId: testee1ViewId,
+      grids: {
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              views: [{id: testee1ViewId}],
+              activeViewId: testee1ViewId,
+            }),
+            child2: new MPart({
+              views: [{id: testee2ViewId}],
+              activeViewId: testee2ViewId,
+            }),
           }),
-          child2: new MPart({
-            views: [{id: testee2ViewId}],
-            activeViewId: testee2ViewId,
-          }),
-        }),
+        },
       },
     });
   });
@@ -1108,7 +1116,7 @@ test.describe('Workbench View', () => {
 
     // Drag view in the layout.
     const dragHandle = await testee2ViewPage.view.tab.startDrag();
-    await dragHandle.dragToEdge('east');
+    await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
     // Expect `CanClose` guard not to be invoked.
@@ -1117,22 +1125,24 @@ test.describe('Workbench View', () => {
     // Expect view to be dragged.
     await expectView(testee2ViewPage).toBeActive();
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .8,
-          child1: new MPart({id: MAIN_AREA}),
-          child2: new MPart({
-            views: [{id: testee2ViewId}],
-            activeViewId: testee2ViewId,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .8,
+            child1: new MPart({id: MAIN_AREA}),
+            child2: new MPart({
+              views: [{id: testee2ViewId}],
+              activeViewId: testee2ViewId,
+            }),
           }),
-        }),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
   });
@@ -1169,22 +1179,26 @@ test.describe('Workbench View', () => {
 
     // Expect view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
     await expectView(new ViewPagePO(newWindow.appPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
     await expectView(testee1ViewPage).toBeActive();
@@ -1226,22 +1240,26 @@ test.describe('Workbench View', () => {
 
     // Expect view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.1'}],
-          activeViewId: 'view.1',
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.1'}],
+            activeViewId: 'view.1',
+          }),
+        },
       },
     });
     await expectView(new ViewPagePO(newAppPO, {viewId: 'view.1'})).toBeActive();
 
     // Expect view to be removed from the origin window.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: testee1ViewId}],
-          activeViewId: testee1ViewId,
-        }),
+      grids: {
+        mainArea: {
+          root: new MPart({
+            views: [{id: testee1ViewId}],
+            activeViewId: testee1ViewId,
+          }),
+        },
       },
     });
     await expectView(testee1ViewPage).toBeActive();
@@ -1270,20 +1288,20 @@ test.describe('Workbench View', () => {
   test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Open two views in main area.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+      .addView('view.100', {partId: 'part.activity-1'})
+      .navigateView('view.100', ['test-view'])
+      .activatePart('part.activity-1'),
+    );
+
+    // Open view in main area.
     const viewPage1 = await workbenchNavigator.openInNewTab(ViewPagePO);
-    const viewPage2 = await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // Capture instance id of view 2
+    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.100'});
     const view2ComponentId = await viewPage2.getComponentInstanceId();
-
-    // Drag view 2 into peripheral area.
-    const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToEdge('east');
-    await dragHandle.drop();
-
-    await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeActive();
 
     // Maximize the main area.
     await viewPage1.view.tab.dblclick();
@@ -1375,5 +1393,149 @@ test.describe('Workbench View', () => {
       'x=0, y=0, width=0, height=0',
       `x=${size.x}, y=${size.y}, width=${size.width}, height=${size.height}`,
     ]);
+  });
+
+  test('should show "null content" hint if not navigated view', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    await workbenchNavigator.modifyLayout(factory => factory
+      .addView('view.100', {partId: 'part.initial'}),
+    );
+
+    // Expect hint to show.
+    const view = appPO.view({viewId: 'view.100'});
+    await expect(view.nullContentMessage).toBeVisible();
+
+    // Reload the application and expect the hint to still be displayed.
+    await test.step('Reloading the application', async () => {
+      await appPO.reload();
+      await expect(view.nullContentMessage).toBeVisible();
+    });
+
+    // Navigate the view.
+    await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['path/to/view']));
+
+    // Expect hint not to show.
+    await expect(view.nullContentMessage).not.toBeAttached();
+  });
+
+  test.describe('View Background Color', () => {
+
+    test('should apply "--sci-workbench-view-peripheral-background-color" to views in docked parts (docked part, no main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main')
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+        .addView('view.101', {partId: 'part.main'})
+        .addView('view.102', {partId: 'part.activity'})
+        .activatePart('part.activity'),
+      );
+
+      // Set view background color design tokens.
+      const viewBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-view-background-color', viewBackgroundColor);
+      const peripheralViewBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-view-peripheral-background-color', peripheralViewBackgroundColor);
+
+      // Expect view background colors.
+      await expect(appPO.view({viewId: 'view.101'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+      await expect(appPO.view({viewId: 'view.102'}).locator).toHaveCSS('background-color', peripheralViewBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-view-peripheral-background-color" to views in docked parts (docked part, main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+        .addView('view.101', {partId: 'part.activity'})
+        .activatePart('part.activity'),
+      );
+
+      // Add view to main area.
+      await workbenchNavigator.modifyLayout(layout => layout.addView('view.102', {partId: 'part.initial'}));
+
+      // Set view background color design tokens.
+      const viewBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-view-background-color', viewBackgroundColor);
+      const peripheralViewBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-view-peripheral-background-color', peripheralViewBackgroundColor);
+
+      // Expect view background colors.
+      await expect(appPO.view({viewId: 'view.101'}).locator).toHaveCSS('background-color', peripheralViewBackgroundColor);
+      await expect(appPO.view({viewId: 'view.102'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-view-peripheral-background-color" to views in docked parts (docked part, main area, part relative to main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.bottom', {relativeTo: MAIN_AREA, align: 'bottom'})
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+        .addView('view.101', {partId: 'part.activity'})
+        .addView('view.102', {partId: 'part.bottom'})
+        .activatePart('part.activity'),
+      );
+
+      // Add view to main area.
+      await workbenchNavigator.modifyLayout(layout => layout.addView('view.103', {partId: 'part.initial'}));
+
+      // Set view background color design tokens.
+      const viewBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-view-background-color', viewBackgroundColor);
+      const peripheralViewBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-view-peripheral-background-color', peripheralViewBackgroundColor);
+
+      // Expect view background colors.
+      await expect(appPO.view({viewId: 'view.101'}).locator).toHaveCSS('background-color', peripheralViewBackgroundColor);
+      await expect(appPO.view({viewId: 'view.102'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+      await expect(appPO.view({viewId: 'view.103'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-view-peripheral-background-color" to views outside the main area (no docked part, main area, part relative to main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.bottom', {relativeTo: MAIN_AREA, align: 'bottom'})
+        .addView('view.101', {partId: 'part.bottom'}),
+      );
+
+      // Add view to main area.
+      await workbenchNavigator.modifyLayout(layout => layout.addView('view.102', {partId: 'part.initial'}));
+
+      // Set view background color design tokens.
+      const viewBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-view-background-color', viewBackgroundColor);
+      const peripheralViewBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-view-peripheral-background-color', peripheralViewBackgroundColor);
+
+      // Expect view background colors.
+      await expect(appPO.view({viewId: 'view.101'}).locator).toHaveCSS('background-color', peripheralViewBackgroundColor);
+      await expect(appPO.view({viewId: 'view.102'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-view-background-color" to all views in the main grid (no docked part, no main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.top')
+        .addPart('part.bottom', {relativeTo: 'part.top', align: 'bottom'})
+        .addView('view.101', {partId: 'part.top'})
+        .addView('view.102', {partId: 'part.bottom'}),
+      );
+
+      // Set view background color design tokens.
+      const viewBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-view-background-color', viewBackgroundColor);
+      const peripheralViewBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-view-peripheral-background-color', peripheralViewBackgroundColor);
+
+      // Expect view background colors.
+      await expect(appPO.view({viewId: 'view.101'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+      await expect(appPO.view({viewId: 'view.102'}).locator).toHaveCSS('background-color', viewBackgroundColor);
+    });
   });
 });

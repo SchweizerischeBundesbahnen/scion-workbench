@@ -3,6 +3,8 @@
   <span>RelativeTo</span>
   <span>Align</span>
   <span>Ratio</span>
+  <span>Title</span>
+  <span>CSS Class(es)</span>
   <span class="checkbox">Activate</span>
   <button (click)="onAddPart()" class="e2e-add" title="Add part" sciMaterialIcon>add</button>
 
@@ -20,8 +22,12 @@
     </select>
     <!-- Ratio -->
     <input [formControl]="partFormGroup.controls.relativeTo.controls.ratio" type="number" [class]="'e2e-ratio'">
+    <!-- Title -->
+    <input [formControl]="partFormGroup.controls.extras.controls.title" [class]="'e2e-title'">
+    <!-- CSS class -->
+    <app-multi-value-input [formControl]="partFormGroup.controls.extras.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     <!-- Activate -->
-    <sci-checkbox [formControl]="partFormGroup.controls.options.controls.activate" [class]="'e2e-activate-part'"/>
+    <sci-checkbox [formControl]="partFormGroup.controls.extras.controls.activate" [class]="'e2e-activate-part'"/>
     <!-- Remove button -->
     <button class="e2e-remove" (click)="onRemovePart($index)" title="Remove part" sciMaterialIcon>remove</button>
   }

@@ -17,9 +17,11 @@ import {waitUntilBoundingBoxStable} from '../helper/testing.util';
 import {InputFieldTestPagePO as MicrofrontendInputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
 import {InputFieldTestPagePO as WorkbenchInputFieldTestPagePO} from '../workbench/page-object/test-pages/input-field-test-page.po';
 import {ViewPagePO} from './page-object/view-page.po';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectView} from '../matcher/view-matcher';
+import {MAIN_AREA} from '../workbench.model';
+import {RouterPagePO} from './page-object/router-page.po';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from '../workbench/workbench-layout-constants';
 
 test.describe('Workbench Popup', () => {
 
@@ -358,7 +360,7 @@ test.describe('Workbench Popup', () => {
 
     const popup = appPO.popup({cssClass: 'testee'});
 
-    const viewBounds = await appPO.activePart({inMainArea: true}).activeView.getBoundingBox();
+    const viewBounds = await appPO.activePart({grid: 'mainArea'}).activeView.getBoundingBox();
     await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toEqual(viewBounds.left + 150);
     await expect.poll(() => popup.getBoundingBox().then(box => box.top - POPUP_DIAMOND_ANCHOR_SIZE)).toEqual(viewBounds.top + 150);
 
@@ -416,7 +418,7 @@ test.describe('Workbench Popup', () => {
 
       // Open view 1 with popup.
       const popupPage = await SizeTestPagePO.openInPopup(appPO);
-      const viewPage1 = new PopupOpenerPagePO(appPO, {viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()});
+      const viewPage1 = new PopupOpenerPagePO(appPO, {viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()});
 
       await expectPopup(popupPage).toBeVisible();
       const popupSize = await popupPage.getBoundingBox();
@@ -477,7 +479,7 @@ test.describe('Workbench Popup', () => {
       await expectPopup(popupPage).not.toBeAttached();
     });
 
-    test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator}) => {
+    test('should detach popup if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -488,18 +490,21 @@ test.describe('Workbench Popup', () => {
         },
       });
 
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+        .activatePart('part.activity-1'),
+      );
+
       // Open view in main area.
       const viewInMainArea = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      // Open popup opener view.
-      const popupOpenerView = await microfrontendNavigator.openInNewTab(PopupOpenerPagePO, 'app1');
-
-      // Drag popup opener view into peripheral area.
-      const dragHandle = await popupOpenerView.view.tab.startDrag();
-      await dragHandle.dragToEdge('east');
-      await dragHandle.drop();
+      // Open popup opener page in peripheral area.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'popup', app: 'app1'}, {partId: 'part.activity-1', target: 'view.100'});
 
       // Open popup.
+      const popupOpenerView = new PopupOpenerPagePO(appPO, {viewId: 'view.100'});
       await popupOpenerView.enterCssClass('testee');
       await popupOpenerView.enterQualifier({component: 'testee'});
       await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});

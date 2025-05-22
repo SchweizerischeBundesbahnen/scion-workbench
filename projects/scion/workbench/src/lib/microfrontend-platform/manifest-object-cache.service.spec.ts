@@ -115,5 +115,5 @@ describe('ManifestObjectCache', () => {
  * Looks up a capability using {@link ManifestService}.
  */
 async function lookupCapability(id: string): Promise<Capability> {
-  return (await firstValueFrom(TestBed.inject(ManifestService).lookupCapabilities$({id})))[0];
+  return (await firstValueFrom(TestBed.inject(ManifestService).lookupCapabilities$({id})))[0]!;
 }

@@ -21,8 +21,9 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {Arrays} from '@scion/toolkit/util';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {parseTypedString} from '../common/parse-typed-value.util';
 
 @Component({
   selector: 'app-part-page',
@@ -40,7 +41,7 @@ import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
     SciFormFieldComponent,
     SciKeyValueComponent,
     WorkbenchPartActionDirective,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class PartPageComponent {
@@ -51,6 +52,7 @@ export default class PartPageComponent {
   protected readonly route = inject(ActivatedRoute);
   protected readonly uuid = UUID.randomUUID();
   protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
+  protected readonly titleList = `title-list-${UUID.randomUUID()}`;
   protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
@@ -59,6 +61,10 @@ export default class PartPageComponent {
   constructor() {
     this.partActions = this.computePartActions();
     this.installCssClassUpdater();
+  }
+
+  protected onPartTitleChange(title: string): void {
+    this.part.title = parseTypedString(title)!;
   }
 
   private computePartActions(): Signal<WorkbenchPartActionDescriptor[]> {
@@ -76,9 +82,7 @@ export default class PartPageComponent {
   private installCssClassUpdater(): void {
     this.form.controls.cssClass.valueChanges
       .pipe(takeUntilDestroyed())
-      .subscribe(cssClasses => {
-        this.part.cssClass = cssClasses;
-      });
+      .subscribe(cssClasses => this.part.cssClass = cssClasses);
   }
 }
 

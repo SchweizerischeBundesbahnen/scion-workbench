@@ -75,51 +75,53 @@ test.describe('Workbench Layout Migration', () => {
     const _2b534d97Part = parts.find(part => part.alternativeId === '2b534d97-ed7d-43b3-bb2c-0e59d9766e86') ?? throwError(`Part not found with alternativeId '2b534d97-ed7d-43b3-bb2c-0e59d9766e86'`);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .8,
-          child1: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'row',
-            ratio: .2,
-            child1: new MPart({
-              id: _33b22f60Part.id,
-              alternativeId: _33b22f60Part.alternativeId,
-              views: [{id: 'view.3'}],
-              activeViewId: 'view.3',
+            ratio: .8,
+            child1: new MTreeNode({
+              direction: 'row',
+              ratio: .2,
+              child1: new MPart({
+                id: _33b22f60Part.id,
+                alternativeId: _33b22f60Part.alternativeId,
+                views: [{id: 'view.3'}],
+                activeViewId: 'view.3',
+              }),
+              child2: new MPart({
+                id: MAIN_AREA,
+                alternativeId: MAIN_AREA_ALTERNATIVE_ID,
+              }),
             }),
             child2: new MPart({
-              id: MAIN_AREA,
-              alternativeId: MAIN_AREA_ALTERNATIVE_ID,
+              id: _9bc4c09fPart.id,
+              alternativeId: _9bc4c09fPart.alternativeId,
+              views: [{id: 'view.5'}],
+              activeViewId: 'view.5',
             }),
           }),
-          child2: new MPart({
-            id: _9bc4c09fPart.id,
-            alternativeId: _9bc4c09fPart.alternativeId,
-            views: [{id: 'view.5'}],
-            activeViewId: 'view.5',
+          activePartId: _33b22f60Part.id,
+        },
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'column',
+            ratio: .5,
+            child1: new MPart({
+              id: _a25eb4cfPart.id,
+              alternativeId: _a25eb4cfPart.alternativeId,
+              views: [{id: 'view.1'}, {id: 'view.4'}],
+              activeViewId: 'view.4',
+            }),
+            child2: new MPart({
+              id: _2b534d97Part.id,
+              alternativeId: _2b534d97Part.alternativeId,
+              views: [{id: 'view.2'}],
+              activeViewId: 'view.2',
+            }),
           }),
-        }),
-        activePartId: _33b22f60Part.id,
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'column',
-          ratio: .5,
-          child1: new MPart({
-            id: _a25eb4cfPart.id,
-            alternativeId: _a25eb4cfPart.alternativeId,
-            views: [{id: 'view.1'}, {id: 'view.4'}],
-            activeViewId: 'view.4',
-          }),
-          child2: new MPart({
-            id: _2b534d97Part.id,
-            alternativeId: _2b534d97Part.alternativeId,
-            views: [{id: 'view.2'}],
-            activeViewId: 'view.2',
-          }),
-        }),
-        activePartId: _a25eb4cfPart.id,
+          activePartId: _a25eb4cfPart.id,
+        },
       },
     });
 
@@ -211,51 +213,53 @@ test.describe('Workbench Layout Migration', () => {
     const _1d94dcb6Part = parts.find(part => part.alternativeId === '1d94dcb6-76b6-47eb-b300-39448993d36b') ?? throwError(`Part not found with alternativeId '1d94dcb6-76b6-47eb-b300-39448993d36b'`);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: leftPart.id,
-            alternativeId: leftPart.alternativeId,
-            views: [{id: 'view.2'}, {id: 'view.3'}],
-            activeViewId: 'view.2',
-          }),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'row',
-            ratio: .75,
+            ratio: .25,
             child1: new MPart({
-              id: MAIN_AREA,
-              alternativeId: MAIN_AREA_ALTERNATIVE_ID,
+              id: leftPart.id,
+              alternativeId: leftPart.alternativeId,
+              views: [{id: 'view.2'}, {id: 'view.3'}],
+              activeViewId: 'view.2',
+            }),
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .75,
+              child1: new MPart({
+                id: MAIN_AREA,
+                alternativeId: MAIN_AREA_ALTERNATIVE_ID,
+              }),
+              child2: new MPart({
+                id: rightPart.id,
+                alternativeId: rightPart.alternativeId,
+                views: [{id: 'view.4'}],
+                activeViewId: 'view.4',
+              }),
+            }),
+          }),
+          activePartId: leftPart.id,
+        },
+        mainArea: {
+          root: new MTreeNode({
+            direction: 'column',
+            ratio: .5,
+            child1: new MPart({
+              id: _6f09e6e2Part.id,
+              alternativeId: _6f09e6e2Part.alternativeId,
+              views: [{id: 'view.1'}],
+              activeViewId: 'view.1',
             }),
             child2: new MPart({
-              id: rightPart.id,
-              alternativeId: rightPart.alternativeId,
-              views: [{id: 'view.4'}],
-              activeViewId: 'view.4',
+              id: _1d94dcb6Part.id,
+              alternativeId: _1d94dcb6Part.alternativeId,
+              views: [{id: 'view.5'}],
+              activeViewId: 'view.5',
             }),
           }),
-        }),
-        activePartId: leftPart.id,
-      },
-      mainAreaGrid: {
-        root: new MTreeNode({
-          direction: 'column',
-          ratio: .5,
-          child1: new MPart({
-            id: _6f09e6e2Part.id,
-            alternativeId: _6f09e6e2Part.alternativeId,
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
-          }),
-          child2: new MPart({
-            id: _1d94dcb6Part.id,
-            alternativeId: _1d94dcb6Part.alternativeId,
-            views: [{id: 'view.5'}],
-            activeViewId: 'view.5',
-          }),
-        }),
-        activePartId: _1d94dcb6Part.id,
+          activePartId: _1d94dcb6Part.id,
+        },
       },
     });
 

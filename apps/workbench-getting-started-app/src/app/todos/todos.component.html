@@ -1,7 +1,7 @@
 <ol>
   @for (todo of todoService.todos; track todo.id) {
     <li>
-      <a [wbRouterLink]="['/todos', todo.id]" [wbRouterLinkExtras]="{target: 'auto'}">{{todo.task}}</a>
+      <a [wbRouterLink]="['/todos', todo.id]">{{todo.task}}</a>
     </li>
   }
 </ol>

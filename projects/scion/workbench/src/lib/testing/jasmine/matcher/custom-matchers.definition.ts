@@ -30,7 +30,7 @@ export interface CustomMatchers<T> extends jasmine.Matchers<T> {
   /**
    * Expects the specified workbench layout.
    *
-   * The actual value can be either a {@link ɵWorkbenchLayout} instance or a {@link ComponentFixture} for a {@link WorkbenchLayoutComponent} or its parent element.
+   * The actual value can be either a {@link ɵWorkbenchLayout} instance or a {@link ComponentFixture} for a {@link WorkbenchMainGridComponent} or its parent element.
    * If a fixture is provided, the DOM structure is also asserted.
    *
    * Note that properties not specified in the `expected` object are excluded from the assertion.

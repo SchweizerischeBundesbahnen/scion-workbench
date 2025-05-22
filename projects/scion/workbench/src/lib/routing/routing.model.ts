@@ -26,7 +26,7 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
    *
    * One of:
    * - 'auto':   Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
-   * - 'blank':  Navigates in a new view.
+   * - 'blank':  Opens a new view and navigates it.
    * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
    */
   target?: ViewId | string | 'blank' | 'auto';
@@ -200,12 +200,13 @@ export interface NavigationData {
  * Signature of a function to modify the workbench layout.
  *
  * The router will invoke this function with the current workbench layout. The layout has methods for modifying it.
- * The layout is immutable, so each modification creates a new instance. Use the instance for further modifications and finally return it.
+ * The layout is immutable; each modification creates a new instance.
  *
  * The function can call `inject` to get any required dependencies.
  *
  * ## Workbench Layout
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
+ * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
+ * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
  *
  * ## Example
  * The following example adds a part to the left of the main area, inserts a view and navigates it.
@@ -220,6 +221,6 @@ export interface NavigationData {
  * ```
  *
  * @param layout - Reference to the current workbench layout for modification.
- * @return Modified layout, or `null` to cancel navigation.
+ * @return Modified layout, or `null` to cancel the navigation.
  */
 export type NavigateFn = (layout: WorkbenchLayout) => Promise<WorkbenchLayout | null> | WorkbenchLayout | null;

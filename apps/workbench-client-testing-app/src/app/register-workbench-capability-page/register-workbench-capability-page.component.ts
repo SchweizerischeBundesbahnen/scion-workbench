@@ -21,8 +21,8 @@ import {stringifyError} from '../common/stringify-error.util';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {parseTypedString} from '../common/parse-typed-value.util';
-import {CssClassComponent} from '../css-class/css-class.component';
 import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapabilityProperties} from './perspective-capability-properties/perspective-capability-properties.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 /**
  * Allows registering workbench capabilities.
@@ -38,8 +38,8 @@ import {PerspectiveCapabilityPropertiesComponent, WorkbenchPerspectiveCapability
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
     SciViewportComponent,
-    CssClassComponent,
     PerspectiveCapabilityPropertiesComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class RegisterWorkbenchCapabilityPageComponent {

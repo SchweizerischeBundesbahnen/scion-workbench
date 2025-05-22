@@ -48,10 +48,10 @@ export class WorkbenchComponent implements OnDestroy {
   }
 
   /**
-   * Tests if given part is in the main area.
+   * Tests if given part is not a peripheral part.
    */
-  protected isPartInMainArea = (part: WorkbenchPart): boolean => {
-    return part.isInMainArea;
+  protected isNotPeripheralPart = (part: WorkbenchPart): boolean => {
+    return !part.peripheral();
   };
 
   protected onMoveView(view: WorkbenchView): void {

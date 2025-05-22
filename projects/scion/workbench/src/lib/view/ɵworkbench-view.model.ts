@@ -43,7 +43,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _viewEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchService = inject(ɵWorkbenchService);
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
@@ -232,7 +232,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       return true;
     }
 
-    const currentLayout = this._workbenchLayoutService.layout();
+    const currentLayout = this._layout();
     return this._workbenchRouter.navigate(
       layout => currentLayout === layout ? layout.activateView(this.id, {activatePart: true}) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: options?.skipLocationChange},

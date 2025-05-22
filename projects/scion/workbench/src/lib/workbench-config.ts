@@ -13,15 +13,101 @@ import {Signal, Type} from '@angular/core';
 import {LogAppender, LogLevel} from './logging';
 import {MicrofrontendPlatformConfig} from '@scion/microfrontend-platform';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform/microfrontend-platform-config-loader';
-import {WorkbenchLayoutFn, WorkbenchPerspectives} from './perspective/workbench-perspective.model';
+import {WorkbenchPerspectives} from './perspective/workbench-perspective.model';
 import {WorkbenchStorage} from './storage/workbench-storage';
 import {WorkbenchTextProviderFn} from './text/workbench-text-provider.model';
 import {WorkbenchIconProviderFn} from './icon/workbench-icon-provider.model';
+import {WorkbenchLayoutFn} from './layout/workbench-layout';
 
 /**
  * Configuration of the SCION Workbench.
  */
 export abstract class WorkbenchConfig {
+
+  /**
+   * Defines the layout(s) of the application. Defaults to a single layout with only a main area.
+   *
+   * An application can have multiple layouts, called perspectives. A perspective defines an arrangement of parts and views.
+   * Parts can be docked to the side or positioned relative to each other. Views are stacked in parts and can be dragged to other parts.
+   * Content can be displayed in both parts and views.
+   *
+   * A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support
+   * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
+   * Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives.
+   *
+   * See {@link WorkbenchLayoutFn} for more information and an example.
+   */
+  public abstract layout?: WorkbenchLayoutFn | WorkbenchPerspectives;
+
+  /**
+   * Provides texts to the SCION Workbench.
+   *
+   * A text provider is a function that returns the text for a translation key.
+   *
+   * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
+   * Otherwise, the text is returned as is.
+   *
+   * The SCION Workbench uses the following translation keys for built-in texts:
+   * - workbench.clear.tooltip
+   * - workbench.close.action
+   * - workbench.close_all_tabs.action
+   * - workbench.close_other_tabs.action
+   * - workbench.close_tab.action
+   * - workbench.close_tab.tooltip
+   * - workbench.close_tabs_to_the_left.action
+   * - workbench.close_tabs_to_the_right.action
+   * - workbench.close.tooltip
+   * - workbench.dev_mode_only_hint.tooltip
+   * - workbench.minimize.tooltip
+   * - workbench.move_tab_down.action
+   * - workbench.move_tab_to_new_window.action
+   * - workbench.move_tab_to_the_left.action
+   * - workbench.move_tab_to_the_right.action
+   * - workbench.move_tab_up.action
+   * - workbench.null_content.message
+   * - workbench.null_view_developer_hint.message
+   * - workbench.ok.action
+   * - workbench.page_not_found.message
+   * - workbench.page_not_found.title
+   * - workbench.page_not_found_developer_hint.message
+   * - workbench.show_open_tabs.tooltip
+   *
+   * The function:
+   * - Can call `inject` to get any required dependencies.
+   * - Can call `toSignal` to convert an Observable to a Signal.
+   *
+   * @see WorkbenchTextProviderFn
+   */
+  public abstract textProvider?: WorkbenchTextProviderFn;
+
+  /**
+   * Provides icons to the SCION Workbench.
+   *
+   * An icon provider is a function that returns a component for an icon. The component renders the icon.
+   *
+   * Defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
+   *
+   * The default icon provider requires the application to include the Material icon font, for example in `styles.scss`, as follows:
+   * ```scss
+   * @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+   * ```
+   *
+   * The SCION Workbench uses the following icons:
+   * - `workbench.clear`: Clear button in input fields
+   * - `workbench.close`: Close button in views, dialogs and notifications
+   * - `workbench.dirty`: Visual indicator for view with unsaved content
+   * - `workbench.menu_down`: Menu button of drop down menus
+   * - `workbench.minimize`: Minimize button in docked parts
+   * - `workbench.pin`: Visual indicator for a pinned view
+   * - `workbench.search`: Visual indicator in search or filter fields
+   *
+   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
+   *
+   * The function can call `inject` to get any required dependencies.
+   *
+   * @see WorkbenchIconProviderFn
+   */
+  public abstract iconProvider?: WorkbenchIconProviderFn;
 
   /**
    * Specifies the component to display in `<wb-workbench>` while the workbench is starting.
@@ -118,14 +204,6 @@ export abstract class WorkbenchConfig {
   public abstract microfrontendPlatform?: MicrofrontendPlatformConfig | Type<MicrofrontendPlatformConfigLoader>;
 
   /**
-   * Defines the workbench layout. Multiple layouts can be defined in the form of perspectives.
-   * If not set, defaults to a layout with only a main area.
-   *
-   * See {@link WorkbenchLayoutFn} for more information and an example.
-   */
-  public abstract layout?: WorkbenchLayoutFn | WorkbenchPerspectives;
-
-  /**
    * Provides persistent storage to the SCION Workbench.
    *
    * If not set, the workbench uses the browser's local storage as persistent storage.
@@ -145,66 +223,6 @@ export abstract class WorkbenchConfig {
      */
     modalityScope?: 'workbench' | 'viewport';
   };
-
-  /**
-   * Provides texts to the SCION Workbench.
-   *
-   * A text provider is a function that returns the text for a translation key.
-   *
-   * Texts starting with the percent symbol (`%`) are passed to the text provider for translation, with the percent symbol omitted.
-   * Otherwise, the text is returned as is.
-   *
-   * The SCION Workbench uses the following translation keys for built-in texts:
-   * - workbench.clear.tooltip
-   * - workbench.close.action
-   * - workbench.close_all_tabs.action
-   * - workbench.close_other_tabs.action
-   * - workbench.close_tab.action
-   * - workbench.close_tab.tooltip
-   * - workbench.close_tabs_to_the_left.action
-   * - workbench.close_tabs_to_the_right.action
-   * - workbench.close.tooltip
-   * - workbench.move_tab_down.action
-   * - workbench.move_tab_to_new_window.action
-   * - workbench.move_tab_to_the_left.action
-   * - workbench.move_tab_to_the_right.action
-   * - workbench.move_tab_up.action
-   * - workbench.ok.action
-   * - workbench.page_not_found.message
-   * - workbench.page_not_found.title
-   * - workbench.page_not_found_developer_hint.message
-   * - workbench.show_open_tabs.tooltip
-   *
-   * The function:
-   * - Can call `inject` to get any required dependencies.
-   * - Can call `toSignal` to convert an Observable to a Signal.
-   *
-   * @see WorkbenchTextProviderFn
-   */
-  public abstract textProvider?: WorkbenchTextProviderFn;
-
-  /**
-   * Provides icons to the SCION Workbench.
-   *
-   * An icon provider is a function that returns a component for an icon. The component renders the icon.
-   *
-   * Defaults to a Material icon provider, interpreting the icon as a Material icon ligature.
-   * The default icon provider requires the application to include the Material icon font in the HTML.
-   *
-   * The SCION Workbench uses the following icons:
-   * - `workbench.clear`: Clear button in input fields
-   * - `workbench.close`: Close button in views, dialogs and notifications
-   * - `workbench.dirty`: Visual indicator for view with unsaved content
-   * - `workbench.menu_down`: Menu button of drop down menus
-   * - `workbench.search`: Visual indicator in search or filter fields
-   *
-   * To not replace built-in workbench icons, the icon provider can return `undefined` for icons starting with the `workbench.` prefix.
-   *
-   * The function can call `inject` to get any required dependencies.
-   *
-   * @see WorkbenchIconProviderFn
-   */
-  public abstract iconProvider?: WorkbenchIconProviderFn;
 
   /**
    * Configures logging for the workbench.

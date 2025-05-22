@@ -32,7 +32,7 @@ export class ViewDropZoneDirective implements OnInit {
   /**
    * Specifies the regions where views can be dropped. Defaults to every region.
    */
-  public readonly regions = input<DropZoneRegion>(undefined, {alias: 'wbViewDropZoneRegions'});
+  public readonly regions = input<DropZoneRegion | false>(undefined, {alias: 'wbViewDropZoneRegions'});
 
   /**
    * Specifies CSS class(es) to add to the drop zone.
@@ -42,18 +42,18 @@ export class ViewDropZoneDirective implements OnInit {
   /**
    * Specifies attribute(s) to add to the drop zone.
    */
-  public readonly attributes = input<{[name: string]: unknown}>(undefined, {alias: 'wbViewDropZoneAttributes'});
+  public readonly attributes = input<{[name: string]: unknown} | undefined>(undefined, {alias: 'wbViewDropZoneAttributes'});
 
   /**
    * Specifies the size of a drop zone region, either as percentage value [0,1] or absolute pixel value.
    */
-  public readonly dropRegionSize = input(.5, {alias: 'wbViewDropZoneRegionSize'});
+  public readonly dropRegionSize = input(.5, {alias: 'wbViewDropZoneRegionSize', transform: (value: number | undefined) => value ?? .5});
 
   /**
    * Specifies the size of the visual placeholder when dragging a view over a drop region.
    * Can be a percentage value [0,1] or absolute pixel value. Defaults to {@link dropRegionSize}.
    */
-  public readonly dropPlaceholderSize = input<number>(undefined, {alias: 'wbViewDropZonePlaceholderSize'});
+  public readonly dropPlaceholderSize = input<number | undefined>(undefined, {alias: 'wbViewDropZonePlaceholderSize'});
 
   /**
    * Notifies when dropping a view.
@@ -216,6 +216,9 @@ export class ViewDropZoneDirective implements OnInit {
    */
   private computeDropZoneRegion(event: DragEvent): Region | null {
     const regions = this.regions() ?? {north: true, east: true, south: true, west: true, center: true};
+    if (!regions) {
+      return null;
+    }
 
     const {width, height, left, top, right, bottom} = this._boundingClientRect();
     const {maxHeight, maxWidth} = this._dropRegionSize();

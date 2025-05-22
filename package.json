@@ -1,6 +1,6 @@
 {
   "name": "scion-workbench",
-  "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel.",
+  "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to display content side-by-side or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel.",
   "license": "EPL-2.0",
   "homepage": "https://github.com/SchweizerischeBundesbahnen/scion-workbench",
   "bugs": {

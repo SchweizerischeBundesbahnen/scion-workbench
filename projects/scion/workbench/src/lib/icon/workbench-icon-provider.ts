@@ -32,6 +32,8 @@ const workbenchIcons: {[icon: string]: string} = {
   'workbench.close': 'close',
   'workbench.dirty': 'dirty',
   'workbench.menu_down': 'chevron_down',
+  'workbench.minimize': 'minimize',
+  'workbench.pin': 'pin',
   'workbench.search': 'search',
 };
 
@@ -45,6 +47,8 @@ const workbenchIcons: {[icon: string]: string} = {
  * - `clear`: Clear button in input fields
  * - `close`: Close button in views, dialogs and notifications
  * - `dirty`: Visual indicator for view with unsaved content
+ * - `minimize`: Minimize button in docked parts
+ * - `pin`: Visual indicator for a pinned view
  * - `search`: Visual indicator in search or filter fields
  */
 @Component({

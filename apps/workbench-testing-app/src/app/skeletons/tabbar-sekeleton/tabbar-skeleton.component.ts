@@ -25,7 +25,7 @@ import {ArrayPipe} from '../array.pipe';
 })
 export class TabbarSkeletonComponent {
 
-  private _active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
+  private readonly _active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   public readonly tabs = input.required<number>();
   public readonly selectedTab = model.required<number>();

@@ -20,6 +20,7 @@ import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-pa
 import {expectDialog} from '../matcher/dialog-matcher';
 import {expectView} from '../matcher/view-matcher';
 import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
+import {MAIN_AREA} from '../workbench.model';
 
 test.describe('Workbench Dialog', () => {
 
@@ -84,7 +85,7 @@ test.describe('Workbench Dialog', () => {
 
       // Open view 1 with dialog.
       const dialogPage = await SizeTestPagePO.openInDialog(appPO);
-      const viewPage1 = new DialogOpenerPagePO(appPO.view({viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()}));
+      const viewPage1 = new DialogOpenerPagePO(appPO.view({viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()}));
 
       await expectDialog(dialogPage).toBeVisible();
       const dialogSize = await dialogPage.getBoundingBox();
@@ -112,16 +113,19 @@ test.describe('Workbench Dialog', () => {
     test('should detach the dialog if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+        .addView('view.100', {partId: 'part.activity-1'})
+        .navigateView('view.100', ['test-dialog-opener'])
+        .activatePart('part.activity-1'),
+      );
+
       // Open view in main area.
       const viewPageInMainArea = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       // Open dialog opener view.
-      const dialogOpenerPage = await workbenchNavigator.openInNewTab(DialogOpenerPagePO);
-
-      // Drag dialog opener view into peripheral area.
-      const dragHandle = await dialogOpenerPage.view.tab.startDrag();
-      await dragHandle.dragToEdge('east');
-      await dragHandle.drop();
+      const dialogOpenerPage = new DialogOpenerPagePO(appPO.view({viewId: 'view.100'}));
 
       // Open dialog.
       await dialogOpenerPage.open('dialog-page', {cssClass: 'testee'});

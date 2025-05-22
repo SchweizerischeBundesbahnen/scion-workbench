@@ -1,25 +1,26 @@
-@if (mainAreaGrid().root | wbGridElementIfVisible; as root) {
-  <wb-grid-element [element]="root"
-                   wbViewDropZone
-                   [wbViewDropZoneRegionSize]="100"
-                   [wbViewDropZonePlaceholderSize]="100"
-                   [wbViewDropZoneRegions]="{
-                     north: false,
-                     south: root | wbRequiresDropZone:'south',
-                     west: root | wbRequiresDropZone:'west',
-                     east: root | wbRequiresDropZone:'east',
-                     center: false,
-                   }"
-                   [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
-                   [wbViewDropZoneAttributes]="{'data-partid': part.id}"
-                   (wbViewDropZoneDrop)="onViewDrop($event)"/>
+@if (mainAreaGrid() | wbGridIfVisible; as grid) {
+  <wb-grid [grid]="grid"
+           [gridDropZone]="{
+             dropRegionSize: 100,
+             dropPlaceholderSize: 100,
+             dropZoneCssClass: [
+               'e2e-grid-drop-zone',
+               'e2e-part-drop-zone'
+             ],
+             dropZoneAttributes: {
+               'data-grid': 'main-area',
+               'data-partid': part.id,
+             }
+           }"
+           [attr.data-grid]="'main-area'"
+           class="e2e-content"/>
 } @else {
-  <sci-viewport class="desktop e2e-part-content"
+  <sci-viewport class="desktop e2e-part-content e2e-content"
                 wbViewDropZone
-                [wbViewDropZoneRegions]="{center: true, north: false, south: false, west: false, east: false}"
+                [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
                 [wbViewDropZoneCssClass]="['e2e-part-drop-zone', 'e2e-desktop-drop-zone']"
                 [wbViewDropZoneAttributes]="{'data-partid': part.id}"
-                (wbViewDropZoneDrop)="onViewDrop($event)">
+                (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
     @if (part.navigation()) {
       <router-outlet [name]="part.id" wbRouterOutletRootContext/>
     } @else if (desktop()) {

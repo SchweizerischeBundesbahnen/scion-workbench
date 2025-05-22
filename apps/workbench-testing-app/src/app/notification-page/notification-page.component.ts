@@ -16,7 +16,7 @@ import {StringifyPipe} from '../common/stringify.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs/operators';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
@@ -28,7 +28,7 @@ import {UUID} from '@scion/toolkit/uuid';
     StringifyPipe,
     SciFormFieldComponent,
     SciViewportComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export class NotificationPageComponent {

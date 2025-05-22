@@ -21,7 +21,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {parseTypedString} from '../common/parse-typed-value.util';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-popup-opener-page',
@@ -35,7 +35,7 @@ import {CssClassComponent} from '../css-class/css-class.component';
     SciAccordionItemDirective,
     SciCheckboxComponent,
     PopupPositionLabelPipe,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class PopupOpenerPageComponent {

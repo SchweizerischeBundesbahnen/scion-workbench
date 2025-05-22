@@ -12,15 +12,6 @@
 }
 
 /**
- * Applies content to peripheral workbench parts, i.e., parts located outside the main area, but only if a main area is present.
- */
-@mixin peripheral-workbench-parts-selector {
-  wb-workbench:has(wb-part[data-partid="part.main-area"]) wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]) & {
-    @content;
-  }
-}
-
-/**
  * Provides styles for an icon button's element states: :hover, :active, and :focus.
  *
  * Supports additional styling or overrides via @content.

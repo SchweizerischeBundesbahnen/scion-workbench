@@ -10,34 +10,53 @@
 
 import {Commands, NavigationData, NavigationState} from '../routing/routing.model';
 import {ActivatedRoute} from '@angular/router';
+import {ActivityId} from '../activity/workbench-activity.model';
+import {Translatable} from '../text/workbench-text-provider.model';
+import {WorkbenchLayoutFactory} from './workbench-layout.factory';
 
 /**
- * The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is
- * displayed in views or parts.
+ * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
+ * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
  *
- * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
- * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
- * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
- * area for user interaction.
+ * A typical workbench application has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to
+ * support the user's workflow.
  *
- * Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time.
- * Perspectives share the same main area, if any.
+ * Multiple layouts, called perspectives, can be created. Users can switch between perspectives. Perspectives share the same main area, if any.
  *
- * The layout is an immutable object that provides methods to modify the layout. Modifications have no
- * side effects. Each modification creates a new layout instance that can be used for further modifications.
+ * The layout has methods for modifying it. The layout is immutable; each modification creates a new instance.
  */
 export interface WorkbenchLayout {
 
   /**
    * Adds a part with the given id to this layout. Position and size are expressed relative to a reference part.
    *
-   * @param id - The id of the part to add.  Use {@link MAIN_AREA} to add the main area.
+   * A part can also be aligned relative to a docked part, enabling inline layouts within docked parts, such as splitting the docked parts into multiple sections.
+   *
+   * @param id - The id of the part to add. Use {@link MAIN_AREA} to add the main area.
    * @param relativeTo - Specifies the reference part to lay out the part.
-   * @param options - Controls how to add the part to the layout.
-   * @param options.activate - Controls whether to activate the part. Defaults to `false`.
+   * @param extras - Controls how to add the part to the layout.
    * @return a copy of this layout with the part added.
    */
-  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout;
+  addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout;
+
+  /**
+   * Adds a part with the given id to this layout, docking it to the specified docking area.
+   *
+   * Docked parts can be minimized to create more space for the main content. Users cannot drag views into or out of docked parts.
+   *
+   * A part can be docked to the left, right, or bottom side of the workbench.
+   * Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, and `bottom-left` and `bottom-right`.
+   * Parts added to the same area are stacked, with only one part active per stack. If there is an active part in both stacks of a side,
+   * the two parts are split vertically or horizontally, depending on the side.
+   *
+   * A docked part may be navigated to display content, have views, or define a layout with multiple parts aligned relative to each other.
+   *
+   * @param id - The id of the part to add.
+   * @param dockTo - Controls to which area to dock the part.
+   * @param extras - Controls how to add the part to the layout.
+   * @return a copy of this layout with the part added.
+   */
+  addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
 
   /**
    * Navigates the specified part based on the provided array of commands and extras.
@@ -96,14 +115,15 @@ export interface WorkbenchLayout {
    * Adds a view to the specified part.
    *
    * @param id - The id of the view to add.
-   * @param options - Controls how to add the view to the layout.
-   * @param options.partId - References the part to which to add the view.
-   * @param options.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
-   * @param options.activateView - Controls whether to activate the view. Defaults to `false`.
-   * @param options.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
+   * @param extras - Controls how to add the view to the layout.
+   * @param extras.partId - References the part to which to add the view.
+   * @param extras.position - Specifies the position where to insert the view. The position is zero-based. Defaults to `end`.
+   * @param extras.activateView - Controls whether to activate the view. Defaults to `false`.
+   * @param extras.activatePart - Controls whether to activate the part that contains the view. Defaults to `false`.
+   * @param extras.cssClass - Specifies CSS class(es) to add to the view, e.g., to locate the view in tests.
    * @return a copy of this layout with the view added.
    */
-  addView(id: string, options: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
+  addView(id: string, extras: {partId: string; position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean; cssClass?: string | string[]}): WorkbenchLayout;
 
   /**
    * Navigates the specified view based on the provided array of commands and extras.
@@ -237,14 +257,104 @@ export interface ReferencePart {
 }
 
 /**
- * Identifies the part that represents the main area.
+ * Controls the appearance and behavior of a part.
+ */
+export interface PartExtras {
+  /**
+   * Title displayed in the part bar.
+   */
+  title?: Translatable;
+  /**
+   * Specifies CSS class(es) to add to the part, e.g., to locate the part in tests.
+   */
+  cssClass?: string | string[];
+  /**
+   * Controls whether to activate the part. Defaults to `false`.
+   */
+  activate?: boolean;
+}
+
+/**
+ * Controls the appearance and behavior of a docked part.
+ *
+ * A docked part is a part that is docked to the left, right, or bottom side of the workbench.
+ * Docked parts can be minimized to create more space for the main content. Users cannot drag
+ * views into or out of docked parts.
+ */
+export interface DockedPartExtras {
+  /**
+   * Icon (key) of the toggle button in the sidebar, used to open or close the docked part.
+   *
+   * The actual icon is resolved through an {@link WorkbenchIconProviderFn} registered in {@link WorkbenchConfig.iconProvider}.
+   *
+   * If no icon provider is configured, the icon defaults to a Material Icon font ligature. The default icon provider requires
+   * the application to include the Material icon font, for example in `styles.scss`, as follows:
+   *
+   * ```scss
+   * @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded');
+   * ```
+   *
+   * The application can then reference icons from the Material Icons Font: https://fonts.google.com/icons
+   */
+  icon: string;
+  /**
+   * Label of the toggle button in the sidebar.
+   */
+  label: Translatable;
+  /**
+   * Tooltip displayed when hovering over the toggle button in the sidebar.
+   */
+  tooltip?: Translatable;
+  /**
+   * Title displayed in the part bar.
+   *
+   * If not provided, defaults to {@link DockedPartExtras.label}. Set to `false` to not display a title.
+   */
+  title?: Translatable | false;
+  /**
+   * CSS class(es) to add to the docked part and its toggle button, e.g., to locate the part in tests.
+   */
+  cssClass?: string | string[];
+  /**
+   * Internal identifier for the docked part.
+   *
+   * @docs-private Not public API, intended for internal use only.
+   */
+  ɵactivityId?: ActivityId;
+}
+
+/**
+ * A part can be docked to the left, right, or bottom side of the workbench.
+ *
+ * Each side has two docking areas: `left-top` and `left-bottom`, `right-top` and `right-bottom`, and `bottom-left` and `bottom-right`.
+ * Parts added to the same area are stacked, with only one part active per stack. If there is an active part in both stacks of a side,
+ * the two parts are split vertically or horizontally, depending on the side.
+ */
+export interface DockingArea {
+  /**
+   * Controls where to dock a part.
+   * - `left-top`: Dock to the top on the left side.
+   * - `left-bottom`: Dock to the bottom on the left side.
+   * - `right-top`: Dock to the top on the right side.
+   * - `right-bottom`: Dock to the bottom on the right side.
+   * - `bottom-left`: Dock to the left on the bottom side.
+   * - `bottom-right`: Dock to the right on the bottom side.
+   */
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+}
+
+/**
+ * Identifies the main area part in the workbench layout.
  *
  * Refer to this part to align parts relative to the main area.
+ *
+ * The main area is a special part that can be added to the layout. The main area is where the workbench opens new views by default.
+ * It is shared between perspectives and its layout is not reset when resetting perspectives.
  */
 export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
- * Represents the type of the constant {@link MAIN_AREA}.
+ * Represents the type of the {@link MAIN_AREA} constant.
  */
 export type MAIN_AREA = 'part.main-area';
 
@@ -254,3 +364,162 @@ export type MAIN_AREA = 'part.main-area';
  * @see MAIN_AREA
  */
 export const MAIN_AREA_ALTERNATIVE_ID = 'main-area';
+
+/**
+ * Contains different versions of a workbench layout.
+ *
+ * The M-prefix indicates this object is a model object that is serialized and stored, requiring migration on breaking change.
+ */
+export interface MWorkbenchLayout {
+  /**
+   * Layout before any user personalization (initial layout).
+   */
+  referenceLayout: {
+    /**
+     * @see WorkbenchLayoutSerializer.serializeGrids
+     * @see WorkbenchLayoutSerializer.deserializeGrid
+     */
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    /**
+     * @see WorkbenchLayoutSerializer.serializeActivityLayout
+     */
+    activityLayout: string;
+    /**
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
+     */
+    outlets: string;
+  };
+  /**
+   * Layout personalized by the user.
+   */
+  userLayout: {
+    /**
+     * @see WorkbenchLayoutSerializer.serializeGrids
+     * @see WorkbenchLayoutSerializer.deserializeGrid
+     */
+    grids: {
+      main: string;
+      [activityId: ActivityId]: string;
+    };
+    /**
+     * @see WorkbenchLayoutSerializer.serializeActivityLayout
+     */
+    activityLayout: string;
+    /**
+     * @see WorkbenchLayoutSerializer.serializeOutlets
+     * @see WorkbenchLayoutSerializer.deserializeOutlets
+     */
+    outlets: string;
+  };
+}
+
+/**
+ * Signature of a function to provide a workbench layout.
+ *
+ * The workbench will invoke this function with a factory object to create the layout. The layout is immutable; each modification creates a new instance.
+ *
+ * The function can call `inject` to get any required dependencies.
+ *
+ * ## Workbench Layout
+ * The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
+ * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
+ *
+ * The layout typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support
+ * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
+ * Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives.
+
+ * ## Steps to create the layout
+ * Start by adding parts to the layout. Parts can be docked to a specific area (`left-top`, `left-bottom`, `right-top`, `right-bottom`, `bottom-left`, `bottom-right`)
+ * or aligned relative to each other. Views can be added to any part except the main area part. To display content, navigate parts and views to registered routes.
+ *
+ * To maintain a clean URL, we recommend navigating the parts and views to empty path routes and using a navigation hint for differentiation.
+ * - Use the `canMatchWorkbenchPart` guard to match a route for a part navigated with a particular hint.
+ * - Use the `canMatchWorkbenchView` guard to match a route for a view navigated with a particular hint.
+ *
+ * ## Example
+ * The following example defines a layout with a main area and four parts docked to the side:
+ *
+ * ```plain
+ * +------+-----------+------+
+ * |      |           |      |
+ * |      |           |      |
+ * | left | main area | right|
+ * |      |           |      |
+ * |      |           |      |
+ * +------+-----------+------+
+ * |          bottom         |
+ * +-------------------------+
+ * ```
+ *
+ * ```ts
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideWorkbench({
+ *       layout: (factory: WorkbenchLayoutFactory) => factory
+ *         // Add parts to dock areas on the side.
+ *         .addPart(MAIN_AREA)
+ *         .addPart('navigator', {dockTo: 'left-top'}, {label: 'Navigator', icon: 'folder'})
+ *         .addPart('find', {dockTo: 'bottom-left'}, {label: 'Find', icon: 'search'})
+ *         .addPart('inventory', {dockTo: 'right-top'}, {label: 'Inventory', icon: 'inventory'})
+ *         .addPart('notifications', {dockTo: 'right-bottom'}, {label: 'Notifications', icon: 'notifications'})
+ *
+ *         // Add views to parts.
+ *         .addView('find1', {partId: 'find'})
+ *         .addView('find2', {partId: 'find'})
+ *         .addView('find3', {partId: 'find'})
+ *
+ *         // Navigate the main area to display a welcome page.
+ *         .navigatePart(MAIN_AREA, [], {hint: 'welcome'})
+ *
+ *         // Navigate parts to display content.
+ *         .navigatePart('navigator', [], {hint: 'navigator'})
+ *         .navigatePart('inventory', ['path/to/inventory'])
+ *         .navigatePart('notifications', [], {hint: 'notifications'})
+ *
+ *         // Navigate views to display content.
+ *         .navigateView('find1', ['path/to/find'])
+ *         .navigateView('find2', ['path/to/find'])
+ *         .navigateView('find3', ['path/to/find'])
+ *
+ *         // Activate parts to open docked parts.
+ *         .activatePart('navigator')
+ *         .activatePart('find')
+ *         .activatePart('inventory'),
+ *     }),
+ *   ],
+ * });
+ * ```
+ *
+ * The layout requires the following routes.
+ *
+ * ```ts
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {provideRouter} from '@angular/router';
+ * import {canMatchWorkbenchView, canMatchWorkbenchPart} from '@scion/workbench';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideRouter([
+ *      // Route for the "MAIN_AREA Part"
+ *       {path: '', canMatch: [canMatchWorkbenchPart('welcome')], loadComponent: () => import('./welcome/welcome.component')},
+ *       // Route for the "Navigator Part"
+ *       {path: '', canMatch: [canMatchWorkbenchPart('navigator')], loadComponent: () => import('./navigator/navigator.component')},
+ *       // Route for the "Find View"
+ *       {path: 'path/to/find', loadComponent: () => import('./find/find.component')},
+ *       // Route for the "Inventory Part"
+ *       {path: 'path/to/inventory', loadComponent: () => import('./inventory/inventory.component')},
+ *       // Route for the "Notifications Part"
+ *       {path: '', canMatch: [canMatchWorkbenchPart('notifications')], loadComponent: () => import('./notifications/notifications.component')},
+ *     ]),
+ *   ],
+ * });
+ * ```
+ */
+export type WorkbenchLayoutFn = (factory: WorkbenchLayoutFactory) => Promise<WorkbenchLayout> | WorkbenchLayout;

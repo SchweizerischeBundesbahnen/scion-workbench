@@ -8,10 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostListener, inject, Injector, input, NgZone, Signal} from '@angular/core';
-import {fromEvent, merge, withLatestFrom} from 'rxjs';
+import {Component, computed, ElementRef, HostListener, inject, Injector, input, Signal} from '@angular/core';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {map} from 'rxjs/operators';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
@@ -20,15 +18,13 @@ import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {ViewMenuService} from '../view-context-menu/view-menu.service';
 import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
-import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
-import {subscribeIn} from '@scion/toolkit/operators';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
 import {synchronizeCssClasses} from '../../common/css-class.util';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
+import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -60,8 +56,8 @@ export class ViewTabComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-  private readonly _router = inject(ɵWorkbenchRouter);
   private readonly _viewMenuService = inject(ViewMenuService);
+  private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef).nativeElement as HTMLElement;
@@ -73,7 +69,6 @@ export class ViewTabComponent {
   protected readonly viewTitleOffsetRight = computed(() => this.view().closable() ? '1.5rem' : undefined); // offset for the title to not overlap the close button
 
   constructor() {
-    this.installMaximizeListener();
     this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
@@ -144,6 +139,7 @@ export class ViewTabComponent {
       viewTitleOffsetRight: this.viewTitleOffsetRight(),
       workbenchId: this._workbenchId,
       classList: view.classList.asMap(),
+      activityId: this._layout().activity({viewId: view.id}, {orElse: null})?.id,
     });
 
     if (!view.active()) {
@@ -154,33 +150,6 @@ export class ViewTabComponent {
   @HostListener('dragend')
   protected onDragEnd(): void {
     this.viewDragService.unsetViewDragData();
-  }
-
-  /**
-   * Listens for 'dblclick' events to maximize or minimize the main area.
-   *
-   * Note that the listener is not activated until the mouse is moved. Otherwise, closing successive
-   * views (if they have different tab widths) could result in unintended maximization or minimization.
-   */
-  private installMaximizeListener(): void {
-    const zone = inject(NgZone);
-    const enabled$ = merge(fromEvent<Event>(this.host, 'mouseenter'), fromEvent<Event>(this.host, 'mousemove'), fromEvent<Event>(this.host, 'mouseleave'))
-      .pipe(
-        subscribeIn(fn => zone.runOutsideAngular(fn)),
-        map(event => event.type === 'mousemove'), // the 'mousemove' event arms the listener
-      );
-
-    fromEvent<Event>(this.host, 'dblclick')
-      .pipe(
-        withLatestFrom(enabled$),
-        takeUntilDestroyed(),
-      )
-      .subscribe(([event, enabled]) => {
-        event.stopPropagation(); // prevent `PartBarComponent` handling the dblclick event which would undo maximization/minimization
-        if (enabled && this.view().part().isInMainArea) {
-          void this._router.navigate(layout => layout.toggleMaximized());
-        }
-      });
   }
 
   private addHostCssClasses(): void {
