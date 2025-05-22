@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, Injector} from '@angular/core';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 import {MWorkbenchLayoutV4} from './model/workbench-layout-migration-v4.model';
 import {MWorkbenchLayoutV5} from './model/workbench-layout-migration-v5.model';
@@ -25,7 +25,7 @@ import {WorkbenchLayoutSerializer} from '../workench-layout-serializer.service';
 export class WorkbenchLayoutMigrationV5 implements WorkbenchMigration {
 
   private readonly _workbenchLayoutFactory = inject(ɵWorkbenchLayoutFactory);
-  private readonly _workbenchLayoutSerializer = inject(WorkbenchLayoutSerializer);
+  private readonly _injector = inject(Injector);
 
   public migrate(json: string): string {
     const oldViewId = /^view\.\d+$/;
@@ -55,16 +55,17 @@ export class WorkbenchLayoutMigrationV5 implements WorkbenchMigration {
       }
     });
 
+    const workbenchSerializer = this._injector.get(WorkbenchLayoutSerializer);
     const workbenchLayoutV5: MWorkbenchLayoutV5 = {
       userLayout: {
-        grids: this._workbenchLayoutSerializer.serializeGrids(userLayoutV4.grids),
-        activityLayout: this._workbenchLayoutSerializer.serializeActivityLayout(userLayoutV4.activityLayout),
-        outlets: this._workbenchLayoutSerializer.serializeOutlets(userLayoutV4.outlets({mainGrid: true, activityGrids: true})),
+        grids: workbenchSerializer.serializeGrids(userLayoutV4.grids),
+        activityLayout: workbenchSerializer.serializeActivityLayout(userLayoutV4.activityLayout),
+        outlets: workbenchSerializer.serializeOutlets(userLayoutV4.outlets({mainGrid: true, activityGrids: true})),
       },
       referenceLayout: {
-        grids: this._workbenchLayoutSerializer.serializeGrids(referenceLayoutV4.grids),
-        activityLayout: this._workbenchLayoutSerializer.serializeActivityLayout(referenceLayoutV4.activityLayout),
-        outlets: this._workbenchLayoutSerializer.serializeOutlets(referenceLayoutV4.outlets({mainGrid: true, activityGrids: true})),
+        grids: workbenchSerializer.serializeGrids(referenceLayoutV4.grids),
+        activityLayout: workbenchSerializer.serializeActivityLayout(referenceLayoutV4.activityLayout),
+        outlets: workbenchSerializer.serializeOutlets(referenceLayoutV4.outlets({mainGrid: true, activityGrids: true})),
       },
     };
     return JSON.stringify(workbenchLayoutV5);
