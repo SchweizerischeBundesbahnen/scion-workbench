@@ -68,7 +68,7 @@ export class WorkbenchThemeSwitcher {
     fromMutation$(documentRoot, {attributeFilter: ['sci-theme']})
       .pipe(
         subscribeOn(animationFrameScheduler), // ensure styles of theme to be applied when reading computed styles
-        map(() => documentRoot.getAttribute('sci-theme') ?? (getComputedStyle(documentRoot).getPropertyValue('--sci-theme') || null)), // fall back to OS preference when removing `sci-theme` attribute
+        map(() => getComputedStyle(documentRoot).getPropertyValue('--sci-theme') || null),
         takeUntilDestroyed(),
       )
       .subscribe(theme => {
