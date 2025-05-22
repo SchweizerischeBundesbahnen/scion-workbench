@@ -10,6 +10,7 @@
 
 import {Navigation} from '@angular/router';
 import {NavigationStates} from './routing.model';
+import {ActivityId} from '../activity/workbench-activity.model';
 
 /**
  * Provides methods to associate {@link WorkbenchNavigationalState} with a navigation.
@@ -38,19 +39,26 @@ export const WorkbenchNavigationalStates = {
  */
 export interface WorkbenchNavigationalState {
   /**
-   * Serialized workbench grid.
-   *
-   * Note: The main area grid is not passed as navigational state, but as query parameter {@link MAIN_AREA_LAYOUT_QUERY_PARAM}.
+   * Arrangement of parts and views.
    */
-  workbenchGrid: string;
+  grids: {
+    /**
+     * Serialized main grid.
+     */
+    main: string;
+    /**
+     * Serialized activity grids.
+     */
+    [activityId: ActivityId]: string;
+  };
+  /**
+   * Arrangement of activities.
+   */
+  activityLayout: string;
   /**
    * Identifies the perspective that is navigated.
    */
-  perspectiveId?: string | undefined;
-  /**
-   * Indicates whether to maximize the main area.
-   */
-  maximized: boolean;
+  perspectiveId?: string;
   /**
    * Provides navigation state of views contained in the workbench layout.
    */

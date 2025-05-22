@@ -9,7 +9,7 @@
  */
 
 import {Component, computed, inject, input, Signal, untracked} from '@angular/core';
-import {MPart, MTreeNode} from '../workbench-layout.model';
+import {MPart, MTreeNode} from '../workbench-grid.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';
@@ -17,6 +17,7 @@ import {PortalModule} from '@angular/cdk/portal';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {WorkbenchLayouts} from '../workbench-layouts.util';
+import {NullContentComponent} from '../../null-content/null-content.component';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -37,6 +38,7 @@ import {WorkbenchLayouts} from '../workbench-layouts.util';
     PartPortalPipe,
     SciSashboxComponent,
     SciSashDirective,
+    NullContentComponent,
   ],
   host: {
     '[attr.data-parentnodeid]': 'element().parent?.id',
@@ -62,10 +64,10 @@ export class GridElementComponent {
     this._workbenchLayoutService.signalResizing(true);
   }
 
-  protected onSashEnd(treeNode: MTreeNode, [sashSize1, sashSize2]: number[]): void {
-    const ratio = sashSize1 / (sashSize1 + sashSize2);
+  protected onSashEnd(treeNode: MTreeNode, {sash1, sash2}: {[sashKey: string]: number}): void {
+    const ratio = sash1! / (sash1! + sash2!);
     this._workbenchLayoutService.signalResizing(false);
-    void this._workbenchRouter.navigate(layout => layout.setSplitRatio(treeNode.id, ratio));
+    void this._workbenchRouter.navigate(layout => layout.setTreeNodeSplitRatio(treeNode.id, ratio));
   }
 
   private computeChildren(): Signal<ChildElement[]> {

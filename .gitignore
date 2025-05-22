@@ -46,3 +46,7 @@ Thumbs.db
 
 # lib source
 /src-lib
+
+# Draw.io
+*.bkp
+*.dtmp

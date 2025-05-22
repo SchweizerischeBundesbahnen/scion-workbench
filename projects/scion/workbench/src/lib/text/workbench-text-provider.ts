@@ -58,11 +58,15 @@ const workbenchTexts: Record<string, string> = {
   'workbench.close_tabs_to_the_left.action': 'Close Tabs to the Left',
   'workbench.close_tabs_to_the_right.action': 'Close Tabs to the Right',
   'workbench.close.tooltip': 'Close',
+  'workbench.dev_mode_only_hint.tooltip': 'This hint is only displayed in dev mode.',
+  'workbench.minimize.tooltip': 'Minimize',
   'workbench.move_tab_down.action': 'Move Down',
   'workbench.move_tab_to_new_window.action': 'Move to New Window',
   'workbench.move_tab_to_the_left.action': 'Move Left',
   'workbench.move_tab_to_the_right.action': 'Move Right',
   'workbench.move_tab_up.action': 'Move Up',
+  'workbench.null_content.message': 'Nothing to show.',
+  'workbench.null_view_developer_hint.message': 'This view has not been navigated.<br>Navigate the view "{{view}}" to display content.',
   'workbench.ok.action': 'OK',
   'workbench.page_not_found.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try to open the page again.',
   'workbench.page_not_found.title': 'Page Not Found',
@@ -77,7 +81,7 @@ const workbenchTexts: Record<string, string> = {
  */
 export const workbenchTextProvider: WorkbenchTextProviderFn = (key: string, params: Record<string, string>): string | undefined => {
   // Get the text.
-  const text = workbenchTexts[key] as string | undefined;
+  const text = workbenchTexts[key];
   if (text === undefined) {
     return undefined;
   }

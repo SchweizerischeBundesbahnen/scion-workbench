@@ -103,7 +103,7 @@ export class NotificationService {
 
     // Reduce the notification's input, if specified a reducer.
     if (config.groupInputReduceFn) {
-      config.componentInput = config.groupInputReduceFn(notifications[index].input, config.componentInput);
+      config.componentInput = config.groupInputReduceFn(notifications[index]!.input, config.componentInput);
     }
 
     return {

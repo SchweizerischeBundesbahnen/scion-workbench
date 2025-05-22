@@ -9,7 +9,7 @@
  * This version is appended to the HTTP request as query parameter when fetching the icon font to support cache busting.
  * Update this version when adding, removing or changing icons.
  */
-$-version: 2;
+$-version: 3;
 
 $-default-icon-font-config: (
   // The font path must be root relative or excluded from the application build. Otherwise, the application build will fail

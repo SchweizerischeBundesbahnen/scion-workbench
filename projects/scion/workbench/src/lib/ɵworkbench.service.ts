@@ -15,7 +15,7 @@ import {WorkbenchService} from './workbench.service';
 import {WorkbenchRouter} from './routing/workbench-router.service';
 import {WORKBENCH_VIEW_REGISTRY} from './view/workbench-view.registry';
 import {WorkbenchPerspectiveService} from './perspective/workbench-perspective.service';
-import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
+import {WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
 import {WORKBENCH_PART_REGISTRY} from './part/workbench-part.registry';
 import {ɵWorkbenchView} from './view/ɵworkbench-view.model';
 import {ɵWorkbenchPart} from './part/ɵworkbench-part.model';
@@ -24,7 +24,6 @@ import {WORKBENCH_PERSPECTIVE_REGISTRY} from './perspective/workbench-perspectiv
 import {WORKBENCH_PART_ACTION_REGISTRY} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
 import {ViewId} from './view/workbench-view.model';
-import {ɵWorkbenchLayout} from './layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
@@ -40,25 +39,18 @@ export class ɵWorkbenchService implements WorkbenchService {
   private readonly _viewMenuItemRegistry = inject(WORKBENCH_VIEW_MENU_ITEM_REGISTRY);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _perspectiveService = inject(WorkbenchPerspectiveService);
-  private readonly _layoutService = inject(WorkbenchLayoutService);
 
-  public readonly layout: Signal<ɵWorkbenchLayout>;
-  public readonly perspectives: Signal<ɵWorkbenchPerspective[]>;
-  public readonly parts: Signal<ɵWorkbenchPart[]>;
-  public readonly views: Signal<ɵWorkbenchView[]>;
-  public readonly activePerspective: Signal<WorkbenchPerspective | undefined>;
+  public readonly layout = inject(WorkbenchLayoutService).layout;
+  public readonly perspectives = inject(WORKBENCH_PERSPECTIVE_REGISTRY).objects;
+  public readonly parts = inject(WORKBENCH_PART_REGISTRY).objects;
+  public readonly views = inject(WORKBENCH_VIEW_REGISTRY).objects;
+  public readonly activePerspective = inject(WorkbenchPerspectiveService).activePerspective;
   public readonly theme = this.computeLegacyThemeObject();
   public readonly settings = {
     theme: inject(WorkbenchThemeSwitcher).theme,
+    panelAlignment: inject(WorkbenchLayoutService).panelAlignment,
+    panelAnimation: inject(WorkbenchLayoutService).panelAnimation,
   };
-
-  constructor() {
-    this.layout = this._layoutService.layout;
-    this.perspectives = this._perspectiveRegistry.objects;
-    this.parts = this._partRegistry.objects;
-    this.views = this._viewRegistry.objects;
-    this.activePerspective = this._perspectiveService.activePerspective;
-  }
 
   /** @inheritDoc */
   public getPerspective(perspectiveId: string): ɵWorkbenchPerspective | null {

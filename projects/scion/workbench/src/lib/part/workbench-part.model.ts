@@ -16,9 +16,10 @@ import {NavigationData, NavigationState} from '../routing/routing.model';
 import {UrlSegment} from '@angular/router';
 
 /**
- * Represents a part of the workbench layout.
+ * A part is a visual workbench element to create the workbench layout. Parts can be docked to the side or
+ * positioned relative to each other. A part can be a stack of views or display content.
  *
- * A part is a stack of views that can be arranged in the workbench layout.
+ * The part component can inject this handle to interact with the part.
  *
  * @see WorkbenchView
  */
@@ -40,9 +41,32 @@ export abstract class WorkbenchPart {
   public abstract readonly alternativeId: string | undefined;
 
   /**
-   * Indicates whether this part is located in the main area.
+   * Title displayed in the part bar.
+   *
+   * Note that the title of the top-leftmost part of a docked part cannot be changed.
+   */
+  public abstract get title(): Signal<string | undefined>;
+  public abstract set title(title: string | undefined);
+
+  /**
+   * Indicates whether this part is located in the workbench main area.
    */
   public abstract readonly isInMainArea: boolean;
+
+  /**
+   * Indicates whether this part is located in the workbench peripheral area.
+   */
+  public abstract readonly peripheral: Signal<boolean>;
+
+  /**
+   * Indicates whether this part is the top-leftmost part.
+   */
+  public abstract readonly topLeft: Signal<boolean>;
+
+  /**
+   * Indicates whether this part is the top-rightmost part.
+   */
+  public abstract readonly topRight: Signal<boolean>;
 
   /**
    * Indicates whether this part is active or inactive.

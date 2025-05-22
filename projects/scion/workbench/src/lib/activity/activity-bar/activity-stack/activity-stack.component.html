@@ -1,0 +1,3 @@
+@for (activity of stack().activities; track activity.id) {
+  <wb-activity-item [activity]="activity" [active]="stack().activeActivityId === activity.id"/>
+}

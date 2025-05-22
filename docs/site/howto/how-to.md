@@ -1,7 +1,7 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > How To Guides
 
@@ -16,9 +16,8 @@ We are working on a comprehensive guide that explains the features and concepts 
 - [How to start the SCION Workbench](how-to-start-workbench.md)
 
 #### Workbench Layout
-- [How to define the initial workbench layout](how-to-define-initial-layout.md)
+- [How to define the workbench layout](how-to-define-layout.md)
 - [How to modify the workbench layout](how-to-modify-layout.md)
-- [How to provide a perspective](how-to-provide-perspective.md)
 - [How to customize the workbench layout](how-to-customize-layout.md)
 - [How to work with perspectives](how-to-perspective.md)
 
@@ -47,7 +46,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 #### Miscellaneous
 - [How to theme the SCION Workbench](how-to-theme-workbench.md)
 - [How to localize the SCION Workbench](how-to-localize.md)
-- [How to customize icons in the SCION Workbench](how-to-icons.md)
+- [How to change icons in the SCION Workbench](how-to-icons.md)
 
 ***
 

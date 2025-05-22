@@ -17,7 +17,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-dialog-opener-page',
@@ -28,7 +28,7 @@ import {CssClassComponent} from '../css-class/css-class.component';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class DialogOpenerPageComponent {

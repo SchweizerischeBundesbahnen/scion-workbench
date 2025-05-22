@@ -23,6 +23,10 @@
     <input class="e2e-heading" [ngModel]="view().heading()" (ngModelChange)="view().heading = $event">
   </sci-form-field>
 
+  <sci-form-field label="Part Title">
+    <input class="e2e-part-title" [ngModel]="view().part().title()" (ngModelChange)="onPartTitleChange($event)" [attr.list]="partTitleList">
+  </sci-form-field>
+
   <sci-form-field label="Navigation Hint">
     <span class="e2e-navigation-hint">{{view().navigation()?.hint}}</span>
   </sci-form-field>
@@ -64,3 +68,7 @@
 <ng-template wbDialogAction>
   <button (click)="onClose()">Close</button>
 </ng-template>
+
+<datalist [attr.id]="partTitleList">
+  <option value="<undefined>">&lt;undefined&gt;</option>
+</datalist>

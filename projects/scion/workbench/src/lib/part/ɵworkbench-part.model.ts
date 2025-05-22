@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked} from '@angular/core';
+import {assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
@@ -24,36 +24,48 @@ import {WORKBENCH_PART_ACTION_REGISTRY} from './workbench-part-action.registry';
 import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
+import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
+import {MActivity} from '../activity/workbench-activity.model';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
   private readonly _partEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
+  private readonly _title = signal<string | undefined>(undefined);
+  private readonly _titleComputed = this.computeTitle();
 
   public readonly alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
   public readonly active = signal(false);
   public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
   public readonly activeViewId = signal<ViewId | null>(null);
+  public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
+  public readonly peripheral = signal(false);
+  public readonly topLeft = signal(false);
+  public readonly topRight = signal(false);
+  public readonly activity = signal<MActivity | null>(null);
+  public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
+
+  private _isInMainArea: boolean | undefined;
+  private _activationInstant: number | undefined;
 
   /**
    * Reference to the HTML element of {@link PartComponent} or {@link MainAreaPartComponent}.
    */
   public partComponent: HTMLElement | undefined;
 
-  private _isInMainArea: boolean | undefined;
-  private _activationInstant: number | undefined;
-
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
     this.alternativeId = layout.part({partId: this.id}).alternativeId;
     this._partComponent = options.component;
+    this.gridName = signal(layout.grid({partId: id}).gridName);
     this.actions = this.computePartActions();
     this.touchOnActivate();
     this.installModelUpdater();
@@ -86,10 +98,17 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
     const mPart = layout.part({partId: this.id});
-    const active = layout.activePart({grid: this._isInMainArea ? 'mainArea' : 'workbench'})?.id === this.id;
-    this.active.set(active);
+    const {gridName, grid} = layout.grid({partId: this.id});
+    this.gridName.set(gridName);
+    this.peripheral.set(layout.isPeripheralPart(this.id));
+    this.active.set(grid.activePartId === this.id);
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
+    this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
+    this.topLeft.set(isTopLeft(grid.root, layout.part({partId: this.id})));
+    this.topRight.set(isTopRight(grid.root, layout.part({partId: this.id})));
+
+    this.classList.layout = mPart.cssClass;
 
     // Test if a new route has been activated for this part.
     const routeChanged = route && route.routeConfig !== previousRoute?.routeConfig;
@@ -112,6 +131,30 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     }
   }
 
+  private computeTitle(): Signal<string | undefined> {
+    return computed(() => {
+      const activity = this.activity();
+
+      // If this part is not contained in an activity, return the title from the handle or layout.
+      if (!activity) {
+        return this._title() ?? this._layout().part({partId: this.id}).title;
+      }
+
+      // If this part is the top-leftmost part, return the activity title set on the layout.
+      if (this.topLeft()) {
+        return this._layout().part({partId: activity.referencePartId}).title;
+      }
+
+      // If this part is the reference part but not positioned top-leftmost, only return the handle's title, not the activity title set on the layout.
+      if (this.id === activity.referencePartId) {
+        return this._title();
+      }
+
+      // Default to the title set on the handle or defined on the layout.
+      return this._title() ?? this._layout().part({partId: this.id}).title;
+    });
+  }
+
   /**
    * Returns the component of this part. Returns `null` if not displaying navigated content.
    */
@@ -131,7 +174,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       return true;
     }
 
-    const currentLayout = this._workbenchLayoutService.layout();
+    const currentLayout = this._layout();
     return this._workbenchRouter.navigate(
       layout => currentLayout === layout ? layout.activatePart(this.id) : null, // cancel navigation if the layout has become stale
       {skipLocationChange: true}, // do not add part activation into browser history stack
@@ -142,6 +185,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     return this._activationInstant;
   }
 
+  /** @inheritDoc */
   public get isInMainArea(): boolean {
     return this._isInMainArea ?? false;
   }
@@ -151,6 +195,16 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    */
   public get injector(): Injector {
     return this._partEnvironmentInjector;
+  }
+
+  /** @inheritDoc */
+  public get title(): Signal<string | undefined> {
+    return this._titleComputed;
+  }
+
+  /** @inheritDoc */
+  public set title(title: string | undefined) {
+    untracked(() => this._title.set(title));
   }
 
   /** @inheritDoc */
@@ -240,6 +294,35 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
     }
   }
+}
+
+/**
+ * Tests if this part is the top-leftmost part.
+ */
+function isTopLeft(element: MTreeNode | MPart, testee: MPart): boolean {
+  if (element instanceof MPart) {
+    return element.id === testee.id;
+  }
+
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
+  return isTopLeft(child1Visible ? element.child1 : element.child2, testee);
+}
+
+/**
+ * Tests if this part is the top-rightmost part.
+ */
+function isTopRight(element: MTreeNode | MPart, testee: MPart): boolean {
+  if (element instanceof MPart) {
+    return element.id === testee.id;
+  }
+
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(element.child2);
+
+  if (child1Visible && child2Visible) {
+    return element.direction === 'column' ? isTopRight(element.child1, testee) : isTopRight(element.child2, testee);
+  }
+  return isTopRight(child1Visible ? element.child1 : element.child2, testee);
 }
 
 /**

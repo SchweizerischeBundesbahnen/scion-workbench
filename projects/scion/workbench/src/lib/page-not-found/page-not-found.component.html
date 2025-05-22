@@ -9,5 +9,6 @@
 
 @if (isDevMode) {
   @let hint = '%workbench.page_not_found_developer_hint.message' | wbText;
-  <section class="developer-hint">{{hint()}}</section>
+  @let tooltip = '%workbench.dev_mode_only_hint.tooltip' | wbText;
+  <section class="developer-hint" [title]="tooltip()">{{hint()}}</section>
 }

@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sci-workbench-activity-item-gap);
+  user-select: none;
+  padding: var(--sci-workbench-activity-bar-padding);
+  background-color: var(--sci-workbench-activity-bar-background-color);
+
+  &[data-align="left"] {
+    border-right: 1px solid var(--sci-color-border);
+  }
+
+  &[data-align="right"] {
+    border-left: 1px solid var(--sci-color-border);
+  }
+
+  > wb-activity-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  > hr {
+    all: unset;
+    height: 1px;
+    width: 24px;
+    align-self: center;
+    background-color: var(--sci-color-border);
+    border-radius: var(--sci-corner);
+  }
+
+  > div.filler {
+    flex: auto;
+  }
+}

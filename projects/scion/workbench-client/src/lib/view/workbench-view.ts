@@ -12,10 +12,11 @@ import {Observable} from 'rxjs';
 import {WorkbenchViewCapability} from './workbench-view-capability';
 
 /**
- * Handle to interact with a view opened via {@link WorkbenchRouter}.
+ * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.
  *
- * The view microfrontend can inject this handle to interact with the view, such as setting the title,
- * reading parameters, or closing it.
+ * Users can drag views from one part to another, even across windows, or place them side-by-side, horizontally and vertically.
+ *
+ * The view microfrontend can inject this handle to interact with the view.
  *
  * @category View
  * @see WorkbenchViewCapability

@@ -12,7 +12,8 @@ import {Locator} from '@playwright/test';
 import {ExpectationResult} from './custom-matchers.definition';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
-import {PartId, ViewId} from '@scion/workbench';
+import {ActivityId, PartId, ViewId} from '@scion/workbench';
+import {SASHBOX_SPLITTER_SIZE} from '../workbench/workbench-layout-constants';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -32,29 +33,253 @@ export async function toEqualWorkbenchLayout(locator: Locator, expected: Expecte
  * Asserts expected workbench layout.
  */
 async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator: Locator): Promise<void> {
-  // Assert the workbench grid plus the main area grid if expected.
-  if (expected.workbenchGrid) {
-    await assertGridElement(expected.workbenchGrid.root, locator.locator('wb-workbench-layout > wb-grid-element:not([data-parentnodeid])'), expected);
+  // Assert activity layout.
+  if (expected.activityLayout) {
+    await assertActivityToolbars(expected.activityLayout, locator);
+    await assertActivityPanels(expected.activityLayout, locator);
   }
-  // Assert only the main area grid, but not the workbench grid since not expected.
-  else if (expected.mainAreaGrid) {
-    await assertGridElement(expected.mainAreaGrid.root, locator.locator('wb-part[data-partid="part.main-area"] > wb-grid-element'), expected);
+  // Assert activity grids.
+  for (const [activityId, grid] of Object.entries(pickActivityGrids(expected.grids))) {
+    await assertGridElement(grid.root, locator.locator(`wb-layout wb-activity-panel wb-grid[data-grid="${activityId}"] > wb-grid-element`), expected.grids!);
+  }
+  // Assert the main grid plus the main area grid if expected.
+  if (expected.grids?.main) {
+    await assertGridElement(expected.grids.main.root, locator.locator('wb-layout wb-grid[data-grid="main"] > wb-grid-element'), expected.grids);
+  }
+  // Assert only the main area grid, but not the main grid since not expected.
+  else if (expected.grids?.mainArea) {
+    await assertGridElement(expected.grids.mainArea.root, locator.locator('wb-layout wb-grid[data-grid="main"] wb-part[data-partid="part.main-area"] > wb-grid[data-grid="main-area"] > wb-grid-element'), expected.grids);
   }
 
   // Assert active part of the main area grid.
-  if (expected.mainAreaGrid?.activePartId) {
-    const activePartId = expected.mainAreaGrid.activePartId;
-    const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="part.main-area"] wb-part[data-partid="${activePartId}"].active`);
+  if (expected.grids?.mainArea?.activePartId) {
+    const activePartId = expected.grids.mainArea.activePartId;
+    const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="main-area"][data-partid="${activePartId}"].active`);
     await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main area grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-workbench-layout wb-part[data-partid="part.main-area"] wb-part:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
+    await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="main-area"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
   }
-  // Assert active part of the workbench grid.
-  if (expected.workbenchGrid?.activePartId) {
-    const activePartId = expected.workbenchGrid.activePartId;
-    const activePartLocator = locator.locator(`wb-workbench-layout wb-part[data-partid="${activePartId}"]:not([data-context="main-area"]).active`);
-    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the workbench grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-workbench-layout wb-part:not([data-partid="${activePartId}"]):not([data-context="main-area"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the workbench grid, but is not.`));
+  // Assert active part of the main grid.
+  if (expected.grids?.main?.activePartId) {
+    const activePartId = expected.grids.main.activePartId;
+    const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="main"][data-partid="${activePartId}"].active`);
+    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main grid, but is not.`));
+    await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="main"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main grid, but is not.`));
   }
+}
+
+async function assertActivityToolbars(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
+  if (expectedActivityLayout.toolbars?.leftTop) {
+    await assertActivityStack(expectedActivityLayout.toolbars.leftTop, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="left-top"]'));
+  }
+  if (expectedActivityLayout.toolbars?.leftBottom) {
+    await assertActivityStack(expectedActivityLayout.toolbars.leftBottom, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="left-bottom"]'));
+  }
+  if (expectedActivityLayout.toolbars?.rightTop) {
+    await assertActivityStack(expectedActivityLayout.toolbars.rightTop, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="right-top"]'));
+  }
+  if (expectedActivityLayout.toolbars?.rightBottom) {
+    await assertActivityStack(expectedActivityLayout.toolbars.rightBottom, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="right-bottom"]'));
+  }
+  if (expectedActivityLayout.toolbars?.bottomLeft) {
+    await assertActivityStack(expectedActivityLayout.toolbars.bottomLeft, locator.locator('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="bottom-left"]'));
+  }
+  if (expectedActivityLayout.toolbars?.bottomRight) {
+    await assertActivityStack(expectedActivityLayout.toolbars.bottomRight, locator.locator('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="bottom-right"]'));
+  }
+}
+
+async function assertActivityStack(expectedStack: MActivityStack, locator: Locator): Promise<void> {
+  if (expectedStack.activities.length === 0) {
+    await throwIfPresent(locator, () => Error(`[DOMAssertError] Expected activity stack to not have activities, but it has. [locator=${locator}]`));
+  }
+  for (const [i, activity] of expectedStack.activities.entries()) {
+    const activityLocator = locator.locator('wb-activity-item').nth(i).locator(`:scope[data-activityid="${activity.id}"]`);
+    await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be present, but is not. [activityId=${activity.id}, locator=${activityLocator}]`));
+  }
+  if (expectedStack.activeActivityId === 'none') {
+    const activityLocator = locator.locator(`wb-activity-item.active`);
+    await throwIfPresent(activityLocator, () => Error(`[DOMAssertError] Expected no activity to be active, but is. [locator=${activityLocator}]`));
+  }
+  else {
+    const activityLocator = locator.locator(`wb-activity-item[data-activityid="${expectedStack.activeActivityId}"].active`);
+    await throwIfAbsent(activityLocator, () => Error(`[DOMAssertError] Expected activity to be active, but is not. [activityId=${expectedStack.activeActivityId}, locator=${activityLocator}]`));
+  }
+}
+
+async function assertActivityPanels(expectedActivityLayout: Partial<MActivityLayout>, locator: Locator): Promise<void> {
+  if (expectedActivityLayout.panels?.left) {
+    await assertLeftActivityPanel(expectedActivityLayout.panels.left, locator.locator('wb-layout wb-activity-panel[data-panel="left"]'));
+  }
+  if (expectedActivityLayout.panels?.right) {
+    await assertRightActivityPanel(expectedActivityLayout.panels.right, locator.locator('wb-layout wb-activity-panel[data-panel="right"]'));
+  }
+  if (expectedActivityLayout.panels?.bottom) {
+    await assertBottomActivityPanel(expectedActivityLayout.panels.bottom, locator.locator('wb-layout wb-activity-panel[data-panel="bottom"]'));
+  }
+}
+
+async function assertLeftActivityPanel(expectedPanel: Required<MActivityLayout['panels']>['left'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
+    await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected left activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
+  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected left activity panel '${panelLocator}' to be in the DOM, but is not.`));
+
+  // Assert left activity panel width
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: expectedPanel.width,
+      height: panelBoundingBox.height,
+    },
+    context: () => 'Width of left activity panel does not match expected.',
+  });
+  if (expectedPanel.ratio) {
+    // Assert top group
+    const topGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const topGridBoundingBox = (await topGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: topGridBoundingBox,
+      expected: {
+        x: topGridBoundingBox.x,
+        y: topGridBoundingBox.y,
+        width: expectedPanel.width,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
+      },
+      context: () => 'Height of "left-top" activity does not match expected.',
+    });
+    // Assert bottom group
+    const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: bottomGridBoundingBox,
+      expected: {
+        x: bottomGridBoundingBox.x,
+        y: bottomGridBoundingBox.y,
+        width: expectedPanel.width,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+      },
+      context: () => 'Height of "left-bottom" activity does not match expected.',
+    });
+  }
+}
+
+async function assertRightActivityPanel(expectedPanel: Required<MActivityLayout['panels']>['right'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
+    await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected right activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
+  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected right activity panel '${panelLocator}' to be in the DOM, but is not.`));
+
+  // Assert right activity panel width
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: expectedPanel.width,
+      height: panelBoundingBox.height,
+    },
+    context: () => 'Right activity panel width does not match expected.',
+  });
+  if (expectedPanel.ratio) {
+    // Assert top group
+    const topGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const topGridBoundingBox = (await topGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: topGridBoundingBox,
+      expected: {
+        x: topGridBoundingBox.x,
+        y: topGridBoundingBox.y,
+        width: expectedPanel.width,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
+      },
+      context: () => 'Height of "right-top" activity does not match expected.',
+    });
+
+    // Assert bottom group
+    const bottomGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const bottomGridBoundingBox = (await bottomGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: bottomGridBoundingBox,
+      expected: {
+        x: bottomGridBoundingBox.x,
+        y: bottomGridBoundingBox.y,
+        width: expectedPanel.width,
+        height: (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+      },
+      context: () => 'Height of "right-bottom" activity does not match expected.',
+    });
+  }
+}
+
+async function assertBottomActivityPanel(expectedPanel: Required<MActivityLayout['panels']>['bottom'], panelLocator: Locator): Promise<void> {
+  if (expectedPanel === 'closed') {
+    await throwIfPresent(panelLocator, () => Error(`[DOMAssertError] Expected bottom activity panel not to be present, but it is. [locator=${panelLocator}]`));
+    return;
+  }
+
+  await throwIfAbsent(panelLocator, () => Error(`[DOMAssertError] Expected bottom activity panel '${panelLocator}' to be in the DOM, but is not.`));
+
+  // Assert bottom activity panel height
+  const panelBoundingBox = (await panelLocator.boundingBox())!;
+  await throwIfBoundingBoxNotCloseTo({
+    actual: panelBoundingBox,
+    expected: {
+      x: panelBoundingBox.x,
+      y: panelBoundingBox.y,
+      width: panelBoundingBox.width,
+      height: expectedPanel.height,
+    },
+    context: () => 'Bottom activity panel height does not match expected.',
+  });
+  if (expectedPanel.ratio) {
+    // Assert left group
+    const leftGridLocator = panelLocator.locator('wb-grid').nth(0);
+    const leftGridBoundingBox = (await leftGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: leftGridBoundingBox,
+      expected: {
+        x: leftGridBoundingBox.x,
+        y: leftGridBoundingBox.y,
+        width: (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio,
+        height: expectedPanel.height,
+      },
+      context: () => 'Width of "bottom-left" activity does not match expected.',
+    });
+
+    // Assert right group
+    const rightGridLocator = panelLocator.locator('wb-grid').nth(1);
+    const rightGridBoundingBox = (await rightGridLocator.boundingBox())!;
+    await throwIfBoundingBoxNotCloseTo({
+      actual: rightGridBoundingBox,
+      expected: {
+        x: rightGridBoundingBox.x,
+        y: rightGridBoundingBox.y,
+        width: (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio),
+        height: expectedPanel.height,
+      },
+      context: () => 'Width of "bottom-right" activity does not match expected.',
+    });
+  }
+}
+
+function pickActivityGrids(grids: ExpectedWorkbenchGrids | undefined): {[activityId: ActivityId]: MPartGrid} {
+  return Object.fromEntries(Object.entries(grids ?? {}).reduce((acc, [gridName, grid]) => {
+    if (!grid) {
+      return acc;
+    }
+    if (!isActivityId(gridName)) {
+      return acc;
+    }
+    return acc.set(gridName, grid as MPartGrid);
+  }, new Map<ActivityId, MPartGrid>()));
 }
 
 /**
@@ -63,21 +288,21 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
  * @see assertNodeGridElement
  * @see assertPartGridElement
  */
-async function assertGridElement(expectedGridElement: MTreeNode | MPart, gridElementLocator: Locator, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
+async function assertGridElement(expectedGridElement: MTreeNode | MPart, gridElementLocator: Locator, expectedGrids: ExpectedWorkbenchGrids): Promise<void> {
   await throwIfAbsent(gridElementLocator, () => Error(`[DOMAssertError] Expected grid element to be present, but is not. [${expectedGridElement.type}=${JSON.stringify(expectedGridElement)}, locator=${gridElementLocator}]`));
 
   if (expectedGridElement instanceof MTreeNode) {
-    await assertNodeGridElement(expectedGridElement, gridElementLocator, expectedWorkbenchLayout);
+    await assertNodeGridElement(expectedGridElement, gridElementLocator, expectedGrids);
   }
   else {
-    await assertPartGridElement(expectedGridElement, gridElementLocator, expectedWorkbenchLayout);
+    await assertPartGridElement(expectedGridElement, gridElementLocator, expectedGrids);
   }
 }
 
 /**
  * Performs a recursive assertion of the DOM structure starting with the expected tree node.
  */
-async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLocator: Locator, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
+async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLocator: Locator, expectedGrids: ExpectedWorkbenchGrids): Promise<void> {
   const nodeId = await gridElementLocator.getAttribute('data-nodeid');
   if (!nodeId) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}, locator=${gridElementLocator}]`);
@@ -99,7 +324,7 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
   const child1Locator = gridElementLocator.locator(child1Selector);
   if (expectedTreeNode.child1) {
     await throwIfAbsent(child1Locator, () => Error(`[DOMAssertError] Expected element '${child1Selector}' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`));
-    await assertGridElement(expectedTreeNode.child1, child1Locator, expectedWorkbenchLayout);
+    await assertGridElement(expectedTreeNode.child1, child1Locator, expectedGrids);
   }
   else {
     await throwIfPresent(child1Locator, () => Error(`[DOMAssertError] Expected element '${child1Selector}' not to be in the DOM, but is. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child1Locator}]`));
@@ -110,7 +335,7 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
   const child2Locator = gridElementLocator.locator(child2Selector);
   if (expectedTreeNode.child2) {
     await throwIfAbsent(child2Locator, () => Error(`[DOMAssertError] Expected element '${child2Selector}' to be in the DOM, but is not. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child2Locator}]`));
-    await assertGridElement(expectedTreeNode.child2, child2Locator, expectedWorkbenchLayout);
+    await assertGridElement(expectedTreeNode.child2, child2Locator, expectedGrids);
   }
   else {
     await throwIfPresent(child2Locator, () => Error(`[DOMAssertError] Expected element '${child2Selector}' not to be in the DOM, but is. [${expectedTreeNode.child1!.type}=${JSON.stringify(expectedTreeNode.child1)}, locator=${child2Locator}]`));
@@ -123,7 +348,7 @@ async function assertNodeGridElement(expectedTreeNode: MTreeNode, gridElementLoc
 /**
  * Performs a recursive assertion of the DOM structure starting with the expected part.
  */
-async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Locator, expectedWorkbenchLayout: ExpectedWorkbenchLayout): Promise<void> {
+async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Locator, expectedGrids: ExpectedWorkbenchGrids): Promise<void> {
   const partId = await gridElementLocator.getAttribute('data-partid');
   if (expectedPart.id && partId !== expectedPart.id) {
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute '[data-partid="${expectedPart.id}"]', but is '[data-partid="${partId}"]'. [MPart=${JSON.stringify(expectedPart)}, locator=${gridElementLocator}]`);
@@ -132,8 +357,8 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
   if (partId === MAIN_AREA) {
     const mainAreaPartLocator = gridElementLocator.locator('wb-part[data-partid="part.main-area"]');
     await throwIfAbsent(mainAreaPartLocator, () => Error(`[DOMAssertError] Expected element 'wb-part[data-partid="part.main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${mainAreaPartLocator}]`));
-    if (expectedWorkbenchLayout.mainAreaGrid) {
-      await assertGridElement(expectedWorkbenchLayout.mainAreaGrid.root, mainAreaPartLocator.locator(`> wb-grid-element`), expectedWorkbenchLayout);
+    if (expectedGrids.mainArea) {
+      await assertGridElement(expectedGrids.mainArea.root, mainAreaPartLocator.locator(`> wb-grid[data-grid="main-area"] > wb-grid-element`), expectedGrids);
     }
     return;
   }
@@ -293,6 +518,13 @@ async function throwIfBoundingBoxNotCloseTo(args: {actual: BoundingBox | null | 
   }
 }
 
+interface BoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 /**
  * Compares given two Arrays for shallow equality.
  */
@@ -306,25 +538,83 @@ function isEqualArray(array1: Array<unknown>, array2: Array<unknown>): boolean {
   return array1.every((item, index) => item === array2[index]);
 }
 
+function isActivityId(activityId: string | undefined | null): activityId is ActivityId {
+  return activityId?.startsWith('activity.') ?? false;
+}
+
 /**
  * Expected layout used in {@link #toEqualWorkbenchLayout}.
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Specifies the expected workbench grid. If not set, does not assert the workbench grid.
+   * Specifies the expected activity layout. If not set, does not assert the activity layout.
    */
-  workbenchGrid?: MPartGrid;
+  activityLayout?: Partial<MActivityLayout>;
+  /**
+   * Specifies the expected grids.
+   */
+  grids?: ExpectedWorkbenchGrids;
+}
+
+interface ExpectedWorkbenchGrids {
+  /**
+   * Specifies the expected main grid. If not set, does not assert the main grid.
+   */
+  main?: MPartGrid;
   /**
    * Specifies the expected main area grid. If not set, does not assert the main area grid.
    */
-  mainAreaGrid?: MPartGrid;
+  mainArea?: MPartGrid;
+
+  /**
+   * Specifies the expected activity grids. If not set, does not assert the activity grids.
+   */
+  [activityId: ActivityId]: MPartGrid;
 }
 
-interface BoundingBox {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+/**
+ * Modified version of {@link MActivityLayout} to expect the workbench layout.
+ */
+export interface MActivityLayout {
+  toolbars: {
+    leftTop?: MActivityStack;
+    leftBottom?: MActivityStack;
+    rightTop?: MActivityStack;
+    rightBottom?: MActivityStack;
+    bottomLeft?: MActivityStack;
+    bottomRight?: MActivityStack;
+  };
+  panels: {
+    left?: {
+      width: number;
+      ratio?: number;
+    } | 'closed';
+    right?: {
+      width: number;
+      ratio?: number;
+    } | 'closed';
+    bottom?: {
+      height: number;
+      ratio?: number;
+    } | 'closed';
+  };
+}
+
+/**
+ * Modified version of {@link MActivityStack} to expect the workbench layout.
+ */
+export interface MActivityStack {
+  activities: Array<Partial<MActivity>>;
+  activeActivityId: ActivityId | 'none';
+}
+
+/**
+ * Modified version of {@link MActivity} to expect the workbench layout.
+ */
+export interface MActivity {
+  id: ActivityId;
+  label: string;
+  icon: string;
 }
 
 /**

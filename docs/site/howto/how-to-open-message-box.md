@@ -1,7 +1,7 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Message Box
 
@@ -10,7 +10,7 @@ structured content or input prompts.
 
 Displayed on top of other content, a message box blocks interaction with other parts of the application. A message box can be view-modal or application-modal. Multiple message boxes are stacked, and only the topmost message box in each modality stack can be interacted with.
 
-### How to display a text message
+### How to Display a Text Message
 To display a text message, inject `MessageBoxService` and invoke the `open` method, passing the text to display. 
 
 ```ts
@@ -20,7 +20,7 @@ import {WorkbenchMessageBoxService} from '@scion/workbench';
 inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.');
 ```
 
-### How to display structured content
+### How to Display Structured Content
 To display structured content, pass a component instead of a string literal.
 
 Data can be passed to the component as inputs via the options object in the form of an object literal. Inputs are available as input properties in the component.
@@ -51,7 +51,7 @@ export class SomeComponent {
 }
 ```
 
-### How to define action buttons
+### How to Define Action Buttons
 Action buttons can be defined via the options object in the form of an object literal. Each property in the object literal represents a button, with the property value used as the button label. If not defining a button, the message box displays an OK button.
 
 Clicking a button closes the message box and resolves the Promise to the property key. A button with the key `cancel` is also assigned the Escape keystroke.
@@ -74,7 +74,7 @@ if (action === 'yes') {
 }
 ```
 
-### How to set the modality of a message box
+### How to Set the Modality of a Message Box
 A message box can be view-modal or application-modal. A view-modal message box blocks only a specific view, allowing the user to interact with other views. An application-modal message box blocks the workbench by default, or the browser's viewport, if set in the global workbench dialog settings.
 
 By default, the calling context determines the modality of the message box. If the message box is opened from a view, only this view is blocked. To open the message box with a different modality, specify the modality in the message box options.
@@ -88,7 +88,7 @@ inject(WorkbenchMessageBoxService).open('Lorem ipsum dolor sit amet.', {
 });
 ```
 
-### How to set the severity of a message box
+### How to Set the Severity of a Message Box
 A message can be displayed as info, warning or alert. The severity can be set via the options object.
 
 ```ts
@@ -100,7 +100,7 @@ inject(WorkbenchMessageBoxService).open('Data could not be saved.', {
 });
 ```
 
-### How to set a title
+### How to Set a Title
 A message box can have a title. The title is specified via the options object. 
 
 ```ts
@@ -112,7 +112,7 @@ inject(WorkbenchMessageBoxService).open('The view contains stale data.', {
 });
 ```
 
-### How to change the default look of a message box
+### How to Change the Default Look of a Message Box
 The following CSS variables can be set to customize the default look of a message box.
 
 - `--sci-workbench-messagebox-max-width`

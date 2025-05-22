@@ -22,6 +22,7 @@ import {environment} from '../environments/environment';
 import {provideAnimations, provideNoopAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 import {provideMainAreaInitialPartId} from './workbench/main-area-initial-part-id.provider';
+import {provideDesignTokens} from './workbench/provide-design-tokens';
 
 /**
  * Central place to configure the workbench-testing-app.
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withHashLocation()),
     provideWorkbench(workbenchConfig),
     provideConfirmWorkbenchStartup(),
+    provideDesignTokens(),
     provideThrottleCapabilityLookupInterceptor(),
     provideMainAreaInitialPartId(),
     provideWorkbenchLifecycleHookLoggers(),

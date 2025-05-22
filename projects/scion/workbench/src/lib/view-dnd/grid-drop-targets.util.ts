@@ -9,7 +9,7 @@
  */
 
 import {ViewMoveEventTarget} from './view-drag.service';
-import {MPart, MPartGrid} from '../layout/workbench-layout.model';
+import {MPart, MPartGrid} from '../layout/workbench-grid.model';
 
 /**
  * Provides helper functions for dragging a view to a grid.

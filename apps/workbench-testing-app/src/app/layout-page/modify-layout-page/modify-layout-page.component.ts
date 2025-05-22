@@ -18,6 +18,8 @@ import {WorkbenchPart, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@
 import {stringifyError} from '../../common/stringify-error.util';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.component';
+import {AddDockedPartsComponent, DockedPartDescriptor} from '../tables/add-docked-parts/add-docked-parts.component';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-modify-layout-page',
@@ -29,6 +31,8 @@ import {NavigatePartsComponent} from '../tables/navigate-parts/navigate-parts.co
     NavigateViewsComponent,
     ReactiveFormsModule,
     NavigatePartsComponent,
+    AddDockedPartsComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class ModifyLayoutPageComponent {
@@ -39,9 +43,13 @@ export default class ModifyLayoutPageComponent {
 
   protected readonly form = this._formBuilder.group({
     parts: this._formBuilder.control<PartDescriptor[]>([]),
+    dockedParts: this._formBuilder.control<DockedPartDescriptor[]>([]),
     views: this._formBuilder.control<ViewDescriptor[]>([]),
     partNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
     viewNavigations: this._formBuilder.control<NavigationDescriptor[]>([]),
+    activateParts: this._formBuilder.control<string[] | undefined>([]),
+    activateViews: this._formBuilder.control<string[] | undefined>([]),
+    removeParts: this._formBuilder.control<string[] | undefined>([]),
   });
 
   protected readonly partProposals = this.computePartProposals();
@@ -50,12 +58,14 @@ export default class ModifyLayoutPageComponent {
   protected modifyError: string | false | undefined;
 
   private computePartProposals(): Signal<string[]> {
-    const partsFromUI = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
+    const parts = toSignal(this.form.controls.parts.valueChanges, {initialValue: []});
+    const dockedParts = toSignal(this.form.controls.dockedParts.valueChanges, {initialValue: []});
     const workbenchService = inject(WorkbenchService);
 
-    return computed(() => new Array<WorkbenchPart | PartDescriptor>()
+    return computed(() => new Array<WorkbenchPart | DockedPartDescriptor | PartDescriptor>()
       .concat(workbenchService.parts())
-      .concat(partsFromUI())
+      .concat(dockedParts())
+      .concat(parts())
       .map(part => part.id)
       .filter(Boolean)
       .reduce((acc, partId) => acc.includes(partId) ? acc : acc.concat(partId), new Array<string>()),
@@ -85,13 +95,29 @@ export default class ModifyLayoutPageComponent {
 
   private navigate(): Promise<boolean> {
     return this._workbenchRouter.navigate(layout => {
+      // Add docked parts.
+      for (const dockedPart of this.form.controls.dockedParts.value) {
+        layout = layout.addPart(dockedPart.id, dockedPart.dockTo, {
+          icon: dockedPart.extras.icon,
+          label: dockedPart.extras.label,
+          tooltip: dockedPart.extras.tooltip,
+          title: dockedPart.extras.title,
+          cssClass: dockedPart.extras.cssClass,
+          ɵactivityId: dockedPart.extras.ɵactivityId,
+        });
+      }
+
       // Add parts.
       for (const part of this.form.controls.parts.value) {
         layout = layout.addPart(part.id, {
           relativeTo: part.relativeTo.relativeTo,
           align: part.relativeTo.align!,
           ratio: part.relativeTo.ratio!,
-        }, {activate: part.options?.activate});
+        }, {
+          title: part.extras?.title,
+          cssClass: part.extras?.cssClass,
+          activate: part.extras?.activate,
+        });
       }
 
       // Add views.
@@ -123,6 +149,21 @@ export default class ModifyLayoutPageComponent {
           state: viewNavigation.extras?.state,
           cssClass: viewNavigation.extras?.cssClass,
         });
+      }
+
+      // Activate parts.
+      for (const part of this.form.controls.activateParts.value ?? []) {
+        layout = layout.activatePart(part);
+      }
+
+      // Activate views.
+      for (const view of this.form.controls.activateViews.value ?? []) {
+        layout = layout.activateView(view);
+      }
+
+      // Remove parts.
+      for (const part of this.form.controls.removeParts.value ?? []) {
+        layout = layout.removePart(part);
       }
 
       return layout;

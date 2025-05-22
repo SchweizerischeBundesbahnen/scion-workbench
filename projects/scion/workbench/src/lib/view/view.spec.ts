@@ -39,7 +39,7 @@ import {ɵWorkbenchLayoutFactory} from '../layout/ɵworkbench-layout.factory';
 import {WorkbenchLayoutFactory} from '../layout/workbench-layout.factory';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
-import {BlankComponent} from '../routing/workbench-auxiliary-route-installer.service';
+import {NullContentComponent} from '../null-content/null-content.component';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 import {PartId} from '../part/workbench-part.model';
@@ -1041,7 +1041,7 @@ describe('View', () => {
     const workbenchRouter = TestBed.inject(ɵWorkbenchRouter);
     await workbenchRouter.navigate(layout => layout.addView('view.100', {partId: layout.activePart({grid: 'mainArea'})!.id, activateView: true}));
     await waitUntilStable();
-    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent()).toBe(getComponent(fixture, BlankComponent));
+    expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent()).toBe(getComponent(fixture, NullContentComponent));
 
     // Navigate to "path/to/view".
     await workbenchRouter.navigate(['path/to/view'], {target: 'view.100'});
@@ -1284,7 +1284,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1336,7 +1336,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.mainAreaGrid!.activePartId}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea!.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -2786,14 +2786,16 @@ describe('View', () => {
 
       // Expect view to be moved.
       expect(fixture).toEqualWorkbenchLayout({
-        workbenchGrid: {
-          root: new MPart({id: MAIN_AREA}),
-        },
-        mainAreaGrid: {
-          root: new MTreeNode({
-            child1: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
-          }),
+        grids: {
+          main: {
+            root: new MPart({id: MAIN_AREA}),
+          },
+          mainArea: {
+            root: new MTreeNode({
+              child1: new MPart({id: 'part.initial', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
+              child2: new MPart({id: 'part.right', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
+            }),
+          },
         },
       });
     });

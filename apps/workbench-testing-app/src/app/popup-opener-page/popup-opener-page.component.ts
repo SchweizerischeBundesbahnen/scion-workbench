@@ -27,7 +27,7 @@ import InputFieldTestPageComponent from '../test-pages/input-field-test-page/inp
 import DialogOpenerPageComponent from '../dialog-opener-page/dialog-opener-page.component';
 import {Dictionaries} from '@scion/toolkit/util';
 import {parseTypedString} from '../common/parse-typed-value.util';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.component';
 
 @Component({
@@ -41,7 +41,7 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
     SciAccordionItemDirective,
     SciCheckboxComponent,
     PopupPositionLabelPipe,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class PopupOpenerPageComponent {

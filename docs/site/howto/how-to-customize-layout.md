@@ -11,6 +11,57 @@ The application can define defaults through design tokens and may provide a user
 The SCION Workbench has no built-in user interface for changing settings; the application must implement it.
 
 <details>
+    <summary><strong>Panel Alignment</strong></summary>
+    <br>
+
+Controls the alignment of the bottom panel of docked parts. Avalable alignments are `justify`, `center`, `left` and `right`. Defaults to `justify`.
+
+Set the default panel alignment via `--sci-workbench-layout-panel-align` design token.
+```scss
+:root {
+  --sci-workbench-layout-panel-align: center;
+}
+```
+
+Set user's preference via `WorkbenchService.settings.panelAlignment` property.
+```ts
+inject(WorkbenchService).settings.panelAlignment.set('center')
+```
+
+**Justify (Default)**\
+[<img src="/docs/site/images/workbench-layout-alignment-justify.drawio.svg" height="300" alt="Panel Alignment Justify">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-alignment-justify.drawio.svg)
+
+**Center**\
+[<img src="/docs/site/images/workbench-layout-alignment-center.drawio.svg" height="300" alt="Panel Alignment Center">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-alignment-center.drawio.svg)
+
+**Left**\
+[<img src="/docs/site/images/workbench-layout-alignment-left.drawio.svg" height="300" alt="Panel Alignment Left">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-alignment-left.drawio.svg)
+
+**Right**\
+[<img src="/docs/site/images/workbench-layout-alignment-right.drawio.svg" height="300" alt="Panel Alignment Right">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-layout-alignment-right.drawio.svg)
+</details>
+
+<details>
+    <summary><strong>Panel Animation</strong></summary>
+    <br>
+
+Enables slide-in and slide-out animations of panels. Defaults to `true`.
+
+Set the default animation behavior via `--sci-workbench-layout-panel-animate` design token.
+```scss
+:root {
+  --sci-workbench-layout-panel-animate: false;
+}
+``` 
+
+Set user's preference via `WorkbenchService.settings.panelAnimation` property.
+```ts
+inject(WorkbenchService).settings.panelAnimation.set(false);
+```
+
+</details>
+
+<details>
     <summary><strong>Theme</strong></summary>
     <br>
 

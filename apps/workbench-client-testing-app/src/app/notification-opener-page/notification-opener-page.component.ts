@@ -14,8 +14,8 @@ import {WorkbenchNotificationService, WorkbenchView} from '@scion/workbench-clie
 import {stringifyError} from '../common/stringify-error.util';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {CssClassComponent} from '../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-notification-opener-page',
@@ -25,7 +25,7 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class NotificationOpenerPageComponent {

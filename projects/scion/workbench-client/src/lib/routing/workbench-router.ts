@@ -129,7 +129,7 @@ export interface WorkbenchNavigationExtras {
    *
    * One of:
    * - 'auto':   Navigates existing views that match the qualifier and required params, or opens a new view otherwise. Optional parameters do not affect view resolution.
-   * - 'blank':  Navigates in a new view.
+   * - 'blank':  Opens a new view and navigates it.
    * - <viewId>: Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.
    */
   target?: string | 'blank' | 'auto';

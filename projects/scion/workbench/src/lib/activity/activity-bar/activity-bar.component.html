@@ -1,0 +1,38 @@
+@let activityLayout = layout().activityLayout;
+
+@switch (align()) {
+  @case ('left') {
+    @if (activityLayout.toolbars.leftTop.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.leftTop" data-docking-area="left-top"/>
+    }
+
+    @if (activityLayout.toolbars.leftTop.activities.length && activityLayout.toolbars.leftBottom.activities.length) {
+      <hr/>
+    }
+
+    @if (activityLayout.toolbars.leftBottom.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.leftBottom" data-docking-area="left-bottom"/>
+    }
+    <div class="filler"></div>
+    @if (activityLayout.toolbars.bottomLeft.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.bottomLeft" data-docking-area="bottom-left"/>
+    }
+  }
+  @case ('right') {
+    @if (activityLayout.toolbars.rightTop.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.rightTop" data-docking-area="right-top"/>
+    }
+
+    @if (activityLayout.toolbars.rightTop.activities.length && activityLayout.toolbars.rightBottom.activities.length) {
+      <hr>
+    }
+
+    @if (activityLayout.toolbars.rightBottom.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.rightBottom" data-docking-area="right-bottom"/>
+    }
+    <div class="filler"></div>
+    @if (activityLayout.toolbars.bottomRight.activities.length) {
+      <wb-activity-stack [stack]="activityLayout.toolbars.bottomRight" data-docking-area="bottom-right"/>
+    }
+  }
+}

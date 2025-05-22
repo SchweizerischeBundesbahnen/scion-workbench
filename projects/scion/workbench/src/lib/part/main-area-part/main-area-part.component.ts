@@ -11,13 +11,11 @@
 import {Component, computed, ElementRef, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {GridElementComponent} from '../../layout/grid-element/grid-element.component';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
-import {RequiresDropZonePipe} from '../../view-dnd/requires-drop-zone.pipe';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {GridElementIfVisiblePipe} from '../../common/grid-element-if-visible.pipe';
+import {GridIfVisiblePipe} from '../../common/grid-if-visible.pipe';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
@@ -25,6 +23,8 @@ import {Logger} from '../../logging';
 import {MAIN_AREA} from '../../layout/workbench-layout';
 import {DESKTOP} from '../../workbench-element-references';
 import {NgTemplateOutlet} from '@angular/common';
+import {GridComponent} from '../../layout/grid/grid.component';
+import {dasherize} from '../../common/dasherize.util';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -52,32 +52,36 @@ import {NgTemplateOutlet} from '@angular/common';
   templateUrl: './main-area-part.component.html',
   styleUrls: ['./main-area-part.component.scss'],
   imports: [
-    GridElementComponent,
+    GridComponent,
     ViewDropZoneDirective,
-    RequiresDropZonePipe,
     RouterOutlet,
     RouterOutletRootContextDirective,
     SciViewportComponent,
-    GridElementIfVisiblePipe,
+    GridIfVisiblePipe,
     NgTemplateOutlet,
   ],
+  host: {
+    '[attr.data-grid]': 'dasherize(part.gridName())',
+  },
 })
 export class MainAreaPartComponent {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
-  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
+  private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _logger = inject(Logger);
 
   protected readonly part = inject(ɵWorkbenchPart);
-  protected readonly mainAreaGrid = computed(() => this._workbenchLayoutService.layout().mainAreaGrid!);
+  protected readonly mainAreaGrid = computed(() => this._layout().grids.mainArea!);
   protected readonly desktop = inject(DESKTOP);
+  protected readonly dasherize = dasherize;
+  protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea!));
 
   constructor() {
     inject(ɵWorkbenchPart).partComponent = inject(ElementRef).nativeElement as HTMLElement;
   }
 
-  protected onViewDrop(event: WbViewDropEvent): void {
+  protected onDesktopViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
       source: {
         workbenchId: event.dragData.workbenchId,
@@ -144,7 +148,7 @@ export class MainAreaPartComponent {
         ],
       });
 
-      Alternatively, or for layouts without a main area, provide a desktop using an '<ng-template>' with the 'wbDesktop' directive. The template content will be used as the desktop content.
+      Alternatively, or for layouts without a main area, provide a desktop using an '<ng-template>' with the 'wbDesktop' directive. The template content is used as the desktop content.
 
       <wb-workbench>
         <ng-template wbDesktop>

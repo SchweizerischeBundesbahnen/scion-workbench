@@ -8,38 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export interface MPartV3 {
-  type: 'MPart';
-  id: string;
-  views: MViewV3[];
-  activeViewId?: ViewIdV3;
-  structural: boolean;
-}
-
-export interface MTreeNodeV3 {
-  type: 'MTreeNode';
-  nodeId: string;
-  child1: MTreeNodeV3 | MPartV3;
-  child2: MTreeNodeV3 | MPartV3;
-  ratio: number;
-  direction: 'column' | 'row';
-}
-
-export interface MPartGridV3 {
-  root: MTreeNodeV3 | MPartV3;
-  activePartId: string;
-}
-
-export interface MViewV3 {
-  id: ViewIdV3;
-  alternativeId?: string;
-  cssClass?: string[];
-  navigation?: {
-    hint?: string;
-    cssClass?: string[];
+export interface MPerspectiveLayoutV3 {
+  referenceLayout: {
+    workbenchGrid: string;
+    outlets: string;
+  };
+  userLayout: {
+    workbenchGrid: string;
+    outlets: string;
   };
 }
-
-export type ViewIdV3 = `view.${number}`;
-
-export const VIEW_ID_PREFIX_V3 = 'view.';

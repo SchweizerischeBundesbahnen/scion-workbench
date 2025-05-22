@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {fromRect} from '../helper/testing.util';
-import {POPUP_DIAMOND_ANCHOR_SIZE} from '../popup.po';
+import {POPUP_DIAMOND_ANCHOR_SIZE} from './workbench-layout-constants';
 
 test.describe('Workbench Popup Position', () => {
 

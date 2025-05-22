@@ -1,17 +1,17 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
 Right-clicking on a view tab opens a context menu for interacting with the view and its contents.
 
-### How to contribute to the view context menu
+### How to Contribute to the View Context Menu
 Context menu items can be added declaratively in an HTML template or via `WorkbenchService`.
 
-#### Add a menu item via HTML template
-Add an `<ng-template>` and decorate it with the `wbViewMenuItem` directive. The template content will be used as the menu item content. The menu item shares the lifecycle of its embedding context.
+#### Add a Menu Item via HTML Template
+Add an `<ng-template>` and decorate it with the `wbViewMenuItem` directive. The template content is used as the menu item content. The menu item shares the lifecycle of its embedding context.
 
 ```html
 <ng-template wbViewMenuItem [accelerator]="['ctrl', 'alt', '1']" (action)="...">
@@ -31,7 +31,11 @@ A predicate can be used to match a specific context, such as a particular view o
 </ng-template>
 ```
 
-The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
+> [!TIP]
+> The function can call `inject` to get required dependencies and runs in a reactive context.
+
+> [!NOTE] 
+> The function is called again when tracked signals change.
 
 ```ts
 import {Component} from '@angular/core';
@@ -43,7 +47,8 @@ class MenuItemComponent {
 }
 ```
 
-The `WorkbenchView` is available as the default template variable (`let-view`).
+> [!TIP]
+> The `WorkbenchView` is available as the default template variable (`let-view`).
 
 ```html
 <ng-template wbViewMenuItem let-view>
@@ -51,7 +56,7 @@ The `WorkbenchView` is available as the default template variable (`let-view`).
 </ng-template>
 ```
 
-#### Add a menu item via WorkbenchService
+#### Add a Menu Item via WorkbenchService
 Menu items can also be added using a factory function and registered via `WorkbenchService.registerViewMenuItem`. The content can be a component or a template.
 
 ```ts
@@ -87,7 +92,11 @@ inject(WorkbenchService).registerViewMenuItem(view => {
 });
 ```
 
-The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
+> [!TIP]
+> The function can call `inject` to get required dependencies and runs in a reactive context.
+
+> [!NOTE]
+> The function is called again when tracked signals change.
 
 Data can be passed to the component or template as inputs:
 
@@ -158,7 +167,7 @@ inject(WorkbenchService).registerViewMenuItem(() => ({
 }));
 ```
 
-### Built-in context menu items
+### Built-in Context Menu Items
 Built-in context menu items can be customized or removed via configuration passed to the `provideWorkbench` function. For example, to use a different accelerator.
 
 ```ts

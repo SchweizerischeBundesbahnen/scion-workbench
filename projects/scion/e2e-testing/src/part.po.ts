@@ -14,8 +14,7 @@ import {ViewTabPO} from './view-tab.po';
 import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
 import {PartId} from '@scion/workbench';
-import {DomRect, fromRect} from './helper/testing.util';
-import {getCssClasses} from './helper/testing.util';
+import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
 
 /**
  * Handle for interacting with a workbench part.
@@ -37,10 +36,16 @@ export class PartPO {
    */
   public readonly sash: PartSashPO;
 
+  /**
+   * Locates the message displayed if not navigated this part and this part has no views.
+   */
+  public readonly nullContentMessage: Locator;
+
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
     this.activeView = new ViewPO(this.locator.locator('wb-view'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
     this.sash = new PartSashPO(this.locator);
+    this.nullContentMessage = this.locator.locator('wb-null-content');
   }
 
   public async getPartId(): Promise<PartId> {
@@ -48,10 +53,10 @@ export class PartPO {
   }
 
   /**
-   * Indicates if this part is contained in the main area.
+   * Indicates if this part is contained in the peripheral area.
    */
-  public async isInMainArea(): Promise<boolean> {
-    return (await this.locator.getAttribute('data-context')) === 'main-area';
+  public async isPeripheral(): Promise<boolean> {
+    return (await this.locator.getAttribute('data-peripheral')) !== null;
   }
 
   /**
@@ -73,8 +78,11 @@ export class PartPO {
     return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | 'center' | null;
   }
 
-  public async getBoundingBox(): Promise<DomRect> {
-    return fromRect(await this.locator.boundingBox());
+  /**
+   * Gets the bounding box of this part (inclusive partbar) or its content (exclusive partbar). Defaults to the bounding box of the part.
+   */
+  public async getBoundingBox(selector: 'part' | 'content' = 'part'): Promise<DomRect> {
+    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-content').boundingBox());
   }
 
   public getCssClasses(): Promise<string[]> {

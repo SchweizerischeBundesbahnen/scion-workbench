@@ -28,7 +28,7 @@
     border-top-color: var(--sci-workbench-tab-border-color);
     background-color: var(--sci-workbench-view-background-color);
 
-    @include workbench.peripheral-workbench-parts-selector {
+    wb-part[data-peripheral] & {
       background-color: var(--sci-workbench-view-peripheral-background-color);
     }
 
@@ -49,9 +49,6 @@
     min-width: var(--sci-workbench-tab-min-width);
     max-width: var(--sci-workbench-tab-max-width);
     isolation: isolate; // stacking context to overlay the positioned 'hover' overlay
-  }
-
-  &:not(.drag-image) > div.content {
     // Subtract tab border to align tab content with part title and part actions.
     transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
   }
@@ -64,12 +61,9 @@
       visibility: hidden;
       padding: $padding;
       border-radius: var(--sci-corner-small);
+      // Subtract tab border to align close button with part title and part actions.
+      transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
     }
-  }
-
-  &:not(.drag-image) > button.close:is(button, #sci-reset) {
-    // Subtract tab border to align close button with part title and part actions.
-    transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
   }
 
   &.active, &:hover:not(.view-drag) {
@@ -118,7 +112,7 @@
       box-shadow: inset 0 0 0 var(--sci-workbench-tab-border-width) var(--sci-workbench-tab-border-color);
       box-sizing: content-box;
 
-      @include workbench.peripheral-workbench-parts-selector {
+      wb-part[data-peripheral] & {
         border-color: var(--sci-workbench-view-peripheral-background-color);
       }
     }

@@ -19,9 +19,8 @@ import {WorkbenchView} from '../../view/workbench-view.model';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
-import {MAIN_AREA} from '../../layout/workbench-layout';
-import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
+import {TextPipe} from '../../text/text.pipe';
 import {PartId} from '../workbench-part.model';
 
 /**
@@ -41,7 +40,6 @@ import {PartId} from '../workbench-part.model';
   ],
   host: {
     '[class.view-drag]': 'true',
-    '[class.drag-image]': 'true',
     '[class.active]': 'true',
     '[class.can-drop]': 'canDrop()',
     '[class.drag-over-tabbar]': 'isDragOverTabbar()',
@@ -86,7 +84,7 @@ export class ViewTabDragImageComponent {
     const partRegistry = inject(WORKBENCH_PART_REGISTRY);
     return computed(() => {
       const partId = this.isDragOverTabbar();
-      return untracked(() => partId && partRegistry.has(MAIN_AREA) && !partRegistry.get(partId).isInMainArea);
+      return untracked(() => partId && partRegistry.get(partId).peripheral());
     });
   }
 

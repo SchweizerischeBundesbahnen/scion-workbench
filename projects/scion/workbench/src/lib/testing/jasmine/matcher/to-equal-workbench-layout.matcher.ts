@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,8 +13,7 @@ import MatchersUtil = jasmine.MatchersUtil;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import ObjectContaining = jasmine.ObjectContaining;
 import {DebugElement} from '@angular/core';
-import {WorkbenchLayoutComponent} from '../../../layout/workbench-layout.component';
-import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-layout.model';
+import {MPart as _MPart, MPartGrid as _MPartGrid, MTreeNode as _MTreeNode, MView as _MView} from '../../../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../../../layout/workbench-layouts.util';
 import {ɵWorkbenchLayout} from '../../../layout/ɵworkbench-layout';
 import {MAIN_AREA} from '../../../layout/workbench-layout';
@@ -24,6 +23,9 @@ import {By} from '@angular/platform-browser';
 import {NavigationStates, Outlets} from '../../../routing/routing.model';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {Objects} from '../../../common/objects.util';
+import {WorkbenchComponent} from '../../../workbench.component';
+import {ActivityId, MActivity as _MActivity, MActivityLayout as _MActivityLayout, MActivityStack as _MActivityStack} from '../../../activity/workbench-activity.model';
+import {throwError} from '../../../common/throw-error.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -44,15 +46,15 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
             return pass();
           }
 
-          // Resolve debug element for `WorkbenchLayoutComponent`.
+          // Resolve debug element for `WorkbenchComponent`.
           let debugElement = actual instanceof ComponentFixture ? actual.debugElement : actual;
-          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            debugElement = debugElement.query(By.directive(WorkbenchLayoutComponent));
+          if (!(debugElement.componentInstance instanceof WorkbenchComponent)) {
+            debugElement = debugElement.query(By.directive(WorkbenchComponent));
           }
 
-          // Expect debug element to represent `WorkbenchLayoutComponent` element.
-          if (!(debugElement.componentInstance instanceof WorkbenchLayoutComponent)) {
-            return fail(`Expected fixture or DebugElement to be 'WorkbenchLayoutComponent' (or a parent), but was ${(actual.componentInstance as object).constructor.name}.`);
+          // Expect debug element to represent `WorkbenchComponent` element.
+          if (!(debugElement.componentInstance instanceof WorkbenchComponent)) {
+            return fail(`Expected fixture or DebugElement to be 'WorkbenchComponent' (or a parent), but was ${actual.componentInstance?.constructor?.name}.`); // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           }
 
           // Assert model.
@@ -81,13 +83,52 @@ export const toEqualWorkbenchLayoutCustomMatcher: jasmine.CustomMatcherFactories
  * Asserts the actual layout model to equal the expected model. Only properties declared on the expected object are asserted.
  */
 function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: ɵWorkbenchLayout, util: MatchersUtil): void {
+  // Prepare the actual layout for comparison with the expected layout.
+  const {leftTop, leftBottom, rightTop, rightBottom, bottomLeft, bottomRight} = actual.activityLayout.toolbars;
   const actualLayout: ExpectedWorkbenchLayout = {
     perspectiveId: actual.perspectiveId,
-    mainAreaGrid: actual.mainAreaGrid ?? undefined,
-    workbenchGrid: actual.workbenchGrid,
-    maximized: actual.maximized,
+    activityLayout: {
+      toolbars: {
+        leftTop: {
+          ...leftTop,
+          activeActivityId: leftTop.activeActivityId ?? 'none',
+          minimizedActivityId: leftTop.minimizedActivityId ?? 'none',
+        },
+        leftBottom: {
+          ...leftBottom,
+          activeActivityId: leftBottom.activeActivityId ?? 'none',
+          minimizedActivityId: leftBottom.minimizedActivityId ?? 'none',
+        },
+        rightTop: {
+          ...rightTop,
+          activeActivityId: rightTop.activeActivityId ?? 'none',
+          minimizedActivityId: rightTop.minimizedActivityId ?? 'none',
+        },
+        rightBottom: {
+          ...rightBottom,
+          activeActivityId: rightBottom.activeActivityId ?? 'none',
+          minimizedActivityId: rightBottom.minimizedActivityId ?? 'none',
+        },
+        bottomLeft: {
+          ...bottomLeft,
+          activeActivityId: bottomLeft.activeActivityId ?? 'none',
+          minimizedActivityId: bottomLeft.minimizedActivityId ?? 'none',
+        },
+        bottomRight: {
+          ...bottomRight,
+          activeActivityId: bottomRight.activeActivityId ?? 'none',
+          minimizedActivityId: bottomRight.minimizedActivityId ?? 'none',
+        },
+      },
+      panels: {
+        left: leftTop.activeActivityId || leftBottom.activeActivityId ? actual.activityLayout.panels.left : 'closed',
+        right: rightTop.activeActivityId || rightBottom.activeActivityId ? actual.activityLayout.panels.right : 'closed',
+        bottom: bottomLeft.activeActivityId || bottomRight.activeActivityId ? actual.activityLayout.panels.bottom : 'closed',
+      },
+    },
+    grids: actual.grids,
     navigationStates: actual.navigationStates(),
-    outlets: actual.outlets(),
+    outlets: actual.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true}),
   };
   const result = toEqual(actualLayout, objectContainingRecursive(expected), util);
   if (!result.pass) {
@@ -101,13 +142,184 @@ function assertWorkbenchLayoutModel(expected: ExpectedWorkbenchLayout, actual: �
  * Note: To pierce the shadow DOM and use the `:scope` selector, we use `Element.querySelector` instead of `DebugElement.query(By.css(...))`, i.e., to access the light DOM of sci-viewport.
  */
 function assertWorkbenchLayoutDOM(expected: ExpectedWorkbenchLayout, actualElement: Element): void {
-  // Assert the workbench grid plus the main area grid if expected.
-  if (expected.workbenchGrid) {
-    assertGridElementDOM(expected.workbenchGrid.root, actualElement.querySelector(':scope > wb-grid-element:not([data-parentnodeid])'), expected);
+  // Assert the activity layout.
+  if (expected.activityLayout) {
+    assertActivityToolbarsDOM(expected.activityLayout, actualElement);
+    assertActivityPanelsDOM(expected.activityLayout, actualElement);
   }
-  // Assert only the main area grid, but not the workbench grid since not expected.
-  else if (expected.mainAreaGrid) {
-    assertGridElementDOM(expected.mainAreaGrid.root, actualElement.querySelector('wb-part[data-partid="part.main-area"] > wb-grid-element'), expected);
+  // Assert activity grids.
+  for (const [activityId, grid] of Object.entries(WorkbenchLayouts.pickActivityGrids(expected.grids))) {
+    assertGridElementDOM(grid.root, actualElement.querySelector(`wb-layout wb-activity-panel wb-grid[data-grid="${activityId}"] > wb-grid-element`), expected);
+  }
+  // Assert the main grid plus the main area grid if expected.
+  if (expected.grids?.main) {
+    assertGridElementDOM(expected.grids.main.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] > wb-grid-element'), expected);
+  }
+  // Assert only the main area grid, but not the main grid since not expected.
+  else if (expected.grids?.mainArea) {
+    assertGridElementDOM(expected.grids.mainArea.root, actualElement.querySelector('wb-layout wb-grid[data-grid="main"] wb-part[data-partid="part.main-area"] > wb-grid[data-grid="main-area"] > wb-grid-element'), expected);
+  }
+}
+
+function assertActivityToolbarsDOM(expectedActivityLayout: Partial<MActivityLayout>, actualElement: Element): void {
+  if (expectedActivityLayout.toolbars?.leftTop) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.leftTop, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="left-top"]'), 'left-top');
+  }
+  if (expectedActivityLayout.toolbars?.leftBottom) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.leftBottom, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="left-bottom"]'), 'left-bottom');
+  }
+  if (expectedActivityLayout.toolbars?.rightTop) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.rightTop, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="right-top"]'), 'right-top');
+  }
+  if (expectedActivityLayout.toolbars?.rightBottom) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.rightBottom, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="right-bottom"]'), 'right-bottom');
+  }
+  if (expectedActivityLayout.toolbars?.bottomLeft) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.bottomLeft, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="left"] > wb-activity-stack[data-docking-area="bottom-left"]'), 'bottom-left');
+  }
+  if (expectedActivityLayout.toolbars?.bottomRight) {
+    assertActivityStackDOM(expectedActivityLayout.toolbars.bottomRight, actualElement.querySelector('wb-layout > wb-activity-bar[data-align="right"] > wb-activity-stack[data-docking-area="bottom-right"]'), 'bottom-right');
+  }
+}
+
+function assertActivityStackDOM(expectedStack: MActivityStack, actualElement: Element | null, dockingArea: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right'): void {
+  if (expectedStack.activities.length === 0) {
+    actualElement && throwError(`[DOMAssertError] Expected activity stack to not have activities, but it has. [dockingArea=${dockingArea}]`);
+    return;
+  }
+
+  if (!actualElement) {
+    throw Error(`[DOMAssertError] Expected activity stack to be present, but is not. [stack=${dockingArea}]`);
+  }
+
+  for (const [i, activity] of expectedStack.activities.entries()) {
+    const activityElement = actualElement.querySelectorAll('wb-activity-item').item(i);
+    if (activityElement.getAttribute('data-activityid') !== activity.id) {
+      throw Error(`[DOMAssertError] Expected activity to be present, but is not. [dockingArea=${dockingArea}, activityId=${activity.id}]`);
+    }
+  }
+  if (expectedStack.activeActivityId === 'none') {
+    const activityElement = actualElement.querySelector(`wb-activity-item.active`);
+    if (activityElement) {
+      throw Error(`[DOMAssertError] Expected no activity to be active in group, but is. [dockingArea=${dockingArea}, activityId=${activityElement.getAttribute('data-activityid')}]`);
+    }
+  }
+  else if (expectedStack.activeActivityId !== undefined) {
+    const activityElement = actualElement.querySelector(`wb-activity-item[data-activityid="${expectedStack.activeActivityId}"].active`);
+    if (!activityElement) {
+      throw Error(`[DOMAssertError] Expected activity to be active, but is not. [dockingArea=${dockingArea}, activityId=${expectedStack.activeActivityId}]`);
+    }
+  }
+}
+
+function assertActivityPanelsDOM(expectedActivityLayout: Partial<MActivityLayout>, actualElement: Element): void {
+  if (expectedActivityLayout.panels?.left) {
+    assertLeftActivityPanelDOM(expectedActivityLayout.panels.left, actualElement.querySelector('wb-layout wb-activity-panel[data-panel="left"]'));
+  }
+  if (expectedActivityLayout.panels?.right) {
+    assertRightActivityPanelDOM(expectedActivityLayout.panels.right, actualElement.querySelector('wb-layout wb-activity-panel[data-panel="right"]'));
+  }
+  if (expectedActivityLayout.panels?.bottom) {
+    assertBottomActivityPanelDOM(expectedActivityLayout.panels.bottom, actualElement.querySelector('wb-layout wb-activity-panel[data-panel="bottom"]'));
+  }
+}
+
+function assertLeftActivityPanelDOM(expectedPanel: Required<MActivityLayout['panels']>['left'], actualElement: Element | null): void {
+  if (expectedPanel === 'closed') {
+    actualElement && throwError(`[DOMAssertError] Expected left activity panel not to be present, but it is.`);
+    return;
+  }
+
+  if (!actualElement) {
+    throw Error(`[DOMAssertError] Expected left activity panel to be in the DOM, but is not.`);
+  }
+
+  // Assert left activity panel width.
+  const panelBoundingBox = actualElement.getBoundingClientRect();
+  if (panelBoundingBox.width !== expectedPanel.width) {
+    throw Error(`[DOMAssertError] Expected width of left activity panel to be ${expectedPanel.width} but was ${panelBoundingBox.width}.`);
+  }
+
+  if (expectedPanel.ratio) {
+    // Assert ratio (top group height).
+    const topGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(0).getBoundingClientRect();
+    const expectedTopGroupHeight = (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio;
+    if (topGridBoundingbox.height != expectedTopGroupHeight) {
+      throw Error(`[DOMAssertError] Expected height of top group of left activity panel to be ${expectedTopGroupHeight} but was ${panelBoundingBox.height}.`);
+    }
+
+    // Assert ratio (bottom group height).
+    const bottomGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(1).getBoundingClientRect();
+    const expectedBottomGroupHeight = (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio);
+    if (bottomGridBoundingbox.height != expectedBottomGroupHeight) {
+      throw Error(`[DOMAssertError] Expected height of bottom group of left activity panel to be ${expectedBottomGroupHeight} but was ${panelBoundingBox.height}.`);
+    }
+  }
+}
+
+function assertRightActivityPanelDOM(expectedPanel: Required<MActivityLayout['panels']>['right'], actualElement: Element | null): void {
+  if (expectedPanel === 'closed') {
+    actualElement && throwError(`[DOMAssertError] Expected right activity panel not to be present, but it is.`);
+    return;
+  }
+
+  if (!actualElement) {
+    throw Error(`[DOMAssertError] Expected right activity panel to be in the DOM, but is not.`);
+  }
+
+  // Assert right activity panel width.
+  const panelBoundingBox = actualElement.getBoundingClientRect();
+  if (panelBoundingBox.width !== expectedPanel.width) {
+    throw Error(`[DOMAssertError] Expected width of right activity panel to be ${expectedPanel.width} but was ${panelBoundingBox.width}.`);
+  }
+
+  if (expectedPanel.ratio) {
+    // Assert ratio (top group height).
+    const topGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(0).getBoundingClientRect();
+    const expectedTopGroupHeight = (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio;
+    if (topGridBoundingbox.height != expectedTopGroupHeight) {
+      throw Error(`[DOMAssertError] Expected height of top group of right activity panel to be ${expectedTopGroupHeight} but was ${panelBoundingBox.height}.`);
+    }
+
+    // Assert ratio (bottom group height).
+    const bottomGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(1).getBoundingClientRect();
+    const expectedBottomGroupHeight = (panelBoundingBox.height - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio);
+    if (bottomGridBoundingbox.height != expectedBottomGroupHeight) {
+      throw Error(`[DOMAssertError] Expected height of bottom group of right activity panel to be ${expectedBottomGroupHeight} but was ${panelBoundingBox.height}.`);
+    }
+  }
+}
+
+function assertBottomActivityPanelDOM(expectedPanel: Required<MActivityLayout['panels']>['bottom'], actualElement: Element | null): void {
+  if (expectedPanel === 'closed') {
+    actualElement && throwError(`[DOMAssertError] Expected bottom activity panel not to be present, but it is.`);
+    return;
+  }
+
+  if (!actualElement) {
+    throw Error(`[DOMAssertError] Expected bottom activity panel to be in the DOM, but is not.`);
+  }
+
+  // Assert bottom activity panel height.
+  const panelBoundingBox = actualElement.getBoundingClientRect();
+  if (panelBoundingBox.height !== expectedPanel.height) {
+    throw Error(`[DOMAssertError] Expected height of bottom activity panel to be ${expectedPanel.height} but was ${panelBoundingBox.height}.`);
+  }
+
+  if (expectedPanel.ratio) {
+    // Assert ratio (left group width).
+    const leftGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(0).getBoundingClientRect();
+    const expectedLeftGroupWidth = (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * expectedPanel.ratio;
+    if (leftGridBoundingbox.width != expectedLeftGroupWidth) {
+      throw Error(`[DOMAssertError] Expected width of left group of bottom activity panel to be ${expectedLeftGroupWidth} but was ${leftGridBoundingbox.width}.`);
+    }
+
+    // Assert ratio (right group width).
+    const rightGridBoundingbox = actualElement.querySelectorAll('wb-grid').item(1).getBoundingClientRect();
+    const expectedRightGroupWidth = (panelBoundingBox.width - SASHBOX_SPLITTER_SIZE) * (1 - expectedPanel.ratio);
+    if (rightGridBoundingbox.width != expectedRightGroupWidth) {
+      throw Error(`[DOMAssertError] Expected width of right group of bottom activity panel to be ${expectedRightGroupWidth} but was ${rightGridBoundingbox.width}.`);
+    }
   }
 }
 
@@ -196,8 +408,8 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
     if (!actualPartElement) {
       throw Error(`[DOMAssertError]: Expected element 'wb-part[data-partid="part.main-area"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
-    if (expectedWorkbenchLayout.mainAreaGrid) {
-      assertGridElementDOM(expectedWorkbenchLayout.mainAreaGrid.root, actualPartElement.querySelector(`:scope > wb-grid-element`), expectedWorkbenchLayout);
+    if (expectedWorkbenchLayout.grids?.mainArea) {
+      assertGridElementDOM(expectedWorkbenchLayout.grids.mainArea.root, actualPartElement.querySelector(':scope > wb-grid[data-grid="main-area"] > wb-grid-element'), expectedWorkbenchLayout);
     }
     return;
   }
@@ -270,21 +482,17 @@ function toEqual(actual: any, expected: any, util: MatchersUtil, expectationFail
  */
 export interface ExpectedWorkbenchLayout {
   /**
-   * Asserts specified workbench grid, if set.
+   * Asserts the specified activity layout, if set.
    */
-  workbenchGrid?: MPartGrid;
+  activityLayout?: Partial<MActivityLayout>;
   /**
-   * Asserts specified main area grid, if set.
+   * Asserts the specified grids.
    */
-  mainAreaGrid?: MPartGrid;
+  grids?: ExpectedWorkbenchGrids;
   /**
    * Asserts the layout to belong to specified perspective, if set.
    */
   perspectiveId?: string | undefined;
-  /**
-   * Asserts specified maximized state, if set.
-   */
-  maximized?: boolean;
   /**
    * Asserts specified navigation states, if set.
    */
@@ -294,6 +502,55 @@ export interface ExpectedWorkbenchLayout {
    */
   outlets?: Outlets;
 }
+
+interface ExpectedWorkbenchGrids {
+  /**
+   * Asserts the specified main grid. If not set, does not assert the main grid.
+   */
+  main?: MPartGrid;
+  /**
+   * Asserts the specified main area grid. If not set, does not assert the main area grid.
+   */
+  mainArea?: MPartGrid;
+
+  /**
+   * Asserts the specified activity grids. If not set, does not assert the activity grids.
+   */
+  [activityId: ActivityId]: MPartGrid;
+}
+
+export type MActivityLayout = Omit<_MActivityLayout, 'toolbars' | 'panels'> & {
+  toolbars: {
+    leftTop?: MActivityStack;
+    leftBottom?: MActivityStack;
+    rightTop?: MActivityStack;
+    rightBottom?: MActivityStack;
+    bottomLeft?: MActivityStack;
+    bottomRight?: MActivityStack;
+  };
+  panels: {
+    left?: {
+      width: number;
+      ratio?: number;
+    } | 'closed';
+    right?: {
+      width: number;
+      ratio?: number;
+    } | 'closed';
+    bottom?: {
+      height: number;
+      ratio?: number;
+    } | 'closed';
+  };
+};
+
+export type MActivityStack = Omit<_MActivityStack, 'activities' | 'activeActivityId' | 'minimizedActivityId'> & {
+  activities: Array<Partial<MActivity>>;
+  activeActivityId?: ActivityId | 'none';
+  minimizedActivityId?: ActivityId | 'none';
+};
+
+export type MActivity = Partial<_MActivity>;
 
 /**
  * `MPartGrid` that can be used as expectation in {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -336,6 +593,11 @@ export class MPart extends _MPart {
     });
   }
 }
+
+/**
+ * Size of the splitter of sash boxes.
+ */
+const SASHBOX_SPLITTER_SIZE = 1;
 
 /**
  * Constant used by the {@link #any} matcher to identify properties matching any value except `null` and `undefined`.

@@ -71,7 +71,8 @@ export class MicrofrontendViewComponent {
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
   private readonly _unsubscribeParamsUpdater$ = new Subject<void>();
   private readonly _universalKeystrokes = [
-    ['escape'], // allows closing notifications
+    ['escape'], // keystroke to close notifications
+    ['ctrl', 'shift', 'F12'], // keystroke to minimize activities
   ];
 
   protected readonly view = inject(ɵWorkbenchView);

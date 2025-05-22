@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Commands, NavigationData, NavigationState, PartId, ReferencePart, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
+import {ActivityId, Commands, DockedPartExtras, DockingArea, NavigationData, NavigationState, PartExtras, PartId, ReferencePart, Translatable, WorkbenchLayout, WorkbenchLayoutFactory} from '@scion/workbench';
 import {MAIN_AREA} from '../../../workbench.model';
 import {ActivatedRoute} from '@angular/router';
 
@@ -17,8 +17,8 @@ import {ActivatedRoute} from '@angular/router';
  */
 export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
 
-  public addPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
-    return new ɵWorkbenchLayout().addInitialPart(id, options);
+  public addPart(id: string | MAIN_AREA, extras?: PartExtras): WorkbenchLayout {
+    return new ɵWorkbenchLayout().addInitialPart(id, extras);
   }
 }
 
@@ -27,23 +27,54 @@ export class ɵWorkbenchLayoutFactory implements WorkbenchLayoutFactory {
  */
 export class ɵWorkbenchLayout implements WorkbenchLayout {
 
+  public dockedParts = new Array<DockedPartDescriptor>();
   public parts = new Array<PartDescriptor>();
   public views = new Array<ViewDescriptor>();
   public partNavigations = new Array<PartNavigationDescriptor>();
   public viewNavigations = new Array<ViewNavigationDescriptor>();
+  public activeParts = new Array<string>();
+  public activeViews = new Array<string>();
+  public removeParts = new Array<string>();
 
-  public addInitialPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout {
-    this.parts.push({id, activate: options?.activate});
+  public addInitialPart(id: string | MAIN_AREA, extras?: PartExtras): WorkbenchLayout {
+    this.parts.push({id, title: extras?.title, activate: extras?.activate, cssClass: extras?.cssClass});
     return this;
   }
 
-  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, options?: {activate?: boolean}): WorkbenchLayout {
+  public addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout;
+  public addPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout;
+  public addPart(id: string, reference: ReferencePart | DockingArea, extras?: PartExtras | DockedPartExtras): WorkbenchLayout {
+    if ((reference as Partial<DockingArea>).dockTo) {
+      return this.addDockedPart(id, reference as DockingArea, extras as DockedPartExtras);
+    }
+    else {
+      return this._addPart(id, reference as ReferencePart, extras as PartExtras);
+    }
+  }
+
+  private _addPart(id: string | MAIN_AREA, relativeTo: ReferencePart, extras?: PartExtras): WorkbenchLayout {
     this.parts.push({
       id,
       relativeTo: relativeTo.relativeTo,
       align: relativeTo.align,
       ratio: relativeTo.ratio,
-      activate: options?.activate,
+      title: extras?.title,
+      cssClass: extras?.cssClass,
+      activate: extras?.activate,
+    });
+    return this;
+  }
+
+  private addDockedPart(id: string, dockTo: DockingArea, extras: DockedPartExtras): WorkbenchLayout {
+    this.dockedParts.push({
+      id,
+      dockTo: dockTo.dockTo,
+      icon: extras.icon,
+      label: extras.label,
+      tooltip: extras.tooltip,
+      title: extras.title,
+      cssClass: extras.cssClass,
+      ɵactivityId: extras.ɵactivityId,
     });
     return this;
   }
@@ -97,15 +128,21 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   public removePart(id: string): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.removePart` is not supported.');
+    this.removeParts.push(id);
+    return this;
   }
 
   public activateView(id: string, options?: {activatePart?: boolean}): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.activateView` is not supported.');
+    this.activeViews.push(id);
+    if (options?.activatePart) {
+      throw Error('[PageObjectError] Option `activatePart` in `WorkbenchLayout.activateView` is not supported.');
+    }
+    return this;
   }
 
   public activatePart(id: string): WorkbenchLayout {
-    throw Error('[PageObjectError] Operation `WorkbenchLayout.activatePart` is not supported.');
+    this.activeParts.push(id);
+    return this;
   }
 
   public moveView(id: string, targetPartId: string, options?: {position?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'; activateView?: boolean; activatePart?: boolean}): WorkbenchLayout {
@@ -118,6 +155,20 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 }
 
 /**
+ * Represents a docked part to add to the layout.
+ */
+export interface DockedPartDescriptor {
+  id: string;
+  dockTo: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom' | 'bottom-left' | 'bottom-right';
+  icon: string;
+  label: Translatable;
+  tooltip?: Translatable;
+  title?: Translatable | false;
+  cssClass?: string | string[];
+  ɵactivityId?: ActivityId;
+}
+
+/**
  * Represents a part to add to the layout.
  */
 export interface PartDescriptor {
@@ -125,7 +176,9 @@ export interface PartDescriptor {
   relativeTo?: string;
   align?: 'left' | 'right' | 'top' | 'bottom';
   ratio?: number;
+  title?: Translatable;
   activate?: boolean;
+  cssClass?: string | string[];
 }
 
 /**

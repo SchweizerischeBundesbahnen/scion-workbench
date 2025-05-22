@@ -60,7 +60,7 @@ export class LayoutPagePO implements WorkbenchViewPagePO {
     return modifyLayoutPage.modify(fn);
   }
 
-  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: PartId | PartId[]; grid?: 'workbench' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
+  public async registerPartAction(content: string, options?: {align?: 'start' | 'end'; viewId?: ViewId | ViewId[]; partId?: PartId | PartId[]; grid?: 'main' | 'mainArea'; cssClass?: string | string[]}): Promise<void> {
     await this.view.tab.click();
     await this._tabbar.selectTab('e2e-register-part-action');
 

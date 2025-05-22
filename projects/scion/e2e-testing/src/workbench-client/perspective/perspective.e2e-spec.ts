@@ -83,34 +83,36 @@ test.describe('Workbench Perspective', () => {
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await viewPage1.view.tab.getViewId()},
-              {id: await viewPage2.view.tab.getViewId()},
-            ],
-            activeViewId: await viewPage1.view.tab.getViewId(),
-          }),
-          child2: new MTreeNode({
+      grids: {
+        main: {
+          root: new MTreeNode({
             direction: 'row',
-            ratio: .8,
+            ratio: .25,
             child1: new MPart({
-              id: MAIN_AREA,
-            }),
-            child2: new MPart({
-              id: 'part.right',
+              id: 'part.left',
               views: [
-                {id: await viewPage3.view.tab.getViewId()},
-                {id: await viewPage4.view.tab.getViewId()},
+                {id: await viewPage1.view.tab.getViewId()},
+                {id: await viewPage2.view.tab.getViewId()},
               ],
-              activeViewId: await viewPage3.view.tab.getViewId(),
+              activeViewId: await viewPage1.view.tab.getViewId(),
+            }),
+            child2: new MTreeNode({
+              direction: 'row',
+              ratio: .8,
+              child1: new MPart({
+                id: MAIN_AREA,
+              }),
+              child2: new MPart({
+                id: 'part.right',
+                views: [
+                  {id: await viewPage3.view.tab.getViewId()},
+                  {id: await viewPage4.view.tab.getViewId()},
+                ],
+                activeViewId: await viewPage3.view.tab.getViewId(),
+              }),
             }),
           }),
-        }),
+        },
       },
     });
 
@@ -207,36 +209,38 @@ test.describe('Workbench Perspective', () => {
 
     // Expect layout of the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .8,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await viewPage1.view.tab.getViewId()},
-            ],
-            activeViewId: await viewPage1.view.tab.getViewId(),
-          }),
-          child2: new MTreeNode({
-            direction: 'column',
-            ratio: .5,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .8,
             child1: new MPart({
-              id: 'part.right-top',
+              id: 'part.left',
               views: [
-                {id: await viewPage2.view.tab.getViewId()},
+                {id: await viewPage1.view.tab.getViewId()},
               ],
-              activeViewId: await viewPage2.view.tab.getViewId(),
+              activeViewId: await viewPage1.view.tab.getViewId(),
             }),
-            child2: new MPart({
-              id: 'part.right-bottom',
-              views: [
-                {id: await viewPage3.view.tab.getViewId()},
-              ],
-              activeViewId: await viewPage3.view.tab.getViewId(),
+            child2: new MTreeNode({
+              direction: 'column',
+              ratio: .5,
+              child1: new MPart({
+                id: 'part.right-top',
+                views: [
+                  {id: await viewPage2.view.tab.getViewId()},
+                ],
+                activeViewId: await viewPage2.view.tab.getViewId(),
+              }),
+              child2: new MPart({
+                id: 'part.right-bottom',
+                views: [
+                  {id: await viewPage3.view.tab.getViewId()},
+                ],
+                activeViewId: await viewPage3.view.tab.getViewId(),
+              }),
             }),
           }),
-        }),
+        },
       },
     });
 
@@ -420,21 +424,23 @@ test.describe('Workbench Perspective', () => {
     // Expect perspective 1 to be active.
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual(perspective1.metadata!.id);
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await viewPage1.view.tab.getViewId()},
-            ],
-            activeViewId: await viewPage1.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await viewPage1.view.tab.getViewId()},
+              ],
+              activeViewId: await viewPage1.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
     await expectView(viewPage1).toBeActive();
@@ -445,21 +451,23 @@ test.describe('Workbench Perspective', () => {
     // Expect perspective 2 to be active.
     await expect.poll(() => appPO.getActivePerspectiveId()).toEqual(perspective2.metadata!.id);
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: MAIN_AREA,
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: MAIN_AREA,
+            }),
+            child2: new MPart({
+              id: 'part.right',
+              views: [
+                {id: await viewPage2.view.tab.getViewId()},
+              ],
+              activeViewId: await viewPage2.view.tab.getViewId(),
+            }),
           }),
-          child2: new MPart({
-            id: 'part.right',
-            views: [
-              {id: await viewPage2.view.tab.getViewId()},
-            ],
-            activeViewId: await viewPage2.view.tab.getViewId(),
-          }),
-        }),
+        },
       },
     });
     await expectView(viewPage2).toBeActive();
@@ -543,22 +551,24 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await testViewPage1.view.tab.getViewId()},
-              {id: await notFoundPage.view.tab.getViewId()},
-            ],
-            activeViewId: await testViewPage1.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await testViewPage1.view.tab.getViewId()},
+                {id: await notFoundPage.view.tab.getViewId()},
+              ],
+              activeViewId: await testViewPage1.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
 
@@ -587,22 +597,24 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await testViewPage1.view.tab.getViewId()},
-              {id: await testViewPage2.view.tab.getViewId()},
-            ],
-            activeViewId: await testViewPage1.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await testViewPage1.view.tab.getViewId()},
+                {id: await testViewPage2.view.tab.getViewId()},
+              ],
+              activeViewId: await testViewPage1.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
 
@@ -659,21 +671,23 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await notFoundPage.view.tab.getViewId()},
-            ],
-            activeViewId: await notFoundPage.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await notFoundPage.view.tab.getViewId()},
+              ],
+              activeViewId: await notFoundPage.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
 
@@ -732,21 +746,23 @@ test.describe('Workbench Perspective', () => {
 
     // Expect the perspective.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await testViewPage.view.tab.getViewId()},
-            ],
-            activeViewId: await testViewPage.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await testViewPage.view.tab.getViewId()},
+              ],
+              activeViewId: await testViewPage.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
 
@@ -813,23 +829,25 @@ test.describe('Workbench Perspective', () => {
     await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NullCapabilityError/})).not.toEqual([]);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await testViewPage1.view.tab.getViewId()},
-              {id: await notFoundPage2.view.tab.getViewId()},
-              {id: await notFoundPage3.view.tab.getViewId()},
-            ],
-            activeViewId: await testViewPage1.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await testViewPage1.view.tab.getViewId()},
+                {id: await notFoundPage2.view.tab.getViewId()},
+                {id: await notFoundPage3.view.tab.getViewId()},
+              ],
+              activeViewId: await testViewPage1.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
 
@@ -895,22 +913,24 @@ test.describe('Workbench Perspective', () => {
     await expect.poll(() => consoleLogs.get({severity: 'warning', message: /NotQualifiedError/})).not.toEqual([]);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .5,
-          child1: new MPart({
-            id: 'part.left',
-            views: [
-              {id: await testViewPage.view.tab.getViewId()},
-              {id: await notFoundPage.view.tab.getViewId()},
-            ],
-            activeViewId: await testViewPage.view.tab.getViewId(),
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [
+                {id: await testViewPage.view.tab.getViewId()},
+                {id: await notFoundPage.view.tab.getViewId()},
+              ],
+              activeViewId: await testViewPage.view.tab.getViewId(),
+            }),
+            child2: new MPart({
+              id: MAIN_AREA,
+            }),
           }),
-          child2: new MPart({
-            id: MAIN_AREA,
-          }),
-        }),
+        },
       },
     });
 

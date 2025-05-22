@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2023 Swiss Federal Railways
+ * Copyright (c) 2018-2025 Swiss Federal Railways
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,6 +25,8 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
 import {PartId} from './workbench-part.model';
+import {dasherize} from '../common/dasherize.util';
+import {NullContentComponent} from '../null-content/null-content.component';
 
 @Component({
   selector: 'wb-part',
@@ -38,7 +40,12 @@ import {PartId} from './workbench-part.model';
     RouterOutletRootContextDirective,
     ViewPortalPipe,
     SciViewportComponent,
+    NullContentComponent,
   ],
+  host: {
+    '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,
+    '[attr.data-grid]': 'dasherize(part.gridName())',
+  },
 })
 export class PartComponent implements OnInit {
 
@@ -49,6 +56,8 @@ export class PartComponent implements OnInit {
   private readonly _cd = inject(ChangeDetectorRef);
 
   protected readonly part = inject(ɵWorkbenchPart);
+  protected readonly canDrop = inject(ViewDragService).canDrop(inject(ɵWorkbenchPart));
+  protected readonly dasherize = dasherize;
 
   @HostBinding('attr.tabindex')
   protected tabIndex = -1;
@@ -56,14 +65,6 @@ export class PartComponent implements OnInit {
   @HostBinding('attr.data-partid')
   protected get partId(): PartId {
     return this.part.id;
-  }
-
-  /**
-   * Gets the context in which this part is used.
-   */
-  @HostBinding('attr.data-context')
-  protected get context(): 'main-area' | null {
-    return this.part.isInMainArea ? 'main-area' : null;
   }
 
   @HostBinding('class.active')

@@ -1,13 +1,13 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
 Similar to Angular, the workbench provides a router for view navigation. View navigation is based on Angular's routing mechanism and thus supports lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more. A view can inject `ActivatedRoute` to obtain parameters passed to the navigation and/or read data associated with the route.
 
-### How to open a view
+### How to Open a View
 
 A view is opened using the `WorkbenchRouter`. Like the Angular router, the workbench router has a `navigate` method that is passed an array of commands and optional navigation extras to control the navigation.
 
@@ -43,15 +43,15 @@ inject(WorkbenchRouter).navigate(['path/to/view', {some: 'param'}]);
 inject(WorkbenchRouter).navigate(['path/to/view'], {data: {some: 'data'}});
 ```
 
-### How to control the navigation target
+### How to Control the Navigation Target
 By default, the router navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution.
 
-The default behavior can be overridden by specifying a `target` via navigation extras.
+The default behavior can be overridden by specifying a `target` in navigation extras.
 
 | Target     | Explanation                                                                                                               | Default |
 |------------|---------------------------------------------------------------------------------------------------------------------------|---------|
 | `auto`     | Navigates existing views that match the path, or opens a new view otherwise. Matrix params do not affect view resolution. | yes     |
-| `blank`    | Navigates in a new view.                                                                                                  |         |
+| `blank`    | Opens a new view and navigates it.                                                                                        |         |
 | `<viewId>` | Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.                              |         |
 
 ### How to differentiate between routes with an identical path
@@ -89,7 +89,7 @@ bootstrapApplication(AppComponent, {
 });
 ```
 
-### How to navigate in a template
+### How to Navigate in a Template
 The workbench provides the `wbRouterLink` directive for navigation in a template. The `wbRouterLink` directive is the workbench equivalent of the Angular `routerLink`.
 
 Use this directive to navigate the current view. If the user presses the CTRL key (Mac: ⌘, Windows: ⊞), this directive will open a new view.
@@ -112,13 +112,10 @@ Prepend the path with a forward slash `/` to navigate absolutely, or set `relati
 ```
 
 ***
-#### Related Links:
-- [Learn how to provide a view.][link-how-to-provide-view]
-- [Learn how to define the initial workbench layout.][link-how-to-define-initial-workbench-layout]
+**Further Reading:**
+- [How to Provide a View](how-to-provide-view.md)
+- [How to Define the Workbench Layout](how-to-define-layout.md)
 ***
-
-[link-how-to-provide-view]: /docs/site/howto/how-to-provide-view.md
-[link-how-to-define-initial-workbench-layout]: /docs/site/howto/how-to-define-initial-layout.md
 
 [menu-how-to]: /docs/site/howto/how-to.md
 [menu-home]: /README.md

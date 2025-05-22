@@ -1,15 +1,15 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Layout
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
+The workbench layout is an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other. Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
 
-### How to modify the workbench layout
+### How to Modify the Workbench Layout
 
-The workbench layout can be modified using the `navigate` method of the `WorkbenchRouter` by passing a function. The router will invoke this function with the current workbench layout. The layout has methods for modifying it. The layout is immutable, so each modification creates a new instance. Use the instance for further modifications and finally return it.
+The workbench layout can be modified using the `navigate` method of the `WorkbenchRouter` by passing a function. The router will invoke this function with the current workbench layout. The layout has methods for modifying it. The layout is immutable; each modification creates a new instance.
 
 The following example adds a part to the left of the main area, inserts a view and navigates it.
 
@@ -25,6 +25,7 @@ inject(WorkbenchRouter).navigate(layout => layout
 );
 ```
 
+> [!NOTE]
 > The function can call `inject` to get any required dependencies.
 
 

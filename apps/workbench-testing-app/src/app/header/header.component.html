@@ -1,5 +1,5 @@
 <!-- Perspective Switcher -->
-@let activePerspective = workbenchService.activePerspective();
+@let activePerspective = workbenchService.activePerspective()!;
 <button (click)="onPerspectiveSwitcherMenuOpen(perspective_switcher_menu_button)"
         title="Switch Perspective"
         class="e2e-perspective-switcher-menu-button perspective-switcher" [class.menu-open]="perspectiveSwitcherMenuState() === 'open'"

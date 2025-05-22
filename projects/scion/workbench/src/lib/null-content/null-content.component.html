@@ -1,0 +1,7 @@
+@if (isDevMode && view) {
+  @let hint = '%workbench.null_view_developer_hint.message;view=' + (view.alternativeId ?? view.id) | wbText;
+  @let tooltip = '%workbench.dev_mode_only_hint.tooltip' | wbText;
+  <section class="developer-hint" [title]="tooltip()" [innerHTML]="hint()"></section>
+} @else {
+  {{('%workbench.null_content.message' | wbText)()}}
+}

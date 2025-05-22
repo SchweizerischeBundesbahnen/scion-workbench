@@ -1,11 +1,11 @@
 **<a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Part
 
-### How to display content in a part
+### How to Display Content in a Part
 A part can display content when its view stack is empty.
 
 To display content in a part, the part must be navigated, similar to navigating a view.

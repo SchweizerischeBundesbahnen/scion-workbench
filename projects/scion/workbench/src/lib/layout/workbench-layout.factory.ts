@@ -10,7 +10,7 @@
 
 import {Injectable} from '@angular/core';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
-import {MAIN_AREA, WorkbenchLayout} from './workbench-layout';
+import {MAIN_AREA, PartExtras, WorkbenchLayout} from './workbench-layout';
 
 /**
  * Factory for creating a {@link WorkbenchLayout}.
@@ -22,9 +22,9 @@ export abstract class WorkbenchLayoutFactory {
    * Creates a layout with given part.
    *
    * @param id - The id of the part. Use {@link MAIN_AREA} to add the main area.
-   * @param options - Controls how to add the part to the layout.
-   * @param options.activate - Controls whether to activate the part. If not set, defaults to `false`.
+   * @param extras - Controls how to add the part to the layout.
+   * @param extras.activate - Controls whether to activate the part. If not set, defaults to `false`.
    * @return layout with the part added.
    */
-  public abstract addPart(id: string | MAIN_AREA, options?: {activate?: boolean}): WorkbenchLayout;
+  public abstract addPart(id: string | MAIN_AREA, extras?: PartExtras): WorkbenchLayout;
 }

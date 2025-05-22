@@ -25,7 +25,7 @@ export default class ActivatorModule {
   }
 
   private async registerManifestObjects(appSymbolicName: string): Promise<void> {
-    const app = /workbench-client-testing-(?<app>.+)/.exec(appSymbolicName)!.groups!['app'];
+    const app = /workbench-client-testing-(?<app>.+)/.exec(appSymbolicName)!.groups!['app']!;
     const heading = `${app}: Workbench Client E2E Testpage`;
 
     // Register view to interact with the workbench view object.

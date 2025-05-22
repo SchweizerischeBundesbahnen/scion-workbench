@@ -23,11 +23,11 @@ describe('Text Provider', () => {
   it('should provide text for key (signal)', () => {
     TestBed.configureTestingModule({
       providers: [
-        provideTextProvider(key => texts[key]),
+        provideTextProvider(key => texts[key as 'key-1' | 'key-2']),
       ],
     });
 
-    const texts: Record<string, WritableSignal<string>> = {
+    const texts: Record<'key-1' | 'key-2', WritableSignal<string>> = {
       'key-1': signal('text-1'),
       'key-2': signal('text-2'),
     };
@@ -215,7 +215,7 @@ describe('Text Provider', () => {
   it('should support observable as text provider using `toSignal`', () => {
     TestBed.configureTestingModule({
       providers: [
-        provideTextProvider(key => toSignal(texts[key], {requireSync: true})),
+        provideTextProvider(key => texts[key] ? toSignal(texts[key], {requireSync: true}) : undefined),
       ],
     });
 

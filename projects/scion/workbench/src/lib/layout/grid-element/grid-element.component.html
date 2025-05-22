@@ -7,21 +7,27 @@
 @if (element() | wbInstanceof:MTreeNode; as treeNode) {
   @let children = this.children();
 
-  @if (children.length === 1) {
-    <!-- Node with a single visible child. -->
-    <wb-grid-element [element]="children[0].element"/>
-  }
-  @if (children.length > 1) {
-    <!-- Node with multiple visible children. -->
-    <sci-sashbox [direction]="treeNode.direction"
-                 [attr.data-nodeid]="treeNode.id"
-                 (sashStart)="onSashStart()"
-                 (sashEnd)="onSashEnd(treeNode, $event)">
-      @for (child of children; track child.element.id) {
-        <ng-template sciSash [size]="child.size">
-          <wb-grid-element [element]="child.element" [class]="'sash-' + ($index + 1)"/>
-        </ng-template>
-      }
-    </sci-sashbox>
+  @switch (children.length) {
+    @case (0) {
+      <!-- Node with no visible children. -->
+      <wb-null-content/>
+    }
+    @case (1) {
+      <!-- Node with a single visible child. -->
+      <wb-grid-element [element]="children[0]!.element"/>
+    }
+    @default {
+      <!-- Node with multiple visible children. -->
+      <sci-sashbox [direction]="treeNode.direction"
+                   [attr.data-nodeid]="treeNode.id"
+                   (sashStart)="onSashStart()"
+                   (sashEnd2)="onSashEnd(treeNode, $event)">
+        @for (child of children; track child.element.id) {
+          <ng-template sciSash [size]="child.size" [key]="'sash' + ($index + 1)">
+            <wb-grid-element [element]="child.element" [class]="'sash-' + ($index + 1)"/>
+          </ng-template>
+        }
+      </sci-sashbox>
+    }
   }
 }

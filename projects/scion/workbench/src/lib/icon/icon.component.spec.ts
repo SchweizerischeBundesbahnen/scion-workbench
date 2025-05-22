@@ -266,8 +266,8 @@ describe('IconComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         provideIconProvider(
-          icon => provider1[icon] as Type<unknown> | undefined && {component: provider1[icon], inputs: {provider: '1'}},
-          icon => provider2[icon] as Type<unknown> | undefined && {component: provider2[icon], inputs: {provider: '2'}},
+          icon => provider1[icon] && {component: provider1[icon], inputs: {provider: '1'}},
+          icon => provider2[icon] && {component: provider2[icon], inputs: {provider: '2'}},
         ),
         {provide: ComponentFixtureAutoDetect, useValue: true},
       ],

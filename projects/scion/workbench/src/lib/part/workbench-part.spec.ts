@@ -17,10 +17,13 @@ import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import {provideRouter} from '@angular/router';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
-import {Component, DestroyRef, Directive, inject, OnDestroy} from '@angular/core';
+import {Component, DestroyRef, Directive, inject, OnDestroy, signal} from '@angular/core';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchPartNavigation} from './workbench-part.model';
+import {By} from '@angular/platform-browser';
+import {WorkbenchService} from '../workbench.service';
+import {MAIN_AREA} from '../layout/workbench-layout';
 
 describe('WorkbenchPart', () => {
 
@@ -292,5 +295,176 @@ describe('WorkbenchPart', () => {
     // Expect properties not to be changed until destroyed previous component.
     expect(componentInstancePart7.navigationReadInDestroy).toEqual(jasmine.objectContaining({data: {data: 'part-7'}, state: {state: 'part-7'}, hint: 'part-7'}));
     expect(componentInstancePart7.navigationCssClassReadInDestroy).toEqual(['part-7']);
+  });
+
+  it('should set part title', async () => {
+    const texts = {
+      'title-1': 'TITLE-1',
+      'title-2': 'TITLE-2',
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => {
+            return factory
+              .addPart('part.left', {title: '%title-1'})
+              .addPart('part.right', {align: 'right'}, {title: 'title-2'})
+              .navigatePart('part.left', ['test-part'])
+              .navigatePart('part.right', ['test-part']);
+          },
+          textProvider: key => signal(texts[key as keyof typeof texts]),
+        }),
+      ],
+    });
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Expect title to be set.
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('TITLE-1');
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.right"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('title-2');
+  });
+
+  it('should indicate whether part is in main area or not', async () => {
+    TestBed.configureTestingModule({providers: [provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'})]});
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Create initial workbench layout.
+    await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+      .addPart('part.inMainArea', {relativeTo: 'part.initial', align: 'left'})
+      .addPart('part.notInMainArea', {align: 'left'}),
+    );
+    await waitUntilStable();
+
+    // Expect part to be in main area.
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.inMainArea').isInMainArea).toBeTrue();
+
+    // Expect part not to be in main area.
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.notInMainArea').isInMainArea).toBeFalse();
+  });
+
+  describe('Part Bar', () => {
+
+    it('should show part bar if part has title', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart('part.testee', {title: 'Title'})
+              .navigatePart('part.testee', ['test-part']),
+          }),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should show activity title only in top-leftmost part in activity', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart(MAIN_AREA)
+              .addPart('part.activity-top', {dockTo: 'left-top'}, {title: 'ACTIVITY', label: 'Activity', icon: 'folder'})
+              .addPart('part.activity-bottom', {relativeTo: 'part.activity-top', align: 'bottom'})
+              .navigatePart('part.activity-top', ['test-part'])
+              .navigatePart('part.activity-bottom', ['test-part'])
+              .activatePart('part.activity-top'),
+          }),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Expect part bar of 'part.activity-top' to show with title.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.activity-top"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('ACTIVITY');
+      // Expect part bar of 'part.activity-bottom' not to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.activity-bottom"] > wb-part-bar'))).toBeNull();
+    });
+
+    it('should show part bar if part has views', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart('part.testee')
+              .addView('view.100', {partId: 'part.testee'}),
+          }),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should show part bar if part has actions', async () => {
+      @Component({
+        selector: 'spec-action',
+        template: 'spec-action',
+      })
+      class SpecActionComponent {
+      }
+
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart('part.testee')
+              .navigatePart('part.testee', ['test-part']),
+          }),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Register part action.
+      TestBed.inject(WorkbenchService).registerPartAction(() => SpecActionComponent);
+      await waitUntilStable();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should show part bar of activity\'s top-rightmost part even if not showing the activity title (to display minimize button)', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart(MAIN_AREA)
+              .addPart('part.testee', {dockTo: 'left-top'}, {title: false, label: 'Activity', icon: 'folder'})
+              .navigatePart('part.testee', ['test-part'])
+              .activatePart('part.testee'),
+          }),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Expect part bar to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).not.toBeNull();
+    });
+
+    it('should not show part bar if part has no title, no views, no actions and not in activity', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart('part.testee')
+              .navigatePart('part.testee', ['test-part']),
+          }),
+        ],
+      });
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Expect part bar not to show.
+      expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).toBeNull();
+    });
   });
 });

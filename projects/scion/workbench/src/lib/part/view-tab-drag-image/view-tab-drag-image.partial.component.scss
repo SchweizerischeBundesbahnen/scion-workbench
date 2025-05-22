@@ -12,6 +12,14 @@
     > div.corner-radius {
       display: none;
     }
+
+    > div.content {
+      transform: unset; // see view-tab.component.scss
+    }
+
+    > button.close:is(button, #sci-reset) {
+      transform: unset; // see view-tab.component.scss
+    }
   }
 
   &:not(.can-drop) {

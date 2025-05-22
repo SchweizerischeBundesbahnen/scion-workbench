@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Provider, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {WorkbenchStartup} from './startup/workbench-startup.service';
@@ -16,7 +16,6 @@ import {WorkbenchConfig} from './workbench-config';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
 import {DOCUMENT, NgComponentOutlet} from '@angular/common';
-import {WorkbenchLayoutComponent} from './layout/workbench-layout.component';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
@@ -25,6 +24,12 @@ import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-ro
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Routing} from './routing/routing.util';
+import {LayoutComponent} from './layout/layout.component';
+import {ɵWorkbenchService} from './ɵworkbench.service';
+import {fromEvent} from 'rxjs';
+import {ɵWorkbenchRouter} from './routing/ɵworkbench-router.service';
+import {subscribeIn} from '@scion/toolkit/operators';
+import {filter} from 'rxjs/operators';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -35,9 +40,9 @@ import {Routing} from './routing/routing.util';
   styleUrls: ['./workbench.component.scss'],
   imports: [
     NgComponentOutlet,
-    WorkbenchLayoutComponent,
     NotificationListComponent,
     GlassPaneDirective,
+    LayoutComponent,
   ],
   viewProviders: [
     configureWorkbenchGlassPane(),
@@ -47,6 +52,7 @@ export class WorkbenchComponent {
 
   private _workbenchLauncher = inject(WorkbenchLauncher);
   private _logger = inject(Logger);
+  private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
 
   private _iframeOverlayHost = viewChild('iframe_overlay_host', {read: ViewContainerRef});
   private _viewDropZoneOverlayHost = viewChild('view_drop_zone_overlay_host', {read: ViewContainerRef});
@@ -54,6 +60,7 @@ export class WorkbenchComponent {
   /** Splash to display during workbench startup. */
   protected splash = inject(WorkbenchConfig).splashComponent ?? inject(WorkbenchConfig).startup?.splash ?? SplashComponent;
   protected workbenchStartup = inject(WorkbenchStartup);
+  protected workbenchService = inject(ɵWorkbenchService);
 
   constructor() {
     this._logger.debug(() => 'Constructing WorkbenchComponent.', LoggerNames.LIFECYCLE);
@@ -61,6 +68,24 @@ export class WorkbenchComponent {
     this.startWorkbench();
     this.disableChangeDetectionDuringNavigation();
     this.provideWorkbenchElementReferences();
+    this.installMaximizeShortcutListener();
+  }
+
+  /**
+   * Toggles layout maximization by pressing Ctrl+Shift+F12.
+   */
+  private installMaximizeShortcutListener(): void {
+    const zone = inject(NgZone);
+    fromEvent<KeyboardEvent>(window, 'keydown', {capture: true}) // capturing phase for a higher precedence
+      .pipe(
+        subscribeIn(fn => zone.runOutsideAngular(fn)),
+        filter(event => event.ctrlKey && event.shiftKey && event.key === 'F12'),
+        takeUntilDestroyed(),
+      )
+      .subscribe(event => {
+        event.preventDefault();
+        void this._workbenchRouter.navigate(layout => layout.toggleMaximized());
+      });
   }
 
   /**

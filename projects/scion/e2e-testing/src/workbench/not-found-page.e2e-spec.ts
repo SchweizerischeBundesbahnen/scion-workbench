@@ -12,7 +12,6 @@ import {test} from '../fixtures';
 import {expect} from '@playwright/test';
 import {PageNotFoundPagePO} from './page-object/page-not-found-page.po';
 import {expectView} from '../matcher/view-matcher';
-import {BlankViewPagePO} from './page-object/blank-view-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {ConsoleLogs} from '../helper/console-logs';
 import {ViewPagePO} from './page-object/view-page.po';
@@ -21,34 +20,6 @@ import {expectPart} from '../matcher/part-matcher';
 test.describe('Workbench Page Not Found', () => {
 
   test.describe('View', () => {
-
-    test('should display blank page when adding a view but not navigating it', async ({appPO, workbenchNavigator, consoleLogs}) => {
-      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
-
-      // Add view.101 in peripheral area
-      // Add view.102 in main area
-      await workbenchNavigator.modifyLayout(layout => layout
-        .addPart('part.left', {align: 'left'})
-        .addView('view.101', {partId: 'part.left', activateView: true})
-        .addView('view.102', {partId: 'part.initial'}),
-      );
-
-      const viewPage1 = new BlankViewPagePO(appPO, {viewId: 'view.101'});
-      const viewPage2 = new BlankViewPagePO(appPO, {viewId: 'view.102'});
-
-      await expectView(viewPage1).toBeActive();
-      await expectView(viewPage2).toBeActive();
-
-      // Reload the application and expect the blank page to still be displayed.
-      await test.step('Reloading the application', async () => {
-        await appPO.reload();
-        await expectView(viewPage1).toBeActive();
-        await expectView(viewPage2).toBeActive();
-      });
-
-      // Expect Angular router not to error.
-      await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
-    });
 
     test('should display "Not Found" page when navigating to an unknown path', async ({appPO, workbenchNavigator, consoleLogs}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});

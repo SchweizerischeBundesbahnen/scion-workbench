@@ -4,7 +4,7 @@
 | --- | --- | --- | --- | --- |
 
 ## SCION Projects
-SCION provides fundamental building blocks for implementing a microfrontend architecture and facilitates the development of Angular web applications that require a flexible layout to arrange content side-by-side or stacked.
+SCION provides fundamental building blocks for implementing a microfrontend architecture and facilitates the development of Angular web applications that require a flexible layout to display content side-by-side or stacked.
 
 ***
 
@@ -12,7 +12,7 @@ SCION provides fundamental building blocks for implementing a microfrontend arch
   SCION Microfrontend Platform enables you to successfully implement a framework-agnostic microfrontend architecture by providing you with fundamental APIs for client-side communication, embedding microfrontends, and navigating between the microfrontends. It is a lightweight, web stack agnostic library that has no user-facing components and does not dictate any form of application structure.
   
 - [**SCION Workbench** <img src="/docs/logo/angular.svg" alt="Angular-specific" title="Angular-specific">][link-scion-workench]\
-  SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.
+  SCION Workbench enables the creation of Angular web applications that require a flexible layout to display content side-by-side or stacked, all personalizable by the user via drag & drop.
    
 - [**SCION Toolkit**][link-scion-toolkit]\
   SCION Toolkit is a collection of UI components and utilities designed primarily for use in SCION libraries and their demo and test applications. 

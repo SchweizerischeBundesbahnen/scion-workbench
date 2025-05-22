@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  --sci-sashbox-gap: 0;
+  --sci-sashbox-splitter-background-color: var(--sci-workbench-part-divider-color);
+  --sci-sashbox-splitter-background-color-hover: var(--sci-workbench-part-divider-color-hover);
+  --sci-sashbox-splitter-size: var(--sci-workbench-part-divider-size);
+  --sci-sashbox-splitter-size-hover: var(--sci-workbench-part-divider-size-hover);
+  --sci-sashbox-splitter-touch-target-size: var(--sci-workbench-part-divider-touch-target-size);
+  --sci-sashbox-splitter-border-radius: 0;
+  --sci-sashbox-splitter-opacity-active: var(--sci-workbench-part-divider-opacity-active);
+  --sci-sashbox-splitter-opacity-hover: var(--sci-workbench-part-divider-opacity-hover);
+
+  > wb-activity-bar {
+    flex: none;
+  }
+
+  > main {
+    flex: auto;
+    display: grid;
+
+    sci-viewport.desktop {
+      > router-outlet {
+        position: absolute;
+      }
+    }
+
+    sci-sashbox {
+      // Unset stacking context formed by <sci-sashbox> so that sash splitters can overlap microfrontends (iframes).
+      //
+      // For iframe-based microfrontend integration, we cannot add iframes directly as sash content, but have to project
+      // iframes to the sash boundaries instead. Otherwise, iframes would reload when being reparented in the DOM.
+      //
+      // The sashbox sets a z-index on sash splitters to overlap sash content. However, this only applies to sash content
+      // modeled via `ng-template`. To make the splitters still overlap the iframes, we unset the stacking context of the
+      // sashbox component (by setting `z-index` to `auto`), causing the stacking contexts formed by the splitters to become
+      // part of the workbench's parent stacking context.
+      //
+      // For more information about stacking contexts, refer to
+      // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context.
+      z-index: auto;
+    }
+  }
+}

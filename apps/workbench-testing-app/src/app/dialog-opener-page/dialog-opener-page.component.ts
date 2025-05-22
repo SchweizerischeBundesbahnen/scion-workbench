@@ -18,7 +18,7 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {DialogPageComponent} from '../dialog-page/dialog-page.component';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import BlankTestPageComponent from '../test-pages/blank-test-page/blank-test-page.component';
 import FocusTestPageComponent from '../test-pages/focus-test-page/focus-test-page.component';
 import PopupOpenerPageComponent from '../popup-opener-page/popup-opener-page.component';
@@ -34,7 +34,7 @@ import SizeTestPageComponent from '../test-pages/size-test-page/size-test-page.c
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class DialogOpenerPageComponent {
