@@ -19,8 +19,14 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {PartId, ViewId} from '@scion/workbench';
+import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
+import {ActivityItemPO} from './activity-item.po';
+import {ActivityPanelPO} from './activity-panel.po';
+import {RequireOne} from './helper/utility-types';
+import {dasherize} from './helper/dasherize.util';
+import {GridPO} from './grid.po';
+import {DesktopPO} from './desktop.po';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -33,10 +39,16 @@ export class AppPO {
    * Handle for interacting with the header of the testing application.
    */
   public readonly header: AppHeaderPO;
+
   /**
    * Locates the workbench root element `<wb-workbench>`.
    */
   public readonly workbenchRoot: Locator;
+
+  /**
+   * Handle for interacting with the workbench desktop.
+   */
+  public readonly desktop: DesktopPO;
 
   /**
    * Locates workbench notifications.
@@ -56,6 +68,7 @@ export class AppPO {
   constructor(public readonly page: Page) {
     this.header = new AppHeaderPO(this.page.locator('app-header'));
     this.workbenchRoot = this.page.locator('wb-workbench');
+    this.desktop = new DesktopPO(this.page);
     this.notifications = this.page.locator('wb-notification');
     this.dialogs = this.page.locator('wb-dialog');
     this.workbench = new WorkbenchAccessor(this.page);
@@ -91,6 +104,9 @@ export class AppPO {
     }
     if (options?.perspectives?.length) {
       this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, options.perspectives.join(';'));
+    }
+    if (options?.designTokens) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DESIGN_TOKENS, JSON.stringify(options.designTokens));
     }
     if (options?.dialogModalityScope) {
       this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options.dialogModalityScope);
@@ -164,23 +180,18 @@ export class AppPO {
   }
 
   /**
-   * Handle for interacting with the currently active workbench part in the specified area.
+   * Handle for interacting with the currently active workbench part in the specified grid.
    */
-  public activePart(locateBy: {inMainArea: boolean}): PartPO {
-    if (locateBy.inMainArea) {
-      return new PartPO(this.page.locator('wb-part[data-context="main-area"].active'));
-    }
-    else {
-      return new PartPO(this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]).active'));
-    }
+  public activePart(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): PartPO {
+    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"].active`));
   }
 
   /**
    * Handle to the specified part in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the part.
-   * @param locateBy.partId - Identifies the part by its id
-   * @param locateBy.cssClass - Identifies the part by its CSS class
+   * @param locateBy.partId - Identifies the part by its id.
+   * @param locateBy.cssClass - Identifies the part by its CSS class.
    */
   public part(locateBy: {partId?: PartId; cssClass?: string}): PartPO {
     if (locateBy.partId !== undefined && locateBy.cssClass !== undefined) {
@@ -199,15 +210,15 @@ export class AppPO {
    * Locates opened views.
    *
    * @param locateBy - Controls which views to locate.
-   * @param locateBy.inMainArea - Controls whether to locate views contained in the main area (`true`), not contained in the main area (`false`), or both (not specified).
+   * @param locateBy.peripheral - Controls whether to locate views located in the peripheral area.
    */
-  public views(locateBy?: {inMainArea?: boolean; cssClass?: string}): Locator {
+  public views(locateBy?: {peripheral?: boolean; cssClass?: string}): Locator {
     const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
-    if (locateBy?.inMainArea === true) {
-      return this.page.locator('wb-part[data-context="main-area"] wb-view-tab').locator(locateByCssClass);
+    if (locateBy?.peripheral === true) {
+      return this.page.locator('wb-part[data-peripheral] wb-view-tab').locator(locateByCssClass);
     }
-    if (locateBy?.inMainArea === false) {
-      return this.page.locator('wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]) wb-view-tab').locator(locateByCssClass);
+    if (locateBy?.peripheral === false) {
+      return this.page.locator('wb-part:not([data-peripheral]) wb-view-tab').locator(locateByCssClass);
     }
     else {
       return this.page.locator('wb-view-tab').locator(locateByCssClass);
@@ -218,8 +229,8 @@ export class AppPO {
    * Handle to the specified view in the workbench layout.
    *
    * @param locateBy - Specifies how to locate the view. Either `viewId` or `cssClass`, or both must be set.
-   * @param locateBy.viewId - Identifies the view by its id
-   * @param locateBy.cssClass - Identifies the view by its CSS class
+   * @param locateBy.viewId - Identifies the view by its id.
+   * @param locateBy.cssClass - Identifies the view by its CSS class.
    */
   public view(locateBy: {viewId?: ViewId; cssClass?: string}): ViewPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
@@ -241,6 +252,44 @@ export class AppPO {
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
+  }
+
+  /**
+   * Handle to the specified grid in the workbench layout.
+   *
+   * @param locateBy - Specifies how to locate the grid.
+   * @param locateBy.grid - Identifies the grid by its name.
+   */
+  public grid(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): GridPO {
+    return new GridPO(this.page.locator(`wb-grid[data-grid="${locateBy.grid}"]`));
+  }
+
+  /**
+   * Handle to the specified activity item in the workbench layout.
+   *
+   * @param locateBy - Specifies how to locate the activity item.
+   * @param locateBy.activityId - Identifies the activity by its id.
+   * @param locateBy.cssClass - Identifies the activity by its CSS class.
+   */
+  public activityItem(locateBy: RequireOne<{activityId: ActivityId; cssClass: string}>): ActivityItemPO {
+    if (locateBy.activityId !== undefined && locateBy.cssClass !== undefined) {
+      return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"].${locateBy.cssClass}`));
+    }
+    else if (locateBy.activityId !== undefined) {
+      return new ActivityItemPO(this.page.locator(`wb-activity-item[data-activityid="${locateBy.activityId}"]`));
+    }
+    else {
+      return new ActivityItemPO(this.page.locator(`wb-activity-item.${locateBy.cssClass}`));
+    }
+  }
+
+  /**
+   * Handle to the specified activity panel in the workbench layout.
+   *
+   * @param panel - Specifies which activity panel to locate.
+   */
+  public activityPanel(panel: 'left' | 'right' | 'bottom'): ActivityPanelPO {
+    return new ActivityPanelPO(this.page.locator(`wb-activity-panel[data-panel="${panel}"]`));
   }
 
   /**
@@ -298,8 +347,8 @@ export class AppPO {
     await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
-    const inMainArea = await this.hasMainArea();
-    return new StartPagePO(this, {viewId: await this.activePart({inMainArea}).activeView.getViewId()});
+    const activePart = new PartPO(this.page.locator('wb-part:not([data-peripheral]).active'));
+    return new StartPagePO(this, {viewId: await activePart.activeView.getViewId()});
   }
 
   /**
@@ -317,7 +366,7 @@ export class AppPO {
    * Waits until the workbench finished startup.
    */
   public async waitUntilWorkbenchStarted(): Promise<void> {
-    await this.page.locator('wb-workbench wb-workbench-layout').waitFor({state: 'visible'});
+    await this.page.locator('wb-workbench wb-layout').waitFor({state: 'visible'});
   }
 
   /**
@@ -356,47 +405,12 @@ export class AppPO {
   }
 
   /**
-   * Gets the active drop zone when dragging a view to the workbench edge.
+   * Sets given design token on the HTML root element.
    */
-  public async getActiveEdgeDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
-    const dropZone = this.page.locator('div.e2e-edge-drop-zone');
-    if (!await dropZone.isVisible()) {
-      return null;
-    }
-
-    const dropZoneId = await dropZone.getAttribute('data-id');
-    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
-    if (!await dropPlaceholder.isVisible()) {
-      return null;
-    }
-
-    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
-  }
-
-  /**
-   * Gets the active drop zone when dragging a view over the desktop.
-   */
-  public async getActiveDesktopDropZone(): Promise<'north' | 'east' | 'south' | 'west' | null> {
-    const dropZone = this.page.locator('div.e2e-desktop-drop-zone');
-    if (!await dropZone.isVisible()) {
-      return null;
-    }
-
-    const dropZoneId = await dropZone.getAttribute('data-id');
-    const dropPlaceholder = this.page.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
-    if (!await dropPlaceholder.isVisible()) {
-      return null;
-    }
-
-    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
-  }
-
-  /**
-   * Sets given design token on the workbench HTML element.
-   */
-  public async setDesignToken(name: string, value: string): Promise<void> {
-    const pageFunction = (workbenchElement: HTMLElement, token: {name: string; value: string}): void => workbenchElement.style.setProperty(token.name, token.value);
-    await this.workbenchRoot.evaluate(pageFunction, {name, value});
+  public async setDesignToken(name: `--sci-${string}`, value: string): Promise<void> {
+    await this.page.evaluate((token: {name: string; value: string}): void => {
+      document.documentElement.style.setProperty(token.name, token.value);
+    }, {name, value});
   }
 
   /**
@@ -411,13 +425,6 @@ export class AppPO {
    */
   public getLocalStorageItem(key: string): Promise<string | null> {
     return this.page.evaluate(key => localStorage.getItem(key), key);
-  }
-
-  /**
-   * Tests if the layout has a main area.
-   */
-  public hasMainArea(): Promise<boolean> {
-    return this.workbenchRoot.locator('wb-part[data-partid="part.main-area"]').isVisible();
   }
 
   /**
@@ -494,6 +501,10 @@ export interface Options {
    */
   localStorage?: {[key: string]: string};
   /**
+   * Specifies design tokens available to the application.
+   */
+  designTokens?: {[name: string]: string};
+  /**
    * Controls if to use the legacy start page (via empty path route) instead of the desktop.
    *
    * @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support.
@@ -529,6 +540,11 @@ export enum WorkenchStartupQueryParams {
    * Query param to register perspectives. Multiple perspectives are separated by semicolon.
    */
   PERSPECTIVES = 'perspectives',
+
+  /**
+   * Query param to provide design tokens to the application.
+   */
+  DESIGN_TOKENS = 'designTokens',
 
   /**
    * Query param to set the scope for application-modal dialogs.

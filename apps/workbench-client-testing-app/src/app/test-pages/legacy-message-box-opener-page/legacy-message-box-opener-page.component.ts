@@ -13,8 +13,8 @@ import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {WorkbenchCapabilities, WorkbenchMessageBoxLegacyOptions, WorkbenchView} from '@scion/workbench-client';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../../common/stringify-error.util';
-import {CssClassComponent} from '../../css-class/css-class.component';
 import {IntentClient, mapToBody} from '@scion/microfrontend-platform';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 /**
  * Allows testing workbench message box backward compatibility for workbench clients older than version v1.0.0-beta.23.
@@ -28,7 +28,7 @@ import {IntentClient, mapToBody} from '@scion/microfrontend-platform';
   imports: [
     ReactiveFormsModule,
     SciFormFieldComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class LegacyMessageBoxOpenerPageComponent {

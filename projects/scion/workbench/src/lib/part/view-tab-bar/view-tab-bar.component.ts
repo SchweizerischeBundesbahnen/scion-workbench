@@ -82,6 +82,7 @@ export class ViewTabBarComponent implements OnDestroy {
   private readonly _viewportComponentElement = viewChild.required(SciViewportComponent, {read: ElementRef<HTMLElement>});
   private readonly _tabCornerRadiusElement = viewChild.required('tab_corner_radius', {read: ElementRef<HTMLElement>});
   private readonly _viewportBoundingBox = boundingClientRect(this._viewportComponentElement);
+  private readonly _canDrop = inject(ViewDragService).canDrop(inject(ɵWorkbenchPart));
 
   /**
    * Reference to the part.
@@ -188,6 +189,10 @@ export class ViewTabBarComponent implements OnDestroy {
    * Method invoked when the user drags a tab into this tabbar.
    */
   private onTabbarDragEnter(event: DragEvent): void {
+    if (!this._canDrop()) {
+      return;
+    }
+
     // Memoize drag data.
     const dragData = this._dragData = this._viewDragService.viewDragData()!;
 
@@ -223,6 +228,10 @@ export class ViewTabBarComponent implements OnDestroy {
    * Method invoked when the user drags a tab out of this tabbar.
    */
   private onTabbarDragLeave(event: DragEvent): void {
+    if (!this._canDrop()) {
+      return;
+    }
+
     // Set CSS class to animate leaving the tabbar, but not when canceling the drag operation for instant reset.
     // Pointer coordinates are not set when the drag operation is canceled or when dragging the tab out of the window.
     if (event.screenX || event.screenY) {
@@ -247,6 +256,11 @@ export class ViewTabBarComponent implements OnDestroy {
    */
   private onTabbarDragOver(event: DragEvent, dragDistance: number, scrollDistance: number): void {
     NgZone.assertNotInAngularZone();
+
+    if (!this._canDrop()) {
+      return;
+    }
+
     event.preventDefault(); // allow view drop
 
     // Locate the tab the user is dragging over.

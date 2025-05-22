@@ -59,7 +59,7 @@
         </sci-form-field>
 
         <sci-form-field label="CSS Class(es)">
-          <app-css-class [formControl]="form.controls.viewProperties.controls.cssClass"/>
+          <app-multi-value-input [formControl]="form.controls.viewProperties.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
         </sci-form-field>
 
         <sci-form-field label="Pin to Desktop">
@@ -104,7 +104,7 @@
         </sci-form-field>
 
         <sci-form-field label="CSS Class(es)">
-          <app-css-class [formControl]="form.controls.popupProperties.controls.cssClass"/>
+          <app-multi-value-input [formControl]="form.controls.popupProperties.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
         </sci-form-field>
       }
       @case (WorkbenchCapabilities.Dialog) {
@@ -157,7 +157,7 @@
         </sci-form-field>
 
         <sci-form-field label="CSS Class(es)">
-          <app-css-class [formControl]="form.controls.dialogProperties.controls.cssClass"/>
+          <app-multi-value-input [formControl]="form.controls.dialogProperties.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
         </sci-form-field>
       }
       @case (WorkbenchCapabilities.MessageBox) {
@@ -197,7 +197,7 @@
           </sci-form-field>
 
           <sci-form-field label="CSS Class(es)">
-            <app-css-class [formControl]="form.controls.messageBoxProperties.controls.cssClass"/>
+            <app-multi-value-input [formControl]="form.controls.messageBoxProperties.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
           </sci-form-field>
         </ng-container>
       }

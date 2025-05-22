@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, effect, inject, Injectable, Injector, NgZone, OnDestroy, untracked} from '@angular/core';
+import {computed, effect, inject, Injectable, Injector, isSignal, NgZone, OnDestroy, Signal, untracked} from '@angular/core';
 import {BehaviorSubject, EMPTY, fromEvent, merge, mergeMap, mergeWith, MonoTypeOperatorFunction, Observable, Observer, Subject, switchMap, TeardownLogic} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
@@ -19,6 +19,12 @@ import {ClassListMap} from '../common/class-list';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {PartId} from '../part/workbench-part.model';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {ActivityId, MActivity} from '../activity/workbench-activity.model';
+import {MPartGrid} from '../layout/workbench-grid.model';
+import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
+import {isActivityId, ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
+import {WORKBENCH_ID} from '../workbench-id';
 
 /**
  * Coordinates cross application drag and drop of views.
@@ -29,7 +35,9 @@ import {Translatable} from '../text/workbench-text-provider.model';
 export class ViewDragService implements OnDestroy {
 
   private readonly _injector = inject(Injector);
+  private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _zone = inject(NgZone);
+  private readonly _workbenchLayoutService = inject(WorkbenchLayoutService);
   private readonly _viewDragStartBroadcastChannel = new WorkbenchBroadcastChannel<ViewDragData>('workbench/view/dragstart');
   private readonly _viewDragEndBroadcastChannel = new WorkbenchBroadcastChannel<void>('workbench/view/dragend');
   private readonly _viewMoveBroadcastChannel = new WorkbenchBroadcastChannel<ViewMoveEvent>('workbench/view/move');
@@ -68,6 +76,10 @@ export class ViewDragService implements OnDestroy {
    * Indicates if a drag operation is active across application instances of the same origin.
    */
   public readonly dragging = computed<boolean>(() => this.viewDragData() !== null);
+
+  constructor() {
+    this.installDragDetector();
+  }
 
   /**
    * Signals start dragging a tab over specified tabbar (dragenter).
@@ -108,6 +120,43 @@ export class ViewDragService implements OnDestroy {
     }
     // Test the event to originate from an app of this origin.
     return this.dragging();
+  }
+
+  /**
+   * Tests if a view can be dropped on the specified target.
+   */
+  public canDrop(target: ɵWorkbenchPart | MPartGrid | Signal<ɵWorkbenchPart | MPartGrid>): Signal<boolean> {
+    return computed(() => {
+      const dropTarget = isSignal(target) ? target() : target;
+      const dragData = this.viewDragData();
+
+      return untracked(() => {
+        if (!dragData) {
+          return false;
+        }
+
+        // Dragging a view from or to an activity is only valid within the same activity and application instance.
+        const dragSourceActivityId = dragData.activityId;
+        const dropTargetActivityId = getContainingActivity(dropTarget, this._workbenchLayoutService.layout())?.id;
+        if (dragSourceActivityId || dropTargetActivityId) {
+          return dragSourceActivityId === dropTargetActivityId && dragData.workbenchId === this._workbenchId;
+        }
+
+        return true;
+      });
+
+      /**
+       * Gets the activity that contains the specified element, or `null` if the element is not contained in an activity.
+       */
+      function getContainingActivity(element: ɵWorkbenchPart | MPartGrid, layout: ɵWorkbenchLayout): MActivity | null {
+        if (element instanceof ɵWorkbenchPart) {
+          return layout.activity({partId: element.id}, {orElse: null});
+        }
+
+        const gridName = layout.grid({grid: element}).gridName;
+        return isActivityId(gridName) ? layout.activity({id: gridName}) : null;
+      }
+    });
   }
 
   /**
@@ -263,6 +312,16 @@ export class ViewDragService implements OnDestroy {
     }, {injector: options?.injector});
   }
 
+  /**
+   * Signals when start dragging a view.
+   */
+  private installDragDetector(): void {
+    effect(() => {
+      const dragging = this.dragging();
+      untracked(() => this._workbenchLayoutService.signalDragging(dragging));
+    });
+  }
+
   public ngOnDestroy(): void {
     this._viewMoveBroadcastChannel.destroy();
     this._viewDragStartBroadcastChannel.destroy();
@@ -287,13 +346,14 @@ export interface ViewDragData {
    */
   viewTabPointerOffsetY: number;
   viewId: ViewId;
+  partId: PartId;
+  activityId?: ActivityId;
   alternativeViewId?: string;
   viewTitle: Translatable | null;
   viewHeading: Translatable | null;
   navigation?: Omit<WorkbenchViewNavigation, 'id' | 'state'>;
   viewClosable: boolean | 'disabled';
   viewDirty: boolean;
-  partId: PartId;
   viewTabWidth: number;
   viewTabHeight: number;
   viewTitleOffsetRight?: string | undefined;

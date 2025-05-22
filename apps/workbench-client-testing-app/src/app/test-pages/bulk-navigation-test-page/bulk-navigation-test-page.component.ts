@@ -12,8 +12,8 @@ import {Component, inject} from '@angular/core';
 import {WorkbenchRouter} from '@scion/workbench-client';
 import {NonNullableFormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
-import {CssClassComponent} from '../../css-class/css-class.component';
 import {APP_SYMBOLIC_NAME} from '../../workbench-client/workbench-client.provider';
+import {MultiValueInputComponent} from '../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-bulk-navigation-test-page',
@@ -22,7 +22,7 @@ import {APP_SYMBOLIC_NAME} from '../../workbench-client/workbench-client.provide
   imports: [
     SciFormFieldComponent,
     ReactiveFormsModule,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class BulkNavigationTestPageComponent {

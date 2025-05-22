@@ -50,7 +50,7 @@
     </sci-form-field>
 
     <sci-form-field label="CSS Class(es)">
-      <app-css-class [formControl]="form.controls.options.controls.cssClass"/>
+      <app-multi-value-input [formControl]="form.controls.options.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     </sci-form-field>
   </section>
 </form>

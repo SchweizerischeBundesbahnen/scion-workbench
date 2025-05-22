@@ -34,7 +34,7 @@
               @for (viewFormGroup of partFormGroup.controls.views.controls; track viewIndex; let viewIndex = $index) {
                 <app-record [formControl]="viewFormGroup.controls.qualifier" class="e2e-qualifier legend qualifier"/>
                 <app-record [formControl]="viewFormGroup.controls.params" class="e2e-params legend params"/>
-                <app-css-class [formControl]="viewFormGroup.controls.cssClass" class="css-class legend"/>
+                <app-multi-value-input [formControl]="viewFormGroup.controls.cssClass" [placeholder]="'class-1 class-2'" class="legend css-class e2e-class"/>
                 <div class="active legend">
                   <sci-checkbox [formControl]="viewFormGroup.controls.active" class="e2e-active"/>
                 </div>

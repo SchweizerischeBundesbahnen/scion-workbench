@@ -19,7 +19,7 @@ import {DESKTOP} from '../workbench-element-references';
  * A desktop can provide instructions for working with the application, display a welcome page, or provide links to open views.
  *
  * Usage:
- * Add this directive to an `<ng-template>` child of the `<wb-workbench>` component. The template content will be used as desktop content.
+ * Add this directive to an `<ng-template>` child of the `<wb-workbench>` component. The template content is used as desktop content.
  *
  * ```html
  * <wb-workbench>

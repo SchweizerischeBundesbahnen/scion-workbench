@@ -13,9 +13,10 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {noop} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {MAIN_AREA} from '@scion/workbench';
+import {MAIN_AREA, Translatable} from '@scion/workbench';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
 import {UUID} from '@scion/toolkit/uuid';
+import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-add-parts',
@@ -25,6 +26,7 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciCheckboxComponent,
     SciMaterialIconDirective,
+    MultiValueInputComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => AddPartsComponent)},
@@ -50,7 +52,9 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
         align: FormControl<'left' | 'right' | 'top' | 'bottom' | undefined>;
         ratio: FormControl<number | undefined>;
       }>;
-      options: FormGroup<{
+      extras: FormGroup<{
+        title: FormControl<Translatable | undefined>;
+        cssClass: FormControl<string | string[] | undefined>;
         activate: FormControl<boolean | undefined>;
       }>;
     }>>([]),
@@ -70,8 +74,10 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
             align: partFormGroup.controls.relativeTo.controls.align.value,
             ratio: partFormGroup.controls.relativeTo.controls.ratio.value,
           },
-          options: {
-            activate: partFormGroup.controls.options.controls.activate.value,
+          extras: {
+            title: partFormGroup.controls.extras.controls.title.value,
+            cssClass: partFormGroup.controls.extras.controls.cssClass.value,
+            activate: partFormGroup.controls.extras.controls.activate.value,
           },
         })));
         this._cvaTouchedFn();
@@ -99,8 +105,10 @@ export class AddPartsComponent implements ControlValueAccessor, Validator {
           align: this._formBuilder.control<'left' | 'right' | 'top' | 'bottom' | undefined>({value: isInitialPart ? undefined : part.relativeTo.align, disabled: isInitialPart}, isInitialPart ? Validators.nullValidator : Validators.required),
           ratio: this._formBuilder.control<number | undefined>({value: isInitialPart ? undefined : part.relativeTo.ratio, disabled: isInitialPart}),
         }),
-        options: this._formBuilder.group({
-          activate: part.options?.activate,
+        extras: this._formBuilder.group({
+          title: part.extras?.title,
+          cssClass: this._formBuilder.control<string | string[] | undefined>(part.extras?.cssClass),
+          activate: part.extras?.activate,
         }),
       }), {emitEvent: options?.emitEvent ?? true});
   }
@@ -146,7 +154,9 @@ export interface PartDescriptor {
     align?: 'left' | 'right' | 'top' | 'bottom';
     ratio?: number;
   };
-  options?: {
+  extras?: {
+    title?: Translatable;
+    cssClass?: string | string[];
     activate?: boolean;
   };
 }

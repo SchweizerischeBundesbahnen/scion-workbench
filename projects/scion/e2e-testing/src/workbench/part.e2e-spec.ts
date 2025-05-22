@@ -15,6 +15,7 @@ import {ViewPagePO} from './page-object/view-page.po';
 import {expectPart} from '../matcher/part-matcher';
 import {PartPagePO} from './page-object/part-page.po';
 import {MAIN_AREA} from '../workbench.model';
+import {RouterPagePO} from './page-object/router-page.po';
 
 test.describe('Workbench Part', () => {
 
@@ -238,5 +239,195 @@ test.describe('Workbench Part', () => {
         navigationHint: '',
       },
     );
+  });
+
+  test('should locate part by css class', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.left', {cssClass: 'testee-1'})
+      .addPart('part.right', {relativeTo: 'part.left', align: 'right'}, {cssClass: 'testee-2'})
+      .navigatePart('part.left', ['test-part'])
+      .navigatePart('part.right', ['test-router']),
+    );
+
+    // Locate part by css class
+    await expectPart(appPO.part({cssClass: 'testee-1'})).toDisplayComponent(PartPagePO.selector);
+    await expectPart(appPO.part({cssClass: 'testee-2'})).toDisplayComponent(RouterPagePO.selector);
+  });
+
+  test.describe('Title', () => {
+
+    test('should display part title (set via layout)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left', {title: 'testee-1'})
+        .addPart('part.right', {align: 'right'}, {title: 'testee-2'})
+        .navigatePart('part.left', ['test-part'])
+        .navigatePart('part.right', ['test-part']),
+      );
+
+      // Expect part title to display.
+      await expect(appPO.part({partId: 'part.left'}).bar.title).toHaveText('testee-1');
+      await expect(appPO.part({partId: 'part.right'}).bar.title).toHaveText('testee-2');
+    });
+
+    test('should display part title (set via part handle)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right'})
+        .navigatePart('part.left', ['test-part'])
+        .navigatePart('part.right', ['test-part']),
+      );
+
+      const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
+      const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
+
+      // Enter part title.
+      await leftPartPage.enterTitle('testee-1');
+      await rightPartPage.enterTitle('testee-2');
+
+      // Expect part title to display.
+      await expect(leftPartPage.part.bar.title).toHaveText('testee-1');
+      await expect(rightPartPage.part.bar.title).toHaveText('testee-2');
+    });
+
+    test('should display part title when part contains views', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left', {title: 'testee-1'})
+        .addPart('part.right', {align: 'right'}, {title: 'testee-2'})
+        .addView('view.101', {partId: 'part.left'})
+        .addView('view.102', {partId: 'part.right'}),
+      );
+
+      // Expect part title to display.
+      await expect(appPO.part({partId: 'part.left'}).bar.title).toHaveText('testee-1');
+      await expect(appPO.part({partId: 'part.right'}).bar.title).toHaveText('testee-2');
+    });
+  });
+
+  test.describe('Part Background Color', () => {
+
+    test('should apply "--sci-workbench-part-peripheral-background-color" to docked parts (docked part, no main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main')
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+        .navigatePart('part.main', ['test-part'])
+        .navigatePart('part.activity', ['test-part'])
+        .activatePart('part.activity'),
+      );
+
+      // Set part background color design tokens.
+      const partBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-part-background-color', partBackgroundColor);
+      const peripheralPartBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-part-peripheral-background-color', peripheralPartBackgroundColor);
+
+      // Expect part background colors.
+      await expect(appPO.part({partId: 'part.main'}).locator).toHaveCSS('background-color', partBackgroundColor);
+      await expect(appPO.part({partId: 'part.activity'}).locator).toHaveCSS('background-color', peripheralPartBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-part-peripheral-background-color" to docked parts (docked part, main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+        .navigatePart('part.activity', ['test-part'])
+        .activatePart('part.activity'),
+      );
+
+      // Navigate part in main area.
+      await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.initial', ['test-part']));
+
+      // Set part background color design tokens.
+      const partBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-part-background-color', partBackgroundColor);
+      const peripheralPartBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-part-peripheral-background-color', peripheralPartBackgroundColor);
+
+      // Expect part background colors.
+      await expect(appPO.part({partId: 'part.initial'}).locator).toHaveCSS('background-color', partBackgroundColor);
+      await expect(appPO.part({partId: 'part.activity'}).locator).toHaveCSS('background-color', peripheralPartBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-part-peripheral-background-color" to docked parts (docked part, main area, part relative to main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.bottom', {relativeTo: MAIN_AREA, align: 'bottom'})
+        .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+        .navigatePart('part.activity', ['test-part'])
+        .navigatePart('part.bottom', ['test-part'])
+        .activatePart('part.activity'),
+      );
+
+      // Navigate part in main area.
+      await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.initial', ['test-part']));
+
+      // Set part background color design tokens.
+      const partBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-part-background-color', partBackgroundColor);
+      const peripheralPartBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-part-peripheral-background-color', peripheralPartBackgroundColor);
+
+      // Expect part background colors.
+      await expect(appPO.part({partId: 'part.initial'}).locator).toHaveCSS('background-color', partBackgroundColor);
+      await expect(appPO.part({partId: 'part.bottom'}).locator).toHaveCSS('background-color', partBackgroundColor);
+      await expect(appPO.part({partId: 'part.activity'}).locator).toHaveCSS('background-color', peripheralPartBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-part-peripheral-background-color" to parts outside the main area (no docked part, main area, part relative to main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.bottom', {relativeTo: MAIN_AREA, align: 'bottom'})
+        .navigatePart('part.bottom', ['test-part']),
+      );
+
+      // Navigate part in main area.
+      await workbenchNavigator.modifyLayout(layout => layout.navigatePart('part.initial', ['test-part']));
+
+      // Set part background color design tokens.
+      const partBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-part-background-color', partBackgroundColor);
+      const peripheralPartBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-part-peripheral-background-color', peripheralPartBackgroundColor);
+
+      // Expect part background colors.
+      await expect(appPO.part({partId: 'part.initial'}).locator).toHaveCSS('background-color', partBackgroundColor);
+      await expect(appPO.part({partId: 'part.bottom'}).locator).toHaveCSS('background-color', peripheralPartBackgroundColor);
+    });
+
+    test('should apply "--sci-workbench-part-background-color" to all parts in the main grid (no docked part, no main area)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.top')
+        .addPart('part.bottom', {relativeTo: 'part.top', align: 'bottom'})
+        .navigatePart('part.top', ['test-part'])
+        .navigatePart('part.bottom', ['test-part']),
+      );
+
+      // Set part background color design tokens.
+      const partBackgroundColor = 'rgb(0, 255, 0)';
+      await appPO.setDesignToken('--sci-workbench-part-background-color', partBackgroundColor);
+      const peripheralPartBackgroundColor = 'rgb(0, 0, 255)';
+      await appPO.setDesignToken('--sci-workbench-part-peripheral-background-color', peripheralPartBackgroundColor);
+
+      // Expect part background colors.
+      await expect(appPO.part({partId: 'part.top'}).locator).toHaveCSS('background-color', partBackgroundColor);
+      await expect(appPO.part({partId: 'part.bottom'}).locator).toHaveCSS('background-color', partBackgroundColor);
+    });
   });
 });

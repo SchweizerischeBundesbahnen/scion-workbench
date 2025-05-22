@@ -14,7 +14,7 @@ import {AbstractControl, ControlValueAccessor, FormControl, FormGroup, NG_VALIDA
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciMaterialIconDirective} from '@scion/components.internal/material-icon';
-import {CssClassComponent} from '../../../css-class/css-class.component';
+import {MultiValueInputComponent} from '../../../multi-value-input/multi-value-input.component';
 import {UUID} from '@scion/toolkit/uuid';
 
 @Component({
@@ -25,7 +25,7 @@ import {UUID} from '@scion/toolkit/uuid';
     ReactiveFormsModule,
     SciCheckboxComponent,
     SciMaterialIconDirective,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
   providers: [
     {provide: NG_VALUE_ACCESSOR, multi: true, useExisting: forwardRef(() => AddViewsComponent)},

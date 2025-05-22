@@ -19,7 +19,7 @@
     <!-- State -->
     <app-record [formControl]="navigationFormGroup.controls.extras.controls.state" class="e2e-state"/>
     <!-- CSS class -->
-    <app-css-class [formControl]="navigationFormGroup.controls.extras.controls.cssClass"/>
+    <app-multi-value-input [formControl]="navigationFormGroup.controls.extras.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     <!-- Remove button -->
     <button class="e2e-remove" (click)="onRemoveNavigation($index)" title="Remove navigation" sciMaterialIcon>remove</button>
   }

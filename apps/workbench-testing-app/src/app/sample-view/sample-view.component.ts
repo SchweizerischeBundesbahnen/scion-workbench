@@ -54,8 +54,8 @@ export default class SampleViewComponent {
 
   constructor() {
     effect(() => {
-      const navigationData = this.view.navigation()!.data as ViewSkeletonNavigationData;
-      untracked(() => this.onNavigationChange(navigationData));
+      const navigationData = this.view.navigation()!.data as ViewSkeletonNavigationData | undefined;
+      untracked(() => this.onNavigationChange(navigationData ?? {}));
     });
     effect(() => {
       const title = this.view.title();

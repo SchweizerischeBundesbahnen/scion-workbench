@@ -22,6 +22,8 @@ import {Commands, NavigationData, NavigationState, ViewId, WorkbenchNavigationEx
  */
 export class RouterPagePO implements WorkbenchViewPagePO {
 
+  public static readonly selector = 'app-router-page';
+
   public readonly locator: Locator;
   public readonly view: ViewPO;
 
@@ -123,7 +125,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
   }
 
   private async enterCssClass(cssClass?: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
+    await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(cssClass).join(' '));
   }
 
   private async checkViewContext(check?: boolean): Promise<void> {

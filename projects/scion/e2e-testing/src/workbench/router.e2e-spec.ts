@@ -131,7 +131,7 @@ test.describe('Workbench Router', () => {
     await workbenchNavigator.openInNewTab(ViewPagePO);
 
     // close all view tabs
-    await appPO.activePart({inMainArea: true}).bar.viewTabBar.closeTabs();
+    await appPO.activePart({grid: 'mainArea'}).bar.viewTabBar.closeTabs();
 
     await expect(appPO.views()).toHaveCount(0);
 
@@ -755,14 +755,14 @@ test.describe('Workbench Router', () => {
     await workbenchNavigator.modifyLayout(layout => layout
       .addPart('part.left', {align: 'left'})
       .addView('view.100', {partId: 'part.left', activatePart: true, activateView: true})
-      .navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}),
+      .navigateView('view.100', ['test-view'], {data: {navigated: 'false'}}),
     );
 
     // Open view in a part not contained in the layout.
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
       partId: 'does-not-exist',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
       cssClass: 'testee',
     });
 
@@ -770,8 +770,8 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        partId: await appPO.activePart({inMainArea: true}).getPartId(),
-        navigationState: {navigated: 'true'},
+        partId: await appPO.activePart({grid: 'mainArea'}).getPartId(),
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -781,13 +781,13 @@ test.describe('Workbench Router', () => {
         viewId: 'view.100',
         urlSegments: 'test-view',
         partId: 'part.left',
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
   });
 
-  test('should open view in the active part of the workbench grid if specified part is not in the layout', async ({appPO, workbenchNavigator}) => {
+  test('should open view in the active part of the main grid if specified part is not in the layout', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Create perspective with a left and right part.
@@ -796,17 +796,15 @@ test.describe('Workbench Router', () => {
       .addPart('part.right', {align: 'right'})
       .addView('router', {partId: 'part.left', cssClass: 'router'})
       .addView('view.100', {partId: 'part.right'})
-      .navigateView('router', ['test-router']),
+      .navigateView('router', ['test-router'])
+      .navigateView('view.100', ['test-view'], {data: {navigated: 'false'}}),
     );
-
-    // Add state via separate navigation as not supported when adding views to the perspective.
-    await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['test-view'], {state: {navigated: 'false'}}));
 
     // Open view in a part not contained in the layout.
     const routerPage = new RouterPagePO(appPO, {cssClass: 'router'});
     await routerPage.navigate(['test-view'], {
       partId: 'does-not-exist',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
       cssClass: 'testee',
     });
 
@@ -814,8 +812,8 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.view({cssClass: 'testee'}).getInfo()).toMatchObject(
       {
         urlSegments: 'test-view',
-        partId: await appPO.activePart({inMainArea: false}).getPartId(),
-        navigationState: {navigated: 'true'},
+        partId: await appPO.activePart({grid: 'main'}).getPartId(),
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
 
@@ -825,10 +823,118 @@ test.describe('Workbench Router', () => {
         viewId: 'view.100',
         urlSegments: 'test-view',
         partId: 'part.right',
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(3);
+  });
+
+  test('should not navigate views in peripheral parts if not specifying view id or part id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .activatePart('part.activity'),
+    );
+
+    // Navigate to path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {data: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        navigationData: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.102 not to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.102',
+        navigationData: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should navigate views in peripheral parts by id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .activatePart('part.activity'),
+    );
+
+    // Navigate view.102 to path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {target: 'view.102', data: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 not to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        navigationData: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.102 to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.102',
+        navigationData: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should navigate views in peripheral parts if specifying part id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .activatePart('part.activity'),
+    );
+
+    // Navigate matching views in part 'part.activity' to path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {partId: 'part.activity', data: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 not to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        navigationData: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.102 to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.102',
+        navigationData: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
   });
 
   test('should activate a present view if setting `activate` to `true`', async ({appPO, workbenchNavigator}) => {
@@ -1092,38 +1198,41 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (1/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right-top', {relativeTo: MAIN_AREA, align: 'right'})
-      .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
-      .addView('view.101', {partId: 'part.right-top', activateView: true})
-      .addView('view.102', {partId: 'part.right-bottom', activateView: true})
-      .navigateView('view.101', [], {hint: 'test-view', state: {navigated: 'false'}})
-      .navigateView('view.102', [], {hint: 'test-router', state: {navigated: 'false'}}),
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
+      .navigateView('view.101', [], {hint: 'test-view', data: {navigated: 'false'}})
+      .navigateView('view.102', [], {hint: 'test-router', data: {navigated: 'false'}})
+      .navigateView('view.103', ['test-router']),
     );
 
     const testView1 = appPO.view({viewId: 'view.101'});
     const testView2 = appPO.view({viewId: 'view.102'});
 
     // Navigate to empty-path route with hint 'test-view'.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate([], {
       target: 'auto',
       hint: 'test-view',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
     });
 
     // Expect view.101 to be navigated.
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-view'},
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view.102 not to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-router'},
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1131,37 +1240,40 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (2/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right-top', {relativeTo: MAIN_AREA, align: 'right'})
-      .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
-      .addView('view.101', {partId: 'part.right-top', activateView: true})
-      .addView('view.102', {partId: 'part.right-bottom', activateView: true})
-      .navigateView('view.101', ['test-view'], {hint: 'test-view', state: {navigated: 'false'}})
-      .navigateView('view.102', ['test-view'], {state: {navigated: 'false'}}),
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
+      .navigateView('view.101', ['test-view'], {hint: 'test-view', data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.103', ['test-router']),
     );
 
     const testView1 = appPO.view({viewId: 'view.101'});
     const testView2 = appPO.view({viewId: 'view.102'});
 
     // Navigate to 'test-view' route without hint.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate(['test-view'], {
       target: 'auto',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
     });
 
     // Expect view.101 not to be navigated.
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: 'test-view'},
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view.102 to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: ''},
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1169,38 +1281,41 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (3/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right-top', {relativeTo: MAIN_AREA, align: 'right'})
-      .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
-      .addView('view.101', {partId: 'part.right-top', activateView: true})
-      .addView('view.102', {partId: 'part.right-bottom', activateView: true})
-      .navigateView('view.101', ['test-view'], {hint: 'test-view', state: {navigated: 'false'}})
-      .navigateView('view.102', ['test-view'], {hint: 'test-view', state: {navigated: 'false'}}),
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
+      .navigateView('view.101', ['test-view'], {hint: 'test-view', data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {hint: 'test-view', data: {navigated: 'false'}})
+      .navigateView('view.103', ['test-router']),
     );
 
     const testView1 = appPO.view({viewId: 'view.101'});
     const testView2 = appPO.view({viewId: 'view.102'});
 
     // Navigate to 'test-view' route without hint.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate(['test-view'], {
       target: 'auto',
       hint: 'test-view',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
     });
 
     // Expect view.101 to be navigated.
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: 'test-view'},
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect view.102 to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: 'test-view', navigationHint: 'test-view'},
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1208,21 +1323,24 @@ test.describe('Workbench Router', () => {
   test('should navigate views of the same path and hint [target=auto] (4/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right', {relativeTo: MAIN_AREA, align: 'right'})
-      .addView('view.101', {partId: 'part.right', activateView: true})
-      .navigateView('view.101', [], {hint: 'test-router', state: {navigated: 'false'}}),
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.right'})
+      .addView('view.102', {partId: 'part.main'})
+      .navigateView('view.101', [], {hint: 'test-router', data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-router']),
     );
 
     const testView1 = appPO.view({viewId: 'view.101'});
     const testView2 = appPO.view({cssClass: 'testee'});
 
     // Navigate to empty-path route with hint 'test-view'.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.102'});
     await routerPage.navigate([], {
       target: 'auto',
       hint: 'test-view',
-      state: {navigated: 'true'},
+      data: {navigated: 'true'},
       cssClass: 'testee',
     });
 
@@ -1230,14 +1348,14 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => testView1.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-router'},
-        navigationState: {navigated: 'false'},
+        navigationData: {navigated: 'false'},
       } satisfies Partial<ViewInfo>,
     );
     // Expect testee to be navigated.
     await expect.poll(() => testView2.getInfo()).toMatchObject(
       {
         routeData: {path: '', navigationHint: 'test-view'},
-        navigationState: {navigated: 'true'},
+        navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
     );
   });
@@ -1245,13 +1363,16 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (1/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right-top', {relativeTo: MAIN_AREA, align: 'right'})
-      .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
-      .addView('view.101', {partId: 'part.right-top', activateView: true})
-      .addView('view.102', {partId: 'part.right-bottom', activateView: true})
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.101', [], {hint: 'test-view'})
-      .navigateView('view.102', [], {hint: 'test-router'}),
+      .navigateView('view.102', [], {hint: 'test-router'})
+      .navigateView('view.103', ['test-router']),
     );
 
     const testView1 = new ViewPagePO(appPO, {viewId: 'view.101'});
@@ -1261,7 +1382,7 @@ test.describe('Workbench Router', () => {
     await expectView(testView2).toBeActive();
 
     // Close views navigated to empty-path route with hint 'test-view'.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate([], {
       hint: 'test-view',
       close: true,
@@ -1276,13 +1397,16 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (2/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right-top', {relativeTo: MAIN_AREA, align: 'right'})
-      .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
-      .addView('view.101', {partId: 'part.right-top', activateView: true})
-      .addView('view.102', {partId: 'part.right-bottom', activateView: true})
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.101', ['test-view'], {hint: 'test-view'})
-      .navigateView('view.102', ['test-view']),
+      .navigateView('view.102', ['test-view'])
+      .navigateView('view.103', ['test-router']),
     );
 
     const testView1 = new ViewPagePO(appPO, {viewId: 'view.101'});
@@ -1292,7 +1416,7 @@ test.describe('Workbench Router', () => {
     await expectView(testView2).toBeActive();
 
     // Close views navigated to 'test-view' route without hint.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate(['test-view'], {
       close: true,
     });
@@ -1306,13 +1430,16 @@ test.describe('Workbench Router', () => {
   test('should close views of the same path and hint [target=auto] (3/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right-top', {relativeTo: MAIN_AREA, align: 'right'})
-      .addPart('part.right-bottom', {relativeTo: 'part.right-top', align: 'bottom'})
-      .addView('view.101', {partId: 'part.right-top', activateView: true})
-      .addView('view.102', {partId: 'part.right-bottom', activateView: true})
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
       .navigateView('view.101', ['test-view'], {hint: 'test-view'})
-      .navigateView('view.102', ['test-view'], {hint: 'test-view'}),
+      .navigateView('view.102', ['test-view'])
+      .navigateView('view.103', ['test-router']),
     );
 
     const testView1 = new ViewPagePO(appPO, {viewId: 'view.101'});
@@ -1322,7 +1449,7 @@ test.describe('Workbench Router', () => {
     await expectView(testView2).toBeActive();
 
     // Close views navigated to 'test-view' route without hint.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate(['test-view'], {
       hint: 'test-view',
       close: true,
@@ -1330,26 +1457,30 @@ test.describe('Workbench Router', () => {
 
     // Expect view.101 to be closed.
     await expectView(testView1).not.toBeAttached();
-    // Expect view.102 to be closed.
-    await expectView(testView2).not.toBeAttached();
+    // Expect view.102 not to be closed.
+    await expectView(testView2).toBeActive();
   });
 
   test('should close views of the same path and hint [target=auto] (4/4)', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.right', {relativeTo: MAIN_AREA, align: 'right'})
-      .addView('view.101', {partId: 'part.right'})
-      .addView('view.102', {partId: 'part.right', activateView: true})
-      .navigateView('view.101', [], {hint: 'test-router'})
-      .navigateView('view.102', [], {hint: 'test-view'}),
+    await workbenchNavigator.createPerspective(layout => layout
+      .addPart('part.main')
+      .addPart('part.left', {relativeTo: 'part.main', align: 'left'})
+      .addPart('part.right', {relativeTo: 'part.main', align: 'right'})
+      .addView('view.101', {partId: 'part.left'})
+      .addView('view.102', {partId: 'part.right'})
+      .addView('view.103', {partId: 'part.main'})
+      .navigateView('view.101', ['test-view'], {hint: 'test-view'})
+      .navigateView('view.102', [], {hint: 'test-view'})
+      .navigateView('view.103', ['test-router']),
     );
 
-    const view101 = new RouterPagePO(appPO, {viewId: 'view.101'});
+    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
     const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
 
     // Close views navigated to empty-path route with hint 'test-view'.
-    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    const routerPage = new RouterPagePO(appPO, {viewId: 'view.103'});
     await routerPage.navigate([], {
       hint: 'test-view',
       close: true,
@@ -1392,7 +1523,101 @@ test.describe('Workbench Router', () => {
     await expect.poll(() => appPO.part({partId: 'part.right'}).bar.viewTabBar.getViewIds()).toEqual(['view.104']);
   });
 
-  test('should support app URL to contain view outlets of views in the workbench grid', async ({appPO, workbenchNavigator}) => {
+  test('should not close views in peripheral parts if not specifying view id or part id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'])
+      .navigateView('view.102', ['test-view'])
+      .activatePart('part.activity'),
+    );
+
+    // Close view with path 'test-view'.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {close: true});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 to be closed.
+    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    await expectView(view101).not.toBeAttached();
+
+    // Expect view.102 not to be closed.
+    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+    await expectView(view102).toBeActive();
+  });
+
+  test('should close views in peripheral parts by id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'])
+      .navigateView('view.102', ['test-view'])
+      .activatePart('part.activity'),
+    );
+
+    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+
+    // Close view.101.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate([], {target: 'view.101', close: true});
+
+    // Expect view.101 to be closed.
+    await expectView(view101).not.toBeAttached();
+    await expectView(view102).toBeActive();
+
+    // Close view.102.
+    await routerPage.navigate([], {target: 'view.102', close: true});
+
+    // Expect view.102 to be closed.
+    await expectView(view101).not.toBeAttached();
+    await expectView(view102).not.toBeAttached();
+  });
+
+  test('should close views in peripheral parts if specifying part id', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'])
+      .navigateView('view.102', ['test-view'])
+      .activatePart('part.activity'),
+    );
+
+    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+
+    // Close views in part.main.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {partId: 'part.main', close: true});
+
+    // Expect view.101 to be closed.
+    await expectView(view101).not.toBeAttached();
+    await expectView(view102).toBeActive();
+
+    // Close views in part.activity.
+    await routerPage.navigate(['test-view'], {partId: 'part.activity', close: true});
+
+    // Expect view.102 to be closed.
+    await expectView(view101).not.toBeAttached();
+    await expectView(view102).not.toBeAttached();
+  });
+
+  test('should support app URL to contain view outlets of views in the main grid', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
@@ -1405,36 +1630,40 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.100'}],
-            activeViewId: 'view.100',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.100'}],
+              activeViewId: 'view.100',
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
-    // WHEN: Opening the app with a URL that contains view outlets of views from the workbench grid
+    // WHEN: Opening the app with a URL that contains view outlets of views from the main grid
     await appPO.reload();
 
     // THEN: Expect the workbench layout to be restored.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.100'}],
-            activeViewId: 'view.100',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.100'}],
+              activeViewId: 'view.100',
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -1442,7 +1671,7 @@ test.describe('Workbench Router', () => {
     await expectView(viewPage).toBeActive();
   });
 
-  test('should allow for navigation to an empty-path route in the workbench grid', async ({appPO, workbenchNavigator}) => {
+  test('should allow for navigation to an empty-path route in the main grid', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.modifyLayout(layout => layout
@@ -1453,17 +1682,19 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the left part.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MTreeNode({
-          direction: 'row',
-          ratio: .25,
-          child1: new MPart({
-            id: 'part.left',
-            views: [{id: 'view.100'}],
-            activeViewId: 'view.100',
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .25,
+            child1: new MPart({
+              id: 'part.left',
+              views: [{id: 'view.100'}],
+              activeViewId: 'view.100',
+            }),
+            child2: new MPart({id: MAIN_AREA}),
           }),
-          child2: new MPart({id: MAIN_AREA}),
-        }),
+        },
       },
     });
 
@@ -1485,14 +1716,16 @@ test.describe('Workbench Router', () => {
 
     // Expect the view to be opened in the main area.
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
-      workbenchGrid: {
-        root: new MPart({id: MAIN_AREA}),
-      },
-      mainAreaGrid: {
-        root: new MPart({
-          views: [{id: 'view.100'}],
-          activeViewId: 'view.100',
-        }),
+      grids: {
+        main: {
+          root: new MPart({id: MAIN_AREA}),
+        },
+        mainArea: {
+          root: new MPart({
+            views: [{id: 'view.100'}],
+            activeViewId: 'view.100',
+          }),
+        },
       },
     });
 

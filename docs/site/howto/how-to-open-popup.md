@@ -1,7 +1,7 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Popup
 
@@ -14,7 +14,7 @@ The anchor is used to position the popup based on its preferred alignment:
 
 If the popup is opened within a view, it only displays if the view is active and closes when the view is closed.
 
-### How to open a popup
+### How to Open a Popup
 To open a popup, inject `PopupService` and invoke the `open` method, passing a `PopupConfig` options object to control the appearance of the popup.
 
 ```ts

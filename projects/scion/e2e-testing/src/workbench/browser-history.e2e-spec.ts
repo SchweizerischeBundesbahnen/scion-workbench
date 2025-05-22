@@ -18,10 +18,10 @@ import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('Browser History', () => {
 
-  test('should put workbench grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
+  test('should put main grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Add part to the workbench grid
+    // Add part to the main grid
     await workbenchNavigator.modifyLayout(layout => layout.addPart('part.left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25}));
 
     // Add view-1 to the left part

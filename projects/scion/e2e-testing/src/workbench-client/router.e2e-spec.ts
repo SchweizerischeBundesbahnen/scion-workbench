@@ -2220,7 +2220,7 @@ test.describe('Workbench Router', () => {
     const view = appPO.view({cssClass: 'testee'});
     await expect.poll(() => view.getInfo()).toMatchObject(
       {
-        partId: await appPO.activePart({inMainArea: true}).getPartId(),
+        partId: await appPO.activePart({grid: 'mainArea'}).getPartId(),
       } satisfies Partial<ViewInfo>,
     );
     await expect(appPO.views()).toHaveCount(2);
@@ -2295,5 +2295,262 @@ test.describe('Workbench Router', () => {
     await expectView(viewPage1).not.toBeAttached();
     await expectView(viewPage2).not.toBeAttached();
     await expect(appPO.views()).toHaveCount(1);
+  });
+
+  test('should not close views of peripheral parts if not specifying part id', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .activatePart('part.activity'),
+    );
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+      },
+    });
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+
+    // Prerequisite: Navigate view.101 to microfrontend view.
+    await routerPage.navigate({component: 'testee'}, {target: 'view.101'});
+    await expectView(view101).toBeActive();
+
+    // Prerequisite: Navigate view.102 to microfrontend view.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {target: 'view.102'});
+    await expectView(view102).toBeActive();
+
+    // Close view with path 'test-view'.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {close: true});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 to be closed.
+    await expectView(view101).not.toBeAttached();
+
+    // Expect view.102 not to be closed.
+    await expectView(view102).toBeActive();
+  });
+
+  test('should close views of peripheral parts if specifying part id', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .activatePart('part.activity'),
+    );
+
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+      },
+    });
+
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    const view101 = new ViewPagePO(appPO, {viewId: 'view.101'});
+    const view102 = new ViewPagePO(appPO, {viewId: 'view.102'});
+
+    // Prerequisite: Navigate view.101 to microfrontend view.
+    await routerPage.navigate({component: 'testee'}, {target: 'view.101'});
+    await expectView(view101).toBeActive();
+
+    // Prerequisite: Navigate view.102 to microfrontend view.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {target: 'view.102'});
+    await expectView(view102).toBeActive();
+
+    // Close views in part.activity.
+    await routerPage.navigate({component: 'testee'}, {partId: 'part.activity', close: true});
+    await routerPage.view.tab.close();
+
+    // Expect view.102 to be closed.
+    await expectView(view101).toBeActive();
+    await expectView(view102).not.toBeAttached();
+  });
+
+  test('should not navigate views in peripheral parts if not specifying view id or part id', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial'});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .activatePart('part.activity'),
+    );
+
+    // Register view capability.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'navigated', required: false},
+      ],
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+      },
+    });
+
+    // Prerequisite: Navigate view.101 to microfrontend view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {target: 'view.101', params: {navigated: 'false'}});
+
+    // Prerequisite: Navigate view.102 to microfrontend view.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {target: 'view.102', params: {navigated: 'false'}});
+
+    // Navigate to test view.
+    await routerPage.navigate({component: 'testee'}, {params: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        routeParams: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.102 not to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.102',
+        routeParams: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should navigate views in peripheral parts by id', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial'});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .activatePart('part.activity'),
+    );
+
+    // Register view capability.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'navigated', required: false},
+      ],
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+      },
+    });
+
+    // Prerequisite: Navigate view.101 to microfrontend view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {target: 'view.101', params: {navigated: 'false'}});
+
+    // Prerequisite: Navigate view.102 to microfrontend view.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {target: 'view.102', params: {navigated: 'false'}});
+
+    // Navigate to test view.
+    await routerPage.navigate({component: 'testee'}, {target: 'view.102', params: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 not to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        routeParams: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.102 to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.102',
+        routeParams: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
+  });
+
+  test('should navigate views in peripheral parts if specifying part id', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true, mainAreaInitialPartId: 'part.initial'});
+
+    // Create perspective with a peripheral part.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.activity'})
+      .navigateView('view.101', ['test-view'], {data: {navigated: 'false'}})
+      .navigateView('view.102', ['test-view'], {data: {navigated: 'false'}})
+      .activatePart('part.activity'),
+    );
+
+    // Register view capability.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'testee'},
+      params: [
+        {name: 'navigated', required: false},
+      ],
+      properties: {
+        path: 'test-view',
+        title: 'testee',
+      },
+    });
+
+    // Prerequisite: Navigate view.101 to microfrontend view.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'testee'}, {target: 'view.101', params: {navigated: 'false'}});
+
+    // Prerequisite: Navigate view.102 to microfrontend view.
+    await routerPage.view.tab.click();
+    await routerPage.navigate({component: 'testee'}, {target: 'view.102', params: {navigated: 'false'}});
+
+    // Navigate to test view.
+    await routerPage.navigate({component: 'testee'}, {partId: 'part.activity', params: {navigated: 'true'}});
+    await routerPage.view.tab.close();
+
+    // Expect view.101 not to be navigated.
+    await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.101',
+        routeParams: {navigated: 'false'},
+      } satisfies Partial<ViewInfo>,
+    );
+
+    // Expect view.102 to be navigated
+    await expect.poll(() => appPO.view({viewId: 'view.102'}).tab.getInfo()).toMatchObject(
+      {
+        viewId: 'view.102',
+        routeParams: {navigated: 'true'},
+      } satisfies Partial<ViewInfo>,
+    );
   });
 });

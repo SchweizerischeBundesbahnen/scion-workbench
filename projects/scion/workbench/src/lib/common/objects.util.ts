@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Dictionaries} from '@scion/toolkit/util';
+import {Dictionaries, Objects as ToolkitObjects} from '@scion/toolkit/util';
 
 /**
  * Provides helper functions for working with objects.
@@ -47,5 +47,11 @@ export const Objects = {
    */
   toMatrixNotation: (object: Record<string, unknown> | null | undefined): string => {
     return Object.entries(object ?? {}).map(([key, value]) => `${key}=${value}`).join(';');
+  },
+  /**
+   * Compares the two objects for shallow equality, ignoring the propery order.
+   */
+  isEqual: (a: unknown, b: unknown): boolean => {
+    return ToolkitObjects.isEqual(a, b);
   },
 } as const;

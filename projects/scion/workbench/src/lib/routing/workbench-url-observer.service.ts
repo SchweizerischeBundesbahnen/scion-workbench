@@ -35,6 +35,8 @@ import {filter} from 'rxjs/operators';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {PartId} from '../part/workbench-part.model';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
+import {MPartGrid} from '../layout/workbench-grid.model';
 
 /**
  * Tracks the browser URL for workbench layout changes.
@@ -110,31 +112,34 @@ export class WorkbenchUrlObserver {
     const previousUrl = this._router.parseUrl(this._router.url); // Browser URL is only updated after successful navigation
 
     const newLayout = this._workbenchLayoutFactory.create({
-      mainAreaGrid: (() => {
-        // Read the main area grid from the query parameter.
-        const mainAreaGrid = urlTree.queryParamMap.get(MAIN_AREA_LAYOUT_QUERY_PARAM);
-        if (mainAreaGrid) {
-          return mainAreaGrid;
-        }
+      grids: {
+        main: workbenchNavigationalState?.grids.main ?? previousLayout?.grids.main,
+        mainArea: (() => {
+          // Read the main area grid from the query parameter.
+          const mainAreaGrid = urlTree.queryParamMap.get(MAIN_AREA_LAYOUT_QUERY_PARAM);
+          if (mainAreaGrid) {
+            return mainAreaGrid;
+          }
 
-        // Do not fall back to the current layout if the navigation was performed via the Workbench Router.
-        const isWorkbenchRouterNavigation = workbenchNavigationalState !== null;
-        if (isWorkbenchRouterNavigation) {
-          return null;
-        }
+          // Do not fall back to the current layout if the navigation was performed via the Workbench Router.
+          const isWorkbenchRouterNavigation = workbenchNavigationalState !== null;
+          if (isWorkbenchRouterNavigation) {
+            return undefined;
+          }
 
-        // Do not fall back to the current layout if the navigation was triggered from outside the Angular Router, i.e., the browser back/forward buttons.
-        const isExternalNavigation = this._router.getCurrentNavigation()!.trigger === 'popstate';
-        if (isExternalNavigation) {
-          return null;
-        }
+          // Do not fall back to the current layout if the navigation was triggered from outside the Angular Router, i.e., the browser back/forward buttons.
+          const isExternalNavigation = this._router.getCurrentNavigation()!.trigger === 'popstate';
+          if (isExternalNavigation) {
+            return undefined;
+          }
 
-        // Fall back to the current layout if the navigation was performed via the Angular router, i.e., the navigator did not preserve the query params.
-        return previousLayout?.mainAreaGrid;
-      })(),
-      workbenchGrid: workbenchNavigationalState?.workbenchGrid ?? previousLayout?.workbenchGrid,
+          // Fall back to the current layout if the navigation was performed via the Angular router, i.e., the navigator did not preserve the query params.
+          return previousLayout?.grids.mainArea;
+        })(),
+        ...WorkbenchLayouts.pickActivityGrids<string | MPartGrid>(workbenchNavigationalState?.grids ?? previousLayout?.grids),
+      },
+      activityLayout: workbenchNavigationalState?.activityLayout ?? previousLayout?.activityLayout,
       perspectiveId: workbenchNavigationalState?.perspectiveId ?? previousLayout?.perspectiveId,
-      maximized: workbenchNavigationalState?.maximized ?? previousLayout?.maximized,
       navigationStates: workbenchNavigationalState?.navigationStates ?? previousLayout?.navigationStates(),
       outlets: Object.fromEntries(Routing.parseOutlets(urlTree, {part: true, view: true})),
     });
@@ -306,7 +311,7 @@ export class WorkbenchUrlObserver {
    */
   private migrateURL(): void {
     const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
-    if (layout.mainAreaGrid?.migrated) {
+    if (layout.grids.mainArea?.migrated) {
       // Update the URL with the migrated URL and clear existing query params, for example, if the layout query parameter has been renamed.
       void this._workbenchRouter.navigate(layout => layout, {queryParamsHandling: null, replaceUrl: true});
     }

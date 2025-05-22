@@ -1,7 +1,7 @@
 {
   "name": "@scion/workbench",
   "version": "19.0.0-beta.2",
-  "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop.",
+  "description": "SCION Workbench enables the creation of Angular web applications that require a flexible layout to display content side-by-side or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel.",
   "license": "EPL-2.0",
   "private": false,
   "publishConfig": {
@@ -29,7 +29,7 @@
     "@angular/animations": "^19.0.0",
     "@angular/forms": "^19.0.0",
     "@angular/router": "^19.0.0",
-    "@scion/components": "^19.0.0",
+    "@scion/components": "^19.2.0",
     "@scion/toolkit": "^1.6.0",
     "@scion/microfrontend-platform": "^1.3.0",
     "@scion/workbench-client": "^1.0.0-beta.26",

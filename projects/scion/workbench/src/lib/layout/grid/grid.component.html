@@ -1,0 +1,19 @@
+@let dropZone = gridDropZone();
+@if (dropZone) {
+  <wb-grid-element [element]="grid().root"
+                   wbViewDropZone
+                   [wbViewDropZoneRegionSize]="dropZone.dropRegionSize"
+                   [wbViewDropZonePlaceholderSize]="dropZone.dropPlaceholderSize"
+                   [wbViewDropZoneRegions]="canDrop() && {
+                     north: false,
+                     south: grid().root | wbRequiresDropZone:'south',
+                     west: grid().root | wbRequiresDropZone:'west',
+                     east: grid().root | wbRequiresDropZone:'east',
+                     center: false,
+                   }"
+                   [wbViewDropZoneCssClass]="dropZone.dropZoneCssClass"
+                   [wbViewDropZoneAttributes]="dropZone.dropZoneAttributes"
+                   (wbViewDropZoneDrop)="onViewDrop($event)"/>
+} @else {
+  <wb-grid-element [element]="grid().root"/>
+}
