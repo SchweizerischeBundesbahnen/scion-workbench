@@ -28,7 +28,7 @@ export class WorkbenchLayoutMigrationV5 implements WorkbenchMigration {
   private readonly _workbenchLayoutSerializer = inject(WorkbenchLayoutSerializer);
 
   public migrate(json: string): string {
-    const oldViewId = /^view\.\d+$/
+    const oldViewId = /^view\.\d+$/;
     const workbenchLayoutV4 = JSON.parse(json) as MWorkbenchLayoutV4;
 
     let userLayoutV4 = this._workbenchLayoutFactory.create({
@@ -51,7 +51,7 @@ export class WorkbenchLayoutMigrationV5 implements WorkbenchMigration {
 
     referenceLayoutV4.views().forEach(view => {
       if (oldViewId.test(view.id)) {
-        userLayoutV4 = userLayoutV4.renameView(view.id, `view.${UID.randomUID()}`);
+        referenceLayoutV4 = referenceLayoutV4.renameView(view.id, `view.${UID.randomUID()}`);
       }
     });
 
