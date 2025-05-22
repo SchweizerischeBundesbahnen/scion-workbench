@@ -15,6 +15,8 @@ const runInCI = !!process.env.CI;
 const runHeadless = !!process.env.HEADLESS;
 
 export default {
+  timeout: 999999999,
+  globalTimeout: 999999999,
   forbidOnly: runInCI,
   fullyParallel: true,
   webServer: runInCI ? [

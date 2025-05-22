@@ -90,7 +90,7 @@ export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
         return {id: viewV2.id, navigation: {}};
       }
       else {
-        return {id: computeNextViewId(usedViewIds), navigation: {hint: viewV2.id}};
+        return {id: computeNextViewId(usedViewIds), alternativeId: viewV2.id, navigation: {hint: viewV2.id}};
       }
     }
   }

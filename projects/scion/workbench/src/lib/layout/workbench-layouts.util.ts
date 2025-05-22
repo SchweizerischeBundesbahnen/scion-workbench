@@ -75,6 +75,11 @@ export const WorkbenchLayouts = {
   },
 
   /**
+   * Computes a random view id.
+   */
+  computeViewId: (): ViewId => `${VIEW_ID_PREFIX}${UID.randomUID()}`,
+
+  /**
    * Computes a random part id.
    */
   computePartId: (): PartId => `${PART_ID_PREFIX}${UID.randomUID()}`,

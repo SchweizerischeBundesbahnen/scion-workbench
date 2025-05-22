@@ -15,7 +15,6 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutMerger} from '../layout/workbench-layout-merger.service';
 import {WorkbenchLayoutStorageService} from '../layout/workbench-layout-storage.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
 import {LatestTaskExecutor} from '../executor/latest-task-executor';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutFn} from '../layout/workbench-layout';
@@ -39,7 +38,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private readonly _workbenchlayoutStorageService = inject(WorkbenchLayoutStorageService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _initialLayoutFn: WorkbenchLayoutFn;
-  private readonly _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
 
   public readonly id: string;
   public readonly transient: boolean;
@@ -108,10 +106,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
     // Add outlets of the main area and resolve conflicts if any.
     if (currentLayout.grids.mainArea && this._layout.grids.mainArea) {
-      // Detect and resolve id clashes between views defined by this perspective and views contained in the main area,
-      // assigning views of this perspective a new identity.
-      this._layout = this._perspectiveViewConflictResolver.resolve(currentLayout, this._layout);
-
       // Add outlets contained in the main area.
       Objects.entries(currentLayout.outlets({mainAreaGrid: true})).forEach(([outlet, segments]) => {
         outlets.set(outlet, segments);
