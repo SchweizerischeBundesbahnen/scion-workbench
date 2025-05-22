@@ -17,6 +17,8 @@ import {ViewPagePO} from '../page-object/view-page.po';
 import {DialogPropertiesTestPagePO} from '../page-object/test-pages/dialog-properties-test-page.po';
 import {SizeTestPagePO} from '../page-object/test-pages/size-test-page.po';
 import {expectView} from '../../matcher/view-matcher';
+import {MAIN_AREA} from '../../workbench.model';
+import {RouterPagePO} from '../page-object/router-page.po';
 
 test.describe('Workbench Dialog', () => {
 
@@ -94,7 +96,7 @@ test.describe('Workbench Dialog', () => {
 
       // Open view 1 with dialog.
       const dialogPage = await SizeTestPagePO.openInDialog(appPO);
-      const viewPage1 = new DialogOpenerPagePO(appPO, {viewId: await appPO.activePart({inMainArea: true}).activeView.getViewId()});
+      const viewPage1 = new DialogOpenerPagePO(appPO, {viewId: await appPO.activePart({grid: 'mainArea'}).activeView.getViewId()});
 
       await expectDialog(dialogPage).toBeVisible();
       const dialogSize = await dialogPage.getBoundingBox();
@@ -183,7 +185,7 @@ test.describe('Workbench Dialog', () => {
       ]));
     });
 
-    test('should detach dialog if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator}) => {
+    test('should detach dialog if contextual view is opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: true});
 
       await microfrontendNavigator.registerCapability('app1', {
@@ -195,18 +197,21 @@ test.describe('Workbench Dialog', () => {
         },
       });
 
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart(MAIN_AREA)
+        .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+        .activatePart('part.activity-1'),
+      );
+
       // Open view in main area.
       const viewInMainArea = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-      // Open dialog opener view.
-      const dialogOpenerView = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-
-      // Drag dialog opener view into peripheral area.
-      const dragHandle = await dialogOpenerView.view.tab.startDrag();
-      await dragHandle.dragToEdge('east');
-      await dragHandle.drop();
+      // Open dialog opener page in peripheral area.
+      const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+      await routerPage.navigate({component: 'dialog', app: 'app1'}, {partId: 'part.activity-1', target: 'view.100'});
 
       // Open the dialog.
+      const dialogOpenerView = new DialogOpenerPagePO(appPO, {viewId: 'view.100'});
       await dialogOpenerView.open({component: 'testee'}, {cssClass: 'testee'});
 
       const dialog = appPO.dialog({cssClass: 'testee'});

@@ -19,7 +19,7 @@ import {WorkbenchPart} from '../workbench-part.model';
  * Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
  *
  * Usage:
- * Add this directive to an `<ng-template>`. The template content will be used as the action content. The action shares the lifecycle of its embedding context.
+ * Add this directive to an `<ng-template>`. The template content is used as the action content. The action shares the lifecycle of its embedding context.
  *
  * ```html
  * <ng-template wbPartAction>

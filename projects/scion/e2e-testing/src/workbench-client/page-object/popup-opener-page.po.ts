@@ -104,7 +104,7 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
   }
 
   public async enterCssClass(cssClass: string | string[]): Promise<void> {
-    await this.locator.locator('input.e2e-class').fill(coerceArray(cssClass).join(' '));
+    await this.locator.locator('app-multi-value-input.e2e-class input').fill(coerceArray(cssClass).join(' '));
   }
 
   public async enterCloseStrategy(options: {closeOnFocusLost?: boolean; closeOnEscape?: boolean}): Promise<void> {
@@ -148,7 +148,7 @@ export class PopupOpenerPagePO implements MicrofrontendViewPagePO {
   }
 
   private async waitUntilPopupAttached(): Promise<void> {
-    const cssClass = (await this.locator.locator('input.e2e-class').inputValue()).split(/\s+/).filter(Boolean);
+    const cssClass = (await this.locator.locator('app-multi-value-input.e2e-class input').inputValue()).split(/\s+/).filter(Boolean);
     const popup = this._appPO.popup({cssClass});
     await popup.locator.waitFor({state: 'attached'});
   }

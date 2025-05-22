@@ -51,8 +51,8 @@ export const MicrofrontendViewRoutes = {
 
     return (segments: UrlSegment[], group: UrlSegmentGroup, route: Route): UrlMatchResult | null => {
       // Test if the path matches.
-      const microfrontendRoute = MicrofrontendViewRoutes.parseMicrofrontendRoute(segments);
-      if (!microfrontendRoute) {
+      const microfrontendURL = MicrofrontendViewRoutes.parseMicrofrontendURL(segments);
+      if (!microfrontendURL) {
         return null;
       }
 
@@ -73,7 +73,7 @@ export const MicrofrontendViewRoutes = {
         consumed: segments,
         posParams: {
           ...Object.fromEntries(posParams),
-          [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: segments[1],
+          [ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID]: segments[1]!,
         },
       };
     };
@@ -96,13 +96,13 @@ export const MicrofrontendViewRoutes = {
   },
 
   /**
-   * Tests given URL to be a microfrontend route.
+   * Parses the given microfrontend URL, if any, returning its capability and parameters, or `null` if not a microfrontend URL.
    */
-  parseMicrofrontendRoute: (segments: UrlSegment[]): {capabilityId: string; params: Params} | null => {
-    if (segments.length === 2 && segments[0].path === MicrofrontendViewRoutes.ROUTE_PREFIX) {
+  parseMicrofrontendURL: (segments: UrlSegment[]): {capabilityId: string; params: Params} | null => {
+    if (segments.length === 2 && segments[0]!.path === MicrofrontendViewRoutes.ROUTE_PREFIX) {
       return {
-        capabilityId: segments[1].path,
-        params: segments[1].parameters,
+        capabilityId: segments[1]!.path,
+        params: segments[1]!.parameters,
       };
     }
     return null;
@@ -129,8 +129,8 @@ export const MicrofrontendViewRoutes = {
    * Matches the route if target of a view capability (microfrontend) and the capability exists.
    */
   canMatchViewCapability: ((_route: Route, segments: UrlSegment[]): boolean => {
-    const microfrontendRoute = MicrofrontendViewRoutes.parseMicrofrontendRoute(segments);
-    if (!microfrontendRoute) {
+    const microfrontendURL = MicrofrontendViewRoutes.parseMicrofrontendURL(segments);
+    if (!microfrontendURL) {
       return false;
     }
 
@@ -138,6 +138,6 @@ export const MicrofrontendViewRoutes = {
       return true; // match until started the microfrontend platform to avoid flickering.
     }
 
-    return inject(ManifestObjectCache).hasCapability(microfrontendRoute.capabilityId);
+    return inject(ManifestObjectCache).hasCapability(microfrontendURL.capabilityId);
   }) satisfies CanMatchFn,
 } as const;

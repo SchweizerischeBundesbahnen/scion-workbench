@@ -14,9 +14,8 @@ import {WorkbenchCapabilities} from '../workbench-capabilities.enum';
 /**
  * Provides a workbench perspective.
  *
- * A perspective is a named arrangement of views. Different perspectives provide a different perspective on the application.
- * A perspective can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
- * Views in the main area are retained when switching perspectives.
+ * A perspective is a named layout. Multiple perspectives can be created. Users can switch between perspectives.
+ * Perspectives share the same main area, if any.
  */
 export interface WorkbenchPerspectiveCapability extends Capability {
   /**
@@ -36,13 +35,15 @@ export interface WorkbenchPerspectiveCapability extends Capability {
     /**
      * Defines the layout of this perspective.
      *
-     * The layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
+     * A perspective defines an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other.
+     * Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
      *
-     * The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views.
-     * The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support
-     * the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable
-     * area for user interaction. Views in the main area are retained when switching perspectives. A perspective cannot add
-     * views to the main area.
+     * Users can personalize the layout of a perspective and switch between perspectives. The workbench remembers the last layout of each perspective,
+     * restoring it the next time it is activated.
+     *
+     * A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support
+     * the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default.
+     * Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives.
      *
      * ## Example
      * The following example defines a layout with a main area and three parts:
@@ -179,13 +180,16 @@ export interface WorkbenchPerspectiveView {
 }
 
 /**
- * Identifies the part that represents the main area.
+ * Identifies the main area part in the workbench layout.
  *
  * Refer to this part to align parts relative to the main area.
+ *
+ * The main area is a special part that can be added to the layout. The main area is where the workbench opens new views by default.
+ * It is shared between perspectives and its layout is not reset when resetting perspectives.
  */
 export const MAIN_AREA: MAIN_AREA = 'part.main-area';
 
 /**
- * Identifies the main area.
+ * Represents the type of the {@link MAIN_AREA} constant.
  */
 export type MAIN_AREA = 'part.main-area';

@@ -25,7 +25,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
-import {CssClassComponent} from '../css-class/css-class.component';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {CanClose} from '@scion/workbench-client';
 
 @Component({
@@ -44,8 +44,8 @@ import {CanClose} from '@scion/workbench-client';
     NullIfEmptyPipe,
     JoinPipe,
     AppendParamDataTypePipe,
-    CssClassComponent,
     WorkbenchPartActionDirective,
+    MultiValueInputComponent,
   ],
 })
 export default class ViewPageComponent {

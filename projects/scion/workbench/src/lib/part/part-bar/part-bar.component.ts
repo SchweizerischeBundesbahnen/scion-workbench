@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, HostListener, inject, InjectionToken, Signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, InjectionToken, NgZone, Signal, untracked, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {PartActionComponent} from '../part-action/part-action.component';
@@ -16,7 +16,10 @@ import {ViewListButtonComponent} from '../view-list-button/view-list-button.comp
 import {ViewTabBarComponent} from '../view-tab-bar/view-tab-bar.component';
 import {dimension} from '@scion/components/dimension';
 import {NgClass} from '@angular/common';
+import {EMPTY, fromEvent, mergeMap, of, pairwise, withLatestFrom} from 'rxjs';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {TextPipe} from '../../text/text.pipe';
+import {IconComponent} from '../../icon/icon.component';
 
 /**
  * DI token to inject the HTML element of the {@link PartBarComponent}.
@@ -33,6 +36,7 @@ export const PART_BAR_ELEMENT = new InjectionToken<HTMLElement>('PART_BAR_ELEMEN
     ViewListButtonComponent,
     NgClass,
     TextPipe,
+    IconComponent,
   ],
   providers: [
     {provide: PART_BAR_ELEMENT, useFactory: () => inject(ElementRef).nativeElement as HTMLElement},
@@ -51,14 +55,43 @@ export class PartBarComponent {
 
   constructor() {
     this.maxViewTabBarWidth = this.calculateMaxViewTabBarWidth();
+    this.installActivityMinimizer();
   }
 
-  @HostListener('dblclick', ['$event'])
-  protected onDoubleClick(event: MouseEvent): void {
-    if (this.part.isInMainArea) {
-      void this._router.navigate(layout => layout.toggleMaximized());
-    }
-    event.stopPropagation();
+  protected onMinimize(): void {
+    void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id));
+  }
+
+  /**
+   * Minimizes activities when double-clicking the tabbar or filler, but only if the first and second clicks target the same DOM element.
+   * This prevents unintended maximization or minimization when double-clicking a tab's close button.
+   */
+  private installActivityMinimizer(): void {
+    const host = inject(ElementRef).nativeElement as HTMLElement;
+    const zone = inject(NgZone);
+
+    effect(onCleanup => {
+      // Maximization/minimization is only supported for tabs not located in the peripheral area.
+      if (this.part.peripheral()) {
+        return;
+      }
+
+      const viewTabBar = this._viewTabBar()?.nativeElement as HTMLElement | undefined;
+      const filler = this._fillerElement().nativeElement;
+
+      untracked(() => {
+        const subscription = fromEvent<MouseEvent>([filler].concat(viewTabBar ?? []), 'dblclick')
+          .pipe(
+            withLatestFrom(fromEvent<MouseEvent>(host, 'click', {capture: true}).pipe(pairwise(), subscribeIn(fn => zone.runOutsideAngular(fn)))),
+            mergeMap(([dblClickEvent, [clickEvent1, clickEvent2]]) => clickEvent1.target === clickEvent2.target ? of(dblClickEvent) : EMPTY),
+          )
+          .subscribe(event => {
+            void this._router.navigate(layout => layout.toggleMaximized());
+            event.preventDefault();
+          });
+        onCleanup(() => subscription.unsubscribe());
+      });
+    });
   }
 
   /**

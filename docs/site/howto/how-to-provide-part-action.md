@@ -1,17 +1,17 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Part
 
-Part actions are displayed in the part bar, enabling interaction with the part and its content. Actions can be aligned to the left or right.
+Part actions are displayed in the part bar, enabling interaction with the part, its active view or content. Actions can be aligned to the left or right.
 
-### How to add a part action
+### How to Add a Part Action
 Actions can be added declaratively in an HTML template or via `WorkbenchService`.
 
-#### Add a part action via HTML template
-Add an `<ng-template>` and decorate it with the `wbPartAction` directive. The template content will be used as the action content. The action shares the lifecycle of its embedding context.
+#### Add a Part Action via HTML Template
+Add an `<ng-template>` and decorate it with the `wbPartAction` directive. The template content is used as the action content. The action shares the lifecycle of its embedding context.
 
 ```html
 <ng-template wbPartAction>
@@ -32,7 +32,8 @@ A predicate can be used to match a specific context, such as a particular part o
 </ng-template>
 ```
 
-The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
+> [!TIP]
+> The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
 
 ```ts
 import {Component} from '@angular/core';
@@ -44,7 +45,8 @@ class ActionComponent {
 }
 ```
 
-The `WorkbenchPart` is available as the default template variable (`let-part`).
+> [!TIP]
+> The `WorkbenchPart` is available as the default template variable (`let-part`).
 
 ```html
 <ng-template wbPartAction let-part>
@@ -52,7 +54,7 @@ The `WorkbenchPart` is available as the default template variable (`let-part`).
 </ng-template>
 ```
 
-#### Add a part action via WorkbenchService
+#### Add a Part Action via WorkbenchService
 Part actions can also be added using a factory function and registered via `WorkbenchService.registerPartAction`. The content can be a component or a template.
 
 ```ts
@@ -72,7 +74,13 @@ inject(WorkbenchService).registerPartAction(part => {
   return part.isInMainArea ? ActionComponent : null; // matches parts in the main area
 });
 ```
-For more control, return an object literal. The function can call `inject` to get required dependencies and runs in a reactive context. The function is called again when tracked signals change.
+
+> [!TIP]
+> - For more control, return an object literal.
+> - The function can call `inject` to get required dependencies and runs in a reactive context.
+ 
+> [!NOTE]
+> The function is called again when tracked signals change.
 
 ```ts
 import {inject} from '@angular/core';

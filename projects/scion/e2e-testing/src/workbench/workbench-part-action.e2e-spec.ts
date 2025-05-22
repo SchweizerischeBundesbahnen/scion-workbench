@@ -37,7 +37,7 @@ test.describe('Workbench Part Action', () => {
     await expect(appPO.part({partId: 'part.initial'}).bar.action({cssClass: 'e2e-action'}).locator).toBeVisible();
   });
 
-  test('should contribute action to parts in the workbench grid', async ({appPO, workbenchNavigator}) => {
+  test('should contribute action to parts in the main grid', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     await workbenchNavigator.modifyLayout(layout => layout
@@ -51,9 +51,9 @@ test.describe('Workbench Part Action', () => {
     const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
 
     // Register action
-    await layoutPage.registerPartAction('Action', {grid: 'workbench', cssClass: 'e2e-action'});
+    await layoutPage.registerPartAction('Action', {grid: 'main', cssClass: 'e2e-action'});
 
-    // Expect the action to be displayed in all parts of the workbench grid
+    // Expect the action to be displayed in all parts of the main grid
     await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'e2e-action'}).locator).toBeVisible();
     await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'e2e-action'}).locator).toBeVisible();
     await expect(appPO.part({partId: 'part.initial'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();

@@ -88,7 +88,7 @@ function provideText(translatable: Translatable | undefined | null): Signal<stri
  */
 function parseTranslatable(translationKey: `%${string}`): {key: string; params: Record<string, string>} {
   const {key, params} = /^%(?<key>[^;]+)(;(?<params>.*))?$/.exec(translationKey)!.groups!;
-  return {key, params: parseMatrixParams(params)};
+  return {key: key!, params: parseMatrixParams(params)};
 }
 
 /**
@@ -104,7 +104,7 @@ function parseMatrixParams(matrixParams: string | undefined): Record<string, str
   const params: Record<string, string> = {};
   for (const match of escapeSemicolon(matrixParams).matchAll(/(?<paramName>[^=;]+)=(?<paramValue>[^;]*)/g)) {
     const {paramName, paramValue} = match.groups!;
-    params[unescapeSemicolon(paramName)] = unescapeSemicolon(paramValue);
+    params[unescapeSemicolon(paramName!)] = unescapeSemicolon(paramValue!);
   }
   return params;
 

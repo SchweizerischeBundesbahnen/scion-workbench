@@ -35,6 +35,11 @@ export const WorkbenchStartupQueryParams = {
   PERSPECTIVES_QUERY_PARAM: 'perspectives',
 
   /**
+   * Query param to read provided design tokens.
+   */
+  DESIGN_TOKENS: 'designTokens',
+
+  /**
    * Query param to display an alert dialog during workbench startup to pause the workbench startup until the user confirms the alert.
    */
   CONFIRM_STARTUP_QUERY_PARAM: 'confirmStartup',
@@ -90,6 +95,14 @@ export const WorkbenchStartupQueryParams = {
    */
   perspectiveIds: (): string[] => {
     return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PERSPECTIVES_QUERY_PARAM)?.split(';').filter(Boolean) ?? [];
+  },
+
+  /**
+   * Reads the query param with design tokens provided to the application.
+   */
+  designTokens: (): {[name: string]: string} | undefined => {
+    const designTokens = new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.DESIGN_TOKENS);
+    return designTokens ? JSON.parse(designTokens) as {[name: string]: string} : undefined;
   },
 
   /**

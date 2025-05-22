@@ -21,12 +21,13 @@ export const appConfig: ApplicationConfig = {
     provideWorkbench({
       layout: (factory: WorkbenchLayoutFactory) => factory
         .addPart(MAIN_AREA)
-        .addPart('left', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-        .addView('todos', {partId: 'left'})
-        .navigateView('todos', ['todos']),
+        .navigatePart(MAIN_AREA, ['overview'])
+        .addPart('todos', {dockTo: 'left-top'}, {label: 'Todos', icon: 'checklist'})
+        .navigatePart('todos', ['todos'])
+        .activatePart('todos'),
     }),
     provideRouter([
-      {path: '', loadComponent: () => import('./welcome/welcome.component')},
+      {path: 'overview', loadComponent: () => import('./overview/overview.component')},
       {path: 'todos', loadComponent: () => import('./todos/todos.component')},
       {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
     ], withComponentInputBinding(), withHashLocation()),

@@ -15,9 +15,9 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {parseTypedObject} from '../common/parse-typed-value.util';
-import {CssClassComponent} from '../css-class/css-class.component';
 import {UUID} from '@scion/toolkit/uuid';
 import {stringifyError} from '../common/stringify-error.util';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-router-page',
@@ -28,7 +28,7 @@ import {stringifyError} from '../common/stringify-error.util';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class RouterPageComponent {

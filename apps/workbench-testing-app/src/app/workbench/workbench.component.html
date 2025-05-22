@@ -5,8 +5,8 @@
     </ng-template>
   }
 
-  <ng-template wbPartAction [canMatch]="isPartInMainArea" align="start" cssClass="e2e-open-new-tab">
-    <button [wbRouterLink]="'/start-page'" [wbRouterLinkExtras]="{target: 'blank', position: 'end'}" sciMaterialIcon>
+  <ng-template wbPartAction [canMatch]="isNotPeripheralPart" align="start" cssClass="e2e-open-new-tab" let-part>
+    <button [wbRouterLink]="'/start-page'" [wbRouterLinkExtras]="{target: 'blank', partId: part.id, position: 'end'}" sciMaterialIcon>
       add
     </button>
   </ng-template>

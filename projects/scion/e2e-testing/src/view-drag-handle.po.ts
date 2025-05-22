@@ -10,7 +10,7 @@
 
 import {DomRect, fromRect, throwError} from './helper/testing.util';
 import {Locator, Mouse, Page} from '@playwright/test';
-import {PartId} from '@scion/workbench';
+import {ActivityId, PartId} from '@scion/workbench';
 
 /**
  * Reference to the drag handle of a view to control drag and drop.
@@ -99,21 +99,23 @@ export class ViewDrageHandlePO {
   }
 
   /**
-   * Drags this tab to the specified edge of the workbench.
+   * Drags this tab to the specified region in the specified grid.
    *
-   * @param region - Specifies into which region of the workbench to drag the view.
+   * @param dragTo - Specifies where to drag this tab to.
+   * @param dragTo.grid - Specifies the target grid.
+   * @param dragTo.region - Specifies the drop region.
    * @param options - Controls the drag operation.
    * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position. Defaults to `true`, starting from the center.
    * @param options.orElse - If `false` and the drop zone cannot be located, returns `false` instead of throwing an error.
    */
-  public async dragToEdge(region: 'north' | 'east' | 'south' | 'west', options?: {dragFromCenter?: false; orElse?: false}): Promise<boolean> {
+  public async dragToGrid(dragTo: {grid: 'main' | 'main-area' | ActivityId; region: 'north' | 'east' | 'south' | 'west'}, options?: {dragFromCenter?: false; orElse?: false}): Promise<boolean> {
     if (options?.dragFromCenter ?? true) {
-      const workbenchBounds = fromRect(await this._page.locator('wb-workbench-layout').boundingBox());
-      await this.dragTo({x: workbenchBounds.hcenter, y: workbenchBounds.vcenter});
+      const {hcenter, vcenter} = fromRect(this._page.viewportSize());
+      await this.dragTo({x: hcenter, y: vcenter});
     }
 
-    return this.dragToRegion(region, {
-      dropZoneLocator: this._page.locator('wb-workbench-layout').locator('div.e2e-edge-drop-zone'),
+    return this.dragToRegion(dragTo.region, {
+      dropZoneLocator: this._page.locator('wb-layout').locator(`div.e2e-grid-drop-zone[data-grid="${dragTo.grid}"]`),
       orElse: options?.orElse,
     });
   }

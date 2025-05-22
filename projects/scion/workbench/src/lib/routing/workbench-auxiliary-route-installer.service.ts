@@ -8,12 +8,13 @@
 * SPDX-License-Identifier: EPL-2.0
 */
 
-import {Component, inject, Injectable, InjectionToken} from '@angular/core';
+import {inject, Injectable, InjectionToken} from '@angular/core';
 import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
+import {NullContentComponent} from '../null-content/null-content.component';
 
 /**
  * Facilitates the registration of auxiliary routes of top-level routes.
@@ -54,7 +55,7 @@ export class WorkbenchAuxiliaryRouteInstaller {
         // Register wildcard route to display blank page.
         {
           path: '**',
-          component: BlankComponent,
+          component: NullContentComponent,
         },
       ],
     } satisfies Route));
@@ -111,10 +112,3 @@ export interface AuxiliaryRouteConfig {
  * Can be injected in a `CanMatch` guard to obtain a reference to the workbench element.
  */
 export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('ɵWORKBENCH_AUXILIARY_ROUTE_OUTLET');
-
-/**
- * Component to display if the outlet has not yet been navigated or no navigation information is available.
- */
-@Component({selector: 'wb-blank', template: ''})
-export class BlankComponent {
-}

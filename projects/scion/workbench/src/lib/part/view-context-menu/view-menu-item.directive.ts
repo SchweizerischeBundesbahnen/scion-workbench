@@ -18,7 +18,7 @@ import {WorkbenchView} from '../../view/workbench-view.model';
  * Right-clicking on a view tab opens a context menu to interact with the view and its content.
  *
  * Usage:
- * Add this directive to an `<ng-template>`. The template content will be used as the menu item content. The menu item shares the lifecycle of its embedding context.
+ * Add this directive to an `<ng-template>`. The template content is used as the menu item content. The menu item shares the lifecycle of its embedding context.
  *
  * ```html
  * <ng-template wbViewMenuItem [accelerator]="['ctrl', 'alt', '1']" (action)="...">

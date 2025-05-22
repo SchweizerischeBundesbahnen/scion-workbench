@@ -21,12 +21,12 @@ describe('Text Pipe', () => {
   it('should provide text', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideTextProvider(key => texts[key]),
+        provideTextProvider(key => texts[key as 'key-1' | 'key-2']),
         {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
     });
 
-    const texts: Record<string, WritableSignal<string>> = {
+    const texts: Record<'key-1' | 'key-2', WritableSignal<string>> = {
       'key-1': signal('text-1'),
       'key-2': signal('text-2'),
     };
@@ -68,7 +68,7 @@ describe('Text Pipe', () => {
   it('should support observable as text provider using `toSignal`', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideTextProvider(key => toSignal(texts[key], {requireSync: true})),
+        provideTextProvider(key => texts[key] ? toSignal(texts[key], {requireSync: true}) : undefined),
         {provide: ComponentFixtureAutoDetect, useValue: true},
       ],
     });

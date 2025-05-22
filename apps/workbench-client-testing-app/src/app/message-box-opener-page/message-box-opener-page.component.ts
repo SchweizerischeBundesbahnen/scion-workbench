@@ -15,9 +15,9 @@ import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.intern
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {stringifyError} from '../common/stringify-error.util';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {CssClassComponent} from '../css-class/css-class.component';
 import {startWith} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 
 @Component({
   selector: 'app-message-box-opener-page',
@@ -28,7 +28,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     SciFormFieldComponent,
     SciKeyValueFieldComponent,
     SciCheckboxComponent,
-    CssClassComponent,
+    MultiValueInputComponent,
   ],
 })
 export default class MessageBoxOpenerPageComponent {

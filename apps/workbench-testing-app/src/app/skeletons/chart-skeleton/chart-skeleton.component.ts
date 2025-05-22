@@ -28,8 +28,8 @@ import {Chart} from './chart';
 })
 export class ChartSkeletonComponent {
 
-  protected chart = new Chart({paddingTop: 2, paddingBottom: 2});
-  protected active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
+  protected readonly chart = new Chart({paddingTop: 2, paddingBottom: 2});
+  protected readonly active = inject(WorkbenchView, {optional: true})?.part().active ?? inject(WorkbenchPart, {optional: true})?.active ?? signal(false);
 
   constructor() {
     this.chart.setDataSeries(this.generateDataSeries({n: 250, maxValue: 50}));

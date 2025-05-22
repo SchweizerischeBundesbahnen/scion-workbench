@@ -51,7 +51,7 @@ export class RecordComponent implements ControlValueAccessor {
     const record: Record<string, string> = {};
     for (const match of stringified.matchAll(/(?<key>[^=;]+)=(?<value>[^;]+)/g)) {
       const {key, value} = match.groups!;
-      record[key] = value;
+      record[key!] = value!;
     }
     return record;
   }

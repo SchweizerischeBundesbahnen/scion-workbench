@@ -15,7 +15,7 @@
     <!-- Position -->
     <input [formControl]="viewFormGroup.controls.options.controls.position" type="number" [class]="'e2e-position'">
     <!-- CSS class -->
-    <app-css-class [formControl]="viewFormGroup.controls.options.controls.cssClass"/>
+    <app-multi-value-input [formControl]="viewFormGroup.controls.options.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
     <!-- Activate View -->
     <sci-checkbox [formControl]="viewFormGroup.controls.options.controls.activateView" [class]="'e2e-activate-view'"/>
     <!-- Activate Part -->

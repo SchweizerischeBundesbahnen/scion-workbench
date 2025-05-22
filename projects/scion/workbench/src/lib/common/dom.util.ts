@@ -121,8 +121,8 @@ export function getCssTranslation(element: Element): {translateX: string | 'none
   // The transform property returns a matrix in the form `matrix(a, b, c, d, tx, ty)`, where `tx` is the horizontal translation and `ty` is the vertical translation.
   const matrix = transformStyle.slice('matrix('.length, -1).split(/,\s+/);
   return {
-    translateX: matrix[4],
-    translateY: matrix[5],
+    translateX: matrix[4]!,
+    translateY: matrix[5]!,
   };
 }
 

@@ -27,7 +27,7 @@ export class AttributesDirective {
       const attributes = this.attributes() ?? {};
       const diff = attributeDiffer.diff(Object.keys(attributes));
       if (diff) {
-        diff.forEachAddedItem(({item: name}) => renderer.setAttribute(host, name, attributes[name]));
+        diff.forEachAddedItem(({item: name}) => renderer.setAttribute(host, name, attributes[name]!));
         diff.forEachRemovedItem(({item: name}) => renderer.removeAttribute(host, name));
       }
     });

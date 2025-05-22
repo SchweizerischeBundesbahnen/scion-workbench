@@ -1,3 +1,8 @@
+<!-- Title -->
+@if (part.title()) {
+  <span class="title e2e-title">{{(part.title() | wbText)()}}</span>
+}
+
 <!-- View Tabs -->
 @if (part.viewIds().length) {
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
@@ -29,3 +34,9 @@
   <wb-view-list-button [title]="('%workbench.show_open_tabs.tooltip' | wbText)()"/>
 }
 
+<!-- Minimize Button -->
+@if (part.canMinimize()) {
+  <button (click)="onMinimize()" [title]="('%workbench.minimize.tooltip' | wbText)()" class="minimize e2e-minimize">
+    <wb-icon icon="workbench.minimize"/>
+  </button>
+}

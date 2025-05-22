@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2018-2025 Swiss Federal Railways
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
+
 import {UrlSegment} from '@angular/router';
 import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
@@ -7,11 +17,11 @@ import {ViewOutlet} from '../workbench.constants';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
- * Handle to interact with a view opened via {@link WorkbenchRouter}.
+ * A view is a visual workbench element for displaying content stacked or side-by-side in the workbench layout.
  *
- * The view component can inject this handle to interact with the view, such as setting the title or closing the view.
+ * Users can drag views from one part to another, even across windows, or place them side-by-side, horizontally and vertically.
  *
- * The view component can inject `ActivatedRoute` to obtain parameters passed to the navigation and/or read data associated with the route.
+ * The view component can inject this handle to interact with the view.
  *
  * @see WorkbenchRouter
  */
@@ -70,13 +80,13 @@ export abstract class WorkbenchView {
   public abstract readonly part: Signal<WorkbenchPart>;
 
   /**
-   * Title to be displayed in the view tab.
+   * Title displayed in the view tab.
    */
   public abstract get title(): Signal<Translatable | null>;
   public abstract set title(title: Translatable | null);
 
   /**
-   * Specifies the subtitle to be displayed in the view tab.
+   * Subtitle displayed in the view tab.
    */
   public abstract get heading(): Signal<Translatable | null>;
   public abstract set heading(heading: Translatable | null);

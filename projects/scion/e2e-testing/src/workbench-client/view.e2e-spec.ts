@@ -1071,39 +1071,45 @@ test.describe('Workbench View', () => {
     await expectView(viewPage2).toBeInactive();
   });
 
-  test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator}) => {
+  test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, microfrontendNavigator, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // Open two views in main area.
-    const viewPage1 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    const viewPage2 = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'testee-1', ɵactivityId: 'activity.1'})
+      .activatePart('part.activity-1'),
+    );
 
-    // Capture instance id of view 2
-    const view2ComponentId = await viewPage2.getComponentInstanceId();
+    // Open view in main area.
+    const viewInMainArea = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
 
-    // Drag view 2 into peripheral area.
-    const dragHandle = await viewPage2.view.tab.startDrag();
-    await dragHandle.dragToEdge('east');
-    await dragHandle.drop();
+    // Open view in peripheral area.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'view', app: 'app1'}, {partId: 'part.activity-1', target: 'view.100'});
+    await routerPage.view.tab.close();
 
-    await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeActive();
+    // Capture instance id of test view.
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    const viewComponentId = await viewPage.getComponentInstanceId();
+
+    await expectView(viewInMainArea).toBeActive();
+    await expectView(viewPage).toBeActive();
 
     // Maximize the main area.
-    await viewPage1.view.tab.dblclick();
-    await expectView(viewPage1).toBeActive();
-    await expect(viewPage2.view.locator).not.toBeAttached();
-    await expect(viewPage2.view.tab.locator).not.toBeAttached();
-    await expect(viewPage2.outlet.locator).toBeAttached();
-    await expect(viewPage2.outlet.locator).not.toBeVisible();
+    await viewInMainArea.view.tab.dblclick();
+    await expectView(viewInMainArea).toBeActive();
+    await expect(viewPage.view.locator).not.toBeAttached();
+    await expect(viewPage.view.tab.locator).not.toBeAttached();
+    await expect(viewPage.outlet.locator).toBeAttached();
+    await expect(viewPage.outlet.locator).not.toBeVisible();
 
     // Restore the layout.
-    await viewPage1.view.tab.dblclick();
-    await expectView(viewPage1).toBeActive();
-    await expectView(viewPage2).toBeActive();
+    await viewInMainArea.view.tab.dblclick();
+    await expectView(viewInMainArea).toBeActive();
+    await expectView(viewPage).toBeActive();
 
     // Expect view 2 not to be instantiated anew
-    expect(view2ComponentId).toEqual(await viewPage2.getComponentInstanceId());
+    expect(viewComponentId).toEqual(await viewPage.getComponentInstanceId());
   });
 
   test('should change detect active views after construction', async ({appPO, microfrontendNavigator}) => {

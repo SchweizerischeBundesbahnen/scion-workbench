@@ -73,6 +73,8 @@ The SCION Workbench requires the following icons, which can be replaced using an
 | workbench.close     | Close button in views, dialogs and notifications |
 | workbench.dirty     | Visual indicator for view with unsaved content   |
 | workbench.menu_down | Menu button of drop down menus                   |
+| workbench.minimize  | Minimize button in docked parts                  |
+| workbench.pin       | Visual indicator for a pinned view               |
 | workbench.search    | Visual indicator in search or filter fields      |
 
 > [!TIP]

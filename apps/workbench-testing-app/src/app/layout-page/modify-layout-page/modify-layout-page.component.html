@@ -5,6 +5,11 @@
   </section>
 
   <section>
+    <header>Docked Parts</header>
+    <app-add-docked-parts [formControl]="form.controls.dockedParts"/>
+  </section>
+
+  <section>
     <header>Views</header>
     <app-add-views [formControl]="form.controls.views" [partProposals]="partProposals()"/>
   </section>
@@ -17,6 +22,21 @@
   <section>
     <header>View Navigations</header>
     <app-navigate-views [formControl]="form.controls.viewNavigations" [viewProposals]="viewProposals()"/>
+  </section>
+
+  <section>
+    <header>Activate Parts</header>
+    <app-multi-value-input [formControl]="form.controls.activateParts" [placeholder]="'part.1 part.2'" class="e2e-active-parts"/>
+  </section>
+
+  <section>
+    <header>Activate Views</header>
+    <app-multi-value-input [formControl]="form.controls.activateViews" [placeholder]="'view.1 view.2'" class="e2e-active-views"/>
+  </section>
+
+  <section>
+    <header>Remove Parts</header>
+    <app-multi-value-input [formControl]="form.controls.removeParts" [placeholder]="'part.1 part.2'" class="e2e-remove-parts"/>
   </section>
 
   <button (click)="onModify()" [disabled]="form.invalid" class="e2e-modify" sci-primary>Modify</button>

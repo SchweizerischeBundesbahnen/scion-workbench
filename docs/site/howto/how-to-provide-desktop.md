@@ -1,7 +1,7 @@
 <a href="/README.md"><img src="/resources/branding/scion-workbench-banner.svg" height="50" alt="SCION Workbench"></a>
 
 | SCION Workbench | [Projects Overview][menu-projects-overview] | [Changelog][menu-changelog] | [Contributing][menu-contributing] | [Sponsoring][menu-sponsoring] |  
-| --- | --- | --- | --- | --- |
+|-----------------|---------------------------------------------|-----------------------------|-----------------------------------|-------------------------------|
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > Desktop
 
@@ -9,8 +9,8 @@ The workbench displays a desktop when the layout is empty (no view and no naviga
 
 A desktop can provide instructions for working with the application, display a welcome page, or provide links to open views.
 
-### How to provide a desktop
-Add the directive `wbDesktop` to an `<ng-template>` child of the `<wb-workbench>` component. The template content will be used as desktop content.
+### How to Provide a Desktop
+Add the directive `wbDesktop` to an `<ng-template>` child of the `<wb-workbench>` component. The template content is used as the desktop content.
 
 ```html
 <wb-workbench>
@@ -20,6 +20,7 @@ Add the directive `wbDesktop` to an `<ng-template>` child of the `<wb-workbench>
 </wb-workbench>
 ```
 
+> [!TIP]
 > Using `@if` allows displaying the desktop based on a condition, e.g. the active perspective.
 
 For layouts with a main area, it is recommended to navigate the main area part instead.

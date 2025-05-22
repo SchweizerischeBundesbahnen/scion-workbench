@@ -1,13 +1,15 @@
 SCION Workbench
 ===============
 
-SCION Workbench enables the creation of Angular web applications that require a flexible layout to arrange content side-by-side or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel.
+SCION Workbench enables the creation of Angular web applications that require a flexible layout to display content side-by-side or stacked, all personalizable by the user via drag & drop. This type of layout is ideal for applications with non-linear workflows, enabling users to work on content in parallel. Examples include business applications, scientific or development tools, and command & control interfaces.
 
-The workbench layout is a grid of parts. Parts are aligned relative to each other. Each part is a stack of views. Content is displayed in views or parts.
+An application can have multiple layouts, called perspectives. A perspective defines an arrangement of parts and views. Parts can be docked to the side or positioned relative to each other. Views are stacked in parts and can be dragged to other parts. Content can be displayed in both parts and views.
 
-The layout can be divided into a main and a peripheral area, with the main area as the primary place for opening views. The peripheral area arranges parts around the main area to provide navigation or context-sensitive assistance to support the user's workflow. Defining a main area is optional and recommended for applications requiring a dedicated and maximizable area for user interaction.
+Users can personalize the layout of a perspective and switch between perspectives. The workbench remembers the last layout of each perspective, restoring it the next time it is activated.
 
-Multiple layouts, called perspectives, are supported. Perspectives can be switched. Only one perspective is active at a time. Perspectives share the same main area, if any.
+A perspective typically has a main area part and other parts docked to the side, providing navigation and context-sensitive assistance to support the user's workflow. Initially empty or displaying a welcome page, the main area is where the workbench opens new views by default. Users can split the main area (or any other part) by dragging views side-by-side, vertically and horizontally, even across windows.
+
+Unlike any other part, the main area is shared between perspectives, and its layout is not reset when resetting perspectives. Having a main area and multiple perspectives is optional.
 
 The sources for this package are in [SCION Workbench](https://github.com/SchweizerischeBundesbahnen/scion-workbench) repo. Please file issues and pull requests against that repo.
 

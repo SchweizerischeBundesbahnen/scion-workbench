@@ -1,0 +1,26 @@
+@if (activityId1() && activityId2()) {
+  <sci-sashbox [direction]="direction()" (sashStart)="onSashStart()" (sashEnd2)="onSashEnd($event)">
+    <ng-template sciSash [size]="sashSizes().sash1" key="sash1">
+      <ng-container *ngTemplateOutlet="activity_template; context: {$implicit: activityId1()}"/>
+    </ng-template>
+
+    <ng-template sciSash [size]="sashSizes().sash2" key="sash2">
+      <ng-container *ngTemplateOutlet="activity_template; context: {$implicit: activityId2()}"/>
+    </ng-template>
+  </sci-sashbox>
+} @else if (activityId1()) {
+  <ng-container *ngTemplateOutlet="activity_template; context: {$implicit: activityId1()}"/>
+} @else if (activityId2()) {
+  <ng-container *ngTemplateOutlet="activity_template; context: {$implicit: activityId2()}"/>
+}
+
+<ng-template #activity_template let-activityId>
+  <wb-grid [grid]="layout().grids[activityId]!"
+           [attr.data-grid]="activityId"
+           [gridDropZone]="{
+             dropRegionSize: .15,
+             dropPlaceholderSize: .15,
+             dropZoneCssClass: 'e2e-grid-drop-zone',
+             dropZoneAttributes: {'data-grid': activityId},
+           }"/>
+</ng-template>
