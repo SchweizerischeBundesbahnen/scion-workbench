@@ -15,7 +15,22 @@ import {WorkbenchConfig} from '../workbench-config';
 /**
  * Provides the main entry point to start the SCION Workbench.
  *
- * Depending on {@link WorkbenchConfig.startup}, the SCION Workbench starts during application bootstrapping or when the `<wb-workbench>` component is added to the DOM.
+ * The SCION Workbench starts automatically when the `<wb-workbench>` component is added to the DOM. Alternatively,
+ * the workbench can be started manually using the `WorkbenchLauncher`, such as in an app initializer or a route guard.
+ *
+ * **Example of starting the workbench in an app initializer:**
+ * ```ts
+ * import {provideWorkbench, WorkbenchLauncher} from '@scion/workbench';
+ * import {bootstrapApplication} from '@angular/platform-browser';
+ * import {inject, provideAppInitializer} from '@angular/core';
+ *
+ * bootstrapApplication(AppComponent, {
+ *   providers: [
+ *     provideWorkbench(),
+ *     provideAppInitializer(() => inject(WorkbenchLauncher).launch())
+ *   ]
+ * });
+ * ```
  *
  * The application can hook into the startup process of the SCION Workbench by providing one or more initializers to {@link provideWorkbenchInitializer}.
  * Initializers execute at defined points during startup, enabling the application's controlled initialization. The workbench is fully started once

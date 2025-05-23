@@ -47,6 +47,9 @@ export abstract class WorkbenchConfig {
   /**
    * Configures startup of the SCION Workbench.
    *
+   * The SCION Workbench starts automatically when the `<wb-workbench>` component is added to the DOM. Alternatively,
+   * the workbench can be started manually using {@link WorkbenchLauncher.launch}, such as in an app initializer or a route guard.
+   *
    * The application can hook into the startup process of the SCION Workbench by providing one or more initializers to {@link provideWorkbenchInitializer}.
    * Initializers execute at defined points during startup, enabling the application's controlled initialization. The workbench is fully started once
    * all initializers have completed.
@@ -64,6 +67,8 @@ export abstract class WorkbenchConfig {
      *  - **APP_INITIALIZER**
      *   Starts the workbench during application bootstrapping, blocking Angular's app startup until the workbench is ready.
      *   No splash is displayed.
+     *
+     * @deprecated since version 19.0.0-beta.3. To start the workbench in an app initializer, use Angular's `provideAppInitializer()` function: `provideAppInitializer(() => inject(WorkbenchLauncher).launch())`. Otherwise, no migration is necessary. No replacement. API will be removed in version 21.
      */
     launcher?: 'LAZY' | 'APP_INITIALIZER';
 
