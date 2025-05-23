@@ -16,7 +16,7 @@
   </div>
 }
 
-@if (view().closable()) {
+@if (view().isClosable()) {
   <button (click)="onClose($event)"
           [title]="('%workbench.close.tooltip' | wbText)()"
           class="close e2e-close">

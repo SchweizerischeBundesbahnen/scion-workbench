@@ -52,6 +52,7 @@ import {IconComponent} from '../../icon/icon.component';
     '[attr.data-viewid]': 'view().id',
     '[attr.draggable]': 'true',
     '[attr.tabindex]': '-1', // make the view focusable to install view menu accelerators
+    '[style.--sci-workbench-tab-title-offset-right]': 'viewTitleOffsetRight()',
   },
 })
 export class ViewTabComponent {
@@ -69,6 +70,7 @@ export class ViewTabComponent {
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   protected readonly viewDragService = inject(ViewDragService);
+  protected readonly viewTitleOffsetRight = computed(() => this.view().closable() ? '1.5rem' : undefined); // offset for the title to not overlap the close button
 
   constructor() {
     this.installMaximizeListener();
@@ -121,7 +123,7 @@ export class ViewTabComponent {
       viewTitle: view.title(),
       viewHeading: view.heading(),
       viewDirty: view.dirty(),
-      viewClosable: view.closable(),
+      viewClosable: view.isClosable() || (view.closable() ? 'disabled' : false),
       navigation: view.navigation() && {
         path: view.navigation()!.path,
         hint: view.navigation()!.hint,
@@ -133,6 +135,7 @@ export class ViewTabComponent {
       viewTabPointerOffsetY: event.offsetY,
       viewTabWidth: this.host.getBoundingClientRect().width,
       viewTabHeight: this.host.getBoundingClientRect().height,
+      viewTitleOffsetRight: this.viewTitleOffsetRight(),
       workbenchId: this._workbenchId,
       classList: view.classList.asMap(),
     });

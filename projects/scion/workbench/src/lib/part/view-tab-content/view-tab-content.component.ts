@@ -10,7 +10,6 @@
 
 import {Component, inject} from '@angular/core';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 
@@ -22,12 +21,8 @@ import {IconComponent} from '../../icon/icon.component';
     TextPipe,
     IconComponent,
   ],
-  host: {
-    '[attr.context]': 'context',
-  },
 })
 export class ViewTabContentComponent {
 
   protected readonly view = inject(WorkbenchView);
-  protected readonly context = inject<ViewTabRenderingContext>(VIEW_TAB_RENDERING_CONTEXT);
 }

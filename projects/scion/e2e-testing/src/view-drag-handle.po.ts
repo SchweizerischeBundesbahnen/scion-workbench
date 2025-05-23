@@ -22,11 +22,41 @@ export class ViewDrageHandlePO {
   private _page: Page;
   private _mouse: Mouse;
 
+  public dragImage: {
+    /**
+     * Locates the title of the view tab.
+     */
+    title: Locator;
+    /**
+     * Locates the heading of the view tab.
+     */
+    heading: Locator;
+    /**
+     * Locates the dirty marker of the view tab.
+     */
+    dirty: Locator;
+    /**
+     * Locates the content of the view tab.
+     */
+    content: Locator;
+    /**
+     * Locates the close button of the view tab.
+     */
+    closeButton: Locator;
+  };
+
   constructor(public readonly locator: Locator, mousePosition: {x: number; y: number}) {
     this._x = mousePosition.x;
     this._y = mousePosition.y;
     this._page = locator.page();
     this._mouse = locator.page().mouse;
+    this.dragImage = {
+      title: this.locator.locator('.e2e-title'),
+      heading: this.locator.locator('.e2e-heading'),
+      dirty: this.locator.locator('.e2e-dirty'),
+      content: this.locator.locator('wb-view-tab-content'),
+      closeButton: this.locator.locator('button.e2e-close'),
+    };
   }
 
   /**

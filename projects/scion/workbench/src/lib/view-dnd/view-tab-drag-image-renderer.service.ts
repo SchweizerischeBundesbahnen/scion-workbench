@@ -136,6 +136,7 @@ export class ViewTabDragImageRenderer {
         top: `${dragPosition.y}px`,
         width: `${dragPosition.width}px`,
         height: `${dragPosition.height}px`,
+        '--sci-workbench-tab-title-offset-right': dragData.viewTitleOffsetRight,
       },
     });
     this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, null, this._applicationRef, this._injector);
@@ -222,6 +223,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly position = signal(0).asReadonly();
   public readonly scrolledIntoView = signal(true).asReadonly();
   public readonly menuItems = signal([]);
+  public readonly isClosable: Signal<boolean>;
 
   constructor(dragData: ViewDragData) {
     this.id = dragData.viewId;
@@ -235,7 +237,8 @@ class DragImageWorkbenchView implements WorkbenchView {
     this.title = signal(dragData.viewTitle).asReadonly();
     this.heading = signal(dragData.viewHeading).asReadonly();
     this.dirty = signal(dragData.viewDirty).asReadonly();
-    this.closable = signal(dragData.viewClosable).asReadonly();
+    this.closable = signal(dragData.viewClosable !== false).asReadonly();
+    this.isClosable = signal(dragData.viewClosable === true).asReadonly();
   }
 
   public close(): Promise<boolean> {

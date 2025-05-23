@@ -42,6 +42,7 @@
   }
 
   > div.content {
+    display: inline-grid;
     font-family: var(--sci-workbench-tab-font-family), sans-serif;
     font-size: var(--sci-workbench-tab-font-size);
     font-weight: var(--sci-workbench-tab-font-weight);

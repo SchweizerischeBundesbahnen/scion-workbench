@@ -101,6 +101,13 @@ export abstract class WorkbenchView {
   public abstract set closable(closable: boolean);
 
   /**
+   * Computes whether this view can be effectively closed based on its current state, e.g., is closable and not blocked.
+   *
+   * @internal
+   */
+  public abstract readonly isClosable: Signal<boolean>;
+
+  /**
    * Indicates whether this view is active or inactive.
    */
   public abstract readonly active: Signal<boolean>;
