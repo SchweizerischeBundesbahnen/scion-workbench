@@ -8,20 +8,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, HostBinding, inject, Injector, NgZone, signal} from '@angular/core';
+import {Component, computed, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {toSignal} from '@angular/core/rxjs-interop';
 import {DOCUMENT} from '@angular/common';
 import {WorkbenchView} from '../../view/workbench-view.model';
-import {observeIn, subscribeIn} from '@scion/toolkit/operators';
+import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
 import {MAIN_AREA} from '../../layout/workbench-layout';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
+import {PartId} from '../workbench-part.model';
 
 /**
  * @see ViewTabComponent
@@ -38,70 +39,70 @@ import {IconComponent} from '../../icon/icon.component';
     TextPipe,
     IconComponent,
   ],
+  host: {
+    '[class.view-drag]': 'true',
+    '[class.drag-image]': 'true',
+    '[class.active]': 'true',
+    '[class.can-drop]': 'canDrop()',
+    '[class.drag-over-tabbar]': 'isDragOverTabbar()',
+    '[class.drag-over-peripheral-tabbar]': 'isDragOverPeripheralTabbar()',
+  },
 })
 export class ViewTabDragImageComponent {
-
-  private readonly _viewDragService = inject(ViewDragService);
 
   protected readonly view = signal(inject(WorkbenchView)).asReadonly();
   protected readonly viewTabContentPortal = signal(createViewTabContentPortal()).asReadonly();
 
-  @HostBinding('class.active')
-  protected active = true;
-
   /**
    * Indicates if dragging this view tab over a tabbar.
    */
-  @HostBinding('class.drag-over-tabbar')
-  protected isDragOverTabbar = false;
-
-  /**
-   * Indicates if dragging this view tab over a valid drop target.
-   */
-  @HostBinding('class.can-drop')
-  protected canDrop = false;
+  protected readonly isDragOverTabbar = this.computeDragOverTabbar();
 
   /**
    * Indicates if dragging this view tab over a tabbar located in the peripheral area.
    */
-  @HostBinding('class.drag-over-peripheral-tabbar')
-  protected isDragOverPeripheralTabbar = false;
+  protected readonly isDragOverPeripheralTabbar = this.computeDragOverPeripheralTabbar();
 
-  constructor() {
-    this.installDragOverTabbarDetector();
-    this.installCanDropDetector();
-  }
+  /**
+   * Indicates if dragging this view tab over a valid drop target.
+   */
+  protected readonly canDrop = this.computeCanDrop();
 
   protected onClose(..._: unknown[]): void {
     throw Error('[UnsupportedOperationError]');
   }
 
-  private installDragOverTabbarDetector(): void {
-    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
-    this._viewDragService.tabbarDragOver$
-      .pipe(takeUntilDestroyed())
-      .subscribe(partId => {
-        // Compute if dragging this view tab over a tabbar.
-        this.isDragOverTabbar = !!partId;
-        // Compute if dragging this view tab over a tabbar located in the peripheral area.
-        this.isDragOverPeripheralTabbar = !!partId && partRegistry.has(MAIN_AREA) && !partRegistry.get(partId).isInMainArea;
-      });
+  /**
+   * Computes if dragging this view tab over a tabbar.
+   */
+  private computeDragOverTabbar(): Signal<PartId | false> {
+    return toSignal(inject(ViewDragService).tabbarDragOver$, {requireSync: true});
   }
 
-  private installCanDropDetector(): void {
+  /**
+   * Computes if dragging this view tab over a tabbar located in the peripheral area.
+   */
+  private computeDragOverPeripheralTabbar(): Signal<boolean> {
+    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
+    return computed(() => {
+      const partId = this.isDragOverTabbar();
+      return untracked(() => partId && partRegistry.has(MAIN_AREA) && !partRegistry.get(partId).isInMainArea);
+    });
+  }
+
+  /**
+   * Computes if dragging this view tab over a valid drop target.
+   */
+  private computeCanDrop(): Signal<boolean> {
     const documentRoot = inject(DOCUMENT).documentElement;
     const zone = inject(NgZone);
-    this._viewDragService.viewDrag$(documentRoot, {eventType: 'dragover'})
+    const canDrop$ = inject(ViewDragService).viewDrag$(documentRoot, {eventType: 'dragover'})
       .pipe(
         subscribeIn(fn => zone.runOutsideAngular(fn)),
         map(event => event.defaultPrevented),
         distinctUntilChanged(),
-        observeIn(fn => zone.run(fn)),
-        takeUntilDestroyed(),
-      )
-      .subscribe(canDrop => {
-        this.canDrop = canDrop;
-      });
+      );
+    return toSignal(canDrop$, {initialValue: false});
   }
 }
 

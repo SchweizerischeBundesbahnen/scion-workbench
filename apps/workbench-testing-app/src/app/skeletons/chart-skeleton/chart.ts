@@ -19,14 +19,12 @@ export class Chart {
   private readonly _points: Signal<Point[]>;
 
   public readonly lineChart: Signal<string | undefined>;
-  public readonly areaChart: Signal<string | undefined>;
   public readonly viewbox: Signal<string | undefined>;
 
   constructor(private _config: ChartConfig) {
     this._points = this.computePoints();
     this.viewbox = this.computeViewbox();
     this.lineChart = this.computeLineChart();
-    this.areaChart = this.computeAreaChart();
   }
 
   /**
@@ -88,27 +86,6 @@ export class Chart {
       return [
         `M ${points[0].x} ${points[0].y}`,
         ...points.slice(1).map(point => ` L${point.x} ${point.y}`),
-      ].join(' ');
-    });
-  }
-
-  /**
-   * Computes the SVG path for the area chart.
-   */
-  private computeAreaChart(): Signal<string | undefined> {
-    return computed(() => {
-      const points = this._points();
-
-      if (!points.length) {
-        return undefined;
-      }
-
-      return [
-        `M ${points[0].x} ${points[0].y}`,
-        ...points.slice(1).map(point => ` L${point.x} ${point.y}`),
-        `V ${Math.max(...this._dataSeries()) + this._config.paddingBottom - 1}`,
-        'H 0',
-        'Z',
       ].join(' ');
     });
   }

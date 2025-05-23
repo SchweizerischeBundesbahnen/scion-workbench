@@ -1,4 +1,4 @@
-@use '../../common/workbench-mixins';
+@use '../../common/workbench.mixin';
 
 :host {
   display: flex;
@@ -20,22 +20,20 @@
       left: 0;
       right: 0;
       line-height: 1.5;
-      @include workbench-mixins.ellipsis-on-overflow();
-      font-family: var(--sci-workbench-dialog-title-font-family);
+      @include workbench.ellipsis-on-overflow();
+      font-family: var(--sci-workbench-dialog-title-font-family), sans-serif;
       font-size: var(--sci-workbench-dialog-title-font-size);
       font-weight: var(--sci-workbench-dialog-title-font-weight);
       text-align: var(--sci-workbench-dialog-title-align);
     }
   }
 
-  > button.close {
-    all: unset;
-    flex: none;
-    cursor: pointer;
-    align-self: center;
-
-    &:not(:hover) {
-      opacity: .75;
+  > button.close:is(button, #sci-reset) {
+    @include workbench.icon-button-element-states() {
+      flex: none;
+      align-self: center;
+      border-radius: var(--sci-corner-small);
+      padding: .125em;
     }
   }
 }

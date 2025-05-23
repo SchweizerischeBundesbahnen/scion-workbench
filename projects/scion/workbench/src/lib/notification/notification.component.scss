@@ -1,3 +1,5 @@
+@use '../common/workbench.mixin';
+
 :host {
   display: grid;
   background-color: var(--sci-color-background-elevation);
@@ -38,16 +40,13 @@
     }
   }
 
-  > button.close {
-    all: unset;
-    position: absolute;
-    align-self: start;
-    justify-self: end;
-    cursor: pointer;
-    padding: .5em .5em 0 0;
-
-    &:hover {
-      font-weight: bold;
+  > button.close:is(button, #sci-reset) {
+    @include workbench.icon-button-element-states() {
+      position: absolute;
+      top: .275em;
+      right: .275em;
+      padding: .125em;
+      border-radius: var(--sci-corner-small);
     }
   }
 }

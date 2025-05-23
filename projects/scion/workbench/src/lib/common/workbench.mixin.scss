@@ -1,0 +1,60 @@
+/**
+ * SASS mixins used by the SCION Workbench.
+ */
+
+/**
+ * Displays ellipsis when text overflows.
+ */
+@mixin ellipsis-on-overflow {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/**
+ * Applies content to peripheral workbench parts, i.e., parts located outside the main area, but only if a main area is present.
+ */
+@mixin peripheral-workbench-parts-selector {
+  wb-workbench:has(wb-part[data-partid="part.main-area"]) wb-part:not([data-partid="part.main-area"]):not([data-context="main-area"]) & {
+    @content;
+  }
+}
+
+/**
+ * Provides styles for an icon button's element states: :hover, :active, and :focus.
+ *
+ * Supports additional styling or overrides via @content.
+ */
+@mixin icon-button-element-states {
+  all: unset;
+  display: inline-grid;
+  place-content: center;
+  place-items: center;
+  padding: .25em;
+  border-radius: var(--sci-corner);
+  user-select: none;
+  overflow: hidden;
+  cursor: var(--sci-workbench-button-cursor);
+
+  &:hover:where(:not(:disabled)) {
+    background-color: var(--sci-workbench-button-background-color-hover);
+  }
+
+  &:active:where(:not(:disabled)) {
+    background-color: var(--sci-workbench-button-background-color-active);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+  }
+
+  &:disabled {
+    color: var(--sci-color-gray-500);
+  }
+
+  @content;
+}

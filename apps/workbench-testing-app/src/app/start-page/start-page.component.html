@@ -13,17 +13,15 @@
       <section class="tiles e2e-workbench-view-tiles">
         <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"/>
         @for (route of workbenchViewRoutes | appFilter$:filterControl:selectViewRouteText | async; track route) {
-          <a
-            (click)="onViewOpen(route.path!, $event)"
-            [ngClass]="route.data![WorkbenchRouteData.cssClass]"
-            href="">
+          <button (click)="onViewOpen(route.path!, $event)"
+                  [ngClass]="route.data![WorkbenchRouteData.cssClass]">
             {{route.data![WorkbenchRouteData.title]}}
             @if (route.data![WorkbenchRouteData.heading]) {
               <span class="description">
                 {{route.data![WorkbenchRouteData.heading]}}
               </span>
             }
-          </a>
+          </button>
         }
       </section>
     </ng-template>
@@ -34,15 +32,14 @@
       <section class="tiles e2e-microfrontend-view-tiles">
         <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"/>
         @for (viewCapability of microfrontendViewCapabilities | appFilter$:filterControl:selectViewCapabilityText | async; track viewCapability.metadata!.id) {
-          <a (click)="onMicrofrontendViewOpen(viewCapability, $event)"
-             [ngClass]="[viewCapability.metadata!.appSymbolicName] | appConcatArray:viewCapability.properties.cssClass"
-             href=""
-             class="microfrontend">
+          <button (click)="onMicrofrontendViewOpen(viewCapability, $event)"
+                  [ngClass]="[viewCapability.metadata!.appSymbolicName] | appConcatArray:viewCapability.properties.cssClass"
+                  class="microfrontend">
             {{viewCapability.properties.title}}
             <span class="description">
               {{viewCapability.metadata!.appSymbolicName}}
             </span>
-          </a>
+          </button>
         }
       </section>
     </ng-template>
@@ -53,15 +50,14 @@
       <section class="tiles e2e-test-capability-tiles">
         <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"/>
         @for (testCapability of testCapabilities | appFilter$:filterControl:selectTestCapabilityText | async; track testCapability.metadata!.id) {
-          <a (click)="onTestCapabilityOpen(testCapability, $event)"
-             [ngClass]="[testCapability.metadata!.appSymbolicName] | appConcatArray:testCapability.properties?.['cssClass']"
-             href=""
-             class="test-capability">
+          <button (click)="onTestCapabilityOpen(testCapability, $event)"
+                  [ngClass]="[testCapability.metadata!.appSymbolicName] | appConcatArray:testCapability.properties?.['cssClass']"
+                  class="test-capability">
             {{testCapability.properties?.['cssClass']}}
             <span class="description">
               {{testCapability.metadata!.appSymbolicName}}
             </span>
-          </a>
+          </button>
         }
       </section>
     </ng-template>
