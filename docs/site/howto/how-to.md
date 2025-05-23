@@ -11,7 +11,7 @@ We are working on a comprehensive guide that explains the features and concepts 
 
 ***
 
-#### Installation & Configuration
+#### Installation & Startup
 - [How to install the SCION Workbench](how-to-install-workbench.md)
 - [How to start the SCION Workbench](how-to-start-workbench.md)
 
