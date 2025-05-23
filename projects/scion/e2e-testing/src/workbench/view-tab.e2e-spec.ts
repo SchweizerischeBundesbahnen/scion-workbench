@@ -149,7 +149,7 @@ test.describe('Workbench View Tab', () => {
     await viewPage.checkClosable(true);
 
     // Expect the view tab to have a close button.
-    await expect(viewTab.closeButton).toBeVisible();
+    await expect(viewTab.closeButton).toBeEnabled();
 
     await test.step('drag image', async () => {
       // Start dragging the view tab.
@@ -157,7 +157,7 @@ test.describe('Workbench View Tab', () => {
       await dragHandle.dragTo({x: appPO.viewportBoundingBox().hcenter, y: appPO.viewportBoundingBox().vcenter});
 
       // Expect the drag image to have a close button.
-      await expect(dragHandle.dragImage.closeButton).toBeVisible();
+      await expect(dragHandle.dragImage.closeButton).toBeEnabled();
     });
   });
 
@@ -200,7 +200,7 @@ test.describe('Workbench View Tab', () => {
     });
   });
 
-  test('should not have close button if view is blocked', async ({appPO, workbenchNavigator}) => {
+  test('should have disabled close button if view is blocked', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Open test view.
@@ -218,16 +218,16 @@ test.describe('Workbench View Tab', () => {
     // Block the view by opening a modal dialog.
     await dialogOpenerPage.open('dialog-page', {modality: 'view', context: {viewId: await viewTab.getViewId()}, cssClass: 'testee'});
 
-    // Expect the close button not to be visible.
-    await expect(viewTab.closeButton).not.toBeVisible();
+    // Expect the close button to be disabled.
+    await expect(viewTab.closeButton).toBeDisabled();
 
     await test.step('drag image', async () => {
       // Start dragging the view tab.
       const dragHandle = await viewTab.startDrag();
       await dragHandle.dragTo({x: appPO.viewportBoundingBox().hcenter, y: appPO.viewportBoundingBox().vcenter});
 
-      // Expect the drag image not to have a close button.
-      await expect(dragHandle.dragImage.closeButton).not.toBeVisible();
+      // Expect the drag image to have a disabled close button.
+      await expect(dragHandle.dragImage.closeButton).toBeDisabled();
 
       // Cancel the drag operation.
       await dragHandle.cancel();
@@ -236,8 +236,8 @@ test.describe('Workbench View Tab', () => {
     // Close the dialog.
     await appPO.dialog({cssClass: 'testee'}).close();
 
-    // Expect the close button to be visible.
-    await expect(viewTab.closeButton).toBeVisible();
+    // Expect the close button to be enabled.
+    await expect(viewTab.closeButton).toBeEnabled();
   });
 
   test('should not overlap title and close button', async ({appPO, workbenchNavigator}) => {

@@ -187,8 +187,8 @@ test.describe('Workbench Dialog', () => {
       const dialog = appPO.dialog({cssClass: 'testee'});
       const dialogPage = new DialogPagePO(dialog);
 
-      // Expect close button not to be visible.
-      await expect(dialogOpenerPage.view.tab.closeButton).not.toBeVisible();
+      // Expect close button to be disabled.
+      await expect(dialogOpenerPage.view.tab.closeButton).toBeDisabled();
 
       // Expect context menu item to be disabled.
       const viewTabContextMenu = await dialogOpenerPage.view.tab.openContextMenu();
@@ -207,7 +207,7 @@ test.describe('Workbench Dialog', () => {
 
       // Expect view to be closable when dialog is closed.
       await dialog.close();
-      await expect(dialogOpenerPage.view.tab.closeButton).toBeVisible();
+      await expect(dialogOpenerPage.view.tab.closeButton).toBeEnabled();
 
       await dialogOpenerPage.view.tab.close();
       await expect(dialogOpenerPage.view.tab.locator).not.toBeAttached();
