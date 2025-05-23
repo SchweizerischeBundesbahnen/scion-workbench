@@ -39,6 +39,16 @@ export class ViewTabPO {
   public readonly heading: Locator;
 
   /**
+   * Locates the dirty marker of the view tab.
+   */
+  public readonly dirty: Locator;
+
+  /**
+   * Locates the content of the view tab.
+   */
+  public readonly content: Locator;
+
+  /**
    * Locates the close button of the view tab.
    */
   public readonly closeButton: Locator;
@@ -47,6 +57,8 @@ export class ViewTabPO {
     this.part = part;
     this.title = this.locator.locator('.e2e-title');
     this.heading = this.locator.locator('.e2e-heading');
+    this.dirty = this.locator.locator('.e2e-dirty');
+    this.content = this.locator.locator('wb-view-tab-content');
     this.closeButton = this.locator.locator('button.e2e-close');
   }
 

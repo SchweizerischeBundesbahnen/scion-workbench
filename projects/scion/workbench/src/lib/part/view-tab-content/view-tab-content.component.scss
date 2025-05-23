@@ -2,41 +2,37 @@
 @use '../../common/workbench.mixin';
 
 :host {
-  display: flex;
-  flex-direction: column;
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1em;
   gap: .25em;
-  overflow: hidden; // to have ellipsis on overflow
+
+  &:has(wb-icon.dirty) {
+    grid-template-columns: auto 1fr;
+  }
+
+  > wb-icon.dirty {
+    align-self: center;
+    color: var(--sci-workbench-tab-text-color); // do not inherit color from active tab
+  }
 
   > span.title {
+    align-self: center;
+    margin-right: var(--sci-workbench-tab-title-offset-right);
     @include workbench.ellipsis-on-overflow();
-    font-weight: 400;
-    font-size: 1em;
-    display: flex;
-    align-items: center;
-    gap: .25em;
-
-    > wb-icon.dirty {
-      color: var(--sci-workbench-tab-text-color); // do not inherit color from active tab
-    }
   }
 
   > span.heading {
     @include workbench.ellipsis-on-overflow();
-    font-size: .9em;
-    font-weight: 300;
+    grid-column: 1/-1;
+    font-family: var(--sci-workbench-tab-heading-font-family), sans-serif;
+    font-size: var(--sci-workbench-tab-heading-font-size);
+    font-weight: var(--sci-workbench-tab-heading-font-weight);
   }
 
-  &[context="tab"], &[context="drag-image"] {
-    span.title {
-      margin-right: 1.5rem;
-    }
-  }
-
-  // @formatter:off - Disable formatting because IntelliJ adds a space between number and unit, making the condition invalid.
   @container viewtab (height < #{workbench-constants.$viewtab-multiline-breakpoint}) {
     > span.heading {
       display: none;
     }
   }
-  // @formatter:on
 }

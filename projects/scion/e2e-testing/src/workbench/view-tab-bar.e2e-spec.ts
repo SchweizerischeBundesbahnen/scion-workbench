@@ -462,6 +462,7 @@ test.describe('View Tabbar', () => {
 
     test('should scroll the active tab into view when dragging it to the end of the viewport', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       await workbenchNavigator.createPerspective(layout => layout
         .addPart('part.left')
@@ -559,6 +560,7 @@ test.describe('View Tabbar', () => {
 
     test('should scroll the active tab into view when opening a new tab', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -576,7 +578,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect first tab to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);
@@ -593,6 +595,7 @@ test.describe('View Tabbar', () => {
 
     test('should fully scroll active tab into view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -610,7 +613,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Open new tab at the end.
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
@@ -623,6 +626,7 @@ test.describe('View Tabbar', () => {
 
     test('should scroll the active tab into view when opening/reloading the application', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -640,7 +644,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect last tab to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.110'}).tab.isActive()).toBe(true);
@@ -656,6 +660,7 @@ test.describe('View Tabbar', () => {
 
     test('should scroll the active tab into view when closing the active tab', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -673,7 +678,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect "view.103" to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.103'}).tab.isActive()).toBe(true);
@@ -694,6 +699,7 @@ test.describe('View Tabbar', () => {
 
     test('should scroll the active tab into view when navigating the active view', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -711,7 +717,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Scroll tabbar to the end.
       await appPO.part({partId: 'part.left'}).bar.viewTabBar.setViewportScrollLeft(Number.MAX_SAFE_INTEGER);
@@ -731,6 +737,7 @@ test.describe('View Tabbar', () => {
 
     test('should not scroll the active tab into view when closing an inactive tab', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -748,7 +755,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect last tab to be active and scrolled into view.
       await appPO.view({viewId: 'view.110'}).tab.click();
@@ -771,6 +778,7 @@ test.describe('View Tabbar', () => {
 
     test('should not scroll the active tab into view when opening an inactive tab', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.setDesignToken('--sci-workbench-tab-min-width', '5rem');
 
       // Add part with 10 views left to the main area.
       await workbenchNavigator.modifyLayout(layout => layout
@@ -788,7 +796,7 @@ test.describe('View Tabbar', () => {
       );
 
       // Expect tabbar to overflow (prerequisite).
-      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBe(6);
+      await expect.poll(() => appPO.part({partId: 'part.left'}).bar.getHiddenTabCount()).toBeGreaterThan(1);
 
       // Expect first tab to be active and scrolled into view.
       await expect.poll(() => appPO.view({viewId: 'view.101'}).tab.isActive()).toBe(true);

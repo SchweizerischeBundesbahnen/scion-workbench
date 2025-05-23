@@ -175,7 +175,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private removeViewsWithoutGuard(layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     return layout.views({markedForRemoval: true}).reduce((layout, mView) => {
       const view = this._workbenchViewRegistry.get(mView.id, {orElse: null});
-      if (!view || (view.closable() && !view.canCloseGuard)) {
+      if (!view || (view.isClosable() && !view.canCloseGuard)) {
         return layout.removeView(mView.id, {force: true});
       }
       return layout;
@@ -192,7 +192,7 @@ export class ɵWorkbenchRouter implements WorkbenchRouter {
   private async scheduleViewRemoval(layout: ɵWorkbenchLayout): Promise<boolean> {
     const navigations = layout.views({markedForRemoval: true})
       .map(mView => this._workbenchViewRegistry.get(mView.id, {orElse: null}))
-      .filter((view): view is ɵWorkbenchView => !!view && view.closable())
+      .filter((view): view is ɵWorkbenchView => !!view && view.isClosable())
       .map(async view => {
         // Capture current navigation id to not proceed closing if navigated in the meantime.
         const navigationId = view.navigation()?.id;
