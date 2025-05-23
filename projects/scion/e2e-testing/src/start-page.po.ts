@@ -62,7 +62,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
     const viewId = await this.view.getViewId();
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-workbench-views');
-    await this._tabbarLocator.locator(`.e2e-workbench-view-tiles a.${cssClass}`).click();
+    await this._tabbarLocator.locator(`.e2e-workbench-view-tiles button.${cssClass}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
     // Wait until completed navigation.
     await this._appPO.waitForLayoutChange({navigationId});
@@ -75,7 +75,7 @@ export class StartPagePO implements WorkbenchViewPagePO {
     const viewId = await this.view.getViewId();
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this._tabbar.selectTab('e2e-microfrontend-views');
-    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles a.${cssClass}.workbench-client-testing-${app}`).click();
+    await this._tabbarLocator.locator(`.e2e-microfrontend-view-tiles button.${cssClass}.workbench-client-testing-${app}`).click();
     await this._appPO.view({viewId, cssClass}).waitUntilAttached();
     // Wait for microfrontend to be loaded.
     const frameLocator = new SciRouterOutletPO(this._appPO, {name: viewId}).frameLocator;
@@ -89,6 +89,6 @@ export class StartPagePO implements WorkbenchViewPagePO {
    */
   public async clickTestCapability(capabilityCssClass: string, app: string): Promise<void> {
     await this._tabbar.selectTab('e2e-test-capabilities');
-    await this._tabbarLocator.locator(`.e2e-test-capability-tiles a.${capabilityCssClass}.workbench-client-testing-${app}`).click();
+    await this._tabbarLocator.locator(`.e2e-test-capability-tiles button.${capabilityCssClass}.workbench-client-testing-${app}`).click();
   }
 }

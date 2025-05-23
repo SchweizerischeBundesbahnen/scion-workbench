@@ -25,9 +25,9 @@
     text-align: center;
   }
 
-  > button {
+  > button.close:is(button, #sci-reset) {
     all: unset;
-    cursor: pointer;
+    cursor: var(--sci-workbench-button-cursor);
     padding: .5em 1.5em;
     color: var(--sci-color-accent-inverse);
     background-color: var(--sci-color-accent);

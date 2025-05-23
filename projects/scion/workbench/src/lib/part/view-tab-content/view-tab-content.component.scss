@@ -1,5 +1,5 @@
 @use '../../../../design/workbench-constants';
-@use '../../common/workbench-mixins';
+@use '../../common/workbench.mixin';
 
 :host {
   display: flex;
@@ -8,23 +8,27 @@
   overflow: hidden; // to have ellipsis on overflow
 
   > span.title {
-    @include workbench-mixins.ellipsis-on-overflow();
+    @include workbench.ellipsis-on-overflow();
     font-weight: 400;
     font-size: 1em;
     display: flex;
     align-items: center;
     gap: .25em;
+
+    > wb-icon.dirty {
+      color: var(--sci-workbench-tab-text-color); // do not inherit color from active tab
+    }
   }
 
   > span.heading {
-    @include workbench-mixins.ellipsis-on-overflow();
+    @include workbench.ellipsis-on-overflow();
     font-size: .9em;
     font-weight: 300;
   }
 
   &[context="tab"], &[context="drag-image"] {
     span.title {
-      margin-right: 1em;
+      margin-right: 1.5rem;
     }
   }
 

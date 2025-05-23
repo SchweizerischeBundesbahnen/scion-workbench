@@ -1,3 +1,5 @@
+@use '../common/workbench.mixin';
+
 :host {
   display: inline-flex;
   flex-direction: row;
@@ -21,20 +23,15 @@
     }
   }
 
-  > button.clear {
-    all: unset;
-    flex: none;
-    align-self: center;
-    opacity: .75;
-    cursor: pointer;
-
-    &:hover {
-      opacity: 1;
+  > button.clear:is(button, #sci-reset) {
+    @include workbench.icon-button-element-states() {
+      flex: none;
+      align-self: center;
     }
   }
 
   &:not(:focus-within):not(:hover), &:has(> input:disabled), &.empty {
-    > button.clear {
+    > button.clear:is(button, #sci-reset) {
       visibility: hidden;
     }
   }

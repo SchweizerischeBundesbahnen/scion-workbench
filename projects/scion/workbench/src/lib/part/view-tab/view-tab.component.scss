@@ -1,5 +1,5 @@
 @use '../../../../design/workbench-constants';
-@use '../../common/workbench-mixins';
+@use '../../common/workbench.mixin';
 
 /**
  * IMPORTANT: THIS CSS FILE IS ALSO USED BY `ViewTabDragImageComponent`
@@ -12,12 +12,12 @@
   padding-right: var(--sci-workbench-tab-padding-inline);
   position: relative; // positioning context
   user-select: none;
-  cursor: pointer;
+  cursor: var(--sci-workbench-tab-cursor);
   box-sizing: border-box;
   outline: none;
-  border-top: 1px solid transparent;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-top: var(--sci-workbench-tab-border-top-width) solid transparent;
+  border-left: var(--sci-workbench-tab-border-width) solid transparent;
+  border-right: var(--sci-workbench-tab-border-width) solid transparent;
   border-top-left-radius: var(--sci-workbench-tab-border-radius);
   border-top-right-radius: var(--sci-workbench-tab-border-radius);
 
@@ -28,57 +28,76 @@
     border-top-color: var(--sci-workbench-tab-border-color);
     background-color: var(--sci-workbench-view-background-color);
 
-    @include workbench-mixins.peripheral-workbench-parts-selector {
+    @include workbench.peripheral-workbench-parts-selector {
       background-color: var(--sci-workbench-view-peripheral-background-color);
     }
 
     > div.content {
-      color: var(--sci-workbench-tab-active-text-color);
+      color: var(--sci-workbench-tab-text-color-active);
     }
 
     &.part-active > div.content {
-      color: var(--sci-workbench-part-active-tab-active-text-color);
+      color: var(--sci-workbench-part-active-tab-text-color-active);
     }
   }
 
   > div.content {
+    font-family: var(--sci-workbench-tab-font-family), sans-serif;
+    font-size: var(--sci-workbench-tab-font-size);
+    font-weight: var(--sci-workbench-tab-font-weight);
     min-width: var(--sci-workbench-tab-min-width);
     max-width: var(--sci-workbench-tab-max-width);
     isolation: isolate; // stacking context to overlay the positioned 'hover' overlay
   }
 
-  > button.close {
-    all: unset;
-    position: absolute;
-    cursor: pointer;
-    visibility: hidden;
-    padding: .125em;
-    border-radius: var(--sci-corner-small);
-    right: .2em;
+  &:not(.drag-image) > div.content {
+    // Subtract tab border to align tab content with part title and part actions.
+    transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
+  }
 
-    &:not(:hover) {
-      opacity: .75;
+  > button.close:is(button, #sci-reset) {
+    @include workbench.icon-button-element-states() {
+      $padding: .125em;
+      position: absolute;
+      right: calc(var(--sci-workbench-tab-padding-inline) - $padding);
+      visibility: hidden;
+      padding: $padding;
+      border-radius: var(--sci-corner-small);
     }
   }
 
-  &.active, &:hover:not(.drag-over-tabbar) {
-    > button.close {
+  &:not(.drag-image) > button.close:is(button, #sci-reset) {
+    // Subtract tab border to align close button with part title and part actions.
+    transform: translateY(calc(#{-1} * var(--sci-workbench-tab-border-top-width)));
+  }
+
+  &.active, &:hover:not(.view-drag) {
+    > button.close:is(button, #sci-reset) {
       visibility: visible;
     }
   }
 
-  &.active > button.close:hover {
-    background-color: var(--sci-workbench-tab-hover-background-color);
-  }
-
   // Indicator when hovering the tab
-  &:hover:not(.active):not(.drag-over-tabbar):before {
-    content: '';
-    background-color: var(--sci-workbench-tab-hover-background-color);
-    position: absolute;
-    inset: 0 0 .125em .125em;
-    border-radius: var(--sci-workbench-tab-border-radius);
-    pointer-events: none;
+  @container style(--sci-workbench-tab-background-color-hover) {
+    &:hover:not(.active):not(.view-drag) {
+      &::before {
+        content: '';
+        position: absolute;
+        place-self: start center;
+        box-sizing: border-box;
+        height: calc(calc(100% - var(--sci-workbench-tab-padding-block-hover) - var(--sci-workbench-part-bar-border-bottom-width))); // Subtract "part bar bottom border width" to not overlay the bottom part bar line.
+        width: calc(calc(100% - var(--sci-workbench-tab-padding-inline-hover) + calc(2 * var(--sci-workbench-tab-border-width)))); // Add "tab border width" to fully cover the tab
+        background-color: var(--sci-workbench-tab-background-color-hover);
+        border: var(--sci-workbench-tab-border-width) solid var(--sci-workbench-tab-background-color-hover);
+        border-radius: var(--sci-workbench-tab-border-radius);
+        pointer-events: none;
+      }
+
+      // Use a darker hover background for the close button than for the tab hover background.
+      > button.close:is(button, #sci-reset):not(:disabled):hover {
+        background-color: color-mix(in srgb, var(--sci-workbench-tab-background-color-hover) 90%, #{light-dark}(var(--sci-static-color-black), var(--sci-static-color-white)));
+      }
+    }
   }
 
   > div.corner-radius {
@@ -95,10 +114,10 @@
       height: calc(2 * var(--sci-workbench-tab-border-radius));
       border: var(--sci-workbench-tab-border-radius) solid var(--sci-workbench-view-background-color);
       border-radius: 50%;
-      box-shadow: inset 0 0 0 1px var(--sci-workbench-tab-border-color);
+      box-shadow: inset 0 0 0 var(--sci-workbench-tab-border-width) var(--sci-workbench-tab-border-color);
       box-sizing: content-box;
 
-      @include workbench-mixins.peripheral-workbench-parts-selector {
+      @include workbench.peripheral-workbench-parts-selector {
         border-color: var(--sci-workbench-view-peripheral-background-color);
       }
     }
@@ -120,13 +139,10 @@
     }
   }
 
-  // @formatter:off - Disable formatting because IntelliJ adds a space between number and unit, making the condition invalid.
   @container viewtab (height >= #{workbench-constants.$viewtab-multiline-breakpoint}) {
-    > button.close {
-      align-self: start;
-      top: .125em;
-      right: .125em;
+    > button.close:is(button, #sci-reset) {
+      top: 5px;
+      right: 5px;
     }
   }
-  // @formatter:on
 }
