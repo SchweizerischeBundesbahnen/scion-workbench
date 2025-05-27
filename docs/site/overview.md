@@ -31,20 +31,7 @@ Users can split the main area (or any other part) by dragging views side-by-side
 #### Developer Experience
 The SCION Workbench is built on top of Angular and is designed to have minimal impact on application development. The Workbench API is based on familiar Angular concepts, making development straightforward.
 
-Any component can be opened as a view. A view is a regular Angular component associated with a route. Views are navigated using the Workbench Router. Like the Angular Router, it has a `navigate` method to open views or change the workbench layout. Data is passed to views through navigation. A view can read data from its `ActivatedRoute`.
-
-Because SCION Workbench uses Angular's routing mechanism to navigate and lay out views, the application can harness Angular's extensive routing capabilities, such as lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more.
-
-#### Integration into Angular
-SCION Workbench integrates with the Angular Router to perform layout changes and populate views, enabling persistent and backward/forward navigation.
-
-A view is a named router outlet that is filled based on the current Angular router state. The SCION Workbench registers view-specific auxiliary routes for all routes, enabling routing on a per-view basis.
-
-The browser URL contains the path and arrangement of views in the main area. The arrangement of views outside the main area is passed as state to the navigation and stored in workbench storage (defaults to local storage).
-The figure below shows the browser URL when there are 3 views opened in the main area. For each view, Angular adds an auxiliary route to the URL. An auxiliary route consists of the view identifier and the path. Multiple views are separated by two slashes.
-
- [<img src="/docs/site/images/workbench-url.drawio.svg">](https://github.com/SchweizerischeBundesbahnen/scion-workbench/raw/master/docs/site/images/workbench-url.drawio.svg)
-
+Any component associated with a route can be opened as a view or displayed in a part. Similar to Angular, the workbench provides a router for view and part navigation. A view or part can inject `ActivatedRoute` to obtain parameters passed to the navigation. The navigation is based on Angular's routing mechanism and thus supports lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more.
 
 [link-features]: /docs/site/features.md
 
