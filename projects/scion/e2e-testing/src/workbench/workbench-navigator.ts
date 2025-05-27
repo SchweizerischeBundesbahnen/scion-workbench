@@ -104,16 +104,19 @@ export class WorkbenchNavigator {
    * @see WorkbenchService.registerPerspective
    * @see WorkbenchService.switchPerspective
    */
-  public async createPerspective(id: string, layoutFn: WorkbenchLayoutFn): Promise<string>;
-  public async createPerspective(layoutFn: WorkbenchLayoutFn): Promise<string>;
-  public async createPerspective(arg1: string | WorkbenchLayoutFn, arg2?: WorkbenchLayoutFn): Promise<string> {
+  public async createPerspective(id: string, layoutFn: WorkbenchLayoutFn, options?: PerspectiveCreateOptions): Promise<string>;
+  public async createPerspective(layoutFn: WorkbenchLayoutFn, options?: PerspectiveCreateOptions): Promise<string>;
+  public async createPerspective(arg1: string | WorkbenchLayoutFn, arg2?: WorkbenchLayoutFn | PerspectiveCreateOptions, arg3?: PerspectiveCreateOptions): Promise<string> {
     const id = typeof arg1 === 'string' ? arg1 : crypto.randomUUID();
-    const layoutFn = typeof arg1 === 'function' ? arg1 : arg2!;
+    const layoutFn = typeof arg1 === 'function' ? arg1 : arg2 as WorkbenchLayoutFn;
+    const options = (typeof arg1 === 'function' ? arg2 : arg3) as PerspectiveCreateOptions | undefined;
 
     const layoutPage = await this.openInNewTab(LayoutPagePO);
     await layoutPage.createPerspective(id, {layout: layoutFn});
     await layoutPage.view.tab.close();
-    await this._appPO.switchPerspective(id);
+    if (options?.active ?? true) {
+      await this._appPO.switchPerspective(id);
+    }
     return id;
   }
 
@@ -127,4 +130,14 @@ export class WorkbenchNavigator {
     await layoutPage.modifyLayout(layoutFn);
     await layoutPage.view.tab.close();
   }
+}
+
+/**
+ * Controls the creation of the perspective.
+ */
+export interface PerspectiveCreateOptions {
+  /**
+   * Controls if to activate the perspective.
+   */
+  active?: boolean;
 }

@@ -902,7 +902,7 @@ test.describe('Workbench View', () => {
     await expectView(testViewPage).not.toBeAttached();
   });
 
-  test('should only create browser history entry when confirming closing a view', async ({appPO, workbenchNavigator}) => {
+  test('should only create browser session history entry when confirming closing a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Open router view.
