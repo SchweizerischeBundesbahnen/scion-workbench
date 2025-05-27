@@ -5,9 +5,10 @@
 
 ## [SCION Workbench][menu-home] > How To Guides
 
-This section provides answers to some common questions when developing an application with the SCION Workbench.
+This section provides documentation and instructions for developing applications with SCION Workbench.
 
-We are working on a comprehensive guide that explains the features and concepts of the SCION Workbench in more detail.
+> [!NOTE]
+> Documentation for integrating microfrontends into the SCION Workbench is planned for 2026. In the meantime, please refer to our testing application for an example, or contact us by submitting an issue on GitHub if you need assistance.
 
 ***
 

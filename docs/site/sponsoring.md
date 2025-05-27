@@ -9,7 +9,7 @@ We would like to thank our sponsors and contributors which support development o
 
 ***
 ### SBB Swiss Federal Railways
-SCION Workbench and SCION Microfrontend Platform emerged from development at [SBB][link-sponsor-sbb] in building a revolutionary traffic management system. SBB is the main contributor of the project. We would like to thank SBB which supports open source software and made SCION possible in the first place.
+SCION Workbench and SCION Microfrontend Platform emerged from development at [SBB][link-sponsor-sbb] in building a Traffic Management System. SBB is the main contributor of the project. We would like to thank SBB which supports open source software and made SCION possible in the first place.
 
 [![SBB Swiss Federal Railways](/docs/logo/sbb.png)][link-sponsor-sbb]
 

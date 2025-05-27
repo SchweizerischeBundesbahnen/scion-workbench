@@ -7,6 +7,15 @@
 
 On this page you will find the latest news about the development of the SCION Workbench.
 
+- **2025-05: Docking and Stacking of Workbench Parts**\
+  Parts can be docked to the left, right, or bottom side of the workbench. Docked parts can be minimized to create more space for the main content.
+
+- **2025-01: Display of Content in Workbench Parts**\
+  A part can be navigated to display content. Content is only displayed if its view stack is empty.
+
+- **2024-05: API to Modify the Workbench Layout**\
+  The workbench layout can be modified using the workbench router.
+
 - **2023-11: Added Workbench Dialog**\
   SCION Workbench enables the display of a component in a modal dialog. A dialog can be view-modal or application-modal.
  
