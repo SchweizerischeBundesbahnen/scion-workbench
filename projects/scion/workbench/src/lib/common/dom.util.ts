@@ -1,6 +1,9 @@
 import {coerceElement} from '@angular/cdk/coercion';
-import {booleanAttribute, ElementRef, numberAttribute} from '@angular/core';
+import {booleanAttribute, DestroyRef, ElementRef, inject, Injector, numberAttribute} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
+import {DOCUMENT} from '@angular/common';
+import {UID} from './uid.util';
+import {DisposeFn} from './disposable';
 
 /**
  * Creates an HTML element and optionally adds it to the DOM.
@@ -124,6 +127,60 @@ export function getCssTranslation(element: Element): {translateX: string | 'none
     translateX: matrix[4]!,
     translateY: matrix[5]!,
   };
+}
+
+/**
+ * Ensures that the given HTML element is positioned, setting its position to `relative` if it is not already positioned.
+ *
+ * Positioning is set using a constructable CSS stylesheet with a CSS layer. CSS layers have lower priority than "normal"
+ * CSS declarations, and the layer name indicates the styling originates from `@scion/workbench`.
+ *
+ * This function adds an attribute to the element to locate it from the stylesheet, with the name containing a random identifier plus the context.
+ *
+ * This function must be passed an injector or called in an injection context. Destroying the injector will remove the attribute and the stylesheet.
+ */
+export function positionElement(elementLike: Element | ElementRef<Element>, options: {context: string; injector?: Injector}): void {
+  const injector = options.injector ?? inject(Injector);
+  const element = coerceElement(elementLike);
+  const document = injector.get(DOCUMENT);
+  const disposables = new Array<DisposeFn>();
+
+  // Generate identifiers to locate the element from the stylesheet.
+  const elementIdentifier = `data-wb-${options.context}-${UID.randomUID()}`;
+  const elementIdentifierImportant = `${elementIdentifier}-important`;
+
+  // Add stylesheet to change the element's position to relative.
+  const styleSheet = new CSSStyleSheet({});
+  styleSheet.insertRule(`
+      @layer sci-workbench {
+        [${elementIdentifier}] {
+          position: relative;
+        }
+      }`,
+  );
+  document.adoptedStyleSheets.push(styleSheet);
+  disposables.push(() => Arrays.remove(document.adoptedStyleSheets, styleSheet));
+
+  // Add attribute to locate the element from the stylesheet.
+  element.setAttribute(elementIdentifier, '');
+  disposables.push(() => element.removeAttribute(elementIdentifier));
+
+  // If CSS layer styles have no effect due to 'static' positioning or unset styles, enforce positioning with !important.
+  const animationFrame = requestAnimationFrame(() => {
+    if (getComputedStyle(element).position === 'static') {
+      styleSheet.insertRule(`
+        [${elementIdentifierImportant}] {
+          position: relative !important;
+        }
+      `);
+      element.setAttribute(elementIdentifierImportant, '');
+      disposables.push(() => element.removeAttribute(elementIdentifierImportant));
+    }
+  });
+  disposables.push(() => cancelAnimationFrame(animationFrame));
+
+  // Clean up when the injection context is destroyed.
+  injector.get(DestroyRef).onDestroy(() => disposables.forEach(disposable => disposable()));
 }
 
 /**

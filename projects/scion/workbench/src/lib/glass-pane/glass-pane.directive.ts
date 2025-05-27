@@ -9,7 +9,7 @@
  */
 
 import {AfterViewInit, Directive, ElementRef, inject, InjectionToken, Injector, OnDestroy, runInInjectionContext} from '@angular/core';
-import {createElement, setStyle} from '../common/dom.util';
+import {createElement, positionElement, setStyle} from '../common/dom.util';
 import {fromEvent} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
@@ -36,7 +36,7 @@ export class GlassPaneDirective implements OnDestroy, AfterViewInit {
   private _glassPane: GlassPane | null = null;
 
   constructor() {
-    this.ensureHostElementPositioned();
+    positionElement(this._targetElement, {context: 'glasspane'});
   }
 
   public ngAfterViewInit(): void {
@@ -53,12 +53,6 @@ export class GlassPaneDirective implements OnDestroy, AfterViewInit {
         this._glassPane?.dispose();
         this._glassPane = blockedBy ? new GlassPane(this._targetElement, blockedBy, this._options) : null;
       });
-  }
-
-  private ensureHostElementPositioned(): void {
-    if (getComputedStyle(this._targetElement).position === 'static') {
-      setStyle(this._targetElement, {'position': 'relative'});
-    }
   }
 
   public ngOnDestroy(): void {

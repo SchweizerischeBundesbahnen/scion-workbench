@@ -9,7 +9,7 @@
  */
 
 import {Directive, effect, ElementRef, inject, input, output, untracked} from '@angular/core';
-import {createElement, getCssTranslation, setStyle} from '../common/dom.util';
+import {createElement, positionElement, getCssTranslation} from '../common/dom.util';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -44,7 +44,7 @@ export class ResizableDirective {
   private maxWidth: number | undefined;
 
   constructor() {
-    this.ensureHostElementPositioned();
+    positionElement(this._host, {context: 'resizable'});
     this.installResizeHandles();
   }
 
@@ -315,12 +315,6 @@ export class ResizableDirective {
       width: hostBounds.width + delta,
       translateX: getComputedTranslateX(this._host) + delta / 2, // Move only by half the delta as centered horizontally.
     });
-  }
-
-  private ensureHostElementPositioned(): void {
-    if (getComputedStyle(this._host).position === 'static') {
-      setStyle(this._host, {'position': 'relative'});
-    }
   }
 }
 

@@ -17,3 +17,8 @@ export interface Disposable {
    */
   dispose(): void;
 }
+
+/**
+ * Signature of a function to clean up allocated resources.
+ */
+export type DisposeFn = () => void;
