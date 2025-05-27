@@ -41,7 +41,7 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    // Perform browser history back.
+    // Perform browser session history back.
     await appPO.navigateBack();
 
     // Expect perspective 1 to be active.
@@ -52,7 +52,7 @@ test.describe('Workbench Perspective', () => {
       },
     });
 
-    // Perform browser history forward.
+    // Perform browser session history forward.
     await appPO.navigateForward();
 
     // Expect perspective 2 to be active.

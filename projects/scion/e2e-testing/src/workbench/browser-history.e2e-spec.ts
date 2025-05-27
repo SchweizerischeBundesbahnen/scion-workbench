@@ -15,10 +15,77 @@ import {NonStandaloneViewTestPagePO} from './page-object/test-pages/non-standalo
 import {MAIN_AREA} from '../workbench.model';
 import {expectView} from '../matcher/view-matcher';
 import {ViewPagePO} from './page-object/view-page.po';
+import {expect, Page} from '@playwright/test';
 
-test.describe('Browser History', () => {
+test.describe('Browser Session History', () => {
 
-  test('should put main grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
+  test('should create single entry in browser session history when loading the application', async ({appPO, page}) => {
+    const historyStackSizeBefore = await getBrowserHistoryStackSize(page);
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Expect single entry added to the browser session history.
+    await expect.poll(() => getBrowserHistoryStackSize(page)).toBe(historyStackSizeBefore + 1);
+    // Expect state in browser session history to contain the workbench layout.
+    await expect.poll(() => page.evaluate(() => (history.state as {ɵworkbench?: unknown}).ɵworkbench)).toBeDefined(); // state[WORKBENCH_NAVIGATION_STATE_KEY]: WorkbenchNavigationalState
+  });
+
+  test('should create new entry in browser session history when switching perspectives', async ({appPO, workbenchNavigator, page}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create two perspectives (no activation).
+    await workbenchNavigator.createPerspective('testee-1', factory => factory.addPart(MAIN_AREA), {active: false});
+    await workbenchNavigator.createPerspective('testee-2', factory => factory.addPart(MAIN_AREA), {active: false});
+
+    await test.step('Switching to perspective 1 (initial perspective activation)', async () => {
+      // Capture browser session history count.
+      const historyStackSizeBefore = await getBrowserHistoryStackSize(page);
+
+      // Switch to perspective 1.
+      await appPO.switchPerspective('testee-1');
+
+      // Expect the browser session history to contain a single new entry.
+      await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-1');
+      await expect.poll(() => getBrowserHistoryStackSize(page)).toBe(historyStackSizeBefore + 1);
+    });
+
+    await test.step('Switching to perspective 2 (initial perspective activation)', async () => {
+      // Capture browser session history count.
+      const historyStackSizeBefore = await getBrowserHistoryStackSize(page);
+
+      // Switch to perspective 2.
+      await appPO.switchPerspective('testee-2');
+
+      // Expect the browser session history to contain a single new entry.
+      await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
+      await expect.poll(() => getBrowserHistoryStackSize(page)).toBe(historyStackSizeBefore + 1);
+    });
+
+    await test.step('Switching to perspective 1', async () => {
+      // Capture browser session history count.
+      const historyStackSizeBefore = await getBrowserHistoryStackSize(page);
+
+      // Switch to perspective 1.
+      await appPO.switchPerspective('testee-1');
+
+      // Expect the browser session history to contain a single new entry.
+      await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-1');
+      await expect.poll(() => getBrowserHistoryStackSize(page)).toBe(historyStackSizeBefore + 1);
+    });
+
+    await test.step('Switching to perspective 2', async () => {
+      // Capture browser session history count.
+      const historyStackSizeBefore = await getBrowserHistoryStackSize(page);
+
+      // Switch to perspective 2.
+      await appPO.switchPerspective('testee-2');
+
+      // Expect the browser session history to contain a single new entry.
+      await expect.poll(() => appPO.getActivePerspectiveId()).toEqual('testee-2');
+      await expect.poll(() => getBrowserHistoryStackSize(page)).toBe(historyStackSizeBefore + 1);
+    });
+  });
+
+  test('should put main grid-related navigations into browser session history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add part to the main grid
@@ -107,7 +174,7 @@ test.describe('Browser History', () => {
     await expectView(testee2ViewPage).toBeActive();
   });
 
-  test('should put main-area grid-related navigations into browser history', async ({appPO, workbenchNavigator}) => {
+  test('should put main-area grid-related navigations into browser session history', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Add view-1
@@ -369,3 +436,10 @@ test.describe('Browser History', () => {
     });
   });
 });
+
+/**
+ * Reads the number of entries in browser session history.
+ */
+function getBrowserHistoryStackSize(page: Page): Promise<number> {
+  return page.evaluate(() => history.length);
+}

@@ -168,7 +168,7 @@ test.describe('Navigational State', () => {
       await expect.poll(() => viewPage.getNavigationState()).toEqual({some: 'state'});
     });
 
-    test('should maintain state when navigating back and forth in browser history', async ({appPO, workbenchNavigator}) => {
+    test('should maintain state when navigating back and forth in browser session history', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
@@ -392,7 +392,7 @@ test.describe('Navigational State', () => {
       await expect.poll(() => part1Page.getNavigationState()).toEqual({some: 'state'});
     });
 
-    test('should maintain state when navigating back and forth in browser history', async ({appPO, workbenchNavigator}) => {
+    test('should maintain state when navigating back and forth in browser session history', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       // Add part.

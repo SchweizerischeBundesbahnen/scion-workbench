@@ -40,6 +40,7 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _initialLayoutFn: WorkbenchLayoutFn;
   private readonly _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
+  private readonly _activePerspective = inject(ACTIVE_PERSPECTIVE);
 
   public readonly id: string;
   public readonly transient: boolean;
@@ -71,8 +72,11 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     // Load the layout from the storage, if present, or use the initial layout otherwise.
     this._layout = (await this.loadLayout()) ?? this._initialLayout;
 
+    // Do not push new state into browser session history when activating the initial workbench perspective.
+    const replaceUrl = this._activePerspective() === undefined;
+
     // Perform navigation to activate the layout of this perspective.
-    return this._workbenchRouter.navigate(currentLayout => this.createLayoutForActivation(currentLayout));
+    return this._workbenchRouter.navigate(currentLayout => this.createLayoutForActivation(currentLayout), {replaceUrl});
   }
 
   /**
