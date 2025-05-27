@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Route, Routes, ROUTES, UrlSegment} from '@angular/router';
+import {Route, Routes, UrlSegment} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView, MAIN_AREA, WorkbenchLayout, WorkbenchLayoutFactory, WorkbenchPerspectiveDefinition, WorkbenchRouteData} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench/workbench-startup-query-params';
-import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {inject} from '@angular/core';
 import {ViewSkeletonNavigationData} from './sample-view/sample-view.component';
 import {SettingsService} from './settings.service';
 import {PartSkeletonNavigationData} from './sample-part/sample-part.component';
+import {environment} from '../environments/environment';
 
 /**
  * Keys for associating data with a perspective.
@@ -35,91 +36,81 @@ export const PerspectiveData = {
 } as const;
 
 /**
- * Provides perspective definitions for the workbench testing application.
+ * Provides perspectives of the SCION Workbench Testing Application.
  */
 export const Perspectives = {
   /**
    * Specifies the initial perspective of the testing app.
    */
-  initialPerspective: 'blank',
+  initialPerspective: environment.initialPerspective,
 
   /**
-   * Defines perspectives of the workbench testing app.
+   * Specifies perspectives available in the testing app.
    */
-  provideDefinitions: (): WorkbenchPerspectiveDefinition[] => {
-    return [
-      {
-        id: 'blank',
-        layout: factory => factory.addPart(MAIN_AREA),
-        data: {
-          [PerspectiveData.label]: 'Default Layout',
-          [PerspectiveData.menuItemLabel]: 'Default Layout',
-          [PerspectiveData.menuGroup]: 'default',
-        },
+  definitions: [
+    {
+      id: 'blank',
+      layout: factory => factory.addPart(MAIN_AREA),
+      data: {
+        [PerspectiveData.label]: 'Default Layout',
+        [PerspectiveData.menuItemLabel]: 'Default Layout',
+        [PerspectiveData.menuGroup]: 'default',
       },
-      {
-        id: 'activity-perspective-1',
-        layout: provideActivityPerspectiveLayout1,
-        data: {
-          [PerspectiveData.label]: 'Sample Layout 1 (Docked Parts)',
-          [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
-          [PerspectiveData.menuGroup]: 'docked-parts-layout',
-        },
+    },
+    {
+      id: 'activity-perspective-1',
+      layout: provideActivityPerspectiveLayout1,
+      data: {
+        [PerspectiveData.label]: 'Sample Layout 1 (Docked Parts)',
+        [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
+        [PerspectiveData.menuGroup]: 'docked-parts-layout',
       },
-      {
-        id: 'activity-perspective-2',
-        layout: provideActivityPerspectiveLayout2,
-        data: {
-          [PerspectiveData.label]: 'Sample Layout 2 (Docked Parts)',
-          [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
-          [PerspectiveData.menuGroup]: 'docked-parts-layout',
-        },
+    },
+    {
+      id: 'activity-perspective-2',
+      layout: provideActivityPerspectiveLayout2,
+      data: {
+        [PerspectiveData.label]: 'Sample Layout 2 (Docked Parts)',
+        [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
+        [PerspectiveData.menuGroup]: 'docked-parts-layout',
       },
-      {
-        id: 'perspective-1',
-        layout: providePerspectiveLayout1,
-        data: {
-          [PerspectiveData.label]: 'Sample Layout 1 (Peripheral Parts)',
-          [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
-          [PerspectiveData.menuGroup]: 'peripheral-part-layout',
-        },
+    },
+    {
+      id: 'perspective-1',
+      layout: providePerspectiveLayout1,
+      data: {
+        [PerspectiveData.label]: 'Sample Layout 1 (Peripheral Parts)',
+        [PerspectiveData.menuItemLabel]: 'Sample Layout 1',
+        [PerspectiveData.menuGroup]: 'peripheral-part-layout',
       },
-      {
-        id: 'perspective-2',
-        layout: providePerspectiveLayout2,
-        data: {
-          [PerspectiveData.label]: 'Sample Layout 2 (Peripheral Parts)',
-          [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
-          [PerspectiveData.menuGroup]: 'peripheral-part-layout',
-        },
+    },
+    {
+      id: 'perspective-2',
+      layout: providePerspectiveLayout2,
+      data: {
+        [PerspectiveData.label]: 'Sample Layout 2 (Peripheral Parts)',
+        [PerspectiveData.menuItemLabel]: 'Sample Layout 2',
+        [PerspectiveData.menuGroup]: 'peripheral-part-layout',
       },
-      // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
-      ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => ({
-        id: perspectiveId,
-        layout: factory => factory.addPart(MAIN_AREA),
-      } satisfies WorkbenchPerspectiveDefinition)),
-    ];
-  },
+    },
+    // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
+    ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => ({
+      id: perspectiveId,
+      layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
+    })),
+  ] satisfies WorkbenchPerspectiveDefinition[],
 
   /**
-   * Provides routes for views arranged in perspectives.
+   * Specifies routes used in perspectives of the testing app.
    */
-  provideRoutes: (): EnvironmentProviders => {
-    return makeEnvironmentProviders([
-      {
-        provide: ROUTES,
-        multi: true,
-        useValue: [
-          // Sample View
-          {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
-          {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
-          // Sample Part
-          {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
-          {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./part-page/part-page.component')},
-        ] satisfies Routes,
-      },
-    ]);
-  },
+  routes: [
+    // Sample View
+    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-view/sample-view.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchView('sample-view')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./view-page/view-page.component'), data: {[WorkbenchRouteData.title]: 'Sample View', [WorkbenchRouteData.heading]: 'Workbench Sample View'}},
+    // Sample Part
+    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./sample-part/sample-part.component')},
+    {path: '', canMatch: [(route: Route, segments: UrlSegment[]) => canMatchWorkbenchPart('sample-part')(route, segments) && !inject(SettingsService).isEnabled('displaySkeletons')], loadComponent: () => import('./part-page/part-page.component')},
+  ] satisfies Routes,
 } as const;
 
 function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {

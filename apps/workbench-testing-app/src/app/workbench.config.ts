@@ -22,7 +22,7 @@ export const workbenchConfig: WorkbenchConfig = {
   },
   microfrontendPlatform: WorkbenchStartupQueryParams.standalone() ? undefined : environment.microfrontendPlatformConfig,
   layout: {
-    perspectives: Perspectives.provideDefinitions(),
+    perspectives: Perspectives.definitions,
     initialPerspective: Perspectives.initialPerspective,
   },
   dialog: {
