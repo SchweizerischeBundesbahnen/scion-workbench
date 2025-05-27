@@ -1,6 +1,10 @@
 :host {
   display: grid;
-  position: relative; // positioning context
+  // Create a positioning context, but with 0 specificity to allow the application to override positioning, e.g., from styles.scss.
+  :where(&) {
+    position: relative;
+  }
+
   overflow: hidden;
   color: var(--sci-color-text);
   background-color: var(--sci-color-background-primary);

@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, Directive, effect, ElementRef, inject, Injector, input, NgZone, OnInit, output, signal, untracked} from '@angular/core';
-import {createElement, setAttribute, setStyle} from '../common/dom.util';
+import {computed, Directive, effect, ElementRef, inject, Injector, input, NgZone, output, signal, untracked} from '@angular/core';
+import {createElement, positionElement, setAttribute, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ViewDropPlaceholderRenderer} from './view-drop-placeholder-renderer.service';
 import {Disposable} from '../common/disposable';
@@ -27,7 +27,7 @@ import {subscribeIn} from '@scion/toolkit/operators';
  * If not positioned, the element is changed to be positioned relative.
  */
 @Directive({selector: '[wbViewDropZone]'})
-export class ViewDropZoneDirective implements OnInit {
+export class ViewDropZoneDirective {
 
   /**
    * Specifies the regions where views can be dropped. Defaults to every region.
@@ -76,10 +76,7 @@ export class ViewDropZoneDirective implements OnInit {
   constructor() {
     this.installDropZone();
     this.installDropPlaceholderRenderer();
-  }
-
-  public ngOnInit(): void {
-    this.ensureHostElementPositioned();
+    positionElement(this._host, {context: 'dropzone'});
   }
 
   /**
@@ -293,12 +290,6 @@ export class ViewDropZoneDirective implements OnInit {
       region === 'west' || region === 'east' ? coercePixelValue(size, {containerSize: width}) : width,
       region === 'north' || region === 'south' ? coercePixelValue(size, {containerSize: height}) : height,
     );
-  }
-
-  private ensureHostElementPositioned(): void {
-    if (getComputedStyle(this._host).position === 'static') {
-      setStyle(this._host, {position: 'relative'});
-    }
   }
 }
 
