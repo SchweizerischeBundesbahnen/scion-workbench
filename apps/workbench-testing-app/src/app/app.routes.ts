@@ -12,6 +12,7 @@ import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {topLevelTestPageRoutes} from './test-pages/routes';
 import {canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
+import {Perspectives} from './workbench.perspectives';
 
 export const routes: Routes = [
   {
@@ -170,5 +171,6 @@ export const routes: Routes = [
     path: 'test-pages',
     loadChildren: () => import('./test-pages/routes'),
   },
+  ...Perspectives.routes,
   ...topLevelTestPageRoutes,
 ];

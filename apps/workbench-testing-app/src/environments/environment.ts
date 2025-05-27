@@ -38,5 +38,6 @@ const microfrontendPlatformConfig: MicrofrontendPlatformConfig = {
 export const environment = {
   animationEnabled: false,
   logAngularChangeDetectionCycles: true,
+  initialPerspective: 'blank',
   microfrontendPlatformConfig,
 };
