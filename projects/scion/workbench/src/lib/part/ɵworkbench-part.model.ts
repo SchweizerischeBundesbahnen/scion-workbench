@@ -60,7 +60,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   /**
    * Reference to the HTML element of {@link PartComponent} or {@link MainAreaPartComponent}.
    */
-  public partComponent: HTMLElement | undefined;
+  public partComponent = signal<HTMLElement | undefined>(undefined);
 
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
     this.alternativeId = layout.part({partId: this.id}).alternativeId;

@@ -251,6 +251,34 @@ test.describe('Workbench Popup', () => {
     });
   });
 
+  test('should stick to popup anchor after re-layout of workbench parts', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'})
+      .addView('view.100', {partId: 'part.right'}),
+    );
+
+    // Open popup in main area.
+    const popupOpenerView = await workbenchNavigator.openInNewTab(PopupOpenerPagePO);
+    await popupOpenerView.selectPopupComponent('blank-test-page');
+    await popupOpenerView.enterCssClass('testee');
+    await popupOpenerView.enterCloseStrategy({closeOnFocusLost: false});
+    await popupOpenerView.open();
+
+    const popup = appPO.popup({cssClass: 'testee'});
+
+    // Remove the right part by closing its only view, causing the workbench to re-layout workbench parts.
+    await appPO.view({viewId: 'view.100'}).tab.close();
+    await expect(popup.locator).toBeVisible();
+
+    // Expect the popup to stick to the popup anchor.
+    const anchorBox = await popupOpenerView.getAnchorElementBoundingBox();
+    await expect.poll(() => popup.getBoundingBox().then(box => box.bottom + POPUP_DIAMOND_ANCHOR_SIZE)).toBeCloseTo(anchorBox.top, 0);
+    await expect.poll(() => popup.getBoundingBox().then(box => box.hcenter)).toBeCloseTo(anchorBox.hcenter, 0);
+  });
+
   test('should allow passing a value to the popup component', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
