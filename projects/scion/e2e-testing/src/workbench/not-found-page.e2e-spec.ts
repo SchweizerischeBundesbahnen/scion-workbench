@@ -122,9 +122,9 @@ test.describe('Workbench Page Not Found', () => {
       await workbenchNavigator.modifyLayout(layout => layout
         .addPart('part.left', {align: 'left'})
         .addPart('part.right', {align: 'right'})
-        .addView('testee-1', {partId: 'part.left', activateView: true, cssClass: 'testee-1'})
-        .addView('testee-2', {partId: 'part.initial', cssClass: 'testee-2'})
-        .addView('testee-3', {partId: 'part.right', cssClass: 'testee-3'})
+        .addView('testee-1', {partId: 'part.initial', cssClass: 'testee-1'})
+        .addView('testee-2', {partId: 'part.left', cssClass: 'testee-2', activateView: true})
+        .addView('testee-3', {partId: 'part.right', cssClass: 'testee-3', activateView: true})
         .navigateView('testee-1', ['does/not/exist'])
         .navigateView('testee-2', ['does/not/exist'])
         .navigateView('testee-3', [], {hint: 'does-not-match'}),
