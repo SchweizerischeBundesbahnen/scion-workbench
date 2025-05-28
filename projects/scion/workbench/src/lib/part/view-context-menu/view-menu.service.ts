@@ -286,13 +286,19 @@ export class ViewMenuService {
 
   private registerMoveToNewWindowMenuItem(config: MenuItemConfig | false): void {
     if (isEnabled(config)) {
-      this._workbenchService.registerViewMenuItem(view => ({
-        content: TextComponent,
-        inputs: {text: '%workbench.move_tab_to_new_window.action'},
-        group: config.group ?? 'open',
-        cssClass: config.cssClass ?? 'e2e-move-to-new-window',
-        onAction: () => view.move('new-window'),
-      }));
+      this._workbenchService.registerViewMenuItem(view => {
+        if (view.part().peripheral()) {
+          return null;
+        }
+
+        return {
+          content: TextComponent,
+          inputs: {text: '%workbench.move_tab_to_new_window.action'},
+          group: config.group ?? 'open',
+          cssClass: config.cssClass ?? 'e2e-move-to-new-window',
+          onAction: () => view.move('new-window'),
+        };
+      });
     }
   }
 }

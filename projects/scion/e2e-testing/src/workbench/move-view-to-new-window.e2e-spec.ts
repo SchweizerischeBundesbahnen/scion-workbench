@@ -23,11 +23,11 @@ test.describe('Workbench View', () => {
   test('should move a path-based view in the main grid to a new window', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
-    // Add two views to the peripheral area.
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.left', {align: 'left', ratio: .25})
-      .addView('view.101', {partId: 'part.left', activateView: true})
-      .addView('view.102', {partId: 'part.left', activateView: true})
+    // Add two views to the main grid.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.102', {partId: 'part.main', activateView: true})
       .navigateView('view.101', ['test-view'])
       .navigateView('view.102', ['test-view']),
     );
@@ -62,12 +62,7 @@ test.describe('Workbench View', () => {
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
         main: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .25,
-            child1: new MPart({id: 'part.left', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
-            child2: new MPart({id: MAIN_AREA}),
-          }),
+          root: new MPart({id: 'part.main', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
         },
       },
     });
@@ -77,10 +72,10 @@ test.describe('Workbench View', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Define perspective with a view in the main grid.
-    await workbenchNavigator.modifyLayout(layout => layout
-      .addPart('part.left', {align: 'left', ratio: .25})
-      .addView('view.101', {partId: 'part.left', activateView: true})
-      .addView('view.102', {partId: 'part.left', activateView: true})
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.101', {partId: 'part.main'})
+      .addView('view.102', {partId: 'part.main', activateView: true})
       .navigateView('view.101', [], {hint: 'test-view'})
       .navigateView('view.102', [], {hint: 'test-view'}),
     );
@@ -115,12 +110,7 @@ test.describe('Workbench View', () => {
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
         main: {
-          root: new MTreeNode({
-            direction: 'row',
-            ratio: .25,
-            child1: new MPart({id: 'part.left', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
-            child2: new MPart({id: MAIN_AREA}),
-          }),
+          root: new MPart({id: 'part.main', views: [{id: 'view.102'}], activeViewId: 'view.102'}),
         },
       },
     });

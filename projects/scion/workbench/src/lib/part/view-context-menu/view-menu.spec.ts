@@ -23,6 +23,7 @@ import {WorkbenchService} from '../../workbench.service';
 import {UUID} from '@scion/toolkit/uuid';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchRouter} from '../../routing/workbench-router.service';
+import {MAIN_AREA} from '../../layout/workbench-layout';
 
 describe('View Menu', () => {
 
@@ -1182,6 +1183,83 @@ describe('View Menu', () => {
         jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}),
       ]));
     });
+  });
+
+  it(`should exclude 'Move to New Window' in peripheral parts`, async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          mainAreaInitialPartId: 'part.initial',
+          layout: factory => factory
+            .addPart(MAIN_AREA)
+            .addPart('part.left', {align: 'left', ratio: .25})
+            .addView('view.101', {partId: 'part.left'}),
+        }),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Open view in main area.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.102'});
+    await waitUntilStable();
+
+    // Expect view in peripheral area not to have 'Move to New Window' menu item.
+    const view1 = TestBed.inject(WorkbenchService).getView('view.101')!;
+    expect(view1.part().peripheral()).toBeTrue();
+    expect(view1.menuItems()).not.toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
+
+    // Expect view in main area to have 'Move to New Window' menu item.
+    const view2 = TestBed.inject(WorkbenchService).getView('view.102')!;
+    expect(view2.part().peripheral()).toBeFalse();
+    expect(view2.menuItems()).toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
+
+    // Move view from main area to peripheral area.
+    view2.move('part.left');
+    await waitUntilStable();
+
+    // Expect view in peripheral area not to have 'Move to New Window' menu item.
+    expect(view2.part().peripheral()).toBeTrue();
+    expect(view2.menuItems()).not.toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
+
+    // Move view from peripheral area to main area.
+    view2.move('part.initial');
+    await waitUntilStable();
+
+    // Expect view in main area to have 'Move to New Window' menu item.
+    expect(view2.part().peripheral()).toBeFalse();
+    expect(view2.menuItems()).toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
+  });
+
+  it(`should exclude 'Move to New Window' in docked parts`, async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart(MAIN_AREA)
+            .addPart('part.activity', {dockTo: 'left-top'}, {label: 'Label', icon: 'folder'})
+            .addView('view.101', {partId: 'part.activity'}),
+        }),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Open view in main area.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.102'});
+    await waitUntilStable();
+
+    // Expect view in activity not to have 'Move to New Window' menu item.
+    const view1 = TestBed.inject(WorkbenchService).getView('view.101')!;
+    expect(view1.part().peripheral()).toBeTrue();
+    expect(view1.menuItems()).not.toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
+
+    // Expect view in main area to have 'Move to New Window' menu item.
+    const view2 = TestBed.inject(WorkbenchService).getView('view.102')!;
+    expect(view2.part().peripheral()).toBeFalse();
+    expect(view2.menuItems()).toContain(jasmine.objectContaining({cssClass: 'e2e-move-to-new-window'}));
   });
 });
 
