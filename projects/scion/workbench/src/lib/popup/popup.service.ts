@@ -259,7 +259,7 @@ export class PopupService {
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
-    const partBounds = boundingClientRect(computed(() => contextualView?.part().partComponent), {injector});
+    const partBounds = boundingClientRect(computed(() => contextualView?.part().partComponent()), {injector});
     const viewBounds = boundingClientRect(computed(() => contextualView?.portal.componentRef.location.nativeElement as HTMLElement | undefined), {injector});
 
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {

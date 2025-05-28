@@ -78,7 +78,7 @@ export class MainAreaPartComponent {
   protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea!));
 
   constructor() {
-    inject(ɵWorkbenchPart).partComponent = inject(ElementRef).nativeElement as HTMLElement;
+    inject(ɵWorkbenchPart).partComponent.set(inject(ElementRef).nativeElement as HTMLElement);
   }
 
   protected onDesktopViewDrop(event: WbViewDropEvent): void {
