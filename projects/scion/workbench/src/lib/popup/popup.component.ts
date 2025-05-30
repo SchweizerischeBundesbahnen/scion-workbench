@@ -10,8 +10,8 @@
 
 import {Component, effect, HostBinding, inject, Injector, Provider, viewChild} from '@angular/core';
 import {ɵPopup} from './popup.config';
-import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
-import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
+import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 
@@ -26,8 +26,8 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
   templateUrl: './popup.component.html',
   styleUrls: ['./popup.component.scss'],
   imports: [
-    A11yModule,
-    PortalModule,
+    CdkTrapFocus,
+    CdkPortalOutlet,
     SciViewportComponent,
   ],
   hostDirectives: [

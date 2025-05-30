@@ -8,14 +8,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef, DOCUMENT} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {WorkbenchStartup} from './startup/workbench-startup.service';
 import {WorkbenchConfig} from './workbench-config';
 import {SplashComponent} from './startup/splash/splash.component';
 import {Logger, LoggerNames} from './logging';
-import {DOCUMENT, NgComponentOutlet} from '@angular/common';
+import {NgComponentOutlet} from '@angular/common';
 import {NotificationListComponent} from './notification/notification-list.component';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';

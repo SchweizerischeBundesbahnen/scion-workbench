@@ -34,7 +34,7 @@ describe('WorkbenchViewRegistry', () => {
     TestBed.runInInjectionContext(() => effect(() => {
       captor.push(TestBed.inject(WORKBENCH_VIEW_REGISTRY).objects().map(view => view.part().id));
     }));
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(captor).toEqual([[]]);
 
     // Open view in the right part.

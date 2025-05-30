@@ -1,9 +1,10 @@
 import {coerceElement} from '@angular/cdk/coercion';
-import {booleanAttribute, DestroyRef, ElementRef, inject, Injector, numberAttribute} from '@angular/core';
+import {booleanAttribute, DestroyRef, ElementRef, inject, Injector, numberAttribute, DOCUMENT} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
-import {DOCUMENT} from '@angular/common';
+
 import {UID} from './uid.util';
 import {DisposeFn} from './disposable';
+import {Observable} from 'rxjs';
 
 /**
  * Creates an HTML element and optionally adds it to the DOM.
@@ -181,6 +182,21 @@ export function positionElement(elementLike: Element | ElementRef<Element>, opti
 
   // Clean up when the injection context is destroyed.
   injector.get(DestroyRef).onDestroy(() => disposables.forEach(disposable => disposable()));
+}
+
+/**
+ * Emits when the next animation frame is executed.
+ *
+ * Unlike using `timer(0, animationFrameScheduler)`, this observable emits within the zone where it is subscribed.
+ *
+ * Note that the RxJS `animationFrameScheduler` may not necessarily execute in the current execution context, such as inside or outside Angular.
+ * The scheduler always executes tasks in the zone where it was first used in the application.
+ */
+export function nextAnimationFrame$(): Observable<void> {
+  return new Observable<void>(observer => {
+    const animationFrame = requestAnimationFrame(() => observer.next());
+    return () => cancelAnimationFrame(animationFrame);
+  });
 }
 
 /**

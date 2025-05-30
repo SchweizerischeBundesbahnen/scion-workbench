@@ -88,7 +88,7 @@ describe('WorkbenchObjectRegistry', () => {
 
     // WHEN subscribing
     TestBed.runInInjectionContext(() => effect(() => captor.push(registry.objects())));
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // THEN expect an instant emission
     expect(captor).toEqual([
@@ -97,7 +97,7 @@ describe('WorkbenchObjectRegistry', () => {
 
     // WHEN registering an object
     registry.register('2', {id: '2', version: 1});
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // THEN expect an emission
     expect(captor).toEqual([
@@ -107,7 +107,7 @@ describe('WorkbenchObjectRegistry', () => {
 
     // WHEN registering an object
     registry.register('3', {id: '3', version: 1});
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // THEN expect an emission
     expect(captor).toEqual([
@@ -118,7 +118,7 @@ describe('WorkbenchObjectRegistry', () => {
 
     // WHEN replacing an object
     registry.register('2', {id: '2', version: 2});
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // THEN expect an emission with the object replaced
     expect(captor).toEqual([
@@ -130,7 +130,7 @@ describe('WorkbenchObjectRegistry', () => {
 
     // WHEN unregistering an object
     registry.unregister('2');
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // THEN expect an emission
     expect(captor).toEqual([

@@ -24,15 +24,9 @@
   },
   "keywords": [
     "scion",
-    "workbench microfrontend integration",
-    "workbench",
-    "workbench client",
+    "scion workbench client",
     "microfrontend",
-    "micro frontend",
-    "typescript",
-    "javascript",
-    "framework-agnostic",
-    "webstack-agnostic"
+    "micro-frontend"
   ],
   "repository": {
     "type": "git",

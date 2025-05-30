@@ -3,14 +3,13 @@
 {
   "compilerOptions": {
     "baseUrl": "../../../",
-    "outDir": "../../../out-tsc",
+    "outDir": "../../../out-tsc/playwright",
     "sourceMap": true,
     "strict": true,
     "noUnusedLocals": true,
     "experimentalDecorators": true,
-    "moduleResolution": "bundler",
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "preserve",
     "types": [
       "node"
     ],

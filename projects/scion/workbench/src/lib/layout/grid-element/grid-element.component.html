@@ -21,7 +21,7 @@
       <sci-sashbox [direction]="treeNode.direction"
                    [attr.data-nodeid]="treeNode.id"
                    (sashStart)="onSashStart()"
-                   (sashEnd2)="onSashEnd(treeNode, $event)">
+                   (sashEnd)="onSashEnd(treeNode, $event)">
         @for (child of children; track child.element.id) {
           <ng-template sciSash [size]="child.size" [key]="'sash' + ($index + 1)">
             <wb-grid-element [element]="child.element" [class]="'sash-' + ($index + 1)"/>

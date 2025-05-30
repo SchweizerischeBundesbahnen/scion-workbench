@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, computed, inject, Injectable, Signal, untracked} from '@angular/core';
+import {assertNotInReactiveContext, computed, DOCUMENT, inject, Injectable, Signal, untracked} from '@angular/core';
 import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
 import {Disposable} from './common/disposable';
 import {WorkbenchService} from './workbench.service';
@@ -27,7 +27,6 @@ import {ViewId} from './view/workbench-view.model';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
-import {DOCUMENT} from '@angular/common';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {

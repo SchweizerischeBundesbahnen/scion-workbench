@@ -13,7 +13,6 @@ import {Component, NgModule} from '@angular/core';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {provideRouter, RouterModule} from '@angular/router';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {CommonModule} from '@angular/common';
 import {toShowCustomMatcher} from '../testing/jasmine/matcher/to-show.matcher';
 import {advance, styleFixture} from '../testing/testing.util';
 import {WorkbenchComponent} from '../workbench.component';
@@ -97,7 +96,6 @@ class FeatureA_View2_Component {
 
 @NgModule({
   imports: [
-    CommonModule,
     RouterModule.forChild([
       {path: 'view-1', component: FeatureA_View1_Component},
       {path: 'view-2', component: FeatureA_View2_Component},
@@ -120,7 +118,6 @@ class FeatureB_View2_Component {
 
 @NgModule({
   imports: [
-    CommonModule,
     RouterModule.forChild([
       {path: 'view-1', component: FeatureB_View1_Component},
       {path: 'view-2', component: FeatureB_View2_Component},

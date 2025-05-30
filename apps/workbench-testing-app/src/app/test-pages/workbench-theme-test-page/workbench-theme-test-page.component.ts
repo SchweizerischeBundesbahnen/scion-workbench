@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Signal, untracked} from '@angular/core';
+import {Component, computed, DOCUMENT, inject, Signal, untracked} from '@angular/core';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {WorkbenchService} from '@scion/workbench';
-import {DOCUMENT} from '@angular/common';
 
 @Component({
   selector: 'app-workbench-theme-test-page',

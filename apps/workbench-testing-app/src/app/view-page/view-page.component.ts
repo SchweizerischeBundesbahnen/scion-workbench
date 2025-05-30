@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, inject, Signal} from '@angular/core';
+import {Component, computed, inject, Signal} from '@angular/core';
 import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchPartActionDirective, WorkbenchStartup, WorkbenchView} from '@scion/workbench';
 import {mergeWith} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -27,6 +27,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {CanClose} from '@scion/workbench-client';
+import {rootEffect} from '../common/root-effect';
 
 @Component({
   selector: 'app-view-page',
@@ -66,7 +67,7 @@ export default class ViewPageComponent {
   });
 
   constructor() {
-    if (!inject(WorkbenchStartup).isStarted()) {
+    if (!inject(WorkbenchStartup).done()) {
       throw Error('[LifecycleError] Component constructed before the workbench startup completed!'); // Do not remove as required by `startup.e2e-spec.ts` in [#1]
     }
 
@@ -102,14 +103,14 @@ export default class ViewPageComponent {
   }
 
   private installViewActiveStateLogger(): void {
-    effect(() => {
+    rootEffect(() => {
       if (this.view.active()) {
         console.debug(`[ViewActivate] [component=ViewPageComponent@${this.uuid}]`);
       }
       else {
         console.debug(`[ViewDeactivate] [component=ViewPageComponent@${this.uuid}]`);
       }
-    }, {forceRoot: true});
+    });
   }
 
   private installCssClassUpdater(): void {

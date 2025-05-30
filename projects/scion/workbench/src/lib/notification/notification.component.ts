@@ -12,7 +12,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostListe
 import {EMPTY, OperatorFunction, timer} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {ɵNotification} from './ɵnotification';
-import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {Notification} from './notification';
 import {AsyncPipe} from '@angular/common';
 import {CoerceObservablePipe} from '../common/coerce-observable.pipe';
@@ -30,7 +30,7 @@ import {IconComponent} from '../icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
-    PortalModule,
+    CdkPortalOutlet,
     CoerceObservablePipe,
     TextPipe,
     IconComponent,

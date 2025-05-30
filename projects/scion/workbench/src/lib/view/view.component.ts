@@ -14,7 +14,7 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
 import {ɵWorkbenchView} from './ɵworkbench-view.model';
 import {Logger, LoggerNames} from '../logging';
-import {A11yModule} from '@angular/cdk/a11y';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
 import {ViewId, WorkbenchView} from './workbench-view.model';
@@ -32,7 +32,7 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
   imports: [
     RouterOutlet,
     RouterOutletRootContextDirective,
-    A11yModule,
+    CdkTrapFocus,
     SciViewportComponent,
   ],
   hostDirectives: [

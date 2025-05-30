@@ -37,11 +37,11 @@
   <!-- |       BOTTOM   |   | -->
   <!-- +----------------+---+ -->
   <!-- @formatter:on -->
-  <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+  <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
     <ng-template sciSash>
-      <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
+      <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
         <ng-template sciSash>
-          <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+          <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
             <!-- Left Activity Panel -->
             @if (leftActivityPanel(); as panel) {
               <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
@@ -84,7 +84,7 @@
   <!-- |   |    BOTTOM      | -->
   <!-- +---+----------------+ -->
   <!-- @formatter:on -->
-  <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+  <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
     <!-- Left Activity Panel -->
     @if (leftActivityPanel(); as panel) {
       <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
@@ -92,9 +92,9 @@
       </ng-template>
     }
     <ng-template sciSash>
-      <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
+      <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
         <ng-template sciSash>
-          <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+          <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
             <!-- Main Grid -->
             <ng-template sciSash>
               <ng-container *ngTemplateOutlet="main_grid"/>
@@ -129,7 +129,7 @@
   <!-- |   |   BOTTOM   | T | -->
   <!-- +---+------------+---+ -->
   <!-- @formatter:on -->
-  <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+  <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
     <!-- Left Activity Panel -->
     @if (leftActivityPanel(); as panel) {
       <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">
@@ -137,7 +137,7 @@
       </ng-template>
     }
     <ng-template sciSash>
-      <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
+      <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
         <!-- Main Grid -->
         <ng-template sciSash>
           <ng-container *ngTemplateOutlet="main_grid"/>
@@ -172,9 +172,9 @@
   <!-- |       BOTTOM       | -->
   <!-- +--------------------+ -->
   <!-- @formatter:on -->
-  <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd2)="onVerticalSashEnd($event)">
+  <sci-sashbox [direction]="'column'" (sashStart)="onSashStart()" (sashEnd)="onVerticalSashEnd($event)">
     <ng-template sciSash>
-      <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd2)="onHorizontalSashEnd($event)">
+      <sci-sashbox [direction]="'row'" (sashStart)="onSashStart()" (sashEnd)="onHorizontalSashEnd($event)">
         <!-- Left Activity Panel -->
         @if (leftActivityPanel(); as panel) {
           <ng-template sciSash [size]="panel.width + 'px'" key="left" [animate]="panelAnimation()">

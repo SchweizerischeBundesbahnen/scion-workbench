@@ -12,7 +12,7 @@ import {Component, computed, ElementRef, HostListener, inject, Injector, input, 
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {VIEW_DRAG_TRANSFER_TYPE, ViewDragService} from '../../view-dnd/view-drag.service';
 import {createElement} from '../../common/dom.util';
-import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {VIEW_TAB_RENDERING_CONTEXT, ViewTabRenderingContext} from '../../workbench.constants';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
@@ -36,7 +36,7 @@ import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
   templateUrl: './view-tab.component.html',
   styleUrls: ['./view-tab.component.scss'],
   imports: [
-    PortalModule,
+    CdkPortalOutlet,
     TextPipe,
     IconComponent,
   ],

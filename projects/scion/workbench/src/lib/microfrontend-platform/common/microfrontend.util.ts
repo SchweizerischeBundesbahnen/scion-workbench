@@ -9,13 +9,13 @@
  */
 
 import {Capability, SciRouterOutletElement} from '@scion/microfrontend-platform';
-import {effect, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
+import {DOCUMENT, ElementRef, inject, Injector, Signal, untracked} from '@angular/core';
 import {WorkbenchTheme, ɵTHEME_CONTEXT_KEY} from '@scion/workbench-client';
 import {WorkbenchService} from '../../workbench.service';
 import {Crypto} from '@scion/toolkit/crypto';
 import {coerceElement} from '@angular/cdk/coercion';
 import {first} from 'rxjs/operators';
-import {DOCUMENT} from '@angular/common';
+import {rootEffect} from '../../common/root-effect';
 
 /**
  * Provides functions related to workbench themes.
@@ -33,7 +33,7 @@ export const Microfrontends = {
     const documentRoot = injector.get(DOCUMENT).documentElement;
     const settings = injector.get(WorkbenchService).settings;
 
-    effect(() => {
+    rootEffect(() => {
       const routerOutlet = coerceElement(routerOutletElement());
       const theme = settings.theme();
 
@@ -48,7 +48,7 @@ export const Microfrontends = {
           routerOutlet.removeContextValue('color-scheme');
         }
       });
-    }, {injector, forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    }, {injector});
   },
   /**
    * Waits for contextual data to be available to embedded content.
@@ -60,7 +60,7 @@ export const Microfrontends = {
     const injector = options?.injector ?? inject(Injector);
 
     return new Promise<void>(resolve => {
-      effect(onCleanup => {
+      rootEffect(onCleanup => {
         const routerOutlet = coerceElement(routerOutletElement());
 
         untracked(() => {
@@ -69,7 +69,7 @@ export const Microfrontends = {
             .subscribe(() => resolve());
           onCleanup(() => subscription.unsubscribe());
         });
-      }, {injector, forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+      }, {injector});
     });
   },
   /**

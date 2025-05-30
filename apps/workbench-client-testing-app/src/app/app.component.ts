@@ -13,7 +13,7 @@ import {FocusMonitor, MicrofrontendPlatformClient} from '@scion/microfrontend-pl
 import {AsyncPipe} from '@angular/common';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutlet} from '@angular/router';
-import {A11yModule} from '@angular/cdk/a11y';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {APP_SYMBOLIC_NAME} from './workbench-client/workbench-client.provider';
 
 @Component({
@@ -23,7 +23,7 @@ import {APP_SYMBOLIC_NAME} from './workbench-client/workbench-client.provider';
   imports: [
     AsyncPipe,
     RouterOutlet,
-    A11yModule,
+    CdkTrapFocus,
     SciViewportComponent,
   ],
 })

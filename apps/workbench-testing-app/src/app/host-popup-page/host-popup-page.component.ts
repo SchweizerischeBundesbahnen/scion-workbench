@@ -13,7 +13,7 @@ import {UUID} from '@scion/toolkit/uuid';
 import {ActivatedRoute} from '@angular/router';
 import {WorkbenchPopup} from '@scion/workbench-client';
 import {AsyncPipe, JsonPipe} from '@angular/common';
-import {A11yModule} from '@angular/cdk/a11y';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {NullIfEmptyPipe} from '../common/null-if-empty.pipe';
@@ -33,7 +33,7 @@ import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
     FormsModule,
     AsyncPipe,
     JsonPipe,
-    A11yModule,
+    CdkTrapFocus,
     NullIfEmptyPipe,
     SciViewportComponent,
     SciFormFieldComponent,

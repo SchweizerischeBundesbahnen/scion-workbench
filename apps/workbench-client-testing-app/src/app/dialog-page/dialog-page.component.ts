@@ -21,7 +21,7 @@ import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {A11yModule} from '@angular/cdk/a11y';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 
 @Component({
   selector: 'app-dialog-page',
@@ -39,7 +39,7 @@ import {A11yModule} from '@angular/cdk/a11y';
     SciAccordionItemDirective,
     SciKeyValueComponent,
     SciCheckboxComponent,
-    A11yModule,
+    CdkTrapFocus,
   ],
 })
 export default class DialogPageComponent {

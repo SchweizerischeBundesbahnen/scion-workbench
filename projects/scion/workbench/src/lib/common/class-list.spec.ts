@@ -77,11 +77,11 @@ describe('ClassList', () => {
     const captor = new Array<string[]>();
 
     TestBed.runInInjectionContext(() => effect(() => captor.push(classList.asList())));
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Set CSS classes in scope 'application'.
     classList.application = 'testee-application-1';
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(captor).toEqual([
       [],
       jasmine.arrayWithExactContents([
@@ -91,7 +91,7 @@ describe('ClassList', () => {
 
     // Set CSS classes in scope 'layout'.
     classList.layout = ['testee-layout-1', 'testee-layout-2'];
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(captor).toEqual([
       [],
       jasmine.arrayWithExactContents([
@@ -106,7 +106,7 @@ describe('ClassList', () => {
 
     // Replace CSS classes in scope 'application'.
     classList.application = ['testee-application-3'];
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(captor).toEqual([
       [],
       jasmine.arrayWithExactContents([
@@ -160,7 +160,7 @@ describe('ClassList', () => {
     classList.route = ['b'];
     classList.navigation = ['c'];
     classList.layout = ['d'];
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(captor).toEqual([
       jasmine.arrayWithExactContents(['a', 'b', 'c', 'd']),
     ]);
@@ -170,7 +170,7 @@ describe('ClassList', () => {
     classList.route = ['b'];
     classList.navigation = ['c'];
     classList.layout = ['d'];
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect no change.
     expect(captor).toEqual([
@@ -182,7 +182,7 @@ describe('ClassList', () => {
     classList.route = ['b'];
     classList.navigation = ['C'];
     classList.layout = ['d'];
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect change.
     expect(captor).toEqual([

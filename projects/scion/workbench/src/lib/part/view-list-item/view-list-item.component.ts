@@ -9,7 +9,7 @@
  */
 
 import {ChangeDetectionStrategy, Component, computed, inject, Injector, input, Signal} from '@angular/core';
-import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {WorkbenchConfig} from '../../workbench-config';
@@ -24,7 +24,7 @@ import {IconComponent} from '../../icon/icon.component';
   styleUrls: ['./view-list-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    PortalModule,
+    CdkPortalOutlet,
     TextPipe,
     IconComponent,
   ],

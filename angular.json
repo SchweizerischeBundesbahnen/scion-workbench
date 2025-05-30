@@ -10,10 +10,7 @@
       "prefix": "wb",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/scion/workbench/ng-package.json"
-          },
+          "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
               "tsConfig": "projects/scion/workbench/tsconfig.lib.prod.json"
@@ -25,7 +22,7 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:karma",
           "options": {
             "tsConfig": "projects/scion/workbench/tsconfig.spec.json",
             "karmaConfig": "projects/scion/workbench/karma.conf.js",
@@ -70,10 +67,7 @@
       "prefix": "wb",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/scion/workbench-client/ng-package.json"
-          },
+          "builder": "@angular/build:ng-packagr",
           "configurations": {
             "production": {
               "tsConfig": "projects/scion/workbench-client/tsconfig.lib.prod.json"
@@ -85,7 +79,7 @@
           "defaultConfiguration": "production"
         },
         "test": {
-          "builder": "@angular-devkit/build-angular:karma",
+          "builder": "@angular/build:karma",
           "options": {
             "main": "projects/scion/workbench-client/src/test.ts",
             "tsConfig": "projects/scion/workbench-client/tsconfig.spec.json",
@@ -116,10 +110,8 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/workbench-getting-started-app",
-            "index": "apps/workbench-getting-started-app/src/index.html",
             "browser": "apps/workbench-getting-started-app/src/main.ts",
             "polyfills": [
               "zone.js"
@@ -177,7 +169,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "workbench-getting-started-app:build:production-ci"
@@ -212,10 +204,8 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/workbench-testing-app",
-            "index": "apps/workbench-testing-app/src/index.html",
             "browser": "apps/workbench-testing-app/src/main.ts",
             "polyfills": [
               "zone.js"
@@ -422,7 +412,7 @@
           "defaultConfiguration": "development"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "workbench-testing-app:build:production-ci"
@@ -435,12 +425,15 @@
             },
             "development-basehref": {
               "buildTarget": "workbench-testing-app:build:development-basehref"
-            },
-            "development-basehref-webpack": {
-              "buildTarget": "workbench-testing-app:build-basehref-webpack:development"
             }
           },
           "defaultConfiguration": "development"
+        },
+        "serve-basehref-webpack": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "workbench-testing-app:build-basehref-webpack:development"
+          }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
@@ -466,10 +459,8 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/workbench-client-testing-app",
-            "index": "apps/workbench-client-testing-app/src/index.html",
             "browser": "apps/workbench-client-testing-app/src/main.ts",
             "polyfills": [
               "zone.js"
@@ -573,7 +564,7 @@
           "defaultConfiguration": "development"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "workbench-client-testing-app:build:production-vercel"
@@ -613,6 +604,32 @@
           }
         }
       }
+    }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
   }
 }

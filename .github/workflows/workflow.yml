@@ -1,7 +1,7 @@
 name: Continuous Integration and Delivery
 on: [push, pull_request, workflow_dispatch]
 env:
-  NODE_VERSION: 22.11.0
+  NODE_VERSION: 22.16.0
 jobs:
   install:
     name: 'Installing NPM modules'
@@ -167,7 +167,7 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npm run test:headless
+      - run: npm run test:headless -- --no-watch
   e2e:
     name: 'E2E Testing'
     needs: [ build-libs, build-apps ]
