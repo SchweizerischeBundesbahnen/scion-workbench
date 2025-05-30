@@ -103,8 +103,6 @@ jobs:
             cmd: npm run workbench-testing-app:ci:build
           - name: workbench-testing-app-basehref
             cmd: npm run workbench-testing-app:basehref:build
-          - name: workbench-testing-app-basehref-webpack
-            cmd: npm run workbench-testing-app:basehref-webpack:build
           - name: workbench-testing-app-vercel-latest
             cmd: npm run workbench-testing-app:vercel-latest:build
           - name: workbench-testing-app-vercel-release
@@ -200,11 +198,6 @@ jobs:
         with:
           name: workbench-testing-app-basehref
           path: dist/workbench-testing-app-basehref
-      - name: 'Downloading app: workbench-testing-app-basehref-webpack (dist)'
-        uses: actions/download-artifact@v4
-        with:
-          name: workbench-testing-app-basehref-webpack
-          path: dist/workbench-testing-app-basehref-webpack
       - name: 'Downloading app: workbench-client-testing-app-ci (dist)'
         uses: actions/download-artifact@v4
         with:

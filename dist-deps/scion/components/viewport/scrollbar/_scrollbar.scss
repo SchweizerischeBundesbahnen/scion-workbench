@@ -1,0 +1,45 @@
+@use 'sass:map';
+
+/**
+ * Positions scrollbars absolutely relative to the bounding box of the nearest positioned parent.
+ *
+ * Invoke from within the 'sci-scrollbar' selector.
+ */
+@mixin position() {
+  $scrollbar-size: 12px;
+
+  position: absolute;
+  transition-duration: 1s;
+  transition-property: opacity;
+  transition-timing-function: ease-out;
+
+  &.vertical {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: unset;
+    width: $scrollbar-size;
+  }
+
+  &.horizontal {
+    top: unset;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: $scrollbar-size;
+  }
+}
+
+/**
+ * Hides emulated scrollbars if all the following conditions are met:
+ * - host element not hovered (mouse navigation)
+ * - host element not active (touch navigation)
+ * - not scrolling (ensures the scrollbar to be visible even if dragging the thumb outside of the host element, :active pseudo-class not working in IE and Firefox)
+ *
+ * Invoke from within the viewport selector.
+ */
+@mixin hide-when-inactive() {
+  &:host-context(:not(:hover):not(:active)) sci-scrollbar:not(.scrolling) { // use :host-context to work with shadow DOM, i.e., to select the shadow host of the shadow DOM
+    opacity: 0; // do not use 'display' nor 'visibility' property to fade the scrollbar
+  }
+}

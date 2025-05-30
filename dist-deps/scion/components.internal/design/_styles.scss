@@ -1,0 +1,162 @@
+/**
+ * Collection of SASS mixins to style the SCION internal component library.
+ */
+
+/**
+ * Styles Material icon buttons.
+ */
+@mixin mat-icon-button() {
+  display: inline-grid;
+  place-content: center;
+  place-items: center;
+  padding: 3px;
+  font-size: 20px; // Material default is 24px
+  color: var(--sci-color-text);
+  border-radius: var(--sci-corner);
+  border: unset;
+  background-color: unset;
+  user-select: none;
+  overflow: hidden;
+
+  &:hover:where(:not(:disabled)) {
+    background-color: #{light-dark}(color-mix(in srgb, var(--sci-color-gray-200) 95%, var(--sci-static-color-white)), var(--sci-color-gray-200));
+  }
+
+  &:active:where(:not(:disabled)) {
+    background-color: var(--sci-color-gray-300);
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sci-color-accent);
+  }
+
+  &:disabled {
+    color: var(--sci-color-gray-300);
+  }
+}
+
+/**
+ * Styles buttons.
+ */
+@mixin button() {
+  all: unset;
+  padding: .5em 1.5em;
+  color: var(--sci-color-accent);
+  border: 1px solid var(--sci-color-accent);
+  font-weight: 500;
+  border-radius: var(--sci-corner);
+  text-align: center;
+  user-select: none;
+
+  &:hover:where(:not(:disabled)) {
+    background-color: #{light-dark}(color-mix(in srgb, var(--sci-color-gray-100) 95%, var(--sci-static-color-white)), color-mix(in srgb, var(--sci-color-gray-100) 75%, var(--sci-static-color-black)));
+  }
+
+  &:active:where(:not(:disabled)) {
+    background-color: #{light-dark}(color-mix(in srgb, var(--sci-color-gray-100) 97%, var(--sci-static-color-black)), color-mix(in srgb, var(--sci-color-gray-100) 85%, var(--sci-static-color-black)));
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline-offset: 2px;
+    outline: 2px solid var(--sci-color-accent);
+  }
+
+  &:disabled {
+    color: var(--sci-color-text-subtle);
+    border-color: var(--sci-color-border);
+    background-color: var(--sci-color-background-input-disabled);
+  }
+
+  &[sci-primary]:where(:not(:disabled)) {
+    color: var(--sci-color-accent-inverse);
+    background-color: var(--sci-color-accent);
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--sci-color-accent) 95%, var(--sci-static-color-black));
+    }
+
+    &:active {
+      background-color: color-mix(in srgb, var(--sci-color-accent) 90%, var(--sci-static-color-black));
+    }
+  }
+}
+
+/**
+ * Styles input fields.
+ */
+@mixin input-field() {
+  all: unset;
+  border: 1px solid var(--sci-color-border);
+  border-radius: var(--sci-corner);
+  padding: .5em;
+  transition: border-color ease-in-out .15s, color ease-in-out .15s;
+  background-color: var(--sci-color-background-input);
+  color: var(--sci-color-text);
+  appearance: auto;
+
+  &:focus-within:not(:disabled):not(:has(input:disabled)):not(:has(select:disabled)) {
+    border-color: var(--sci-color-accent);
+  }
+
+  &.ng-invalid.ng-touched {
+    border-color: var(--sci-color-negative);
+  }
+
+  &:disabled, &:has(input:disabled), &:has(select:disabled) {
+    color: var(--sci-color-text-subtlest);
+    background-color: var(--sci-color-background-input-disabled);
+  }
+
+  &:read-only {
+    color: var(--sci-color-text-subtle);
+  }
+
+  > option {
+    background-color: var(--sci-color-background-elevation);
+    color: var(--sci-color-text);
+
+    &:hover {
+      background-color: var(--sci-color-background-elevation-hover);
+    }
+  }
+}
+
+/**
+ * Styles a chip.
+ */
+@mixin chip($border-color, $background-color, $color, $borderStyle: solid) {
+  border: 1px $borderStyle $border-color;
+  background-color: $background-color;
+  color: $color;
+  border-radius: var(--sci-corner-small);
+  padding: .25em .5em;
+  font-size: smaller;
+  user-select: none;
+  margin-bottom: .25em;
+
+  &:not(:last-child) {
+    margin-right: .25em;
+  }
+}
+
+/**
+ * Styles a link.
+ */
+@mixin link($radius: 2px) {
+  color: var(--sci-color-accent);
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+
+  &:hover, &:focus {
+    text-decoration: underline;
+  }
+}

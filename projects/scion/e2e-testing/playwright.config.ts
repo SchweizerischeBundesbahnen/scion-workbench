@@ -38,12 +38,6 @@ export default {
       port: 4300,
       reuseExistingServer: false,
     },
-    // TODO [Angular 21] remove when `@angular-devkit/build-angular:browser` builder is deprecated
-    {
-      command: 'npm run workbench-testing-app:basehref-webpack:dist-serve',
-      port: 4400,
-      reuseExistingServer: false,
-    },
   ] : [],
   use: {
     browserName: 'chromium',

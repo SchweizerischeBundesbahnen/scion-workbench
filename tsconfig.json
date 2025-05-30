@@ -22,6 +22,12 @@
       ],
       "@scion/workbench-client": [
         "./dist/scion/workbench-client"
+      ],
+      "@scion/components/*": [
+        "./dist-deps/scion/components/*"
+      ],
+      "@scion/components.internal/*": [
+        "./dist-deps/scion/components.internal/*"
       ]
     }
     /*
@@ -47,6 +53,12 @@
     //      "@scion/workbench-client": [
     //        "./projects/scion/workbench-client/src/public-api"
     //      ],
+    //      "@scion/components/*": [
+    //        "./dist-deps/scion/components/*"
+    //      ],
+    //      "@scion/components.internal/*": [
+    //        "./dist-deps/scion/components.internal/*"
+    //      ]
     //      //      "@scion/toolkit/*": [
     //      //        "./src-lib/@scion/toolkit/*/src/public_api"
     //      //      ],
