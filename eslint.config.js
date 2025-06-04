@@ -117,6 +117,7 @@ module.exports = tseslint.config(
       // https://github.com/angular-eslint/angular-eslint/tree/main/packages/eslint-plugin
       "@angular-eslint/no-input-rename": "off",
       "@angular-eslint/no-output-rename": "off",
+      "@angular-eslint/prefer-inject": "warn",
 
       // https://github.com/DaveMBush/eslint-plugin-rxjs?tab=readme-ov-file#rules
       "@smarttools/rxjs/no-implicit-any-catch": "off",

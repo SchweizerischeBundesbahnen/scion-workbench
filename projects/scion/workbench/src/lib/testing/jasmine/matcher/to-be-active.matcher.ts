@@ -11,8 +11,7 @@
 import CustomMatcher = jasmine.CustomMatcher;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 import {TestBed} from '@angular/core/testing';
-import {DebugElement} from '@angular/core';
-import {DOCUMENT} from '@angular/common';
+import {DebugElement, DOCUMENT} from '@angular/core';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toBeActive}.

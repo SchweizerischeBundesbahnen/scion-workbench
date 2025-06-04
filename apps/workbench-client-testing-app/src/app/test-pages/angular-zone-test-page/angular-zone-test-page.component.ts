@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Component, inject, NgZone} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {NgTemplateOutlet} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {ɵMicrofrontendRouteParams, ɵWorkbenchCommands, ɵWorkbenchView} from '@scion/workbench-client';
@@ -23,7 +23,7 @@ import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/component
   templateUrl: './angular-zone-test-page.component.html',
   styleUrls: ['./angular-zone-test-page.component.scss'],
   imports: [
-    CommonModule,
+    NgTemplateOutlet,
     FormsModule,
     SciCheckboxComponent,
     SciAccordionComponent,

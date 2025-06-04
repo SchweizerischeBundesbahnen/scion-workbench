@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, Injector, NgZone, Signal, signal, untracked} from '@angular/core';
+import {Component, computed, DOCUMENT, inject, Injector, NgZone, signal, Signal, untracked} from '@angular/core';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
-import {ComponentPortal, PortalModule} from '@angular/cdk/portal';
+import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {WorkbenchConfig} from '../../workbench-config';
 import {ViewTabContentComponent} from '../view-tab-content/view-tab-content.component';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {DOCUMENT} from '@angular/common';
 import {WorkbenchView} from '../../view/workbench-view.model';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {distinctUntilChanged, map} from 'rxjs/operators';
@@ -34,7 +33,7 @@ import {PartId} from '../workbench-part.model';
     './view-tab-drag-image.partial.component.scss',
   ],
   imports: [
-    PortalModule,
+    CdkPortalOutlet,
     TextPipe,
     IconComponent,
   ],

@@ -7,7 +7,6 @@
   <div wbViewDropZone
        [wbViewDropZoneRegionSize]=".25"
        [wbViewDropZonePlaceholderSize]=".5"
-       [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
        [wbViewDropZoneAttributes]="{'data-partid': part.id}"
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
@@ -18,7 +17,6 @@
   <sci-viewport class="part-content e2e-part-content e2e-content"
                 wbViewDropZone
                 [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
-                [wbViewDropZoneCssClass]="'e2e-part-drop-zone'"
                 [wbViewDropZoneAttributes]="{'data-partid': part.id}"
                 (wbViewDropZoneDrop)="onViewDrop($event)">
     <router-outlet [name]="part.id" wbRouterOutletRootContext/>

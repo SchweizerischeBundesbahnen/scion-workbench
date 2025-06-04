@@ -16,8 +16,6 @@ import {UID} from '../../common/uid.util';
 
 /**
  * Migrates the workbench layout from version 4 to version 5.
- *
- * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV5 implements WorkbenchMigration {

@@ -139,7 +139,7 @@ export class ViewTabDragImageRenderer {
         '--sci-workbench-tab-title-offset-right': dragData.viewTitleOffsetRight,
       },
     });
-    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, null, this._applicationRef, this._injector);
+    this._viewDragImagePortalOutlet = new DomPortalOutlet(outletElement, this._applicationRef, this._injector);
     const componentRef = this._viewDragImagePortalOutlet.attachComponentPortal(new ComponentPortal(ViewTabDragImageComponent, null, Injector.create({
       parent: this._injector,
       providers: [

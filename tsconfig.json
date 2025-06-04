@@ -3,7 +3,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -11,18 +10,12 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "esModuleInterop": true,
     "experimentalDecorators": true,
-    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "preserve",
     "noUnusedLocals": true,
     "noUncheckedIndexedAccess": true,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
     "paths": {
       "@scion/workbench": [
         "./dist/scion/workbench"
@@ -55,12 +48,15 @@
     //        "./projects/scion/workbench-client/src/public-api"
     //      ],
     //      //      "@scion/toolkit/*": [
+    //      //        "./src-lib/@scion/toolkit/*",
     //      //        "./src-lib/@scion/toolkit/*/src/public_api"
     //      //      ],
     //      //      "@scion/components/*": [
+    //      //        "./src-lib/@scion/components/*",
     //      //        "./src-lib/@scion/components/*/src/public_api"
     //      //      ],
     //      //      "@scion/components.internal/*": [
+    //      //        "./src-lib/@scion/components.internal/*",
     //      //        "./src-lib/@scion/components.internal/*/src/public_api"
     //      //      ],
     //      //      "@scion/microfrontend-platform": [
@@ -72,6 +68,30 @@
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
+    "typeCheckHostBindings": true,
     "strictTemplates": true
-  }
+  },
+  "references": [
+    {
+      "path": "./projects/scion/workbench/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/scion/workbench/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/scion/workbench-client/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/scion/workbench-client/tsconfig.spec.json"
+    },
+    {
+      "path": "./apps/workbench-testing-app/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/workbench-client-testing-app/tsconfig.app.json"
+    },
+    {
+      "path": "./apps/workbench-getting-started-app/tsconfig.app.json"
+    }
+  ]
 }

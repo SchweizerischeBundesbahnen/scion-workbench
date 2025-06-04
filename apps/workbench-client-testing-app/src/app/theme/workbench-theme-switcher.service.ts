@@ -1,5 +1,4 @@
-import {EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
-import {DOCUMENT} from '@angular/common';
+import {DOCUMENT, EnvironmentProviders, inject, Injectable, makeEnvironmentProviders} from '@angular/core';
 import {WorkbenchTheme, WorkbenchThemeMonitor} from '@scion/workbench-client';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WORKBENCH_POST_CONNECT} from '../workbench-client/workbench-client.provider';

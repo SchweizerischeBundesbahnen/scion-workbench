@@ -15,8 +15,6 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
  * Migrates the workbench layout from version 5 to version 6.
- *
- * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV6 implements WorkbenchMigration {

@@ -14,7 +14,7 @@ import {test} from '../fixtures';
 test.describe('HTML base HREF', () => {
 
   /**
-   * # esbuild builder (@angular-devkit/build-angular:application)
+   * # esbuild builder (@angular/build:application)
    *
    * This test expects the application to be served on 'http://localhost:4300/subdir/browser' with '/subdir/browser/' configured as the base URL.
    *
@@ -46,7 +46,7 @@ test.describe('HTML base HREF', () => {
    * npm run workbench-testing-app:basehref-webpack:serve
    * ```
    *
-   * TODO [Angular 20] remove when `@angular-devkit/build-angular:browser` builder is deprecated
+   * TODO [Angular 21] remove when `@angular-devkit/build-angular:browser` builder is deprecated
    */
   test('should fetch the icon font if deployed in a subdirectory (webpack)', async ({page, appPO}) => {
     const response = page.waitForResponse(/scion-workbench-icons\.(ttf|woff)/);

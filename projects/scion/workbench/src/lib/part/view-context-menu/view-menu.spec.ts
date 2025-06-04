@@ -154,13 +154,13 @@ describe('View Menu', () => {
       };
     });
 
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(menuItemConstructCount['view.101']).toEqual({menuItem1: 1, menuItem2: 1, menuItem3: 0});
     expect(menuItemConstructCount['view.102']).toEqual({menuItem1: 1, menuItem2: 1, menuItem3: 0});
 
     // Change menu item 2 contained in view 1.
     trackedSignals['view.101'].menuItem2.set(UUID.randomUUID());
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect only menu item 2 in view 1 to be re-constructed.
     expect(menuItemConstructCount['view.101']).toEqual({menuItem1: 1, menuItem2: 2, menuItem3: 0});
@@ -168,7 +168,7 @@ describe('View Menu', () => {
 
     // Change menu item 1 contained in view 2.
     trackedSignals['view.102'].menuItem1.set(UUID.randomUUID());
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect only menu item 1 in view 2 to be re-constructed.
     expect(menuItemConstructCount['view.101']).toEqual({menuItem1: 1, menuItem2: 2, menuItem3: 0});
@@ -184,7 +184,7 @@ describe('View Menu', () => {
         onAction: () => noop(),
       };
     });
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect menu item 1 and menu item 2 not to be re-constructed.
     expect(menuItemConstructCount['view.101']).toEqual({menuItem1: 1, menuItem2: 2, menuItem3: 1});

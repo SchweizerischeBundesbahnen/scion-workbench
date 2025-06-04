@@ -8,15 +8,17 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, Directive, effect, ElementRef, inject, Injector, input, NgZone, output, signal, untracked} from '@angular/core';
-import {createElement, positionElement, setAttribute, setStyle} from '../common/dom.util';
+import {computed, Directive, effect, ElementRef, inject, input, NgZone, output, untracked} from '@angular/core';
+import {createElement, nextAnimationFrame$, positionElement, setAttribute, setStyle} from '../common/dom.util';
 import {ViewDragData, ViewDragService} from './view-drag.service';
 import {ViewDropPlaceholderRenderer} from './view-drop-placeholder-renderer.service';
 import {Disposable} from '../common/disposable';
 import {boundingClientRect} from '@scion/components/dimension';
 import {UUID} from '@scion/toolkit/uuid';
-import {asyncScheduler} from 'rxjs';
+import {audit, BehaviorSubject, delay, identity, Observable, of, share, SubjectLike, switchMap} from 'rxjs';
 import {subscribeIn} from '@scion/toolkit/operators';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {finalize, tap} from 'rxjs/operators';
 
 /**
  * Makes the host element a drop zone for views.
@@ -33,11 +35,6 @@ export class ViewDropZoneDirective {
    * Specifies the regions where views can be dropped. Defaults to every region.
    */
   public readonly regions = input<DropZoneRegion | false>(undefined, {alias: 'wbViewDropZoneRegions'});
-
-  /**
-   * Specifies CSS class(es) to add to the drop zone.
-   */
-  public readonly cssClass = input<string | string[] | undefined>(undefined, {alias: 'wbViewDropZoneCssClass'});
 
   /**
    * Specifies attribute(s) to add to the drop zone.
@@ -64,10 +61,10 @@ export class ViewDropZoneDirective {
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _viewDropPlaceholderRenderer = inject(ViewDropPlaceholderRenderer);
   private readonly _zone = inject(NgZone);
-  private readonly _injector = inject(Injector);
   private readonly _id = UUID.randomUUID();
   private readonly _boundingClientRect = boundingClientRect(inject(ElementRef));
-  private readonly _dropRegion = signal<Region | null>(null);
+  private readonly _dropRegion$ = createDropRegionObservable();
+
   private readonly _dropRegionSize = computed(() => ({
     maxHeight: coercePixelValue(this.dropRegionSize(), {containerSize: this._boundingClientRect().height}),
     maxWidth: coercePixelValue(this.dropRegionSize(), {containerSize: this._boundingClientRect().width}),
@@ -117,7 +114,7 @@ export class ViewDropZoneDirective {
         ...this.attributes(),
         'data-id': this._id,
       },
-      cssClass: this.cssClass(),
+      cssClass: 'e2e-drop-zone',
       style: {
         'position': 'absolute',
         'inset': 0,
@@ -133,13 +130,13 @@ export class ViewDropZoneDirective {
       .subscribe((event: DragEvent) => {
         // Unset region when dragging over the tab bar or out of the host element.
         if (this._viewDragService.isDragOverTabbar || event.type === 'dragleave') {
-          this._dropRegion.set(null);
+          this._dropRegion$.next(null);
           return;
         }
 
         // Compute the drop region.
         const region = this.computeDropZoneRegion(event);
-        this._dropRegion.set(region);
+        this._dropRegion$.next(region);
         if (!region) {
           return;
         }
@@ -159,18 +156,17 @@ export class ViewDropZoneDirective {
 
     // Enable drop zone based on dragging over an allowed drop region.
     // If enabled, drag events are not received by nested drop zones.
-    const dropZoneActivator = effect(() => {
-      const dropRegion = this._dropRegion();
+    const dropZoneActivator = this._dropRegion$.subscribe(dropRegion => {
       setStyle(dropZoneElement, {'pointer-events': dropRegion ? null : 'none'});
       setAttribute(dropZoneElement, {'data-region': dropRegion});
-    }, {manualCleanup: true, injector: this._injector});
+    });
 
     return {
       dispose: () => {
         dragHandler.unsubscribe();
+        dropZoneActivator.unsubscribe();
         dropZoneElement.remove();
-        dropZoneActivator.destroy();
-        this._dropRegion.set(null);
+        this._dropRegion$.next(null);
       },
     };
   }
@@ -179,33 +175,35 @@ export class ViewDropZoneDirective {
    * Renders or removes the drop placeholder based on the current drop region.
    */
   private installDropPlaceholderRenderer(): void {
-    effect(onCleanup => {
-      const region = this._dropRegion();
+    // Use an observable instead of an effect to control when to call `ViewDropPlaceholderRenderer.render`.
+    // Child elements must invoke the render method before parent elements. Otherwise, nested drop zones
+    // would override the drop placeholder of parent drop zones.
 
-      untracked(() => {
-        // Render drop placeholder when dragging over a drop region.
+    // Component effects always execute top-down the component tree, the opposite direction to drag events
+    // that bubble up the component tree. The same applies to root effects, which execute in registration
+    // order rather than in the order of tracked signal changes.
+
+    const dragging = this._viewDragService.dragging;
+    this._dropRegion$
+      .pipe(
+        // When leaving the drop zone (no drop region) but continue dragging, remove the drop zone asynchronously
+        // to animate transition of the placeholder to another drop zone. If ended dragging, remove the placeholder
+        // immediately.
+        switchMap((region: Region | null) => of(region).pipe(!region && dragging() ? delay(50) : identity)),
+        finalize(() => this._viewDropPlaceholderRenderer.render(this._id, null)),
+        takeUntilDestroyed(),
+      )
+      .subscribe((region: Region | null) => {
         if (region) {
+          // Render the drop placeholder.
           const rect = this.computeDropPlaceholderRect(region, this.dropPlaceholderSize() ?? this.dropRegionSize());
           this._viewDropPlaceholderRenderer.render(this._id, rect);
-          return;
-        }
-
-        // Remove the drop placeholder when leaving a drop region. If continue dragging, remove it asynchronously to animate transition
-        // of the placeholder to another drop zone. If ended dragging, remove the placeholder immediately.
-        if (this._viewDragService.dragging()) {
-          const delayedRemoval = asyncScheduler.schedule(() => this._viewDropPlaceholderRenderer.render(this._id, null), 50);
-          onCleanup(() => delayedRemoval.unsubscribe());
         }
         else {
+          // Remove the drop placeholder.
           this._viewDropPlaceholderRenderer.render(this._id, null);
         }
       });
-    }, {
-      // Root effects run in FIFO order, while component effects run top-down the component tree, the opposite direction to
-      // drag events which bubble up the component tree. The correct order is required for parent drop zones to overwrite
-      // the drop placeholders of nested drop zones.
-      forceRoot: true,
-    });
   }
 
   /**
@@ -325,3 +323,32 @@ export interface DropZoneRegion {
  * Represents a drop region.
  */
 type Region = 'north' | 'east' | 'south' | 'west' | 'center';
+
+/**
+ * Creates a subject-like observable to observe and set the drop region,
+ * multicasting the drop zone to many observers while throttling emission
+ * to the latest drop region per animation frame.
+ */
+function createDropRegionObservable(): Observable<Region | null> & Pick<SubjectLike<Region | null>, 'next'> {
+  const zone = inject(NgZone);
+  const region$ = new BehaviorSubject<Region | null>(null);
+
+  const observe$ = region$
+    .pipe(
+      subscribeIn(fn => zone.runOutsideAngular(fn)),
+      // Ensure not to be in Angular.
+      tap(() => NgZone.assertNotInAngularZone()),
+      // Throttle emission to a single event per animation frame.
+      audit(() => nextAnimationFrame$()),
+      share(),
+    ) as Observable<Region | null> & Pick<SubjectLike<Region | null>, 'next'>;
+
+  // Add notifier function.
+  observe$.next = (region: Region | null): void => {
+    if (region$.value !== region) {
+      zone.runOutsideAngular(() => region$.next(region));
+    }
+  };
+
+  return observe$;
+}

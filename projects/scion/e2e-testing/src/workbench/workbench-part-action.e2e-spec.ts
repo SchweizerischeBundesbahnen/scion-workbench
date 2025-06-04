@@ -234,7 +234,7 @@ test.describe('Workbench Part Action', () => {
     // Register action
     await layoutPage.registerPartAction('Action', {grid: 'mainArea', viewId: 'view.101', cssClass: 'e2e-action'});
 
-    // Expect the action not to be displayed
+    // Expect the action not to display.
     await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'part.initial'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
@@ -244,7 +244,7 @@ test.describe('Workbench Part Action', () => {
     await dragHandle1.dragToPart('part.initial', {region: 'center'});
     await dragHandle1.drop();
 
-    // Expect the action not to be displayed
+    // Expect the action to display in the initial part.
     await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'part.initial'}).bar.action({cssClass: 'e2e-action'}).locator).toBeVisible();
@@ -254,7 +254,7 @@ test.describe('Workbench Part Action', () => {
     await dragHandle2.dragToPart('part.right', {region: 'center'});
     await dragHandle2.drop();
 
-    // Expect the action not to be displayed
+    // Expect the action not to display.
     await expect(appPO.part({partId: 'part.left'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'part.right'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();
     await expect(appPO.part({partId: 'part.initial'}).bar.action({cssClass: 'e2e-action'}).locator).not.toBeAttached();

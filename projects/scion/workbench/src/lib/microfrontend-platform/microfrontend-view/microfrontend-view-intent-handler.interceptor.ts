@@ -52,8 +52,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
 
   private async navigate(message: IntentMessage<WorkbenchNavigationExtras | undefined>): Promise<boolean> {
     const viewCapability = message.capability as WorkbenchViewCapability;
-    // TODO [Angular 20] remove backward compatibility for property 'blankInsertionIndex'
-    const extras: WorkbenchNavigationExtras & {blankInsertionIndex?: number | 'start' | 'end' | 'before-active-view' | 'after-active-view'} = message.body ?? {};
+    const extras: WorkbenchNavigationExtras = message.body ?? {};
 
     const intentParams = Objects.withoutUndefinedEntries(Dictionaries.coerce(message.intent.params));
     const {urlParams, transientParams} = MicrofrontendViewRoutes.splitParams(intentParams, viewCapability);
@@ -68,7 +67,7 @@ export class MicrofrontendViewIntentHandler implements IntentInterceptor {
         partId,
         activate: extras.activate,
         close: extras.close,
-        position: extras.position ?? extras.blankInsertionIndex,
+        position: extras.position,
         cssClass: extras.cssClass,
         state: Objects.withoutUndefinedEntries({
           [MicrofrontendViewRoutes.STATE_TRANSIENT_PARAMS]: transientParams,

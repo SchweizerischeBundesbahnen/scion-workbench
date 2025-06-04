@@ -34,6 +34,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom', ratio: .25})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.bottom', activateView: true}),
@@ -98,6 +99,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom', ratio: .25})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.bottom', activateView: true}),
@@ -162,6 +164,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .25})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.right', activateView: true}),
@@ -225,6 +228,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.right', activateView: true}),
@@ -252,6 +256,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom'})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.bottom', activateView: true}),
@@ -279,6 +284,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
         .addPart('part.bottom-left', {relativeTo: 'part.initial', align: 'bottom'})
         .addView('view.101', {partId: 'part.initial'})
@@ -308,6 +314,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.left', {relativeTo: 'part.initial', align: 'left'})
         .addPart('part.bottom-right', {relativeTo: 'part.initial', align: 'bottom'})
         .addView('view.101', {partId: 'part.initial'})
@@ -340,6 +347,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom'})
         .addPart('part.left', {relativeTo: 'part.initial', align: 'left'})
         .addPart('part.bottom-right', {relativeTo: 'part.initial', align: 'bottom'})
@@ -374,6 +382,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom'})
         .addPart('part.left', {relativeTo: 'part.initial', align: 'left'})
@@ -407,6 +416,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.left', {relativeTo: 'part.initial', align: 'left'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
         .addPart('part.bottom-middle', {relativeTo: 'part.initial', align: 'bottom'})
@@ -436,6 +446,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.left-top', {relativeTo: 'part.initial', align: 'left'})
         .addPart('part.right-top', {relativeTo: 'part.initial', align: 'right'})
         .addPart('part.left-bottom', {relativeTo: 'part.left-top', align: 'bottom'})
@@ -457,6 +468,7 @@ test.describe('View Drag Main Area', () => {
       const testView = await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right'})
         .addView('view.101', {partId: 'part.right', activateView: true}),
@@ -484,6 +496,7 @@ test.describe('View Drag Main Area', () => {
       await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom', ratio: .25})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.bottom', activateView: true}),
@@ -525,6 +538,7 @@ test.describe('View Drag Main Area', () => {
       await workbenchNavigator.openInNewTab(ViewPagePO);
 
       await workbenchNavigator.modifyLayout(layout => layout
+        .addPart('part.activity', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity'}) // add activity to disable drop zones near main grid edges
         .addPart('part.bottom', {relativeTo: 'part.initial', align: 'bottom', ratio: .25})
         .addView('view.101', {partId: 'part.initial'})
         .addView('view.102', {partId: 'part.bottom', activateView: true}),

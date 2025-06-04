@@ -3,10 +3,6 @@
            [gridDropZone]="{
              dropRegionSize: 100,
              dropPlaceholderSize: 100,
-             dropZoneCssClass: [
-               'e2e-grid-drop-zone',
-               'e2e-part-drop-zone'
-             ],
              dropZoneAttributes: {
                'data-grid': 'main-area',
                'data-partid': part.id,
@@ -18,8 +14,10 @@
   <sci-viewport class="desktop e2e-part-content e2e-content"
                 wbViewDropZone
                 [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
-                [wbViewDropZoneCssClass]="['e2e-part-drop-zone', 'e2e-desktop-drop-zone']"
-                [wbViewDropZoneAttributes]="{'data-partid': part.id}"
+                [wbViewDropZoneAttributes]="{
+                  'data-desktop': '',
+                  'data-partid': part.id,
+                }"
                 (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
     @if (part.navigation()) {
       <router-outlet [name]="part.id" wbRouterOutletRootContext/>

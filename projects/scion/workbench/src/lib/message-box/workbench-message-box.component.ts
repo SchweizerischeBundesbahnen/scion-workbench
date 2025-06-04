@@ -19,8 +19,7 @@ import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {TypeofPipe} from '../common/typeof.pipe';
 import {throwError} from '../common/throw-error.util';
-import {Dimension} from '@scion/toolkit/observable';
-import {SciDimensionDirective} from '@scion/components/dimension';
+import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {TextPipe} from '../text/text.pipe';
 import {Translatable} from '../text/workbench-text-provider.model';
 
@@ -93,7 +92,7 @@ export class WorkbenchMessageBoxComponent {
     this._dialog.size.minWidth = `${preferredSize}px`;
   }
 
-  protected onContentDimensionChange(dimension: Dimension): void {
+  protected onContentDimensionChange(dimension: SciDimension): void {
     this.empty = !dimension.offsetHeight;
   }
 }

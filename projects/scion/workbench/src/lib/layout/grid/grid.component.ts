@@ -100,10 +100,6 @@ export interface GridDropZoneConfig {
    */
   dropPlaceholderSize?: number;
   /**
-   * Specifies CSS class(es) to add to the drop zones.
-   */
-  dropZoneCssClass?: string | string[] | undefined;
-  /**
    * Specifies attribute(s) to add to the drop zones.
    */
   dropZoneAttributes?: {[name: string]: unknown};

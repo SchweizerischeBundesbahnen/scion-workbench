@@ -19,20 +19,14 @@
   },
   "peerDependencies": {
     "rxjs": "^7.5.0",
-    "@scion/toolkit": "^1.0.0-0",
-    "@scion/microfrontend-platform": "^1.0.0-rc.12"
+    "@scion/toolkit": "^1.6.0 || ^2.0.0",
+    "@scion/microfrontend-platform": "^1.0.0"
   },
   "keywords": [
     "scion",
-    "workbench microfrontend integration",
-    "workbench",
-    "workbench client",
+    "scion workbench client",
     "microfrontend",
-    "micro frontend",
-    "typescript",
-    "javascript",
-    "framework-agnostic",
-    "webstack-agnostic"
+    "micro-frontend"
   ],
   "repository": {
     "type": "git",

@@ -64,7 +64,7 @@ export class PartPO {
    */
   public async getActiveDropZone(): Promise<'north' | 'east' | 'south' | 'west' | 'center' | null> {
     const partId = await this.getPartId();
-    const dropZone = this.locator.locator(`div.e2e-part-drop-zone[data-partid="${partId}"]`);
+    const dropZone = this.locator.locator(`div.e2e-drop-zone[data-partid="${partId}"]`);
     if (!await dropZone.isVisible()) {
       return null;
     }

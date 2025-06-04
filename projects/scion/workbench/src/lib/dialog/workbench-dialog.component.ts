@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, ElementRef, forwardRef, HostBinding, HostListener, inject, NgZone, Provider, untracked, viewChild} from '@angular/core';
+import {Component, effect, ElementRef, forwardRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
 import {BehaviorSubject, fromEvent} from 'rxjs';
-import {A11yModule, CdkTrapFocus} from '@angular/cdk/a11y';
+import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {SciViewportComponent} from '@scion/components/viewport';
@@ -39,7 +39,7 @@ import {synchronizeCssClasses} from '../common/css-class.util';
   imports: [
     NgComponentOutlet,
     NgTemplateOutlet,
-    A11yModule,
+    CdkTrapFocus,
     AsyncPipe,
     MovableDirective,
     ResizableDirective,
@@ -55,6 +55,18 @@ import {synchronizeCssClasses} from '../common/css-class.util';
   viewProviders: [
     configureDialogGlassPane(),
   ],
+  host: {
+    '[style.--ɵdialog-transform-translate-x]': 'transformTranslateX()',
+    '[style.--ɵdialog-transform-translate-y]': 'transformTranslateY()',
+    '[style.--ɵdialog-min-height]': 'dialog.size.minHeight() ?? headerHeight()',
+    '[style.--ɵdialog-height]': 'dialog.size.height()',
+    '[style.--ɵdialog-max-height]': 'dialog.size.maxHeight()',
+    '[style.--ɵdialog-min-width]': 'dialog.size.minWidth() ?? \'100px\'',
+    '[style.--ɵdialog-width]': 'dialog.size.width()',
+    '[style.--ɵdialog-max-width]': 'dialog.size.maxWidth()',
+    '[class.justified]': '!dialog.padding()',
+    '[attr.data-dialogid]': 'dialog.id',
+  },
 })
 export class WorkbenchDialogComponent {
 
@@ -67,53 +79,9 @@ export class WorkbenchDialogComponent {
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
 
-  private _headerHeight: string | undefined;
-
-  @HostBinding('style.--ɵdialog-transform-translate-x')
-  protected transformTranslateX = 0;
-
-  @HostBinding('style.--ɵdialog-transform-translate-y')
-  protected transformTranslateY = 0;
-
-  @HostBinding('style.--ɵdialog-min-height')
-  protected get minHeight(): string | undefined {
-    return this.dialog.size.minHeight() ?? this._headerHeight;
-  }
-
-  @HostBinding('style.--ɵdialog-height')
-  protected get height(): string | undefined {
-    return this.dialog.size.height();
-  }
-
-  @HostBinding('style.--ɵdialog-max-height')
-  protected get maxHeight(): string | undefined {
-    return this.dialog.size.maxHeight();
-  }
-
-  @HostBinding('style.--ɵdialog-min-width')
-  protected get minWidth(): string | undefined {
-    return this.dialog.size.minWidth() ?? '100px';
-  }
-
-  @HostBinding('style.--ɵdialog-width')
-  protected get width(): string | undefined {
-    return this.dialog.size.width();
-  }
-
-  @HostBinding('style.--ɵdialog-max-width')
-  protected get maxWidth(): string | undefined {
-    return this.dialog.size.maxWidth();
-  }
-
-  @HostBinding('class.justified')
-  protected get justified(): boolean {
-    return !this.dialog.padding();
-  }
-
-  @HostBinding('attr.data-dialogid')
-  public get id(): string {
-    return this.dialog.id;
-  }
+  protected headerHeight = signal<string | undefined>(undefined);
+  protected transformTranslateX = signal(0);
+  protected transformTranslateY = signal(0);
 
   constructor() {
     this.setDialogOffset();
@@ -124,8 +92,8 @@ export class WorkbenchDialogComponent {
 
   private setDialogOffset(): void {
     const stackPosition = this.dialog.getPositionInDialogStack();
-    this.transformTranslateX = stackPosition * 10;
-    this.transformTranslateY = stackPosition * 10;
+    this.transformTranslateX.set(stackPosition * 10);
+    this.transformTranslateY.set(stackPosition * 10);
   }
 
   private addHostCssClasses(): void {
@@ -206,8 +174,8 @@ export class WorkbenchDialogComponent {
   }
 
   protected onMove(event: WbMoveEvent): void {
-    this.transformTranslateX = event.translateX;
-    this.transformTranslateY = event.translateY;
+    this.transformTranslateX.set(event.translateX);
+    this.transformTranslateY.set(event.translateY);
   }
 
   protected onResize(event: WbResizeEvent): void {
@@ -218,15 +186,15 @@ export class WorkbenchDialogComponent {
       this.dialog.size.width = `${event.width}px`;
     }
     if (event.translateX !== undefined) {
-      this.transformTranslateX = event.translateX;
+      this.transformTranslateX.set(event.translateX);
     }
     if (event.translateY !== undefined) {
-      this.transformTranslateY = event.translateY;
+      this.transformTranslateY.set(event.translateY);
     }
   }
 
   protected onHeaderDimensionChange(dimension: SciDimension): void {
-    this._headerHeight = `${dimension.offsetHeight}px`;
+    this.headerHeight.set(`${dimension.offsetHeight}px`);
   }
 }
 

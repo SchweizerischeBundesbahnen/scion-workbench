@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {computed, inject, Injectable, signal} from '@angular/core';
+import {computed, DOCUMENT, inject, Injectable, signal} from '@angular/core';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {throwError} from '../common/throw-error.util';
 import {resolveWhen} from '../common/resolve-when.util';
 import {renderingFlag} from './rendering-flag';
 import {readCssVariable} from '../common/dom.util';
-import {DOCUMENT} from '@angular/common';
 
 /**
  * Provides access to the workbench layout.

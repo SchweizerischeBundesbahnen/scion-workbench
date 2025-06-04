@@ -20,7 +20,6 @@ import {SciKeyValueComponent} from '@scion/components.internal/key-value';
 import {SciFormFieldComponent} from '@scion/components.internal/form-field';
 import {SciAccordionComponent, SciAccordionItemDirective} from '@scion/components.internal/accordion';
 import {SciCheckboxComponent} from '@scion/components.internal/checkbox';
-import {A11yModule} from '@angular/cdk/a11y';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WorkbenchDialogActionDirective} from '@scion/workbench';
 
@@ -43,7 +42,6 @@ import {WorkbenchDialogActionDirective} from '@scion/workbench';
     SciAccordionItemDirective,
     SciKeyValueComponent,
     SciCheckboxComponent,
-    A11yModule,
     WorkbenchDialogActionDirective,
   ],
 })

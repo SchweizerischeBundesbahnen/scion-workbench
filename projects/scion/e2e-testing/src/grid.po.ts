@@ -29,7 +29,7 @@ export class GridPO {
    */
   public async getActiveDropZone(): Promise<'north' | 'east' | 'south' | 'west' | 'center' | null> {
     const gridName = await this.getGridName();
-    const dropZone = this.locator.locator(`div.e2e-grid-drop-zone[data-grid="${gridName}"]`);
+    const dropZone = this.locator.locator(`div.e2e-drop-zone[data-grid="${gridName}"]`);
     if (!await dropZone.isVisible()) {
       return null;
     }

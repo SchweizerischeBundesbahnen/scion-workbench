@@ -108,10 +108,10 @@ The location of the icon font can be configured via the SCSS module `@scion/work
 ```
 
 If deploying the application in a subdirectory, use a relative directory path for the browser to load the icon files relative to the document base URL (as specified in the `<base>` HTML tag).
-Note that using a relative path requires to exclude the icon files from the application build. Depending on whether building the application with esbuild `@angular-devkit/build-angular:application`
+Note that using a relative path requires to exclude the icon files from the application build. Depending on whether building the application with esbuild `@angular/build:application`
 or webpack `@angular-devkit/build-angular:browser`, different steps are required to exclude the icons from the build.
 
-#### Using @angular-devkit/build-angular:application (esbuild)
+#### Using @angular/build:application (esbuild, default since Angular 20)
 Configure the `@scion/workbench` SCSS module to load the icon font relative to the document base URL:
 ```scss
 @use '@scion/workbench' with (

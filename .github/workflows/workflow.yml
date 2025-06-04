@@ -1,7 +1,7 @@
 name: Continuous Integration and Delivery
 on: [push, pull_request, workflow_dispatch]
 env:
-  NODE_VERSION: 22.11.0
+  NODE_VERSION: 22.16.0
 jobs:
   install:
     name: 'Installing NPM modules'
@@ -167,14 +167,14 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-      - run: npm run test:headless
+      - run: npm run test:headless -- --no-watch
   e2e:
     name: 'E2E Testing'
     needs: [ build-libs, build-apps ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shard: [ 1/15, 2/15, 3/15, 4/15, 5/15, 6/15, 7/15, 8/15, 9/15, 10/15, 11/15, 12/15, 13/15, 14/15, 15/15 ]
+        shard: [ 1/20, 2/20, 3/20, 4/20, 5/20, 6/20, 7/20, 8/20, 9/20, 10/20, 11/20, 12/20, 13/20, 14/20, 15/20, 16/20, 17/20, 18/20, 19/20, 20/20]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

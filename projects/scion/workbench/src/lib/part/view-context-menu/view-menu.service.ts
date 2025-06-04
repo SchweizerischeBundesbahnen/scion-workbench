@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {effect, ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
+import {ElementRef, inject, Injectable, Injector, isSignal, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewMenuComponent} from './view-menu.component';
@@ -23,6 +23,7 @@ import {provideViewContext} from '../../view/view-context-provider';
 import {Arrays} from '@scion/toolkit/util';
 import {TextComponent} from './text/text.component';
 import {coerceElement} from '@angular/cdk/coercion';
+import {rootEffect} from '../../common/root-effect';
 
 /**
  * Shows menu items of a {@link WorkbenchView} in a menu.
@@ -111,7 +112,8 @@ export class ViewMenuService {
     const injector = options?.injector ?? inject(Injector);
     const zone = injector.get(NgZone);
 
-    effect(onCleanup => {
+    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    rootEffect(onCleanup => {
       const element = coerceElement(isSignal(elementLike) ? elementLike() : elementLike);
       const view = isSignal(viewLike) ? viewLike() : viewLike;
 
@@ -119,7 +121,7 @@ export class ViewMenuService {
         const subscription = installMenuAccelerators(element, view);
         onCleanup(() => subscription.unsubscribe());
       });
-    }, {injector, forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    }, {injector});
 
     /**
      * Subscribes to keyboard events for menu items of given {@link WorkbenchView} on specified element.

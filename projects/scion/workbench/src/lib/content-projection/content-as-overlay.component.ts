@@ -11,6 +11,7 @@
 import {Component, computed, effect, ElementRef, inject, input, signal, Signal, TemplateRef, untracked, viewChild, ViewContainerRef} from '@angular/core';
 import {setStyle} from '../common/dom.util';
 import {boundingClientRect} from '@scion/components/dimension';
+import {rootEffect} from '../common/root-effect';
 
 /**
  * Projects `ng-content` to a top-level DOM element and aligns it with this component's bounding box.
@@ -98,7 +99,8 @@ export class ContentAsOverlayComponent {
   private alignOverlayToHostBounds(): void {
     const hostBounds = boundingClientRect(inject(ElementRef<HTMLElement>));
 
-    effect(() => {
+    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    rootEffect(() => {
       const overlay = this._overlay();
       if (!overlay) {
         return;
@@ -120,7 +122,7 @@ export class ContentAsOverlayComponent {
         height: `${height}px`,
         visibility: null,
       });
-    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    });
   }
 }
 

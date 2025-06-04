@@ -13,7 +13,7 @@ import {DockedPartExtras, DockingArea, MAIN_AREA, MAIN_AREA_ALTERNATIVE_ID, Part
 import {LayoutSerializationFlags, WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
-import {inject, Injectable, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
+import {DOCUMENT, inject, Injectable, InjectionToken, Injector, runInInjectionContext} from '@angular/core';
 import {Routing} from '../routing/routing.util';
 import {Commands, NavigationData, NavigationState, NavigationStates, Outlets} from '../routing/routing.model';
 import {ActivatedRoute, UrlSegment} from '@angular/router';
@@ -28,7 +28,6 @@ import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, Activ
 import {Objects} from '../common/objects.util';
 import {RequireOne} from '../common/utility-types';
 import {readCssVariable} from '../common/dom.util';
-import {DOCUMENT} from '@angular/common';
 
 /**
  * @inheritDoc
