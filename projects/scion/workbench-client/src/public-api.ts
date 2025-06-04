@@ -37,7 +37,6 @@ export {type WorkbenchMessageBoxCapability, type WorkbenchMessageBoxSize, eMESSA
 export {WorkbenchMessageBoxService} from './lib/message-box/workbench-message-box-service';
 export {ɵWorkbenchMessageBoxService} from './lib/message-box/ɵworkbench-message-box-service';
 export {type WorkbenchMessageBoxOptions} from './lib/message-box/workbench-message-box.options';
-export {type WorkbenchMessageBoxLegacyOptions} from './lib/message-box/workbench-message-box-legacy.options';
 export {WorkbenchMessageBox} from './lib/message-box/workbench-message-box';
 export {type ɵMessageBoxContext, ɵMESSAGE_BOX_CONTEXT} from './lib/message-box/ɵworkbench-message-box-context';
 export {type WorkbenchNotificationCapability} from './lib/notification/workbench-notification-capability';

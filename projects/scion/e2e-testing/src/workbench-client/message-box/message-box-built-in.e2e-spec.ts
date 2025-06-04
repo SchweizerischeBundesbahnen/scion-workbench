@@ -13,7 +13,6 @@ import {MessageBoxOpenerPagePO} from '../page-object/message-box-opener-page.po'
 import {expect} from '@playwright/test';
 import {expectMessageBox} from '../../matcher/message-box-matcher';
 import {TextMessagePO} from '../page-object/text-message.po';
-import {LegacyMessageBoxOpenerPagePO} from '../page-object/test-pages/legacy-message-box-opener-page.po';
 
 test.describe('Workbench Message Box Built-in Capability', () => {
 
@@ -303,22 +302,5 @@ test.describe('Workbench Message Box Built-in Capability', () => {
         await expectMessageBox(textMessagePage).toBeVisible();
       });
     });
-  });
-
-  // @deprecated since workbench version 17.0.0-beta.9; PO will be removed in a future release.
-  test('should support legacy content option for workbench clients older than version v1.0.0-beta.23', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
-
-    // Open the message box.
-    const legacyMessageBoxOpenerPage = await LegacyMessageBoxOpenerPagePO.openInNewTab(appPO, microfrontendNavigator);
-    await legacyMessageBoxOpenerPage.open({content: 'TEXT', cssClass: 'testee'});
-
-    const messageBox = appPO.messagebox({cssClass: 'testee'});
-    const textMessagePage = new TextMessagePO(messageBox);
-
-    await expectMessageBox(textMessagePage).toBeVisible();
-    await expect(textMessagePage.text).toHaveText('TEXT');
   });
 });
