@@ -16,8 +16,6 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
  * Migrates the perspective layout from version 1 to version 2.
- *
- * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutMigrationV2 implements WorkbenchMigration {

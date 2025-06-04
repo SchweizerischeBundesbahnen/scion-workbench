@@ -22,7 +22,7 @@ export class DesktopPO {
    * Gets the active drop zone when dragging a view over the desktop.
    */
   public async getActiveDropZone(): Promise<'north' | 'east' | 'south' | 'west' | 'center' | null> {
-    const dropZone = this.page.locator('div.e2e-desktop-drop-zone');
+    const dropZone = this.page.locator('div.e2e-drop-zone[data-desktop]');
     if (!await dropZone.isVisible()) {
       return null;
     }

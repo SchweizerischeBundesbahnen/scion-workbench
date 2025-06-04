@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, createEnvironmentInjector, EnvironmentInjector, inject, Injectable, NgZone, runInInjectionContext} from '@angular/core';
+import {assertNotInReactiveContext, createEnvironmentInjector, DOCUMENT, EnvironmentInjector, inject, Injectable, NgZone, runInInjectionContext} from '@angular/core';
 import {WorkbenchDialogOptions} from './workbench-dialog.options';
 import {ɵWorkbenchDialog} from './ɵworkbench-dialog';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
@@ -18,7 +18,6 @@ import {WorkbenchDialogRegistry} from './workbench-dialog.registry';
 import {filter} from 'rxjs/operators';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialogService} from './workbench-dialog.service';
-import {DOCUMENT} from '@angular/common';
 import {provideViewContext} from '../view/view-context-provider';
 import {UUID} from '@scion/toolkit/uuid';
 

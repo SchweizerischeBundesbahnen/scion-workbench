@@ -18,6 +18,7 @@ import {expectView} from '../matcher/view-matcher';
 import {RouterPagePO} from './page-object/router-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH} from './workbench-layout-constants';
+import {DomRect} from '../helper/testing.util';
 
 test.describe('Activity Layout', () => {
 
@@ -2593,7 +2594,7 @@ test.describe('Activity Layout', () => {
 
       // Capture bounding boxes.
       const panelBoundingBox = await activityPanel.getBoundingBox();
-      const [topActivityBoundingBox] = await activityPanel.getActivityBoundingBoxes();
+      const [topActivityBoundingBox] = (await activityPanel.getActivityBoundingBoxes()) as [DomRect, ...DomRect[]];
 
       // Move splitter 100px to the top.
       await activityPanel.moveSplitter(-100);
@@ -2675,7 +2676,7 @@ test.describe('Activity Layout', () => {
 
       // Capture bounding boxes.
       const panelBoundingBox = await activityPanel.getBoundingBox();
-      const [topActivityBoundingBox] = await activityPanel.getActivityBoundingBoxes();
+      const [topActivityBoundingBox] = (await activityPanel.getActivityBoundingBoxes()) as [DomRect, ...DomRect[]];
 
       // Move splitter 100px to the top.
       await activityPanel.moveSplitter(-100);
@@ -2757,7 +2758,7 @@ test.describe('Activity Layout', () => {
 
       // Capture bounding boxes.
       const panelBoundingBox = await activityPanel.getBoundingBox();
-      const [leftActivityBoundingBox] = await activityPanel.getActivityBoundingBoxes();
+      const [leftActivityBoundingBox] = (await activityPanel.getActivityBoundingBoxes()) as [DomRect, ...DomRect[]];
 
       // Move splitter 100px to the left.
       await activityPanel.moveSplitter(-100);

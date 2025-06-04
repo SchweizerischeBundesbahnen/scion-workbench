@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
+import {DOCUMENT, EnvironmentProviders, inject, makeEnvironmentProviders} from '@angular/core';
 import {provideWorkbenchInitializer, WorkbenchStartupPhase} from '@scion/workbench';
 import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
-import {DOCUMENT} from '@angular/common';
 
 /**
  * Provides a set of DI providers to set design tokens based on {@link WorkbenchStartupQueryParams#DESIGN_TOKENS}.

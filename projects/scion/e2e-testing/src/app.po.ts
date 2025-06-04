@@ -61,6 +61,16 @@ export class AppPO {
   public readonly dialogs: Locator;
 
   /**
+   * Locates the drop placeholder.
+   */
+  public readonly dropPlaceholder: Locator;
+
+  /**
+   * Locates the drop zones.
+   */
+  public readonly dropZones: Locator;
+
+  /**
    * Enables programmatic interaction with the Workbench API.
    */
   public readonly workbench: WorkbenchAccessor;
@@ -71,6 +81,8 @@ export class AppPO {
     this.desktop = new DesktopPO(this.page);
     this.notifications = this.page.locator('wb-notification');
     this.dialogs = this.page.locator('wb-dialog');
+    this.dropPlaceholder = this.page.locator('div.e2e-drop-placeholder');
+    this.dropZones = this.page.locator('div.e2e-drop-zone');
     this.workbench = new WorkbenchAccessor(this.page);
   }
 

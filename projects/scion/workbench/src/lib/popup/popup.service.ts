@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, computed, createEnvironmentInjector, DestroyRef, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
+import {assertNotInReactiveContext, computed, createEnvironmentInjector, DestroyRef, DOCUMENT, effect, ElementRef, EnvironmentInjector, inject, Injectable, Injector, NgZone, runInInjectionContext, Signal, untracked} from '@angular/core';
 import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cdk/overlay';
 import {firstValueFrom, fromEvent} from 'rxjs';
 import {filter} from 'rxjs/operators';
@@ -19,7 +19,6 @@ import {Observables} from '@scion/toolkit/util';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {fromResize$} from '@scion/toolkit/observable';
 import {PopupComponent} from './popup.component';
-import {DOCUMENT} from '@angular/common';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';

@@ -2439,7 +2439,7 @@ describe('View', () => {
       const log = new Array<string>();
 
       @Component({selector: 'spec-view-1', template: '{{view.title()}}'})
-      class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
+      class SpecViewComponent1 implements OnInit {
 
         public readonly view = inject(WorkbenchView);
 
@@ -2455,7 +2455,7 @@ describe('View', () => {
       }
 
       @Component({selector: 'spec-view-2', template: '{{view.title()}}'})
-      class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
+      class SpecViewComponent2 implements OnInit {
 
         public readonly view = inject(WorkbenchView);
 
@@ -2502,7 +2502,7 @@ describe('View', () => {
       const log = new Array<string>();
 
       @Component({selector: 'spec-view-1', template: '{{view.title()}}'})
-      class SpecViewComponent1 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
+      class SpecViewComponent1 implements OnInit {
 
         public readonly view = inject(WorkbenchView);
 
@@ -2518,7 +2518,7 @@ describe('View', () => {
       }
 
       @Component({selector: 'spec-view-2', template: '{{view.title()}}'})
-      class SpecViewComponent2 implements OnInit { // eslint-disable-line @angular-eslint/component-class-suffix
+      class SpecViewComponent2 implements OnInit {
 
         public readonly view = inject(WorkbenchView);
 

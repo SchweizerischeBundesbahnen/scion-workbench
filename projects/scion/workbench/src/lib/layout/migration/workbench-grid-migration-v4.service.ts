@@ -15,8 +15,6 @@ import {MPartGridV4, MPartV4, MTreeNodeV4, MViewV4} from './model/workbench-grid
 
 /**
  * Migrates the workbench layout from version 3 to version 4.
- *
- * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV4 implements WorkbenchMigration {

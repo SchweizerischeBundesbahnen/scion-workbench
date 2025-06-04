@@ -13,7 +13,6 @@ import {OverlayRef} from '@angular/cdk/overlay';
 import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {KeyValuePipe, NgClass} from '@angular/common';
-import {PortalModule} from '@angular/cdk/portal';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
 import {ViewId} from '../../view/workbench-view.model';
 import {Maps} from '@scion/toolkit/util';
@@ -29,10 +28,8 @@ import {MenuItemComponent} from './menu-item/menu-item.component';
   imports: [
     NgClass,
     KeyValuePipe,
-    PortalModule,
     WbFormatAcceleratorPipe,
     MenuItemComponent,
-
   ],
 })
 export class ViewMenuComponent {

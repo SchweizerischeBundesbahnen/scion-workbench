@@ -102,7 +102,7 @@ export class ViewTabPO {
       return new Promise<boolean>(resolve => {
         const intersectionObserver = new IntersectionObserver(([entry]) => {
           intersectionObserver.disconnect();
-          resolve(entry.isIntersecting);
+          resolve(entry!.isIntersecting);
         }, {root: tabbarViewport, threshold: 1});
         intersectionObserver.observe(viewTabElement);
       });

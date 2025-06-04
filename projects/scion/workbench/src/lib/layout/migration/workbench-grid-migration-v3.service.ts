@@ -17,8 +17,6 @@ import {Routing} from '../../routing/routing.util';
 
 /**
  * Migrates the workbench layout from version 2 to version 3.
- *
- * TODO [Angular 20] Remove migrator.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV3 implements WorkbenchMigration {

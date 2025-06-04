@@ -8,11 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, inject, Injectable, NgZone} from '@angular/core';
+import {assertNotInReactiveContext, DOCUMENT, inject, Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject, fromEvent, Observable} from 'rxjs';
 import {ɵNotification} from './ɵnotification';
 import {NotificationConfig} from './notification.config';
-import {DOCUMENT} from '@angular/common';
 import {filter, map} from 'rxjs/operators';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
 import {Arrays} from '@scion/toolkit/util';

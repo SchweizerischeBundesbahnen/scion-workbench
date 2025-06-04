@@ -49,7 +49,7 @@ export class MessageBoxOpenerPagePO implements WorkbenchViewPagePO {
 
     const componentMatch = /^component:(?<component>.+)$/.exec(content);
     if (componentMatch) {
-      await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!.component);
+      await this.locator.locator('select.e2e-component').selectOption(componentMatch.groups!.component!);
     }
     else {
       await this.locator.locator('input.e2e-message').fill(content);

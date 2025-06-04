@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, Injector, Provider, Signal, untracked, viewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, ElementRef, inject, Injector, Provider, Signal, untracked, viewChild} from '@angular/core';
 import {ActivatedRoute, Params} from '@angular/router';
 import {firstValueFrom, Observable, Subject, switchMap} from 'rxjs';
 import {first, map, takeUntil} from 'rxjs/operators';
@@ -35,6 +35,7 @@ import {MicrofrontendWorkbenchView} from './microfrontend-workbench-view.model';
 import {Microfrontends} from '../common/microfrontend.util';
 import {Objects} from '../../common/objects.util';
 import {WorkbenchView} from '../../view/workbench-view.model';
+import {rootEffect} from '../../common/root-effect';
 
 /**
  * Embeds the microfrontend of a view capability.
@@ -118,10 +119,11 @@ export class MicrofrontendViewComponent {
    * Provides the view context to embedded content.
    */
   private propagateViewContext(): void {
-    effect(() => {
+    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    rootEffect(() => {
       const routerOutletElement = this._routerOutletElement().nativeElement;
       untracked(() => routerOutletElement.setContextValue(ɵVIEW_ID_CONTEXT_KEY, this.view.id));
-    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    });
   }
 
   private async onNavigate(prevCapability: WorkbenchViewCapability | null, capability: WorkbenchViewCapability | null, params: Params): Promise<void> {
@@ -237,23 +239,25 @@ export class MicrofrontendViewComponent {
   }
 
   private installViewActivePublisher(): void {
-    effect(() => {
+    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    rootEffect(() => {
       const active = this.view.active();
       untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewActiveTopic(this.view.id);
         void this._messageClient.publish(commandTopic, active, {retain: true});
       });
-    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    });
   }
 
   private installPartIdPublisher(): void {
-    effect(() => {
+    // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    rootEffect(() => {
       const part = this.view.part();
       untracked(() => {
         const commandTopic = ɵWorkbenchCommands.viewPartIdTopic(this.view.id);
         void this._messageClient.publish(commandTopic, part.id, {retain: true});
       });
-    }, {forceRoot: true}); // Run as root effect to run even if the parent component is detached from change detection (e.g., if the view is not visible).
+    });
   }
 
   /**

@@ -83,7 +83,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
       ],
     });
-    return new ComponentPortal(this._partComponent, null, injector, null, null);
+    return new ComponentPortal(this._partComponent, null, injector);
   }
 
   /**

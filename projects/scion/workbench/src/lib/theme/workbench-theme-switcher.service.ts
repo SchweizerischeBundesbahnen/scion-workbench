@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {effect, inject, Injectable, untracked} from '@angular/core';
-import {DOCUMENT} from '@angular/common';
+import {DOCUMENT, effect, inject, Injectable, untracked} from '@angular/core';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {map, subscribeOn} from 'rxjs/operators';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';

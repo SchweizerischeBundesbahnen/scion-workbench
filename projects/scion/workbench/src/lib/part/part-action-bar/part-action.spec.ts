@@ -135,13 +135,13 @@ describe('PartAction', () => {
       };
     });
 
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
     expect(actionConstructCount['part.left']).toEqual({action1: 1, action2: 1, action3: 0});
     expect(actionConstructCount['part.right']).toEqual({action1: 1, action2: 1, action3: 0});
 
     // Change action 2 contained in the left part.
     trackedSignals['part.left'].action2.set(UUID.randomUUID());
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect only action 2 in the left part to be re-constructed.
     expect(actionConstructCount['part.left']).toEqual({action1: 1, action2: 2, action3: 0});
@@ -149,7 +149,7 @@ describe('PartAction', () => {
 
     // Change action 1 contained in the right part.
     trackedSignals['part.right'].action1.set(UUID.randomUUID());
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect only action 1 in the right part to be re-constructed.
     expect(actionConstructCount['part.left']).toEqual({action1: 1, action2: 2, action3: 0});
@@ -164,7 +164,7 @@ describe('PartAction', () => {
         content: SpecActionComponent,
       };
     });
-    TestBed.flushEffects();
+    TestBed.tick(); // flush effects
 
     // Expect action 1 and action 2 not to be re-constructed.
     expect(actionConstructCount['part.left']).toEqual({action1: 1, action2: 2, action3: 1});

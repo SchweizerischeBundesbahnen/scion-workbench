@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DoCheck, HostBinding, inject, NgZone} from '@angular/core';
+import {Component, DoCheck, DOCUMENT, HostBinding, inject, NgZone} from '@angular/core';
 import {filter} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {DOCUMENT} from '@angular/common';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
 import {fromEvent} from 'rxjs';

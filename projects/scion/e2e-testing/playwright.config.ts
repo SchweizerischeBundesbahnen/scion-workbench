@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {PlaywrightTestConfig} from '@playwright/test';
 import {CustomMatchers} from './src/matcher/custom-matchers.definition';
+import {defineConfig} from '@playwright/test';
 
 const runInCI = !!process.env.CI;
 const runHeadless = !!process.env.HEADLESS;
 
-export default {
+export default defineConfig({
   forbidOnly: runInCI,
   fullyParallel: true,
   webServer: runInCI ? [
@@ -38,7 +38,7 @@ export default {
       port: 4300,
       reuseExistingServer: false,
     },
-    // TODO [Angular 20] remove when `@angular-devkit/build-angular:browser` builder is deprecated
+    // TODO [Angular 21] remove when `@angular-devkit/build-angular:browser` builder is deprecated
     {
       command: 'npm run workbench-testing-app:basehref-webpack:dist-serve',
       port: 4400,
@@ -57,8 +57,8 @@ export default {
     },
   },
   maxFailures: runInCI ? 1 : undefined,
-  testMatch: /.*\.e2e-spec\.js/,
-} satisfies PlaywrightTestConfig;
+  testMatch: /.*\.e2e-spec\.ts/,
+});
 
 // Install SCION-specific matchers that can be used as expectations.
 CustomMatchers.install();

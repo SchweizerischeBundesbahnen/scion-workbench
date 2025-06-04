@@ -60,15 +60,19 @@ export class AppHeaderPO {
    * Clicks specified setting in settings menu.
    */
   public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
-    await this._locator.locator('button.e2e-settings-menu-button').click();
-
-    const menuItem = this._locator.page()
+    const menu = this._locator.page()
       .locator('.e2e-application-menu') // CDK overlay
-      .locator('app-menu')
-      .locator(`button.e2e-menu-item.${locateBy.cssClass}`);
+      .locator('app-menu');
 
-    // Wait until the menu is attached.
-    await menuItem.waitFor({state: 'attached'});
+    // Open the menu only if not yet opened.
+    if (!await menu.isVisible()) {
+      await this._locator.locator('button.e2e-settings-menu-button').click();
+      // Wait until the menu is opened.
+      await menu.waitFor({state: 'visible'});
+    }
+
+    // Locate the menu item.
+    const menuItem = menu.locator(`button.e2e-menu-item.${locateBy.cssClass}`);
 
     // Do not toggle the menu item if already in the expected state.
     if (options?.check !== undefined && (await menuItem.locator('span.e2e-check-mark').isVisible()) === options.check) {

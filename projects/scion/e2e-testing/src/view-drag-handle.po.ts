@@ -11,6 +11,7 @@
 import {DomRect, fromRect, throwError} from './helper/testing.util';
 import {Locator, Mouse, Page} from '@playwright/test';
 import {ActivityId, PartId} from '@scion/workbench';
+import {MAIN_AREA} from './workbench.model';
 
 /**
  * Reference to the drag handle of a view to control drag and drop.
@@ -83,17 +84,23 @@ export class ViewDrageHandlePO {
    * @param partId - Specifies the part to drag the tab into.
    * @param options - Controls the drag operation.
    * @param options.region - Specifies into which region of the part to drag the view.
-   * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position. Defaults to `true`, starting from the center of the part.
+   * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position, not from the center of the part,
+   *                                 only dragging to the specified region. Defaults to `true`, starting from the center of the part.
    * @param options.orElse - If `false` and the drop zone cannot be located, returns `false` instead of throwing an error.
    */
   public async dragToPart(partId: PartId, options: {region: 'north' | 'east' | 'south' | 'west' | 'center'; dragFromCenter?: false; orElse?: false}): Promise<boolean> {
     if (options.dragFromCenter ?? true) {
       const partBounds = fromRect(await this._page.locator(`wb-part[data-partid="${partId}"]`).boundingBox());
       await this.dragTo({x: partBounds.hcenter, y: partBounds.vcenter});
+
+      // If the main area part, shift pointer by 1 pixel to not hover the part splitters.
+      if (partId === MAIN_AREA) {
+        await this.dragTo({deltaX: 1, deltaY: 1});
+      }
     }
 
     return this.dragToRegion(options.region, {
-      dropZoneLocator: this._page.locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-part-drop-zone[data-partid="${partId}"]`),
+      dropZoneLocator: this._page.locator(`wb-part[data-partid="${partId}"]`).locator(`div.e2e-drop-zone[data-partid="${partId}"]`),
       orElse: options.orElse,
     });
   }
@@ -105,17 +112,21 @@ export class ViewDrageHandlePO {
    * @param dragTo.grid - Specifies the target grid.
    * @param dragTo.region - Specifies the drop region.
    * @param options - Controls the drag operation.
-   * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position. Defaults to `true`, starting from the center.
+   * @param options.dragFromCenter - If `false`, starts dragging from the current pointer position, not from the center of the grid,
+   *                                 only dragging to the specified region. Defaults to `true`, starting from the center of the grid.
    * @param options.orElse - If `false` and the drop zone cannot be located, returns `false` instead of throwing an error.
    */
   public async dragToGrid(dragTo: {grid: 'main' | 'main-area' | ActivityId; region: 'north' | 'east' | 'south' | 'west'}, options?: {dragFromCenter?: false; orElse?: false}): Promise<boolean> {
     if (options?.dragFromCenter ?? true) {
       const {hcenter, vcenter} = fromRect(this._page.viewportSize());
       await this.dragTo({x: hcenter, y: vcenter});
+
+      // Shift pointer by 1 pixel to not hover the part splitters.
+      await this.dragTo({deltaX: 1, deltaY: 1});
     }
 
     return this.dragToRegion(dragTo.region, {
-      dropZoneLocator: this._page.locator('wb-layout').locator(`div.e2e-grid-drop-zone[data-grid="${dragTo.grid}"]`),
+      dropZoneLocator: this._page.locator('wb-layout').locator(`div.e2e-drop-zone[data-grid="${dragTo.grid}"]`),
       orElse: options?.orElse,
     });
   }
@@ -145,6 +156,9 @@ export class ViewDrageHandlePO {
         while ((await dropZoneLocator.getAttribute('data-region')) !== 'east' && this._x < right) {
           await this.dragTo({deltaY: 0, deltaX: 5}, {steps: 1});
         }
+        break;
+      case 'center':
+        await this.dragTo({deltaY: 0, deltaX: 0}, {steps: 10});
         break;
     }
 

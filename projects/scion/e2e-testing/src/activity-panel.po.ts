@@ -69,7 +69,7 @@ export class ActivityPanelPO {
     const mouse = this.locator.page().mouse;
     const steps = Math.ceil(Math.abs(distance) / 5);
 
-    const [activityBounds] = await this.getActivityBoundingBoxes();
+    const [activityBounds] = (await this.getActivityBoundingBoxes()) as [DomRect, ...DomRect[]];
     switch (await this.getPanel()) {
       case 'left':
       case 'right': {

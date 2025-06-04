@@ -1,5 +1,5 @@
 @if (activityId1() && activityId2()) {
-  <sci-sashbox [direction]="direction()" (sashStart)="onSashStart()" (sashEnd2)="onSashEnd($event)">
+  <sci-sashbox [direction]="direction()" (sashStart)="onSashStart()" (sashEnd)="onSashEnd($event)">
     <ng-template sciSash [size]="sashSizes().sash1" key="sash1">
       <ng-container *ngTemplateOutlet="activity_template; context: {$implicit: activityId1()}"/>
     </ng-template>
@@ -20,7 +20,6 @@
            [gridDropZone]="{
              dropRegionSize: .15,
              dropPlaceholderSize: .15,
-             dropZoneCssClass: 'e2e-grid-drop-zone',
              dropZoneAttributes: {'data-grid': activityId},
            }"/>
 </ng-template>
