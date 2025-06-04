@@ -49,7 +49,7 @@
       </ng-template>
       <ng-template #panel_referrer>
         <sci-form-field label="View ID">
-          <output class="e2e-view-id" [value]="popup.referrer.viewId ?? '<undefined>'"></output>
+          <output class="e2e-view-id" [value]="view?.id ?? '<undefined>'"></output>
         </sci-form-field>
       </ng-template>
     </sci-accordion>

@@ -9,7 +9,7 @@
  */
 
 import {Component, HostBinding, inject} from '@angular/core';
-import {Popup} from '@scion/workbench';
+import {Popup, WorkbenchView} from '@scion/workbench';
 import {UUID} from '@scion/toolkit/uuid';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -37,6 +37,7 @@ export class PopupPageComponent {
 
   protected readonly popup = inject(Popup);
   protected readonly uuid = UUID.randomUUID();
+  protected readonly view = inject(WorkbenchView, {optional: true});
 
   protected readonly form = this._formBuilder.group({
     minHeight: this._formBuilder.control(''),

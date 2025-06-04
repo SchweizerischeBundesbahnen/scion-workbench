@@ -11,7 +11,7 @@
 import {assertNotInReactiveContext, ElementRef, EnvironmentInjector, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
-import {Arrays, Dictionaries} from '@scion/toolkit/util';
+import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs/operators';
@@ -189,13 +189,6 @@ export abstract class Popup<T = unknown, R = unknown> {
   public abstract readonly size: PopupSize | undefined;
 
   /**
-   * Provides information about the context in which this popup was opened.
-   *
-   * @deprecated since version 18.0.0-beta.4; Inject {@link WorkbenchView} instead.
-   */
-  public abstract readonly referrer: PopupReferrer;
-
-  /**
    * CSS classes associated with the popup.
    */
   public abstract readonly cssClasses: string[];
@@ -222,9 +215,6 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
   };
 
   public readonly cssClasses: string[];
-  public readonly referrer: PopupReferrer = Dictionaries.withoutUndefinedEntries({
-    viewId: this._context.view?.id,
-  });
 
   /**
    * Indicates whether this popup is blocked by dialog(s) that overlay it.
@@ -295,14 +285,4 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
   public destroy(): void {
     this._popupEnvironmentInjector.destroy();
   }
-}
-
-/**
- * Information about the context in which a popup was opened.
- */
-export interface PopupReferrer {
-  /**
-   * Identity of the view if opened in the context of a view.
-   */
-  viewId?: ViewId;
 }
