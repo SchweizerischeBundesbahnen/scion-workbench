@@ -35,7 +35,6 @@ import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 import {Routing} from '../routing/routing.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
-import {MicrofrontendMessageBoxLegacyIntentTranslator} from './microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
 import {providePerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
 import {MicrofrontendPerspectiveIntentHandler} from './microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
@@ -63,7 +62,6 @@ export function provideWorkbenchMicrofrontendSupport(workbenchConfig: WorkbenchC
     MicrofrontendViewIntentHandler,
     MicrofrontendPopupIntentHandler,
     MicrofrontendDialogIntentHandler,
-    MicrofrontendMessageBoxLegacyIntentTranslator,
     MicrofrontendMessageBoxIntentHandler,
     MicrofrontendPerspectiveCapabilityValidator,
     MicrofrontendViewCapabilityValidator,

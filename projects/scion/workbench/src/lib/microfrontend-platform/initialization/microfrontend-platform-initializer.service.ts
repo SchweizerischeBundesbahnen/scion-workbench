@@ -27,7 +27,6 @@ import {MicrofrontendDialogCapabilityValidator} from '../microfrontend-dialog/mi
 import {MicrofrontendViewCapabilityValidator} from '../microfrontend-view/microfrontend-view-capability-validator.interceptor';
 import {StableCapabilityIdAssigner} from '../stable-capability-id-assigner.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from '../microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {MicrofrontendMessageBoxLegacyIntentTranslator} from '../microfrontend-message-box/microfrontend-message-box-legacy-intent-translator.interceptor';
 import {MicrofrontendPerspectiveCapabilityValidator} from '../microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
 import {MicrofrontendPerspectiveIntentHandler} from '../microfrontend-perspective/microfrontend-perspective-intent-handler.interceptor';
 
@@ -45,7 +44,6 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
   private readonly _popupIntentHandler = inject(MicrofrontendPopupIntentHandler);
   private readonly _dialogIntentHandler = inject(MicrofrontendDialogIntentHandler);
   private readonly _messageBoxIntentHandler = inject(MicrofrontendMessageBoxIntentHandler);
-  private readonly _messageBoxLegacyIntentTranslator = inject(MicrofrontendMessageBoxLegacyIntentTranslator);
   private readonly _viewCapabilityValidator = inject(MicrofrontendViewCapabilityValidator);
   private readonly _perspectiveCapabilityValidator = inject(MicrofrontendPerspectiveCapabilityValidator);
   private readonly _popupCapabilityValidator = inject(MicrofrontendPopupCapabilityValidator);
@@ -97,9 +95,6 @@ export class MicrofrontendPlatformInitializer implements OnDestroy {
 
     // Register dialog intent interceptor to open the corresponding dialog.
     Beans.register(IntentInterceptor, {useValue: this._dialogIntentHandler, multi: true});
-
-    // Register message box intent interceptor to provide backward compatibility for workbench clients older than version v1.0.0-beta.23.
-    Beans.register(IntentInterceptor, {useValue: this._messageBoxLegacyIntentTranslator, multi: true});
 
     // Register message box intent interceptor to open the corresponding message box.
     Beans.register(IntentInterceptor, {useValue: this._messageBoxIntentHandler, multi: true});
