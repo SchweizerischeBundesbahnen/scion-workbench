@@ -9,5 +9,5 @@
  */
 
 export {PopupService} from './popup.service';
-export {Popup, PopupConfig, type CloseStrategy, type PopupSize, type PopupReferrer} from './popup.config';
+export {Popup, PopupConfig, type CloseStrategy, type PopupSize} from './popup.config';
 export {type Point, type TopLeftPoint, type TopRightPoint, type BottomLeftPoint, type BottomRightPoint, type PopupOrigin} from './popup.origin';

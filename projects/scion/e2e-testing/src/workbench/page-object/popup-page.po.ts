@@ -10,7 +10,7 @@
 
 import {withoutUndefinedEntries} from '../../helper/testing.util';
 import {PopupPO} from '../../popup.po';
-import {PopupReferrer, PopupSize} from '@scion/workbench';
+import {PopupSize, ViewId} from '@scion/workbench';
 import {SciAccordionPO} from '../../@scion/components.internal/accordion.po';
 import {Locator} from '@playwright/test';
 import {WorkbenchPopupPagePO} from './workbench-popup-page.po';
@@ -69,7 +69,7 @@ export class PopupPagePO implements WorkbenchPopupPagePO {
     }
   }
 
-  public async getReferrer(): Promise<PopupReferrer> {
+  public async getReferrer(): Promise<{viewId?: ViewId}> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-referrer'));
     await accordion.expand();
     try {
