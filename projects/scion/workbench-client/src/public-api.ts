@@ -14,7 +14,7 @@
 export {WorkbenchClient} from './lib/workbench-client';
 export {WorkbenchRouter, type WorkbenchNavigationExtras, ɵMicrofrontendRouteParams, type ɵViewParamsUpdateCommand} from './lib/routing/workbench-router';
 export {type WorkbenchViewCapability, type ViewParamDefinition} from './lib/view/workbench-view-capability';
-export {WorkbenchView, type CanClose, type CanCloseFn, type CanCloseRef, type ViewSnapshot, type ViewId} from './lib/view/workbench-view';
+export {WorkbenchView, type CanCloseFn, type CanCloseRef, type ViewSnapshot, type ViewId} from './lib/view/workbench-view';
 export {ɵVIEW_ID_CONTEXT_KEY, ɵWorkbenchView} from './lib/view/ɵworkbench-view';
 export {WorkbenchCapabilities} from './lib/workbench-capabilities.enum';
 export {ɵWorkbenchCommands} from './lib/ɵworkbench-commands';

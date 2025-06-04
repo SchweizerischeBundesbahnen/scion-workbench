@@ -95,8 +95,7 @@ export class MicrofrontendViewComponent {
     this.keystrokesToBubble = this.computeKeyStrokesToBubble();
     this.installViewActivePublisher();
     this.installPartIdPublisher();
-    this.installCanCloseGuard(ɵWorkbenchCommands.canCloseTopic(this.view.id));
-    this.installCanCloseGuard(ɵWorkbenchCommands.viewClosingTopic(this.view.id));
+    this.installCanCloseGuard();
     this.installMenuAccelerators();
     this.propagateWorkbenchTheme();
     this.propagateViewContext();
@@ -272,7 +271,8 @@ export class MicrofrontendViewComponent {
     await firstValueFrom(viewParams$);
   }
 
-  private installCanCloseGuard(canCloseTopic: string): void {
+  private installCanCloseGuard(): void {
+    const canCloseTopic = ɵWorkbenchCommands.canCloseTopic(this.view.id);
     let canCloseRef: CanCloseRef | undefined;
     this._messageClient.subscriberCount$(canCloseTopic)
       .pipe(
