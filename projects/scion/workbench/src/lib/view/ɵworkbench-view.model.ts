@@ -11,7 +11,7 @@
 import {firstValueFrom, Observable} from 'rxjs';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {ViewDragService, ViewMoveEventSource} from '../view-dnd/view-drag.service';
-import {CanClose, CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../workbench.model';
+import {CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} from '../workbench.model';
 import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
@@ -60,10 +60,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _closable = signal(true);
   private readonly _blockedBy: Signal<ɵWorkbenchDialog | null>;
   private readonly _scrolledIntoView = signal(true);
-  private readonly _classBasedCanCloseGuard = this.constructClassBasedCanCloseGuard();
 
   private _activationInstant: number | undefined;
-  private _canCloseFn: (() => Promise<boolean>) | undefined;
 
   public alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchViewNavigation | undefined>(undefined);
@@ -82,6 +80,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly portal: WbComponentPortal;
   public readonly classList = new ClassList();
   public readonly isClosable = computed(() => this._closable() && !this._blockedBy());
+
+  /**
+   * Guard to confirm closing the view, if any.
+   *
+   * @see canClose
+   */
+  public canCloseGuard: (() => Promise<boolean>) | undefined;
 
   constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout, options: {component: ComponentType<ViewComponent>}) {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
@@ -133,7 +138,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       this.dirty = false;
       this.classList.route = Routing.lookupRouteData(route, WorkbenchRouteData.cssClass);
       this.classList.application = [];
-      this._canCloseFn = undefined;
+      this.canCloseGuard = undefined;
     }
 
     // Test if this view was navigated. Navigation does not necessarily cause the route to change.
@@ -305,7 +310,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public canClose(canClose: CanCloseFn): CanCloseRef {
-    const canCloseFn = this._canCloseFn = async (): Promise<boolean> => {
+    const canCloseGuard = this.canCloseGuard = async (): Promise<boolean> => {
       try {
         const close = runInInjectionContext(this.portal.componentRef.injector, canClose);
         return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
@@ -318,18 +323,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
     return {
       dispose: () => {
-        if (canCloseFn === this._canCloseFn) {
-          this._canCloseFn = undefined;
+        if (canCloseGuard === this.canCloseGuard) {
+          this.canCloseGuard = undefined;
         }
       },
     };
-  }
-
-  /**
-   * Reference to the `CanClose` guard registered on this view, if any.
-   */
-  public get canCloseGuard(): (() => Promise<boolean>) | undefined {
-    return this._canCloseFn ?? (typeof this.getComponent<CanClose>()?.canClose === 'function' ? this._classBasedCanCloseGuard : undefined);
   }
 
   /**
@@ -377,24 +375,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         this._activationInstant = this._activationInstantProvider.now();
       }
     });
-  }
-
-  /**
-   * Provides legacy support for deprecated class-based {@link CanClose} guard.
-   *
-   * @deprecated since version 18.0.0-beta.9. No longer needed with the removal of class-based {@link CanClose} guard.
-   */
-  private constructClassBasedCanCloseGuard(): () => Promise<boolean> {
-    return async () => {
-      try {
-        const close = runInInjectionContext(this.portal.componentRef.injector, () => this.getComponent<CanClose>()!.canClose());
-        return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
-      }
-      catch (error) {
-        this._logger.error(`Unhandled error while invoking 'CanClose' guard of view '${this.id}'.`, error);
-        return true;
-      }
-    };
   }
 
   /**

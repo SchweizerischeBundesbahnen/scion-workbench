@@ -15,36 +15,6 @@ import {Injector, TemplateRef} from '@angular/core';
 import {WorkbenchPart} from './part/workbench-part.model';
 
 /**
- * Guard that a view can implement to decide whether it can be closed.
- *
- * The following example implements a `CanClose` guard that asks the user whether the view can be closed.
- *
- * ```ts
- * class ViewComponent implements CanClose {
- *
- *   public async canClose(): Promise<boolean> {
- *     const action = await inject(WorkbenchMessageBoxService).open('Do you want to close this view?', {
- *       actions: {yes: 'Yes', no: 'No'},
- *     });
- *     return action === 'yes';
- *   }
- * }
- * ```
- * @deprecated since version 18.0.0-beta.9. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
- */
-export interface CanClose {
-
-  /**
-   * Decides whether this view can be closed.
-   *
-   * This function can call `inject` to get any required dependencies.
-   *
-   * @deprecated since version 18.0.0-beta.9. Register a callback on {@link WorkbenchView.canClose} instead of implementing the {@link CanClose} lifecycle hook. Refer to the {@link WorkbenchView.canClose} documentation for an example. This API will be removed in a future release.
-   */
-  canClose(): Observable<boolean> | Promise<boolean> | boolean;
-}
-
-/**
  * The signature of a function to confirm closing a view., e.g., if dirty.
  *
  * The function can call `inject` to get dependencies.

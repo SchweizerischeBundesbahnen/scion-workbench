@@ -86,12 +86,6 @@
     <sci-checkbox [formControl]="form.controls.confirmClosing" class="e2e-confirm-closing"/>
   </sci-form-field>
 
-  @if (form.controls.confirmClosing.value) {
-    <sci-form-field label="Use Legacy Guard" title="Check to use the deprecated class-based CanClose guard.">
-      <sci-checkbox [formControl]="form.controls.useClassBasedCanCloseGuard" class="e2e-class-based-can-close-guard"/>
-    </sci-form-field>
-  }
-
   <sci-form-field label="CSS Class(es)">
     <app-multi-value-input [formControl]="form.controls.cssClass" [placeholder]="'class-1 class-2'" class="e2e-class"/>
   </sci-form-field>
