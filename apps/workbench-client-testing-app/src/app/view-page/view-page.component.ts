@@ -10,11 +10,11 @@
 
 import {Component, inject} from '@angular/core';
 import {FormGroup, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
-import {CanClose, CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
+import {CanCloseRef, WorkbenchMessageBoxService, WorkbenchRouter, WorkbenchView} from '@scion/workbench-client';
 import {ActivatedRoute} from '@angular/router';
 import {UUID} from '@scion/toolkit/uuid';
-import {mergeWith, MonoTypeOperatorFunction, NEVER} from 'rxjs';
-import {finalize, map, startWith, take} from 'rxjs/operators';
+import {MonoTypeOperatorFunction, NEVER} from 'rxjs';
+import {finalize, startWith, take} from 'rxjs/operators';
 import {APP_INSTANCE_ID} from '../app-instance-id';
 import {KeyValueEntry, SciKeyValueFieldComponent} from '@scion/components.internal/key-value-field';
 import {AsyncPipe, JsonPipe, Location} from '@angular/common';
@@ -64,8 +64,6 @@ export default class ViewPageComponent {
     heading: this._formBuilder.control(''),
     closable: this._formBuilder.control(true),
     confirmClosing: this._formBuilder.control(false),
-    /** @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard. */
-    useClassBasedCanCloseGuard: this._formBuilder.control(false),
     selfNavigation: this._formBuilder.group({
       params: this._formBuilder.array<FormGroup<KeyValueEntry>>([]),
       paramsHandling: this._formBuilder.control<'merge' | 'replace' | ''>(''),
@@ -80,7 +78,6 @@ export default class ViewPageComponent {
     this.view.setClosable(this.form.controls.closable.valueChanges.pipe(this.logCompletion('ClosableObservableComplete')));
 
     this.installCanCloseGuard();
-    this.installClassBasedCanCloseGuard();
     this.installViewActiveStateLogger();
     this.installObservableCompletionLogger();
     this.setInitialTitleFromParams();
@@ -133,50 +130,20 @@ export default class ViewPageComponent {
     }
   }
 
-  /**
-   * Installs a {@link CanClose} guard depending on the current settings.
-   */
   private installCanCloseGuard(): void {
     let canCloseRef: CanCloseRef | undefined;
 
     this.form.controls.confirmClosing.valueChanges
       .pipe(
-        mergeWith(this.form.controls.useClassBasedCanCloseGuard.valueChanges.pipe(map(() => this.form.controls.confirmClosing.value))),
         startWith(this.form.controls.confirmClosing.value),
         takeUntilDestroyed(),
       )
       .subscribe(confirmClosing => {
-        if (confirmClosing && !this.form.controls.useClassBasedCanCloseGuard.value) {
+        if (confirmClosing) {
           canCloseRef = this.view.canClose(() => this.confirmClosing());
         }
         else {
           canCloseRef?.dispose();
-        }
-      });
-  }
-
-  /**
-   * Installs a class-based {@link CanClose} guard depending on the current settings.
-   *
-   * @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard.
-   */
-  private installClassBasedCanCloseGuard(): void {
-    const canCloseGuard = {
-      canClose: () => this.confirmClosing(),
-    } satisfies CanClose;
-
-    this.form.controls.confirmClosing.valueChanges
-      .pipe(
-        mergeWith(this.form.controls.useClassBasedCanCloseGuard.valueChanges.pipe(map(() => this.form.controls.confirmClosing.value))),
-        startWith(this.form.controls.confirmClosing.value),
-        takeUntilDestroyed(),
-      )
-      .subscribe(confirmClosing => {
-        if (confirmClosing && this.form.controls.useClassBasedCanCloseGuard.value) {
-          this.view.addCanClose(canCloseGuard);
-        }
-        else {
-          this.view.removeCanClose(canCloseGuard);
         }
       });
   }

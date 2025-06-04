@@ -22,6 +22,7 @@ import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {SciRouterOutletPO} from './page-object/sci-router-outlet.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
+import {waitForCondition} from '../helper/testing.util';
 
 test.describe('Workbench View', () => {
 
@@ -245,41 +246,6 @@ test.describe('Workbench View', () => {
     await expectView(testeeViewPage).not.toBeAttached();
   });
 
-  /** @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard. */
-  test('should prevent closing a view using the deprecated class-based `CanClose` guard', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
-
-    // Open view.
-    const testeeViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    await testeeViewPage.checkConfirmClosing(true);
-    await testeeViewPage.checkUseClassBasedCanCloseGuard(true);
-
-    // Close view.
-    await testeeViewPage.view.tab.close();
-
-    // Expect the closing to be blocked.
-    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
-    await expectView(testeeViewPage).toBeActive();
-
-    // Cancel closing.
-    await canCloseMessageBox.clickActionButton('no');
-    await expectView(testeeViewPage).toBeActive();
-
-    // Close view.
-    await testeeViewPage.view.tab.close();
-
-    // Expect the closing to be blocked.
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
-    await expectView(testeeViewPage).toBeActive();
-
-    // Confirm closing.
-    await canCloseMessageBox.clickActionButton('yes');
-    await expectView(testeeViewPage).not.toBeAttached();
-  });
-
   test('should unregister `CanClose` guard', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
@@ -288,37 +254,6 @@ test.describe('Workbench View', () => {
     // Open view.
     const testeeViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
     await testeeViewPage.checkConfirmClosing(true);
-
-    // Close view.
-    await testeeViewPage.view.tab.close();
-
-    // Expect the closing to be blocked.
-    const canCloseMessageBox = appPO.messagebox({cssClass: ['e2e-close-view', await testeeViewPage.view.getViewId()]});
-    await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox)).toBeVisible();
-    await expectView(testeeViewPage).toBeActive();
-
-    // Cancel closing.
-    await canCloseMessageBox.clickActionButton('no');
-    await expectView(testeeViewPage).toBeActive();
-
-    // Unregister `CanClose` guard.
-    await testeeViewPage.checkConfirmClosing(false);
-
-    // Close view.
-    await testeeViewPage.view.tab.close();
-    await expectView(testeeViewPage).not.toBeAttached();
-  });
-
-  /** @deprecated since version 1.0.0-beta.28. No longer needed with the removal of class-based {@link CanClose} guard. */
-  test('should unregister deprecated class-based `CanClose` guard', async ({appPO, microfrontendNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: true});
-
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
-
-    // Open view.
-    const testeeViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
-    await testeeViewPage.checkConfirmClosing(true);
-    await testeeViewPage.checkUseClassBasedCanCloseGuard(true);
 
     // Close view.
     await testeeViewPage.view.tab.close();
@@ -601,6 +536,91 @@ test.describe('Workbench View', () => {
     await expectView(differentPage).not.toBeAttached();
     await expectView(routerPage).toBeActive();
     await expect(appPO.views()).toHaveCount(1);
+  });
+
+  /**
+   * This test verifies the view handle to unregister the `CanClose` guard of a previous microfrontend of the same app correctly,
+   * i.e., before the registration of the `CanClose` guard of the new microfrontend.
+   */
+  test('should allow for registration of a `CanClose` guard if navigated to different microfrontend (same app)', async ({appPO, workbenchNavigator, microfrontendNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: true});
+
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox'});
+
+    // Register view 1.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'view-1'},
+      properties: {
+        path: 'test-pages/view-test-page/view1',
+        title: 'View 1',
+        showSplash: true,
+      },
+    });
+
+    // Register view 2.
+    await microfrontendNavigator.registerCapability('app1', {
+      type: 'view',
+      qualifier: {component: 'view-2'},
+      properties: {
+        path: 'test-pages/view-test-page/view2',
+        title: 'View 2',
+        showSplash: true,
+      },
+    });
+
+    // Create layout to open views to the right.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'}),
+    );
+
+    // Open view-1.
+    const routerPage = await microfrontendNavigator.openInNewTab(RouterPagePO, 'app1');
+    await routerPage.navigate({component: 'view-1'}, {
+      partId: 'part.right',
+      target: 'view.100',
+    });
+
+    // Enable Close guard.
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await viewPage.checkConfirmClosing(true);
+
+    // Capture component instance.
+    const componentInstance1 = await viewPage.getComponentInstanceId();
+
+    // Close view.
+    await viewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    const canCloseMessageBox = new TextMessageBoxPagePO(appPO.messagebox({cssClass: ['e2e-close-view', 'view.100']}));
+    await expectMessageBox(canCloseMessageBox).toBeVisible();
+    await expectView(viewPage).toBeActive();
+
+    // Cancel closing.
+    await canCloseMessageBox.messageBox.clickActionButton('no');
+
+    // Navigate view to view-2.
+    await routerPage.navigate({component: 'view-2'}, {
+      partId: 'part.right',
+      target: 'view.100',
+    });
+
+    // Wait until displaying view-2.
+    await waitForCondition(async () => (await viewPage.getComponentInstanceId()) !== componentInstance1);
+
+    // Enable Close guard.
+    await viewPage.checkConfirmClosing(true);
+
+    // Close view.
+    await viewPage.view.tab.close();
+
+    // Expect the closing to be blocked.
+    await expectMessageBox(canCloseMessageBox).toBeVisible();
+
+    // Confirm closing.
+    await canCloseMessageBox.messageBox.clickActionButton('yes');
+    await expectView(viewPage).not.toBeAttached();
   });
 
   test('should display text and title of message box opened in `CanClose` guard', async ({appPO, microfrontendNavigator}) => {

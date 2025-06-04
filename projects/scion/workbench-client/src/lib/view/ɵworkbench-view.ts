@@ -16,7 +16,7 @@ import {ɵWorkbenchCommands} from '../ɵworkbench-commands';
 import {distinctUntilChanged, filter, map, mergeMap, shareReplay, skip, switchMap, takeUntil, tap} from 'rxjs/operators';
 import {ɵMicrofrontendRouteParams} from '../routing/workbench-router';
 import {Observables} from '@scion/toolkit/util';
-import {CanClose, CanCloseFn, CanCloseRef, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
+import {CanCloseFn, CanCloseRef, ViewId, ViewSnapshot, WorkbenchView} from './workbench-view';
 import {decorateObservable} from '../observable-decorator';
 
 export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
@@ -32,7 +32,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
    * Observable that emits before navigating to a different microfrontend of the same app.
    */
   private _beforeInAppNavigation$ = new Subject<void>();
-  private _canCloseFn: CanCloseFn | CanClose | undefined;
+  private _canCloseFn: CanCloseFn | undefined;
   private _canCloseSubscription: Subscription | undefined;
 
   public active$: Observable<boolean>;
@@ -89,8 +89,11 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(params => this.snapshot.params = new Map(params));
     // Detect navigation to a different view capability of the same app.
-    this.capability$
+    // Do NOT use `capability$` observable to detect capability change, as its lookup is asynchronous.
+    this.params$
       .pipe(
+        map(params => params.get(ɵMicrofrontendRouteParams.ɵVIEW_CAPABILITY_ID) as string),
+        distinctUntilChanged(),
         skip(1), // skip the initial navigation
         takeUntil(merge(this._beforeUnload$, this._destroy$)),
       )
@@ -98,6 +101,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
         this._beforeInAppNavigation$.next();
         this._canCloseFn = undefined;
         this._canCloseSubscription?.unsubscribe();
+        this._canCloseSubscription = undefined;
       });
 
     // Signal view properties available.
@@ -163,28 +167,9 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
   }
 
   /** @inheritDoc */
-  public addCanClose(canClose: CanClose): void {
-    this.canClose(canClose);
-  }
-
-  /** @inheritDoc */
-  public removeCanClose(canClose: CanClose): void {
-    if (canClose === this._canCloseFn) {
-      this._canCloseSubscription!.unsubscribe();
-      this._canCloseSubscription = undefined;
-      this._canCloseFn = undefined;
-    }
-  }
-
-  /** @inheritDoc */
-  public canClose(canClose: CanCloseFn | CanClose): CanCloseRef {
+  public canClose(canClose: CanCloseFn): CanCloseRef {
     this._canCloseFn = canClose;
-    this._canCloseSubscription ??= Beans.get(MessageClient).onMessage(ɵWorkbenchCommands.canCloseTopic(this.id), () => {
-      if (typeof this._canCloseFn === 'object') {
-        return this._canCloseFn.canClose();
-      }
-      return this._canCloseFn?.() ?? true;
-    });
+    this._canCloseSubscription ??= Beans.get(MessageClient).onMessage(ɵWorkbenchCommands.canCloseTopic(this.id), () => this._canCloseFn?.() ?? true);
     return {
       dispose: () => {
         if (canClose === this._canCloseFn) {
@@ -198,6 +183,7 @@ export class ɵWorkbenchView implements WorkbenchView, PreDestroy {
 
   public preDestroy(): void {
     this._canCloseSubscription?.unsubscribe();
+    this._canCloseSubscription = undefined;
     this._destroy$.next();
   }
 }

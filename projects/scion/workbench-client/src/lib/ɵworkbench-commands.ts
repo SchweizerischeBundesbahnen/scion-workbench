@@ -64,12 +64,6 @@ export const ɵWorkbenchCommands = {
    * closing is prevented.
    */
   canCloseTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/canClose`,
-  /**
-   * TODO [Angular 20] Remove legacy topic.
-   *
-   * @deprecated since version 17.0.0-beta.8; Use `canCloseTopic` instead.
-   */
-  viewClosingTopic: (viewId: ViewId) => `ɵworkbench/views/${viewId}/closing`,
 
   /**
    * Computes the topic for signaling that a microfrontend is about to be replaced by a microfrontend of another app.
