@@ -104,11 +104,6 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-confirm-closing')).toggle(check);
   }
 
-  /** @deprecated since version 18.0.0-beta.9. No longer needed with the removal of class-based {@link CanClose} guard. */
-  public async checkUseClassBasedCanCloseGuard(check: boolean): Promise<void> {
-    await new SciCheckboxPO(this.locator.locator('sci-checkbox.e2e-class-based-can-close-guard')).toggle(check);
-  }
-
   public async clickClose(): Promise<void> {
     const accordion = new SciAccordionPO(this.locator.locator('sci-accordion.e2e-view-methods'));
     await accordion.expand();
