@@ -35,7 +35,7 @@ Start by adding parts to the layout. Parts can be docked to a specific area (`le
 import {bootstrapApplication} from '@angular/platform-browser';
 import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       layout: (factory: WorkbenchLayoutFactory) => factory
@@ -91,7 +91,7 @@ import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 import {canMatchWorkbenchView, canMatchWorkbenchPart} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       // Route for the "MAIN_AREA Part"
@@ -121,7 +121,7 @@ Parts can also be positioned relative to each other rather than docked to a spec
 import {bootstrapApplication} from '@angular/platform-browser';
 import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       layout: (factory: WorkbenchLayoutFactory) => factory
@@ -164,7 +164,7 @@ A part can also be aligned relative to a docked part, enabling inline layouts wi
 import {bootstrapApplication} from '@angular/platform-browser';
 import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       layout: (factory: WorkbenchLayoutFactory) => factory
@@ -199,7 +199,7 @@ A perspective must have a unique identity. Optionally, data can be associated wi
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       layout: {

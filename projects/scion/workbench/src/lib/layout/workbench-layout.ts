@@ -459,7 +459,7 @@ export interface MWorkbenchLayout {
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {MAIN_AREA, provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench({
  *       layout: (factory: WorkbenchLayoutFactory) => factory
@@ -504,7 +504,7 @@ export interface MWorkbenchLayout {
  * import {provideRouter} from '@angular/router';
  * import {canMatchWorkbenchView, canMatchWorkbenchPart} from '@scion/workbench';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideRouter([
  *      // Route for the "MAIN_AREA Part"

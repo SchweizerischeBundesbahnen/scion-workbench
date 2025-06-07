@@ -77,7 +77,7 @@ inject(WorkbenchRouter).navigate([], {hint: 'outline'});
 inject(WorkbenchRouter).navigate([], {hint: 'navigator'});
 
 // Routes
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       // Outline View

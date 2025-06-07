@@ -13,7 +13,7 @@ The built-in "Not Found" page can be replaced, e.g., to localize the page, as fo
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideWorkbench} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       pageNotFoundComponent: YourPageNotFoundComponent,
