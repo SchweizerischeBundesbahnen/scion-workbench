@@ -54,7 +54,7 @@ import {provideIconProviders} from './icon/icon-providers';
  * import {provideAnimations} from '@angular/platform-browser/animations';
  * import {bootstrapApplication} from '@angular/platform-browser';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench({
  *       layout: (factory: WorkbenchLayoutFactory) => factory
@@ -84,7 +84,7 @@ import {provideIconProviders} from './icon/icon-providers';
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {inject, provideAppInitializer} from '@angular/core';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench(),
  *     provideAppInitializer(() => inject(WorkbenchLauncher).launch())
@@ -103,7 +103,7 @@ import {provideIconProviders} from './icon/icon-providers';
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {inject} from '@angular/core';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench(),
  *     provideWorkbenchInitializer(() => inject(SomeService).init()),

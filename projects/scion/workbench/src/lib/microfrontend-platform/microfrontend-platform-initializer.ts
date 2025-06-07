@@ -103,7 +103,7 @@ export enum MicrofrontendPlatformStartupPhase {
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {inject} from '@angular/core';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench(),
  *     provideMicrofrontendPlatformInitializer(() => inject(SomeService).init()),

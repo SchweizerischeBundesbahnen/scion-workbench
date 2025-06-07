@@ -47,7 +47,7 @@ An application-modal dialog blocks the workbench element, still allowing interac
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideWorkbench} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       dialog: {modalityScope: 'viewport'},

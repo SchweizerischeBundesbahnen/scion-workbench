@@ -50,7 +50,7 @@ import {provideRouter} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideWorkbench} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench(),
     provideRouter([]), // required by the SCION Workbench
@@ -65,13 +65,13 @@ bootstrapApplication(AppComponent, {
     <summary><strong>Insert Workbench Component</strong></summary>
     <br>
 
-Open `app.component.html` and replace it with the following content:
+Open `app.html` and replace it with the following content:
 
 ```html 
 <wb-workbench/>
 ```
 
-Import the SCION Workbench component in `app.component.ts`. Added lines are marked with `[+]`.
+Import the SCION Workbench component in `app.ts`. Added lines are marked with `[+]`.
 
 ```ts
     import {Component} from '@angular/core';
@@ -82,17 +82,17 @@ Import the SCION Workbench component in `app.component.ts`. Added lines are mark
       imports: [
 [+]     WorkbenchComponent
       ],
-      templateUrl: './app.component.html',
-      styleUrl: './app.component.scss'
+      templateUrl: './app.html',
+      styleUrl: './app.scss'
     })
-    export class AppComponent {
+    export class App {
       title = 'workbench-getting-started';
     }
 ```
 
 The workbench itself does not position nor lay out the `<wb-workbench>` component. Depending on your requirements, you may want the workbench to fill the entire page viewport or only parts of it, for example, if you have a header, footer, or navigation panel.
 
-For a quick start, position the workbench absolutely and align it with the page viewport. Open `app.component.scss` and replace it with the following content:
+For a quick start, position the workbench absolutely and align it with the page viewport. Open `app.scss` and replace it with the following content:
 ```scss
 wb-workbench {
   position: absolute;

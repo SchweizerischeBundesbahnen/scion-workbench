@@ -23,7 +23,7 @@ import {ɵWorkbenchLauncher} from './ɵworkbench-launcher.service';
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {inject, provideAppInitializer} from '@angular/core';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench(),
  *     provideAppInitializer(() => inject(WorkbenchLauncher).launch())
@@ -41,7 +41,7 @@ import {ɵWorkbenchLauncher} from './ɵworkbench-launcher.service';
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {inject} from '@angular/core';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench(),
  *     provideWorkbenchInitializer(() => inject(SomeService).init()),

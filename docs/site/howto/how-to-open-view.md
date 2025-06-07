@@ -32,7 +32,7 @@ Set up the route for the view in Angular's router configuration:
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: 'path/to/view', component: ViewComponent},
@@ -102,7 +102,7 @@ inject(WorkbenchRouter).navigate([], {hint: 'search'});
 inject(WorkbenchRouter).navigate([], {hint: 'navigator'});
 
 // Routes
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       // Search View

@@ -78,13 +78,13 @@ We configure the router with `componentInputBinding` to read parameters directly
     <summary><strong>Insert SCION Workbench Component</strong></summary>
     <br>
 
-Open `app.component.html` and change it as follows:
+Open `app.html` and change it as follows:
 
 ```html 
 <wb-workbench/>
 ```
 
-Import the SCION Workbench component in `app.component.ts`.
+Import the SCION Workbench component in `app.ts`.
 
 ```ts
     import {Component} from '@angular/core';
@@ -95,17 +95,17 @@ Import the SCION Workbench component in `app.component.ts`.
       imports: [
 [+]     WorkbenchComponent
       ],
-      templateUrl: './app.component.html',
-      styleUrl: './app.component.scss'
+      templateUrl: './app.html',
+      styleUrl: './app.scss'
     })
-    export class AppComponent {
+    export class App {
       title = 'workbench-getting-started';
     }
 ```
 
 The workbench itself does not position nor lay out the `<wb-workbench>` component. Depending on your requirements, you may want the workbench to fill the entire page viewport or only parts of it, for example, if you have an application header.
 
-For a quick start, position the workbench absolutely and align it with the page viewport. Open `app.component.scss` and change it as follows:
+For a quick start, position the workbench absolutely and align it with the page viewport. Open `app.scss` and change it as follows:
 ```scss
   wb-workbench {
     position: absolute;
@@ -169,7 +169,7 @@ We will use the `TodoService` to get some sample todos. You can download the `to
     ng generate component overview --skip-tests
     ```
 
-2. Open `overview.component.ts` component and change it as follows.
+2. Open `overview.ts` component and change it as follows.
 
     ```ts
         import {Component, inject} from '@angular/core';
@@ -177,10 +177,10 @@ We will use the `TodoService` to get some sample todos. You can download the `to
 
         @Component({
           selector: 'app-overview',
-          templateUrl: './overview.component.html',
-          styleUrl: './overview.component.scss',
+          templateUrl: './overview.html',
+          styleUrl: './overview.scss',
         })
-    [+] export default class OverviewComponent {      
+    [+] export default class Overview {      
     [+]   protected todoService = inject(TodoService);
         }
     ```
@@ -188,13 +188,13 @@ We will use the `TodoService` to get some sample todos. You can download the `to
 
    We also change the component to be exported by default, making it easier to register the route for the component.
 
-3. Open `overview.component.html` and change it as follows:
+3. Open `overview.html` and change it as follows:
 
     ```html
     You have {{todoService.todos.length}} pending todos.
     ```
 
-4. Open `overview.component.scss` and add the following styles.
+4. Open `overview.scss` and add the following styles.
 
     ```scss
     :host {
@@ -217,7 +217,7 @@ We will use the `TodoService` to get some sample todos. You can download the `to
           providers: [
             provideWorkbench(),
             provideRouter([
-    [+]       {path: 'overview', loadComponent: () => import('./overview/overview.component')},
+    [+]       {path: 'overview', loadComponent: () => import('./overview/overview')},
             ], withComponentInputBinding()),
             provideAnimations(),
           ],
@@ -242,7 +242,7 @@ We will use the `TodoService` to get some sample todos. You can download the `to
    [+]         .navigatePart(MAIN_AREA, ['overview']),
            }),
            provideRouter([
-             {path: 'overview', loadComponent: () => import('./overview/overview.component')},
+             {path: 'overview', loadComponent: () => import('./overview/overview')},
            ], withComponentInputBinding()),
            provideAnimations(),
          ],
@@ -263,7 +263,7 @@ We will use the `TodoService` to get some sample todos. You can download the `to
     ```console
     ng generate component todos --skip-tests
     ```
-2. Open `todos.component.ts` and change it as follows.
+2. Open `todos.ts` component and change it as follows.
 
     ```ts
     [+] import {Component, inject} from '@angular/core';
@@ -272,12 +272,13 @@ We will use the `TodoService` to get some sample todos. You can download the `to
     
         @Component({
           selector: 'app-todos',
-          templateUrl: './todos.component.html',
+          templateUrl: './todos.html',
+          styleUrl: './todos.scss',
           imports: [
     [+]     WorkbenchRouterLinkDirective,
           ],
         })
-    [+] export default class TodosComponent {
+    [+] export default class Todos {
 
     [+]   protected todoService = inject(TodoService);
         }
@@ -286,7 +287,7 @@ We will use the `TodoService` to get some sample todos. You can download the `to
 
    We change the component to be exported by default, making it easier to register the route for the component.
 
-3. Open `todos.component.html` and change it as follows:
+3. Open `todos.html` and change it as follows:
 
     ```html
     <ol>
@@ -313,8 +314,8 @@ We will use the `TodoService` to get some sample todos. You can download the `to
           providers: [
             provideWorkbench(),
             provideRouter([
-              {path: 'overview', loadComponent: () => import('./overview/overview.component')},
-    [+]       {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
+              {path: 'overview', loadComponent: () => import('./overview/overview')},
+    [+]       {path: 'todos', loadComponent: () => import('./todos/todos')}, 
             ], withComponentInputBinding()),
             provideAnimations(),
           ],
@@ -343,8 +344,8 @@ We will use the `TodoService` to get some sample todos. You can download the `to
    [+]         .activatePart('todos'),
            }),
            provideRouter([
-             {path: 'overview', loadComponent: () => import('./overview/overview.component')},
-             {path: 'todos', loadComponent: () => import('./todos/todos.component')}, 
+             {path: 'overview', loadComponent: () => import('./overview/overview')},
+             {path: 'todos', loadComponent: () => import('./todos/todos')}, 
            ], withComponentInputBinding()),
            provideAnimations(),
          ],
@@ -369,7 +370,7 @@ In this step, we will create a component to open a todo in a view in the main ar
     ```console
     ng generate component todo --skip-tests
     ```
-2. Open `todo.component.ts` and change it as follows.
+2. Open `todo.ts` component and change it as follows.
 
     ```ts
     [+] import {Component, computed, effect, inject, input} from '@angular/core';
@@ -379,13 +380,13 @@ In this step, we will create a component to open a todo in a view in the main ar
 
         @Component({
           selector: 'app-todo',
-          templateUrl: './todo.component.html',
-          styleUrl: './todo.component.scss',
+          templateUrl: './todo.html',
+          styleUrl: './todo.scss',
           imports: [
     [+]     DatePipe,
           ],
         })
-    [+] export default class TodoComponent {
+    [+] export default class Todo {
         
     [+]   public id = input.required<string>();
 
@@ -404,7 +405,7 @@ In this step, we will create a component to open a todo in a view in the main ar
 
    In the next step, we will render the todo in the template.
 
-3. Open `todo.component.html` and change it as follows.
+3. Open `todo.html` and change it as follows.
 
     ```html
     <span>Task:</span>{{todo().task}}
@@ -412,7 +413,7 @@ In this step, we will create a component to open a todo in a view in the main ar
     <span>Description:</span>{{todo().description}}
     ```
 
-4. Open `todo.component.scss` and add the following styles.
+4. Open `todo.scss` and add the following styles.
 
     ```css
     :host {
@@ -446,9 +447,9 @@ In this step, we will create a component to open a todo in a view in the main ar
                .navigateView('todos', ['todos'])
            }),
          provideRouter([
-           {path: 'overview', loadComponent: () => import('./overview/overview.component')},
-           {path: 'todos', loadComponent: () => import('./todos/todos.component')},
-   [+]     {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},  
+           {path: 'overview', loadComponent: () => import('./overview/overview')},
+           {path: 'todos', loadComponent: () => import('./todos/todos')},
+   [+]     {path: 'todos/:id', loadComponent: () => import('./todo/todo')},  
          ], withComponentInputBinding()),
          provideAnimations(),
         ],

@@ -94,7 +94,7 @@ export enum WorkbenchStartupPhase {
  * import {bootstrapApplication} from '@angular/platform-browser';
  * import {inject} from '@angular/core';
  *
- * bootstrapApplication(AppComponent, {
+ * bootstrapApplication(App, {
  *   providers: [
  *     provideWorkbench(),
  *     provideWorkbenchInitializer(() => inject(SomeService).init()),

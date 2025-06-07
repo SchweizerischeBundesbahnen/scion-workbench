@@ -27,7 +27,7 @@ Below is an example with two routes:
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: 'path/to/page1', component: Page1Component},
@@ -64,7 +64,7 @@ Components can be loaded lazily to reduce the initial bundle size.
 import {bootstrapApplication} from '@angular/platform-browser';
 import {PreloadAllModules, provideRouter, withPreloading} from '@angular/router';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: 'path/to/page1', loadComponent: () => import('./components/page1.component')},
@@ -87,7 +87,7 @@ import {provideRouter} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView} from '@scion/workbench';
 import {bootstrapApplication} from '@angular/platform-browser';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {
@@ -113,7 +113,7 @@ import {provideRouter} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView} from '@scion/workbench';
 import {bootstrapApplication} from '@angular/platform-browser';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: 'feature-a', loadChildren: () => import('./feature-a-routes')},
@@ -145,7 +145,7 @@ import {canMatchWorkbenchOutlet, WorkbenchComponent} from '@scion/workbench';
 import {bootstrapApplication} from '@angular/platform-browser';
 import {inject} from '@angular/core';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       // PROTECTED ROUTES
@@ -217,7 +217,7 @@ import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: 'path/to/page1', canMatch: [canMatchWorkbenchView(true)], component: Page1Component},
@@ -234,7 +234,7 @@ import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 import {canMatchWorkbenchPart, canMatchWorkbenchView} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: '', canMatch: [canMatchWorkbenchView('search')], component: SearchComponent},
@@ -266,7 +266,7 @@ import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 import {WorkbenchRouteData} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {

@@ -17,5 +17,5 @@ import {WorkbenchComponent} from '@scion/workbench';
   styleUrl: './app.component.scss',
   imports: [WorkbenchComponent],
 })
-export class AppComponent {
+export class App {
 }
