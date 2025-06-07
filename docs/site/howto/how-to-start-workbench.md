@@ -17,7 +17,7 @@ import {provideWorkbench, WorkbenchLauncher} from '@scion/workbench';
 import {bootstrapApplication} from '@angular/platform-browser';
 import {inject, provideAppInitializer} from '@angular/core';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench(),
     provideAppInitializer(() => inject(WorkbenchLauncher).launch())
@@ -48,7 +48,7 @@ import {provideWorkbench} from '@scion/workbench';
 import {bootstrapApplication} from '@angular/platform-browser';
 import {Component} from '@angular/core';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       splashComponent: CustomSplashComponent
@@ -73,7 +73,7 @@ import {provideWorkbench, provideWorkbenchInitializer} from '@scion/workbench';
 import {bootstrapApplication} from '@angular/platform-browser';
 import {inject} from '@angular/core';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench(),
     provideWorkbenchInitializer(() => inject(SomeService).init()),
@@ -91,7 +91,7 @@ import {provideWorkbench, provideWorkbenchInitializer, WorkbenchStartupPhase} fr
 import {bootstrapApplication} from '@angular/platform-browser';
 import {inject} from '@angular/core';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench(),
     provideWorkbenchInitializer(() => inject(SomeService).init(), {phase: WorkbenchStartupPhase.PostStartup}),

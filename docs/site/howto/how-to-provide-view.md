@@ -12,7 +12,7 @@ Any component can be displayed as a view. A view is a regular Angular component 
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {path: 'path/to/view1', component: ViewComponent},
@@ -59,7 +59,7 @@ import {bootstrapApplication} from '@angular/platform-browser';
 import {provideRouter} from '@angular/router';
 import {WorkbenchRouteData} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideRouter([
       {

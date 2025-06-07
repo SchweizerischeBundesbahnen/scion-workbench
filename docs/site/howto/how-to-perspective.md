@@ -70,7 +70,7 @@ A `canActivate` function can be configured to determine if the perspective can b
 import {bootstrapApplication} from '@angular/platform-browser';
 import {provideWorkbench, WorkbenchLayoutFactory} from '@scion/workbench';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(App, {
   providers: [
     provideWorkbench({
       layout: {

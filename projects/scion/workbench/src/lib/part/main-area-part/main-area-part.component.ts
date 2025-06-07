@@ -109,7 +109,7 @@ export class MainAreaPartComponent {
       import {provideRouter} from '@angular/router';
       import {MAIN_AREA, provideWorkbench} from '@scion/workbench';
       
-      bootstrapApplication(AppComponent, {
+      bootstrapApplication(App, {
         providers: [
           provideWorkbench({
             layout: factory => factory
@@ -131,7 +131,7 @@ export class MainAreaPartComponent {
       import {provideRouter} from '@angular/router';
       import {canMatchWorkbenchPart, MAIN_AREA, provideWorkbench} from '@scion/workbench';
       
-      bootstrapApplication(AppComponent, {
+      bootstrapApplication(App, {
         providers: [
           provideWorkbench({
             layout: factory => factory
