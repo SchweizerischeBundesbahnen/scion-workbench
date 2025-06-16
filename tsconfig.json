@@ -71,6 +71,7 @@
     "typeCheckHostBindings": true,
     "strictTemplates": true
   },
+  "files": [],
   "references": [
     {
       "path": "./projects/scion/workbench/tsconfig.lib.json"
