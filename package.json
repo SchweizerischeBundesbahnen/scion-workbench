@@ -10,7 +10,7 @@
     "name": "SCION contributors"
   },
   "scripts": {
-    "before-push": "run-s build lint test:headless e2e:headless",
+    "before-push": "run-s build lint \"test:headless -- --no-watch\" e2e:headless",
     "build": "run-s **:*:build **:*:typedoc",
     "start": "run-p -r workbench-testing-app:serve workbench-client-testing-app:*:serve",
     "lint": "run-p **:*:lint",
