@@ -8,17 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer, runInInjectionContext} from '@angular/core';
+import {EnvironmentProviders, inject, InjectionToken, Injector, makeEnvironmentProviders, NgZone, provideAppInitializer} from '@angular/core';
 import {APP_IDENTITY, ContextService, FocusMonitor, IntentClient, ManifestService, MessageClient, ObservableDecorator, OutletRouter, PlatformPropertyService, PreferredSizeService} from '@scion/microfrontend-platform';
 import {WorkbenchClient, WorkbenchDialog, WorkbenchDialogService, WorkbenchMessageBox, WorkbenchMessageBoxService, WorkbenchNotificationService, WorkbenchPopup, WorkbenchPopupService, WorkbenchRouter, WorkbenchThemeMonitor, WorkbenchView} from '@scion/workbench-client';
 import {NgZoneObservableDecorator} from './ng-zone-observable-decorator';
 import {Beans} from '@scion/toolkit/bean-manager';
 import {environment} from '../../environments/environment';
-
-/**
- * DI token for injectables to be instantiated after connected to the workbench.
- */
-export const WORKBENCH_POST_CONNECT = new InjectionToken<unknown>('WORKBENCH_POST_CONNECT');
+import {runWorkbenchClientInitializers, WorkbenchClientStartupPhase} from './workbench-client-initializer';
 
 /**
  * DI token providing access to the {@link APP_IDENTITY}.
@@ -65,8 +61,9 @@ async function connectToWorkbenchFn(): Promise<void> {
   const injector = inject(Injector);
 
   Beans.register(ObservableDecorator, {useValue: new NgZoneObservableDecorator(zone)});
+  await runWorkbenchClientInitializers(WorkbenchClientStartupPhase.PreConnect, injector);
   await zone.runOutsideAngular(() => WorkbenchClient.connect(determineAppSymbolicName()));
-  await runInInjectionContext(injector, () => inject(WORKBENCH_POST_CONNECT, {optional: true}));
+  await runWorkbenchClientInitializers(WorkbenchClientStartupPhase.PostConnect, injector);
 }
 
 /**
