@@ -251,15 +251,14 @@ test.describe('Navigational CSS Classes', () => {
 
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-view'], {
-        target: 'view.100',
+        target: 'testee',
         cssClass: 'testee-navigation',
       });
 
-      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
-
       // Move view to new window.
-      const newAppPO = await viewPage.view.tab.moveToNewWindow();
-      const newViewPage = new ViewPagePO(newAppPO, {viewId: 'view.1'});
+      const newAppPO = await appPO.view({cssClass: 'testee-navigation'}).tab.moveToNewWindow();
+      const newView = (await newAppPO.workbench.views()).find(view => view.alternativeId === 'testee')!;
+      const newViewPage = new ViewPagePO(newAppPO, {viewId: newView.id});
 
       // Expect CSS classes of the navigation to be retained
       await expect.poll(() => newViewPage.view.getCssClasses()).toContain('testee-navigation');
@@ -272,30 +271,28 @@ test.describe('Navigational CSS Classes', () => {
       // Open view 1
       const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
       await routerPage.navigate(['test-view'], {
-        target: 'view.101',
+        target: 'testee-1',
         activate: false,
         cssClass: 'testee-navigation-1',
       });
 
       // Open view 2
       await routerPage.navigate(['test-view'], {
-        target: 'view.102',
+        target: 'testee-2',
         activate: false,
         cssClass: 'testee-navigation-2',
       });
 
-      const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.101'});
-      const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.102'});
-
       // Move view 1 to new window.
-      const newAppPO = await viewPage1.view.tab.moveToNewWindow();
-      const newViewPage1 = new ViewPagePO(newAppPO, {viewId: 'view.1'});
+      const newAppPO = await appPO.view({cssClass: 'testee-navigation-1'}).tab.moveToNewWindow();
+      const newView1 = (await newAppPO.workbench.views()).find(view => view.alternativeId === 'testee-1')!;
 
       // Move view 2 to the window.
-      await viewPage2.view.tab.moveTo(await newViewPage1.view.part.getPartId(), {workbenchId: await newAppPO.getWorkbenchId()});
-      const newViewPage2 = new ViewPagePO(newAppPO, {viewId: 'view.2'});
+      await appPO.view({cssClass: 'testee-navigation-2'}).tab.moveTo(newView1.partId, {workbenchId: await newAppPO.getWorkbenchId()});
+      const newView2 = (await newAppPO.workbench.views()).find(view => view.alternativeId === 'testee-2')!;
+      const newViewPage2 = new ViewPagePO(newAppPO, {viewId: newView2.id});
 
-      // Expect CSS classes of the navigation to be retained
+      // Expect CSS classes of the navigation to be retained.
       await expect.poll(() => newViewPage2.view.getCssClasses()).toContain('testee-navigation-2');
       await expect.poll(() => newViewPage2.view.tab.getCssClasses()).toContain('testee-navigation-2');
     });

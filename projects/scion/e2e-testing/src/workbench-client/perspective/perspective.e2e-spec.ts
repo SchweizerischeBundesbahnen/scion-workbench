@@ -1166,7 +1166,7 @@ test.describe('Workbench Perspective', () => {
       await appPO.switchPerspective(perspective1.metadata!.id);
 
       // Expect microfrontend to display.
-      await expect.poll(() => viewPageApp1.view.getInfo()).toMatchObject({viewId: 'view.1', title: 'Microfrontend View App 1'} satisfies Partial<ViewInfo>);
+      await expect.poll(() => viewPageApp1.view.getInfo()).toMatchObject({title: 'Microfrontend View App 1'} satisfies Partial<ViewInfo>);
       // Expect the microfrontend to be aligned to the view bounds.
       await expect(async () => {
         const outletBounds = await viewPageApp1.outlet.getBoundingBox();
@@ -1179,7 +1179,7 @@ test.describe('Workbench Perspective', () => {
       await appPO.switchPerspective(perspective2.metadata!.id);
 
       // Expect microfrontend to display.
-      await expect.poll(() => viewPageApp2.view.getInfo()).toMatchObject({viewId: 'view.1', title: 'Microfrontend View App 2'} satisfies Partial<ViewInfo>);
+      await expect.poll(() => viewPageApp2.view.getInfo()).toMatchObject({title: 'Microfrontend View App 2'} satisfies Partial<ViewInfo>);
       // Expect the microfrontend to be aligned to the view bounds.
       await expect(async () => {
         const outletBounds = await viewPageApp2.outlet.getBoundingBox();
@@ -1192,7 +1192,7 @@ test.describe('Workbench Perspective', () => {
       await appPO.switchPerspective(perspective1.metadata!.id);
 
       // Expect microfrontend to display.
-      await expect.poll(() => viewPageApp1.view.getInfo()).toMatchObject({viewId: 'view.1', title: 'Microfrontend View App 1'} satisfies Partial<ViewInfo>);
+      await expect.poll(() => viewPageApp1.view.getInfo()).toMatchObject({title: 'Microfrontend View App 1'} satisfies Partial<ViewInfo>);
       // Expect the microfrontend to be aligned to the view bounds.
       await expect(async () => {
         const outletBounds = await viewPageApp1.outlet.getBoundingBox();
@@ -1205,7 +1205,7 @@ test.describe('Workbench Perspective', () => {
       await appPO.switchPerspective(perspective2.metadata!.id);
 
       // Expect microfrontend to display.
-      await expect.poll(() => viewPageApp2.view.getInfo()).toMatchObject({viewId: 'view.1', title: 'Microfrontend View App 2'} satisfies Partial<ViewInfo>);
+      await expect.poll(() => viewPageApp2.view.getInfo()).toMatchObject({title: 'Microfrontend View App 2'} satisfies Partial<ViewInfo>);
       // Expect the microfrontend to be aligned to the view bounds.
       await expect(async () => {
         const outletBounds = await viewPageApp2.outlet.getBoundingBox();

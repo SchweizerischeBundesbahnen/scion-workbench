@@ -9,7 +9,7 @@
  */
 
 import {Page} from '@playwright/test';
-import {ViewId, WorkbenchPart, WorkbenchService} from '@scion/workbench';
+import {PartId, ViewId, WorkbenchPart, WorkbenchService, WorkbenchView} from '@scion/workbench';
 
 /**
  * Enables programmatic interaction with the Workbench API.
@@ -24,6 +24,13 @@ export class WorkbenchAccessor {
       const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
       return workbenchService.closeViews(...viewIds);
     }, viewIds);
+  }
+
+  public views(): Promise<Array<Pick<WorkbenchView, 'id' | 'alternativeId'> & {partId: PartId}>> {
+    return this._page.evaluate(() => {
+      const workbenchService = (window as unknown as Record<string, unknown>).__workbenchService as WorkbenchService;
+      return workbenchService.views().map(view => ({id: view.id, alternativeId: view.alternativeId, partId: view.part().id}));
+    });
   }
 
   public parts(): Promise<Array<Pick<WorkbenchPart, 'id' | 'alternativeId'>>> {

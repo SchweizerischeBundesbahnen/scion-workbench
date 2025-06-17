@@ -1709,48 +1709,6 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.activePart({grid: 'mainArea'})!.id).toEqual('part.B');
   });
 
-  it('should compute next view id', async () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
-
-    let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart(MAIN_AREA);
-
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.1');
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.1');
-
-    workbenchLayout = workbenchLayout.addView('view.1', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.2');
-
-    workbenchLayout = workbenchLayout.addView('view.2', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
-    workbenchLayout = workbenchLayout.addView('view.3', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.4');
-
-    workbenchLayout = workbenchLayout.addView('view.4', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.5');
-
-    workbenchLayout = workbenchLayout.addView('view.5', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.6');
-
-    workbenchLayout = workbenchLayout.addView('view.6', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
-
-    workbenchLayout = workbenchLayout.removeView('view.3'); // marked for removal
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
-
-    workbenchLayout = workbenchLayout.removeView('view.3', {force: true});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
-    workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.1');
-
-    workbenchLayout = workbenchLayout.addView('view.1', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.3');
-
-    workbenchLayout = workbenchLayout.addView('view.3', {partId: 'part.initial'});
-    expect(workbenchLayout.computeNextViewId()).toEqual('view.7');
-  });
-
   it('should remove view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
@@ -2689,6 +2647,30 @@ describe('WorkbenchLayout', () => {
 
     // Expect layout to be equal if using stable part identifiers.
     expect(workbenchLayout1.equals(workbenchLayout2, {excludeTreeNodeId: true, assignStablePartIdentifier: true})).toBeTrue();
+  });
+
+  it('should compare view identifiers based on their order in the layout', async () => {
+    const workbenchLayout1 = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view-1', {partId: 'part.left', cssClass: 'view-1'}) // alternative id
+      .addView('view.2', {partId: 'part.left', cssClass: 'view-2'})
+      .addView('view-3', {partId: 'part.right', cssClass: 'view-3'}) // alternative id
+      .addView('view.4', {partId: 'part.right', cssClass: 'view-4'});
+
+    const workbenchLayout2 = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view-1', {partId: 'part.left', cssClass: 'view-1'}) // alternative id
+      .addView('view.2', {partId: 'part.left', cssClass: 'view-2'})
+      .addView('view-3', {partId: 'part.right', cssClass: 'view-3'}) // alternative id
+      .addView('view.4', {partId: 'part.right', cssClass: 'view-4'});
+
+    // Expect layout not to be equal if not using stable view identifiers.
+    expect(workbenchLayout1.equals(workbenchLayout2, {excludeTreeNodeId: true})).toBeFalse();
+
+    // Expect layout to be equal if using stable view identifiers.
+    expect(workbenchLayout1.equals(workbenchLayout2, {excludeTreeNodeId: true, assignStableViewIdentifier: true})).toBeTrue();
   });
 
   it('should add view referencing an alternative part id', async () => {

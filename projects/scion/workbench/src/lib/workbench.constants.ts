@@ -53,7 +53,7 @@ export type PartOutlet = `${typeof PART_ID_PREFIX}${string}`;
 /**
  * Format of a view outlet name.
  */
-export type ViewOutlet = `${typeof VIEW_ID_PREFIX}${number}`;
+export type ViewOutlet = `${typeof VIEW_ID_PREFIX}${string}`;
 
 /**
  * Format of a popup outlet name.

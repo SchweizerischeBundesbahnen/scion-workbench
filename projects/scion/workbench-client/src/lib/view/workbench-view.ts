@@ -180,8 +180,8 @@ export interface ViewSnapshot {
 /**
  * Format of a view identifier.
  *
- * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
+ * Each view is assigned a unique identifier (e.g., `view.d4de99fb`, `view.cad347dd`, etc.).
  *
  * @category View
  */
-export type ViewId = `view.${number}`;
+export type ViewId = `view.${string}`;

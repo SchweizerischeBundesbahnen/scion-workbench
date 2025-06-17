@@ -15,7 +15,7 @@ import {MPartGridV5, MPartV5, MTreeNodeV5, MViewV5} from './model/workbench-grid
 import {UID} from '../../common/uid.util';
 
 /**
- * Migrates the workbench layout from version 4 to version 5.
+ * Migrates the workbench grid model from version 4 to version 5.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV5 implements WorkbenchMigration {

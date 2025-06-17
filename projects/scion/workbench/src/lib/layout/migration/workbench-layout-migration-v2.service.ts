@@ -15,7 +15,7 @@ import {Commands} from '../../routing/routing.model';
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
- * Migrates the perspective layout from version 1 to version 2.
+ * Migrates the workbench layout from version 1 to version 2.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutMigrationV2 implements WorkbenchMigration {

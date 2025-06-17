@@ -26,6 +26,9 @@ import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
 import {WorkbenchService} from '../../workbench.service';
+import {WorkbenchView} from '../../view/workbench-view.model';
+import {throwError} from '../../common/throw-error.util';
+import {ɵWorkbenchService} from '../../ɵworkbench.service';
 
 describe('WorkbenchLayout Component', () => {
 
@@ -111,7 +114,7 @@ describe('WorkbenchLayout Component', () => {
     });
 
     // Navigate using the Workbench router.
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.4'});
     await waitUntilStable();
 
     // Expect the layout to be changed.
@@ -150,10 +153,10 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilWorkbenchStarted();
 
     // GIVEN four views (view.1, view.2, view.3, view.4).
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'blank'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.1'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.2'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.3'});
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.4'});
 
     // WHEN moving view.3 to position 0
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -269,8 +272,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -284,8 +287,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -349,8 +352,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -364,8 +367,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -429,8 +432,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -444,8 +447,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -509,8 +512,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -524,8 +527,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -589,8 +592,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -604,8 +607,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -663,8 +666,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -678,8 +681,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -695,8 +698,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.2').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.2').toHaveComponentState('B');
 
-    // Add view 3
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
+    // Add view.3
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3'], {target: 'view.3'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.3', 'C');
 
@@ -829,8 +832,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -844,8 +847,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -944,8 +947,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -959,8 +962,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1059,8 +1062,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1074,8 +1077,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1173,8 +1176,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1188,8 +1191,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1288,8 +1291,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1303,8 +1306,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1320,8 +1323,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.2').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.2').toHaveComponentState('B');
 
-    // Add view 3
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
+    // Add view.3
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3'], {target: 'view.3'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.3', 'C');
 
@@ -1472,8 +1475,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1487,8 +1490,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1579,8 +1582,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1594,8 +1597,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1693,8 +1696,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1708,8 +1711,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -1794,7 +1797,7 @@ describe('WorkbenchLayout Component', () => {
     expect('view.2').toHaveComponentState('B');
   });
 
-  it('should open the same view multiple times', async () => {
+  it('should open the same view multiple times (target=auto)', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
@@ -1808,56 +1811,58 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilWorkbenchStarted();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {cssClass: 'testee-1'});
     await waitUntilStable();
-    enterComponentState(fixture, 'view.1', 'A');
+    const testeeView1 = findView({cssClass: 'testee-1'});
+    enterComponentState(fixture, testeeView1.id, 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         mainArea: {
-          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          root: new MPart({id: 'part.initial', views: [{id: testeeView1.id}], activeViewId: testeeView1.id}),
         },
       },
     });
 
-    expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
-    expect('view.1').toHaveComponentState('A');
+    expect(testeeView1.id).toBeRegistered({partId: 'part.initial', active: true});
+    expect(testeeView1.id).toHaveComponentState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {cssClass: 'testee-2'});
     await waitUntilStable();
-    enterComponentState(fixture, 'view.2', 'B');
+    const testeeView2 = findView({cssClass: 'testee-2'});
+    enterComponentState(fixture, testeeView2.id, 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         mainArea: {
-          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          root: new MPart({id: 'part.initial', views: [{id: testeeView1.id}, {id: testeeView2.id}], activeViewId: testeeView2.id}),
         },
       },
     });
-    expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
-    expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'part.initial', active: true});
-    expect('view.2').toHaveComponentState('B');
+    expect(testeeView1.id).toBeRegistered({partId: 'part.initial', active: false});
+    expect(testeeView1.id).toHaveComponentState('A');
+    expect(testeeView2.id).toBeRegistered({partId: 'part.initial', active: true});
+    expect(testeeView2.id).toHaveComponentState('B');
 
-    // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'part.initial'});
+    // Add view 2 again (target auto)
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'part.initial', cssClass: 'testee-3'});
     await waitUntilStable();
 
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         mainArea: {
-          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          root: new MPart({id: 'part.initial', views: [{id: testeeView1.id}, {id: testeeView2.id}], activeViewId: testeeView2.id}),
         },
       },
     });
-    expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
-    expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'part.initial', active: true});
-    expect('view.2').toHaveComponentState('B');
+    expect(testeeView1.id).toBeRegistered({partId: 'part.initial', active: false});
+    expect(testeeView1.id).toHaveComponentState('A');
+    expect(testeeView2.id).toBeRegistered({partId: 'part.initial', active: true});
+    expect(testeeView2.id).toHaveComponentState('B');
   });
 
-  it('should open the same view multiple times', async () => {
+  it('should open the same view multiple times (target=blank)', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial', startup: {launcher: 'APP_INITIALIZER'}}),
@@ -1871,55 +1876,58 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilWorkbenchStarted();
 
     // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {cssClass: 'testee-1'});
     await waitUntilStable();
-    enterComponentState(fixture, 'view.1', 'A');
+    const testeeView1 = findView({cssClass: 'testee-1'});
+    enterComponentState(fixture, testeeView1.id, 'A');
 
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         mainArea: {
-          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+          root: new MPart({id: 'part.initial', views: [{id: testeeView1.id}], activeViewId: testeeView1.id}),
         },
       },
     });
-    expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
-    expect('view.1').toHaveComponentState('A');
+    expect(testeeView1.id).toBeRegistered({partId: 'part.initial', active: true});
+    expect(testeeView1.id).toHaveComponentState('A');
 
     // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {cssClass: 'testee-2'});
     await waitUntilStable();
-    enterComponentState(fixture, 'view.2', 'B');
+    const testeeView2 = findView({cssClass: 'testee-2'});
+    enterComponentState(fixture, testeeView2.id, 'B');
 
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         mainArea: {
-          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}], activeViewId: 'view.2'}),
+          root: new MPart({id: 'part.initial', views: [{id: testeeView1.id}, {id: testeeView2.id}], activeViewId: testeeView2.id}),
         },
       },
     });
-    expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
-    expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'part.initial', active: true});
-    expect('view.2').toHaveComponentState('B');
+    expect(testeeView1.id).toBeRegistered({partId: 'part.initial', active: false});
+    expect(testeeView1.id).toHaveComponentState('A');
+    expect(testeeView2.id).toBeRegistered({partId: 'part.initial', active: true});
+    expect(testeeView2.id).toHaveComponentState('B');
 
-    // Add view 2 again
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'part.initial', target: 'blank'});
+    // Add view 2 again (target blank)
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {partId: 'part.initial', target: 'blank', cssClass: 'testee-3'});
     await waitUntilStable();
-    enterComponentState(fixture, 'view.3', 'C');
+    const testeeView3 = findView({cssClass: 'testee-3'});
+    enterComponentState(fixture, testeeView3.id, 'C');
 
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         mainArea: {
-          root: new MPart({id: 'part.initial', views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.3'}], activeViewId: 'view.3'}),
+          root: new MPart({id: 'part.initial', views: [{id: testeeView1.id}, {id: testeeView2.id}, {id: testeeView3.id}], activeViewId: testeeView3.id}),
         },
       },
     });
-    expect('view.1').toBeRegistered({partId: 'part.initial', active: false});
-    expect('view.1').toHaveComponentState('A');
-    expect('view.2').toBeRegistered({partId: 'part.initial', active: false});
-    expect('view.2').toHaveComponentState('B');
-    expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect('view.3').toHaveComponentState('C');
+    expect(testeeView1.id).toBeRegistered({partId: 'part.initial', active: false});
+    expect(testeeView1.id).toHaveComponentState('A');
+    expect(testeeView2.id).toBeRegistered({partId: 'part.initial', active: false});
+    expect(testeeView2.id).toHaveComponentState('B');
+    expect(testeeView3.id).toBeRegistered({partId: 'part.initial', active: true});
+    expect(testeeView3.id).toHaveComponentState('C');
   });
 
   it('should open views to the right and to the left, and then close them', async () => {
@@ -1937,8 +1945,8 @@ describe('WorkbenchLayout Component', () => {
     const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add view 1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1']);
+    // Add view.1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/1'], {target: 'view.1'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.1', 'A');
 
@@ -1952,8 +1960,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.1').toBeRegistered({partId: 'part.initial', active: true});
     expect('view.1').toHaveComponentState('A');
 
-    // Add view 2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2']);
+    // Add view.2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/2'], {target: 'view.2'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.2', 'B');
 
@@ -2003,8 +2011,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.2').toBeRegistered({partId: 'part.EAST-1', active: true});
     expect('view.2').toHaveComponentState('B');
 
-    // Add view 3 to part EAST-1
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3']);
+    // Add view.3 to part EAST-1
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/3'], {target: 'view.3'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.3', 'C');
 
@@ -2068,8 +2076,8 @@ describe('WorkbenchLayout Component', () => {
     expect('view.3').toBeRegistered({partId: 'part.EAST-2', active: true});
     expect('view.3').toHaveComponentState('C');
 
-    // Add view 4 to part EAST-2
-    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4']);
+    // Add view.4 to part EAST-2
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4'], {target: 'view.4'});
     await waitUntilStable();
     enterComponentState(fixture, 'view.4', 'D');
 
@@ -2099,7 +2107,7 @@ describe('WorkbenchLayout Component', () => {
     expect('view.4').toBeRegistered({partId: 'part.EAST-2', active: true});
     expect('view.4').toHaveComponentState('D');
 
-    // Move view 4 to a new part in the west
+    // Move view.4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2296,7 +2304,7 @@ describe('WorkbenchLayout Component', () => {
     expect('view.4').toBeRegistered({partId: 'part.WEST-1', active: true});
     expect('view.4').toHaveComponentState('D');
 
-    // Close view 4
+    // Close view.4
     await TestBed.inject(WorkbenchRouter).navigate(['path/to/view/4'], {close: true});
     await waitUntilStable();
 
@@ -2643,7 +2651,7 @@ describe('WorkbenchLayout Component', () => {
     expect('view.3').toHaveComponentState('C');
     expect('view.4').toHaveComponentState('D');
 
-    // Move view 4 to a new part in the west
+    // Move view.4 to a new part in the west
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
       source: {
         workbenchId: TestBed.inject(WORKBENCH_ID),
@@ -2819,7 +2827,7 @@ describe('WorkbenchLayout Component', () => {
     expect('view.2').toHaveComponentState('B');
     expect('view.4').toHaveComponentState('D');
 
-    // Close view 4
+    // Close view.4
     await TestBed.inject(WorkbenchRouter).navigate([], {target: 'view.4', close: true});
     await waitUntilStable();
 
@@ -3348,4 +3356,9 @@ describe('WorkbenchLayout Component', () => {
   ],
 })
 class RouterOutletPlusWorkbenchTestFixtureComponent {
+}
+
+function findView(findBy: {cssClass: string}): WorkbenchView {
+  const view = TestBed.inject(ɵWorkbenchService).views().find(view => view.classList.asList().includes(findBy.cssClass));
+  return view ?? throwError(`[NullViewError] No view found with CSS class ${findBy.cssClass}`);
 }

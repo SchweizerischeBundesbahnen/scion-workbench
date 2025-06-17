@@ -15,6 +15,7 @@ import {WorkbenchLayoutMerger} from './workbench-layout-merger.service';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {ɵWorkbenchLayoutFactory} from './ɵworkbench-layout.factory';
 import {segments} from '../testing/testing.util';
+import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 
 describe('WorkbenchLayoutMerger', () => {
 
@@ -23,31 +24,34 @@ describe('WorkbenchLayoutMerger', () => {
   });
 
   it('should preserve local changes when no diff between base and remote', () => {
-    const base = TestBed.inject(ɵWorkbenchLayoutFactory)
+    // Use factory function to generate new part and view ids.
+    const baseFn = (): ɵWorkbenchLayout => TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.topLeft', {relativeTo: MAIN_AREA, align: 'left', ratio: .25})
-      .addPart('part.bottomLeft', {relativeTo: 'part.topLeft', align: 'bottom', ratio: .5})
+      .addPart('part-bottomLeft', {relativeTo: 'part.topLeft', align: 'bottom', ratio: .5}) // alternative id
       .addView('view.1', {partId: 'part.topLeft'})
-      .addView('view.2', {partId: 'part.topLeft'})
-      .addView('view.3', {partId: 'part.bottomLeft'})
+      .addView('view-2', {partId: 'part.topLeft'}) // alternative id
+      .addView('view.3', {partId: 'part-bottomLeft'})
       .addPart('part.left', {align: 'left', ratio: .25})
       .navigatePart('part.left', ['path/to/part'])
       .navigateView('view.1', ['path/to/view/1'])
-      .navigateView('view.2', ['path/to/view/2'])
+      .navigateView('view-2', ['path/to/view/2'])
       .navigateView('view.3', [], {hint: 'hint-3'});
 
     const mergedLayout = TestBed.inject(WorkbenchLayoutMerger).merge({
-      local: base
-        .removeView('view.2', {force: true})
+      local: baseFn()
+        .removeView('view-2', {force: true})
         .addView('view.100', {partId: 'part.topLeft'})
         .addPart('part.left-bottom', {relativeTo: 'part.left', align: 'bottom'})
         .navigateView('view.100', ['path/to/view/100'])
         .navigateView('view.1', ['PATH/TO/VIEW/1'])
         .navigatePart('part.left', ['PATH/TO/PART'])
         .navigatePart('part.left-bottom', ['path/to/part']),
-      base,
-      remote: base,
+      base: baseFn(),
+      remote: baseFn(),
     });
+
+    const bottomLeftPart = mergedLayout.parts({id: 'part-bottomLeft'}).at(0)!;
 
     // Expect local changes not to be discarded.
     expect(mergedLayout).toEqualWorkbenchLayout({
@@ -82,7 +86,7 @@ describe('WorkbenchLayoutMerger', () => {
                   ],
                 }),
                 child2: new MPart({
-                  id: 'part.bottomLeft',
+                  id: bottomLeftPart.id,
                   views: [
                     {id: 'view.3', navigation: {id: any(), hint: 'hint-3'}},
                   ],
