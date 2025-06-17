@@ -15,7 +15,7 @@ import {MPartGridV7, MPartV7, MTreeNodeV7, PartIdV7} from './model/workbench-gri
 import {UID} from '../../common/uid.util';
 
 /**
- * Migrates the workbench layout from version 6 to version 7.
+ * Migrates the workbench grid model from version 6 to version 7.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV7 implements WorkbenchMigration {

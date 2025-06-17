@@ -16,7 +16,7 @@ import {WorkbenchMigration} from '../../migration/workbench-migration';
 import {Routing} from '../../routing/routing.util';
 
 /**
- * Migrates the workbench layout from version 2 to version 3.
+ * Migrates the workbench grid model from version 2 to version 3.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
@@ -88,7 +88,7 @@ export class WorkbenchGridMigrationV3 implements WorkbenchMigration {
         return {id: viewV2.id, navigation: {}};
       }
       else {
-        return {id: computeNextViewId(usedViewIds), navigation: {hint: viewV2.id}};
+        return {id: computeNextViewId(usedViewIds), alternativeId: viewV2.id, navigation: {hint: viewV2.id}};
       }
     }
   }

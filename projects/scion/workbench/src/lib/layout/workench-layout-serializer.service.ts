@@ -24,6 +24,7 @@ import {MActivityLayout} from '../activity/workbench-activity.model';
 import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration-v2.service';
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
+import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
 import {MWorkbenchLayout} from './workbench-layout';
 
 /**
@@ -38,7 +39,8 @@ export class WorkbenchLayoutSerializer {
   private _workbenchLayoutMigrator = new WorkbenchMigrator()
     .registerMigration(1, inject(WorkbenchLayoutMigrationV2))
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
-    .registerMigration(3, inject(WorkbenchLayoutMigrationV4));
+    .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
+    .registerMigration(4, inject(WorkbenchLayoutMigrationV5));
 
   /**
    * Migrates a serialized {@link MPartGrid} to the latest version.
@@ -196,7 +198,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 4;
+export const WORKBENCH_LAYOUT_VERSION = 5;
 
 /**
  * Represents the current version of the workbench grid model.
@@ -253,6 +255,12 @@ export interface LayoutSerializationFlags {
    * Excludes the part navigation id from the serialization.
    */
   excludePartNavigationId?: true;
+  /**
+   * Assigns each view a stable id based on its position in the grid.
+   *
+   * Stable view identifiers are required to compare the initial grid with the user-modified grid to detect layout changes.
+   */
+  assignStableViewIdentifier?: true;
   /**
    * Assigns each part a stable id based on its position in the grid.
    *

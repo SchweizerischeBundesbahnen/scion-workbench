@@ -49,11 +49,15 @@ test.describe('View Drag & Drop', () => {
      * +-----------------+    +-----------------+
      */
     test('should allow dragging a view to the center of its own part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       // Open two views in the main area.
-      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await workbenchNavigator.modifyLayout(factory => factory
+        .addView('view.1', {partId: 'part.initial'})
+        .addView('view.2', {partId: 'part.initial'}),
+      );
+      const view1 = appPO.view({viewId: 'view.1'});
+      const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to the center.
       const dragHandle = await view2.tab.startDrag();
@@ -82,11 +86,15 @@ test.describe('View Drag & Drop', () => {
      * +-----------------+    +----------+----------+
      */
     test('should allow dragging a view to a new part in the west of its own part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       // Open two views in the main area.
-      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await workbenchNavigator.modifyLayout(factory => factory
+        .addView('view.1', {partId: 'part.initial'})
+        .addView('view.2', {partId: 'part.initial'}),
+      );
+      const view1 = appPO.view({viewId: 'view.1'});
+      const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the west.
       const dragHandle = await view2.tab.startDrag();
@@ -124,11 +132,15 @@ test.describe('View Drag & Drop', () => {
      * +-----------------+    +----------+----------+
      */
     test('should allow dragging a view to a new part in the east of its own part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       // Open two views in the main area.
-      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await workbenchNavigator.modifyLayout(factory => factory
+        .addView('view.1', {partId: 'part.initial'})
+        .addView('view.2', {partId: 'part.initial'}),
+      );
+      const view1 = appPO.view({viewId: 'view.1'});
+      const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the east.
       const dragHandle = await view2.tab.startDrag();
@@ -169,11 +181,15 @@ test.describe('View Drag & Drop', () => {
      * +-----------------+    +----------+
      */
     test('should allow dragging a view to a new part in the north of its own part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       // Open two views in the main area.
-      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await workbenchNavigator.modifyLayout(factory => factory
+        .addView('view.1', {partId: 'part.initial'})
+        .addView('view.2', {partId: 'part.initial'}),
+      );
+      const view1 = appPO.view({viewId: 'view.1'});
+      const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the north.
       const dragHandle = await view2.tab.startDrag();
@@ -214,11 +230,15 @@ test.describe('View Drag & Drop', () => {
      * +-----------------+    +----------+
      */
     test('should allow dragging a view to a new part in the south of its own part', async ({appPO, workbenchNavigator}) => {
-      await appPO.navigateTo({microfrontendSupport: false});
+      await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
       // Open two views in the main area.
-      const view1 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
-      const view2 = (await workbenchNavigator.openInNewTab(ViewPagePO)).view;
+      await workbenchNavigator.modifyLayout(factory => factory
+        .addView('view.1', {partId: 'part.initial'})
+        .addView('view.2', {partId: 'part.initial'}),
+      );
+      const view1 = appPO.view({viewId: 'view.1'});
+      const view2 = appPO.view({viewId: 'view.2'});
 
       // Move view 2 to a new part in the south.
       const dragHandle = await view2.tab.startDrag();
@@ -261,10 +281,9 @@ test.describe('View Drag & Drop', () => {
     test('should allow dragging a view to the center of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      await workbenchNavigator.openInNewTab(ViewPagePO);
-
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
+        .addView('view.1', {partId: 'part.initial'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
         .addView('view.101', {partId: 'part.right', activateView: true})
         .addView('view.102', {partId: 'part.right'}),
@@ -309,10 +328,9 @@ test.describe('View Drag & Drop', () => {
     test('should allow dragging a view to the west of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      await workbenchNavigator.openInNewTab(ViewPagePO);
-
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
+        .addView('view.1', {partId: 'part.initial'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
         .addView('view.101', {partId: 'part.right', activateView: true})
         .addView('view.102', {partId: 'part.right'}),
@@ -367,10 +385,9 @@ test.describe('View Drag & Drop', () => {
     test('should allow dragging a view to the east of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      await workbenchNavigator.openInNewTab(ViewPagePO);
-
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
+        .addView('view.1', {partId: 'part.initial'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
         .addView('view.101', {partId: 'part.right', activateView: true})
         .addView('view.102', {partId: 'part.right'}),
@@ -428,10 +445,9 @@ test.describe('View Drag & Drop', () => {
     test('should allow dragging a view to the north of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      await workbenchNavigator.openInNewTab(ViewPagePO);
-
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
+        .addView('view.1', {partId: 'part.initial'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
         .addView('view.101', {partId: 'part.right', activateView: true})
         .addView('view.102', {partId: 'part.right'}),
@@ -489,10 +505,9 @@ test.describe('View Drag & Drop', () => {
     test('should allow dragging a view to the south of another part', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
-      await workbenchNavigator.openInNewTab(ViewPagePO);
-
       // Open two views in another part.
       await workbenchNavigator.modifyLayout(layout => layout
+        .addView('view.1', {partId: 'part.initial'})
         .addPart('part.right', {relativeTo: 'part.initial', align: 'right', ratio: .5})
         .addView('view.101', {partId: 'part.right', activateView: true})
         .addView('view.102', {partId: 'part.right'}),

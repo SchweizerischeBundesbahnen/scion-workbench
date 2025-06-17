@@ -1355,39 +1355,62 @@ describe('View', () => {
     expect(errors).not.toContain(jasmine.stringMatching(`ExpressionChangedAfterItHasBeenCheckedError`));
   });
 
-  it('should have alternative id from MView', async () => {
+  it('should have different view handle when replacing layout', async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideWorkbenchForTest({mainAreaInitialPartId: 'part.initial'}),
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addView('testee', {partId: 'part.main'}),
+        }),
       ],
     });
 
     styleFixture(TestBed.createComponent(WorkbenchComponent));
     await waitUntilWorkbenchStarted();
 
-    // Add layout with view "view.1" and alternative view id "testee-1"
-    await TestBed.inject(WorkbenchRouter).navigate(layout => layout.addView('testee-1', {partId: 'part.initial'}));
-    const view1 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-1')!;
+    const view1 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee')!;
 
-    // Replace layout with view "view.1" and alternative view id "testee-2"
+    // Replace layout and add view.
     await TestBed.inject(ɵWorkbenchRouter).navigate(() => inject(ɵWorkbenchLayoutFactory)
-      .addPart(MAIN_AREA)
-      .addView('testee-2', {partId: 'part.initial'}),
+      .addPart('part.main')
+      .addView('testee', {partId: 'part.main'}),
     );
 
-    // Expect the view handle to be the same.
-    const view2 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-2')!;
-    expect(view1).toBe(view2);
+    // Expect the view handle NOT to be the same.
+    const view2 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee')!;
+    expect(view1).not.toBe(view2);
+    expect(view1.id).not.toBe(view2.id);
+    expect(view1.alternativeId).toBe(view2.alternativeId);
+  });
 
-    // Replace layout with view "view.1" and alternative view id "testee-2"
+  it('should have different view handle when removing and adding view', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addView('testee', {partId: 'part.main'}),
+        }),
+      ],
+    });
+
+    styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    const view1 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee')!;
+
+    // Remove view and add view again.
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout
-      .removeView('testee-2', {force: true})
-      .addView('testee-3', {partId: 'part.initial'}),
+      .removeView('testee', {force: true})
+      .addView('testee', {partId: 'part.main'}),
     );
 
-    // Expect the view handle to be the same.
-    const view3 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee-3')!;
-    expect(view1).toBe(view3);
+    // Expect the view handle NOT to be the same.
+    const view2 = TestBed.inject(ɵWorkbenchService).views().find(view => view.alternativeId === 'testee')!;
+    expect(view1).not.toBe(view2);
+    expect(view1.id).not.toBe(view2.id);
+    expect(view1.alternativeId).toBe(view2.alternativeId);
   });
 
   describe('Activated Route', () => {
