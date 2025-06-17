@@ -15,7 +15,6 @@ import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutMerger} from '../layout/workbench-layout-merger.service';
 import {WorkbenchLayoutStorageService} from '../layout/workbench-layout-storage.service';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {WorkbenchPerspectiveViewConflictResolver} from './workbench-perspective-view-conflict-resolver.service';
 import {LatestTaskExecutor} from '../executor/latest-task-executor';
 import {UrlSegment} from '@angular/router';
 import {WorkbenchLayoutFn} from '../layout/workbench-layout';
@@ -39,7 +38,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
   private readonly _workbenchlayoutStorageService = inject(WorkbenchLayoutStorageService);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _initialLayoutFn: WorkbenchLayoutFn;
-  private readonly _perspectiveViewConflictResolver = inject(WorkbenchPerspectiveViewConflictResolver);
   private readonly _activePerspective = inject(ACTIVE_PERSPECTIVE);
 
   public readonly id: string;
@@ -98,9 +96,6 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
 
   /**
    * Creates the perspective layout using the main area of the current layout.
-   *
-   * When switching perspective, id clashes between views contained in the perspective and the main area are possible.
-   * The activation detects and resolves conflicts, changing the layout of this perspective if necessary.
    */
   private createLayoutForActivation(currentLayout: ɵWorkbenchLayout): ɵWorkbenchLayout {
     if (!this._layout) {
@@ -110,20 +105,13 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
     // Outlets of the new layout.
     const outlets = new Map<string, UrlSegment[]>();
 
-    // Add outlets of the main area and resolve conflicts if any.
-    if (currentLayout.grids.mainArea && this._layout.grids.mainArea) {
-      // Detect and resolve id clashes between views defined by this perspective and views contained in the main area,
-      // assigning views of this perspective a new identity.
-      this._layout = this._perspectiveViewConflictResolver.resolve(currentLayout, this._layout);
-
-      // Add outlets contained in the main area.
-      Objects.entries(currentLayout.outlets({mainAreaGrid: true})).forEach(([outlet, segments]) => {
-        outlets.set(outlet, segments);
-      });
-    }
-
-    // Add outlets contained in this perspective.
+    // Add outlets of this perspective.
     Objects.entries(this._layout.outlets({mainGrid: true, activityGrids: true})).forEach(([outlet, segments]) => {
+      outlets.set(outlet, segments);
+    });
+
+    // Add outlets of the shared main area.
+    Objects.entries(currentLayout.outlets({mainAreaGrid: true})).forEach(([outlet, segments]) => {
       outlets.set(outlet, segments);
     });
 

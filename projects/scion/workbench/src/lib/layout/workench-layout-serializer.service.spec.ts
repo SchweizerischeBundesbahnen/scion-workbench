@@ -119,7 +119,7 @@ describe('WorkbenchLayoutSerializer', () => {
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
       .addPart('part.right-top', {align: 'right', relativeTo: MAIN_AREA})
-      .addPart('right-bottom', {align: 'bottom', relativeTo: 'part.right-top'});
+      .addPart('right-bottom', {align: 'bottom', relativeTo: 'part.right-top'}); // alternative id
 
     // Serialize and deserialize the layout.
     const serializedLayout = workbenchLayout.serialize({assignStablePartIdentifier: true});
@@ -140,6 +140,41 @@ describe('WorkbenchLayoutSerializer', () => {
                 id: 'part.__3__',
                 alternativeId: 'right-bottom',
               }),
+            }),
+          }),
+        },
+      },
+    });
+  });
+
+  it('should serialize view identifiers into logical identifiers based on their order in the layout', async () => {
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view-1', {partId: 'part.left', cssClass: 'view-1'}) // alternative id
+      .addView('view.2', {partId: 'part.left', cssClass: 'view-2'})
+      .addView('view-3', {partId: 'part.right', cssClass: 'view-3'}) // alternative id
+      .addView('view.4', {partId: 'part.right', cssClass: 'view-4'});
+
+    // Serialize and deserialize the layout.
+    const serializedLayout = workbenchLayout.serialize({assignStableViewIdentifier: true});
+    const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
+
+    expect(deserializedLayout).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({
+              views: [
+                {id: 'view.__1__', cssClass: ['view-1'], alternativeId: 'view-1'},
+                {id: 'view.__2__', cssClass: ['view-2']},
+              ],
+            }),
+            child2: new MPart({
+              views: [
+                {id: 'view.__3__', cssClass: ['view-3'], alternativeId: 'view-3'},
+                {id: 'view.__4__', cssClass: ['view-4']},
+              ],
             }),
           }),
         },

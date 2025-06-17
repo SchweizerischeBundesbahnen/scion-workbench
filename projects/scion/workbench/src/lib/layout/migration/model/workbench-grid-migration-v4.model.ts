@@ -42,4 +42,4 @@ export interface MViewV4 {
   };
 }
 
-export type ViewIdV4 = `view.${number}`;
+export type ViewIdV4 = `view.${string}`;

@@ -229,7 +229,7 @@ describe('CanMatchWorkbenchView Guard', () => {
 
       // Navigate to the empty-path route.
       const workbenchRouter = TestBed.inject(WorkbenchRouter);
-      await workbenchRouter.navigate([], {hint: 'view-1'});
+      await workbenchRouter.navigate([], {hint: 'view-1', target: 'view.1'});
       await waitUntilStable();
 
       expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Circular loading of the workbench component detected in workbench outlet 'view\.1'\./));

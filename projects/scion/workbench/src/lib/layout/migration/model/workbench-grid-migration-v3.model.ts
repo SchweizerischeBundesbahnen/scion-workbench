@@ -40,6 +40,6 @@ export interface MViewV3 {
   };
 }
 
-export type ViewIdV3 = `view.${number}`;
+export type ViewIdV3 = `view.${string}`;
 
 export const VIEW_ID_PREFIX_V3 = 'view.';

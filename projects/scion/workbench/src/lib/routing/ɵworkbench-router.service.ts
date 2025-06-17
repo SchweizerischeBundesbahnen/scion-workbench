@@ -262,7 +262,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
     else {
       switch (extras.target ?? 'auto') {
         case 'blank': {
-          return addView(layout.computeNextViewId(), layout);
+          return addView(WorkbenchLayouts.computeViewId(), layout);
         }
         case 'auto': {
           const urlSegments = Routing.commandsToSegments(commands, {relativeTo: extras.relativeTo});
@@ -276,7 +276,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
             return views.reduce((layout, view) => updateView(view.id, layout), layout);
           }
           else {
-            return addView(layout.computeNextViewId(), layout);
+            return addView(WorkbenchLayouts.computeViewId(), layout);
           }
         }
         default: {

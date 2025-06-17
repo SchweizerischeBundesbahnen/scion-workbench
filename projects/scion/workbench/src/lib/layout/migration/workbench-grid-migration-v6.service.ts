@@ -14,7 +14,7 @@ import {MPartGridV6, MPartV6, MTreeNodeV6, MViewV6} from './model/workbench-grid
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
- * Migrates the workbench layout from version 5 to version 6.
+ * Migrates the workbench grid model from version 5 to version 6.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchGridMigrationV6 implements WorkbenchMigration {

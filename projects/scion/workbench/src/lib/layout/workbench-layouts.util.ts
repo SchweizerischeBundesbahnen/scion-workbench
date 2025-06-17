@@ -59,28 +59,17 @@ export const WorkbenchLayouts = {
   },
 
   /**
-   * Computes the next available view id.
+   * Computes a unique view id.
    */
-  computeNextViewId: (viewIds: Iterable<ViewId>): ViewId => {
-    const ids = Array.from(viewIds)
-      .map(viewId => Number(viewId.substring(VIEW_ID_PREFIX.length)))
-      .reduce((set, id) => set.add(id), new Set<number>());
-
-    for (let i = 1; i <= ids.size; i++) {
-      if (!ids.has(i)) {
-        return `${VIEW_ID_PREFIX}${i}`;
-      }
-    }
-    return `${VIEW_ID_PREFIX}${ids.size + 1}`;
-  },
+  computeViewId: (): ViewId => `${VIEW_ID_PREFIX}${UID.randomUID()}`,
 
   /**
-   * Computes a random part id.
+   * Computes a unique part id.
    */
   computePartId: (): PartId => `${PART_ID_PREFIX}${UID.randomUID()}`,
 
   /**
-   * Computes a random activity id.
+   * Computes a unique activity id.
    */
   computeActivityId: (): ActivityId => `${ACTIVITY_ID_PREFIX}${UID.randomUID()}`,
 

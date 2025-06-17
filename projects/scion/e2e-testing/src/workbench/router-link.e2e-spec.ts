@@ -473,19 +473,20 @@ test.describe('Workbench RouterLink', () => {
       .navigateView('view.101', ['test-router'], {data: {navigated: 'false'}}),
     );
 
-    const testView = appPO.view({viewId: 'view.1'});
-
     // Open test view via router link.
     const routerPage = new RouterPagePO(appPO, {viewId: 'view.101'});
     await routerPage.navigateViaRouterLink(['/test-view'], {
       target: 'blank',
+      cssClass: 'testee',
       data: {navigated: 'true'},
     });
 
     // Expect test view to be opened
+    const testView = appPO.view({cssClass: 'testee'});
+    const testViewId = await testView.getViewId();
     await expect.poll(() => testView.getInfo()).toMatchObject(
       {
-        viewId: 'view.1',
+        viewId: testViewId,
         urlSegments: 'test-view',
         navigationData: {navigated: 'true'},
       } satisfies Partial<ViewInfo>,
@@ -512,8 +513,8 @@ test.describe('Workbench RouterLink', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: testViewId}],
+            activeViewId: testViewId,
           }),
         },
       },
