@@ -46,4 +46,4 @@ export interface MViewV6 {
 export interface NavigationDataV6 {
   [key: string]: unknown;
 }
-export type ViewIdV6 = `view.${number}`;
+export type ViewIdV6 = `view.${string}`;

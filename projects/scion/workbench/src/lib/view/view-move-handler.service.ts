@@ -72,7 +72,7 @@ export class ViewMoveHandler {
     const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
 
     await this._workbenchRouter.navigate(layout => {
-      const newViewId = event.source.alternativeViewId ?? layout.computeNextViewId();
+      const newViewId = event.source.alternativeViewId ?? WorkbenchLayouts.computeViewId();
       if (addToNewPart) {
         const newPartId = event.target.newPart?.id ?? WorkbenchLayouts.computePartId();
         return layout
@@ -98,7 +98,7 @@ export class ViewMoveHandler {
     // Open the view "standalone" in a blank window in an anonymous perspective.
     const urlTree = await this._workbenchRouter.createUrlTree(() => {
       const newLayout = this._workbenchLayoutFactory.create();
-      const newViewId = event.source.alternativeViewId ?? newLayout.computeNextViewId();
+      const newViewId = event.source.alternativeViewId ?? WorkbenchLayouts.computeViewId();
       const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
       return newLayout
         .addView(newViewId, {

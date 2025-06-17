@@ -542,7 +542,7 @@ describe('Workbench Perspective', () => {
     });
   });
 
-  it('should open a empty-path view in the active part of perspective without main area', async () => {
+  it('should open a view in the active part of perspective without main area', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest({
@@ -551,16 +551,8 @@ describe('Workbench Perspective', () => {
             .addPart('part.right', {align: 'right'})
             .addView('view.101', {partId: 'part.left'})
             .addView('view.102', {partId: 'part.right'})
-            .navigateView('view.101', [], {hint: 'list'})
-            .navigateView('view.102', [], {hint: 'overview'})
             .activatePart('part.right'),
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
-        provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchView('list')], component: TestComponent},
-          {path: '', canMatch: [canMatchWorkbenchView('overview')], component: TestComponent},
-          {path: 'details/:id', component: TestComponent},
-        ]),
       ],
     });
 
@@ -580,17 +572,17 @@ describe('Workbench Perspective', () => {
       },
     });
 
-    // open new details view
-    await TestBed.inject(WorkbenchRouter).navigate(['details/1']);
+    // Open view.
+    await TestBed.inject(WorkbenchRouter).navigate(['path/to/view'], {target: 'view.201'});
     await waitUntilStable();
 
-    // empty-path view should be opened in the active part (right) of the main grid
+    // Expect view to be opened in the active part (right) of the main grid
     expect(fixture).toEqualWorkbenchLayout({
       grids: {
         main: {
           root: new MTreeNode({
             child1: new MPart({id: 'part.left', views: [{id: 'view.101'}], activeViewId: 'view.101'}),
-            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.1'}], activeViewId: 'view.1'}),
+            child2: new MPart({id: 'part.right', views: [{id: 'view.102'}, {id: 'view.201'}], activeViewId: 'view.201'}),
             direction: 'row',
             ratio: .5,
           }),
@@ -612,7 +604,6 @@ describe('Workbench Perspective', () => {
             .addView('view.201', {partId: 'part.right'})
             .addView('view.202', {partId: 'part.right', activateView: true})
             .addView('view.203', {partId: 'part.right'}),
-          startup: {launcher: 'APP_INITIALIZER'},
         }),
       ],
     });

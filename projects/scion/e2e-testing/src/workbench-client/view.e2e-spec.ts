@@ -336,10 +336,12 @@ test.describe('Workbench View', () => {
 
     // Open test view 2.
     const testee2ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    const testee2ViewId = await testee2ViewPage.view.getViewId();
     await testee2ViewPage.checkConfirmClosing(true); // prevent the view from closing
 
     // Open test view 3.
     const testee3ViewPage = await microfrontendNavigator.openInNewTab(ViewPagePO, 'app1');
+    const testee3ViewId = await testee3ViewPage.view.getViewId();
     await testee3ViewPage.checkConfirmClosing(true); // prevent the view from closing
 
     // Open test view 4.
@@ -356,8 +358,8 @@ test.describe('Workbench View', () => {
     await expectView(testee3ViewPage).toBeActive();
     await expectView(testee4ViewPage).not.toBeAttached();
 
-    const canCloseMessageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', await testee2ViewPage.view.getViewId()]});
-    const canCloseMessageBox3 = appPO.messagebox({cssClass: ['e2e-close-view', await testee3ViewPage.view.getViewId()]});
+    const canCloseMessageBox2 = appPO.messagebox({cssClass: ['e2e-close-view', testee2ViewId]});
+    const canCloseMessageBox3 = appPO.messagebox({cssClass: ['e2e-close-view', testee3ViewId]});
 
     // Test that the closing of view 2 and view 3 is blocked.
     await expectMessageBox(new TextMessageBoxPagePO(canCloseMessageBox2)).toBeHidden();
@@ -367,7 +369,8 @@ test.describe('Workbench View', () => {
     await canCloseMessageBox3.clickActionButton('error');
 
     // Assert error.
-    await expect.poll(() => consoleLogs.contains({severity: 'error', message: /\[CanCloseSpecError] Error in CanLoad of view 'view\.3'\./})).toBe(true);
+    const expectedMessage = new RegExp(`\\[CanCloseSpecError] Error in CanLoad of view '${testee3ViewId}'\\.`);
+    await expect.poll(() => consoleLogs.contains({severity: 'error', message: expectedMessage})).toBe(true);
 
     // Prevent closing view 2.
     await canCloseMessageBox2.clickActionButton('no');

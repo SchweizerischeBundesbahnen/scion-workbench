@@ -49,4 +49,4 @@ export interface NavigationDataV7 {
 }
 
 export type PartIdV7 = `part.${string}`;
-export type ViewIdV7 = `view.${number}`;
+export type ViewIdV7 = `view.${string}`;

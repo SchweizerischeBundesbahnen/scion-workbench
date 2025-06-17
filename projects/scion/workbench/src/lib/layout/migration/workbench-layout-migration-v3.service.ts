@@ -14,7 +14,7 @@ import {MPerspectiveLayoutV3} from './model/workbench-layout-migration-v3.model'
 import {WorkbenchMigration} from '../../migration/workbench-migration';
 
 /**
- * Migrates the perspective layout from version 2 to version 3.
+ * Migrates the workbench layout from version 2 to version 3.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchLayoutMigrationV3 implements WorkbenchMigration {

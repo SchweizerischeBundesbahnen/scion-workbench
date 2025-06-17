@@ -22,7 +22,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {UrlSegmentMatcher} from '../routing/url-segment-matcher';
 import {WorkbenchLayouts} from './workbench-layouts.util';
 import {Logger} from '../logging';
-import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
+import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, VIEW_ID_PREFIX, WorkbenchOutlet} from '../workbench.constants';
 import {PartId} from '../part/workbench-part.model';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH, ActivityId, MActivity, MActivityLayout, MActivityStack} from '../activity/workbench-activity.model';
 import {Objects} from '../common/objects.util';
@@ -523,7 +523,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       workingCopy.__addView({id}, extras);
     }
     else {
-      workingCopy.__addView({id: this.computeNextViewId(), alternativeId: id}, extras);
+      workingCopy.__addView({id: WorkbenchLayouts.computeViewId(), alternativeId: id}, extras);
     }
     return workingCopy;
   }
@@ -646,6 +646,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   public serialize(flags?: LayoutSerializationFlags): SerializedWorkbenchLayout {
     const workingCopy = this.workingCopy();
 
+    // Check if to assign each view a stable id based on its position in the grid.
+    if (flags?.assignStableViewIdentifier) {
+      workingCopy.__assignStableViewIdentifier();
+    }
+
     // Check if to assign each part a stable id based on its position in the grid.
     if (flags?.assignStablePartIdentifier) {
       workingCopy.__assignStablePartIdentifier();
@@ -685,13 +690,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this.perspectiveId === other.perspectiveId
       // Navigational state is not tested for equality as it is set through view navigation, resulting in a new navigation id when modified.
     );
-  }
-
-  /**
-   * Computes the next available view id.
-   */
-  public computeNextViewId(): ViewId {
-    return WorkbenchLayouts.computeNextViewId(this.views().map(view => view.id));
   }
 
   /**
@@ -1245,6 +1243,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     view.id = newViewId;
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __assignStableViewIdentifier(): void {
+    this.views().forEach((view, index) => this.__renameView(view, `${VIEW_ID_PREFIX}__${index + 1}__`)); // surround with underscores to avoid collision with existing identifiers
   }
 
   /**

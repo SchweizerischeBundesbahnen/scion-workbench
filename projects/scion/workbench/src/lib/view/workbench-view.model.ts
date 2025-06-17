@@ -239,7 +239,7 @@ export abstract class WorkbenchView {
 /**
  * Format of a view identifier.
  *
- * Each view is assigned a unique identifier (e.g., `view.1`, `view.2`, etc.).
+ * Each view is assigned a unique identifier (e.g., `view.d4de99fb`, `view.cad347dd`, etc.).
  * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
  * be identified either by its unique or alternative id.
  */

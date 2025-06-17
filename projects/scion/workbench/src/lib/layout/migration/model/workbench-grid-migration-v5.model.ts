@@ -48,4 +48,4 @@ export interface NavigationDataV5 {
   [key: string]: unknown;
 }
 
-export type ViewIdV5 = `view.${number}`;
+export type ViewIdV5 = `view.${string}`;

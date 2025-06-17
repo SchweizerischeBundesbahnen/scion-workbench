@@ -26,7 +26,7 @@ test.describe('Workbench View', () => {
     // Add two views to the main grid.
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
-      .addView('view.101', {partId: 'part.main', activateView: true})
+      .addView('view.101', {partId: 'part.main', activateView: true, cssClass: 'testee'})
       .addView('view.102', {partId: 'part.main', activateView: true})
       .navigateView('view.101', ['test-view'])
       .navigateView('view.102', ['test-view']),
@@ -40,6 +40,7 @@ test.describe('Workbench View', () => {
     };
 
     // Expect test view to be moved to the new window.
+    const newViewId = await newAppPO.view({cssClass: 'testee'}).getViewId();
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
         main: {
@@ -47,15 +48,15 @@ test.describe('Workbench View', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: 'view.1'});
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: newViewId});
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -74,7 +75,7 @@ test.describe('Workbench View', () => {
     // Define perspective with a view in the main grid.
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
-      .addView('view.101', {partId: 'part.main'})
+      .addView('view.101', {partId: 'part.main', cssClass: 'testee'})
       .addView('view.102', {partId: 'part.main', activateView: true})
       .navigateView('view.101', [], {hint: 'test-view'})
       .navigateView('view.102', [], {hint: 'test-view'}),
@@ -88,6 +89,7 @@ test.describe('Workbench View', () => {
     };
 
     // Expect test view to be moved to the new window.
+    const newViewId = await newAppPO.view({cssClass: 'testee'}).getViewId();
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
         main: {
@@ -95,15 +97,15 @@ test.describe('Workbench View', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: 'view.1'});
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: newViewId});
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -123,6 +125,7 @@ test.describe('Workbench View', () => {
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
     await routerPage.navigate(['test-view'], {
       target: 'view.100',
+      cssClass: 'testee',
     });
 
     // Move test view to new window.
@@ -133,6 +136,7 @@ test.describe('Workbench View', () => {
     };
 
     // Expect test view to be moved to the new window.
+    const newViewId = await newAppPO.view({cssClass: 'testee'}).getViewId();
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
         main: {
@@ -140,15 +144,15 @@ test.describe('Workbench View', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: 'view.1'});
+    const viewPage = new ViewPagePO(newWindow.appPO, {viewId: newViewId});
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -182,6 +186,7 @@ test.describe('Workbench View', () => {
 
     // Move test view to new window.
     const newAppPO = await testViewPage.tab.moveToNewWindow();
+    const newViewId = await newAppPO.view({cssClass: 'testee'}).getViewId();
 
     // Expect test view to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
@@ -191,15 +196,15 @@ test.describe('Workbench View', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
     });
 
     // Expect test view to display.
-    const viewPage = new ViewPagePO(newAppPO, {viewId: 'view.1'});
+    const viewPage = new ViewPagePO(newAppPO, {viewId: newViewId});
     await expectView(viewPage).toBeActive();
 
     // Expect test view to be removed from the origin window.
@@ -223,9 +228,9 @@ test.describe('Workbench View', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.part')
-      .addView('view.101', {partId: 'part.part'})
-      .addView('view.102', {partId: 'part.part'})
-      .addView('view.103', {partId: 'part.part'})
+      .addView('view.101', {partId: 'part.part', cssClass: 'testee-1'})
+      .addView('view.102', {partId: 'part.part', cssClass: 'testee-2'})
+      .addView('view.103', {partId: 'part.part', cssClass: 'testee-3'})
       .navigateView('view.101', ['test-view']) // path-based view
       .navigateView('view.102', ['test-view']) // path-based view
       .navigateView('view.103', [], {hint: 'test-view'}), // empty-path view
@@ -233,6 +238,8 @@ test.describe('Workbench View', () => {
 
     // Move view 1 to a new window
     const newAppPO = await appPO.view({viewId: 'view.101'}).tab.moveToNewWindow();
+    const newView1Id = await newAppPO.view({cssClass: 'testee-1'}).getViewId();
+
     // Expect view 1 to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -242,9 +249,9 @@ test.describe('Workbench View', () => {
         mainArea: {
           root: new MPart({
             views: [
-              {id: 'view.1'},
+              {id: newView1Id},
             ],
-            activeViewId: 'view.1',
+            activeViewId: newView1Id,
           }),
         },
       },
@@ -268,6 +275,8 @@ test.describe('Workbench View', () => {
     await appPO.view({viewId: 'view.102'}).tab.moveTo(await newAppPO.activePart({grid: 'mainArea'}).getPartId(), {
       workbenchId: await newAppPO.getWorkbenchId(),
     });
+    const newView2Id = await newAppPO.view({cssClass: 'testee-2'}).getViewId();
+
     // Expect view 2 to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -277,10 +286,10 @@ test.describe('Workbench View', () => {
         mainArea: {
           root: new MPart({
             views: [
-              {id: 'view.1'},
-              {id: 'view.2'},
+              {id: newView1Id},
+              {id: newView2Id},
             ],
-            activeViewId: 'view.2',
+            activeViewId: newView2Id,
           }),
         },
       },
@@ -303,6 +312,8 @@ test.describe('Workbench View', () => {
     await appPO.view({viewId: 'view.103'}).tab.moveTo(await newAppPO.activePart({grid: 'mainArea'}).getPartId(), {
       workbenchId: await newAppPO.getWorkbenchId(),
     });
+    const newView3Id = await newAppPO.view({cssClass: 'testee-3'}).getViewId();
+
     // Expect view 3 to be moved to the new window.
     await expect(newAppPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -312,11 +323,11 @@ test.describe('Workbench View', () => {
         mainArea: {
           root: new MPart({
             views: [
-              {id: 'view.1'},
-              {id: 'view.2'},
-              {id: 'view.3'},
+              {id: newView1Id},
+              {id: newView2Id},
+              {id: newView3Id},
             ],
-            activeViewId: 'view.3',
+            activeViewId: newView3Id,
           }),
         },
       },
@@ -338,6 +349,7 @@ test.describe('Workbench View', () => {
 
     // Move test view to new window.
     const newAppPO = await testViewPage.tab.moveToNewWindow();
+    const newViewId = await newAppPO.view({cssClass: 'test-view'}).getViewId();
     const newWindow = {
       appPO: newAppPO,
       page: newAppPO.page,
@@ -347,15 +359,12 @@ test.describe('Workbench View', () => {
     // Open peripheral view in the new browser window.
     const newAppRouterPage = await newWindow.workbenchNavigator.openInNewTab(RouterPagePO);
     await newAppRouterPage.navigate(['test-view'], {
-      target: 'blank',
-      cssClass: 'peripheral-view',
+      target: 'view.101',
     });
     await newAppRouterPage.view.tab.close();
 
     // Move peripheral view to main grid.
-    const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
-    const peripheralViewId = await peripheralViewPage.getViewId();
-    const dragHandle = await peripheralViewPage.tab.startDrag();
+    const dragHandle = await newWindow.appPO.view({viewId: 'view.101'}).tab.startDrag();
     await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
@@ -368,15 +377,15 @@ test.describe('Workbench View', () => {
             ratio: .8,
             child1: new MPart({id: MAIN_AREA}),
             child2: new MPart({
-              views: [{id: peripheralViewId}],
-              activeViewId: peripheralViewId,
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
           }),
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
@@ -396,8 +405,8 @@ test.describe('Workbench View', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
@@ -415,15 +424,15 @@ test.describe('Workbench View', () => {
             ratio: .8,
             child1: new MPart({id: MAIN_AREA}),
             child2: new MPart({
-              views: [{id: peripheralViewId}],
-              activeViewId: peripheralViewId,
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
           }),
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
@@ -443,6 +452,7 @@ test.describe('Workbench View', () => {
 
     // Move test view to new window.
     const newAppPO = await testViewPage.tab.moveToNewWindow();
+    const newViewId = await newAppPO.view({cssClass: 'test-view'}).getViewId();
     const newWindow = {
       appPO: newAppPO,
       workbenchNavigator: new WorkbenchNavigator(newAppPO),
@@ -451,15 +461,12 @@ test.describe('Workbench View', () => {
     // Open peripheral view.
     const newAppRouterPage = await newWindow.workbenchNavigator.openInNewTab(RouterPagePO);
     await newAppRouterPage.navigate(['test-view'], {
-      target: 'blank',
-      cssClass: 'peripheral-view',
+      target: 'view.101',
     });
     await newAppRouterPage.view.tab.close();
 
     // Move peripheral view to main grid.
-    const peripheralViewPage = newWindow.appPO.view({cssClass: 'peripheral-view'});
-    const peripheralViewId = await peripheralViewPage.getViewId();
-    const dragHandle = await peripheralViewPage.tab.startDrag();
+    const dragHandle = await newWindow.appPO.view({viewId: 'view.101'}).tab.startDrag();
     await dragHandle.dragToGrid({grid: 'main', region: 'east'});
     await dragHandle.drop();
 
@@ -472,15 +479,15 @@ test.describe('Workbench View', () => {
             ratio: .8,
             child1: new MPart({id: MAIN_AREA}),
             child2: new MPart({
-              views: [{id: peripheralViewId}],
-              activeViewId: peripheralViewId,
+              views: [{id: 'view.101'}],
+              activeViewId: 'view.101',
             }),
           }),
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
@@ -497,8 +504,8 @@ test.describe('Workbench View', () => {
         },
         mainArea: {
           root: new MPart({
-            views: [{id: 'view.1'}],
-            activeViewId: 'view.1',
+            views: [{id: newViewId}],
+            activeViewId: newViewId,
           }),
         },
       },
