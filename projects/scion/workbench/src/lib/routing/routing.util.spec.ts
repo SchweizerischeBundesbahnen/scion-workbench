@@ -261,7 +261,7 @@ describe('Routing.parseOutlets', () => {
 
     // Add view outlets view.101 and view.103 to the URL.
     await TestBed.inject(ɵWorkbenchRouter).navigate(layout => {
-      const activeMainAreaPart = layout.activePart({grid: 'mainArea'})!;
+      const activeMainAreaPart = layout.activePart({grid: 'mainArea'});
       return layout
         .addView('view.101', {partId: activeMainAreaPart.id})
         .addView('view.102', {partId: activeMainAreaPart.id})

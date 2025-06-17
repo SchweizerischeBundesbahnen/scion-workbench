@@ -33,8 +33,8 @@ test.describe('Browser Session History', () => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     // Create two perspectives (no activation).
-    await workbenchNavigator.createPerspective('testee-1', factory => factory.addPart(MAIN_AREA), {active: false});
-    await workbenchNavigator.createPerspective('testee-2', factory => factory.addPart(MAIN_AREA), {active: false});
+    await workbenchNavigator.createPerspective('testee-1', factory => factory.addPart(MAIN_AREA), {activate: false});
+    await workbenchNavigator.createPerspective('testee-2', factory => factory.addPart(MAIN_AREA), {activate: false});
 
     await test.step('Switching to perspective 1 (initial perspective activation)', async () => {
       // Capture browser session history count.
