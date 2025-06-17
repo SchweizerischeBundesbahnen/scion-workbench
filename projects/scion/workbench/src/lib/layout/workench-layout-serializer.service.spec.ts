@@ -104,7 +104,7 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Expect "migrated" flag to be set.
     expect(layout.grids.main.migrated).toBeTrue();
-    expect(layout.grids.mainArea!.migrated).toBeTrue();
+    expect(layout.grids.mainArea.migrated).toBeTrue();
 
     // Serialize layout.
     const serializedLayout = layout.serialize();
@@ -112,7 +112,7 @@ describe('WorkbenchLayoutSerializer', () => {
 
     // Expect "migrated" flag not to be serialized.
     expect(deserializedLayout.grids.main.migrated).toBeUndefined();
-    expect(deserializedLayout.grids.mainArea!.migrated).toBeUndefined();
+    expect(deserializedLayout.grids.mainArea.migrated).toBeUndefined();
   });
 
   it('should serialize part identifiers into logical identifiers based on their order in the layout', async () => {
