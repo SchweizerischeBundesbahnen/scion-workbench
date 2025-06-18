@@ -205,11 +205,11 @@ describe('Text Provider', () => {
 
     // Expect parameters not to be replaced.
     const text1 = text('%workbench.page_not_found.message;a=b', {injector: TestBed.inject(Injector)})();
-    expect(text1).toEqual('The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try to open the page again.');
+    expect(text1).toEqual('The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try opening the page again or resetting the perspective.');
 
     // Expect parameters to be replaced.
     const text2 = text('%workbench.page_not_found.message;path=path/to/view', {injector: TestBed.inject(Injector)})();
-    expect(text2).toEqual('The requested page <strong>path/to/view</strong> was not found.<br>The URL may have changed. Try to open the page again.');
+    expect(text2).toEqual('The requested page <strong>path/to/view</strong> was not found.<br>The URL may have changed. Try opening the page again or resetting the perspective.');
   });
 
   it('should support observable as text provider using `toSignal`', () => {
