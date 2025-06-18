@@ -70,6 +70,7 @@ export abstract class WorkbenchConfig {
    * - workbench.page_not_found.message
    * - workbench.page_not_found.title
    * - workbench.page_not_found_developer_hint.message
+   * - workbench.reset_perspective.action
    * - workbench.show_open_tabs.tooltip
    *
    * The function:

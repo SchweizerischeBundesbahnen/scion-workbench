@@ -12,6 +12,7 @@ import {Component, computed, inject, isDevMode} from '@angular/core';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {TextPipe} from '../text/text.pipe';
+import {WorkbenchService} from '../workbench.service';
 
 @Component({
   selector: 'wb-page-not-found',
@@ -26,5 +27,6 @@ export default class PageNotFoundComponent {
   protected readonly isDevMode = isDevMode();
   protected readonly view = inject(WorkbenchView, {optional: true});
   protected readonly part = inject(WorkbenchPart, {optional: true});
+  protected readonly workbenchService = inject(WorkbenchService);
   protected readonly path = computed(() => (this.view ?? this.part)?.navigation()?.path.map(segment => `${segment}`).join('/'));
 }
