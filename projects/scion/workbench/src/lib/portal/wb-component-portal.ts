@@ -9,8 +9,9 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {assertNotInReactiveContext, ComponentRef, createComponent, EnvironmentInjector, inject, Injector, Provider, Signal, signal, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, createComponent, DestroyRef, EnvironmentInjector, inject, Injector, Provider, Signal, signal, ViewContainerRef} from '@angular/core';
 import {Logger, LoggerNames} from '../logging';
+import {DisposeFn} from '../common/disposable';
 
 /**
  * Like the Angular CDK 'ComponentPortal' but does not destroy the component on detach.
@@ -28,9 +29,29 @@ export class WbComponentPortal<T = any> {
   private _componentRef: ComponentRef<T> | null | undefined;
   private _logger = inject(Logger);
   private _attached = signal(false);
+  private _onAttachListeners = new Set<() => void>();
+  private _onDetachListeners = new Set<() => void>();
 
-  constructor(private _componentType: ComponentType<T>, private _options?: PortalOptions) {
+  constructor(private _componentType: ComponentType<T>, public _options?: PortalOptions) {
     // Do not construct the component here but the time attaching it to the Angular component tree. See the comment above.
+    console.log(`>>> ++ construct portal ${this._options?.logContext}`);
+  }
+
+  public onAttach(fn: () => void, options?: {injector?: Injector}): DisposeFn {
+    this._onAttachListeners.add(fn);
+    const destroyFn = (): void => void this._onAttachListeners.delete(fn);
+    const injector = options?.injector ?? inject(Injector);
+    injector.get(DestroyRef).onDestroy(() => destroyFn());
+    return destroyFn;
+  }
+
+  public onDetach(fn: () => void, options?: {injector?: Injector}): DisposeFn {
+    this._onDetachListeners.add(fn);
+    const destroyFn = (): void => void this._onDetachListeners.delete(fn);
+
+    const injector = options?.injector ?? inject(Injector);
+    injector.get(DestroyRef).onDestroy(() => destroyFn());
+    return destroyFn;
   }
 
   /**
@@ -41,7 +62,10 @@ export class WbComponentPortal<T = any> {
       elementInjector: Injector.create({
         name: 'WbComponentPortalInjector',
         parent: elementInjector,
-        providers: this._options?.providers ?? [],
+        providers: [
+          ...(this._options?.providers ?? []),
+          {provide: WbComponentPortal, useValue: this},
+        ],
       }),
       environmentInjector: elementInjector.get(EnvironmentInjector),
     });
@@ -85,6 +109,7 @@ export class WbComponentPortal<T = any> {
     this._viewContainerRef.insert(this._componentRef.hostView);
     this._attached.set(true);
     (this._componentRef.instance as Partial<OnAttach>).onAttach?.();
+    this._onAttachListeners.forEach(fn => fn());
   }
 
   /**
@@ -101,6 +126,7 @@ export class WbComponentPortal<T = any> {
 
     this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._componentRef);
     (this._componentRef!.instance as Partial<OnDetach>).onDetach?.();
+    this._onDetachListeners.forEach(fn => fn());
     const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
     this._viewContainerRef!.detach(index);
     this._componentRef!.changeDetectorRef.detach();
@@ -129,6 +155,13 @@ export class WbComponentPortal<T = any> {
     return this._componentRef;
   }
 
+  /**
+   * The HTML element of this portal.
+   */
+  public get element(): HTMLElement | undefined {
+    return this._componentRef?.location.nativeElement as HTMLElement | undefined;
+  }
+
   public get attached(): Signal<boolean> {
     return this._attached;
   }
@@ -155,6 +188,8 @@ export interface PortalOptions {
    * Providers registered with the injector for the instantiation of the component.
    */
   providers?: Provider[];
+
+  logContext?: string;
 }
 
 /**

@@ -61,7 +61,12 @@ export class ViewTabComponent {
   private readonly _injector = inject(Injector);
 
   public readonly host = inject(ElementRef).nativeElement as HTMLElement;
-  public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
+  // public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
+  // public readonly view = input.required({alias: 'viewId', transform: (viewId: ViewId) => this._viewRegistry.get(viewId)});
+  public readonly viewId = input.required<ViewId>();
+  // public readonly view = linkedSignal(() => this._viewRegistry.get(this.viewId()));
+  public readonly view = computed(() => this._viewRegistry.objects().find(view => view.id === this.viewId())!);
+  // public readonly view = computed(() => this._viewRegistry.objects().find(view => view.id === this.viewId())!);
   public readonly boundingClientRect = boundingClientRect(inject(ElementRef));
 
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
@@ -72,6 +77,11 @@ export class ViewTabComponent {
     this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
+
+    // effect(() => {
+    //   this._viewRegistry.objects();
+    //   this.view.set(this._viewRegistry.get(this.viewId()));
+    // });
   }
 
   @HostListener('click')

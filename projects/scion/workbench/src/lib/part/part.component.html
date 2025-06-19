@@ -11,7 +11,7 @@
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="active-view e2e-view-content e2e-content">
-    <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
+    <ng-container *wbPortalOutlet="(part.activeViewId() | wbViewPortal)()"/>
   </div>
 } @else if (part.navigation()) {
   <sci-viewport class="part-content e2e-part-content e2e-content"

@@ -264,6 +264,8 @@ function createDynamicTestComponent(onConstruct: () => void): {fixture: Componen
   });
   // Add component into Angular's logical component tree.
   rootComponent.injector.get(ViewContainerRef).insert(testComponent.hostView);
+  // Cleanup resources.
+  rootComponent.onDestroy(() => testComponent.destroy());
 
   return {
     fixture,

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, ElementRef, inject} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
@@ -76,10 +76,6 @@ export class MainAreaPartComponent {
   protected readonly desktop = inject(DESKTOP);
   protected readonly dasherize = dasherize;
   protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea));
-
-  constructor() {
-    inject(ɵWorkbenchPart).partComponent.set(inject(ElementRef).nativeElement as HTMLElement);
-  }
 
   protected onDesktopViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({

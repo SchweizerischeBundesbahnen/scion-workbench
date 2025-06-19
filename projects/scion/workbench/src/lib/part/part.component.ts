@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, HostBinding, inject, Injector, OnInit, untracked} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Injector, OnInit, untracked, viewChild} from '@angular/core';
 import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
@@ -24,9 +24,9 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
-import {PartId} from './workbench-part.model';
 import {dasherize} from '../common/dasherize.util';
 import {NullContentComponent} from '../null-content/null-content.component';
+import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 
 @Component({
   selector: 'wb-part',
@@ -43,37 +43,30 @@ import {NullContentComponent} from '../null-content/null-content.component';
     NullContentComponent,
   ],
   host: {
+    '[attr.data-partid]': 'part.id',
     '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,
     '[attr.data-grid]': 'dasherize(part.gridName())',
+    '[class.active]': 'part.active()',
+    '[attr.tabindex]': '-1',
   },
 })
-export class PartComponent implements OnInit {
+export class PartComponent implements OnInit, OnAttach, OnDetach {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _injector = inject(Injector);
   private readonly _cd = inject(ChangeDetectorRef);
+  private readonly _viewport = viewChild(SciViewportComponent);
 
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly canDrop = inject(ViewDragService).canDrop(inject(ɵWorkbenchPart));
   protected readonly dasherize = dasherize;
 
-  @HostBinding('attr.tabindex')
-  protected tabIndex = -1;
-
-  @HostBinding('attr.data-partid')
-  protected get partId(): PartId {
-    return this.part.id;
-  }
-
-  @HostBinding('class.active')
-  protected get isActive(): boolean {
-    return this.part.active();
-  }
+  private _scrollTop = 0;
+  private _scrollLeft = 0;
 
   constructor() {
-    this.part.partComponent.set(inject(ElementRef).nativeElement as HTMLElement);
     this.installComponentLifecycleLogger();
     this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
@@ -86,6 +79,26 @@ export class PartComponent implements OnInit {
     // Angular component tree, Angular checks the view tab for changes before the view. Therefore, if the view sets
     // its title during construction, then the view tab label will also change, causing the error.
     this._cd.detectChanges();
+  }
+
+  /**
+   * Method invoked after attached this component to the DOM.
+   */
+  public onAttach(): void {
+    if (this._viewport()) {
+      this._viewport()!.scrollTop = this._scrollTop;
+      this._viewport()!.scrollLeft = this._scrollLeft;
+    }
+  }
+
+  /**
+   * Method invoked before detaching this component from the DOM.
+   */
+  public onDetach(): void {
+    if (this._viewport()) {
+      this._scrollTop = this._viewport()!.scrollTop;
+      this._scrollLeft = this._viewport()!.scrollLeft;
+    }
   }
 
   /**
@@ -148,7 +161,7 @@ export class PartComponent implements OnInit {
 
   private installComponentLifecycleLogger(): void {
     const logger = inject(Logger);
-    logger.debug(() => `Constructing PartComponent [partId=${this.partId}]`, LoggerNames.LIFECYCLE);
-    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying PartComponent [partId=${this.partId}]'`, LoggerNames.LIFECYCLE));
+    logger.debug(() => `Constructing PartComponent [partId=${this.part.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying PartComponent [partId=${this.part.id}]'`, LoggerNames.LIFECYCLE));
   }
 }

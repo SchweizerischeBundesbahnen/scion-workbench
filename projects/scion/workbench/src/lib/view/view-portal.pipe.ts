@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {inject, Pipe, PipeTransform} from '@angular/core';
+import {computed, inject, Pipe, PipeTransform, signal, Signal} from '@angular/core';
 import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import type {ViewComponent} from '../view/view.component';
@@ -22,10 +22,16 @@ export class ViewPortalPipe implements PipeTransform {
 
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
 
-  public transform(viewId: ViewId | null): WbComponentPortal<ViewComponent> | null {
+  public transform(viewId: ViewId | null): Signal<WbComponentPortal<ViewComponent> | null> {
     if (!viewId) {
-      return null;
+      return signal(null);
     }
-    return this._viewRegistry.get(viewId).portal;
+    return computed(() => this._viewRegistry.objects().find(view => view.id === viewId)?.portal ?? null);
   }
+  // public transform(viewId: ViewId | null): Signal<WbComponentPortal<ViewComponent> | null> {
+  //   if (!viewId) {
+  //     return signal(null);
+  //   }
+  //   return computed(() => this._viewRegistry.objects().find(view => view.id === viewId)?.portal ?? null);
+  // }
 }

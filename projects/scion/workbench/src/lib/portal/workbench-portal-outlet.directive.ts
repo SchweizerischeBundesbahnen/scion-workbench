@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
+import {afterNextRender, DestroyRef, Directive, effect, inject, Injector, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
 import {WbComponentPortal} from './wb-component-portal';
 
 /**
@@ -33,6 +33,7 @@ export class WorkbenchPortalOutletDirective {
   public readonly portal = input.required<WbComponentPortal | null>({alias: 'wbPortalOutlet'});
 
   private readonly _viewContainerRef = inject(ViewContainerRef);
+  private readonly _injector = inject(Injector);
 
   private _portal: WbComponentPortal | null = null;
 
@@ -50,6 +51,7 @@ export class WorkbenchPortalOutletDirective {
     this._viewContainerRef.createEmbeddedView(nullTemplate);
 
     this.installPortal();
+    this.install();
 
     inject(DestroyRef).onDestroy(() => this.detach());
   }
@@ -76,5 +78,15 @@ export class WorkbenchPortalOutletDirective {
     if (this._portal?.isAttachedTo(this._viewContainerRef)) {
       this._portal.detach();
     }
+  }
+
+  private install(): void {
+    const parent = inject(WbComponentPortal, {optional: true});
+    parent?.onDetach(() => {
+      this.detach();
+    });
+    parent?.onAttach(() => {
+      afterNextRender({write: () => this.attach()}, {injector: this._injector});
+    });
   }
 }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, inject, signal} from '@angular/core';
+import {afterRenderEffect, DestroyRef, inject, Signal, signal} from '@angular/core';
 
 /**
  * Provides a registry for workbench model objects.
@@ -97,6 +97,18 @@ export class WorkbenchObjectRegistry<KEY, T> {
       throw this._nullObjectErrorFn(key);
     }
     return object ?? null;
+  }
+
+  public getSignal(key: Signal<KEY>): Signal<T | null> {
+    const object = this._objectsById.get(key());
+    const sig = signal<T | null>(object ?? null);
+
+    afterRenderEffect(() => {
+      this._objects();
+      const obj = this._objectsById.get(key());
+      sig.set(obj ?? null);
+    });
+    return sig;
   }
 
   /**
