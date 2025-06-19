@@ -358,8 +358,9 @@ function assertMTreeNodeDOM(expectedTreeNode: MTreeNode, actualElement: Element,
     throw Error(`[DOMAssertError] Expected element 'wb-grid-element' to have attribute 'data-nodeid', but is missing. [MTreeNode=${JSON.stringify(expectedTreeNode)}]`);
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child1);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(expectedTreeNode.child2);
+  const actualTreeNode: MTreeNode = TestBed.inject(WorkbenchLayoutService).layout().treeNode({nodeId});
+  const child1Visible = WorkbenchLayouts.isGridElementVisible(actualTreeNode.child1);
+  const child2Visible = WorkbenchLayouts.isGridElementVisible(actualTreeNode.child2);
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {

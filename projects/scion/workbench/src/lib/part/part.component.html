@@ -11,16 +11,16 @@
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="active-view e2e-view-content e2e-content">
-    <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
+    <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal; detachable: true"/>
   </div>
 } @else if (part.navigation()) {
-  <sci-viewport class="part-content e2e-part-content e2e-content"
-                wbViewDropZone
-                [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
-                [wbViewDropZoneAttributes]="{'data-partid': part.id}"
-                (wbViewDropZoneDrop)="onViewDrop($event)">
-    <router-outlet [name]="part.id" wbRouterOutletRootContext/>
-  </sci-viewport>
+  <div wbViewDropZone
+       [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
+       [wbViewDropZoneAttributes]="{'data-partid': part.id}"
+       (wbViewDropZoneDrop)="onViewDrop($event)"
+       class="part-content e2e-part-content e2e-content">
+    <ng-container *wbPortalOutlet="part.contentPortal; detachable: true"/>
+  </div>
 } @else {
   <wb-null-content/>
 }

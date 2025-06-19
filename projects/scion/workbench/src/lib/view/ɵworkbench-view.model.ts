@@ -72,6 +72,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly position = computed(() => this.part().viewIds().indexOf(this.id));
   public readonly first = computed(() => this.position() === 0);
   public readonly last = computed(() => this.position() === this.part().viewIds().length - 1);
+  public readonly attached = computed(() => this.portal.attached());
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly active = signal<boolean>(false);
@@ -107,6 +108,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         {provide: WorkbenchPart, useFactory: () => undefined},
         {provide: ɵWorkbenchPart, useFactory: () => undefined},
       ],
+      logContext: this.id,
     });
   }
 

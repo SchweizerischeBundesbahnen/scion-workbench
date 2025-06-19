@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
+import {Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
 import {WbComponentPortal} from './wb-component-portal';
 
 /**
@@ -31,50 +31,66 @@ import {WbComponentPortal} from './wb-component-portal';
 export class WorkbenchPortalOutletDirective {
 
   public readonly portal = input.required<WbComponentPortal | null>({alias: 'wbPortalOutlet'});
+  public readonly detachable = input<boolean>(false, {alias: 'wbPortalOutletDetachable'});
 
   private readonly _viewContainerRef = inject(ViewContainerRef);
 
-  private _portal: WbComponentPortal | null = null;
-
   constructor() {
-    const nullTemplate = inject(TemplateRef) as TemplateRef<void>;
-
-    // To get notified before Angular destroys the portal, we insert a pseudo-element ahead of it.
-    // This pseudo-element gets destroyed first, allowing us to detach the portal and prevent its destruction.
-    this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => this.detach());
-    // Additionally, we add an extra element between the pseudo-element and the portal to not break Angular's destroy algorithm.
-    // Angular's destroy algorithm terminates when an element removes its immediate successor during destruction, but it continues
-    // if the next but one element is removed instead. It is crucial to insert this intermediary element; otherwise, unmounting
-    // the workbench with opened views would fail to destroy the workbench component entirely.
-    // See tests `workbench-ummount.e2e-spec`.
-    this._viewContainerRef.createEmbeddedView(nullTemplate);
-
+    this.installDetachTrigger(); // must be called before `installPortal`.
     this.installPortal();
-
-    inject(DestroyRef).onDestroy(() => this.detach());
   }
 
   /**
    * Attaches the portal, detaching the previous portal, if any.
    */
   private installPortal(): void {
-    effect(() => {
+    effect(onCleanup => {
       const portal = this.portal();
-      untracked(() => {
-        this.detach();
-        this._portal = portal;
-        this.attach();
-      });
+      untracked(() => this.attach(portal));
+      onCleanup(() => this.detach(portal));
     });
   }
 
-  private attach(): void {
-    this._portal?.attach(this._viewContainerRef);
+  /**
+   * Installs a trigger to detach the portal if about to be destroyed.
+   */
+  private installDetachTrigger(): void {
+    const nullTemplate = inject(TemplateRef) as TemplateRef<void>;
+
+    const effectRef = effect(() => {
+      effectRef.destroy();
+
+      if (!this.detachable()) {
+        return;
+      }
+
+      // To get notified before Angular destroys the portal, we insert a pseudo-element ahead of it.
+      // This pseudo-element gets destroyed first, allowing us to detach the portal and prevent its destruction.
+      this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => this.detach(this.portal()));
+
+      // Additionally, we add an extra element between the pseudo-element and the portal to not break Angular's destroy algorithm.
+      // Angular's destroy algorithm terminates when an element removes its immediate successor during destruction, but it continues
+      // if the next but one element is removed instead. It is crucial to insert this intermediary element; otherwise, unmounting
+      // the workbench with opened views would fail to destroy the workbench component entirely.
+      // See tests `workbench-unmount.e2e-spec.ts`.
+      this._viewContainerRef.createEmbeddedView(nullTemplate);
+    });
   }
 
-  private detach(): void {
-    if (this._portal?.isAttachedTo(this._viewContainerRef)) {
-      this._portal.detach();
+  private attach(portal: WbComponentPortal | null): void {
+    portal?.attach(this._viewContainerRef);
+  }
+
+  private detach(portal: WbComponentPortal | null): void {
+    if (!portal?.isAttachedTo(this._viewContainerRef)) {
+      return;
+    }
+
+    if (this.detachable()) {
+      portal.detach();
+    }
+    else {
+      portal.destroy();
     }
   }
 }

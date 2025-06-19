@@ -9,7 +9,7 @@
  */
 
 import {ComponentType} from '@angular/cdk/portal';
-import {assertNotInReactiveContext, ComponentRef, createComponent, EnvironmentInjector, inject, Injector, Provider, Signal, signal, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, ComponentRef, computed, createComponent, EnvironmentInjector, inject, Injector, Provider, Signal, signal, ViewContainerRef} from '@angular/core';
 import {Logger, LoggerNames} from '../logging';
 
 /**
@@ -25,7 +25,7 @@ import {Logger, LoggerNames} from '../logging';
 export class WbComponentPortal<T = any> {
 
   private _viewContainerRef: ViewContainerRef | null | undefined;
-  private _componentRef: ComponentRef<T> | null | undefined;
+  private _componentRef = signal<ComponentRef<T> | null | undefined>(undefined);
   private _logger = inject(Logger);
   private _attached = signal(false);
 
@@ -56,9 +56,9 @@ export class WbComponentPortal<T = any> {
     if (this.isConstructed) {
       throw Error(`[PortalConstructError] Component already constructed. [component=${this._componentType}]`);
     }
-    this._componentRef = this.createComponent(injectionContext);
+    this._componentRef.set(this.createComponent(injectionContext));
     // Trigger change detection to complete the initialization of the component, necessary for components detached from the Angular component tree.
-    this._componentRef.changeDetectorRef.detectChanges();
+    this._componentRef()!.changeDetectorRef.detectChanges();
   }
 
   /**
@@ -78,13 +78,13 @@ export class WbComponentPortal<T = any> {
     }
 
     this._viewContainerRef = viewContainerRef;
-    this._componentRef = this._componentRef ?? this.createComponent(this._viewContainerRef.injector);
-    this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef);
+    this._componentRef.update(componentRef => componentRef ?? this.createComponent(viewContainerRef.injector));
+    this._logger.debug(() => 'Attaching portal', LoggerNames.LIFECYCLE, this._componentRef());
 
-    this._componentRef.changeDetectorRef.reattach();
-    this._viewContainerRef.insert(this._componentRef.hostView);
+    this._componentRef()!.changeDetectorRef.reattach();
+    this._viewContainerRef.insert(this._componentRef()!.hostView);
     this._attached.set(true);
-    (this._componentRef.instance as Partial<OnAttach>).onAttach?.();
+    (this._componentRef()!.instance as Partial<OnAttach>).onAttach?.();
   }
 
   /**
@@ -99,16 +99,16 @@ export class WbComponentPortal<T = any> {
       return;
     }
 
-    this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._componentRef);
-    (this._componentRef!.instance as Partial<OnDetach>).onDetach?.();
-    const index = this._viewContainerRef!.indexOf(this._componentRef!.hostView);
+    this._logger.debug(() => 'Detaching portal', LoggerNames.LIFECYCLE, this._componentRef());
+    (this._componentRef()!.instance as Partial<OnDetach>).onDetach?.();
+    const index = this._viewContainerRef!.indexOf(this._componentRef()!.hostView);
     this._viewContainerRef!.detach(index);
-    this._componentRef!.changeDetectorRef.detach();
+    this._componentRef()!.changeDetectorRef.detach();
     this._attached.set(false);
   }
 
   public get isConstructed(): boolean {
-    return !!this._componentRef;
+    return !!this._componentRef();
   }
 
   public isAttachedTo(viewContainerRef: ViewContainerRef): boolean {
@@ -116,17 +116,24 @@ export class WbComponentPortal<T = any> {
   }
 
   public get isDestroyed(): boolean {
-    return this._componentRef === null;
+    return this._componentRef() === null;
   }
 
   public get componentRef(): ComponentRef<T> {
-    if (this._componentRef === null) {
+    if (this._componentRef() === null) {
       throw Error('[NullPortalError] Portal destroyed.');
     }
-    if (this._componentRef === undefined) {
+    if (this._componentRef() === undefined) {
       throw Error('[NullPortalError] Component not constructed yet.');
     }
-    return this._componentRef;
+    return this._componentRef()!;
+  }
+
+  /**
+   * The HTML element of this portal.
+   */
+  public get element(): Signal<HTMLElement | undefined> {
+    return computed(() => this._componentRef()?.location.nativeElement as HTMLElement | undefined);
   }
 
   public get attached(): Signal<boolean> {
@@ -134,7 +141,7 @@ export class WbComponentPortal<T = any> {
   }
 
   private onDestroy(): void {
-    this._componentRef = null;
+    this._componentRef.set(null);
     this._viewContainerRef = null;
     this._attached.set(false);
   }
@@ -143,7 +150,8 @@ export class WbComponentPortal<T = any> {
    * Destroys the component instance and all the data structures associated with it.
    */
   public destroy(): void {
-    this._componentRef?.destroy();
+    this._logger.debug(() => 'Destroying portal', LoggerNames.LIFECYCLE, this._componentRef());
+    this._componentRef()?.destroy();
   }
 }
 
@@ -155,6 +163,8 @@ export interface PortalOptions {
    * Providers registered with the injector for the instantiation of the component.
    */
   providers?: Provider[];
+
+  logContext?: string;
 }
 
 /**
