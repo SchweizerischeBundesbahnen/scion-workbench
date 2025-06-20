@@ -109,6 +109,18 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
   };
 }
 
+export function canMatchWorkbenchOutlet(condition: boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+    if (condition) {
+      return Routing.isPartOutlet(outlet) || Routing.isViewOutlet(outlet);
+    }
+    else {
+      return !Routing.isPartOutlet(outlet) && !Routing.isViewOutlet(outlet);
+    }
+  };
+}
+
 /**
  * Matches the route based on the active perspective.
  *

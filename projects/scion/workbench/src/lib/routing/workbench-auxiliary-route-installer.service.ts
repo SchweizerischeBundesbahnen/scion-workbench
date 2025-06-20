@@ -9,12 +9,14 @@
 */
 
 import {inject, Injectable, InjectionToken} from '@angular/core';
-import {CanMatchFn, PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
+import {CanMatchFn, GuardResult, PRIMARY_OUTLET, Route, Router, Routes, UrlSegment} from '@angular/router';
 import {WorkbenchConfig} from '../workbench-config';
 import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
 import {NullContentComponent} from '../null-content/null-content.component';
+import {Routing} from './routing.util';
+import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 
 /**
  * Facilitates the registration of auxiliary routes of top-level routes.
@@ -43,8 +45,14 @@ export class WorkbenchAuxiliaryRouteInstaller {
       component: ɵEmptyOutletComponent,
       children: [
         ...this._router.config
+          // Provide primary routes only.
           .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
-          .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
+          // Provide outlet if injection context is not available, e.g., in a {@link UrlMatcher}.
+          .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}}))
+          // Prevent matching the route if no outlet is present in the URL and the outlet has not been navigated with a hint.
+          // Prevents Angular bug that Angular matches canActivate guard regardless of the outlet, and to support for nested routes as Angular does not backtrack empty path routes,
+          // prevent page not found and empty content pages to display
+          .map(route => ({...route, canMatch: [...route.canMatch ?? [], installCanMatch()]})),
         // Register wildcard route to display "Page Not Found".
         ...config.canMatchNotFoundPage?.length ? [{
           path: '**',
@@ -90,6 +98,7 @@ export class WorkbenchAuxiliaryRouteInstaller {
     //   - Do not assign the router a new Routes object (Router.config = ...) to allow resolution of routes added during `NavigationStart` (since Angular 7.x)
     //     (because Angular uses a reference to the Routes object during route navigation)
     const newRoutes: Routes = [...config];
+    console.log('>>> route config', newRoutes);
     this._router.config.splice(0, this._router.config.length, ...newRoutes);
   }
 }
@@ -104,6 +113,49 @@ export interface AuxiliaryRouteConfig {
    * If not specified or empty, does not register the wildcard route ("**").
    */
   canMatchNotFoundPage?: Array<CanMatchFn>;
+}
+
+function installCanMatch(): CanMatchFn {
+  return (route: Route, segments: UrlSegment[]): GuardResult => {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET);
+    if (route.path !== '') {
+      return true;
+    }
+
+    const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+    if (Routing.isViewOutlet(outlet)) {
+      const view = layout.view({viewId: outlet}, {orElse: null});
+      return !!segments.length || !!view?.navigation?.hint;
+    }
+    if (Routing.isPartOutlet(outlet)) {
+      console.log('>>> outlet', outlet, layout);
+      const part = layout.part({partId: outlet}, {orElse: null});
+      return !!segments.length || !!part?.navigation?.hint;
+    }
+    return true;
+  }
+}
+
+export function canMatchWorkbenchView(condition: string | boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+
+    switch (condition) {
+      case true:
+        return Routing.isViewOutlet(outlet);
+      case false:
+        return !Routing.isViewOutlet(outlet);
+      default: { // hint
+        if (!Routing.isViewOutlet(outlet)) {
+          return false;
+        }
+
+        const layout = inject(ɵWorkbenchRouter).getCurrentNavigationContext().layout;
+        const view = layout.view({viewId: outlet}, {orElse: null});
+        return view?.navigation?.hint === condition;
+      }
+    }
+  };
 }
 
 /**

@@ -23,13 +23,21 @@ export const appConfig: ApplicationConfig = {
         .addPart(MAIN_AREA)
         .navigatePart(MAIN_AREA, ['overview'])
         .addPart('todos', {dockTo: 'left-top'}, {label: 'Todos', icon: 'checklist'})
+        .addView('todos', {partId: 'todos'})
+        .navigateView('todos', ['todos'])
         .navigatePart('todos', ['todos'])
         .activatePart('todos'),
     }),
     provideRouter([
-      {path: 'overview', loadComponent: () => import('./overview/overview.component')},
-      {path: 'todos', loadComponent: () => import('./todos/todos.component')},
-      {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
+      {
+        path: '',
+        children: [
+          {path: 'overview', loadComponent: () => import('./overview/overview.component')},
+          {path: 'todos', loadComponent: () => import('./todos/todos.component')},
+          {path: 'todos/:id', loadComponent: () => import('./todo/todo.component')},
+
+        ],
+      },
     ], withComponentInputBinding(), withHashLocation()),
     provideAnimations(),
   ],

@@ -35,6 +35,11 @@ export const WorkbenchStartupQueryParams = {
   PERSPECTIVES_QUERY_PARAM: 'perspectives',
 
   /**
+   * Query param to register perspectives. Multiple perspectives are separated by semicolon.
+   */
+  ROUTES_QUERY_PARAM: 'routes',
+
+  /**
    * Query param to read provided design tokens.
    */
   DESIGN_TOKENS: 'designTokens',
@@ -69,6 +74,7 @@ export const WorkbenchStartupQueryParams = {
    */
   USE_LEGACY_START_PAGE: 'useLegacyStartPage',
 
+
   /**
    * Reads the query param to set the workbench launching strategy.
    */
@@ -88,6 +94,13 @@ export const WorkbenchStartupQueryParams = {
    */
   standalone: (): boolean => {
     return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM));
+  },
+
+  /**
+   * Reads the query param to decide if to run the workbench standalone, or to start it with microfrontend support enabled.
+   */
+  routes: (): string | undefined => {
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.ROUTES_QUERY_PARAM) ?? undefined;
   },
 
   /**
