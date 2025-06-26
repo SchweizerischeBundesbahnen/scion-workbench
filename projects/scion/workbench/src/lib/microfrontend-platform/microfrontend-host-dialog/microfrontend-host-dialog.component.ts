@@ -14,11 +14,9 @@ import {Routing} from '../../routing/routing.util';
 import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
 import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
-import {WorkbenchDialog} from '../../dialog/workbench-dialog';
 import {NgTemplateOutlet} from '@angular/common';
 import {DIALOG_ID_PREFIX} from '../../workbench.constants';
 import {Observable, Subject} from 'rxjs';
-import {throwError} from '../../common/throw-error.util';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
 import {Observables} from '@scion/toolkit/util';
@@ -99,10 +97,7 @@ export class MicrofrontendHostDialogComponent {
       untracked(() => {
         this.outletInjector = Injector.create({
           parent: this._injector,
-          providers: [provideWorkbenchClientDialogHandle(capability, params),
-            // Prevent injecting the dialog handle in host dialog component.
-            {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)},
-          ],
+          providers: [provideWorkbenchClientDialogHandle(capability, params)],
         });
       });
     });
