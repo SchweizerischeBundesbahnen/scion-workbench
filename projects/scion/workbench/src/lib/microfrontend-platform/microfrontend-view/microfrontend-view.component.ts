@@ -346,11 +346,11 @@ function configureMicrofrontendGlassPane(): Provider[] {
   return [
     {
       provide: GLASS_PANE_BLOCKABLE,
-      useExisting: ɵWorkbenchView,
+      useFactory: () => inject(ɵWorkbenchView),
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: (): GlassPaneOptions => ({attributes: {'data-viewid': inject(WorkbenchView).id}}),
+      useFactory: () => ({attributes: {'data-viewid': inject(WorkbenchView).id}}) satisfies GlassPaneOptions,
     },
   ];
 }

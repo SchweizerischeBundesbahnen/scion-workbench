@@ -108,11 +108,11 @@ function configurePopupGlassPane(): Provider[] {
   return [
     {
       provide: GLASS_PANE_BLOCKABLE,
-      useExisting: ɵPopup,
+      useFactory: () => inject(ɵPopup),
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: (): GlassPaneOptions => ({attributes: {'data-popupid': inject(ɵPopup).id}}),
+      useFactory: () => ({attributes: {'data-popupid': inject(ɵPopup).id}}) satisfies GlassPaneOptions,
     },
   ];
 }
