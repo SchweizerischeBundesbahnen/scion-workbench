@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, effect, ElementRef, forwardRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
+import {Component, effect, ElementRef, HostListener, inject, NgZone, Provider, signal, untracked, viewChild} from '@angular/core';
 import {BehaviorSubject, fromEvent} from 'rxjs';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {AsyncPipe, NgComponentOutlet, NgTemplateOutlet} from '@angular/common';
@@ -217,11 +217,11 @@ function configureDialogGlassPane(): Provider[] {
   return [
     {
       provide: GLASS_PANE_BLOCKABLE,
-      useExisting: forwardRef(() => ɵWorkbenchDialog), // resolve {@link ɵWorkbenchDialog} via forwardRef because not defined yet, i.e., {@link ɵWorkbenchDialog} constructs {@link WorkbenchDialogComponent} in its constructor.
+      useFactory: () => inject(ɵWorkbenchDialog),
     },
     {
       provide: GLASS_PANE_OPTIONS,
-      useFactory: (): GlassPaneOptions => ({attributes: {'data-dialogid': inject(ɵWorkbenchDialog).id}}),
+      useFactory: () => ({attributes: {'data-dialogid': inject(ɵWorkbenchDialog).id}}) satisfies GlassPaneOptions,
     },
   ];
 }
