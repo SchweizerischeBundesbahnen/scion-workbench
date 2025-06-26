@@ -11,11 +11,13 @@
     flex: none;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: .5em;
     padding: .3em .5em .3em .75em;
     border-radius: var(--sci-corner);
     background-color: var(--sci-color-accent);
     color: var(--sci-color-background-accent);
+    min-width: 100px;
 
     > span.icon {
       font-size: 20px;

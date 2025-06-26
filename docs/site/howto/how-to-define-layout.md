@@ -109,9 +109,9 @@ bootstrapApplication(AppComponent, {
 });
 ```
 > [!TIP]
-> To maintain a clean URL, we recommend navigating the parts and views to empty path routes and using a navigation hint for differentiation.
-> - Use the `canMatchWorkbenchPart` guard to match a route for a part navigated with a particular hint.
-> - Use the `canMatchWorkbenchView` guard to match a route for a view navigated with a particular hint.
+> To maintain a clean URL, navigate parts and views in the layout to empty-path routes and use a navigation hint for differentiation.
+> - Use the `canMatchWorkbenchPart` guard to match a route only for parts navigated with a particular hint.
+> - Use the `canMatchWorkbenchView` guard to match a route only for views navigated with a particular hint.
 
 **Relative Part Alignment**
 
@@ -241,8 +241,8 @@ For more information on interacting with perspectives, refer to the chapter [How
 
 ***
 **Further Reading:**
+- [How to Define Routes](how-to-define-routes.md)
 - [How to Provide a Desktop](how-to-provide-desktop.md)
-- [How to Provide a View](how-to-provide-view.md)
 - [How to Open a View](how-to-open-view.md)
 - [How to Display Content in a Part](how-to-navigate-part.md)
 ***

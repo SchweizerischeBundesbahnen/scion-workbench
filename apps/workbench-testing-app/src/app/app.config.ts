@@ -9,7 +9,7 @@
  */
 
 import {ApplicationConfig, EnvironmentProviders, makeEnvironmentProviders} from '@angular/core';
-import {provideRouter, withHashLocation} from '@angular/router';
+import {PreloadAllModules, provideRouter, withHashLocation, withPreloading} from '@angular/router';
 import {routes} from './app.routes';
 import {workbenchConfig} from './workbench.config';
 import {provideConfirmWorkbenchStartup} from './workbench/confirm-workbench-startup';
@@ -28,7 +28,7 @@ import {provideDesignTokens} from './workbench/provide-design-tokens';
  */
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes, withHashLocation()),
+    provideRouter(routes, withHashLocation(), withPreloading(PreloadAllModules)),
     provideWorkbench(workbenchConfig),
     provideConfirmWorkbenchStartup(),
     provideDesignTokens(),

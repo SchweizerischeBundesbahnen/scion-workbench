@@ -22,6 +22,7 @@ import {SizeTestPagePO} from './page-object/test-pages/size-test-page.po';
 import {expectMessageBox} from '../matcher/message-box-matcher';
 import {TextMessageBoxPagePO} from '../text-message-box-page.po';
 import {InputFieldTestPagePO} from './page-object/test-pages/input-field-test-page.po';
+import {NullContentPagePO} from './page-object/null-content-page.po';
 
 test.describe('Workbench View', () => {
 
@@ -1341,20 +1342,21 @@ test.describe('Workbench View', () => {
     );
 
     // Expect hint to show.
-    const view = appPO.view({viewId: 'view.100'});
-    await expect(view.nullContentMessage).toBeVisible();
+    const nullContextPage = new NullContentPagePO(appPO, {viewId: 'view.100'});
+    await expectView(nullContextPage).toBeActive();
 
     // Reload the application and expect the hint to still be displayed.
     await test.step('Reloading the application', async () => {
       await appPO.reload();
-      await expect(view.nullContentMessage).toBeVisible();
+      await expectView(nullContextPage).toBeActive();
     });
 
     // Navigate the view.
-    await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['path/to/view']));
+    await workbenchNavigator.modifyLayout(layout => layout.navigateView('view.100', ['test-view']));
 
     // Expect hint not to show.
-    await expect(view.nullContentMessage).not.toBeAttached();
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+    await expectView(viewPage).toBeActive();
   });
 
   test.describe('View Background Color', () => {

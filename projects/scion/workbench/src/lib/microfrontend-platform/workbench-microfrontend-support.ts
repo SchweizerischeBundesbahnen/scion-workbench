@@ -21,7 +21,7 @@ import {provideNotificationIntentHandler} from './microfrontend-notification/mic
 import {MicrofrontendViewIntentHandler} from './microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
-import {CanMatchFn, Route, ROUTES} from '@angular/router';
+import {CanMatchFn, Route} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './microfrontend-view/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view/microfrontend-view-capability-validator.interceptor';
@@ -32,7 +32,7 @@ import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/mic
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
 import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
+import {WORKBENCH_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
 import {Routing} from '../routing/routing.util';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
@@ -42,6 +42,7 @@ import {provideManifestObjectCache} from './manifest-object-cache.service';
 import {MicrofrontendPlatformConfigLoader} from './microfrontend-platform-config-loader';
 import {provideWorkbenchInitializer} from '../startup/workbench-initializer';
 import {Defined} from '@scion/toolkit/util';
+import {WORKBENCH_ROUTE} from '../workbench.constants';
 
 /**
  * Provides a set of DI providers to set up microfrontend support in the workbench.
@@ -136,7 +137,7 @@ function provideWorkbenchClientBeans(): EnvironmentProviders {
 function provideMicrofrontendViewRoute(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {
-      provide: ROUTES,
+      provide: WORKBENCH_ROUTE,
       multi: true,
       useFactory: (): Route => ({
         matcher: MicrofrontendViewRoutes.provideMicrofrontendRouteMatcher(),
@@ -153,7 +154,7 @@ function provideMicrofrontendViewRoute(): EnvironmentProviders {
 function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
   return makeEnvironmentProviders([
     {
-      provide: ROUTES,
+      provide: WORKBENCH_ROUTE,
       multi: true,
       useValue: {
         path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
@@ -169,7 +170,7 @@ function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
  */
 function canMatchWorkbenchMessageBox(): CanMatchFn {
   return () => {
-    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
     return Routing.isMessageBoxOutlet(outlet);
   };
 }

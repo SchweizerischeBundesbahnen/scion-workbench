@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef, DOCUMENT} from '@angular/core';
+import {ChangeDetectorRef, Component, DestroyRef, DOCUMENT, effect, ElementRef, inject, NgZone, Provider, viewChild, ViewContainerRef} from '@angular/core';
 import {IFRAME_OVERLAY_HOST, VIEW_DROP_ZONE_OVERLAY_HOST, WORKBENCH_ELEMENT_REF} from './workbench-element-references';
 import {WorkbenchLauncher} from './startup/workbench-launcher.service';
 import {WorkbenchStartup} from './startup/workbench-startup.service';
@@ -20,10 +20,9 @@ import {NotificationListComponent} from './notification/notification-list.compon
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GLASS_PANE_TARGET_ELEMENT, GlassPaneDirective, GlassPaneOptions} from './glass-pane/glass-pane.directive';
 import {WorkbenchDialogRegistry} from './dialog/workbench-dialog.registry';
 import {Blockable} from './glass-pane/blockable';
-import {WORKBENCH_AUXILIARY_ROUTE_OUTLET} from './routing/workbench-auxiliary-route-installer.service';
+import {WORKBENCH_OUTLET} from './routing/workbench-auxiliary-route-installer.service';
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {Routing} from './routing/routing.util';
 import {LayoutComponent} from './layout/layout.component';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {fromEvent} from 'rxjs';
@@ -140,17 +139,12 @@ export class WorkbenchComponent {
    * Throws if loading the workbench recursively.
    */
   private throwOnCircularLoad(): void {
-    const outlet = inject(WORKBENCH_AUXILIARY_ROUTE_OUTLET, {optional: true});
+    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
     if (!outlet) {
       return;
     }
 
-    if (Routing.isViewOutlet(outlet)) {
-      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in view '${outlet}'. Did you forget to add the CanMatch guard 'canMatchWorkbenchView(false)' to the root (empty-path) route of the application?`);
-    }
-    else {
-      throw Error(`[WorkbenchError] Circular loading of the workbench component detected in outlet '${outlet}'.`);
-    }
+    throw Error(`[WorkbenchError] Circular loading of the workbench component detected in workbench outlet '${outlet}'. Did you forget to add the CanMatch guard 'canMatchWorkbenchOutlet(false)' to the application's empty-path default route?`);
   }
 }
 

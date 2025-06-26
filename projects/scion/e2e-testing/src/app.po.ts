@@ -10,7 +10,7 @@
 
 import {coerceArray, DomRect, fromRect, waitForCondition, waitUntilStable} from './helper/testing.util';
 import {StartPagePO} from './start-page.po';
-import {Locator, Page} from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 import {PartPO} from './part.po';
 import {ViewPO} from './view.po';
 import {ViewTabPO} from './view-tab.po';
@@ -27,6 +27,7 @@ import {RequireOne} from './helper/utility-types';
 import {dasherize} from './helper/dasherize.util';
 import {GridPO} from './grid.po';
 import {DesktopPO} from './desktop.po';
+import {ConsoleLogs} from './helper/console-logs';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -92,6 +93,8 @@ export class AppPO {
    * By passing a features object, you can control how to start the workbench and which app features to enable.
    */
   public async navigateTo(options?: Options): Promise<void> {
+    const consoleLogs = new ConsoleLogs(this.page);
+
     // Prepare local storage.
     if (options?.localStorage) {
       await this.navigateTo({microfrontendSupport: false});
@@ -102,6 +105,9 @@ export class AppPO {
     }
 
     this._workbenchStartupQueryParams = new URLSearchParams();
+    if (options?.appConfig) {
+      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.APP_CONFIG_QUERY_PARAM, options.appConfig);
+    }
     if (options?.launcher) {
       this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options.launcher);
     }
@@ -149,7 +155,14 @@ export class AppPO {
     })());
 
     // Wait until the workbench completed startup.
-    await this.waitUntilWorkbenchStarted();
+    if (options?.waitUntilWorkbenchStarted ?? true) {
+      await this.waitUntilWorkbenchStarted();
+    }
+    // Assert the application to be bootstraped with the specified app config.
+    if (options?.appConfig) {
+      await expect.poll(() => consoleLogs.get(), `Expected application to be bootstraped with app config "${options.appConfig}".`).toContain(`Bootstrapping application: "${options.appConfig}"`);
+    }
+    consoleLogs.dispose();
   }
 
   /**
@@ -166,6 +179,13 @@ export class AppPO {
     // Wait until the workbench completed startup.
     await this.waitUntilWorkbenchStarted();
     await waitUntilStable(() => this.getCurrentNavigationId());
+  }
+
+  /**
+   * Clears the outlets in the URL.
+   */
+  public async clearOutlets(): Promise<void> {
+    await this.page.goto('/#/');
   }
 
   /**
@@ -485,6 +505,16 @@ export interface Options {
    */
   microfrontendSupport?: boolean;
   /**
+   * Specifies the app config to bootstrap the testing app with.
+   */
+  appConfig?:
+    'app-with-guard;forbidden=true' |
+    'app-with-guard;forbidden=false' |
+    'app-with-redirect;providers=workbench-before-router;routes=flat' |
+    'app-with-redirect;providers=workbench-before-router;routes=nested' |
+    'app-with-redirect;providers=workbench-after-router;routes=flat' |
+    'app-with-redirect;providers=workbench-after-router;routes=nested';
+  /**
    * Controls if to open the start page view when no other view is opened, e.g., on startup, or when closing all views. Defaults to `false`.
    */
   stickyViewTab?: boolean;
@@ -517,17 +547,35 @@ export interface Options {
    */
   designTokens?: {[name: string]: string};
   /**
-   * Controls if to use the legacy start page (via empty path route) instead of the desktop.
+   * Controls if to use the legacy start page (via empty-path route) instead of the desktop.
    *
    * @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support.
    */
   useLegacyStartPage?: boolean;
+  /**
+   * Wait until the workbench completed startup.
+   */
+  waitUntilWorkbenchStarted?: false;
 }
 
 /**
  * Query params to instrument the workbench startup.
  */
 export enum WorkenchStartupQueryParams {
+
+  /**
+   * Query param to bootstrap the app with a specific app config.
+   *
+   * Params can be passed in the form of matrix params: "app-with-guard;forbidden=true"
+   *
+   * Available configs:
+   * - 'app-with-guard'
+   * - 'app-with-redirect'
+   *
+   * See `main.ts`.
+   */
+  APP_CONFIG_QUERY_PARAM = 'appConfig',
+
   /**
    * Query param to set the workbench launch strategy.
    */

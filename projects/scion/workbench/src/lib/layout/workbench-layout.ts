@@ -80,7 +80,7 @@ export interface WorkbenchLayout {
    * @param commands - Instructs the router which route to navigate to.
    * @param extras - Controls navigation:
    * @param extras.hint - Allows differentiation between routes with identical paths.
-   *                      Multiple parts can navigate to the same path but still resolve to different routes, e.g., the empty path route to maintain a clean URL.
+   *                      Multiple parts can navigate to the same path but still resolve to different routes, e.g., the empty-path route to maintain a clean URL.
    *
    *                      Example:
    *                      ```ts
@@ -101,7 +101,7 @@ export interface WorkbenchLayout {
    *                      ```
    * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
    * @param extras.data - Associates data with the navigation.
-   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to empty path navigations.
+   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to an empty-path navigation.
    *                      Data must be JSON serializable. Data can be read from {@link WorkbenchPart.navigation.data}.
    * @param extras.state - Passes state to the navigation.
    *                       State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
@@ -143,7 +143,7 @@ export interface WorkbenchLayout {
    * @param commands - Instructs the router which route to navigate to.
    * @param extras - Controls navigation:
    * @param extras.hint - Allows differentiation between routes with identical paths.
-   *                      Multiple views can navigate to the same path but still resolve to different routes, e.g., the empty path route to maintain a clean URL.
+   *                      Multiple views can navigate to the same path but still resolve to different routes, e.g., the empty-path route to maintain a clean URL.
    *                      Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
    *
    *                      Example route config matching routes based on the hint passed to the navigation:
@@ -165,7 +165,7 @@ export interface WorkbenchLayout {
    *                      ```
    * @param extras.relativeTo - Specifies the route for relative navigation, supporting navigational symbols such as '/', './', or '../' in the commands.
    * @param extras.data - Associates data with the navigation.
-   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to empty path navigations.
+   *                      Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to an empty-path navigation.
    *                      Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigation.data}.
    * @param extras.state - Passes state to the navigation.
    *                       State is not persistent, unlike {@link data}; however, state is added to the browser's session history to support back/forward browser navigation.
@@ -436,9 +436,9 @@ export interface MWorkbenchLayout {
  * Start by adding parts to the layout. Parts can be docked to a specific area (`left-top`, `left-bottom`, `right-top`, `right-bottom`, `bottom-left`, `bottom-right`)
  * or aligned relative to each other. Views can be added to any part except the main area part. To display content, navigate parts and views to registered routes.
  *
- * To maintain a clean URL, we recommend navigating the parts and views to empty path routes and using a navigation hint for differentiation.
- * - Use the `canMatchWorkbenchPart` guard to match a route for a part navigated with a particular hint.
- * - Use the `canMatchWorkbenchView` guard to match a route for a view navigated with a particular hint.
+ * To maintain a clean URL, navigate parts and views in the layout to empty-path routes and use a navigation hint for differentiation.
+ * - Use the `canMatchWorkbenchPart` guard to match a route only for parts navigated with a particular hint.
+ * - Use the `canMatchWorkbenchView` guard to match a route only for views navigated with a particular hint.
  *
  * ## Example
  * The following example defines a layout with a main area and four parts docked to the side:

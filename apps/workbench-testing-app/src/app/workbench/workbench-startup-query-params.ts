@@ -20,6 +20,19 @@ import {booleanAttribute} from '@angular/core';
 export const WorkbenchStartupQueryParams = {
 
   /**
+   * Query param to bootstrap the app with a specific app config.
+   *
+   * Params can be passed in the form of matrix params: "app-with-guard;forbidden=true"
+   *
+   * Available configs:
+   * - 'app-with-guard'
+   * - 'app-with-redirect'
+   *
+   * See `main.ts`.
+   */
+  APP_CONFIG_QUERY_PARAM: 'appConfig',
+
+  /**
    * Query param to set the workbench launch strategy.
    */
   LAUNCHER_QUERY_PARAM: 'launcher',
@@ -63,11 +76,20 @@ export const WorkbenchStartupQueryParams = {
   MAIN_AREA_INITIAL_PART_ID: 'mainAreaInitialPartId',
 
   /**
-   * Query param to control if to use the legacy start page (via empty path route) instead of the desktop.
+   * Query param to control if to use the legacy start page (via empty-path route) instead of the desktop.
    *
    * @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support.
    */
   USE_LEGACY_START_PAGE: 'useLegacyStartPage',
+
+  /**
+   * Reads the query param to bootstrap the app with a specific app config.
+   *
+   * Params can be passed in the form of matrix params: "app-with-guard;forbidden=true"
+   */
+  appConfig: (): string | undefined => {
+    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.APP_CONFIG_QUERY_PARAM) ?? undefined;
+  },
 
   /**
    * Reads the query param to set the workbench launching strategy.

@@ -26,11 +26,6 @@ export class ViewPO {
    */
   public readonly tab: ViewTabPO;
 
-  /**
-   * Locates the message displayed if not navigated this view.
-   */
-  public readonly nullContentMessage: Locator;
-
   public readonly scrollbars: {
     vertical: ScrollbarPO;
     horizontal: ScrollbarPO;
@@ -38,7 +33,6 @@ export class ViewPO {
 
   constructor(public readonly locator: Locator, tab: ViewTabPO) {
     this.tab = tab;
-    this.nullContentMessage = this.locator.locator('wb-null-content');
     this.scrollbars = {
       vertical: new ScrollbarPO(this.locator.locator(':scope > sci-viewport > sci-scrollbar.e2e-vertical')),
       horizontal: new ScrollbarPO(this.locator.locator(':scope > sci-viewport > sci-scrollbar.e2e-horizontal')),

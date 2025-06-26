@@ -5,11 +5,19 @@
 
 ## [SCION Workbench][menu-home] > [How To Guides][menu-how-to] > View
 
-Similar to Angular, the workbench provides a router for view navigation. View navigation is based on Angular's routing mechanism and thus supports lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more. A view can inject `ActivatedRoute` to obtain parameters passed to the navigation and/or read data associated with the route.
+The SCION Workbench provides a router for view navigation. A view can inject `ActivatedRoute` to get parameters passed to the navigation and read data associated with the route.
+
+***
+**Content:**
+- [How to Open a View](#how-to-open-a-view)
+- [How to Control the Navigation Target](#how-to-control-the-navigation-target)
+- [How to Differentiate Between Routes with an Identical Path](#how-to-differentiate-between-routes-with-an-identical-path)
+- [How to Navigate in a Template](#how-to-navigate-in-a-template)
+***
 
 ### How to Open a View
 
-A view is opened using the `WorkbenchRouter`. Like the Angular router, the workbench router has a `navigate` method that is passed an array of commands and optional navigation extras to control the navigation.
+To open a view, use the `WorkbenchRouter`. It has a `navigate` method like the Angular router. This method takes an array of commands and extras to control navigation.
 
 ```ts
 import {inject} from '@angular/core';
@@ -17,6 +25,23 @@ import {WorkbenchRouter} from '@scion/workbench';
 
 inject(WorkbenchRouter).navigate(['path/to/view']);
 ```
+
+Set up the route for the view in Angular's router configuration:
+
+```ts
+import {bootstrapApplication} from '@angular/platform-browser';
+import {provideRouter} from '@angular/router';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter([
+      {path: 'path/to/view', component: ViewComponent},
+    ]),
+  ],
+});
+```
+
+Refer to [How To Define Routes](how-to-define-routes.md) to learn more about routes.
 
 The navigation is absolute unless providing a `relativeTo` route in navigation extras.
 ```ts
@@ -30,7 +55,7 @@ const relativeTo = inject(ActivatedRoute);
 inject(WorkbenchRouter).navigate(['../path/to/view'], {relativeTo});
 ```
 
-Additional data can be passed to the navigation as matrix parameters or navigation data. Matrix parameters are added to the path, while navigation data is stored in the layout. Unlike matrix parameters, navigation data can be passed to empty path navigations. The view can read matrix parameters from `ActivatedRoute.params` and navigation data from `WorkbenchView.navigation.data`.
+Additional data can be passed to the navigation as matrix parameters or navigation data. Matrix parameters are added to the path, while navigation data is stored in the layout. Unlike matrix parameters, navigation data can be passed to an empty-path navigation. The view can read matrix parameters from `ActivatedRoute.params` and navigation data from `WorkbenchView.navigation.data`.
 
 ```ts
 import {inject} from '@angular/core';
@@ -54,15 +79,15 @@ The default behavior can be overridden by specifying a `target` in navigation ex
 | `blank`    | Opens a new view and navigates it.                                                                                        |         |
 | `<viewId>` | Navigates the specified view. If already opened, replaces it, or opens a new view otherwise.                              |         |
 
-### How to differentiate between routes with an identical path
+### How to Differentiate Between Routes with an Identical Path
 The workbench router supports passing a hint to the navigation to differentiate between routes with an identical path.
 
-For example, views of the initial layout or a perspective are usually navigated to the empty path route to maintain a clean URL,
+For example, views of the initial layout or a perspective are usually navigated to the empty-path route to maintain a clean URL,
 requiring a navigation hint to differentiate between the routes.
 
 Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
 
-The following example defines two empty path routes, using the `canMatchWorkbenchView` guard to match if navigating with a specific hint. 
+The following example defines two empty-path routes, using the `canMatchWorkbenchView` guard to match if navigating with a specific hint. 
 
 ```ts
 import {inject} from '@angular/core';
@@ -70,18 +95,18 @@ import {canMatchWorkbenchView, WorkbenchRouter} from '@scion/workbench';
 import {provideRouter} from '@angular/router';
 import {bootstrapApplication} from '@angular/platform-browser';
 
-// Navigate to the empty path route, passing a hint to select the route of `OutlineComponent`.
-inject(WorkbenchRouter).navigate([], {hint: 'outline'});
+// Navigate to the empty-path route, passing a hint to select the route of the `SearchComponent`.
+inject(WorkbenchRouter).navigate([], {hint: 'search'});
 
-// Navigate to the empty path route, passing a hint to select the route of `NavigatorComponent`.
+// Navigate to the empty-path route, passing a hint to select the route of the `NavigatorComponent`.
 inject(WorkbenchRouter).navigate([], {hint: 'navigator'});
 
 // Routes
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter([
-      // Outline View
-      {path: '', canMatch: [canMatchWorkbenchView('outline')], component: OutlineComponent},
+      // Search View
+      {path: '', canMatch: [canMatchWorkbenchView('search')], component: SearchComponent},
       // Navigator View
       {path: '', canMatch: [canMatchWorkbenchView('navigator')], component: NavigatorComponent},
     ]),
@@ -113,7 +138,8 @@ Prepend the path with a forward slash `/` to navigate absolutely, or set `relati
 
 ***
 **Further Reading:**
-- [How to Provide a View](how-to-provide-view.md)
+- [How to Define Routes](how-to-define-routes.md)
+- [How to Interact with a View](how-to-interact-with-view.md)
 - [How to Define the Workbench Layout](how-to-define-layout.md)
 ***
 

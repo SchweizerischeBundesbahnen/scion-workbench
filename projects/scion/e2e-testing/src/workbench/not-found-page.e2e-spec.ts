@@ -16,6 +16,7 @@ import {MAIN_AREA} from '../workbench.model';
 import {ConsoleLogs} from '../helper/console-logs';
 import {ViewPagePO} from './page-object/view-page.po';
 import {expectPart} from '../matcher/part-matcher';
+import {PartPagePO} from './page-object/part-page.po';
 
 test.describe('Workbench Page Not Found', () => {
 
@@ -79,6 +80,27 @@ test.describe('Workbench Page Not Found', () => {
 
       // Expect Angular router not to error.
       await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
+    });
+
+    test('should display "Not Found" page in view when clearing outlets in URL', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main')
+        .addView('view.100', {partId: 'part.main'})
+        .navigateView('view.100', ['test-view']),
+      );
+
+      // Expect view to display.
+      const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+      await expectView(viewPage).toBeActive();
+
+      // Clear outlets in the URL, simulate navigation from a browser bookmark.
+      await appPO.clearOutlets();
+
+      // Expect "Not Found" page to display.
+      const notFoundPage = new PageNotFoundPagePO(appPO.view({viewId: 'view.100'}));
+      await expectView(notFoundPage).toBeActive();
     });
 
     test('should drag "Not Found" page to another part', async ({appPO, workbenchNavigator, consoleLogs}) => {
@@ -219,6 +241,25 @@ test.describe('Workbench Page Not Found', () => {
 
       // Expect Angular router not to error.
       await expect.poll(() => consoleLogs.get({severity: 'error'})).toHaveLength(0);
+    });
+
+    test('should display "Not Found" page in part when clearing outlets in URL', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main')
+        .navigatePart('part.main', ['test-part']),
+      );
+
+      // Expect part to display.
+      await expectPart(appPO.part({partId: 'part.main'})).toDisplayComponent(PartPagePO.selector);
+
+      // Clear outlets in the URL, simulate navigation from a browser bookmark.
+      await appPO.clearOutlets();
+
+      // Expect "Not Found" page to display.
+      const part = appPO.part({partId: 'part.main'});
+      await expectPart(part).toDisplayComponent(PageNotFoundPagePO.selector);
     });
   });
 });

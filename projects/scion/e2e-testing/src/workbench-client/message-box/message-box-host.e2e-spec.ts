@@ -20,11 +20,11 @@ test.describe('Workbench Message Box Host', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register message box capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-message-box'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox'}});
 
     // Open the message box.
     const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await messageBoxOpenerPage.open({component: 'host-message-box'}, {cssClass: 'testee'});
+    await messageBoxOpenerPage.open({component: 'host-messagebox'}, {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
     const messageBoxPage = new HostMessageBoxPagePO(messageBox);
@@ -34,7 +34,7 @@ test.describe('Workbench Message Box Host', () => {
     // Expect capability to resolve to the microfrontend message box and to be set in the handle.
     await expect.poll(() => messageBoxPage.getMessageBoxCapability()).toEqual(expect.objectContaining({
       qualifier: {
-        component: 'host-message-box',
+        component: 'host-messagebox',
       },
       properties: {
         path: 'test-host-message-box;matrixParam=:param',
@@ -46,11 +46,11 @@ test.describe('Workbench Message Box Host', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register message box capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-message-box'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox'}});
 
     // Open the message box.
     const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await messageBoxOpenerPage.open({component: 'host-message-box'}, {cssClass: 'testee', params: {param: '123'}});
+    await messageBoxOpenerPage.open({component: 'host-messagebox'}, {cssClass: 'testee', params: {param: '123'}});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
     const messageBoxPage = new HostMessageBoxPagePO(messageBox);
@@ -65,11 +65,11 @@ test.describe('Workbench Message Box Host', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register message box capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'custom-host-message-box'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox', variant: 'explicit-size'}});
 
     // Open the message box.
     const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await messageBoxOpenerPage.open({component: 'custom-host-message-box'}, {cssClass: 'testee'});
+    await messageBoxOpenerPage.open({component: 'host-messagebox', variant: 'explicit-size'}, {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
     const messageBoxPage = new HostMessageBoxPagePO(messageBox);
@@ -94,11 +94,11 @@ test.describe('Workbench Message Box Host', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register message box capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-message-box'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox'}});
 
     // Open the message box.
     const messageBoxOpenerPage = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
-    await messageBoxOpenerPage.open({component: 'host-message-box'}, {cssClass: 'testee'});
+    await messageBoxOpenerPage.open({component: 'host-messagebox'}, {cssClass: 'testee'});
 
     const messageBox = appPO.messagebox({cssClass: 'testee'});
     const messageBoxPage = new HostMessageBoxPagePO(messageBox);

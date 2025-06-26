@@ -18,7 +18,7 @@ import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
  *
  * A view is a visual workbench element for displaying content side-by-side or stacked. A view can be navigated to any route.
  *
- * A view can inject `ActivatedRoute` to obtain parameters passed to the navigation and/or read data associated with the route.
+ * A view can inject `ActivatedRoute` to get parameters passed to the navigation and read data associated with the route.
  */
 @Injectable({providedIn: 'root', useExisting: ɵWorkbenchRouter})
 export abstract class WorkbenchRouter {

@@ -174,35 +174,35 @@ export class WorkbenchUrlObserver {
     // Register view auxiliary routes.
     const addedViewOutlets = navigationContext.outletDiff.addedViewOutlets;
     if (addedViewOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {canMatchNotFoundPage: [matchesIfNavigated]});
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedViewOutlets, {notFoundRoute: matchesIfNavigated});
       this._logger.debug(() => `Registered auxiliary routes for views: ${addedViewOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register part auxiliary routes.
     const addedPartOutlets = navigationContext.outletDiff.addedPartOutlets;
     if (addedPartOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPartOutlets, {canMatchNotFoundPage: [matchesIfNavigated]});
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPartOutlets, {notFoundRoute: matchesIfNavigated});
       this._logger.debug(() => `Registered auxiliary routes for parts: ${addedPartOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register popup auxiliary routes.
     const addedPopupOutlets = navigationContext.outletDiff.addedPopupOutlets;
     if (addedPopupOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPopupOutlets);
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedPopupOutlets, {notFoundRoute: true});
       this._logger.debug(() => `Registered auxiliary routes for popups: ${addedPopupOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register dialog auxiliary routes.
     const addedDialogOutlets = navigationContext.outletDiff.addedDialogOutlets;
     if (addedDialogOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedDialogOutlets);
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedDialogOutlets, {notFoundRoute: true});
       this._logger.debug(() => `Registered auxiliary routes for dialogs: ${addedDialogOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 
     // Register message box auxiliary routes.
     const addedMessageBoxOutlets = navigationContext.outletDiff.addedMessageBoxOutlets;
     if (addedMessageBoxOutlets.length) {
-      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedMessageBoxOutlets);
+      const auxiliaryRoutes = this._auxiliaryRouteInstaller.registerAuxiliaryRoutes(addedMessageBoxOutlets, {notFoundRoute: true});
       this._logger.debug(() => `Registered auxiliary routes for message boxes: ${addedMessageBoxOutlets}`, LoggerNames.ROUTING, auxiliaryRoutes);
     }
 

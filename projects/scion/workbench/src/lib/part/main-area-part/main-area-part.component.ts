@@ -101,7 +101,7 @@ export class MainAreaPartComponent {
   }
 
   protected onLegacyStartPageActivate(): void {
-    this._logger.warn('[Deprecation] The configuration for displaying a start page in the workbench has changed. The main area must now be navigated. Previously, no navigation was required and the component associated with the empty path route was used as the start page. Legacy support will be removed in version 21.', `
+    this._logger.warn('[Deprecation] The configuration for displaying a start page in the workbench has changed. The main area must now be navigated. Previously, no navigation was required and the component associated with the empty-path route was used as the start page. Legacy support will be removed in version 21.', `
 
       // Example for navigating the main area:
       
@@ -125,7 +125,7 @@ export class MainAreaPartComponent {
         ]
       });
 
-      // Example for navigating the main area to the empty path route:
+      // Example for navigating the main area to the empty-path route:
       
       import {bootstrapApplication} from '@angular/platform-browser';
       import {provideRouter} from '@angular/router';
@@ -136,13 +136,13 @@ export class MainAreaPartComponent {
           provideWorkbench({
             layout: factory => factory
               .addPart(MAIN_AREA)
-              .navigatePart(MAIN_AREA, [], {hint: 'desktop'}) // pass hint to match a specific empty path route
+              .navigatePart(MAIN_AREA, [], {hint: 'desktop'}) // pass hint to match a specific empty-path route
           }),
           provideRouter([
             {
               path: '',
               component: DesktopComponent,
-              canMatch: [canMatchWorkbenchPart('desktop')] // match only if navigating with the specified hint
+              canMatch: [canMatchWorkbenchPart('desktop')] // only match if navigating with the specified hint
             }
           ])
         ],

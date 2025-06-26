@@ -8,7 +8,7 @@
 }
 
 <sci-tabbar>
-  @if (workbenchViewRoutes$ | async | appNullIfEmpty; as workbenchViewRoutes) {
+  @if (workbenchViewRoutes | appNullIfEmpty; as workbenchViewRoutes) {
     <ng-template sciTab label="Workbench Views" cssClass="e2e-workbench-views">
       <section class="tiles e2e-workbench-view-tiles">
         <sci-filter-field [formControl]="filterControl" (keydown)="$event.stopPropagation()"/>

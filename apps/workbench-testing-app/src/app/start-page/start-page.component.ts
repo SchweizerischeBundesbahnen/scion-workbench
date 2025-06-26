@@ -11,7 +11,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, HostBinding, HostListener, inject, viewChild} from '@angular/core';
 import {PartId, WorkbenchConfig, WorkbenchRouteData, WorkbenchRouter, WorkbenchService, WorkbenchView} from '@scion/workbench';
 import {Capability, IntentClient, ManifestService} from '@scion/microfrontend-platform';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {WorkbenchCapabilities, WorkbenchPopupService as WorkbenchClientPopupService, WorkbenchRouter as WorkbenchClientRouter, WorkbenchViewCapability} from '@scion/workbench-client';
 import {filterArray, sortArray} from '@scion/toolkit/operators';
 import {PRIMARY_OUTLET, Route, Router, Routes} from '@angular/router';
@@ -55,7 +55,7 @@ export default class StartPageComponent {
 
   protected readonly WorkbenchRouteData = WorkbenchRouteData;
   protected readonly filterControl = inject(NonNullableFormBuilder).control('');
-  protected readonly workbenchViewRoutes$: Observable<Routes>;
+  protected readonly workbenchViewRoutes: Routes;
   protected readonly microfrontendViewCapabilities$: Observable<WorkbenchViewCapability[]> | undefined;
   protected readonly testCapabilities$: Observable<Capability[]> | undefined;
 
@@ -63,17 +63,12 @@ export default class StartPageComponent {
   protected partId: PartId | undefined;
 
   constructor() {
-    const router = inject(Router);
     const workbenchConfig = inject(WorkbenchConfig);
 
     // Read views to be pinned to the desktop.
-    this.workbenchViewRoutes$ = of(router.config)
-      .pipe(filterArray(route => {
-        if ((!route.outlet || route.outlet === PRIMARY_OUTLET)) {
-          return route.data?.['pinToDesktop'] === true;
-        }
-        return false;
-      }));
+    this.workbenchViewRoutes = inject(Router).config
+      .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
+      .flatMap(route => findPinToDesktopRoutes(route));
 
     if (workbenchConfig.microfrontendPlatform) {
       // Read microfrontend views to be pinned to the desktop.
@@ -179,4 +174,17 @@ export default class StartPageComponent {
 
 function isTestCapability(capability: Capability): boolean {
   return Object.keys(capability.qualifier ?? {}).includes('test');
+}
+
+/**
+ * Finds routes to be pinned to the desktop.
+ */
+function findPinToDesktopRoutes(route: Route): Routes {
+  if (route.children) {
+    return route.children.flatMap(findPinToDesktopRoutes);
+  }
+  if (route.data?.['pinToDesktop'] === true) {
+    return [route];
+  }
+  return [];
 }

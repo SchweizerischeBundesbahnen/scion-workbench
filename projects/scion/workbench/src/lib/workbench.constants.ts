@@ -9,6 +9,7 @@
  */
 
 import {InjectionToken} from '@angular/core';
+import {Route} from '@angular/router';
 
 /**
  * Represents the id prefix of parts.
@@ -97,3 +98,8 @@ export const VIEW_TAB_RENDERING_CONTEXT = new InjectionToken<ViewTabRenderingCon
  * Prefix used to identify an anonymous perspective that the workbench creates for views moved to a new window.
  */
 export const ANONYMOUS_PERSPECTIVE_ID_PREFIX = 'anonymous.';
+
+/**
+ * DI token for registering workbench-specific routes for workbench outlets.
+ */
+export const WORKBENCH_ROUTE = new InjectionToken<Route>('WORKBENCH_ROUTE');
