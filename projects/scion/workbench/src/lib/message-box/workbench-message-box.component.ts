@@ -16,9 +16,7 @@ import {WorkbenchDialogFooterDirective} from '../dialog/dialog-footer/workbench-
 import {WorkbenchDialogHeaderDirective} from '../dialog/dialog-header/workbench-dialog-header.directive';
 import {MessageBoxHeaderComponent} from './message-box-header/message-box-header.component';
 import {ComponentType} from '@angular/cdk/portal';
-import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {TypeofPipe} from '../common/typeof.pipe';
-import {throwError} from '../common/throw-error.util';
 import {SciDimension, SciDimensionDirective} from '@scion/components/dimension';
 import {TextPipe} from '../text/text.pipe';
 import {Translatable} from '../text/workbench-text-provider.model';
@@ -42,9 +40,6 @@ import {Translatable} from '../text/workbench-text-provider.model';
     TypeofPipe,
     TextPipe,
   ],
-  providers: [
-    // Prevent injecting the dialog handle in message box context.
-    {provide: WorkbenchDialog, useFactory: () => throwError(`[NullInjectorError] No provider for 'WorkbenchDialog'`)}],
 })
 export class WorkbenchMessageBoxComponent {
 
