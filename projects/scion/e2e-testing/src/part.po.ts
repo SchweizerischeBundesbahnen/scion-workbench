@@ -36,16 +36,10 @@ export class PartPO {
    */
   public readonly sash: PartSashPO;
 
-  /**
-   * Locates the message displayed if not navigated this part and this part has no views.
-   */
-  public readonly nullContentMessage: Locator;
-
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
     this.activeView = new ViewPO(this.locator.locator('wb-view'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
     this.sash = new PartSashPO(this.locator);
-    this.nullContentMessage = this.locator.locator('wb-null-content');
   }
 
   public async getPartId(): Promise<PartId> {

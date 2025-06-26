@@ -8,7 +8,7 @@
 This section provides documentation and instructions for developing applications with SCION Workbench.
 
 > [!NOTE]
-> Documentation for integrating microfrontends into the SCION Workbench is planned for 2026. In the meantime, please refer to our testing application for an example, or contact us by submitting an issue on GitHub if you need assistance.
+> Documentation for integrating microfrontends into the SCION Workbench is planned. In the meantime, please refer to our testing application for an example, or contact us by submitting an issue on GitHub if you need assistance.
 
 ***
 
@@ -22,8 +22,10 @@ This section provides documentation and instructions for developing applications
 - [How to customize the workbench layout](how-to-customize-layout.md)
 - [How to work with perspectives](how-to-perspective.md)
 
+#### Route Configuration
+- [How to Define Routes](how-to-define-routes.md)
+ 
 #### Workbench View
-- [How to provide a view](how-to-provide-view.md)
 - [How to open a view](how-to-open-view.md)
 - [How to interact with a view](how-to-interact-with-view.md)
 - [How to close a view](how-to-close-view.md)

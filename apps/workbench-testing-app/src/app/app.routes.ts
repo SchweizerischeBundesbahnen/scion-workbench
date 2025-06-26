@@ -11,14 +11,14 @@
 import {Routes} from '@angular/router';
 import {WorkbenchComponent} from './workbench/workbench.component';
 import {topLevelTestPageRoutes} from './test-pages/routes';
-import {canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
+import {canMatchWorkbenchOutlet, canMatchWorkbenchPart, canMatchWorkbenchView, WorkbenchRouteData} from '@scion/workbench';
 import {Perspectives} from './workbench.perspectives';
 
 export const routes: Routes = [
   {
     path: '',
     component: WorkbenchComponent,
-    canMatch: [canMatchWorkbenchView(false), canMatchWorkbenchPart(false)],
+    canMatch: [canMatchWorkbenchOutlet(false)],
     // TODO [Angular 21] No longer needed with the removal of legacy start page support.
     children: [
       {
@@ -173,4 +173,8 @@ export const routes: Routes = [
   },
   ...Perspectives.routes,
   ...topLevelTestPageRoutes,
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];

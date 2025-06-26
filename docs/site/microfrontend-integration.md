@@ -11,7 +11,8 @@ A microfrontend architecture can be achieved in many different ways. If you are 
 
 The SCION Microfrontend Platform is a lightweight library specifically designed to facilitate the embedding of microfrontends via iframes. Microfrontends can seamlessly interact with the SCION Workbench using the [SCION Workbench Client][link-scion-workbench-client] or communicate with other microfrontends using the SCION Microfrontend Platform. Any web application can be integrated as a workbench view. Likewise, a workbench view can embed other microfrontends, and so on.
 
-> Note that the documentation for integrating microfrontends into the SCION Workbench is still missing. We are working on a comprehensive guide that will cover the integration of microfrontends.
+> [!NOTE]
+> Documentation for integrating microfrontends into the SCION Workbench is planned. In the meantime, please refer to our testing application for an example, or contact us by submitting an issue on GitHub if you need assistance.
 
 [link-features]: /docs/site/features.md
 [link-scion-microfrontend-platform]: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/README.md

@@ -124,7 +124,7 @@ After completing the above steps, start your application by running `ng serve`. 
 **Further Reading:**
 - [How to Define the Workbench Layout](how-to-define-layout.md)
 - [How to Provide a Desktop](how-to-provide-desktop.md)
-- [How to Provide a View](how-to-provide-view.md)
+- [How to Define Routes](how-to-define-routes.md)
 - [How to Open a View](how-to-open-view.md)
 - [How to Display Content in a Part](how-to-navigate-part.md)
 ***

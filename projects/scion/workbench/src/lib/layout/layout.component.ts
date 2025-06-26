@@ -127,7 +127,7 @@ export class LayoutComponent {
   }
 
   protected onLegacyStartPageActivate(): void {
-    this._logger.warn('[Deprecation] The configuration for displaying a start page in the workbench has changed. Provide a desktop using an `<ng-template>` with the `wbDesktop` directive. The template content is used as the desktop content. Previously, the component associated with the empty path route was used as the start page. Legacy support will be removed in version 21.', `
+    this._logger.warn('[Deprecation] The configuration for displaying a start page in the workbench has changed. Provide a desktop using an `<ng-template>` with the `wbDesktop` directive. The template content is used as the desktop content. Previously, the component associated with the empty-path route was used as the start page. Legacy support will be removed in version 21.', `
     
     Example:
     <wb-workbench>

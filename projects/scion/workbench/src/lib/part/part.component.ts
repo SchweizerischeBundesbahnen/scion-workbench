@@ -26,7 +26,6 @@ import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutlet} from '@angular/router';
 import {PartId} from './workbench-part.model';
 import {dasherize} from '../common/dasherize.util';
-import {NullContentComponent} from '../null-content/null-content.component';
 
 @Component({
   selector: 'wb-part',
@@ -40,7 +39,6 @@ import {NullContentComponent} from '../null-content/null-content.component';
     RouterOutletRootContextDirective,
     ViewPortalPipe,
     SciViewportComponent,
-    NullContentComponent,
   ],
   host: {
     '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,

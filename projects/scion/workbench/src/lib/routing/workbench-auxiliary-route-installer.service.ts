@@ -15,50 +15,66 @@ import PageNotFoundComponent from '../page-not-found/page-not-found.component';
 import {WorkbenchRouteData} from './workbench-route-data';
 import {ɵEmptyOutletComponent} from './empty-outlet/empty-outlet.component';
 import {NullContentComponent} from '../null-content/null-content.component';
+import {WORKBENCH_ROUTE, WorkbenchOutlet} from '../workbench.constants';
+import {matchesIfNavigated} from './workbench-route-guards';
+import {ComponentType} from '@angular/cdk/portal';
 
 /**
- * Facilitates the registration of auxiliary routes of top-level routes.
+ * Enables the registration of auxiliary routes of top-level primary routes.
  */
 @Injectable({providedIn: 'root'})
 export class WorkbenchAuxiliaryRouteInstaller {
 
   private readonly _workbenchConfig = inject(WorkbenchConfig);
   private readonly _router = inject(Router);
+  private readonly _workbenchRoutes = inject(WORKBENCH_ROUTE, {optional: true}) as Route[] | null ?? [];
 
   /**
-   * Registers an auxiliary route for each top-level route, enabling navigation in the specified router outlet(s).
+   * Creates an empty-path auxiliary route for each passed outlet and adds the primary routes defined in the router config as child routes,
+   * enabling navigation in specified router outlets.
    *
    * @param outlets - Specifies outlets for which to create auxiliary routes.
    * @param config - Specifies the config of the auxiliary routes.
    */
-  public registerAuxiliaryRoutes(outlets: string[], config: AuxiliaryRouteConfig = {}): Routes {
+  public registerAuxiliaryRoutes(outlets: WorkbenchOutlet[], config: AuxiliaryRouteConfig = {}): Routes {
     if (!outlets.length) {
       return [];
     }
 
-    const registeredRoutes = outlets.map(outlet => ({
-      path: '',
-      outlet,
-      providers: [{provide: WORKBENCH_AUXILIARY_ROUTE_OUTLET, useValue: outlet}],
-      component: ɵEmptyOutletComponent,
-      children: [
-        ...this._router.config
-          .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
-          .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
-        // Register wildcard route to display "Page Not Found".
-        ...config.canMatchNotFoundPage?.length ? [{
-          path: '**',
-          loadComponent: () => this._workbenchConfig.pageNotFoundComponent ?? PageNotFoundComponent,
-          data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
-          canMatch: config.canMatchNotFoundPage,
-        }] : [],
-        // Register wildcard route to display blank page.
-        {
-          path: '**',
-          component: NullContentComponent,
-        },
-      ],
-    } satisfies Route));
+    const registeredRoutes = outlets
+      .map((outlet: WorkbenchOutlet): Route => ({
+        path: '',
+        outlet,
+        providers: [{provide: WORKBENCH_OUTLET, useValue: outlet}],
+        component: ɵEmptyOutletComponent,
+        children: [
+          // Add workbench-specific routes.
+          ...this._workbenchRoutes
+            // Provide outlet for {@link UrlMatcher} as not called inside a route's injection context.
+            .map(route => ({...route, data: {...route.data, [WorkbenchRouteData.ɵoutlet]: outlet}})),
+          // Add application-specific routes.
+          ...this._router.config
+            // Filter primary routes.
+            .filter(route => !route.outlet || route.outlet === PRIMARY_OUTLET)
+            // Filter wildcard route as most likely not indended for workbench outlets. Otherwise, the "Not Found" and "Nothing to Show" pages would never be matched.
+            .filter(route => route.path !== '**')
+            // Only match the route if the outlet has been navigated, preventing the following issues for application having an empty-path parent route (tested in `app-with-guard.e2e-spec.ts`, `app-with-redirect.e2e-spec.ts`):
+            // - Redirecting in a `CanActivate` guard on an empty-path parent route would lead to an infinite loop.
+            // - The "Not Found" page would not be displayed for an empty-path navigation.
+            // - The "Not Found" page would not be displayed when clearing the outlets from the URL.
+            // - The "Nothing to Show" page would not be displayed at all.
+            //
+            // The issues are caused because Angular always attempts to match empty-path auxiliary routes if the outlet is not included in the URL, regardless
+            // of whether the outlet has been navigated to the empty-path route or not. Additionally, Angular's route matcher does not backtrack if it cannot
+            // find a route for an empty-path outlet in an empty-path subtree. This prevents fallback to a top-level wildcard route, such as a "Not Found" or
+            // "Nothing to Show" route.
+            .map(route => ({...route, canMatch: [...route.canMatch ?? [], matchesIfNavigated]})),
+        ],
+      }))
+      // Add "Page Not Found" wildcard route.
+      .map(route => addNotFoundWildcardRoute(route, {component: this._workbenchConfig.pageNotFoundComponent, canMatch: config.notFoundRoute}))
+      // Add "Nothing to Show" wildcard route.
+      .map(route => addNullContentWildcardRoute(route));
 
     this.replaceRouterConfig([
       ...this._router.config,
@@ -95,15 +111,64 @@ export class WorkbenchAuxiliaryRouteInstaller {
 }
 
 /**
+ * Recursively adds a "Not Found" wildcard route to the specified route and its child routes.
+ *
+ * Has no effect if the route has no child routes or if no `CanMatch` guard is provided.
+ *
+ * @see PageNotFoundComponent
+ */
+function addNotFoundWildcardRoute(route: Route, options: {component?: ComponentType<unknown>; canMatch?: true | CanMatchFn}): Route {
+  if (!options.canMatch) {
+    return route;
+  }
+  if (!route.children) {
+    return route;
+  }
+
+  return {
+    ...route,
+    children: [
+      ...route.children.map(child => addNotFoundWildcardRoute(child, options)),
+      {
+        path: '**',
+        component: options.component ?? PageNotFoundComponent,
+        data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
+        canMatch: options.canMatch === true ? undefined : [options.canMatch],
+      },
+    ],
+  };
+}
+
+/**
+ * Adds the "Nothing to Show" wildcard route as child route.
+ *
+ * @see NullContentComponent
+ */
+function addNullContentWildcardRoute(route: Route): Route {
+  return {
+    ...route,
+    children: [
+      ...route.children ?? [],
+      {
+        path: '**',
+        component: NullContentComponent,
+      },
+    ],
+  };
+}
+
+/**
  * Configures auxiliary routes.
  */
 export interface AuxiliaryRouteConfig {
   /**
-   * Specifies `canMatch` guard(s) to activate the wildcard route ("**").
+   * Controls whether to install the wildcard route ("**") if no route matches.
    *
-   * If not specified or empty, does not register the wildcard route ("**").
+   * A `CanMatch` guard can be provided for conditional installation.
+   *
+   * Defaults to not adding the wildcard route.
    */
-  canMatchNotFoundPage?: Array<CanMatchFn>;
+  notFoundRoute?: true | CanMatchFn;
 }
 
 /**
@@ -111,4 +176,4 @@ export interface AuxiliaryRouteConfig {
  *
  * Can be injected in a `CanMatch` guard to obtain a reference to the workbench element.
  */
-export const WORKBENCH_AUXILIARY_ROUTE_OUTLET = new InjectionToken<string>('ɵWORKBENCH_AUXILIARY_ROUTE_OUTLET');
+export const WORKBENCH_OUTLET = new InjectionToken<WorkbenchOutlet>('ɵWORKBENCH_OUTLET');

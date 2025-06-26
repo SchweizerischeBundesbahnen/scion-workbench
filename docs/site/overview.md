@@ -31,7 +31,7 @@ Users can split the main area (or any other part) by dragging views side-by-side
 #### Developer Experience
 The SCION Workbench is built on top of Angular and is designed to have minimal impact on application development. The Workbench API is based on familiar Angular concepts, making development straightforward.
 
-Any component associated with a route can be opened as a view or displayed in a part. Similar to Angular, the workbench provides a router for view and part navigation. A view or part can inject `ActivatedRoute` to obtain parameters passed to the navigation. The navigation is based on Angular's routing mechanism and thus supports lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more.
+Any component associated with a route can be opened as a view or displayed in a part. Similar to Angular, the workbench provides a router for view and part navigation. A view or part can inject `ActivatedRoute` to get parameters passed to the navigation. The navigation is based on Angular's routing mechanism and thus supports lazy component loading, resolvers, browser back/forward navigation, persistent navigation, and more.
 
 [link-features]: /docs/site/features.md
 

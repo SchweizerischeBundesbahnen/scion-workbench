@@ -72,7 +72,7 @@ export const routes: Routes = [
     loadChildren: () => import('./test-pages/routes'),
   },
   {
-    path: '', // empty path route is used to test opening a microfrontend with an empty path (view/popup/dialog)
+    path: '', // empty-path route is used to test opening a microfrontend with an empty-path (view/popup/dialog)
     pathMatch: 'full',
     loadComponent: () => import('./test-pages/microfrontend-test-page/microfrontend-test-page.component'),
   },

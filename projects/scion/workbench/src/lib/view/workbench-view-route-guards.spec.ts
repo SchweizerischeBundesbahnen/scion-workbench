@@ -26,7 +26,7 @@ describe('CanMatchWorkbenchView Guard', () => {
     jasmine.addMatchers(toShowCustomMatcher);
   });
 
-  it('should match empty path route if not installed `canMatchWorkbenchView` guard', async () => {
+  it('should match empty-path route if not installed `canMatchWorkbenchView` guard', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -39,14 +39,14 @@ describe('CanMatchWorkbenchView Guard', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitUntilWorkbenchStarted();
 
-    // Navigate to empty path route.
+    // Navigate to empty-path route.
     await workbenchRouter.navigate([], {hint: 'ignored'});
     await waitUntilStable();
 
     expect(fixture).toShow(View1Component);
   });
 
-  it('should match empty path route based on hint passed to the navigation', async () => {
+  it('should match empty-path route based on hint passed to the navigation', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -77,7 +77,7 @@ describe('CanMatchWorkbenchView Guard', () => {
     expect(fixture).toShow(View3Component);
   });
 
-  it('should match nested empty path route based on hint passed to the navigation', async () => {
+  it('should match nested empty-path route based on hint passed to the navigation', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
@@ -213,13 +213,13 @@ describe('CanMatchWorkbenchView Guard', () => {
     expect(fixture).toShow(PageNotFoundComponent);
   });
 
-  it('should error when loading the application root route into a view', async () => {
+  it('should error when loading the application\'s default route into a view', async () => {
     await jasmine.spyOnGlobalErrorsAsync(async errors => {
       TestBed.configureTestingModule({
         providers: [
           provideWorkbenchForTest(),
           provideRouter([
-            {path: '', component: WorkbenchComponent}, // do not guard the application root route
+            {path: '', component: WorkbenchComponent}, // do not guard the application's default route
             {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
           ]),
         ],
@@ -227,22 +227,22 @@ describe('CanMatchWorkbenchView Guard', () => {
       const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
       await waitUntilWorkbenchStarted();
 
-      // Navigate to the empty path route.
+      // Navigate to the empty-path route.
       const workbenchRouter = TestBed.inject(WorkbenchRouter);
       await workbenchRouter.navigate([], {hint: 'view-1'});
       await waitUntilStable();
 
-      expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Circular loading of the workbench component detected in view 'view\.1'\. Did you forget to add the CanMatch guard 'canMatchWorkbenchView\(false\)' to the root \(empty-path\) route of the application\?/));
+      expect(errors).toHaveBeenCalledWith(jasmine.stringMatching(/\[WorkbenchError] Circular loading of the workbench component detected in workbench outlet 'view\.1'\./));
       expect(fixture).not.toShow(View1Component);
     });
   });
 
-  it('should not load the application root route into a view', async () => {
+  it('should not load the application\'s default route into a view', async () => {
     TestBed.configureTestingModule({
       providers: [
         provideWorkbenchForTest(),
         provideRouter([
-          {path: '', canMatch: [canMatchWorkbenchView(false)], component: WorkbenchComponent}, // prevent loading the application root route into a view
+          {path: '', canMatch: [canMatchWorkbenchView(false)], component: WorkbenchComponent}, // prevent loading the application's default route into a view
           {path: '', canMatch: [canMatchWorkbenchView('view-1')], component: View1Component},
         ]),
       ],
@@ -250,7 +250,7 @@ describe('CanMatchWorkbenchView Guard', () => {
     const fixture = styleFixture(TestBed.createComponent(RouterOutletComponent));
     await waitUntilWorkbenchStarted();
 
-    // Navigate to the empty path route.
+    // Navigate to the empty-path route.
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await workbenchRouter.navigate([], {hint: 'view-1'});
     await waitUntilStable();
@@ -278,7 +278,7 @@ describe('CanMatchNotFoundPage', () => {
     const workbenchRouter = TestBed.inject(WorkbenchRouter);
     await waitUntilWorkbenchStarted();
 
-    // Navigate to empty path route.
+    // Navigate to empty-path route.
     await workbenchRouter.navigate([], {hint: 'hint', target: 'view.100'});
     await waitUntilStable();
     expect(fixture).toShow(PageNotFoundComponent);

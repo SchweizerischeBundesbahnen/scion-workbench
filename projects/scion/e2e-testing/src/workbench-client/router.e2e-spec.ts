@@ -814,7 +814,7 @@ test.describe('Workbench Router', () => {
     expect(componentInstanceIds.add(await testeeViewPage.getComponentInstanceId()).size).toEqual(4);
   });
 
-  test('should open microfrontend with empty path', async ({appPO, microfrontendNavigator}) => {
+  test('should open microfrontend with empty-path', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {

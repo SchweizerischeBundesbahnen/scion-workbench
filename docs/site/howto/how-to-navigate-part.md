@@ -44,7 +44,7 @@ provideWorkbench({
 });
 ```
 
-To maintain a clean URL, use a hint and navigate to the empty path route.
+To maintain a clean URL, use a hint and navigate to the empty-path route.
 ```ts
 import {MAIN_AREA, provideWorkbench} from '@scion/workbench';
 

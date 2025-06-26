@@ -32,6 +32,19 @@ export const workbenchManifest: Manifest = {
         path: 'test-host-popup;matrixParam=:param',
       },
     } satisfies WorkbenchPopupCapability,
+    // TODO [#271]: Remove this popup capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Popup,
+      qualifier: {
+        component: 'host-popup',
+        variant: 'invalid-path',
+      },
+      private: false,
+      description: 'Represents a popup provided by the host app that has an invalid path.',
+      properties: {
+        path: 'does/not/exist',
+      },
+    } satisfies WorkbenchPopupCapability,
     // TODO [#271]: Remove this dialog capability when implemented the issue #271
     {
       type: WorkbenchCapabilities.Dialog,
@@ -51,7 +64,21 @@ export const workbenchManifest: Manifest = {
     {
       type: WorkbenchCapabilities.Dialog,
       qualifier: {
-        component: 'host-dialog-custom-properties',
+        component: 'host-dialog',
+        variant: 'invalid-path',
+      },
+      private: false,
+      description: 'Represents a dialog provided by the host app that has an invalid path.',
+      properties: {
+        path: 'does/not/exist',
+      },
+    } satisfies WorkbenchDialogCapability,
+    // TODO [#271]: Remove this dialog capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.Dialog,
+      qualifier: {
+        component: 'host-dialog',
+        variant: 'custom-properties',
       },
       private: false,
       description: 'Represents a dialog provided by the host app with non-default property values.',
@@ -78,7 +105,8 @@ export const workbenchManifest: Manifest = {
     {
       type: WorkbenchCapabilities.Dialog,
       qualifier: {
-        component: 'host-dialog-focus-page',
+        component: 'host-dialog',
+        variant: 'focus-page',
       },
       private: false,
       description: 'Represents a dialog provided by the host app that displays the focus test page.',
@@ -90,7 +118,7 @@ export const workbenchManifest: Manifest = {
     {
       type: WorkbenchCapabilities.MessageBox,
       qualifier: {
-        component: 'host-message-box',
+        component: 'host-messagebox',
       },
       private: false,
       description: 'Represents a message box provided by the host app.',
@@ -105,7 +133,21 @@ export const workbenchManifest: Manifest = {
     {
       type: WorkbenchCapabilities.MessageBox,
       qualifier: {
-        component: 'custom-host-message-box',
+        component: 'host-messagebox',
+        variant: 'invalid-path',
+      },
+      private: false,
+      description: 'Represents a message box provided by the host app that has an invalid path.',
+      properties: {
+        path: 'does/not/exist',
+      },
+    },
+    // TODO [#271]: Remove this messagebox capability when implemented the issue #271
+    {
+      type: WorkbenchCapabilities.MessageBox,
+      qualifier: {
+        component: 'host-messagebox',
+        variant: 'explicit-size',
       },
       private: false,
       description: 'Represents a massage box provided by the host app with pre-defined custom size.',

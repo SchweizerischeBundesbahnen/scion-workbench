@@ -48,9 +48,9 @@ export const Routing = {
     const isAbsolutePath = typeof commands[0] === 'string' && commands[0].startsWith('/');
     const relativeTo = isAbsolutePath ? null : (options?.relativeTo ?? null);
 
-    // Angular throws the error 'NG04003: Root segment cannot have matrix parameters' when passing an empty path command
+    // Angular throws the error 'NG04003: Root segment cannot have matrix parameters' when passing an empty-path command
     // followed by a matrix params object, but not when passing matrix params as the first command. For consistency, when
-    // passing matrix params as the first command, we prepend an empty path for Angular to throw the same error.
+    // passing matrix params as the first command, we prepend an empty-path for Angular to throw the same error.
     if (typeof commands[0] === 'object' && (!relativeTo || Routing.hasEmptyPathFromRoot(relativeTo))) {
       commands = ['', ...commands];
     }
@@ -97,6 +97,13 @@ export const Routing = {
    */
   lookupRouteData: <T>(activatedRoute: ActivatedRouteSnapshot, dataKey: string): T | undefined => {
     return activatedRoute.pathFromRoot.reduceRight<T | undefined>((resolvedData, route) => resolvedData ?? route.data[dataKey] as T | undefined, undefined);
+  },
+
+  /**
+   * Tests if the given outlet matches the format of a workbench outlet.
+   */
+  isWorkbenchOutlet: (outlet: string | undefined | null): outlet is WorkbenchOutlet => {
+    return Routing.isPartOutlet(outlet) || Routing.isViewOutlet(outlet) || Routing.isPopupOutlet(outlet) || Routing.isDialogOutlet(outlet) || Routing.isMessageBoxOutlet(outlet);
   },
 
   /**

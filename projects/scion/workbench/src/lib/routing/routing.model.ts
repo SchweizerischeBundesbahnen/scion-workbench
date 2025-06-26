@@ -42,7 +42,7 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
   /**
    * Allows differentiation between routes with identical paths.
    *
-   * Multiple views can navigate to the same path but still resolve to different routes, e.g., the empty path route to maintain a clean URL.
+   * Multiple views can navigate to the same path but still resolve to different routes, e.g., the empty-path route to maintain a clean URL.
    * Like the path, a hint affects view resolution. If set, the router will only navigate views with an equivalent hint, or if not set, views without a hint.
    *
    * Example route config matching routes based on the hint passed to the navigation:
@@ -76,7 +76,7 @@ export interface WorkbenchNavigationExtras extends NavigationExtras {
   /**
    * Associates data with the navigation.
    *
-   * Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to empty path navigations.
+   * Unlike matrix parameters, navigation data is stored in the layout and not added to the URL, allowing data to be passed to an empty-path navigation.
    *
    * Data must be JSON serializable. Data can be read from {@link WorkbenchView.navigation.data}.
    */

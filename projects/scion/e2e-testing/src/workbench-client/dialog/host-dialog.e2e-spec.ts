@@ -67,11 +67,11 @@ test.describe('Workbench Host Dialog', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog-custom-properties'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'custom-properties'}});
 
     // Open the dialog.
     const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-    await dialogOpenerPage.open({component: 'host-dialog-custom-properties'}, {cssClass: 'testee', params: {id: '123'}});
+    await dialogOpenerPage.open({component: 'host-dialog', variant: 'custom-properties'}, {cssClass: 'testee', params: {id: '123'}});
 
     const dialog = appPO.dialog({cssClass: 'testee'});
     const dialogPage = new HostDialogPagePO(dialog);
@@ -105,11 +105,11 @@ test.describe('Workbench Host Dialog', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register dialog capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog-focus-page'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'dialog', qualifier: {component: 'host-dialog', variant: 'focus-page'}});
 
     // Open the dialog.
     const dialogOpenerPage = await microfrontendNavigator.openInNewTab(DialogOpenerPagePO, 'app1');
-    await dialogOpenerPage.open({component: 'host-dialog-focus-page'}, {cssClass: 'testee'});
+    await dialogOpenerPage.open({component: 'host-dialog', variant: 'focus-page'}, {cssClass: 'testee'});
 
     const dialog = appPO.dialog({cssClass: 'testee'});
     const focusTestPage = new FocusTestPagePO(dialog);

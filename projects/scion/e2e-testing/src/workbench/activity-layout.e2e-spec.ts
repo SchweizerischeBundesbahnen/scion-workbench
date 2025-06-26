@@ -19,6 +19,7 @@ import {RouterPagePO} from './page-object/router-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {ACTIVITY_PANEL_HEIGHT, ACTIVITY_PANEL_RATIO, ACTIVITY_PANEL_WIDTH} from './workbench-layout-constants';
 import {DomRect} from '../helper/testing.util';
+import {NullContentPagePO} from './page-object/null-content-page.po';
 
 test.describe('Activity Layout', () => {
 
@@ -3773,7 +3774,7 @@ test.describe('Activity Layout', () => {
 
     // Expect hint to show.
     const activityPart = appPO.part({partId: 'part.activity-1'});
-    await expect(activityPart.nullContentMessage).toBeVisible();
+    await expectPart(activityPart).toDisplayComponent(NullContentPagePO.selector);
   });
 
   test('should show "null content" hint if activity has empty parts only (has no navigated parts or views)', async ({appPO, workbenchNavigator}) => {
@@ -3807,10 +3808,10 @@ test.describe('Activity Layout', () => {
     const activityPart2 = appPO.part({partId: 'part.activity-2'});
 
     // Expect hint to show for activity.1.
-    await expect(activityPart1.nullContentMessage).toBeVisible();
+    await expectPart(activityPart1).toDisplayComponent(NullContentPagePO.selector);
 
     // Expect hint to show for activity.2.
-    await expect(activityPart2.nullContentMessage).toBeVisible();
+    await expectPart(activityPart2).toDisplayComponent(NullContentPagePO.selector);
   });
 
   test.describe('Title', () => {

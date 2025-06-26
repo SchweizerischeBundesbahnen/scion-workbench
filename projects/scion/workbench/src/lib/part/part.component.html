@@ -13,7 +13,7 @@
        class="active-view e2e-view-content e2e-content">
     <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
   </div>
-} @else if (part.navigation()) {
+} @else {
   <sci-viewport class="part-content e2e-part-content e2e-content"
                 wbViewDropZone
                 [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
@@ -21,6 +21,4 @@
                 (wbViewDropZoneDrop)="onViewDrop($event)">
     <router-outlet [name]="part.id" wbRouterOutletRootContext/>
   </sci-viewport>
-} @else {
-  <wb-null-content/>
 }
