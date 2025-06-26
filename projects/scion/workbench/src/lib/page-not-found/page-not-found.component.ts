@@ -8,10 +8,16 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, isDevMode} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, isDevMode} from '@angular/core';
+import {TextPipe} from '../text/text.pipe';
+import {WorkbenchService} from '../workbench.service';
+import {WORKBENCH_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
+import {Routing} from '../routing/routing.util';
+import {Router} from '@angular/router';
 import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
-import {TextPipe} from '../text/text.pipe';
+import {WorkbenchDialog} from '../dialog/workbench-dialog';
+import {Popup} from '../popup/popup.config';
 
 @Component({
   selector: 'wb-page-not-found',
@@ -20,11 +26,34 @@ import {TextPipe} from '../text/text.pipe';
   imports: [
     TextPipe,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PageNotFoundComponent {
 
+  private readonly _router = inject(Router);
+
   protected readonly isDevMode = isDevMode();
+  protected readonly Routing = Routing;
+  protected readonly workbenchService = inject(WorkbenchService);
+
+  protected readonly outlet = inject(WORKBENCH_OUTLET);
   protected readonly view = inject(WorkbenchView, {optional: true});
   protected readonly part = inject(WorkbenchPart, {optional: true});
-  protected readonly path = computed(() => (this.view ?? this.part)?.navigation()?.path.map(segment => `${segment}`).join('/'));
+  protected readonly dialog = inject(WorkbenchDialog, {optional: true});
+  protected readonly popup = inject(Popup, {optional: true});
+
+  protected readonly path = computed(() => {
+    // Track the URL.
+    this.workbenchService.layout();
+
+    const urlTree = this._router.parseUrl(this._router.url);
+    const outlets = Routing.parseOutlets(urlTree, {
+      view: Routing.isViewOutlet(this.outlet) || undefined,
+      part: Routing.isPartOutlet(this.outlet) || undefined,
+      dialog: Routing.isDialogOutlet(this.outlet) || undefined,
+      messagebox: Routing.isMessageBoxOutlet(this.outlet) || undefined,
+      popup: Routing.isPopupOutlet(this.outlet) || undefined,
+    });
+    return outlets.get(this.outlet)?.map(segment => `${segment}`).join('/') ?? '';
+  });
 }

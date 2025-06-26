@@ -25,21 +25,26 @@
     text-align: center;
   }
 
-  > button.close:is(button, #sci-reset) {
-    all: unset;
-    cursor: var(--sci-workbench-button-cursor);
-    padding: .5em 1.5em;
-    color: var(--sci-color-accent-inverse);
-    background-color: var(--sci-color-accent);
-    background-clip: padding-box;
-    border: 1px solid var(--sci-color-accent);
-    border-radius: var(--sci-corner);
-    text-align: center;
+  > section.actions {
+    display: flex;
+    gap: .5em;
 
-    &:focus, &:active {
-      border-color: transparent;
-      outline: 1px solid var(--sci-color-accent);
+    > button:is(button, #sci-reset) {
+      all: unset;
+      cursor: var(--sci-workbench-button-cursor);
+      padding: .5em 1.5em;
       color: var(--sci-color-accent-inverse);
+      background-color: var(--sci-color-accent);
+      background-clip: padding-box;
+      border: 1px solid var(--sci-color-accent);
+      border-radius: var(--sci-corner);
+      text-align: center;
+
+      &:focus, &:active {
+        border-color: transparent;
+        outline: 1px solid var(--sci-color-accent);
+        color: var(--sci-color-accent-inverse);
+      }
     }
   }
 }

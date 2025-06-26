@@ -1,11 +1,30 @@
 <header>{{('%workbench.page_not_found.title' | wbText)()}}</header>
 
-@let message = '%workbench.page_not_found.message;path=' + path() | wbText;
-<section class="message" [innerHTML]="message()"></section>
-
-@if (view) {
-  <button (click)="view.close()" class="close">{{('%workbench.close.action' | wbText)()}}</button>
+@if (Routing.isViewOutlet(outlet)) {
+  @let message = '%workbench.page_not_found_view.message;path=' + path() | wbText;
+  <section class="message" [innerHTML]="message()"></section>
+} @else if (Routing.isPartOutlet(outlet)) {
+  @let message = '%workbench.page_not_found_part.message;path=' + path() | wbText;
+  <section class="message" [innerHTML]="message()"></section>
+} @else {
+  @let message = '%workbench.page_not_found.message;path=' + path() | wbText;
+  <section class="message" [innerHTML]="message()"></section>
 }
+
+<section class="actions">
+  @if (Routing.isViewOutlet(outlet)) {
+    <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
+    <button (click)="view!.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  } @else if (Routing.isPartOutlet(outlet)) {
+    <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
+  } @else if (Routing.isDialogOutlet(outlet)) {
+    <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  } @else if (Routing.isMessageBoxOutlet(outlet)) {
+    <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  } @else if (Routing.isPopupOutlet(outlet)) {
+    <button (click)="popup!.close()">{{('%workbench.close.action' | wbText)()}}</button>
+  }
+</section>
 
 @if (isDevMode) {
   @let hint = '%workbench.page_not_found_developer_hint.message' | wbText;
