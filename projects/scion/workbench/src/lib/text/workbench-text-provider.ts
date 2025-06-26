@@ -68,9 +68,12 @@ const workbenchTexts: Record<string, string> = {
   'workbench.null_content.message': 'Nothing to show.',
   'workbench.null_view_developer_hint.message': 'This view has not been navigated.<br>Navigate the view "{{view}}" to display content.',
   'workbench.ok.action': 'OK',
-  'workbench.page_not_found.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try to open the page again.',
+  'workbench.page_not_found.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed.',
   'workbench.page_not_found.title': 'Page Not Found',
   'workbench.page_not_found_developer_hint.message': 'You can create a custom "Not Found" page component and register it in the workbench configuration to personalize this page.',
+  'workbench.page_not_found_part.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try resetting the perspective.',
+  'workbench.page_not_found_view.message': 'The requested page <strong>{{path}}</strong> was not found.<br>The URL may have changed. Try opening the view again or resetting the perspective.',
+  'workbench.reset_perspective.action': 'Reset Perspective',
   'workbench.show_open_tabs.tooltip': 'Show Open Tabs',
 };
 
