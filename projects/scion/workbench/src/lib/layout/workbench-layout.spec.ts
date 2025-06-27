@@ -4173,8 +4173,8 @@ describe('WorkbenchLayout', () => {
         .addPart('part.activity-2-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
         .addPart('part.activity-2-bottom', {relativeTo: 'part.activity-2-top', align: 'bottom'});
 
-      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-1');
-      expect(workbenchLayout.activity({id: 'activity.2'}).referencePartId).toEqual('part.activity-2-top');
+      expect(workbenchLayout.part({referencePart: true, grid: 'activity.1'}).id).toEqual('part.activity-1');
+      expect(workbenchLayout.part({referencePart: true, grid: 'activity.2'}).id).toEqual('part.activity-2-top');
 
       // Expect reference part to be structural.
       expect(workbenchLayout.part({partId: 'part.activity-1'}).structural).toBeTrue();
@@ -4188,7 +4188,7 @@ describe('WorkbenchLayout', () => {
         .addView('view.1', {partId: 'part.activity-1'})
         .removeView('view.1', {force: true});
 
-      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-1');
+      expect(workbenchLayout.part({referencePart: true, grid: 'activity.1'}).id).toEqual('part.activity-1');
       expect(workbenchLayout.part({partId: 'part.activity-1'})).toBeDefined();
     });
 
@@ -4225,7 +4225,6 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activity({id: 'activity.1'}).label).toEqual('Label');
       expect(workbenchLayout.activity({id: 'activity.1'}).tooltip).toEqual('Tooltip');
       expect(workbenchLayout.activity({id: 'activity.1'}).cssClass).toEqual('class-1');
-      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-1');
       expect(workbenchLayout.part({partId: 'part.activity-1'}).title).toEqual('Title');
       expect(workbenchLayout.part({partId: 'part.activity-1'}).cssClass).toEqual(['class-1']);
       expect(workbenchLayout.part({partId: 'part.activity-1'}).structural).toBeTrue();
@@ -4385,7 +4384,7 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.navigationState({outlet: 'part.activity-2'})).toEqual({some: 'state'});
       expect(workbenchLayout.urlSegments({outlet: 'part.activity-2'})).toEqual(segments(['path/to/part']));
       expect(workbenchLayout.outlets({mainGrid: true, mainAreaGrid: true, activityGrids: true})['part.activity-2']).toEqual(segments(['path/to/part']));
-      expect(workbenchLayout.activity({id: 'activity.1'}).referencePartId).toEqual('part.activity-2');
+      expect(workbenchLayout.part({referencePart: true, partId: 'part.activity-2'})).toBeDefined();
       expect(workbenchLayout.grids['activity.1']!.activePartId).toEqual('part.activity-2');
     });
 
@@ -4447,14 +4446,14 @@ describe('WorkbenchLayout', () => {
       // Define the grid.
       const grids: Partial<WorkbenchGrids> = {
         'activity.1': {
-          root: new MPart({id: 'part.activity-1', structural: true, views: []}),
+          root: new MPart({id: 'part.activity-1', structural: true, views: [], referencePart: true}),
           activePartId: 'part.activity-1',
         },
       };
       // Define activity layout.
-      const activityLayout1: MActivityLayout = {
+      const activityLayout: MActivityLayout = {
         toolbars: {
-          leftTop: {activities: [{id: 'activity.1', referencePartId: 'part.activity-1', label: 'Label', icon: 'icon'}]},
+          leftTop: {activities: [{id: 'activity.1', label: 'Label', icon: 'icon'}]},
           leftBottom: {activities: []},
           rightTop: {activities: []},
           rightBottom: {activities: []},
@@ -4469,23 +4468,22 @@ describe('WorkbenchLayout', () => {
       };
 
       // Assert no error
-      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids, activityLayout: activityLayout1})).not.toThrowError();
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids, activityLayout})).not.toThrowError();
 
       // Assert activity to have a MActivity.
       expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids})).toThrowError(/NullActivityError/);
 
       // Assert activity to have a MPartGrid.
-      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({activityLayout: activityLayout1})).toThrowError(/NullGridError/);
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({activityLayout: activityLayout})).toThrowError(/NullGridError/);
 
       // Assert activity to have reference part.
-      const activityLayout2: MActivityLayout = {
-        ...activityLayout1,
-        toolbars: {
-          ...activityLayout1.toolbars,
-          leftTop: {activities: [{id: 'activity.1', referencePartId: 'part.99', label: 'Label', icon: 'icon'}]},
+      const grids2: Partial<WorkbenchGrids> = {
+        'activity.1': {
+          root: new MPart({id: 'part.activity-1', structural: true, views: []}),
+          activePartId: 'part.activity-1',
         },
       };
-      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids, activityLayout: activityLayout2})).toThrowError(/NullReferencePartError/);
+      expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: grids2, activityLayout})).toThrowError(/NullReferencePartError/);
     });
 
     it('should close activity when removing last view', () => {
@@ -4570,6 +4568,67 @@ describe('WorkbenchLayout', () => {
 
       // Expect activity to be closed.
       expect(changedLayout.activityStack({activityId: 'activity.1'}).activeActivityId).toBeUndefined();
+    });
+
+    /**
+     * The test operates on the following layout:
+     *
+     *                                             MTreeNode (root)
+     *                                                    |
+     *                             +----------------------+----------------------+
+     *                             |                                             |
+     *                      MTreeNode (child)                             MTreeNode (child)
+     *                 +-----------+-----------+                     +-----------+-----------+
+     *                 |                       |                     |                       |
+     *          MTreeNode (child)          part.right         part.bottom-left        part.bottom-right
+     *     +-----------+-----------+
+     *     |                       |
+     * part.left             part.main-area
+     */
+    it('should compute visible flag', () => {
+      const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart(MAIN_AREA)
+        .addPart('part.left', {align: 'left'})
+        .addPart('part.right', {align: 'right'})
+        .addPart('part.bottom-left', {align: 'bottom'})
+        .addPart('part.bottom-right', {relativeTo: 'part.bottom-left', align: 'right'})
+        .navigatePart('part.right', ['test-part'])
+        .addView('testee', {partId: 'part.left'});
+
+      // Serialize and deserialize layout because visible is a computed flag upon deserialization.
+      const serializedLayout = layout.serialize();
+      const deserializedLayout = TestBed.inject(ɵWorkbenchLayoutFactory).create({grids: serializedLayout.grids});
+
+      // Expect visible flag to be computed.
+      const root = deserializedLayout.grids.main.root as MTreeNode;
+      expect(root.visible).toBeTrue();
+
+      const child1 = root.child1 as MTreeNode;
+      expect(child1.visible).toBeTrue();
+
+      const child11 = child1.child1 as MTreeNode;
+      expect(child11.visible).toBeTrue();
+      const child12 = child1.child2 as MPart;
+      expect(child12.visible).toBeTrue();
+
+      const child111 = child11.child1 as MTreeNode;
+      expect(child111.visible).toBeTrue();
+      const child112 = child11.child2 as MPart;
+      expect(child112.visible).toBeTrue();
+
+      const child2 = root.child2 as MTreeNode;
+      expect(child2.visible).toBeFalse();
+
+      const child21 = child2.child1 as MPart;
+      expect(child21.visible).toBeFalse();
+      const child22 = child2.child2 as MPart;
+      expect(child22.visible).toBeFalse();
+
+      expect(deserializedLayout.part({partId: MAIN_AREA}).visible).toBeTrue(); // main area is visible
+      expect(deserializedLayout.part({partId: 'part.right'}).visible).toBeTrue(); // navigated part is visible
+      expect(deserializedLayout.part({partId: 'part.left'}).visible).toBeTrue(); // part with views is visible
+      expect(deserializedLayout.part({partId: 'part.bottom-left'}).visible).toBeFalse(); // part without navigation and views is not visible
+      expect(deserializedLayout.part({partId: 'part.bottom-right'}).visible).toBeFalse(); // part without navigation and views is not visible
     });
   });
 });

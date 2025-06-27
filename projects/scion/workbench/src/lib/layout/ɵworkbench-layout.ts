@@ -329,10 +329,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.throwIfMulti - Controls to error if multiple parts are found.
    * @return parts matching the filter criteria.
    */
-  public parts(findBy: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
-  public parts(findBy: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MPart, ...MPart[]];
-  public parts(findBy?: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
-  public parts(findBy?: {id?: string; viewId?: string; peripheral?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
+  public parts(findBy: {id?: string; viewId?: string; peripheral?: boolean; referencePart?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti: (() => Error) | true}): readonly [MPart];
+  public parts(findBy: {id?: string; viewId?: string; peripheral?: boolean; referencePart?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options: {throwIfEmpty: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly [MPart, ...MPart[]];
+  public parts(findBy?: {id?: string; viewId?: string; peripheral?: boolean; referencePart?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[];
+  public parts(findBy?: {id?: string; viewId?: string; peripheral?: boolean; referencePart?: boolean; grid?: keyof WorkbenchGrids | Array<keyof WorkbenchGrids>}, options?: {throwIfEmpty?: (() => Error) | true; throwIfMulti?: (() => Error) | true}): readonly MPart[] {
     const parts = this.findTreeElements((element: MTreeNode | MPart): element is MPart => {
       if (!(element instanceof MPart)) {
         return false;
@@ -344,6 +344,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         return false;
       }
       if (findBy?.peripheral !== undefined && this.isPeripheralPart(element.id) !== findBy.peripheral) {
+        return false;
+      }
+      if (findBy?.referencePart !== undefined && element.referencePart !== findBy.referencePart) {
         return false;
       }
       return true;
@@ -369,10 +372,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * @param options.orElse - Controls to return `null` instead of throwing an error if no part is found.
    * @return part matching the filter criteria.
    */
-  public part(findBy: RequireOne<{partId: PartId; viewId: string}> & {grid?: keyof WorkbenchGrids}): MPart;
-  public part(findBy: RequireOne<{partId: PartId; viewId: string}> & {grid?: keyof WorkbenchGrids}, options: {orElse: null}): MPart | null;
-  public part(findBy: RequireOne<{partId: PartId; viewId: string}> & {grid?: keyof WorkbenchGrids}, options?: {orElse: null}): MPart | null {
-    const [part] = this.parts({id: findBy.partId, viewId: findBy.viewId, grid: findBy.grid}, {throwIfMulti: true, throwIfEmpty: options?.orElse === null ? undefined : true});
+  public part(findBy: RequireOne<{partId: PartId; viewId: string; referencePart: boolean}> & {grid?: keyof WorkbenchGrids}): MPart;
+  public part(findBy: RequireOne<{partId: PartId; viewId: string; referencePart: boolean}> & {grid?: keyof WorkbenchGrids}, options: {orElse: null}): MPart | null;
+  public part(findBy: RequireOne<{partId: PartId; viewId: string; referencePart: boolean}> & {grid?: keyof WorkbenchGrids}, options?: {orElse: null}): MPart | null {
+    const [part] = this.parts({id: findBy.partId, viewId: findBy.viewId, referencePart: findBy.referencePart, grid: findBy.grid}, {throwIfMulti: true, throwIfEmpty: options?.orElse === null ? undefined : true});
     return part ?? null;
   }
 
@@ -706,6 +709,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         alternativeId: extras.alternativeId,
         title,
         structural: true,
+        referencePart: true,
         views: [],
         cssClass: extras.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
       }),
@@ -715,7 +719,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const activityStack = this.activityStack({dockTo});
     activityStack.activities.push({
       id: activityId,
-      referencePartId: id,
       icon: extras.icon,
       label: extras.label,
       tooltip: extras.tooltip ?? extras.label,
@@ -907,7 +910,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   private __removePart(part: MPart): void {
     // Remove activity if this part is the reference part of the activity.
     const activity = this.activity({partId: part.id}, {orElse: null});
-    if (activity?.referencePartId === part.id) {
+    if (activity && part.referencePart) {
       this.__removeActivity(activity);
       return;
     }
@@ -1004,10 +1007,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (this._navigationStates.has(part.id)) {
       this._navigationStates.set(newPartId, this._navigationStates.get(part.id)!);
       this._navigationStates.delete(part.id);
-    }
-    const activity = this.activity({partId: part.id}, {orElse: null});
-    if (activity?.referencePartId === part.id) {
-      activity.referencePartId = newPartId;
     }
     const {grid} = this.grid({partId: part.id});
     if (grid.activePartId === part.id) {
@@ -1383,7 +1382,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
 
     // Assert reference part to be contained in the grid.
     mActivities.forEach(activity => {
-      if (!this.part({partId: activity.referencePartId, grid: activity.id}, {orElse: null})) {
+      if (!this.part({referencePart: true, grid: activity.id}, {orElse: null})) {
         throw Error(`[NullReferencePartError] Missing reference part for activity ${activity.id}.`);
       }
     });

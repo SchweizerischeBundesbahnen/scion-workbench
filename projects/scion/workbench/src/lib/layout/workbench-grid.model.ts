@@ -54,6 +54,10 @@ export class MTreeNode {
   public ratio!: number;
   public direction!: 'column' | 'row';
   public parent?: MTreeNode;
+  /**
+   * Computed property whether this node is visible or not. Defaults to `true`.
+   */
+  public visible?: boolean;
 
   constructor(treeNode: Omit<MTreeNode, 'type'>) {
     treeNode.parent && assertType(treeNode.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
@@ -91,6 +95,24 @@ export class MPart {
   public activeViewId?: ViewId;
   public structural!: boolean;
   public cssClass?: string[];
+  /**
+   * Specifies if this part is the reference part of its grid.
+   *
+   * The docked part of an activity is the reference part.
+   *
+   * Characteristics of the reference part:
+   * - Structural part, remaining even if its last view is removed.
+   * - Provides the title of the activity, independent of visibility and position in the layout.
+   * - Explicitly removing this part removes the activity.
+   * - If no other part in its grid is visible, the reference part will always be visible.
+   */
+  public referencePart?: boolean;
+  /**
+   * Computed property whether this part is visible or not.
+   *
+   * If the grid is not visible, and this part is a reference part
+   */
+  public visible?: boolean;
   public navigation?: {
     id: string;
     hint?: string;

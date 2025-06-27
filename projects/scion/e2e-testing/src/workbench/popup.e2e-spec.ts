@@ -1123,7 +1123,6 @@ test.describe('Workbench Popup', () => {
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart('part.middle')
-        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
         .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
         .addPart('part.bottom', {align: 'bottom', ratio: .1})
         .addView('testee', {partId: 'part.middle'})
@@ -1143,22 +1142,32 @@ test.describe('Workbench Popup', () => {
 
         const {y} = await popup.getAnchorPosition();
         const viewBoundingBox = await testPage.view.getBoundingBox();
+        const partBoundingBox = await testPage.view.part.getBoundingBox();
 
-        // Expect popup anchor not to exceed bottom view bounds
-        expect(y).toBeLessThanOrEqual(viewBoundingBox.bottom + 1);
+        if (viewBoundingBox.height > 0) {
+          // Expect popup anchor not to exceed bottom view bounds
+          expect(y).toBeLessThanOrEqual(viewBoundingBox.bottom + 1);
 
-        // Expect popup anchor not to exceed top view bounds
-        expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
+          // Expect popup anchor not to exceed top view bounds
+          expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
+        }
+        else {
+          // Expect popup anchor not to exceed bottom part bounds
+          expect(y).toBeLessThanOrEqual(partBoundingBox.bottom + 1);
+
+          // Expect popup anchor not to exceed top part bounds
+          expect(y).toBeGreaterThanOrEqual(partBoundingBox.top - 1);
+        }
       }
 
       const {y} = await popup.getAnchorPosition();
-      const viewBoundingBox = await testPage.view.getBoundingBox();
+      const partBoundingBox = await testPage.view.part.getBoundingBox();
 
-      // Expect popup anchor to stick to top view bounds
-      expect(y).toBeCloseTo(viewBoundingBox.top, 0);
+      // Expect popup anchor to stick to top part bounds
+      expect(y).toBeCloseTo(partBoundingBox.top, 0);
 
-      // Expect popup anchor to stick to bottom view bounds
-      expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+      // Expect popup anchor to stick to bottom part bounds
+      expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
     });
 
     test('should stick popup anchor to bottom view bounds when moving top sash down', async ({appPO, workbenchNavigator}) => {

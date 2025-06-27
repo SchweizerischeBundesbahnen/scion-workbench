@@ -3787,10 +3787,9 @@ test.describe('Activity Layout', () => {
       .activatePart('part.activity-1-top'),
     );
 
-    const activityPanel = appPO.activityPanel('left');
-
-    // Expect hint to show for activity.
-    await expect(activityPanel.nullContentMessage).toBeVisible();
+    // Expect hint to show.
+    const activityPart = appPO.part({partId: 'part.activity-1-top'});
+    await expectPart(activityPart).toDisplayComponent(NullContentPagePO.selector);
   });
 
   test('should show "null content" hint if both activities in panel are empty (have no navigated parts or views)', async ({appPO, workbenchNavigator}) => {

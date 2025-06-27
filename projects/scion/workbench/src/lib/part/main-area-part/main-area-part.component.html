@@ -1,5 +1,5 @@
-@if (mainAreaGrid() | wbGridIfVisible; as grid) {
-  <wb-grid [grid]="grid"
+@if (mainAreaGrid().root.visible) {
+  <wb-grid [grid]="mainAreaGrid()"
            [gridDropZone]="{
              dropRegionSize: 100,
              dropPlaceholderSize: 100,

@@ -125,6 +125,9 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
     .addPart('notifications', {dockTo: 'right-top'}, {label: 'Notifications', icon: 'notifications'})
     .addPart('progress', {dockTo: 'bottom-right'}, {label: 'Progress', icon: 'overview'})
     .addPart('problems', {dockTo: 'bottom-right'}, {label: 'Problems', icon: 'error'})
+    .addPart('marc', {dockTo: 'right-top'}, {icon: 'folder', label: 'Marc'})
+    .addPart('marc-2', {relativeTo: 'marc', align: 'bottom'})
+    .addPart('dani', {dockTo: 'right-top'}, {icon: 'train', label: 'Dani'})
 
     // Add views to parts.
     .addView('find1', {partId: 'find'})
