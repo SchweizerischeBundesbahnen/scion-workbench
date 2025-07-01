@@ -1,0 +1,12 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > sci-viewport {
+    flex: 1 1 0; // set flex-basis to 0 to not exceed available vertical space
+
+    > router-outlet {
+      position: absolute; // out of document flow
+    }
+  }
+}

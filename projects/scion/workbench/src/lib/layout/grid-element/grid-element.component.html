@@ -1,6 +1,6 @@
 <!-- MPart (leaf) -->
 @if (element() | wbInstanceof:MPart; as part) {
-  <ng-container [cdkPortalOutlet]="part.id | wbPartPortal"/>
+  <ng-container *wbPortalOutlet="part.id | wbPartPortal; destroyOnDetach: true"/>
 }
 
 <!-- MTreeNode -->

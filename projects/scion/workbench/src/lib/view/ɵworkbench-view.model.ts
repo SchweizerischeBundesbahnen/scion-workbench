@@ -158,8 +158,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     // To complete the initialization of the routed component (to ensure that `ngOnInit` is called), we manually trigger change
     // detection. We cannot perform change detection right now because the routed component has not been activated/constructed yet.
     // Use case: Navigating an (existing) inactive view to another route.
-    if (!this.active() && this.portal.isConstructed && routeChanged) {
-      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.portal.componentRef.changeDetectorRef.detectChanges());
+    if (!this.active() && this.portal.constructed() && routeChanged) {
+      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.portal.componentRef()!.changeDetectorRef.detectChanges());
     }
   }
 
@@ -312,7 +312,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public canClose(canClose: CanCloseFn): CanCloseRef {
     const canCloseGuard = this.canCloseGuard = async (): Promise<boolean> => {
       try {
-        const close = runInInjectionContext(this.portal.componentRef.injector, canClose);
+        const close = runInInjectionContext(this.portal.componentRef()!.injector, canClose);
         return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
       }
       catch (error) {
@@ -363,7 +363,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get destroyed(): boolean {
-    return this.portal.isDestroyed;
+    return this.portal.destroyed();
   }
 
   /**

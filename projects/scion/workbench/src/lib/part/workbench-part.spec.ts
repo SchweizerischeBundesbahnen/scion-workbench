@@ -93,6 +93,455 @@ describe('WorkbenchPart', () => {
     expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.left-bottom').active()).toBeTrue();
   });
 
+  it('should activate part using `Part.activate()`', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.left')
+            .addPart('part.right', {align: 'right'})
+            .navigatePart('part.left', ['path/to/part'])
+            .navigatePart('part.right', ['path/to/part']),
+        }),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+          activePartId: 'part.left',
+        },
+      },
+    });
+
+    // Activate right part.
+    const rightPart = TestBed.inject(ɵWorkbenchService).getPart('part.right')!;
+    await rightPart.activate();
+    await waitUntilStable();
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+          activePartId: 'part.right',
+        },
+      },
+    });
+
+    // Activate left part.
+    const leftPart = TestBed.inject(ɵWorkbenchService).getPart('part.left')!;
+    await leftPart.activate();
+    await waitUntilStable();
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.left'}),
+            child2: new MPart({id: 'part.right'}),
+            direction: 'row',
+            ratio: .5,
+          }),
+          activePartId: 'part.left',
+        },
+      },
+    });
+
+    // Activate left part again.
+    const layout = TestBed.inject(WorkbenchService).layout();
+    await leftPart.activate();
+    await waitUntilStable();
+
+    // Expect layout not to change.
+    expect(TestBed.inject(WorkbenchService).layout()).toEqual(layout);
+  });
+
+  it('should activate activity using `Part.activate()`', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideWorkbenchForTest({
+          layout: factory => factory
+            .addPart('part.main')
+            .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+            .addPart('part.activity-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
+            .addPart('part.activity-3-top', {dockTo: 'left-top'}, {label: 'Activity 3', icon: 'folder', ɵactivityId: 'activity.3'})
+            .addPart('part.activity-3-bottom', {align: 'bottom', relativeTo: 'part.activity-3-top'})
+            .navigatePart('part.activity-1', ['path/to/part'])
+            .navigatePart('part.activity-2', ['path/to/part'])
+            .navigatePart('part.activity-3-top', ['path/to/part'])
+            .navigatePart('part.activity-3-bottom', ['path/to/part'])
+            .navigatePart('part.main', ['path/to/part']),
+        }),
+      ],
+    });
+
+    const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+    await waitUntilWorkbenchStarted();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'none',
+          },
+        },
+      },
+    });
+
+    const layout = TestBed.inject(ɵWorkbenchService).layout;
+    const activity1Part = TestBed.inject(ɵWorkbenchService).getPart('part.activity-1')!;
+    const activity2Part = TestBed.inject(ɵWorkbenchService).getPart('part.activity-2')!;
+    const activity3TopPart = TestBed.inject(ɵWorkbenchService).getPart('part.activity-3-top')!;
+    const activity3BottomPart = TestBed.inject(ɵWorkbenchService).getPart('part.activity-3-bottom')!;
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeFalse();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-top');
+
+    // TEST: Activate part.activity-1.
+    await activity1Part.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.1']: {
+          root: new MPart({id: 'part.activity-1'}),
+          activePartId: 'part.activity-1',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.1',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeTrue();
+    expect(activity2Part.active()).toBeFalse();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-top');
+
+    // TEST: Activate part.activity-2.
+    await activity2Part.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.2']: {
+          root: new MPart({id: 'part.activity-2'}),
+          activePartId: 'part.activity-2',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.2',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeTrue();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-top');
+
+    // TEST: Activate part.activity-3-top.
+    await activity3TopPart.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.3']: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.activity-3-top'}),
+            child2: new MPart({id: 'part.activity-3-bottom'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+          activePartId: 'part.activity-3-top',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.3',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeFalse();
+    expect(activity3TopPart.active()).toBeTrue();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-top');
+
+    // TEST: Activate part.activity-3-bottom.
+    await activity3BottomPart.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.3']: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.activity-3-top'}),
+            child2: new MPart({id: 'part.activity-3-bottom'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+          activePartId: 'part.activity-3-bottom',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.3',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeFalse();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeTrue();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-bottom');
+
+    // TEST: Activate part.activity-2.
+    await activity2Part.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.2']: {
+          root: new MPart({id: 'part.activity-2'}),
+          activePartId: 'part.activity-2',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.2',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeTrue();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-bottom');
+
+    // TEST: Activate part.activity-3-bottom.
+    await activity3BottomPart.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.3']: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.activity-3-top'}),
+            child2: new MPart({id: 'part.activity-3-bottom'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+          activePartId: 'part.activity-3-bottom',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.3',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeFalse();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeTrue();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-bottom');
+
+    // TEST: Activate part.activity-2.
+    await activity2Part.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.2']: {
+          root: new MPart({id: 'part.activity-2'}),
+          activePartId: 'part.activity-2',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.2',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeTrue();
+    expect(activity3TopPart.active()).toBeFalse();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-bottom');
+
+    // TEST: Activate part.activity-3-top.
+    await activity3TopPart.activate();
+    await waitUntilStable();
+
+    // Assert layout.
+    expect(fixture).toEqualWorkbenchLayout({
+      grids: {
+        ['activity.3']: {
+          root: new MTreeNode({
+            child1: new MPart({id: 'part.activity-3-top'}),
+            child2: new MPart({id: 'part.activity-3-bottom'}),
+            direction: 'column',
+            ratio: .5,
+          }),
+          activePartId: 'part.activity-3-top',
+        },
+        main: {
+          root: new MPart({id: 'part.main'}),
+          activePartId: 'part.main',
+        },
+      },
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}, {id: 'activity.2'}, {id: 'activity.3'}],
+            activeActivityId: 'activity.3',
+          },
+        },
+      },
+    });
+
+    // Assert active state of Part handles.
+    expect(activity1Part.active()).toBeFalse();
+    expect(activity2Part.active()).toBeFalse();
+    expect(activity3TopPart.active()).toBeTrue();
+    expect(activity3BottomPart.active()).toBeFalse();
+
+    // Assert active state of MParts.
+    expect(layout().activePart({grid: 'activity.1'})!.id).toEqual('part.activity-1');
+    expect(layout().activePart({grid: 'activity.2'})!.id).toEqual('part.activity-2');
+    expect(layout().activePart({grid: 'activity.3'})!.id).toEqual('part.activity-3-top');
+  });
+
   /**
    * Verifies that part properties are set after destroying the current component but before constructing the new component.
    *
@@ -488,7 +937,7 @@ describe('WorkbenchPart', () => {
 
   describe('Scroll Position', () => {
 
-    fit('should retain part scroll position when switching activities', async () => {
+    it('should retain part scroll position when switching activities', async () => {
       TestBed.configureTestingModule({
         providers: [
           provideWorkbenchForTest({
@@ -637,4 +1086,4 @@ describe('WorkbenchPart', () => {
       expect(viewportPartRight.scrollTop).toBe(scrollTop);
     });
   });
-}); 
+});
