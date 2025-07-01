@@ -8,21 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {DestroyRef, Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
+import {Directive, effect, inject, input, TemplateRef, untracked, ViewContainerRef} from '@angular/core';
 import {WbComponentPortal} from './wb-component-portal';
 
 /**
- * Directive version of {@link WbComponentPortal}, enabling declarative use in templates.
+ * Renders a {@link WbComponentPortal}, similar to `CdkPortalOutlet`, but with the option to detach it when destroying this directive.
  *
- * Unlike `CdkPortalOutlet` the portal is not destroyed on detach.
- *
- * ---
  * Usage:
- *
  * ```html
- * <ng-container *wbPortalOutlet="greeting"/>
- * <!-- or -->
- * <ng-template [wbPortalOutlet]="greeting"/>
+ * <ng-container *wbPortalOutlet="portal; destroyOnDetach: true"/>
  * ````
  *
  * @see WbComponentPortal
@@ -30,51 +24,54 @@ import {WbComponentPortal} from './wb-component-portal';
 @Directive({selector: 'ng-template[wbPortalOutlet]'})
 export class WorkbenchPortalOutletDirective {
 
+  /**
+   * Specifies the portal.
+   */
   public readonly portal = input.required<WbComponentPortal | null>({alias: 'wbPortalOutlet'});
 
-  private readonly _viewContainerRef = inject(ViewContainerRef);
+  /**
+   * Controls if to detach the portal's component instead of destroying it when this directive is destroyed, such as during a page re-layout
+   */
+  public readonly destroyOnDetach = input.required<boolean>({alias: 'wbPortalOutletDestroyOnDetach'});
 
-  private _portal: WbComponentPortal | null = null;
+  private readonly _viewContainerRef = inject(ViewContainerRef);
 
   constructor() {
     const nullTemplate = inject(TemplateRef) as TemplateRef<void>;
 
-    // To get notified before Angular destroys the portal, we insert a pseudo-element ahead of it.
-    // This pseudo-element gets destroyed first, allowing us to detach the portal and prevent its destruction.
-    this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => this.detach());
-    // Additionally, we add an extra element between the pseudo-element and the portal to not break Angular's destroy algorithm.
-    // Angular's destroy algorithm terminates when an element removes its immediate successor during destruction, but it continues
+    // Insert a pseudo-element before the portal to detect when Angular is about to destroy the portal.
+    // This element gets destroyed first, enabling the portal to detach to prevent destruction.
+    this._viewContainerRef.createEmbeddedView(nullTemplate).onDestroy(() => !this.destroyOnDetach() && this.detach(this.portal()));
+
+    // Add an extra element between the pseudo-element and the portal to prevent breaking Angular's destroy algorithm.
+    this._viewContainerRef.createEmbeddedView(nullTemplate);
+    // NOTE: Angular's destroy algorithm terminates when an element removes its immediate successor during destruction, but it continues
     // if the next but one element is removed instead. It is crucial to insert this intermediary element; otherwise, unmounting
     // the workbench with opened views would fail to destroy the workbench component entirely.
-    // See tests `workbench-ummount.e2e-spec`.
-    this._viewContainerRef.createEmbeddedView(nullTemplate);
+    // Refer to tests in `workbench-unmount.e2e-spec.ts`.
 
-    this.installPortal();
-
-    inject(DestroyRef).onDestroy(() => this.detach());
-  }
-
-  /**
-   * Attaches the portal, detaching the previous portal, if any.
-   */
-  private installPortal(): void {
-    effect(() => {
+    // Install the portal.
+    effect(onCleanup => {
       const portal = this.portal();
-      untracked(() => {
-        this.detach();
-        this._portal = portal;
-        this.attach();
-      });
+      untracked(() => this.attach(portal));
+      onCleanup(() => this.detach(portal));
     });
   }
 
-  private attach(): void {
-    this._portal?.attach(this._viewContainerRef);
+  private attach(portal: WbComponentPortal | null): void {
+    portal?.attach(this._viewContainerRef);
   }
 
-  private detach(): void {
-    if (this._portal?.isAttachedTo(this._viewContainerRef)) {
-      this._portal.detach();
+  private detach(portal: WbComponentPortal | null): void {
+    if (!portal?.isAttachedTo(this._viewContainerRef)) {
+      return;
+    }
+
+    if (this.destroyOnDetach()) {
+      portal.destroy();
+    }
+    else {
+      portal.detach();
     }
   }
 }

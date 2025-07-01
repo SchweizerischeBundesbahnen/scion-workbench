@@ -254,6 +254,56 @@ test.describe('Browser Session History', () => {
     await expectView(testee2ViewPage).toBeActive();
   });
 
+  /**
+   * Navigating back and forward creates a new view handle with the same view id.
+   *
+   * This test verifies the component to operate on the "new" view handle.
+   *
+   * Prerequisite: Part has a single view that is removed on history back and restored on history forward.
+   */
+  test('should operate on "new" view handle after history back and forward if the only view of the part', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create part on the right.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'}),
+    );
+
+    // Add view.
+    const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
+    await routerPage.navigate(['test-view'], {
+      partId: 'part.right',
+      target: 'view.1',
+    });
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
+    await expectView(viewPage).toBeActive();
+
+    // Enter title.
+    await viewPage.enterTitle('A');
+    await expect(appPO.view({viewId: 'view.1'}).tab.title).toHaveText('A');
+
+    // Perform navigation back, undoing adding the view.
+    await appPO.navigateBack();
+
+    // Expect view not to be present (destroyed, not in the layout).
+    await expectView(viewPage).not.toBeAttached();
+
+    // Perform navigation forward.
+    await appPO.navigateForward();
+
+    // Expect view to be present and the title to be reset.
+    await expectView(viewPage).toBeActive();
+    await expect(appPO.view({viewId: 'view.1'}).tab.title).toHaveText('Workbench View');
+
+    // Change title.
+    await viewPage.enterTitle('B');
+
+    // Expect title to be set on the "new" view handle. Would have no effect if set on the "old" handle.
+    await expect(appPO.view({viewId: 'view.1'}).tab.title).toHaveText('B');
+  });
+
   test.describe('Standalone Component', () => {
 
     test('should display standalone view component after browser back/forward navigation ({component: component})', async ({appPO, workbenchNavigator}) => {

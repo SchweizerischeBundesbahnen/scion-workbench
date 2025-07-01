@@ -482,8 +482,8 @@ describe('Workbench Perspective', () => {
     // Switch to perspective-3
     await workbenchService.switchPerspective('perspective-3');
     expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective 3 (wbDesktop)');
-    //
-    // // Switch to perspective-4
+
+    // Switch to perspective-4
     await workbenchService.switchPerspective('perspective-4');
     expect(fixture.debugElement.nativeElement.innerText).toEqual('Desktop Perspective (wbDesktop)');
 

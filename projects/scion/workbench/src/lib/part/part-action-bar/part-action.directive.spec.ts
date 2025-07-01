@@ -425,7 +425,7 @@ describe('PartActionDirective', () => {
     // Close view.
     await TestBed.inject(WorkbenchService).getView('view.100')!.close();
 
-    // Expect no action in left part.
+    // Expect action in left part.
     expect(leftPart.actions()).toEqual([jasmine.objectContaining({cssClass: 'testee'})]);
     expect(rightPart.actions()).toEqual([]);
   });
