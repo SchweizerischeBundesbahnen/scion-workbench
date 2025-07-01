@@ -1,63 +1,15 @@
-# [20.0.0-beta.1](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/19.0.0-beta.3...20.0.0-beta.1) (2025-06-06)
+# [20.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.1...20.0.0-beta.2) (2025-07-01)
+
+
+### Bug Fixes
+
+* **workbench:** fix issues related to child routes with an empty-path parent route ([cf088db](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cf088db5367d96228a46b7b7fee42fc6129ab7d4)), closes [#655](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/655)
 
 
 ### Features
 
-* **workbench:** add support for Angular 20 ([ff042a9](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ff042a931e4d87ad261213d4e81eb0a3e5cf598b))
+* **workbench:** adapt the content of the "Not Found" page to the specific context ([8d3bfdb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/8d3bfdb130e8ac3f3c8813222e1e3ab83141fa5c))
+* **workbench:** allow injection of dialog handle in host dialog and message box ([241b76e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/241b76ec4062cae9b8e0cdafcdc735d538ef26e2))
 
 
-### Code Refactoring
 
-* **workbench/view:** remove deprecated API to prevent view from closing ([c4bcf00](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/c4bcf009c4ff1be445909193d925825bb717d1af))
-* **workbench/popup:** remove deprecated `referrer` field ([d9021da](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/d9021da5f70608ee7436fa24ae6939351c849c77))
-
-
-### BREAKING CHANGES
-
-* **workbench:** Updating `@scion/workbench` to Angular 20 introduced a breaking change.
-  Update your application to Angular 20. For detailed migration instructions, refer to Angular's update guide: https://v20.angular.dev/update-guide.
-
-* **workbench:** SCION Workbench now requires `@scion/toolkit` version `1.6.0` or higher.
-  For more information, refer to the changelog of `@scion/toolkit`: https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG_TOOLKIT.md.
-
-* **workbench:** SCION Workbench now requires `@scion/components` version `20.0.0` or higher.
-  For more information, refer to the changelog of `@scion/components`: https://github.com/SchweizerischeBundesbahnen/scion-toolkit/blob/master/CHANGELOG_COMPONENTS.md.
-
-* **workbench:** SCION Workbench now requires `@scion/microfrontend-platform` version `1.4.0` or higher.
-  For more information, refer to the changelog of `@scion/microfrontend-platform`: https://github.com/SchweizerischeBundesbahnen/scion-microfrontend-platform/blob/master/CHANGELOG.md.
-
-* **workbench/view:** Removed deprecated API to prevent view from closing.
-  To migrate, register a callback on `WorkbenchView.canClose` instead of implementing the `CanClose` interface.
-
-  **Before migration:**
-  ```ts
-  import {CanClose} from '@scion/workbench';
-  import {Component} from '@angular/core';
-  
-  @Component({})
-  export class ViewComponent implements CanClose {
-  
-    public canClose(): boolean {
-      return true;
-    }
-  }
-  ```
-
-  **After migration:**
-  ```ts
-  import {Component, inject} from '@angular/core';
-  import {WorkbenchView} from '@scion/workbench';
-  
-  @Component({})
-  export class ViewComponent {
-  
-    constructor() {
-      inject(WorkbenchView).canClose(() => {
-        return true;
-      });
-    }
-  }
-  ```
-
-* **workbench/popup:** Removed deprecated `Popup.referrer` field.
-  Inject `WorkbenchView` instead.
