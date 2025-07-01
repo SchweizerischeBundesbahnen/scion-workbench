@@ -1,0 +1,9 @@
+- top-left part of activity should aways be visible in activity, even if no views and not navigated
+- 
+- 
+  --> null content page
+  --> this makes null-contnet page in grid-element.html obsolete
+  --> example: activity with to grid node and two not navigated parts
+  --> otherwise, activity title and bar is not displayed
+  --> remove public readonly nullContentMessage: Locator; locator in `activity-panel.po.ts`
+- ObjectRegistry -> replace -> unregister previous

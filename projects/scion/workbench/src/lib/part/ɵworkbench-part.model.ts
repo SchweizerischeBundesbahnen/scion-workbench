@@ -12,7 +12,7 @@ import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
 import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
-import {ComponentPortal, ComponentType} from '@angular/cdk/portal';
+import {ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
@@ -27,6 +27,11 @@ import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MActivity} from '../activity/workbench-activity.model';
+import {WbComponentPortal} from '../portal/wb-component-portal';
+import {PartContentComponent} from './part-content/part-content.component';
+import {MAIN_AREA} from '../layout/workbench-layout';
+import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
+import {PartComponent} from './part.component';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -36,7 +41,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
-  private readonly _partComponent: ComponentType<PartComponent | MainAreaPartComponent>; // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
 
@@ -53,18 +57,16 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
   public readonly actions: Signal<WorkbenchPartAction[]>;
   public readonly classList = new ClassList();
+  public readonly portal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
+  public readonly contentPortal: WbComponentPortal;
 
   private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
 
-  /**
-   * Reference to the HTML element of {@link PartComponent} or {@link MainAreaPartComponent}.
-   */
-  public partComponent = signal<HTMLElement | undefined>(undefined);
-
-  constructor(public readonly id: PartId, layout: ɵWorkbenchLayout, options: {component: ComponentType<PartComponent | MainAreaPartComponent>}) { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
+  constructor(public readonly id: PartId, layout: ɵWorkbenchLayout) {
     this.alternativeId = layout.part({partId: this.id}).alternativeId;
-    this._partComponent = options.component;
+    this.portal = this.createPortal<MainAreaPartComponent | PartComponent>(id === MAIN_AREA ? MainAreaPartComponent : PartComponent);
+    this.contentPortal = this.createPortal(PartContentComponent);
     this.gridName = signal(layout.grid({partId: id}).gridName);
     this.actions = this.computePartActions();
     this.touchOnActivate();
@@ -72,18 +74,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.onLayoutChange({layout});
   }
 
-  /**
-   * Constructs the portal using the given injection context.
-   */
-  public createPortalFromInjectionContext(injectionContext: Injector): ComponentPortal<PartComponent | MainAreaPartComponent> { // eslint-disable-line @typescript-eslint/no-duplicate-type-constituents
-    const injector = Injector.create({
-      parent: injectionContext,
+  private createPortal<T>(componentType: ComponentType<T>): WbComponentPortal<T> {
+    return new WbComponentPortal(componentType, {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
       ],
     });
-    return new ComponentPortal(this._partComponent, null, injector);
   }
 
   /**
@@ -101,13 +98,12 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     const {gridName, grid} = layout.grid({partId: this.id});
     this.gridName.set(gridName);
     this.peripheral.set(layout.isPeripheralPart(this.id));
-    this.active.set(grid.activePartId === this.id);
+    this.active.set(isActive(this.id, layout));
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
     this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
     this.topLeft.set(isTopLeft(grid.root, layout.part({partId: this.id})));
     this.topRight.set(isTopRight(grid.root, layout.part({partId: this.id})));
-
     this.classList.layout = mPart.cssClass;
 
     // Test if a new route has been activated for this part.
@@ -293,6 +289,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     if (this.activeViewId()) {
       this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
     }
+    this.portal.destroy();
+    this.contentPortal.destroy();
   }
 }
 
@@ -325,12 +323,15 @@ function isTopRight(element: MTreeNode | MPart, testee: MPart): boolean {
   return isTopRight(child1Visible ? element.child1 : element.child2, testee);
 }
 
-/**
- * Represents a pseudo-type for the actual {@link PartComponent} which must not be referenced in order to avoid import cycles.
- */
-type PartComponent = unknown;
+function isActive(partId: PartId, layout: ɵWorkbenchLayout): boolean {
+  const {grid} = layout.grid({partId: partId});
+  if (grid.activePartId !== partId) {
+    return false;
+  }
 
-/**
- * Represents a pseudo-type for the actual {@link MainAreaPartComponent} which must not be referenced in order to avoid import cycles.
- */
-type MainAreaPartComponent = unknown;
+  const activity = layout.activity({partId: partId}, {orElse: null});
+  if (activity && layout.activityStack({activityId: activity.id}).activeActivityId !== activity.id) {
+    return false;
+  }
+  return true;
+}
