@@ -2882,21 +2882,21 @@ describe('View', () => {
       expect(view2.part().id).toEqual('part.top');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
-      // // Move view to part 'bottom'.
+      // Move view to part 'bottom'.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.bottom', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
       expect(view2.part().id).toEqual('part.bottom');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
-      // // Move view to part 'right'.
+      // Move view to part 'right'.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.right', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
       expect(view2.part().id).toEqual('part.right');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
-      // // Move view to part 'left'.
+      // Move view to part 'left'.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.left', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.

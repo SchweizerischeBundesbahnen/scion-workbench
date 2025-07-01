@@ -15,7 +15,7 @@ import type {ViewComponent} from '../view/view.component';
 import {ViewId} from './workbench-view.model';
 
 /**
- * Resolves the portal for the given view, or throws an error if the view is not registered.
+ * Pipes to the portal of given view, or throws an error if the view is not registered.
  */
 @Pipe({name: 'wbViewPortal'})
 export class ViewPortalPipe implements PipeTransform {
