@@ -1,15 +1,10 @@
-# [20.0.0-beta.2](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.1...20.0.0-beta.2) (2025-07-01)
-
-
-### Bug Fixes
-
-* **workbench:** fix issues related to child routes with an empty-path parent route ([cf088db](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/cf088db5367d96228a46b7b7fee42fc6129ab7d4)), closes [#655](https://github.com/SchweizerischeBundesbahnen/scion-workbench/issues/655)
+# [20.0.0-beta.3](https://github.com/SchweizerischeBundesbahnen/scion-workbench/compare/20.0.0-beta.2...20.0.0-beta.3) (2025-07-02)
 
 
 ### Features
 
-* **workbench:** adapt the content of the "Not Found" page to the specific context ([8d3bfdb](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/8d3bfdb130e8ac3f3c8813222e1e3ab83141fa5c))
-* **workbench:** allow injection of dialog handle in host dialog and message box ([241b76e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/241b76ec4062cae9b8e0cdafcdc735d538ef26e2))
+* **workbench:** localize view title of "Not Found" page ([518604e](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/518604e7edf985db7073365d04005fdcb16e168b))
+* **workbench:** provide experimental Text and Icon API ([ff92003](https://github.com/SchweizerischeBundesbahnen/scion-workbench/commit/ff920039c127f151d9a22c4c5b42f0531149f013))
 
 
 
