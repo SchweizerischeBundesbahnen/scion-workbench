@@ -9,3 +9,4 @@
  */
 
 export {type WorkbenchIconDescriptor, type WorkbenchIconProviderFn} from './workbench-icon-provider.model';
+export {IconComponent} from './icon.component';

@@ -23,6 +23,8 @@ import {text} from './text';
  * - `%key`: translation key
  * - `%key;param=value`: translation key with a single param
  * - `%key;param1=value1;param2=value2`: translation key with multiple parameters
+ *
+ * @experimental since 20.0.0-beta.3; API and behavior may change in any version without notice.
  */
 @Pipe({name: 'wbText'})
 export class TextPipe implements PipeTransform {

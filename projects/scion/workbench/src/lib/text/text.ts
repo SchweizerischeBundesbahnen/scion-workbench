@@ -12,7 +12,7 @@ import {assertNotInReactiveContext, computed, createEnvironmentInjector, Destroy
 import {Translatable, WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from './workbench-text-provider.model';
 
 /**
- * Provides the text for the given {@link Translatable} based on the registered text provider.
+ * Provides the text for the given {@link Translatable} based on registered text providers.
  *
  * A {@link Translatable} is a string that, if starting with the percent symbol (`%`), is passed to the text provider for translation, with the percent symbol omitted.
  * Otherwise, the text is returned as is. A translation key can include parameters in matrix notation.
@@ -26,6 +26,8 @@ import {Translatable, WORKBENCH_TEXT_PROVIDER, WorkbenchTextProviderFn} from './
  * The function:
  * - Must be called within an injection context, or an explicit {@link Injector} passed.
  * - Must be called in a non-reactive (non-tracking) context.
+ *
+ * @experimental since 20.0.0-beta.3; API and behavior may change in any version without notice.
  */
 export function text(translatable: Signal<Translatable> | Translatable, options?: {injector?: Injector}): Signal<string>;
 export function text(translatable: Signal<Translatable | undefined> | Translatable | undefined, options?: {injector?: Injector}): Signal<string | undefined>;

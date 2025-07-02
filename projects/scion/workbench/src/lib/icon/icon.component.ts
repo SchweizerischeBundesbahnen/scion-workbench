@@ -12,10 +12,12 @@ import {ChangeDetectionStrategy, Component, computed, createComponent, effect, E
 import {WORKBENCH_ICON_PROVIDER, WorkbenchIconDescriptor, WorkbenchIconProviderFn} from './workbench-icon-provider.model';
 
 /**
- * Renders an icon based on icon providers registered under the {@link WORKBENCH_ICON_PROVIDER} DI token.
+ * Renders an icon based on registered icon providers.
  *
  * Multiple icon providers can be registered. Providers are called in registration order.
  * If a provider does not provide the icon, the next provider is called, and so on.
+ *
+ * @experimental since 20.0.0-beta.3; API and behavior may change in any version without notice.
  */
 @Component({
   selector: 'wb-icon',
