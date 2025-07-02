@@ -9,3 +9,5 @@
  */
 
 export {type WorkbenchTextProviderFn, type Translatable} from './workbench-text-provider.model';
+export {TextPipe} from './text.pipe';
+export {text} from './text';
