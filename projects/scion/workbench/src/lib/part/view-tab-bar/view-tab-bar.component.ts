@@ -440,14 +440,14 @@ export class ViewTabBarComponent implements OnDestroy {
   private installActiveViewScroller(): void {
     afterRenderEffect(() => {
       // Track the active view.
-      const activeViewId = this.part.activeViewId();
+      const activeView = this.part.activeView();
       // There may be no active view, e.g., if no view has been activated, or when dragging the last view out of the tabbar.
-      if (!activeViewId) {
+      if (!activeView) {
         return;
       }
 
       // Get the active view tab. Do not track tabs in general to prevent unwanted scrolling when opening or closing inactive tabs.
-      const activeViewTab = untracked(() => this._viewTabs().find(viewTab => viewTab.view().id === activeViewId)!);
+      const activeViewTab = untracked(() => this._viewTabs().find(viewTab => viewTab.view().id === activeView.id)!);
 
       // Track navigation of the active view, scrolling its tab into view if necessary.
       activeViewTab.view().navigation();

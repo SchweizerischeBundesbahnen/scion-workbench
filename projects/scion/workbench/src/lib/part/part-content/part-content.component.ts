@@ -15,6 +15,9 @@ import {WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 
+/**
+ * Renders the content of a part, using a router-outlet to display navigated content.
+ */
 @Component({
   selector: 'wb-part-content',
   templateUrl: './part-content.component.html',

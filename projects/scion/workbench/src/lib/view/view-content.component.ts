@@ -23,12 +23,12 @@ import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 
 /**
- * Renders the workbench view, using a router-outlet to display view content.
+ * Renders the content of a view, using a router-outlet to display navigated content.
  */
 @Component({
-  selector: 'wb-view',
-  templateUrl: './view.component.html',
-  styleUrls: ['./view.component.scss'],
+  selector: 'wb-view-content',
+  templateUrl: './view-content.component.html',
+  styleUrls: ['./view-content.component.scss'],
   imports: [
     RouterOutlet,
     RouterOutletRootContextDirective,
@@ -46,7 +46,7 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
     configureViewGlassPane(),
   ],
 })
-export class ViewComponent implements OnAttach, OnDetach {
+export class ViewContentComponent implements OnAttach, OnDetach {
 
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly viewDragService = inject(ViewDragService);

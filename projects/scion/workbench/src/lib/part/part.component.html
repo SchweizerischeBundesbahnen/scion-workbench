@@ -1,9 +1,9 @@
-@if (part.title() || part.viewIds().length || part.actions().length || part.canMinimize()) {
+@if (part.title() || part.views().length || part.actions().length || part.canMinimize()) {
   <wb-part-bar/>
 }
 
-@if (part.viewIds().length) {
-  @let canSplit = !!part.activeViewId();
+@if (part.views().length) {
+  @let canSplit = !!part.activeView();
   <div wbViewDropZone
        [wbViewDropZoneRegionSize]=".25"
        [wbViewDropZonePlaceholderSize]=".5"
@@ -11,7 +11,7 @@
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="active-view e2e-view-content e2e-content">
-    <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal; destroyOnDetach: false"/>
+    <ng-container *wbPortalOutlet="part.activeView()?.viewContentPortal; destroyOnDetach: false"/>
   </div>
 } @else {
   <div wbViewDropZone
@@ -19,6 +19,6 @@
        [wbViewDropZoneAttributes]="{'data-partid': part.id}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="part-content e2e-part-content e2e-content">
-    <ng-container *wbPortalOutlet="part.contentPortal; destroyOnDetach: false"/>
+    <ng-container *wbPortalOutlet="part.partContentPortal; destroyOnDetach: false"/>
   </div>
 }

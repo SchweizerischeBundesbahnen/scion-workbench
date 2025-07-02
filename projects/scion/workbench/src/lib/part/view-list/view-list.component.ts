@@ -10,8 +10,7 @@
 
 import {ChangeDetectionStrategy, Component, computed, effect, HostBinding, HostListener, inject, Signal, viewChild} from '@angular/core';
 import {OverlayRef} from '@angular/cdk/overlay';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
-import {ViewId, WorkbenchView} from '../../view/workbench-view.model';
+import {WorkbenchView} from '../../view/workbench-view.model';
 import {NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
 import {FilterFieldComponent} from '../../filter-field/filter-field.component';
 import {PartId, WorkbenchPart} from '../workbench-part.model';
@@ -51,17 +50,17 @@ export class ViewListComponent {
 
   constructor() {
     const filterText = toSignal(this.filterFormControl.valueChanges, {initialValue: this.filterFormControl.value});
-    const views = this._part.viewIds().map(viewId => new FilterableView(viewId));
+    const views = this._part.views().map(view => new FilterableView(view));
 
     this.viewsInsideTabbar = computed(() => views
-      .filter(view => view.ref.scrolledIntoView())
+      .filter(({view}) => view.scrolledIntoView())
       .filter(view => view.matches(filterText()))
-      .map(view => view.ref),
+      .map(({view}) => view),
     );
     this.viewsOutsideTabbar = computed(() => views
-      .filter(view => !view.ref.scrolledIntoView())
+      .filter(({view}) => !view.scrolledIntoView())
       .filter(view => view.matches(filterText()))
-      .map(view => view.ref),
+      .map(({view}) => view),
     );
 
     const effectRef = effect(() => {
@@ -107,14 +106,12 @@ function toFilterRegExp(filterText: string): RegExp {
  */
 class FilterableView {
 
-  public readonly ref: WorkbenchView;
   private readonly _title: Signal<string | null>;
   private readonly _heading: Signal<string | null>;
 
-  constructor(public readonly viewId: ViewId) {
-    this.ref = inject(WORKBENCH_VIEW_REGISTRY).get(viewId);
-    this._title = text(this.ref.title);
-    this._heading = text(this.ref.heading);
+  constructor(public readonly view: WorkbenchView) {
+    this._title = text(view.title);
+    this._heading = text(view.heading);
   }
 
   /**

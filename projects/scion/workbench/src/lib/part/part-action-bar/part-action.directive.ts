@@ -90,10 +90,10 @@ export class WorkbenchPartActionDirective {
       if (context.part && context.part.id !== part.id) {
         return null;
       }
-      if (context.part && !context.part.contentPortal.attached()) {
+      if (context.part && !context.part.partContentPortal.attached()) {
         return null;
       }
-      if (context.view && context.view.id !== part.activeViewId()) {
+      if (context.view && context.view.id !== part.activeView()?.id) {
         return null;
       }
       if (this.canMatch() && !this.canMatch()!(part)) {

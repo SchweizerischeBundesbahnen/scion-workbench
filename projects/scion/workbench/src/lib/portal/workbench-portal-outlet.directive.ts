@@ -27,7 +27,7 @@ export class WorkbenchPortalOutletDirective {
   /**
    * Specifies the portal.
    */
-  public readonly portal = input.required<WbComponentPortal | null>({alias: 'wbPortalOutlet'});
+  public readonly portal = input.required<WbComponentPortal | null | undefined>({alias: 'wbPortalOutlet'});
 
   /**
    * Controls if to detach the portal's component instead of destroying it when this directive is destroyed, such as during a page re-layout
@@ -58,11 +58,11 @@ export class WorkbenchPortalOutletDirective {
     });
   }
 
-  private attach(portal: WbComponentPortal | null): void {
+  private attach(portal: WbComponentPortal | null | undefined): void {
     portal?.attach(this._viewContainerRef);
   }
 
-  private detach(portal: WbComponentPortal | null): void {
+  private detach(portal: WbComponentPortal | null | undefined): void {
     if (!portal?.isAttachedTo(this._viewContainerRef)) {
       return;
     }

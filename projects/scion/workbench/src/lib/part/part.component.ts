@@ -14,10 +14,8 @@ import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
-import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
-import {ViewPortalPipe} from '../view/view-portal.pipe';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 import {synchronizeCssClasses} from '../common/css-class.util';
@@ -31,7 +29,6 @@ import {dasherize} from '../common/dasherize.util';
     PartBarComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
-    ViewPortalPipe,
   ],
   host: {
     '[attr.data-partid]': 'part.id',
@@ -44,7 +41,6 @@ import {dasherize} from '../common/dasherize.util';
 export class PartComponent implements OnInit {
 
   private readonly _workbenchId = inject(WORKBENCH_ID);
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _injector = inject(Injector);
   private readonly _cd = inject(ChangeDetectorRef);
@@ -95,12 +91,11 @@ export class PartComponent implements OnInit {
    */
   private constructInactiveViewComponents(): void {
     effect(() => {
-      const viewIds = this.part.viewIds();
-      untracked(() => viewIds
-        .map(viewId => this._viewRegistry.get(viewId))
-        .filter(view => !view.active() && !view.portal.constructed())
+      const views = this.part.views();
+      untracked(() => views
+        .filter(view => !view.active() && !view.viewContentPortal.constructed())
         .forEach(inactiveView => {
-          inactiveView.portal.createComponentFromInjectionContext(this._injector);
+          inactiveView.viewContentPortal.createComponentFromInjectionContext(this._injector);
         }));
     });
   }

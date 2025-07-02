@@ -25,7 +25,7 @@ import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchService} from '../workbench.service';
-import {ViewComponent} from './view.component';
+import {ViewContentComponent} from './view-content.component';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
@@ -1089,14 +1089,14 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect size to be equal.
-    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewContentComponent));
 
     // Navigate to "path/to/view".
     await TestBed.inject(ɵWorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
 
     // Expect size to be equal.
-    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewContentComponent));
   });
 
   it('should show action after one change detection cycle', async () => {

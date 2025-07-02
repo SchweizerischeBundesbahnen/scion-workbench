@@ -16,7 +16,6 @@ import {ComponentType} from '@angular/cdk/portal';
 import {ActivationInstantProvider} from '../activation-instant.provider';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {ViewId} from '../view/workbench-view.model';
 import {ActivatedRouteSnapshot, ChildrenOutletContexts} from '@angular/router';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
@@ -32,6 +31,8 @@ import {PartContentComponent} from './part-content/part-content.component';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';
+import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
 
@@ -39,7 +40,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
-  private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _activationInstantProvider = inject(ActivationInstantProvider);
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
@@ -47,8 +47,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly alternativeId: string | undefined;
   public readonly navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
   public readonly active = signal(false);
-  public readonly viewIds = signal<ViewId[]>([], {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
-  public readonly activeViewId = signal<ViewId | null>(null);
+  public readonly viewIds = computed(() => this.views().map(view => view.id));
+  public readonly activeViewId = computed(() => this.activeView()?.id ?? null);
+  public readonly mPart: WritableSignal<MPart>;
   public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
   public readonly topLeft = signal(false);
@@ -56,26 +57,31 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly activity = signal<MActivity | null>(null);
   public readonly canMinimize = computed(() => this.activity() !== null && this.topRight());
   public readonly actions: Signal<WorkbenchPartAction[]>;
+  public readonly activeView: Signal<ɵWorkbenchView | null>;
+  public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly classList = new ClassList();
-  public readonly portal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
-  public readonly contentPortal: WbComponentPortal<PartContentComponent>;
+  public readonly partPortal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
+  public readonly partContentPortal: WbComponentPortal<PartContentComponent>;
 
   private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
 
   constructor(public readonly id: PartId, layout: ɵWorkbenchLayout) {
-    this.alternativeId = layout.part({partId: this.id}).alternativeId;
-    this.portal = this.createPortal<MainAreaPartComponent | PartComponent>(id === MAIN_AREA ? MainAreaPartComponent : PartComponent);
-    this.contentPortal = this.createPortal(PartContentComponent);
+    this.mPart = signal(layout.part({partId: this.id}));
     this.gridName = signal(layout.grid({partId: id}).gridName);
-    this.actions = this.computePartActions();
+    this.actions = computePartActions(this.id);
+    this.activeView = computeActiveView(this.mPart);
+    this.views = computeViews(this.mPart);
+    this.alternativeId = this.mPart().alternativeId;
+    this.partPortal = this.createPortal<MainAreaPartComponent | PartComponent>(id === MAIN_AREA ? MainAreaPartComponent : PartComponent);
+    this.partContentPortal = this.createPortal(PartContentComponent);
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
   }
 
   private createPortal<T>(componentType: ComponentType<T>): WbComponentPortal<T> {
-    return new WbComponentPortal(componentType, {
+    return new WbComponentPortal<T>(componentType, {
       providers: [
         {provide: ɵWorkbenchPart, useValue: this},
         {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
@@ -96,14 +102,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._isInMainArea ??= layout.hasPart(this.id, {grid: 'mainArea'});
     const mPart = layout.part({partId: this.id});
     const {gridName, grid} = layout.grid({partId: this.id});
+    this.mPart.set(mPart);
     this.gridName.set(gridName);
     this.peripheral.set(layout.isPeripheralPart(this.id));
     this.active.set(isActive(this.id, layout));
-    this.viewIds.set(mPart.views.map(view => view.id));
-    this.activeViewId.set(mPart.activeViewId ?? null);
     this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
-    this.topLeft.set(isTopLeft(grid.root, layout.part({partId: this.id})));
-    this.topRight.set(isTopRight(grid.root, layout.part({partId: this.id})));
+    this.topLeft.set(isTopLeft(grid.root, mPart));
+    this.topRight.set(isTopRight(grid.root, mPart));
     this.classList.layout = mPart.cssClass;
 
     // Test if a new route has been activated for this part.
@@ -214,39 +219,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   /**
-   * Computes actions matching this part.
-   */
-  private computePartActions(): Signal<WorkbenchPartAction[]> {
-    const injector = Injector.create({
-      parent: inject(Injector),
-      providers: [
-        {provide: ɵWorkbenchPart, useValue: this},
-        {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
-      ],
-    });
-
-    // Use a differ to avoid re-creating every action on registration or change.
-    const differ = inject(IterableDiffers).find([]).create<WorkbenchPartActionFn>();
-    const partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
-    const partActions = new Map<WorkbenchPartActionFn, Signal<WorkbenchPartAction | null>>();
-
-    return computed(() => {
-      const changes = differ.diff(partActionRegistry.objects());
-      changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => runInInjectionContext(injector, () => constructAction(this, fn)))));
-      changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
-      return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
-    }, {equal: (a, b) => Arrays.isEqual(a, b)});
-
-    function constructAction(part: WorkbenchPart, factoryFn: WorkbenchPartActionFn): WorkbenchPartAction | null {
-      const action: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null = factoryFn(part);
-      if (action instanceof TemplateRef || typeof action === 'function') {
-        return {content: action};
-      }
-      return action;
-    }
-  }
-
-  /**
    * Updates the activation instant when this part is activated.
    */
   private touchOnActivate(): void {
@@ -286,11 +258,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this._partEnvironmentInjector.destroy();
     // IMPORTANT: Only detach the active view, not destroy it, because views are explicitly destroyed when view handles are removed.
     // Otherwise, moving the last view to another part would fail because the view would already be destroyed.
-    if (this.activeViewId()) {
-      this._viewRegistry.get(this.activeViewId()!, {orElse: null})?.portal.detach();
-    }
-    this.portal.destroy();
-    this.contentPortal.destroy();
+    this.activeView()?.viewContentPortal.detach();
+    this.partPortal.destroy();
+    this.partContentPortal.destroy();
   }
 }
 
@@ -334,4 +304,56 @@ function isActive(partId: PartId, layout: ɵWorkbenchLayout): boolean {
     return false;
   }
   return true;
+}
+
+/**
+ * Computes actions matching this part.
+ */
+function computePartActions(partId: PartId): Signal<WorkbenchPartAction[]> {
+  const partRegistry = inject(WORKBENCH_PART_REGISTRY);
+  const injector = Injector.create({
+    parent: inject(Injector),
+    providers: [
+      {provide: ɵWorkbenchPart, useFactory: () => partRegistry.get(partId)},
+      {provide: WorkbenchPart, useExisting: ɵWorkbenchPart},
+    ],
+  });
+
+  // Use a differ to avoid re-creating every action on registration or change.
+  const differ = inject(IterableDiffers).find([]).create<WorkbenchPartActionFn>();
+  const partActionRegistry = inject(WORKBENCH_PART_ACTION_REGISTRY);
+  const partActions = new Map<WorkbenchPartActionFn, Signal<WorkbenchPartAction | null>>();
+
+  return computed(() => {
+    const changes = differ.diff(partActionRegistry.objects());
+    changes?.forEachAddedItem(({item: fn}) => partActions.set(fn, computed(() => runInInjectionContext(injector, () => constructAction(fn)))));
+    changes?.forEachRemovedItem(({item: fn}) => partActions.delete(fn));
+    return Array.from(partActions.values()).map(partAction => partAction()).filter(partAction => !!partAction);
+  }, {equal: (a, b) => Arrays.isEqual(a, b)});
+
+  function constructAction(factoryFn: WorkbenchPartActionFn): WorkbenchPartAction | null {
+    const part = inject(ɵWorkbenchPart);
+    const action: WorkbenchPartAction | ComponentType<unknown> | TemplateRef<unknown> | null = factoryFn(part);
+    if (action instanceof TemplateRef || typeof action === 'function') {
+      return {content: action};
+    }
+    return action;
+  }
+}
+
+/**
+ * Computes the active view of given part, or `null` if none.
+ */
+function computeActiveView(mPart: Signal<MPart>): Signal<ɵWorkbenchView | null> {
+  const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  // TODO [WorkbenchPart.destroy] Access to active view, but registr
+  return computed(() => mPart().activeViewId ? viewRegistry.get(mPart().activeViewId!, {orElse: null}) : null);
+}
+
+/**
+ * Computes the views opened in given part.
+ */
+function computeViews(mPart: Signal<MPart>): Signal<ɵWorkbenchView[]> {
+  const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  return computed(() => mPart().views.map(({id}) => viewRegistry.get(id)), {equal: (a, b) => Arrays.isEqual(a, b, {exactOrder: true})});
 }
