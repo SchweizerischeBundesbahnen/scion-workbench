@@ -132,7 +132,7 @@ function addNotFoundWildcardRoute(route: Route, options: {component?: ComponentT
       {
         path: '**',
         component: options.component ?? PageNotFoundComponent,
-        data: {[WorkbenchRouteData.title]: 'Page Not Found', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
+        data: {[WorkbenchRouteData.title]: '%workbench.page_not_found.title', [WorkbenchRouteData.cssClass]: 'e2e-page-not-found'},
         canMatch: options.canMatch === true ? undefined : [options.canMatch],
       },
     ],
