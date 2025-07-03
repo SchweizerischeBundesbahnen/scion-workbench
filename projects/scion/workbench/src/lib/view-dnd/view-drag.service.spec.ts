@@ -64,7 +64,7 @@ describe('ViewDragService', () => {
     simulateViewDrag({viewId: 'view.101'});
 
     // Should allow dropping to main area grid.
-    expect(viewDragService.canDrop(workbenchLayoutService.layout().grids.mainArea!)()).toBeTrue();
+    expect(viewDragService.canDrop(workbenchLayoutService.layout().grids.mainArea)()).toBeTrue();
   });
 
   it('should allow dropping view to different window', async () => {
@@ -293,7 +293,7 @@ describe('ViewDragService', () => {
     simulateViewDrag({viewId: 'view.101'});
 
     // Should not allow dropping to main area grid.
-    expect(viewDragService.canDrop(workbenchLayoutService.layout().grids.mainArea!)()).toBeFalse();
+    expect(viewDragService.canDrop(workbenchLayoutService.layout().grids.mainArea)()).toBeFalse();
   });
 
   function simulateViewDrag(dragSource: {viewId: ViewId}): void {

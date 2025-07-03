@@ -1039,7 +1039,7 @@ describe('View', () => {
 
     // Add view without navigating it.
     const workbenchRouter = TestBed.inject(ɵWorkbenchRouter);
-    await workbenchRouter.navigate(layout => layout.addView('view.100', {partId: layout.activePart({grid: 'mainArea'})!.id, activateView: true}));
+    await workbenchRouter.navigate(layout => layout.addView('view.100', {partId: layout.activePart({grid: 'mainArea'}).id, activateView: true}));
     await waitUntilStable();
     expect(TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.100').getComponent()).toBe(getComponent(fixture, NullContentComponent));
 
@@ -1284,7 +1284,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea!.activePartId}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea.activePartId}));
     await waitUntilStable();
 
     // Navigate view.
@@ -1336,7 +1336,7 @@ describe('View', () => {
     spyOn(console, 'error').and.callThrough().and.callFake((args: unknown[]) => errors.push(...args));
 
     // Open view.
-    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea!.activePartId}));
+    await TestBed.inject(ɵWorkbenchRouter).navigate(layout => layout.addView('view.100', {partId: layout.grids.mainArea.activePartId}));
     await waitUntilStable();
 
     // Navigate view.

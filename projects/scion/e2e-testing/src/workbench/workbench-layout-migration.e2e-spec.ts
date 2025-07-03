@@ -68,16 +68,14 @@ test.describe('Workbench Layout Migration', () => {
       perspectives: ['testee'],
     });
 
-    const parts = await appPO.workbench.parts();
-    const _33b22f60Part = parts.find(part => part.alternativeId === '33b22f60-bf34-4704-885d-7de0d707430f') ?? throwError(`Part not found with alternativeId '33b22f60-bf34-4704-885d-7de0d707430f'`);
-    const _9bc4c09fPart = parts.find(part => part.alternativeId === '9bc4c09f-67a7-4c69-a28b-532781a1c98f') ?? throwError(`Part not found with alternativeId '9bc4c09f-67a7-4c69-a28b-532781a1c98f'`);
-    const _a25eb4cfPart = parts.find(part => part.alternativeId === 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1') ?? throwError(`Part not found with alternativeId 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1'`);
-    const _2b534d97Part = parts.find(part => part.alternativeId === '2b534d97-ed7d-43b3-bb2c-0e59d9766e86') ?? throwError(`Part not found with alternativeId '2b534d97-ed7d-43b3-bb2c-0e59d9766e86'`);
+    const _33b22f60Part = await appPO.workbench.part({alternativeId: '33b22f60-bf34-4704-885d-7de0d707430f'});
+    const _9bc4c09fPart = await appPO.workbench.part({alternativeId: '9bc4c09f-67a7-4c69-a28b-532781a1c98f'});
+    const _a25eb4cfPart = await appPO.workbench.part({alternativeId: 'a25eb4cf-9da7-43e7-8db2-302fd38e59a1'});
+    const _2b534d97Part = await appPO.workbench.part({alternativeId: '2b534d97-ed7d-43b3-bb2c-0e59d9766e86'});
 
-    const views = await appPO.workbench.views();
-    const testRouterView = views.find(view => view.alternativeId === 'test-router') ?? throwError(`View not found with alternativeId 'test-router'`);
-    const testView = views.find(view => view.alternativeId === 'test-view') ?? throwError(`View not found with alternativeId 'test-view'`);
-    const view3 = views.find(view => view.partId === _33b22f60Part.id) ?? throwError(`Migrated 'view.3' not found`);
+    const testRouterView = await appPO.workbench.view({alternativeId: 'test-router'});
+    const testView = await appPO.workbench.view({alternativeId: 'test-view'});
+    const view3 = (await appPO.workbench.views()).find(view => view.partId === _33b22f60Part.id) ?? throwError(`Migrated 'view.3' not found`);
 
     await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
       grids: {
@@ -211,11 +209,10 @@ test.describe('Workbench Layout Migration', () => {
       perspectives: ['testee'],
     });
 
-    const parts = await appPO.workbench.parts();
-    const leftPart = parts.find(part => part.alternativeId === 'left') ?? throwError(`Part not found with alternativeId 'left'`);
-    const rightPart = parts.find(part => part.alternativeId === 'right') ?? throwError(`Part not found with alternativeId 'right'`);
-    const _6f09e6e2Part = parts.find(part => part.alternativeId === '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7') ?? throwError(`Part not found with alternativeId '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'`);
-    const _1d94dcb6Part = parts.find(part => part.alternativeId === '1d94dcb6-76b6-47eb-b300-39448993d36b') ?? throwError(`Part not found with alternativeId '1d94dcb6-76b6-47eb-b300-39448993d36b'`);
+    const leftPart = await appPO.workbench.part({alternativeId: 'left'});
+    const rightPart = await appPO.workbench.part({alternativeId: 'right'});
+    const _6f09e6e2Part = await appPO.workbench.part({alternativeId: '6f09e6e2-b63a-4f0d-9ae1-06624fdb37c7'});
+    const _1d94dcb6Part = await appPO.workbench.part({alternativeId: '1d94dcb6-76b6-47eb-b300-39448993d36b'});
 
     const views = await appPO.workbench.views();
     const view2 = views.find(view => view.partId === leftPart.id) ?? throwError(`Migrated 'view.2' not found`);

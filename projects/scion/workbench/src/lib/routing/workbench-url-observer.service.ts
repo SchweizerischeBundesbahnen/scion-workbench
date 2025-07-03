@@ -311,7 +311,7 @@ export class WorkbenchUrlObserver {
    */
   private migrateURL(): void {
     const layout = this._workbenchRouter.getCurrentNavigationContext().layout;
-    if (layout.grids.mainArea?.migrated) {
+    if (layout.grids.mainArea.migrated) {
       // Update the URL with the migrated URL and clear existing query params, for example, if the layout query parameter has been renamed.
       void this._workbenchRouter.navigate(layout => layout, {queryParamsHandling: null, replaceUrl: true});
     }
