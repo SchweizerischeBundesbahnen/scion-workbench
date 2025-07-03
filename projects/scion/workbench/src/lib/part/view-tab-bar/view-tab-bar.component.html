@@ -1,10 +1,10 @@
 <sci-viewport class="e2e-tab-viewport" scrollbarStyle="hidden">
-  @for (viewId of part.viewIds(); track viewId) {
+  @for (view of part.views(); track view.id) {
     @if (viewtab === dropTargetViewTab()) {
       <div class="divider"></div>
     }
     <wb-view-tab #viewtab
-                 [viewId]="viewId"
+                 [viewId]="view.id"
                  [class.drag-source]="viewtab === dragSourceViewTab()"
                  [class.drop-target]="viewtab === dropTargetViewTab()"/>
     <div class="divider"></div>

@@ -6,7 +6,7 @@
   inset: 0;
 
   router-outlet {
-    position: absolute; // take router outlet out of the document flow
+    position: absolute; // out of document flow
   }
 
   > section.metadata {

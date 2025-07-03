@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, effect, ElementRef, inject, input, NgZone, OnDestroy, signal, untracked, viewChild, viewChildren} from '@angular/core';
+import {afterRenderEffect, Component, computed, effect, ElementRef, inject, input, NgZone, OnDestroy, signal, untracked, viewChild, viewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {map, mergeMap, takeUntil} from 'rxjs/operators';
 import {from, fromEvent, merge, Observable, OperatorFunction, Subject, timer} from 'rxjs';
@@ -438,29 +438,23 @@ export class ViewTabBarComponent implements OnDestroy {
    * Scrolls the tab of the active view into view.
    */
   private installActiveViewScroller(): void {
-    effect(() => {
+    afterRenderEffect(() => {
       // Track the active view.
-      const activeViewId = this.part.activeViewId();
+      const activeView = this.part.activeView();
+
       // There may be no active view, e.g., if no view has been activated, or when dragging the last view out of the tabbar.
-      if (!activeViewId) {
-        return;
-      }
-
-      // Do not track rendered tabs in general to prevent unwanted scrolling when opening or closing inactive tabs.
-      const viewTabs = untracked(() => this._viewTabs());
-
-      // Get a reference to the currently rendered active tab, waiting if necessary by tracking the rendered tabs.
-      const activeViewTab = viewTabs.find(viewTab => viewTab.view().id === activeViewId);
-      if (!activeViewTab) {
-        this._viewTabs(); // Track rendered tabs to re-execute once rendered.
+      if (!activeView) {
         return;
       }
 
       // Track navigation of the active view, scrolling its tab into view if necessary.
-      activeViewTab.view().navigation();
+      activeView.navigation();
 
       // Track unsetting drag state to ensure the active view is scrolled into view after drop or cancel.
       this._onUnsetDragState();
+
+      // Do not track rendered tabs to prevent unwanted scrolling when opening or closing inactive tabs.
+      const activeViewTab = untracked(() => this._viewTabs().find(viewTab => viewTab.view() === activeView))!;
 
       // Scroll the tab into view if scrolled out of view.
       untracked(() => requestAnimationFrame(() => {

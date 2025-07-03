@@ -21,7 +21,7 @@ export const toHaveComponentStateCustomMatcher: jasmine.CustomMatcherFactories =
   toHaveComponentState: (): CustomMatcher => {
     return {
       compare(viewId: ViewId, expected: string, failOutput: string | undefined): CustomMatcherResult {
-        const viewComponent = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(viewId).portal.componentRef.location.nativeElement as HTMLElement;
+        const viewComponent = TestBed.inject(WORKBENCH_VIEW_REGISTRY).get(viewId).slot.portal.element()!;
         const actual = viewComponent.querySelector<HTMLOptionElement>('input.component-state')!.value;
         if (actual !== expected) {
           return fail(`Expected transient state '${actual}' of view '${viewId}' to equal '${expected}'. Maybe, the component was not detached but destroyed during layout change.`);

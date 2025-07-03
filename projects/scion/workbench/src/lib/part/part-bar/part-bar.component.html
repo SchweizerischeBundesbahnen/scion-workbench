@@ -4,7 +4,7 @@
 }
 
 <!-- View Tabs -->
-@if (part.viewIds().length) {
+@if (part.views().length) {
   <wb-view-tab-bar [maxWidth]="maxViewTabBarWidth()"/>
 }
 
@@ -30,7 +30,7 @@
 }
 
 <!-- View List Dropdown -->
-@if (part.viewIds().length) {
+@if (part.views().length) {
   <wb-view-list-button [title]="('%workbench.show_open_tabs.tooltip' | wbText)()"/>
 }
 

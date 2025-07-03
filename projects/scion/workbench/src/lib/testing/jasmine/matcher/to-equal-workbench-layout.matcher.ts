@@ -423,13 +423,13 @@ function assertMPartDOM(expectedPart: Partial<MPart>, actualElement: Element, ex
 
   // Assert active view and view tab
   if (expectedPart.activeViewId) {
-    const actualActiveViewDebugElement = actualPartElement.querySelector(`wb-view[data-viewid="${expectedPart.activeViewId}"]`);
+    const actualActiveViewDebugElement = actualPartElement.querySelector(`wb-view-slot[data-viewid="${expectedPart.activeViewId}"]`);
     if (!actualActiveViewDebugElement) {
-      throw Error(`[DOMAssertError]: Expected element 'wb-view[data-viewid="${expectedPart.activeViewId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
+      throw Error(`[DOMAssertError]: Expected element 'wb-view-slot[data-viewid="${expectedPart.activeViewId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
 
     if (!actualPartElement.querySelector(`wb-part-bar wb-view-tab[data-viewid="${expectedPart.activeViewId}"].active`)) {
-      throw Error(`[DOMAssertError]: Expected view tab 'wb-view[data-viewid="${expectedPart.activeViewId}"]' to be active, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
+      throw Error(`[DOMAssertError]: Expected view tab 'wb-view-slot[data-viewid="${expectedPart.activeViewId}"]' to be active, but is not. [MPart=${JSON.stringify(expectedPart)}]`);
     }
   }
 

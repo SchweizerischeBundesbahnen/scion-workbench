@@ -13,7 +13,6 @@ import {ConnectedPosition, Overlay, OverlayConfig, OverlayRef} from '@angular/cd
 import {ComponentPortal} from '@angular/cdk/portal';
 import {ViewListComponent} from '../view-list/view-list.component';
 import {WorkbenchPart} from '../workbench-part.model';
-import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {IconComponent} from '../../icon/icon.component';
 
 @Component({
@@ -44,10 +43,7 @@ export class ViewListButtonComponent {
 
   constructor() {
     const part = inject(WorkbenchPart);
-    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-    this.scrolledOutOfViewTabCount = computed(() => part.viewIds()
-      .map(viewId => viewRegistry.get(viewId))
-      .reduce((count, view) => view.scrolledIntoView() ? count : count + 1, 0));
+    this.scrolledOutOfViewTabCount = computed(() => part.views().reduce((count, view) => view.scrolledIntoView() ? count : count + 1, 0));
   }
 
   @HostListener('click')

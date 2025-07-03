@@ -231,7 +231,7 @@ export class PopupService {
     let activeElement: HTMLElement | undefined;
 
     effect(() => {
-      const attached = contextualView.portal.attached();
+      const attached = contextualView.slot.portal.attached();
       untracked(() => {
         if (attached) {
           overlayRef.overlayElement.classList.add('wb-view-attached');
@@ -258,15 +258,15 @@ export class PopupService {
    * Creates a signal that tracks the position of the popup anchor.
    */
   private trackPopupOrigin(config: PopupConfig, contextualView: ɵWorkbenchView | null, injector: Injector): Signal<DOMRect | undefined> {
-    const partBounds = boundingClientRect(computed(() => contextualView?.part().partComponent()), {injector});
-    const viewBounds = boundingClientRect(computed(() => contextualView?.portal.componentRef.location.nativeElement as HTMLElement | undefined), {injector});
+    const partBounds = boundingClientRect(computed(() => contextualView?.part().portal.element()), {injector});
+    const viewBounds = boundingClientRect(computed(() => contextualView?.slot.portal.element()), {injector});
 
     if (config.anchor instanceof Element || config.anchor instanceof ElementRef) {
       const anchor = coerceElement(config.anchor) as HTMLElement;
       const anchorBounds = boundingClientRect(anchor, {injector});
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
-        if (contextualView && !contextualView.portal.attached()) {
+        if (contextualView && !contextualView.slot.portal.attached()) {
           return undefined;
         }
 
@@ -285,7 +285,7 @@ export class PopupService {
       const anchorBounds = toSignal(Observables.coerce(config.anchor), {injector});
       return computed(() => {
         // Maintain position and size when detached to prevent flickering when attached again and to support for virtual scrolling in popup content.
-        if (contextualView && !contextualView.portal.attached()) {
+        if (contextualView && !contextualView.slot.portal.attached()) {
           return undefined;
         }
 

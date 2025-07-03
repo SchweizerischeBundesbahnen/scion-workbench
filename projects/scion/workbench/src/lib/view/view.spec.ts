@@ -25,7 +25,7 @@ import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {WorkbenchService} from '../workbench.service';
-import {ViewComponent} from './view.component';
+import {ViewSlotComponent} from './view-slot.component';
 import {WorkbenchMessageBoxService} from '../message-box/workbench-message-box.service';
 import {WorkbenchDialogService} from '../dialog/workbench-dialog.service';
 import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
@@ -1089,14 +1089,14 @@ describe('View', () => {
     await waitUntilStable();
 
     // Expect size to be equal.
-    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewSlotComponent));
 
     // Navigate to "path/to/view".
     await TestBed.inject(ɵWorkbenchRouter).navigate(['path/to/view'], {target: 'view.100'});
     await waitUntilStable();
 
     // Expect size to be equal.
-    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewComponent));
+    expect(getSize(fixture, SpecViewComponent)).toEqual(getSize(fixture, ViewSlotComponent));
   });
 
   it('should show action after one change detection cycle', async () => {
@@ -2882,21 +2882,21 @@ describe('View', () => {
       expect(view2.part().id).toEqual('part.top');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
-      // // Move view to part 'bottom'.
+      // Move view to part 'bottom'.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.bottom', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
       expect(view2.part().id).toEqual('part.bottom');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
-      // // Move view to part 'right'.
+      // Move view to part 'right'.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.right', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.
       expect(view2.part().id).toEqual('part.right');
       expect(viewportView2.scrollTop).toBe(scrollTop);
 
-      // // Move view to part 'left'.
+      // Move view to part 'left'.
       await TestBed.inject(WorkbenchRouter).navigate(layout => layout.moveView('view.102', 'part.left', {activateView: true}));
       await waitUntilStable();
       // Expect view to be moved and scroll position to be restored.

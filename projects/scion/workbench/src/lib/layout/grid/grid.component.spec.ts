@@ -176,7 +176,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 to be moved: ['view.3', 'view.1', 'view.2', 'view.4']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').viewIds()).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 1
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -196,7 +196,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 not to be moved
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').viewIds()).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.3', 'view.1', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 2
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -216,7 +216,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN view.3 to be moved as follows: ['view.1', 'view.3', 'view.2', 'view.4']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').viewIds()).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.3', 'view.2', 'view.4']);
 
     // WHEN moving view.3 to position 3
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -236,7 +236,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.3', 'view.4']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').viewIds()).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
 
     // WHEN moving view.3 to position 4
     TestBed.inject(ViewDragService).dispatchViewMoveEvent({
@@ -256,7 +256,7 @@ describe('WorkbenchLayout Component', () => {
 
     // THEN expect view.3 to be moved as follows: ['view.1', 'view.2', 'view.4', 'view.3']
     expect('view.3').toBeRegistered({partId: 'part.initial', active: true});
-    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').viewIds()).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
+    expect(TestBed.inject(WORKBENCH_PART_REGISTRY).get('part.initial').views().map(view => view.id)).toEqual(['view.1', 'view.2', 'view.4', 'view.3']);
   });
 
   it('allows to move a view to a new part in the east', async () => {
@@ -3282,8 +3282,8 @@ describe('WorkbenchLayout Component', () => {
     await waitUntilStable();
 
     // Expect part handle to still have previous state.
-    expect(TestBed.inject(WorkbenchService).getPart('part.initial')!.activeViewId()).toEqual('view.101');
-    expect(TestBed.inject(WorkbenchService).getPart('part.initial')!.viewIds()).toEqual(['view.101']);
+    expect(TestBed.inject(WorkbenchService).getPart('part.initial')!.activeView()!.id).toEqual('view.101');
+    expect(TestBed.inject(WorkbenchService).getPart('part.initial')!.views().map(view => view.id)).toEqual(['view.101']);
 
     // Expect view handle to be partially updated.
     expect(TestBed.inject(WorkbenchService).getView('view.101')!.active()).toBeTrue();
