@@ -1978,6 +1978,37 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.grid({partId: 'part.99'}, {orElse: null})).toBeNull();
   });
 
+  /**
+   * The test operates on the following layout:
+   *
+   *           MTreeNode (root)
+   *                |
+   *    +-----------+-----------+
+   *    |                       |
+   * part.left                MTreeNode (child)
+   *                      +-----+-----+
+   *                      |           |
+   *                   part.right  part.bottom
+   */
+  it('should find tree node by criteria', () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right', relativeTo: 'part.left'})
+      .addPart('part.bottom', {align: 'bottom', relativeTo: 'part.right'});
+
+    const rootTreeNode = workbenchLayout.part({partId: 'part.left'}).parent!;
+    const childTreeNode = workbenchLayout.part({partId: 'part.right'}).parent!;
+
+    // Find by node id.
+    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(childTreeNode);
+    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(workbenchLayout.part({partId: 'part.right'}).parent);
+    expect(workbenchLayout.treeNode({nodeId: childTreeNode.id})).toBe(workbenchLayout.part({partId: 'part.bottom'}).parent);
+    expect(workbenchLayout.treeNode({nodeId: rootTreeNode.id})).toBe(rootTreeNode);
+    expect(workbenchLayout.treeNode({nodeId: rootTreeNode.id})).toBe(childTreeNode.parent);
+  });
+
   it('should return whether a part is contained in the layout', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
@@ -2335,8 +2366,8 @@ describe('WorkbenchLayout', () => {
     workbenchLayout = workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, .3);
     expect(findParentNode('part.left').ratio).toEqual(.3);
 
-    // Expect to error if setting the ratio for a node not contained in the layout.
-    expect(() => workbenchLayout.setTreeNodeSplitRatio('does-not-exist', .3)).toThrowError(/NullElementError/);
+    // Expect to error if setting the ratio on a node not contained in the layout.
+    expect(() => workbenchLayout.setTreeNodeSplitRatio('does-not-exist', .3)).toThrowError(/NullTreeNodeError/);
 
     // Expect to error if setting an illegal ratio.
     expect(() => workbenchLayout.setTreeNodeSplitRatio(findParentNode('part.left').id, -.1)).toThrowError(/LayoutModifyError/);

@@ -602,9 +602,23 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return workingCopy;
   }
 
-  /** @inheritDoc */
-  public modify(modifyFn: (layout: ɵWorkbenchLayout) => ɵWorkbenchLayout): ɵWorkbenchLayout {
-    return modifyFn(this.workingCopy());
+  /**
+   * Finds a {@link MTreeNode} based on the specified filter. If not found, by default, throws an error unless setting the `orElseNull` option.
+   *
+   * @param findBy - Defines the search scope.
+   * @param findBy.nodeId - Searches for a node with the specified id.
+   * @param options - Controls the search.
+   * @param options.orElse - Controls to return `null` instead of throwing an error if no node is found.
+   * @return node matching the filter criteria.
+   */
+  public treeNode(findBy: {nodeId: string}): MTreeNode;
+  public treeNode(findBy: {nodeId: string}, options: {orElse: null}): MTreeNode | null;
+  public treeNode(findBy: {nodeId: string}, options?: {orElse: null}): MTreeNode | null {
+    const [node] = this.findTreeElements((element: MTreeNode | MPart): element is MTreeNode => element instanceof MTreeNode && element.id === findBy.nodeId);
+    if (!node && !options) {
+      throw Error(`[NullTreeNodeError] No MTreeNode found with id '${findBy.nodeId}'.`);
+    }
+    return node ?? null;
   }
 
   /**
@@ -619,6 +633,11 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.__setTreeNodeSplitRatio(nodeId, ratio);
     return workingCopy;
+  }
+
+  /** @inheritDoc */
+  public modify(modifyFn: (layout: ɵWorkbenchLayout) => ɵWorkbenchLayout): ɵWorkbenchLayout {
+    return modifyFn(this.workingCopy());
   }
 
   /**
@@ -1185,7 +1204,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     if (ratio < 0 || ratio > 1) {
       throw Error(`[LayoutModifyError] Ratio for node '${nodeId}' must be in the closed interval [0,1], but was '${ratio}'.`);
     }
-    this.findTreeElement<MTreeNode>({id: nodeId}).ratio = ratio;
+    this.treeNode({nodeId}).ratio = ratio;
   }
 
   /**
