@@ -36,7 +36,7 @@ import {Arrays, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {ViewContentComponent} from './view-content.component';
+import {ViewSlotComponent} from './view-slot.component';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -77,7 +77,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly active = signal<boolean>(false);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
-  public readonly viewContentPortal: WbComponentPortal<ViewContentComponent>;
+  public readonly slot: {portal: WbComponentPortal<ViewSlotComponent>};
   public readonly classList = new ClassList();
   public readonly isClosable = computed(() => this._closable() && !this._blockedBy());
 
@@ -90,7 +90,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout) {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
-    this.viewContentPortal = this.createPortal();
+    this.slot = {portal: this.createPortal()};
     this.menuItems = this.computeMenuItems();
     this._blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
     this.blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
@@ -99,8 +99,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.onLayoutChange({layout});
   }
 
-  private createPortal(): WbComponentPortal<ViewContentComponent> {
-    return new WbComponentPortal(ViewContentComponent, {
+  private createPortal(): WbComponentPortal<ViewSlotComponent> {
+    return new WbComponentPortal(ViewSlotComponent, {
       providers: [
         provideViewContext(this),
         // Prevent injecting this part into the view because the view may be dragged to a different part.
@@ -158,8 +158,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     // To complete the initialization of the routed component (to ensure that `ngOnInit` is called), we manually trigger change
     // detection. We cannot perform change detection right now because the routed component has not been activated/constructed yet.
     // Use case: Navigating an (existing) inactive view to another route.
-    if (!this.active() && this.viewContentPortal.constructed() && routeChanged) {
-      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.viewContentPortal.componentRef()!.changeDetectorRef.detectChanges());
+    if (!this.active() && this.slot.portal.constructed() && routeChanged) {
+      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.slot.portal.componentRef()!.changeDetectorRef.detectChanges());
     }
   }
 
@@ -312,7 +312,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public canClose(canClose: CanCloseFn): CanCloseRef {
     const canCloseGuard = this.canCloseGuard = async (): Promise<boolean> => {
       try {
-        const close = runInInjectionContext(this.viewContentPortal.componentRef()!.injector, canClose);
+        const close = runInInjectionContext(this.slot.portal.componentRef()!.injector, canClose);
         return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
       }
       catch (error) {
@@ -363,7 +363,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get destroyed(): boolean {
-    return this.viewContentPortal.destroyed();
+    return this.slot.portal.destroyed();
   }
 
   /**
@@ -435,6 +435,6 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public destroy(): void {
     this._viewEnvironmentInjector.destroy();
     this._workbenchDialogRegistry.dialogs({viewId: this.id}).forEach(dialog => dialog.destroy());
-    this.viewContentPortal.destroy();
+    this.slot.portal.destroy();
   }
 }

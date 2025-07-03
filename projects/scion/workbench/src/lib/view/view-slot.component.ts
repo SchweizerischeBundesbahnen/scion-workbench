@@ -23,12 +23,12 @@ import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 
 /**
- * Renders the content of a view, using a router-outlet to display navigated content.
+ * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
  */
 @Component({
-  selector: 'wb-view-content',
-  templateUrl: './view-content.component.html',
-  styleUrls: ['./view-content.component.scss'],
+  selector: 'wb-view-slot',
+  templateUrl: './view-slot.component.html',
+  styleUrls: ['./view-slot.component.scss'],
   imports: [
     RouterOutlet,
     RouterOutletRootContextDirective,
@@ -46,7 +46,7 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
     configureViewGlassPane(),
   ],
 })
-export class ViewContentComponent implements OnAttach, OnDetach {
+export class ViewSlotComponent implements OnAttach, OnDetach {
 
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly viewDragService = inject(ViewDragService);

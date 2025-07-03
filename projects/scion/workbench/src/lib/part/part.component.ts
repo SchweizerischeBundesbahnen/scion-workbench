@@ -93,9 +93,9 @@ export class PartComponent implements OnInit {
     effect(() => {
       const views = this.part.views();
       untracked(() => views
-        .filter(view => !view.active() && !view.viewContentPortal.constructed())
+        .filter(view => !view.active() && !view.slot.portal.constructed())
         .forEach(inactiveView => {
-          inactiveView.viewContentPortal.createComponentFromInjectionContext(this._injector);
+          inactiveView.slot.portal.createComponentFromInjectionContext(this._injector);
         }));
     });
   }

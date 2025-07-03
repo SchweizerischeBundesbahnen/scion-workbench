@@ -90,7 +90,7 @@ export class WorkbenchPartActionDirective {
       if (context.part && context.part.id !== part.id) {
         return null;
       }
-      if (context.part && !context.part.partContentPortal.attached()) {
+      if (context.part && !context.part.slot.portal.attached()) {
         return null;
       }
       if (context.view && context.view.id !== part.activeView()?.id) {

@@ -28,6 +28,6 @@ export class PartPortalPipe implements PipeTransform {
       return null;
     }
 
-    return this._partRegistry.get(partId).partPortal;
+    return this._partRegistry.get(partId).portal;
   }
 }

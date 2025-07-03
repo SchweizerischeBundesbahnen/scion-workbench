@@ -27,7 +27,7 @@ import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MActivity} from '../activity/workbench-activity.model';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {PartContentComponent} from './part-content/part-content.component';
+import {PartSlotComponent} from './part-content/part-slot.component';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';
@@ -60,8 +60,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly activeView: Signal<ɵWorkbenchView | null>;
   public readonly views: Signal<ɵWorkbenchView[]>;
   public readonly classList = new ClassList();
-  public readonly partPortal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
-  public readonly partContentPortal: WbComponentPortal<PartContentComponent>;
+  public readonly portal: WbComponentPortal<MainAreaPartComponent | PartComponent>;
+  public readonly slot: {portal: WbComponentPortal<PartSlotComponent>};
 
   private _isInMainArea: boolean | undefined;
   private _activationInstant: number | undefined;
@@ -73,8 +73,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.activeView = computeActiveView(this.mPart);
     this.views = computeViews(this.mPart);
     this.alternativeId = this.mPart().alternativeId;
-    this.partPortal = this.createPortal<MainAreaPartComponent | PartComponent>(id === MAIN_AREA ? MainAreaPartComponent : PartComponent);
-    this.partContentPortal = this.createPortal(PartContentComponent);
+    this.portal = this.createPortal<MainAreaPartComponent | PartComponent>(id === MAIN_AREA ? MainAreaPartComponent : PartComponent);
+    this.slot = {portal: this.createPortal(PartSlotComponent)};
     this.touchOnActivate();
     this.installModelUpdater();
     this.onLayoutChange({layout});
@@ -256,11 +256,8 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
   public destroy(): void {
     this._partEnvironmentInjector.destroy();
-    // IMPORTANT: Only detach the active view, not destroy it, because views are explicitly destroyed when view handles are removed.
-    // Otherwise, moving the last view to another part would fail because the view would already be destroyed.
-    this.activeView()?.viewContentPortal.detach();
-    this.partPortal.destroy();
-    this.partContentPortal.destroy();
+    this.portal.destroy();
+    this.slot.portal.destroy();
   }
 }
 
@@ -346,8 +343,7 @@ function computePartActions(partId: PartId): Signal<WorkbenchPartAction[]> {
  */
 function computeActiveView(mPart: Signal<MPart>): Signal<ɵWorkbenchView | null> {
   const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-  // TODO [WorkbenchPart.destroy] Access to active view, but registr
-  return computed(() => mPart().activeViewId ? viewRegistry.get(mPart().activeViewId!, {orElse: null}) : null);
+  return computed(() => mPart().activeViewId ? viewRegistry.get(mPart().activeViewId!) : null);
 }
 
 /**

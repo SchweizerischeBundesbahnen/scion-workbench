@@ -11,7 +11,7 @@
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="active-view e2e-view-content e2e-content">
-    <ng-container *wbPortalOutlet="part.activeView()?.viewContentPortal; destroyOnDetach: false"/>
+    <ng-container *wbPortalOutlet="part.activeView()?.slot!.portal; destroyOnDetach: false"/>
   </div>
 } @else {
   <div wbViewDropZone
@@ -19,6 +19,6 @@
        [wbViewDropZoneAttributes]="{'data-partid': part.id}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
        class="part-content e2e-part-content e2e-content">
-    <ng-container *wbPortalOutlet="part.partContentPortal; destroyOnDetach: false"/>
+    <ng-container *wbPortalOutlet="part.slot.portal; destroyOnDetach: false"/>
   </div>
 }

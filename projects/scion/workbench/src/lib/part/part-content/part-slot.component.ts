@@ -16,19 +16,19 @@ import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 
 /**
- * Renders the content of a part, using a router-outlet to display navigated content.
+ * Acts as a placeholder for a part's content that Angular fills based on the current router state of the associated part outlet.
  */
 @Component({
-  selector: 'wb-part-content',
-  templateUrl: './part-content.component.html',
-  styleUrl: './part-content.component.scss',
+  selector: 'wb-part-slot',
+  templateUrl: './part-slot.component.html',
+  styleUrl: './part-slot.component.scss',
   imports: [
     RouterOutlet,
     RouterOutletRootContextDirective,
     SciViewportComponent,
   ],
 })
-export class PartContentComponent implements OnAttach, OnDetach {
+export class PartSlotComponent implements OnAttach, OnDetach {
 
   protected readonly part = inject(WorkbenchPart);
   private readonly _viewport = viewChild.required(SciViewportComponent);
