@@ -101,7 +101,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     const {gridName, grid} = layout.grid({partId: this.id});
     this.gridName.set(gridName);
     this.peripheral.set(layout.isPeripheralPart(this.id));
-    this.active.set(grid.activePartId === this.id);
+    this.active.set(isActive(this.id, layout));
     this.viewIds.set(mPart.views.map(view => view.id));
     this.activeViewId.set(mPart.activeViewId ?? null);
     this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
@@ -297,7 +297,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 }
 
 /**
- * Tests if this part is the top-leftmost part.
+ * Computes if this part is the top-leftmost part.
  */
 function isTopLeft(element: MTreeNode | MPart, testee: MPart): boolean {
   if (element instanceof MPart) {
@@ -309,7 +309,7 @@ function isTopLeft(element: MTreeNode | MPart, testee: MPart): boolean {
 }
 
 /**
- * Tests if this part is the top-rightmost part.
+ * Computes if this part is the top-rightmost part.
  */
 function isTopRight(element: MTreeNode | MPart, testee: MPart): boolean {
   if (element instanceof MPart) {
@@ -323,6 +323,25 @@ function isTopRight(element: MTreeNode | MPart, testee: MPart): boolean {
     return element.direction === 'column' ? isTopRight(element.child1, testee) : isTopRight(element.child2, testee);
   }
   return isTopRight(child1Visible ? element.child1 : element.child2, testee);
+}
+
+/**
+ * Computes if the given part is active.
+ *
+ * A part is considered active if it is the currently active part in its grid.
+ * Additionally, if the part is associated with an activity, the activity must also be active.
+ */
+function isActive(partId: PartId, layout: ɵWorkbenchLayout): boolean {
+  const {grid} = layout.grid({partId: partId});
+  if (grid.activePartId !== partId) {
+    return false;
+  }
+
+  const activity = layout.activity({partId: partId}, {orElse: null});
+  if (activity && layout.activityStack({activityId: activity.id}).activeActivityId !== activity.id) {
+    return false;
+  }
+  return true;
 }
 
 /**
