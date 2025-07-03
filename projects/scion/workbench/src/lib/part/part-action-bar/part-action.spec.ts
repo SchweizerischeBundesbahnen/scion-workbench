@@ -117,22 +117,22 @@ describe('PartAction', () => {
 
     // Register action 1.
     TestBed.inject(WorkbenchService).registerPartAction(part => {
-      const partId = part.id as 'part.left' | 'part.right';
-      actionConstructCount[partId].action1++;
-      trackedSignals[partId].action1();
-      return {
-        content: SpecActionComponent,
-      };
+      if (part.id === 'part.left' || part.id === 'part.right') {
+        actionConstructCount[part.id].action1++;
+        trackedSignals[part.id].action1();
+        return SpecActionComponent;
+      }
+      return null;
     });
 
     // Register action 2.
     TestBed.inject(WorkbenchService).registerPartAction(part => {
-      const partId = part.id as 'part.left' | 'part.right';
-      actionConstructCount[partId].action2++;
-      trackedSignals[partId].action2();
-      return {
-        content: SpecActionComponent,
-      };
+      if (part.id === 'part.left' || part.id === 'part.right') {
+        actionConstructCount[part.id].action2++;
+        trackedSignals[part.id].action2();
+        return SpecActionComponent;
+      }
+      return null;
     });
 
     TestBed.tick(); // flush effects
@@ -157,12 +157,13 @@ describe('PartAction', () => {
 
     // Register action 3.
     TestBed.inject(WorkbenchService).registerPartAction(() => {
-      const partId = inject(WorkbenchPart).id as 'part.left' | 'part.right';
-      actionConstructCount[partId].action3++;
-      trackedSignals[partId].action3();
-      return {
-        content: SpecActionComponent,
-      };
+      const part = inject(WorkbenchPart);
+      if (part.id === 'part.left' || part.id === 'part.right') {
+        actionConstructCount[part.id].action3++;
+        trackedSignals[part.id].action3();
+        return SpecActionComponent;
+      }
+      return null;
     });
     TestBed.tick(); // flush effects
 

@@ -10,7 +10,7 @@
 import {TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {styleFixture, waitUntilWorkbenchStarted, waitUntilStable} from '../testing/testing.util';
+import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
 import {withComponentContent} from '../testing/test.component';
 import {WorkbenchComponent} from '../workbench.component';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';

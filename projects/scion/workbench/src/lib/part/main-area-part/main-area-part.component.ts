@@ -72,10 +72,10 @@ export class MainAreaPartComponent {
   private readonly _logger = inject(Logger);
 
   protected readonly part = inject(ɵWorkbenchPart);
-  protected readonly mainAreaGrid = computed(() => this._layout().grids.mainArea!);
+  protected readonly mainAreaGrid = computed(() => this._layout().grids.mainArea);
   protected readonly desktop = inject(DESKTOP);
   protected readonly dasherize = dasherize;
-  protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea!));
+  protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea));
 
   constructor() {
     inject(ɵWorkbenchPart).partComponent.set(inject(ElementRef).nativeElement as HTMLElement);

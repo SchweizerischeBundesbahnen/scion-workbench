@@ -26,6 +26,7 @@ import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {ViewId} from '../view/workbench-view.model';
 import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
+import {MAIN_AREA} from '../layout/workbench-layout';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -301,7 +302,7 @@ export function createNavigationFromCommands(commands: Commands, extras: Workben
       if (extras.partId && layout.hasPart(extras.partId)) {
         return extras.partId;
       }
-      return layout.activePart({grid: 'mainArea'})?.id ?? layout.activePart({grid: 'main'}).id;
+      return layout.hasPart(MAIN_AREA) ? layout.activePart({grid: 'mainArea'}).id : layout.activePart({grid: 'main'}).id;
     })();
 
     return layout

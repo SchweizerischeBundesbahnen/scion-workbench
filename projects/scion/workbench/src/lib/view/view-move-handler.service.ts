@@ -102,7 +102,7 @@ export class ViewMoveHandler {
       const commands = Routing.segmentsToCommands(event.source.navigation?.path ?? []);
       return newLayout
         .addView(newViewId, {
-          partId: newLayout.activePart({grid: 'mainArea'})!.id,
+          partId: newLayout.activePart({grid: 'mainArea'}).id,
           activateView: true,
           cssClass: event.source.classList?.get('layout'),
         })

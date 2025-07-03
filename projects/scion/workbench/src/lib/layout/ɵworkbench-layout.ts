@@ -64,12 +64,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     this._outlets = new Map(Objects.entries(coerceOutlets(config?.outlets)));
     this._navigationStates = new Map(Objects.entries(config?.navigationStates ?? {}));
     this.perspectiveId = config?.perspectiveId;
-
-    // Delete main area grid if not contained in the main grid.
-    if (!this.hasPart(MAIN_AREA, {grid: 'main'})) {
-      delete this._grids.mainArea;
-    }
-
     this.assertActivities();
   }
 
@@ -437,7 +431,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   /**
    * Returns the active part of the specified grid, or `null` if specified grid is not present.
    */
-  public activePart(find: {grid: 'main'}): Readonly<MPart>;
+  public activePart(find: {grid: 'main' | 'mainArea'}): Readonly<MPart>;
   public activePart(find: {grid: keyof WorkbenchGrids}): Readonly<MPart> | null;
   public activePart(find: {grid: keyof WorkbenchGrids}): Readonly<MPart> | null {
     const grid = this._grids[find.grid];
@@ -1304,7 +1298,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       return this.activity({partId}, {orElse: null}) !== null;
     }
     else {
-      return this.hasPart(partId, {grid: 'main'}) && !!this.grids.mainArea;
+      return this.hasPart(partId, {grid: 'main'}) && this.hasPart(MAIN_AREA, {grid: 'main'});
     }
   }
 
@@ -1342,9 +1336,6 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const result: T[] = [];
     const gridFilter = options?.grid ? new Set<keyof WorkbenchGrids>(Arrays.coerce(options.grid)) : undefined;
     for (const [gridName, grid] of Objects.entries(this._grids)) {
-      if (!grid) {
-        continue;
-      }
       if (gridFilter && !gridFilter.has(gridName)) {
         continue;
       }

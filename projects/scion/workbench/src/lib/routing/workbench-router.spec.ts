@@ -71,8 +71,8 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      const part = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'}) ?? throwError('NullActivePart');
-      return TestBed.inject(WorkbenchService).getPart(part.id)!;
+      const activePart = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'});
+      return TestBed.inject(WorkbenchService).getPart(activePart.id)!;
     }
   });
 
@@ -124,8 +124,8 @@ describe('WorkbenchRouter', () => {
     expect(findActiveMainAreaPart().id).toEqual('part.right');
 
     function findActiveMainAreaPart(): WorkbenchPart {
-      const part = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'}) ?? throwError('NullActivePart');
-      return TestBed.inject(WorkbenchService).getPart(part.id)!;
+      const activePart = TestBed.inject(ɵWorkbenchService).layout().activePart({grid: 'mainArea'});
+      return TestBed.inject(WorkbenchService).getPart(activePart.id)!;
     }
   });
 

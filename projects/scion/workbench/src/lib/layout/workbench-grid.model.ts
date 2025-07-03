@@ -139,8 +139,10 @@ export interface WorkbenchGrids<T = ɵMPartGrid> {
   main: T;
   /**
    * Reference to the main area grid, a sub-grid embedded by the main area part contained in the main grid.
+   *
+   * The main area grid is always present even if the layout has no main area part, as it is shared between perspectives.
    */
-  mainArea?: T;
+  mainArea: T;
 
   /**
    * Grids associated with activities.

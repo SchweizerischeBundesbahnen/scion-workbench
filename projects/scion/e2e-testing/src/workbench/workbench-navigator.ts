@@ -114,7 +114,7 @@ export class WorkbenchNavigator {
     const layoutPage = await this.openInNewTab(LayoutPagePO);
     await layoutPage.createPerspective(id, {layout: layoutFn});
     await layoutPage.view.tab.close();
-    if (options?.active ?? true) {
+    if (options?.activate ?? true) {
       await this._appPO.switchPerspective(id);
     }
     return id;
@@ -139,5 +139,5 @@ export interface PerspectiveCreateOptions {
   /**
    * Controls if to activate the perspective.
    */
-  active?: boolean;
+  activate?: boolean;
 }
