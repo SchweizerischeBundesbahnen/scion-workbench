@@ -53,17 +53,17 @@ export default class ViewPageComponent {
 
   private readonly _formBuilder = inject(NonNullableFormBuilder);
 
-  protected readonly view = inject(WorkbenchView);
-  protected readonly route = inject(ActivatedRoute);
-  protected readonly uuid = UUID.randomUUID();
-  protected readonly partActions = this.computePartActions();
-  protected readonly activationInstant = this.computeActivationInstant();
-
   protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
     cssClass: this._formBuilder.control(''),
     confirmClosing: this._formBuilder.control(false),
   });
+
+  protected readonly view = inject(WorkbenchView);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly uuid = UUID.randomUUID();
+  protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
+  protected readonly activationInstant: Signal<number | null>;
 
   constructor() {
     if (!inject(WorkbenchStartup).done()) {
@@ -73,6 +73,9 @@ export default class ViewPageComponent {
     this.installViewActiveStateLogger();
     this.installCssClassUpdater();
     this.installCanCloseGuard();
+
+    this.partActions = this.computePartActions();
+    this.activationInstant = this.computeActivationInstant();
   }
 
   private async confirmClosing(): Promise<boolean> {
@@ -108,7 +111,7 @@ export default class ViewPageComponent {
       ), {initialValue: null});
 
     function viewActivationInstant$(viewId: ViewId): Observable<number | null> {
-      const viewElement = document.querySelector(`wb-view[data-viewid="${viewId}"]`)!;
+      const viewElement = document.querySelector(`wb-view-slot[data-viewid="${viewId}"]`)!;
       return fromMutation$(viewElement, {attributeFilter: ['data-activation-instant'], subtree: false})
         .pipe(
           startWith(null),

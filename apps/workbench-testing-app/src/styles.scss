@@ -75,7 +75,7 @@ button:not([class*="material-icons"]):not([class*="material-symbols"]) {
     border-color: var(--sci-color-accent);
   }
 
-  wb-view[data-focus]::after {
+  wb-view-slot[data-focus]::after {
     @include highlight();
     margin-left: $border-width;
     margin-right: $border-width;

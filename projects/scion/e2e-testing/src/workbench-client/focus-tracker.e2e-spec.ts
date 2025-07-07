@@ -320,7 +320,7 @@ test.describe.only('Focus Tracker', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register message box capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-message-box-focus-page'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox', variant: 'focus-page'}});
 
     // Switch to test perspective.
     const testPerspective = new FocusTestPerspectivePO(appPO);
@@ -339,7 +339,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(messageBoxOpenerViewId);
 
     // TEST: Open message box.
-    await messageBoxOpener.open({component: 'host-message-box-focus-page'}, {cssClass: 'testee'});
+    await messageBoxOpener.open({component: 'host-messagebox', variant: 'focus-page'}, {cssClass: 'testee'});
     const dialogId = await appPO.dialog({cssClass: 'testee'}).getDialogId();
     const focusTestPage = new WorkbenchFocusTestPagePO(appPO.dialog({dialogId}));
 
@@ -468,7 +468,7 @@ test.describe.only('Focus Tracker', () => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     // TODO [#271]: Register popup capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
-    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup-focus-page'}});
+    await microfrontendNavigator.registerIntention('app1', {type: 'popup', qualifier: {component: 'host-popup', variant: 'focus-page'}});
 
     // Switch to test perspective.
     const testPerspective = new FocusTestPerspectivePO(appPO);
@@ -487,7 +487,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual(popupOpenerViewId);
 
     // TEST: Open popup.
-    await popupOpener.enterQualifier({component: 'host-popup-focus-page'});
+    await popupOpener.enterQualifier({component: 'host-popup', variant: 'focus-page'});
     await popupOpener.enterCssClass('testee');
     await popupOpener.enterCloseStrategy({closeOnFocusLost: false});
     await popupOpener.open();

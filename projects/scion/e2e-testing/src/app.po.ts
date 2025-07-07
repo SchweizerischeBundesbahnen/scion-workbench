@@ -234,7 +234,7 @@ export class AppPO {
    * TODO [focus-tracker]: Why do we need a new method? 'activeView' similar to 'activePart', returning the handle.
    */
   public async activeViewId(locateBy: {partId: PartId}): Promise<ViewId | null> {
-    return (await this.page.locator(`wb-part[data-partid="${locateBy.partId}"] wb-view[data-active]`).getAttribute('data-viewid')) as ViewId | null;
+    return (await this.page.locator(`wb-part[data-partid="${locateBy.partId}"] wb-view-slot[data-active]`).getAttribute('data-viewid')) as ViewId | null;
   }
 
   /**
@@ -488,7 +488,7 @@ export class AppPO {
     switch (tagName) {
       case 'WB-PART':
         return await locator.getAttribute('data-partid') as PartId | null;
-      case 'WB-VIEW':
+      case 'WB-VIEW-SLOT':
         return await locator.getAttribute('data-viewid') as ViewId | null;
       case 'WB-DIALOG':
         return await locator.getAttribute('data-dialogid') as DialogId | null;
@@ -507,7 +507,7 @@ export class AppPO {
       return Number.parseInt((await this.page.locator(`wb-part[data-partid="${elementId}"]`).getAttribute('data-activation-instant'))!);
     }
     if (elementId.startsWith('view.')) {
-      return Number.parseInt((await this.page.locator(`wb-view[data-viewid="${elementId}"]`).getAttribute('data-activation-instant'))!);
+      return Number.parseInt((await this.page.locator(`wb-view-slot[data-viewid="${elementId}"]`).getAttribute('data-activation-instant'))!);
     }
     throw Error(`[PageObjectError] Workbench element with id "${elementId}" not found.`);
   }

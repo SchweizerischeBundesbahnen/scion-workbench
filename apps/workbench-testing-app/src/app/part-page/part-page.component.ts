@@ -54,8 +54,8 @@ export default class PartPageComponent {
   protected readonly part = inject(WorkbenchPart);
   protected readonly route = inject(ActivatedRoute);
   protected readonly uuid = UUID.randomUUID();
-  protected readonly partActions = this.computePartActions();
-  protected readonly activationInstant = this.computeActivationInstant();
+  protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
+  protected readonly activationInstant: Signal<number | null>;
   protected readonly titleList = `title-list-${UUID.randomUUID()}`;
   protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
@@ -64,6 +64,8 @@ export default class PartPageComponent {
 
   constructor() {
     this.installCssClassUpdater();
+    this.partActions = this.computePartActions();
+    this.activationInstant = this.computeActivationInstant();
   }
 
   protected onPartTitleChange(title: string): void {

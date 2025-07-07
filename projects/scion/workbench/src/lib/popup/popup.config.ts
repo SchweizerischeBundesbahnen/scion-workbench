@@ -20,6 +20,7 @@ import {Blockable} from '../glass-pane/blockable';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {PopupId} from '../workbench-elements';
+import {ɵDestroyRef} from '../common/ɵdestroy-ref';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -34,7 +35,7 @@ export abstract class PopupConfig {
    *
    * @internal
    */
-  public abstract readonly PopupId?: string;
+  public abstract readonly id?: PopupId;
   /**
    * Controls where to open the popup.
    *
@@ -211,7 +212,8 @@ export abstract class Popup<T = unknown, R = unknown> {
 export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable {
 
   private readonly _popupEnvironmentInjector = inject(EnvironmentInjector);
-  private readonly _context = {
+  private readonly _destroyRef = new ɵDestroyRef();
+  public readonly context = {
     view: inject(ɵWorkbenchView, {optional: true}),
   };
 
@@ -233,9 +235,9 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
    */
   private blockWhenDialogOpened(): void {
     const workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
-    const initialTop = workbenchDialogRegistry.top({viewId: this._context.view?.id});
+    const initialTop = workbenchDialogRegistry.top({viewId: this.context.view?.id});
 
-    workbenchDialogRegistry.top$({viewId: this._context.view?.id})
+    workbenchDialogRegistry.top$({viewId: this.context.view?.id})
       .pipe(
         map(top => top === initialTop ? null : top),
         takeUntilDestroyed(),
@@ -284,6 +286,9 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
    * Destroys this popup and associated resources.
    */
   public destroy(): void {
-    this._popupEnvironmentInjector.destroy();
+    if (!this._destroyRef.destroyed) {
+      this._destroyRef.destroy();
+      this._popupEnvironmentInjector.destroy();
+    }
   }
 }

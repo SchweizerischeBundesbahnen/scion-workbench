@@ -77,17 +77,21 @@ export function registerFocusTracker(target: Element | ElementRef<Element>, elem
       console.log('>>>> onfocusin', elementFn());
       NgZone.assertNotInAngularZone();
       if (event === _event) {
+        console.log('>>> e1');
         return;
       }
 
       _event = event;
 
       if (focusTracker.activeElement() === elementFn()) {
+        console.log('>>> e2');
         return;
       }
 
       const e = event.target as Element;
       if (excludes.some(exclude => exclude.contains(e))) {
+        console.log('>>> e3');
+        // required? why? Prevent activating tab via sequential keyboard navigation
         return;
       }
 
