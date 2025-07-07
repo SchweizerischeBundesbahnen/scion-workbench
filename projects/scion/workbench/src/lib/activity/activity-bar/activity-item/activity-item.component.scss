@@ -23,7 +23,7 @@
       color: var(--sci-workbench-activity-item-text-color-hover);
     }
 
-    &.active, &:active {
+    &[data-active], &:active {
       background-color: var(--sci-workbench-activity-item-background-color-active);
       color: var(--sci-workbench-activity-item-text-color-active);
     }
@@ -34,6 +34,11 @@
 
     &:focus-visible {
       outline: var(--sci-workbench-button-outline-width-focus) solid var(--sci-color-accent);
+    }
+
+    &[data-focus-within-activity] {
+      background-color: var(--sci-workbench-activity-item-background-color-focus);
+      color: var(--sci-workbench-activity-item-text-color-focus);
     }
   }
 }

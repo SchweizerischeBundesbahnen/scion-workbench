@@ -9,17 +9,20 @@
  */
 
 import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Injector, OnInit, untracked} from '@angular/core';
-import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {dasherize} from '../common/dasherize.util';
+import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
+import {WORKBENCH_VIEW_REGISTRY} from '../view/workbench-view.registry';
+import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
+import {WORKBENCH_POPUP_REGISTRY} from '../popup/workbench-popup.registry';
+import {WorkbenchDialogRegistry} from '../dialog/workbench-dialog.registry';
 
 @Component({
   selector: 'wb-part',
@@ -34,8 +37,12 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-partid]': 'part.id',
     '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,
     '[attr.data-grid]': 'dasherize(part.gridName())',
-    '[class.active]': 'part.active()',
+    '[attr.data-focus]': `focusTracker.activeElement() === part.id ? '' : null`,
+    '[attr.data-active]': `part.active() ? '' : null`,
+    '[attr.data-activation-instant]': `part.activationInstant()`,
     '[attr.tabindex]': '-1',
+    // TODO remove and migrate tests to data-active
+    '[class.active]': 'part.active()',
   },
 })
 export class PartComponent implements OnInit {
@@ -48,12 +55,94 @@ export class PartComponent implements OnInit {
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly canDrop = inject(ViewDragService).canDrop(inject(ɵWorkbenchPart));
   protected readonly dasherize = dasherize;
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   constructor() {
     this.installComponentLifecycleLogger();
-    this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
     this.addHostCssClasses();
+
+    const host = inject(ElementRef).nativeElement as HTMLElement;
+    const focusTracker = inject(WorkbenchFocusTracker);
+    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
+    const popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
+
+    registerFocusTracker(host, () => this.part.viewIds().length ? this.part.activeViewId() : this.part.id);
+
+    // Activate on Focus-In
+    effect(() => {
+      const activeElement = focusTracker.activeElement();
+      if (!activeElement) {
+        return;
+      }
+
+      untracked(() => {
+        if (activeElement === this.part.id) {
+          void this.part.activate({force: true});
+        }
+        else if (activeElement === this.part.activeViewId()) {
+          void viewRegistry.get(this.part.activeViewId()!).activate({force: true});
+        }
+      });
+    });
+
+    const dialogRegistry = inject(WorkbenchDialogRegistry);
+
+    // Focus on actication.
+    effect(() => {
+      this.part.activationInstant();
+      const activeView = this.part.activeViewId() ? untracked(() => viewRegistry.get(this.part.activeViewId()!)) : null;
+      activeView?.activationInstant();
+
+      untracked(() => {
+        if (!this.part.active()) {
+          return;
+        }
+
+        const hasViews = this.part.viewIds().length > 0;
+        if (hasViews && activeView) {
+          if (!activeView.activationInstant()) {
+            return;
+          }
+
+          if (popupRegistry.objects().some(popup => popup.context.view?.id === this.part.activeViewId())) {
+            console.log('>>> BLOCKED BY POPUP');
+            return;
+          }
+          if (dialogRegistry.dialogs().some(dialog => dialog.context.view?.id === this.part.activeViewId())) {
+            console.log('>>> BLOCKED BY DIALOG');
+            return;
+          }
+
+          // Do not activate if other view or part is activated later on (e.g., when restoring layout after minimize)
+          if (partRegistry.objects().find(part => part.activationInstant() > activeView.activationInstant()) || viewRegistry.objects().find(view => view.activationInstant() > activeView.activationInstant())) {
+            return;
+          }
+
+          if (focusTracker.activeElement() !== activeView.id) {
+            requestAnimationFrame(() => activeView.focus());
+          }
+        }
+        else if (!hasViews) {
+          if (!this.part.activationInstant()) {
+            return;
+          }
+          console.log('>>> active part', this.part.id, this.part.activationInstant());
+
+          // Do not activate if other part or view is activated later on (e.g., when restoring layout after minimize)
+          if (partRegistry.objects().find(part => part.activationInstant() > this.part.activationInstant()) || viewRegistry.objects().find(view => view.activationInstant() > this.part.activationInstant())) {
+            console.log('>>> active part [skip focus]', this.part.id);
+            return;
+          }
+          console.log('>>> active part [FOCUS]', this.part.id);
+          if (focusTracker.activeElement() !== this.part.id) {
+            requestAnimationFrame(() => host.focus());
+          }
+        }
+      });
+
+    });
   }
 
   public ngOnInit(): void {
@@ -98,22 +187,6 @@ export class PartComponent implements OnInit {
           inactiveView.slot.portal.construct(this._injector);
         }));
     });
-  }
-
-  /**
-   * Activates this part when it gains focus.
-   */
-  private activatePartOnFocusIn(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-
-    toObservable(this.part.active)
-      .pipe(
-        switchMap(active => active ? EMPTY : merge(fromEvent<FocusEvent>(host, 'focusin', {once: true}), fromEvent(host, 'sci-microfrontend-focusin', {once: true}))),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        void this.part.activate();
-      });
   }
 
   private addHostCssClasses(): void {

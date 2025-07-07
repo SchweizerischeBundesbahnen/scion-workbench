@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, Injector, input, untracked, viewChild} from '@angular/core';
 import {ActivityBarComponent} from '../activity/activity-bar/activity-bar.component';
 import {WorkbenchLayoutService} from './workbench-layout.service';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
@@ -29,6 +29,7 @@ import {Logger} from '../logging';
 import {WORKBENCH_ID} from '../workbench-id';
 import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.service';
 import {MAIN_AREA} from './workbench-layout';
+import {registerFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 @Component({
   selector: 'wb-layout',
@@ -60,6 +61,7 @@ export class LayoutComponent {
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _logger = inject(Logger);
   private readonly _panels = computed(() => this.layout().activityLayout.panels);
+  private readonly _desktopElement = viewChild('desktop_element', {read: ElementRef<Element>});
 
   protected readonly desktop = inject(DESKTOP);
   protected readonly toolbars = computed(() => this.layout().activityLayout.toolbars);
@@ -89,6 +91,10 @@ export class LayoutComponent {
   protected readonly canDropInMainGrid = computed(() => {
     return !this.layout().hasActivities() || this.layout().parts({grid: 'main'}).some(part => part.id !== MAIN_AREA);
   });
+
+  constructor() {
+    this.installDesktopFocusTracker();
+  }
 
   protected onSashStart(): void {
     this._workbenchLayoutService.signalResizing(true);
@@ -137,5 +143,20 @@ export class LayoutComponent {
     </wb-workbench>
     `,
     );
+  }
+
+  private installDesktopFocusTracker(): void {
+    const injector = inject(Injector);
+    effect(onCleanup => {
+      const desktop = this._desktopElement()?.nativeElement as HTMLElement | undefined;
+      if (!desktop) {
+        return;
+      }
+
+      untracked(() => {
+        const trackerRef = registerFocusTracker(desktop, null, {injector});
+        onCleanup(() => trackerRef.dispose());
+      });
+    });
   }
 }

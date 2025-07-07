@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, effect, ElementRef, inject, Injector, untracked, viewChild} from '@angular/core';
 import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
@@ -25,6 +25,7 @@ import {DESKTOP} from '../../workbench-element-references';
 import {NgTemplateOutlet} from '@angular/common';
 import {GridComponent} from '../../layout/grid/grid.component';
 import {dasherize} from '../../common/dasherize.util';
+import {registerFocusTracker} from '../../focus/workbench-focus-tracker.service';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -69,6 +70,7 @@ export class MainAreaPartComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewDragService = inject(ViewDragService);
+  private readonly _desktopElement = viewChild('desktop_element', {read: ElementRef<Element>});
   private readonly _logger = inject(Logger);
 
   protected readonly part = inject(ɵWorkbenchPart);
@@ -76,6 +78,10 @@ export class MainAreaPartComponent {
   protected readonly desktop = inject(DESKTOP);
   protected readonly dasherize = dasherize;
   protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea));
+
+  constructor() {
+    this.installDesktopFocusTracker();
+  }
 
   protected onDesktopViewDrop(event: WbViewDropEvent): void {
     this._viewDragService.dispatchViewMoveEvent({
@@ -152,5 +158,20 @@ export class MainAreaPartComponent {
         </ng-template>
       </wb-workbench>
     `);
+  }
+
+  private installDesktopFocusTracker(): void {
+    const injector = inject(Injector);
+    effect(onCleanup => {
+      const desktop = this._desktopElement() as ElementRef<HTMLElement> | undefined;
+      if (!desktop) {
+        return;
+      }
+
+      untracked(() => {
+        const trackerRef = registerFocusTracker(desktop, null, {injector});
+        onCleanup(() => trackerRef.dispose());
+      });
+    });
   }
 }

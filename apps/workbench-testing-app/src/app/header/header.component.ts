@@ -197,6 +197,12 @@ export class HeaderComponent {
         onAction: () => this._settingsService.toggle('resetFormsOnSubmit'),
       }),
       new MenuItem({
+        text: 'Highlight Focus',
+        cssClass: 'e2e-highlight-focus',
+        checked: this._settingsService.isEnabled('highlightFocus'),
+        onAction: () => this._settingsService.toggle('highlightFocus'),
+      }),
+      new MenuItem({
         text: 'Display Skeletons in Sample View',
         checked: this._settingsService.isEnabled('displaySkeletons'),
         onAction: () => {
@@ -204,6 +210,12 @@ export class HeaderComponent {
           // Perform navigation for Angular to evaluate `CanMatch` guards.
           void inject(Router).navigate([{outlets: {}}], {skipLocationChange: true});
         },
+      }),
+      new MenuItem({
+        text: 'Show Test Perspectives',
+        cssClass: 'e2e-show-test-perspectives',
+        checked: this._settingsService.isEnabled('showTestPerspectives'),
+        onAction: () => this._settingsService.toggle('showTestPerspectives'),
       }),
       new MenuItem({
         text: 'Log Angular Change Detection Cycles',
@@ -256,11 +268,14 @@ export class HeaderComponent {
   private findPerspectiveSwitcherMenuItems(): Array<MenuItem | MenuItemSeparator> {
     const groupLabels = new Map<string, string>()
       .set('docked-parts-layout', 'Layout with Parts Docked to the Side')
-      .set('peripheral-part-layout', 'Layout with Parts Around the Main Area');
-
+      .set('peripheral-part-layout', 'Layout with Parts Around the Main Area')
+      .set('test-perspectives', 'Test Perspectives');
+    const showTestPerspectives = this._settingsService.isEnabled('showTestPerspectives');
     const menuItems = new Array<MenuItem | MenuItemSeparator>();
 
     [...this.workbenchService.perspectives()]
+      // Filter Test perspectives based on the settings.
+      .filter(perspective => perspective.data[PerspectiveData.isTestPerspective] ? showTestPerspectives : true)
       // Sort perspectives.
       .sort(comparePerspectives)
       // Group perspectives.

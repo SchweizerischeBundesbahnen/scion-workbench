@@ -39,14 +39,12 @@ export function fromMoveHandle$(handle: HTMLElement): Observable<HandleMoveEvent
       if (mouseDownEvent.button !== 0) { // 0 = main button pressed, usually the left button
         return;
       }
-      mouseDownEvent.preventDefault(); // prevent drag & drop and user selection
       observer.next({type: 'mousestart', mouseEvent: mouseDownEvent});
 
       // Subscribe for 'mousemove' events
       const mouseMoveSubscription = fromEvent<MouseEvent>(document, 'mousemove')
         .pipe(takeUntilDestroyed(destroyRef))
         .subscribe((mouseMoveEvent: MouseEvent) => {
-          mouseMoveEvent.preventDefault(); // prevent drag & drop and user selection
           observer.next({type: 'mousemove', mouseEvent: mouseMoveEvent});
         });
 
@@ -60,7 +58,6 @@ export function fromMoveHandle$(handle: HTMLElement): Observable<HandleMoveEvent
     }
 
     function onTouchStart(touchStartEvent: TouchEvent): void {
-      touchStartEvent.preventDefault(); // prevent moving page viewport
       observer.next({type: 'touchstart', touchEvent: touchStartEvent});
 
       // Subscribe for 'touchmove' events

@@ -28,6 +28,10 @@ const routes: Routes = [
     loadComponent: (): any => import('./input-field-test-page/input-field-test-page.component'),
   },
   {
+    path: 'focus-test-page',
+    loadComponent: () => import('./focus-test-page/focus-test-page.component'),
+  },
+  {
     path: 'angular-zone-test-page',
     loadComponent: (): any => import('./angular-zone-test-page/angular-zone-test-page.component'),
   },

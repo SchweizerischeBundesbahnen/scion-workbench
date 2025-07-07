@@ -91,6 +91,7 @@ export class MPart {
   public activeViewId?: ViewId;
   public structural!: boolean;
   public cssClass?: string[];
+  public activationInstant?: number;
   public navigation?: {
     id: string;
     hint?: string;
@@ -121,6 +122,7 @@ export interface MView {
   alternativeId?: string;
   cssClass?: string[];
   markedForRemoval?: true;
+  activationInstant?: number;
   navigation?: {
     id: string;
     hint?: string;

@@ -24,10 +24,11 @@ import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {provideViewContext} from '../view/view-context-provider';
-import {UUID} from '@scion/toolkit/uuid';
 import {boundingClientRect} from '@scion/components/dimension';
 import {clamp} from '../common/math.util';
 import {coerceElement} from '@angular/cdk/coercion';
+import {newPopupId} from '../workbench-elements';
+import {WORKBENCH_POPUP_REGISTRY} from './workbench-popup.registry';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
@@ -47,6 +48,7 @@ export class PopupService {
   private readonly _overlay = inject(Overlay);
   private readonly _focusManager = inject(FocusMonitor);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+  private readonly _popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
   private readonly _zone = inject(NgZone);
   private readonly _document = inject(DOCUMENT);
   private readonly _view = inject(ɵWorkbenchView, {optional: true});
@@ -81,6 +83,7 @@ export class PopupService {
     const popup = this.createPopup(config, {view: contextualView});
     const popupDestroyRef = popup.injector.get(DestroyRef);
     const popupOrigin = this.trackPopupOrigin(config, contextualView, popup.injector);
+    this._popupRegistry.register(popup.id, popup);
 
     // Wait for the initial position.
     const initialPosition = await firstValueFrom(toObservable(popupOrigin, {injector: popup.injector}).pipe(filter(Boolean)));
@@ -160,13 +163,10 @@ export class PopupService {
       this.hidePopupOnViewDetach(overlayRef, contextualView, popup);
     }
 
-    // Dispose the popup when closing it.
-    popupDestroyRef.onDestroy(() => {
-      overlayRef.dispose();
-    });
-
     return new Promise<R | undefined>((resolve, reject) => {
       popupDestroyRef.onDestroy(() => {
+        this._popupRegistry.unregister(popup.id);
+        overlayRef.dispose();
         popup.result instanceof Error ? reject(popup.result) : resolve(popup.result as R);
       });
     });
@@ -177,7 +177,7 @@ export class PopupService {
    */
   private createPopup<R>(config: PopupConfig, context: {view: ɵWorkbenchView | null}): ɵPopup<R> {
     // Construct the handle in an injection context that shares the popup's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const popupId = config.id ?? UUID.randomUUID();
+    const popupId = config.id ?? newPopupId();
     const popupEnvironmentInjector = createEnvironmentInjector([provideViewContext(context.view)], this._environmentInjector, `Workbench Popup ${popupId}`);
     return runInInjectionContext(popupEnvironmentInjector, () => new ɵPopup<R>(popupId, config));
   }

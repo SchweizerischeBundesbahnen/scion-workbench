@@ -1,0 +1,8 @@
+:host {
+  display: grid;
+
+  > textarea {
+    flex: auto;
+    padding: .5em;
+  }
+}

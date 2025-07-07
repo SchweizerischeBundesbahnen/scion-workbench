@@ -128,7 +128,7 @@ export class WorkbenchNavigator {
   public async modifyLayout(layoutFn: (layout: WorkbenchLayout) => WorkbenchLayout): Promise<void> {
     const layoutPage = await this.openInNewTab(LayoutPagePO);
     await layoutPage.modifyLayout(layoutFn);
-    await layoutPage.view.tab.close();
+    await layoutPage.view.tab.close({programmatic: true});
   }
 }
 

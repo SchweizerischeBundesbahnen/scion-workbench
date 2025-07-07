@@ -19,6 +19,7 @@ import {ɵWorkbenchDialog} from '../dialog/ɵworkbench-dialog';
 import {Blockable} from '../glass-pane/blockable';
 import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
+import {PopupId} from '../workbench-elements';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -33,7 +34,7 @@ export abstract class PopupConfig {
    *
    * @internal
    */
-  public abstract readonly id?: string;
+  public abstract readonly PopupId?: string;
   /**
    * Controls where to open the popup.
    *
@@ -222,7 +223,7 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public result: R | Error | undefined;
 
-  constructor(public id: string, private _config: PopupConfig) {
+  constructor(public id: PopupId, private _config: PopupConfig) {
     this.cssClasses = Arrays.coerce(this._config.cssClass);
     this.blockWhenDialogOpened();
   }
@@ -280,7 +281,7 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
   }
 
   /**
-   * Destroys this dialog and associated resources.
+   * Destroys this popup and associated resources.
    */
   public destroy(): void {
     this._popupEnvironmentInjector.destroy();

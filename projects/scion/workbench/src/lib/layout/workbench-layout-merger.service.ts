@@ -38,6 +38,8 @@ const compareFlags: LayoutSerializationFlags = {
   excludeTreeNodeId: true,
   excludePartNavigationId: true,
   excludeViewNavigationId: true,
+  excludePartActivationInstant: true,
+  excludeViewActivationInstant: true,
   assignStablePartIdentifier: true,
   assignStableViewIdentifier: true,
   assignStableActivityIdentifier: true,

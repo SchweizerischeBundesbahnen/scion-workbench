@@ -36,6 +36,10 @@ export class MessageBoxPO {
     return await this._header.getAttribute('data-severity') as 'info' | 'warn' | 'error';
   }
 
+  public action(key: string): Locator {
+    return this.actions.locator(`:scope[data-action="${key}"]`);
+  }
+
   public async getActions(): Promise<{[key: string]: string}> {
     const actions = new Map<string, string>();
     for (const locator of await this.actions.all()) {

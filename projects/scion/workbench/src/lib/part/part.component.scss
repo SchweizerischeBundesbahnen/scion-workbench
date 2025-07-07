@@ -4,6 +4,7 @@
   outline: none;
   background-color: var(--sci-workbench-part-background-color);
   overflow: hidden; // required for the part bar not to exceed available space
+  position: relative; // Positioning context to visualize the active and focused state
 
   &[data-peripheral] {
     background-color: var(--sci-workbench-part-peripheral-background-color);

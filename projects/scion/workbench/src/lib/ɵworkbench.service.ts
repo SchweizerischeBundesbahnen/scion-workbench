@@ -27,6 +27,7 @@ import {ViewId} from './view/workbench-view.model';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
 import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
+import {WorkbenchFocusTracker} from './focus/workbench-focus-tracker.service';
 
 @Injectable({providedIn: 'root'})
 export class ɵWorkbenchService implements WorkbenchService {
@@ -44,6 +45,7 @@ export class ɵWorkbenchService implements WorkbenchService {
   public readonly parts = inject(WORKBENCH_PART_REGISTRY).objects;
   public readonly views = inject(WORKBENCH_VIEW_REGISTRY).objects;
   public readonly activePerspective = inject(WorkbenchPerspectiveService).activePerspective;
+  public readonly activeWorkbenchElement = inject(WorkbenchFocusTracker).activeElement;
   public readonly theme = this.computeLegacyThemeObject();
   public readonly settings = {
     theme: inject(WorkbenchThemeSwitcher).theme,

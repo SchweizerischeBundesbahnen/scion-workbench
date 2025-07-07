@@ -59,6 +59,10 @@ const SETTINGS = {
     default: true,
     storageKey: 'scion.workbench.testing-app.settings.reset-forms-on-submit',
   },
+  highlightFocus: {
+    default: false,
+    storageKey: 'scion.workbench.testing-app.settings.highlight-focus',
+  },
   logAngularChangeDetectionCycles: {
     default: environment.logAngularChangeDetectionCycles,
     storageKey: 'scion.workbench.testing-app.settings.log-angular-change-detection-cycles',
@@ -66,6 +70,10 @@ const SETTINGS = {
   displaySkeletons: {
     default: !isDevMode(),
     storageKey: 'scion.workbench.testing-app.settings.display-skeletons',
+  },
+  showTestPerspectives: {
+    default: isDevMode(),
+    storageKey: 'scion.workbench.testing-app.settings.show-test-perspectives',
   },
 } as const;
 

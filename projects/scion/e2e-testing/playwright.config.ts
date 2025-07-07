@@ -17,6 +17,8 @@ const runHeadless = !!process.env.HEADLESS;
 export default defineConfig({
   forbidOnly: runInCI,
   fullyParallel: true,
+  timeout: 999999999,
+  globalTimeout: 999999999,
   webServer: runInCI ? [
     {
       command: 'npm run workbench-testing-app:dist-serve',

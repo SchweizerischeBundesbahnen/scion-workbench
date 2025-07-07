@@ -1,3 +1,6 @@
-<button (click)="onToggle()" [class.active]="active()">
+<button (click)="onToggle()"
+        [attr.data-focus-within-activity]="focusWithinActivity() ? '' : null"
+        [attr.data-active]="active() ? '' : null"
+        [class.active]="active()">
   <wb-icon [icon]="activity().icon"/>
 </button>

@@ -155,3 +155,10 @@ export class ɵWorkbenchPopup implements WorkbenchPopup {
 export enum ɵWorkbenchPopupMessageHeaders {
   CLOSE_WITH_ERROR = 'ɵWORKBENCH-POPUP:CLOSE_WITH_ERROR',
 }
+
+/**
+ * Format of a popup identifier.
+ *
+ * @category Popup
+ */
+export type PopupId = `popup.${string}`;
