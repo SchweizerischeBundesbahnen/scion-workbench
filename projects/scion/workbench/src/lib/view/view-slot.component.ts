@@ -91,14 +91,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
 
-    // If closing a part.
-    // const layout = this._layout();
-    // const activityStack = layout.activityStack({viewId: this.view.id}, {orElse: null});
-    // if (!activityStack?.activeActivityId) {
-    //   // this.focusTracker.unsetActiveElement(this.view.id);
-    // }
-
-    // would also workd instead
     setTimeout(() => this.focusTracker.unsetActiveElement(this.view.id));
   }
 

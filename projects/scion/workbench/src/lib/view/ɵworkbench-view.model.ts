@@ -51,6 +51,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private readonly _partRegistry = inject(WORKBENCH_PART_REGISTRY);
   private readonly _viewDragService = inject(ViewDragService);
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
+  private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _logger = inject(Logger);
 
   private readonly _adapters = new Map<Type<unknown> | AbstractType<unknown>, unknown>();
@@ -75,6 +76,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly activationInstant = signal(0);
   public readonly active = signal<boolean>(false);
+  public readonly focused = computed(() => this._focusTracker.activeElement() === this.id);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
   public readonly slot: {portal: WbComponentPortal<ViewSlotComponent>};
@@ -111,7 +113,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       untracked(() => {
         if (activeElement === this.id) {
           console.log(`>>> [ɵWorkbenchView][activateOnFocus][${this.id}] Activate View [instant=${this.activationInstant()}]`);
-          void this.activate({force: true});
+          void this.activate();
         }
       });
     });
@@ -235,7 +237,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   public focus(): void {
-    assertNotInReactiveContext(this.activate, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    assertNotInReactiveContext(this.focus, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     this.slot.portal.componentRef()?.instance.focus();
   }
 
@@ -307,12 +309,11 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public async activate(options?: {force?: true; skipLocationChange?: boolean}): Promise<boolean> {
+  public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchView.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    // if (!options?.force && this.active() && this.part().active() && this._focusTracker.activeElement() === this.id) {
-    //   // this.focus();
-    //   return true;
-    // }
+    if (this.active() && this.part().active() && this._focusTracker.activeElement() === this.id) {
+      return true;
+    }
 
     const skipLocationChange = options?.skipLocationChange ?? (this.active() && this.part().active());
     const currentLayout = this._layout();

@@ -39,6 +39,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _partEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
+  private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   // private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _title = signal<string | undefined>(undefined);
@@ -48,6 +49,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly navigation = signal<WorkbenchPartNavigation | undefined>(undefined);
   public readonly activationInstant = signal(0);
   public readonly active = signal(false);
+  public readonly focused = computed(() => this._focusTracker.activeElement() === this.id);
   public readonly viewIds = computed(() => this.views().map(view => view.id));
   public readonly activeViewId = computed(() => this.activeView()?.id ?? null);
   public readonly mPart: WritableSignal<MPart>;
@@ -92,7 +94,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       untracked(() => {
         if (activeElement === this.id) {
           console.log(`>>> [ɵWorkbenchPart][activateOnFocus][${this.id}] Activate Part [instant=${this.activationInstant()}]`);
-          void this.activate({force: true});
+          void this.activate();
         }
       });
     });
@@ -134,7 +136,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   public focus(): void {
-    assertNotInReactiveContext(this.activate, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    assertNotInReactiveContext(this.focus, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     this.slot.portal.componentRef()?.instance.focus();
   }
 
@@ -228,12 +230,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public async activate(options?: {force?: true}): Promise<boolean> {
+  public async activate(): Promise<boolean> {
     console.log(`>>> WorkbenchPart.activate [part=${this.id}]`);
+
     assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    // if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
-    //   return true;
-    // }
+    if (this.active() && this._focusTracker.activeElement() === this.id) {
+      return true;
+    }
 
     const currentLayout = this._layout();
     return this._workbenchRouter.navigate(

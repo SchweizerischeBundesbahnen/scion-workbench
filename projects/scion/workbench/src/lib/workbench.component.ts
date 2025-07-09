@@ -69,7 +69,6 @@ export class WorkbenchComponent {
     this.disableChangeDetectionDuringNavigation();
     this.provideWorkbenchElementReferences();
     this.installMaximizeShortcutListener();
-    // registerFocusTracker(inject(DOCUMENT).documentElement, null);
 
     const focusTracker = inject(WorkbenchFocusTracker);
     effect(() => {

@@ -74,6 +74,11 @@ export abstract class WorkbenchPart {
   public abstract readonly active: Signal<boolean>;
 
   /**
+   * Indicates whether this part has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
+
+  /**
    * Identifies the active view, or `null` if none.
    *
    * @deprecated since version 20.0.0-beta.4. Use `WorkbenchPart.activeView` instead. API will be removed in version 22.

@@ -56,20 +56,19 @@ class ɵWorkbenchFocusTracker implements WorkbenchFocusTracker {
  *
  * This function must be called within an injection context, or an explicit {@link Injector} passed.
  */
-export function registerFocusTracker(target: ElementRef<Element> | Element, element: WorkbenchElementId | null | (() => WorkbenchElementId | null), options?: {injector?: Injector; unsetOnDestroy?: false}): Disposable {
+export function registerFocusTracker(target: ElementRef<Element> | Element, element: WorkbenchElementId | null | (() => WorkbenchElementId | null), options?: {injector?: Injector}): Disposable {
   const elementFn = typeof element === 'function' ? element : () => element;
 
   const injector = options?.injector ?? inject(Injector);
   const focusTracker = injector.get(ɵWorkbenchFocusTracker);
-  const unsetOnDestroy = options?.unsetOnDestroy ?? true;
 
   const subscription = toObservable(focusTracker.activeElement, {injector})
     .pipe(
       switchMap(activeElement => activeElement === elementFn() ? EMPTY : merge(fromEvent<FocusEvent>(coerceElement(target), 'focusin', {once: true}), fromEvent(coerceElement(target), 'sci-microfrontend-focusin', {once: true}))),
-      finalize(() => unsetOnDestroy && setTimeout(() => focusTracker.unsetActiveElement(elementFn()))),
+      finalize(() => focusTracker.unsetActiveElement(elementFn())),
       takeUntilDestroyed(injector.get(DestroyRef)),
     )
-    .subscribe((event: Event) => {
+    .subscribe(() => {
       console.log('>>>> [FocusTracker] onfocusin', elementFn());
       focusTracker.setActiveElement(elementFn());
     });

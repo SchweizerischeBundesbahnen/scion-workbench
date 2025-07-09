@@ -129,12 +129,6 @@ export class ViewTabBarComponent implements OnDestroy {
     this.installViewDragListener();
     this.installTabbarIndentSizeTracker();
     this.installViewportChangeTracker();
-
-    if (this.part.id === 'part.f789d608') {
-      effect(() => {
-        console.log('>>> views', this.part.views().map(v => v.id));
-      });
-    }
   }
 
   /**
