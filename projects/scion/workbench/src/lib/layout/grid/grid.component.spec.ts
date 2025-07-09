@@ -75,6 +75,7 @@ describe('WorkbenchLayout Component', () => {
             direction: 'row',
             ratio: .2,
           }),
+          activePartId: MAIN_AREA,
         },
         mainArea: {
           root: new MTreeNode({
@@ -83,6 +84,7 @@ describe('WorkbenchLayout Component', () => {
             direction: 'row',
             ratio: .5,
           }),
+          activePartId: 'part.initial',
         },
       },
     });
@@ -101,6 +103,7 @@ describe('WorkbenchLayout Component', () => {
             direction: 'row',
             ratio: .2,
           }),
+          activePartId: MAIN_AREA,
         },
         mainArea: {
           root: new MTreeNode({
@@ -109,6 +112,7 @@ describe('WorkbenchLayout Component', () => {
             direction: 'row',
             ratio: .5,
           }),
+          activePartId: 'part.initial',
         },
       },
     });
@@ -127,6 +131,7 @@ describe('WorkbenchLayout Component', () => {
             direction: 'row',
             ratio: .2,
           }),
+          activePartId: MAIN_AREA,
         },
         mainArea: {
           root: new MTreeNode({
@@ -135,6 +140,7 @@ describe('WorkbenchLayout Component', () => {
             direction: 'row',
             ratio: .5,
           }),
+          activePartId: 'part.initial',
         },
       },
     });

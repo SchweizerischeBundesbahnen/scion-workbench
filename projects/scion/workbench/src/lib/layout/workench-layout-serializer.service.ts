@@ -99,7 +99,7 @@ export class WorkbenchLayoutSerializer {
           .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
           .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : [])
           .concat(flags?.excludeViewActivationInstant ? '**/views/*/activationInstant' : [])
-          .concat(flags?.excludePartActivationInstant ? ({path: '**/activationInstant', predicate: context => context.at(-2) instanceof MPart}) : []),
+          .concat(flags?.excludePartActivationInstant ? ({path: '**/activationInstant', predicate: context => context.at(-1) instanceof MPart}) : []),
         sort: flags?.sort,
       });
       const serialized = window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_GRID_VERSION}`);

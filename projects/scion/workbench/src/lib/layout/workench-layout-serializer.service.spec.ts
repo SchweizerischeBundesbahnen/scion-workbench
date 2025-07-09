@@ -71,7 +71,7 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.part({partId: 'part.1'}).navigation!.id).toBeUndefined();
   });
 
-  it('should not serialize "view.activation.id" field', () => {
+  it('should not serialize "view.activationInstant" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.left')
       .addView('view.1', {partId: 'part.left'})
@@ -88,7 +88,7 @@ describe('WorkbenchLayoutSerializer', () => {
     expect(deserializedLayout.view({viewId: 'view.1'}).activationInstant).toBeUndefined();
   });
 
-  it('should not serialize "part.activation.id" field', () => {
+  it('should not serialize "part.activationInstant" field', () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart('part.1')
       .activatePart('part.1');

@@ -58,6 +58,12 @@ export class PartBarComponent {
     this.installActivityMinimizer();
   }
 
+  // tabbar should never gain focus (not steal focus for content), but focus the content to activate the workench element.
+  protected onNonFocusable(event: Event): void {
+    event.preventDefault();
+    (this.part.activeView() ?? this.part).focus();
+  }
+
   protected onMinimize(): void {
     void this._router.navigate(layout => layout.toggleActivity(this.part.activity()!.id));
   }

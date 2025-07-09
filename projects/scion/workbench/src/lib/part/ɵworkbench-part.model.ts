@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {assertNotInReactiveContext, computed, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
+import {afterRenderEffect, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, TemplateRef, untracked, WritableSignal} from '@angular/core';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchPartAction, WorkbenchPartActionFn} from '../workbench.model';
 import {PartId, WorkbenchPart, WorkbenchPartNavigation} from './workbench-part.model';
@@ -40,7 +40,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
-  private readonly _focusTracker = inject(WorkbenchFocusTracker);
+  // private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
 
@@ -77,6 +77,65 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.slot = {portal: this.createPortal(PartSlotComponent)};
     this.installModelUpdater();
     this.onLayoutChange({layout});
+
+    this.focusOnActivate();
+    this.activateOnFocus();
+  }
+
+  private activateOnFocus(): void {
+    const focusTracker = inject(WorkbenchFocusTracker);
+
+    // Activate on Focus-In
+    effect(() => {
+      const activeElement = focusTracker.activeElement();
+
+      untracked(() => {
+        if (activeElement === this.id) {
+          console.log(`>>> [ɵWorkbenchPart][activateOnFocus][${this.id}] Activate Part [instant=${this.activationInstant()}]`);
+          void this.activate({force: true});
+        }
+      });
+    });
+  }
+
+  private focusOnActivate(): void {
+    // const focusTracker = inject(WorkbenchFocusTracker);
+    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
+    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
+
+    // Focus on actication.
+    afterRenderEffect(() => {
+      const activationInstant = this.activationInstant();
+      console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] Part Activation Instant [instant=${this.activationInstant()}]`);
+
+      untracked(() => {
+        if (!activationInstant) {
+          return;
+        }
+        // if (!this.slot.portal.attached()) {
+        //   return;
+        // }
+        if (!this.active()) {
+          return;
+        }
+
+        // Do not activate if other view or part is activated later on (e.g., when restoring layout after minimize)
+        if (partRegistry.objects().find(part => part.activationInstant() > activationInstant) || viewRegistry.objects().find(view => view.activationInstant() > activationInstant)) {
+          console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] Other Object has newer instant => NOOP`);
+          return;
+        }
+
+        // if (focusTracker.activeElement() !== this.id) {
+        console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] DOIT`);
+        this.focus();
+        // }
+      });
+    });
+  }
+
+  public focus(): void {
+    assertNotInReactiveContext(this.activate, 'Call WorkbenchView.focus() in a non-reactive (non-tracking) context, such as within the untracked() function.');
+    this.slot.portal.componentRef()?.instance.focus();
   }
 
   private createPortal<T>(componentType: ComponentType<T>): WbComponentPortal<T> {
@@ -170,10 +229,11 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public async activate(options?: {force?: true}): Promise<boolean> {
+    console.log(`>>> WorkbenchPart.activate [part=${this.id}]`);
     assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
-      return true;
-    }
+    // if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
+    //   return true;
+    // }
 
     const currentLayout = this._layout();
     return this._workbenchRouter.navigate(

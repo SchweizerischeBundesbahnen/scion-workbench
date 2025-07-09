@@ -1436,19 +1436,26 @@ describe('WorkbenchLayout', () => {
       .activateView('view.4')
       .activateView('view.1');
 
+    expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.1', 'view.5', 'view.2', 'view.3', 'view.4']);
+
     workbenchLayout = workbenchLayout
       .activateView('view.1')
       .removeView('view.1', {force: true});
     expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.4');
+    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.5', 'view.2', 'view.3', 'view.4']);
 
     workbenchLayout = workbenchLayout.removeView('view.4', {force: true});
     expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.5', 'view.2', 'view.3']);
 
     workbenchLayout = workbenchLayout.removeView('view.2', {force: true});
     expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.5');
+    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.5', 'view.3']);
 
     workbenchLayout = workbenchLayout.removeView('view.5', {force: true});
     expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.3']);
   });
 
   /**
@@ -2669,6 +2676,60 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout1.equals(workbenchLayout2, {excludeTreeNodeId: true, assignStableViewIdentifier: true})).toBeTrue();
   });
 
+  it('should not set activation instant when adding part to the layout', async () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'});
+
+    expect(layout.grids.main.activePartId).toEqual('part.left');
+    expect(layout.part({partId: 'part.left'}).activationInstant).toBeUndefined();
+    expect(layout.part({partId: 'part.right'}).activationInstant).toBeUndefined();
+  });
+
+  it('should not set activation instant when adding view to the layout', async () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'});
+
+    expect(layout.view({viewId: 'view.1'}).activationInstant).toBeUndefined();
+    expect(layout.view({viewId: 'view.2'}).activationInstant).toBeUndefined();
+  });
+
+  it('should update activation instant when activating part', async () => {
+    let layout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart('part.main');
+
+    // Activate the part.
+    layout = layout.activatePart('part.main');
+    expect(layout.part({partId: 'part.main'}).activationInstant).toBeDefined();
+    const activationInstant = layout.part({partId: 'part.main'}).activationInstant!;
+
+    // Activate the part.
+    layout = layout.activatePart('part.main');
+    expect(layout.part({partId: 'part.main'}).activationInstant).toBeGreaterThan(activationInstant);
+  });
+
+  it('should update activation instant when activating view', async () => {
+    let layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'});
+
+    // Activate the view.
+    layout = layout.activateView('view.1');
+    expect(layout.view({viewId: 'view.1'}).activationInstant).toBeDefined();
+    const activationInstant = layout.view({viewId: 'view.1'}).activationInstant!;
+
+    // Activate the view.
+    layout = layout.activateView('view.1');
+    expect(layout.view({viewId: 'view.1'}).activationInstant).toBeGreaterThan(activationInstant);
+  });
+
+  it('should not set activation instant when adding part to the layout', async () => {
+    const layout = TestBed.inject(ɵWorkbenchLayoutFactory).addPart('part.main');
+
+    expect(layout.part({partId: 'part.main'}).activationInstant).toBeUndefined();
+  });
+
   it('should add view referencing an alternative part id', async () => {
     const layout = TestBed.inject(ɵWorkbenchLayoutFactory)
       .addPart(MAIN_AREA)
@@ -3821,7 +3882,8 @@ describe('WorkbenchLayout', () => {
         .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
         .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
         .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
-        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'});
+        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'})
+        .addView('view.1', {partId: 'part.activity-3-bottom'})
 
       const leftTopStack = workbenchLayout.activityLayout.toolbars.leftTop;
       const leftBottomStack = workbenchLayout.activityLayout.toolbars.leftBottom;
@@ -3855,6 +3917,10 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityStacks({partId: 'part.activity-3-top'})).toEqual([rightTopStack]);
       expect(workbenchLayout.activityStacks({partId: 'part.activity-3-bottom'})).toEqual([rightTopStack]);
 
+      // Find by view id.
+      expect(workbenchLayout.activityStacks({viewId: undefined})).toEqual(jasmine.arrayWithExactContents([leftTopStack, leftBottomStack, rightTopStack, rightBottomStack, bottomLeftStack, bottomRightStack]));
+      expect(workbenchLayout.activityStacks({viewId: 'view.1'})).toEqual([rightTopStack]);
+
       // Expect to throw if finding multiple activity stacks.
       expect(() => workbenchLayout.activityStacks({}, {throwIfMulti: true})).toThrowError(/MultiActivityStackError/);
       // Expect to throw if finding no activity stack.
@@ -3869,7 +3935,8 @@ describe('WorkbenchLayout', () => {
         .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', ɵactivityId: 'activity.1'})
         .addPart('part.activity-2', {dockTo: 'left-bottom'}, {icon: 'folder', label: 'Activity 2', ɵactivityId: 'activity.2'})
         .addPart('part.activity-3-top', {dockTo: 'right-top'}, {icon: 'folder', label: 'Activity 3', ɵactivityId: 'activity.3'})
-        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'});
+        .addPart('part.activity-3-bottom', {relativeTo: 'part.activity-3-top', align: 'bottom'})
+        .addView('view.1', {partId: 'part.activity-3-bottom'})
 
       const leftTopStack = workbenchLayout.activityLayout.toolbars.leftTop;
       const leftBottomStack = workbenchLayout.activityLayout.toolbars.leftBottom;
@@ -3896,6 +3963,9 @@ describe('WorkbenchLayout', () => {
       expect(workbenchLayout.activityStack({partId: 'part.activity-2'})).toEqual(leftBottomStack);
       expect(workbenchLayout.activityStack({partId: 'part.activity-3-top'})).toEqual(rightTopStack);
       expect(workbenchLayout.activityStack({partId: 'part.activity-3-bottom'})).toEqual(rightTopStack);
+
+      // Find by view id.
+      expect(workbenchLayout.activityStack({viewId: 'view.1'})).toEqual(rightTopStack);
 
       // Expect to throw if finding no activity stack.
       expect(() => workbenchLayout.activityStack({activityId: 'activity.99'})).toThrowError(/NullActivityStackError/);

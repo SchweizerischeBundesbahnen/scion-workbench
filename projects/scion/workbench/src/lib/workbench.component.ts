@@ -74,7 +74,7 @@ export class WorkbenchComponent {
     const focusTracker = inject(WorkbenchFocusTracker);
     effect(() => {
       const activeElement = focusTracker.activeElement();
-      console.log('>>> focusowner', activeElement);
+      console.log('>>> ==== [FocusTracker] active element', activeElement);
     });
   }
 

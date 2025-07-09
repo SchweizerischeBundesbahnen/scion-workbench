@@ -15,9 +15,9 @@ import {synchronizeCssClasses} from '../../../common/css-class.util';
 import {Arrays} from '@scion/toolkit/util';
 import {IconComponent} from '../../../icon/icon.component';
 import {text} from '../../../text/text';
-import {registerFocusTrackerExclude, WorkbenchFocusTracker} from '../../../focus/workbench-focus-tracker.service';
 import {WorkbenchLayoutService} from '../../../layout/workbench-layout.service';
 import {isPartId, isViewId} from '../../../layout/ɵworkbench-layout';
+import {WorkbenchFocusTracker} from '../../../focus/workbench-focus-tracker.service';
 
 /**
  * Renders a button to toggle the visibility of an activity.
@@ -47,7 +47,6 @@ export class ActivityItemComponent {
 
   constructor() {
     this.addHostCssClasses();
-    registerFocusTrackerExclude(inject(ElementRef));
   }
 
   protected onToggle(): void {

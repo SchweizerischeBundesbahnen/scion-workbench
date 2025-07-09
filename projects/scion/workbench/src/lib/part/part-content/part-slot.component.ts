@@ -8,12 +8,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, inject, viewChild} from '@angular/core';
+import {Component, DOCUMENT, ElementRef, inject, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
 import {WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
+import {registerFocusTracker, WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service';
 
 /**
  * Acts as a placeholder for a part's content that Angular fills based on the current router state of the associated part outlet.
@@ -31,11 +32,24 @@ import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 export class PartSlotComponent implements OnAttach, OnDetach {
 
   protected readonly part = inject(WorkbenchPart);
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewport = viewChild.required(SciViewportComponent);
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
+
+  constructor() {
+    registerFocusTracker(inject(ElementRef) as ElementRef<HTMLElement>, this.part.id);
+  }
+
+  public focus(): void {
+    if (!this._host.contains(this._document.activeElement)) {
+      this._viewport().focus();
+    }
+  }
 
   /**
    * Method invoked after attached this component to the DOM.
@@ -51,5 +65,15 @@ export class PartSlotComponent implements OnAttach, OnDetach {
   public onDetach(): void {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
+
+    // If closing a part.
+    // const layout = this._layout();
+    // const activityStack = layout.activityStack({partId: this.part.id}, {orElse: null});
+    // if (!activityStack?.activeActivityId) {
+    //   this.focusTracker.unsetActiveElement(this.part.id);
+    // }
+
+    // would also workd instead
+    setTimeout(() => this.focusTracker.unsetActiveElement(this.part.id));
   }
 }

@@ -15,6 +15,7 @@ import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
 import {PartId} from '@scion/workbench';
 import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {PartSlotPO} from './part-slot.po';
 
 /**
  * Handle for interacting with a workbench part.
@@ -34,7 +35,7 @@ export class PartPO {
   /**
    * Locates the content displayed in the part.
    */
-  public readonly content: Locator;
+  public readonly content: PartSlotPO;
 
   /**
    * Handle to resize this part.
@@ -44,7 +45,7 @@ export class PartPO {
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
     this.activeView = new ViewPO(this.locator.locator('wb-view-slot'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
-    this.content = this.locator.locator(':scope > div.e2e-content');
+    this.content = new PartSlotPO(this.locator.locator('wb-part-slot'));
     this.sash = new PartSashPO(this.locator);
   }
 

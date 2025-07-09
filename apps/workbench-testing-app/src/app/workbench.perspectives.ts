@@ -161,7 +161,11 @@ function provideActivityPerspectiveLayout1(factory: WorkbenchLayoutFactory): Wor
     // Activate parts to open docked parts.
     .activatePart('projects')
     .activatePart('find')
-    .activatePart('inventory');
+    .activatePart('inventory')
+
+    // Add active workbench element log.
+    .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
+    .navigatePart('part.log', ['active-workbench-element-log']);
 }
 
 function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -216,7 +220,11 @@ function provideActivityPerspectiveLayout2(factory: WorkbenchLayoutFactory): Wor
     .activatePart('project')
     .activatePart('find')
     .activatePart('databases')
-    .activateView('terminal4');
+    .activateView('terminal4')
+
+    // Add active workbench element log.
+    .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal'})
+    .navigatePart('part.log', ['active-workbench-element-log']);
 }
 
 function providePerspectiveLayout1(factory: WorkbenchLayoutFactory): WorkbenchLayout {
@@ -307,7 +315,7 @@ function provideFocusTestPerspective(factory: WorkbenchLayoutFactory): Workbench
     .navigateView('view.301', ['test-pages/focus-test-page'])
     .navigateView('view.302', ['test-pages/focus-test-page'])
 
-    // Add Activity logging the active workbench element.
+    // Add active workbench element log.
     .addPart('part.log', {dockTo: 'bottom-right'}, {label: 'Active Workbench Element Log', icon: 'terminal', cssClass: 'e2e-log'})
     .navigatePart('part.log', ['active-workbench-element-log'])
 

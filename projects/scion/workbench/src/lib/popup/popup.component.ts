@@ -87,7 +87,7 @@ export class PopupComponent {
 
   constructor() {
     this.focusInitialElement();
-    registerFocusTracker(inject(ElementRef), this.popup.id);
+    registerFocusTracker(inject(ElementRef) as ElementRef<HTMLElement>, this.popup.id);
   }
 
   private focusInitialElement(): void {

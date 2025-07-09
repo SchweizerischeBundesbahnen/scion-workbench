@@ -148,7 +148,7 @@ export class LayoutComponent {
   private installDesktopFocusTracker(): void {
     const injector = inject(Injector);
     effect(onCleanup => {
-      const desktop = this._desktopElement()?.nativeElement as HTMLElement | undefined;
+      const desktop = this._desktopElement() as ElementRef<HTMLElement> | undefined;
       if (!desktop) {
         return;
       }

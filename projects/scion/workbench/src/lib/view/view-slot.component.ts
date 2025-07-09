@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, ElementRef, inject, Provider, viewChild} from '@angular/core';
+import {Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -21,8 +21,7 @@ import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
-import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
-import {createFocusable, Focusable} from './focusable';
+import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -57,6 +56,8 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   protected readonly viewDragService = inject(ViewDragService);
   protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewport = viewChild.required(SciViewportComponent);
 
   private _scrollTop = 0;
@@ -66,10 +67,13 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this.installComponentLifecycleLogger();
     this.installMenuAccelerators();
     this.addHostCssClasses();
+    registerFocusTracker(this._host, this.view.id);
+  }
 
-    // Register focusable
-    this.view.registerAdapter(Focusable, createFocusable(() => this._viewport().focus()));
-    inject(DestroyRef).onDestroy(() => this.view.unregisterAdapter(Focusable));
+  public focus(): void {
+    if (!this._host.contains(this._document.activeElement)) {
+      this._viewport().focus();
+    }
   }
 
   /**
@@ -86,6 +90,16 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   public onDetach(): void {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
+
+    // If closing a part.
+    // const layout = this._layout();
+    // const activityStack = layout.activityStack({viewId: this.view.id}, {orElse: null});
+    // if (!activityStack?.activeActivityId) {
+    //   // this.focusTracker.unsetActiveElement(this.view.id);
+    // }
+
+    // would also workd instead
+    setTimeout(() => this.focusTracker.unsetActiveElement(this.view.id));
   }
 
   private installMenuAccelerators(): void {

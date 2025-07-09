@@ -92,7 +92,7 @@ export class WorkbenchDialogComponent {
     this.trackFocus();
     this.autoFocus();
 
-    registerFocusTracker(inject(ElementRef), this.dialog.id);
+    registerFocusTracker(inject(ElementRef) as ElementRef<HTMLElement>, this.dialog.id);
   }
 
   private setDialogOffset(): void {

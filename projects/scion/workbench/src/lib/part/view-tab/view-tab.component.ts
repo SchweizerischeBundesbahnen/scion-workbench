@@ -25,7 +25,7 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {registerFocusTrackerExclude, WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service';
+import {WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -76,12 +76,16 @@ export class ViewTabComponent {
     this.addHostCssClasses();
     this.installMenuAccelerators();
     this.viewTabContentPortal = this.createViewTabContentPortal();
-    registerFocusTrackerExclude(inject(ElementRef));
   }
 
   @HostListener('click')
   protected onClick(): void {
-    void this.view().activate();
+    if (this.view().active()) {
+      this.view().focus();
+    }
+    else {
+      void this.view().activate();
+    }
   }
 
   protected onClose(event: MouseEvent): void {
