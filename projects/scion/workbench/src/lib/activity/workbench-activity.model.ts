@@ -9,7 +9,6 @@
  */
 
 import {ACTIVITY_ID_PREFIX} from '../workbench.constants';
-import {PartId} from '../part/workbench-part.model';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -88,15 +87,6 @@ export interface MActivityStack {
 export interface MActivity {
   /** @see DockedPartExtras#ɵactivityId */
   id: ActivityId;
-  /**
-   * Refers to the docked part specified when creating the activity.
-   *
-   * Characteristics of the reference part:
-   * - Structural part, remaining even if its last view is removed.
-   * - Provides the title of the activity, independent of visibility and position in the layout.
-   * - Explicitly removing this part removes the activity.
-   */
-  referencePartId: PartId;
   /** @see DockedPartExtras#icon */
   icon: string;
   /** @see DockedPartExtras#label */

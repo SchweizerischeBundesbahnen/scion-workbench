@@ -16,8 +16,6 @@ import {InstanceofPipe} from '../../common/instanceof.pipe';
 import {WorkbenchPortalOutletDirective} from '../../portal/workbench-portal-outlet.directive';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
-import {WorkbenchLayouts} from '../workbench-layouts.util';
-import {NullContentComponent} from '../../null-content/null-content.component';
 
 /**
  * Renders a {@link MTreeNode} or {@link MPart}.
@@ -38,7 +36,6 @@ import {NullContentComponent} from '../../null-content/null-content.component';
     PartPortalPipe,
     SciSashboxComponent,
     SciSashDirective,
-    NullContentComponent,
   ],
   host: {
     '[attr.data-parentnodeid]': 'element().parent?.id',
@@ -78,21 +75,19 @@ export class GridElementComponent {
       }
 
       return untracked(() => {
-        const child1Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child1);
-        const child2Visible = WorkbenchLayouts.isGridElementVisible(treeNode.child2);
-
-        if (child1Visible && child2Visible) {
+        const {child1, child2} = treeNode;
+        if (child1.visible && child2.visible) {
           const [size1, size2] = calculateSashSizes(treeNode.ratio);
           return [
-            {element: treeNode.child1, size: size1},
-            {element: treeNode.child2, size: size2},
+            {element: child1, size: size1},
+            {element: child2, size: size2},
           ];
         }
-        else if (child1Visible) {
-          return [{element: treeNode.child1}];
+        else if (child1.visible) {
+          return [{element: child1}];
         }
-        else if (child2Visible) {
-          return [{element: treeNode.child2}];
+        else if (child2.visible) {
+          return [{element: child2}];
         }
         return [];
       });

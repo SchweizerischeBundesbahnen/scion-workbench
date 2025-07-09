@@ -359,8 +359,8 @@ function assertMTreeNodeDOM(expectedTreeNode: MTreeNode, actualElement: Element,
   }
 
   const actualTreeNode: MTreeNode = TestBed.inject(WorkbenchLayoutService).layout().treeNode({nodeId});
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(actualTreeNode.child1);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(actualTreeNode.child2);
+  const child1Visible = actualTreeNode.child1.visible;
+  const child2Visible = actualTreeNode.child2.visible;
 
   // Assert sashbox.
   if (child1Visible && child2Visible) {

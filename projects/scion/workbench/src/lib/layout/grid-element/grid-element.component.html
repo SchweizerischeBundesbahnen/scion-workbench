@@ -8,10 +8,6 @@
   @let children = this.children();
 
   @switch (children.length) {
-    @case (0) {
-      <!-- Node with no visible children. -->
-      <wb-null-content/>
-    }
     @case (1) {
       <!-- Node with a single visible child. -->
       <wb-grid-element [element]="children[0]!.element"/>
