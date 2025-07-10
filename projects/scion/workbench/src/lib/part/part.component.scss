@@ -13,19 +13,9 @@
     flex: none;
   }
 
-  > div.active-view {
+  > div.content {
     flex: auto;
     display: grid;
-    position: relative; // positioning context for view content
-  }
-
-  > sci-viewport.part-content {
-    flex: 1 1 0; // set flex-basis to 0 to not exceed available vertical space
-    display: grid;
-    position: relative; // positioning context for routed content
-
-    > router-outlet {
-      position: absolute; // out of document flow
-    }
+    position: relative; // positioning context for slot content
   }
 }

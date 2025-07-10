@@ -303,7 +303,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    */
   private monitorHostElementAttached(): Signal<boolean> {
     if (this.context.view) {
-      return this.context.view.portal.attached;
+      return this.context.view.slot.portal.attached;
     }
     if (this._workbenchConfig.dialog?.modalityScope === 'viewport') {
       return computed(() => true);
@@ -321,7 +321,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
     }
     else {
       const workbenchElementRef = inject(WORKBENCH_ELEMENT_REF);
-      const hostElement = computed(() => (this.context.view ? this.context.view.portal.componentRef.location.nativeElement : workbenchElementRef()?.element.nativeElement) as HTMLElement);
+      const hostElement = computed(() => (this.context.view ? this.context.view.slot.portal.element() : workbenchElementRef()?.element.nativeElement) as HTMLElement);
       const hostBounds = boundingClientRect(hostElement);
       const viewDragService = inject(ViewDragService);
 

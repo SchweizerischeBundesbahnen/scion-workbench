@@ -74,5 +74,5 @@ export function withComponentStateInputElement(): EnvironmentProviders {
  * Use that state to check whether the component has been re-created.
  */
 export function enterComponentState(fixture: ComponentFixture<unknown>, viewId: ViewId, textualState: string): void {
-  (fixture.nativeElement as HTMLElement).querySelector<HTMLOptionElement>(`wb-view[data-viewid="${viewId}"] input.component-state`)!.value = textualState;
+  (fixture.nativeElement as HTMLElement).querySelector<HTMLOptionElement>(`wb-view-slot[data-viewid="${viewId}"] input.component-state`)!.value = textualState;
 }

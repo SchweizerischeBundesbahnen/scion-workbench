@@ -369,11 +369,11 @@ async function assertPartGridElement(expectedPart: MPart, gridElementLocator: Lo
 
   // Assert active view and view tab
   if (expectedPart.activeViewId) {
-    const activeViewLocator = partLocator.locator(`wb-view[data-viewid="${expectedPart.activeViewId}"]`);
-    await throwIfAbsent(activeViewLocator, () => Error(`[DOMAssertError] Expected element 'wb-view[data-viewid="${expectedPart.activeViewId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${activeViewLocator}]`));
+    const activeViewLocator = partLocator.locator(`wb-view-slot[data-viewid="${expectedPart.activeViewId}"]`);
+    await throwIfAbsent(activeViewLocator, () => Error(`[DOMAssertError] Expected element 'wb-view-slot[data-viewid="${expectedPart.activeViewId}"]' to be in the DOM, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${activeViewLocator}]`));
 
     const viewTabLocator = partLocator.locator(`wb-part-bar wb-view-tab[data-viewid="${expectedPart.activeViewId}"].active`);
-    await throwIfAbsent(viewTabLocator, () => Error(`[DOMAssertError] Expected view tab 'wb-view[data-viewid="${expectedPart.activeViewId}"]' to be active, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${viewTabLocator}]`));
+    await throwIfAbsent(viewTabLocator, () => Error(`[DOMAssertError] Expected element 'wb-view-tab[data-viewid="${expectedPart.activeViewId}"]' to be active, but is not. [MPart=${JSON.stringify(expectedPart)}, locator=${viewTabLocator}]`));
   }
 
   // Assert views

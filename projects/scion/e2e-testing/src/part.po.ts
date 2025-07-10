@@ -38,7 +38,7 @@ export class PartPO {
 
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
-    this.activeView = new ViewPO(this.locator.locator('wb-view'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
+    this.activeView = new ViewPO(this.locator.locator('wb-view-slot'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
     this.sash = new PartSashPO(this.locator);
   }
 

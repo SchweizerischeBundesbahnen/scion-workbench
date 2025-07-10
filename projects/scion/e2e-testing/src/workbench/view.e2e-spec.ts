@@ -1240,7 +1240,7 @@ test.describe('Workbench View', () => {
     await expectView(viewPage2).toBeInactive();
   });
 
-  test('should detach view if opened in peripheral area and the main area is maximized', async ({appPO, workbenchNavigator}) => {
+  test('should detach view in activity if the main area is maximized', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory

@@ -15,7 +15,6 @@ import {CanCloseFn, CanCloseRef, WorkbenchMenuItem, WorkbenchViewMenuItemFn} fro
 import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
-import {ComponentType} from '@angular/cdk/portal';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import {AbstractType, assertNotInReactiveContext, computed, effect, EnvironmentInjector, inject, Injector, IterableDiffers, runInInjectionContext, Signal, signal, Type, untracked} from '@angular/core';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
@@ -37,6 +36,7 @@ import {Arrays, Observables} from '@scion/toolkit/util';
 import {Logger} from '../logging/logger';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.registry';
 import {Translatable} from '../text/workbench-text-provider.model';
+import {ViewSlotComponent} from './view-slot.component';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
@@ -69,15 +69,15 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public readonly navigationData = computed(() => this.navigation()?.data ?? {});
   public readonly navigationState = computed(() => this.navigation()?.state ?? {});
   public readonly urlSegments = computed(() => this.navigation()?.path ?? []);
-  public readonly position = computed(() => this.part().viewIds().indexOf(this.id));
+  public readonly position = computed(() => this.part().views().indexOf(this));
   public readonly first = computed(() => this.position() === 0);
-  public readonly last = computed(() => this.position() === this.part().viewIds().length - 1);
+  public readonly last = computed(() => this.position() === this.part().views().length - 1);
 
   public readonly part = signal<ɵWorkbenchPart>(null!);
   public readonly active = signal<boolean>(false);
   public readonly menuItems: Signal<WorkbenchMenuItem[]>;
   public readonly blockedBy$: Observable<ɵWorkbenchDialog | null>;
-  public readonly portal: WbComponentPortal;
+  public readonly slot: {portal: WbComponentPortal<ViewSlotComponent>};
   public readonly classList = new ClassList();
   public readonly isClosable = computed(() => this._closable() && !this._blockedBy());
 
@@ -88,9 +88,9 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
    */
   public canCloseGuard: (() => Promise<boolean>) | undefined;
 
-  constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout, options: {component: ComponentType<ViewComponent>}) {
+  constructor(public readonly id: ViewId, layout: ɵWorkbenchLayout) {
     this.alternativeId = layout.view({viewId: this.id}).alternativeId;
-    this.portal = this.createPortal(options.component);
+    this.slot = {portal: this.createPortal()};
     this.menuItems = this.computeMenuItems();
     this._blockedBy = toSignal(inject(WorkbenchDialogRegistry).top$({viewId: this.id}), {requireSync: true});
     this.blockedBy$ = toObservable<ɵWorkbenchDialog | null>(this._blockedBy);
@@ -99,8 +99,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     this.onLayoutChange({layout});
   }
 
-  private createPortal(viewComponent: ComponentType<ViewComponent>): WbComponentPortal {
-    return new WbComponentPortal(viewComponent, {
+  private createPortal(): WbComponentPortal<ViewSlotComponent> {
+    return new WbComponentPortal(ViewSlotComponent, {
       providers: [
         provideViewContext(this),
         // Prevent injecting this part into the view because the view may be dragged to a different part.
@@ -158,8 +158,8 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     // To complete the initialization of the routed component (to ensure that `ngOnInit` is called), we manually trigger change
     // detection. We cannot perform change detection right now because the routed component has not been activated/constructed yet.
     // Use case: Navigating an (existing) inactive view to another route.
-    if (!this.active() && this.portal.isConstructed && routeChanged) {
-      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.portal.componentRef.changeDetectorRef.detectChanges());
+    if (!this.active() && this.slot.portal.constructed() && routeChanged) {
+      this._workbenchRouter.getCurrentNavigationContext().registerPostNavigationAction(() => this.slot.portal.componentRef()!.changeDetectorRef.detectChanges());
     }
   }
 
@@ -256,18 +256,18 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         return this._workbenchService.closeViews(this.id);
       }
       case 'all-views': {
-        return this._workbenchService.closeViews(...this.part().viewIds());
+        return this._workbenchService.closeViews(...this.part().views().map(view => view.id));
       }
       case 'other-views': {
-        return this._workbenchService.closeViews(...this.part().viewIds().filter(viewId => viewId !== this.id));
+        return this._workbenchService.closeViews(...this.part().views().filter(view => view !== this).map(view => view.id));
       }
       case 'views-to-the-right': {
-        const viewIds = this.part().viewIds();
-        return this._workbenchService.closeViews(...viewIds.slice(viewIds.indexOf(this.id) + 1));
+        const views = this.part().views();
+        return this._workbenchService.closeViews(...views.slice(views.indexOf(this) + 1).map(view => view.id));
       }
       case 'views-to-the-left': {
-        const viewIds = this.part().viewIds();
-        return this._workbenchService.closeViews(...viewIds.slice(0, viewIds.indexOf(this.id)));
+        const views = this.part().views();
+        return this._workbenchService.closeViews(...views.slice(0, views.indexOf(this)).map(view => view.id));
       }
       default: {
         return Promise.resolve(false);
@@ -312,7 +312,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public canClose(canClose: CanCloseFn): CanCloseRef {
     const canCloseGuard = this.canCloseGuard = async (): Promise<boolean> => {
       try {
-        const close = runInInjectionContext(this.portal.componentRef.injector, canClose);
+        const close = runInInjectionContext(this.slot.portal.componentRef()!.injector, canClose);
         return await firstValueFrom(Observables.coerce(close), {defaultValue: true});
       }
       catch (error) {
@@ -363,7 +363,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
 
   /** @inheritDoc */
   public get destroyed(): boolean {
-    return this.portal.isDestroyed;
+    return this.slot.portal.destroyed();
   }
 
   /**
@@ -435,11 +435,5 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   public destroy(): void {
     this._viewEnvironmentInjector.destroy();
     this._workbenchDialogRegistry.dialogs({viewId: this.id}).forEach(dialog => dialog.destroy());
-    this.portal.destroy();
   }
 }
-
-/**
- * Represents a pseudo-type for the actual {@link ViewComponent} which must not be referenced in order to avoid import cycles.
- */
-type ViewComponent = any;

@@ -16,6 +16,7 @@ import {expectPart} from '../matcher/part-matcher';
 import {PartPagePO} from './page-object/part-page.po';
 import {MAIN_AREA} from '../workbench.model';
 import {RouterPagePO} from './page-object/router-page.po';
+import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 
 test.describe('Workbench Part', () => {
 
@@ -429,5 +430,267 @@ test.describe('Workbench Part', () => {
       await expect(appPO.part({partId: 'part.top'}).locator).toHaveCSS('background-color', partBackgroundColor);
       await expect(appPO.part({partId: 'part.bottom'}).locator).toHaveCSS('background-color', partBackgroundColor);
     });
+  });
+
+  test('should preserve title after history back and forward', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create part on the right.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'}, {title: 'Part Title'}),
+    );
+
+    // Navigate part.
+    const layoutPage = await workbenchNavigator.openInNewTab(LayoutPagePO);
+    await layoutPage.modifyLayout(layout => layout.navigatePart('part.right', ['test-part']));
+
+    const part = appPO.part({partId: 'part.right'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+    await expect(part.bar.title).toHaveText('Part Title');
+
+    // Enter title.
+    await partPage.enterTitle('A');
+    await expect(part.bar.title).toHaveText('A');
+
+    // Perform navigation back, undoing the part navigation.
+    await appPO.navigateBack();
+
+    // Expect part not to be present (detached, still in the layout).
+    await expectPart(part).not.toBeAttached();
+
+    // Perform navigation forward.
+    await appPO.navigateForward();
+
+    // Expect part to be present and the title to be restored.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+    await expect(part.bar.title).toHaveText('A');
+
+    // Change title.
+    await partPage.enterTitle('B');
+
+    // Expect title to be set on the "new" part handle.
+    await expect(part.bar.title).toHaveText('B');
+  });
+
+  test('should detach part of activity if closed', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout with an activity.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', cssClass: 'activity'})
+      .navigatePart('part.activity', ['test-part']),
+    );
+
+    // Open activity.
+    const activityItem = appPO.activityItem({cssClass: 'activity'});
+    await activityItem.click();
+
+    const part = appPO.part({partId: 'part.activity'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.activity'});
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const componentInstanceId = await partPage.getComponentInstanceId();
+
+    // Close activity.
+    await activityItem.click();
+
+    // Expect part not to be attached.
+    await expectPart(part).not.toBeAttached();
+
+    // Open activity.
+    await activityItem.click();
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Expect component not to be constructed anew.
+    await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
+  });
+
+  test('should detach parts of activity if closed', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout with an activity.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-top', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', cssClass: 'activity'})
+      .addPart('part.activity-bottom', {relativeTo: 'part.activity-top', align: 'bottom'})
+      .navigatePart('part.activity-top', ['test-part'])
+      .navigatePart('part.activity-bottom', ['test-part']),
+    );
+
+    // Open activity.
+    const activityItem = appPO.activityItem({cssClass: 'activity'});
+    await activityItem.click();
+
+    const topPart = appPO.part({partId: 'part.activity-top'});
+    const topPartPage = new PartPagePO(appPO, {partId: 'part.activity-top'});
+
+    const bottomPart = appPO.part({partId: 'part.activity-bottom'});
+    const bottomPartPage = new PartPagePO(appPO, {partId: 'part.activity-bottom'});
+
+    // Expect parts to display.
+    await expectPart(topPart).toDisplayComponent(PartPagePO.selector);
+    await expectPart(bottomPart).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const topPartComponentInstanceId = await topPartPage.getComponentInstanceId();
+    const bottomPartComponentInstanceId = await bottomPartPage.getComponentInstanceId();
+    expect(topPartComponentInstanceId).not.toEqual(bottomPartComponentInstanceId);
+
+    // Close activity.
+    await activityItem.click();
+
+    // Expect parts not to be attached.
+    await expectPart(topPart).not.toBeAttached();
+    await expectPart(bottomPart).not.toBeAttached();
+
+    // Open activity.
+    await activityItem.click();
+
+    // Expect part to display.
+    await expectPart(topPart).toDisplayComponent(PartPagePO.selector);
+    await expectPart(bottomPart).toDisplayComponent(PartPagePO.selector);
+
+    // Expect components not to be constructed anew.
+    await expect.poll(() => topPartPage.getComponentInstanceId()).toEqual(topPartComponentInstanceId);
+    await expect.poll(() => bottomPartPage.getComponentInstanceId()).toEqual(bottomPartComponentInstanceId);
+  });
+
+  test('should detach parts when switching activities in same activity stack', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout with two activities.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 1', cssClass: 'activity-1'})
+      .addPart('part.activity-2', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity 2', cssClass: 'activity-2'})
+      .navigatePart('part.activity-1', ['test-part'])
+      .navigatePart('part.activity-2', ['test-part']),
+    );
+
+    const activityPage1 = new PartPagePO(appPO, {partId: 'part.activity-1'});
+    const activityPage2 = new PartPagePO(appPO, {partId: 'part.activity-2'});
+
+    // Open activity 1.
+    const activityItem1 = appPO.activityItem({cssClass: 'activity-1'});
+    await activityItem1.click();
+
+    // Expect activity 1 to display.
+    await expectPart(activityPage1.part).toDisplayComponent(PartPagePO.selector);
+    await expectPart(activityPage2.part).not.toBeAttached();
+
+    // Capture component instance id.
+    const componentInstanceId1 = await activityPage1.getComponentInstanceId();
+
+    // Open activity 2.
+    const activityItem2 = appPO.activityItem({cssClass: 'activity-2'});
+    await activityItem2.click();
+
+    // Expect activity 2 to display.
+    await expectPart(activityPage1.part).not.toBeAttached();
+    await expectPart(activityPage2.part).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const componentInstanceId2 = await activityPage2.getComponentInstanceId();
+
+    // Open activity 1.
+    await activityItem1.click();
+
+    // Expect activity 1 to display.
+    await expectPart(activityPage1.part).toDisplayComponent(PartPagePO.selector);
+    await expectPart(activityPage2.part).not.toBeAttached();
+
+    // Expect component not to be constructed anew.
+    await expect.poll(() => activityPage1.getComponentInstanceId()).toEqual(componentInstanceId1);
+
+    // Open activity 2.
+    await activityItem2.click();
+
+    // Expect activity 2 to display.
+    await expectPart(activityPage1.part).not.toBeAttached();
+    await expectPart(activityPage2.part).toDisplayComponent(PartPagePO.selector);
+
+    // Expect component not to be constructed anew.
+    await expect.poll(() => activityPage2.getComponentInstanceId()).toEqual(componentInstanceId2);
+  });
+
+  test('should detach part on layout change', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create part on the right.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.right', {align: 'right'})
+      .navigatePart('part.right', ['test-part']),
+    );
+
+    const part = appPO.part({partId: 'part.right'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.right'});
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const componentInstanceId = await partPage.getComponentInstanceId();
+
+    // Add part to the left, forcing detaching the right part during re-layout.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('part.left', {align: 'left'})
+      .navigatePart('part.left', ['test-part']),
+    );
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Expect the component not to be constructed anew.
+    await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
+  });
+
+  test('should detach part in activity if the main area is maximized', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout a main area and an activity.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .addPart('part.activity', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity'})
+      .navigatePart('part.activity', ['test-part'])
+      .activatePart('part.activity'),
+    );
+
+    const part = appPO.part({partId: 'part.activity'});
+    const partPage = new PartPagePO(appPO, {partId: 'part.activity'});
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const componentInstanceId = await partPage.getComponentInstanceId();
+
+    // Open view in main area.
+    const viewPage = await workbenchNavigator.openInNewTab(ViewPagePO);
+
+    // Maximize the main area.
+    await viewPage.view.tab.dblclick();
+
+    // Expect part to be detached.
+    await expectPart(part).not.toBeAttached();
+
+    // Restore the layout.
+    await viewPage.view.tab.dblclick();
+
+    // Expect part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Expect the component not to be constructed anew.
+    await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
   });
 });

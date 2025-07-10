@@ -85,7 +85,7 @@ export class MicrofrontendViewComponent {
   /** Configures iframe projection. */
   protected readonly overlayConfig: ContentAsOverlayConfig = {
     location: inject(IFRAME_OVERLAY_HOST),
-    visible: this.view.portal.attached,
+    visible: this.view.slot.portal.attached,
   };
 
   protected capability: WorkbenchViewCapability | null = null;

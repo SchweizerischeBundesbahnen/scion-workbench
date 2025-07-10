@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, HostBinding, inject, Provider, untracked, viewChild} from '@angular/core';
+import {Component, DestroyRef, effect, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -17,18 +17,18 @@ import {Logger, LoggerNames} from '../logging';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
-import {ViewId, WorkbenchView} from './workbench-view.model';
+import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
 
 /**
- * Renders the workbench view, using a router-outlet to display view content.
+ * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
  */
 @Component({
-  selector: 'wb-view',
-  templateUrl: './view.component.html',
-  styleUrls: ['./view.component.scss'],
+  selector: 'wb-view-slot',
+  templateUrl: './view-slot.component.html',
+  styleUrls: ['./view-slot.component.scss'],
   imports: [
     RouterOutlet,
     RouterOutletRootContextDirective,
@@ -38,28 +38,23 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
   hostDirectives: [
     GlassPaneDirective,
   ],
+  host: {
+    '[attr.data-viewid]': 'view.id',
+    '[class.view-drag]': 'viewDragService.dragging()',
+  },
   providers: [
     configureViewGlassPane(),
   ],
 })
-export class ViewComponent implements OnAttach, OnDetach {
+export class ViewSlotComponent implements OnAttach, OnDetach {
 
-  private readonly _view = inject(ɵWorkbenchView);
-  private readonly _viewDragService = inject(ViewDragService);
+  protected readonly view = inject(ɵWorkbenchView);
+  protected readonly viewDragService = inject(ViewDragService);
+
   private readonly _viewport = viewChild.required(SciViewportComponent);
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
-
-  @HostBinding('attr.data-viewid')
-  protected get viewId(): ViewId {
-    return this._view.id;
-  }
-
-  @HostBinding('class.view-drag')
-  protected get isViewDragActive(): boolean {
-    return this._viewDragService.viewDragData() !== null;
-  }
 
   constructor() {
     this.installComponentLifecycleLogger();
@@ -86,18 +81,18 @@ export class ViewComponent implements OnAttach, OnDetach {
 
   private onActivateView(): void {
     // Gain focus only if in the active part.
-    if (this._view.part().active()) {
+    if (this.view.part().active()) {
       this._viewport().focus();
     }
   }
 
   private installMenuAccelerators(): void {
-    inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this._view);
+    inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
   }
 
   private installOnActivateView(): void {
     effect(() => {
-      if (this._view.active()) {
+      if (this.view.active()) {
         untracked(() => this.onActivateView());
       }
     });
@@ -105,13 +100,13 @@ export class ViewComponent implements OnAttach, OnDetach {
 
   private addHostCssClasses(): void {
     const host = inject(ElementRef).nativeElement as HTMLElement;
-    synchronizeCssClasses(host, this._view.classList.asList);
+    synchronizeCssClasses(host, this.view.classList.asList);
   }
 
   private installComponentLifecycleLogger(): void {
     const logger = inject(Logger);
-    logger.debug(() => `Constructing ViewComponent. [viewId=${this.viewId}]`, LoggerNames.LIFECYCLE);
-    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying ViewComponent [viewId=${this.viewId}]'`, LoggerNames.LIFECYCLE));
+    logger.debug(() => `Constructing ViewComponent. [viewId=${this.view.id}]`, LoggerNames.LIFECYCLE);
+    inject(DestroyRef).onDestroy(() => logger.debug(() => `Destroying ViewComponent [viewId=${this.view.id}]'`, LoggerNames.LIFECYCLE));
   }
 }
 

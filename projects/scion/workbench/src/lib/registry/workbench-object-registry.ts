@@ -47,6 +47,11 @@ export class WorkbenchObjectRegistry<KEY, T> {
   public register(key: KEY, object: T): void {
     const prevObject = this._objectsById.get(key);
 
+    // Unregister previous object, if any.
+    if (prevObject) {
+      this._onUnregister?.(prevObject);
+    }
+
     // Add to Map.
     this._objectsById.set(key, object);
 
