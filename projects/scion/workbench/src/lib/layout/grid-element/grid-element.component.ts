@@ -13,7 +13,7 @@ import {MPart, MTreeNode} from '../workbench-grid.model';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {WorkbenchLayoutService} from '../workbench-layout.service';
 import {InstanceofPipe} from '../../common/instanceof.pipe';
-import {CdkPortalOutlet} from '@angular/cdk/portal';
+import {WorkbenchPortalOutletDirective} from '../../portal/workbench-portal-outlet.directive';
 import {PartPortalPipe} from '../../part/part-portal.pipe';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {WorkbenchLayouts} from '../workbench-layouts.util';
@@ -34,7 +34,7 @@ import {NullContentComponent} from '../../null-content/null-content.component';
   styleUrls: ['./grid-element.component.scss'],
   imports: [
     InstanceofPipe,
-    CdkPortalOutlet,
+    WorkbenchPortalOutletDirective,
     PartPortalPipe,
     SciSashboxComponent,
     SciSashDirective,

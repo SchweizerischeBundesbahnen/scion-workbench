@@ -8,6 +8,6 @@
 
   // TODO [Angular 21] No longer needed with the removal of legacy start page support.
   > sci-viewport.desktop > router-outlet {
-    position: absolute; // take router outlet out of the document flow
+    position: absolute; // out of document flow
   }
 }

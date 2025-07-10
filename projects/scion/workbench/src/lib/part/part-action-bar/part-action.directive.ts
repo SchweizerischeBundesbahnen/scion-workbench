@@ -10,8 +10,9 @@
 
 import {DestroyRef, Directive, inject, input, TemplateRef} from '@angular/core';
 import {WorkbenchService} from '../../workbench.service';
-import {WorkbenchView} from '../../view/workbench-view.model';
 import {WorkbenchPart} from '../workbench-part.model';
+import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
+import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 
 /**
  * Directive to add an action to a part.
@@ -81,15 +82,18 @@ export class WorkbenchPartActionDirective {
     const template = inject(TemplateRef) as TemplateRef<void>;
     const workbenchService = inject(WorkbenchService);
     const context = {
-      view: inject(WorkbenchView, {optional: true}),
-      part: inject(WorkbenchPart, {optional: true}),
+      view: inject(ɵWorkbenchView, {optional: true}),
+      part: inject(ɵWorkbenchPart, {optional: true}),
     };
 
     const action = workbenchService.registerPartAction((part: WorkbenchPart) => {
-      if (context.part && context.part.id !== part.id) {
+      if (context.part && context.part !== part) {
         return null;
       }
-      if (context.view && context.view.id !== part.activeViewId()) {
+      if (context.part && !context.part.slot.portal.attached()) {
+        return null;
+      }
+      if (context.view && context.view !== part.activeView()) {
         return null;
       }
       if (this.canMatch() && !this.canMatch()!(part)) {

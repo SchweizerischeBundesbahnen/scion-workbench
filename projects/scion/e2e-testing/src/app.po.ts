@@ -266,19 +266,19 @@ export class AppPO {
    */
   public view(locateBy: {viewId?: ViewId; cssClass?: string}): ViewPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
-      const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
+      const viewLocator = this.page.locator(`wb-view-slot[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
       const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.viewId !== undefined) {
-      const viewLocator = this.page.locator(`wb-view[data-viewid="${locateBy.viewId}"]`);
+      const viewLocator = this.page.locator(`wb-view-slot[data-viewid="${locateBy.viewId}"]`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
       const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.cssClass !== undefined) {
-      const viewLocator = this.page.locator(`wb-view.${locateBy.cssClass}`);
+      const viewLocator = this.page.locator(`wb-view-slot.${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab.${locateBy.cssClass}`);
       const partLocator: Locator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));

@@ -1,24 +1,25 @@
-@if (part.title() || part.viewIds().length || part.actions().length || part.canMinimize()) {
+@if (part.title() || part.views().length || part.actions().length || part.canMinimize()) {
   <wb-part-bar/>
 }
 
-@if (part.viewIds().length) {
-  @let canSplit = !!part.activeViewId();
+@if (part.views().length) {
+  <!-- Prevent splitting if there is no active view, i.e, when dragging the last view out of the tabbar. -->
+  @let canSplit = !!part.activeView();
   <div wbViewDropZone
        [wbViewDropZoneRegionSize]=".25"
        [wbViewDropZonePlaceholderSize]=".5"
        [wbViewDropZoneAttributes]="{'data-partid': part.id}"
        [wbViewDropZoneRegions]="canDrop() && {center: true, north: canSplit, south: canSplit, west: canSplit, east: canSplit}"
        (wbViewDropZoneDrop)="onViewDrop($event)"
-       class="active-view e2e-view-content e2e-content">
-    <ng-container *wbPortalOutlet="part.activeViewId() | wbViewPortal"/>
+       class="content e2e-content e2e-view-content">
+    <ng-container *wbPortalOutlet="part.activeView()?.slot!.portal; destroyOnDetach: false"/>
   </div>
 } @else {
-  <sci-viewport class="part-content e2e-part-content e2e-content"
-                wbViewDropZone
-                [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
-                [wbViewDropZoneAttributes]="{'data-partid': part.id}"
-                (wbViewDropZoneDrop)="onViewDrop($event)">
-    <router-outlet [name]="part.id" wbRouterOutletRootContext/>
-  </sci-viewport>
+  <div wbViewDropZone
+       [wbViewDropZoneRegions]="canDrop() && {center: false, north: true, south: true, west: true, east: true}"
+       [wbViewDropZoneAttributes]="{'data-partid': part.id}"
+       (wbViewDropZoneDrop)="onViewDrop($event)"
+       class="content e2e-content e2e-part-content">
+    <ng-container *wbPortalOutlet="part.slot.portal; destroyOnDetach: false"/>
+  </div>
 }

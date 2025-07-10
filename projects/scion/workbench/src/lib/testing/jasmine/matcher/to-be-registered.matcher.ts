@@ -33,24 +33,24 @@ export const toBeRegisteredCustomMatcher: jasmine.CustomMatcherFactories = {
           return fail(`Expected view '${viewId}' to reference part '${expected.partId}', but instead referencing part '${view.part().id}'.`);
         }
         // Assert the view to be contained in the expected part.
-        const viewIds = TestBed.inject(WORKBENCH_PART_REGISTRY).get(expected.partId, {orElse: null})?.viewIds();
-        if (!viewIds?.includes(viewId)) {
-          return fail(`Expected view '${viewId}' to be contained in part '${expected.partId}'. But, part '${expected.partId}' contains the following views: '${viewIds}'.`);
+        const views = TestBed.inject(WORKBENCH_PART_REGISTRY).get(expected.partId, {orElse: null})?.views() ?? [];
+        if (!views.includes(view)) {
+          return fail(`Expected view '${viewId}' to be contained in part '${expected.partId}'. But, part '${expected.partId}' contains the following views: '${views.map(view => view.id)}'.`);
         }
         // Assert the view's active state.
         if (expected.active) {
           if (!view.active()) {
             return fail(`Expected view '${viewId}' to be active.`);
           }
-          if (view.part().activeViewId() !== view.id) {
-            return fail(`Expected view '${viewId}' to be the active view in its part '${view.part().id}', But, view '${view.part().activeViewId()}' is the active view.`);
+          if (view.part().activeView() !== view) {
+            return fail(`Expected view '${viewId}' to be the active view in its part '${view.part().id}', But, view '${view.part().activeView()?.id}' is the active view.`);
           }
         }
         else {
           if (view.active()) {
             return fail(`Expected view '${viewId}' to be inactive.`);
           }
-          if (view.part().activeViewId() === view.id) {
+          if (view.part().activeView() === view) {
             return fail(`Expected view '${viewId}' to be inactive, but is the active view in its part '${view.part().id}'.`);
           }
         }

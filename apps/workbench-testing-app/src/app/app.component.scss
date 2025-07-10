@@ -14,7 +14,7 @@
     display: grid;
 
     > router-outlet {
-      position: absolute; // take router outlet out of the document flow
+      position: absolute; // out of document flow
     }
   }
 }

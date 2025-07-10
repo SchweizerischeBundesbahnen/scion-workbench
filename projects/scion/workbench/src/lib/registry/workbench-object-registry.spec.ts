@@ -49,14 +49,21 @@ describe('WorkbenchObjectRegistry', () => {
   });
 
   it('should replace an existing object', () => {
-    const registry = TestBed.runInInjectionContext(() => new WorkbenchObjectRegistry<string, TestObject>());
+    const log = new Array<string>();
+    const registry = TestBed.runInInjectionContext(() => new WorkbenchObjectRegistry<string, TestObject>({
+      onUnregister: object => log.push(`Object "${object.id}" unregistered.`),
+    }));
 
     registry.register('1', {id: '1', version: 1});
     registry.register('2', {id: '2', version: 1});
     registry.register('3', {id: '3', version: 1});
+    expect(log).toEqual([]);
 
+    // Replace object 2.
     registry.register('2', {id: '2', version: 2});
     expect(registry.objects()).toEqual([{id: '1', version: 1}, {id: '2', version: 2}, {id: '3', version: 1}]);
+
+    expect(log).toEqual(['Object "2" unregistered.']);
   });
 
   it('should return `null` if object is not registered', () => {

@@ -32,6 +32,10 @@ export class PartPagePO {
     this.locator = this.part.locator.locator(PartPagePO.selector);
   }
 
+  public async getComponentInstanceId(): Promise<string> {
+    return this.locator.locator('span.e2e-component-instance-id').innerText();
+  }
+
   public async getParams(): Promise<Params> {
     if (await this.locator.locator('sci-accordion.e2e-params').isHidden()) {
       return {};

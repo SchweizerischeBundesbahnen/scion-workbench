@@ -24,8 +24,9 @@ import {WorkbenchPartNavigation} from './workbench-part.model';
 import {By} from '@angular/platform-browser';
 import {WorkbenchService} from '../workbench.service';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
+import {SciViewportComponent} from '@scion/components/viewport';
 import {ɵWorkbenchService} from '../ɵworkbench.service';
+import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
 
 describe('WorkbenchPart', () => {
 
@@ -756,6 +757,7 @@ describe('WorkbenchPart', () => {
     const texts = {
       'title-1': 'TITLE-1',
       'title-2': 'TITLE-2',
+      'title-3': 'TITLE-3',
     };
 
     TestBed.configureTestingModule({
@@ -778,6 +780,16 @@ describe('WorkbenchPart', () => {
     // Expect title to be set.
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('TITLE-1');
     expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.right"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('title-2');
+
+    // Set title via handle.
+    TestBed.inject(WorkbenchService).getPart('part.left')!.title = 'title-3';
+    await waitUntilStable();
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('title-3');
+
+    // Set translatable title via handle.
+    TestBed.inject(WorkbenchService).getPart('part.left')!.title = '%title-3';
+    await waitUntilStable();
+    expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.left"] > wb-part-bar > span.e2e-title')).nativeElement.innerText).toEqual('TITLE-3');
   });
 
   it('should indicate whether part is in main area or not', async () => {
@@ -920,6 +932,176 @@ describe('WorkbenchPart', () => {
 
       // Expect part bar not to show.
       expect(fixture.debugElement.query(By.css('wb-part[data-partid="part.testee"] > wb-part-bar'))).toBeNull();
+    });
+  });
+
+  describe('Scroll Position', () => {
+
+    it('should retain part scroll position when switching activities', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart(MAIN_AREA)
+              .addPart('part.activity-1', {dockTo: 'left-top'}, {label: 'Activity 1', icon: 'folder', ɵactivityId: 'activity.1'})
+              .addPart('part.activity-2', {dockTo: 'left-top'}, {label: 'Activity 2', icon: 'folder', ɵactivityId: 'activity.2'})
+              .navigatePart('part.activity-1', ['path/to/part'])
+              .navigatePart('part.activity-2', ['path/to/part'])
+              .activatePart('part.activity-1'),
+          }),
+          provideRouter([
+            {path: 'path/to/part', loadComponent: () => TestPartComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-part',
+        template: '<div style="height: 2000px">Content</div>',
+      })
+      class TestPartComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      // Assert activity layout.
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+              activeActivityId: 'activity.1',
+            },
+          },
+        },
+        grids: {
+          'activity.1': {
+            root: new MPart({id: 'part.activity-1'}),
+            activePartId: 'part.activity-1',
+          },
+        },
+      });
+
+      const part1 = TestBed.inject(ɵWorkbenchService).getPart('part.activity-1')!;
+      const part2 = TestBed.inject(ɵWorkbenchService).getPart('part.activity-2')!;
+      const viewportPart1 = part1.getComponent<TestPartComponent>()!.viewport;
+
+      // Scroll part 1 to the bottom.
+      viewportPart1.scrollTop = 2000;
+      const scrollTop = viewportPart1.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Activate activity 2.
+      await part2.activate();
+      await waitUntilStable();
+
+      // Assert activity layout.
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+              activeActivityId: 'activity.2',
+            },
+          },
+        },
+        grids: {
+          'activity.2': {
+            root: new MPart({id: 'part.activity-2'}),
+            activePartId: 'part.activity-2',
+          },
+        },
+      });
+
+      // Activate activity 1.
+      await part1.activate();
+      await waitUntilStable();
+
+      // Assert activity layout.
+      expect(fixture).toEqualWorkbenchLayout({
+        activityLayout: {
+          toolbars: {
+            leftTop: {
+              activities: [{id: 'activity.1'}, {id: 'activity.2'}],
+              activeActivityId: 'activity.1',
+            },
+          },
+        },
+        grids: {
+          'activity.1': {
+            root: new MPart({id: 'part.activity-1'}),
+            activePartId: 'part.activity-1',
+          },
+        },
+      });
+
+      // Expect scroll position to be restored.
+      expect(viewportPart1.scrollTop).toBe(scrollTop);
+    });
+
+    it('should retain part scroll position when changing the layout', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart('part.right')
+              .navigatePart('part.right', ['path/to/part']),
+          }),
+          provideRouter([
+            {path: 'path/to/part', loadComponent: () => TestPartComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-part',
+        template: '<div style="height: 2000px">Content</div>',
+      })
+      class TestPartComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      const partRight = TestBed.inject(ɵWorkbenchService).getPart('part.right')!;
+      const viewportPartRight = partRight.getComponent<TestPartComponent>()!.viewport;
+
+      // Scroll part to the bottom.
+      viewportPartRight.scrollTop = 2000;
+      const scrollTop = viewportPartRight.scrollTop;
+
+      // Expect content to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Change layout by adding a part to the left.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+        .addPart('part.left', {align: 'left'})
+        .navigatePart('part.left', ['path/to/part']),
+      );
+      await waitUntilStable();
+
+      // Assert layout.
+      expect(fixture).toEqualWorkbenchLayout({
+        grids: {
+          main: {
+            root: new MTreeNode({
+              child1: new MPart({id: 'part.left'}),
+              child2: new MPart({id: 'part.right'}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            activePartId: 'part.right',
+          },
+        },
+      });
+
+      // Expect scroll position to be restored.
+      expect(viewportPartRight.scrollTop).toBe(scrollTop);
     });
   });
 });
