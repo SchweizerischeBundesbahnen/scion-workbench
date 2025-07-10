@@ -11,7 +11,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {MPart, MTreeNode} from '../layout/workbench-grid.model';
 import {MAIN_AREA} from '../layout/workbench-layout';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 
 /**
  * Determines whether the given element requires a drop zone in the specified region.
@@ -32,26 +31,24 @@ function requiresDropZone(element: MTreeNode | MPart, region: 'north' | 'south' 
     return element.id === MAIN_AREA;
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(element.child2);
-
-  if (child1Visible && child2Visible) {
+  const {child1, child2} = element;
+  if (child1.visible && child2.visible) {
     switch (region) {
       case 'north':
         // The element requires a drop zone if the element (or its first child) is divided horizontally into multiple parts.
-        return element.direction === 'row' || requiresDropZone(element.child1, region);
+        return element.direction === 'row' || requiresDropZone(child1, region);
       case 'south':
         // The element requires a drop zone if the element (or its second child) is divided horizontally into multiple parts.
-        return element.direction === 'row' || requiresDropZone(element.child2, region);
+        return element.direction === 'row' || requiresDropZone(child2, region);
       case 'west':
         // The element requires a drop zone if the element (or its first child) is divided vertically into multiple parts.
-        return element.direction === 'column' || requiresDropZone(element.child1, region);
+        return element.direction === 'column' || requiresDropZone(child1, region);
       case 'east':
         // The element requires a drop zone if the element (or its second child) is divided vertically into multiple parts.
-        return element.direction === 'column' || requiresDropZone(element.child2, region);
+        return element.direction === 'column' || requiresDropZone(child2, region);
       default:
         return false; // unsupported
     }
   }
-  return requiresDropZone(child1Visible ? element.child1 : element.child2, region);
+  return requiresDropZone(child1.visible ? child1 : child2, region);
 }
