@@ -86,7 +86,7 @@ export class WorkbenchNavigator {
       }
       case LayoutPagePO: {
         await startPage.openWorkbenchView('e2e-test-layout');
-        return new LayoutPagePO(this._appPO, {viewId, cssClass: 'e2e-test-layout'});
+        return new LayoutPagePO(this._appPO.view({viewId, cssClass: 'e2e-test-layout'}));
       }
       case ViewPagePO: {
         await startPage.openWorkbenchView('e2e-test-view');

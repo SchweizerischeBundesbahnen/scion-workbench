@@ -65,7 +65,7 @@ export function registerFocusTracker(target: ElementRef<Element> | Element, elem
   const subscription = toObservable(focusTracker.activeElement, {injector})
     .pipe(
       switchMap(activeElement => activeElement === elementFn() ? EMPTY : merge(fromEvent<FocusEvent>(coerceElement(target), 'focusin', {once: true}), fromEvent(coerceElement(target), 'sci-microfrontend-focusin', {once: true}))),
-      finalize(() => focusTracker.unsetActiveElement(elementFn())),
+      finalize(() => setTimeout(() => focusTracker.unsetActiveElement(elementFn()))), // TODO[focus-tracker] Test test to fail if not setTimeout
       takeUntilDestroyed(injector.get(DestroyRef)),
     )
     .subscribe(() => {

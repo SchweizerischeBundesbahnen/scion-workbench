@@ -113,7 +113,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
       untracked(() => {
         if (activeElement === this.id) {
           console.log(`>>> [ɵWorkbenchView][activateOnFocus][${this.id}] Activate View [instant=${this.activationInstant()}]`);
-          void this.activate();
+          void this.activate({force: true});
         }
       });
     });
@@ -309,9 +309,9 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public async activate(options?: {skipLocationChange?: boolean}): Promise<boolean> {
+  public async activate(options?: {force?: true; skipLocationChange?: boolean}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchView.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (this.active() && this.part().active() && this._focusTracker.activeElement() === this.id) {
+    if (!options?.force && this.active() && this.part().active() && this._focusTracker.activeElement() === this.id) {
       return true;
     }
 

@@ -8,13 +8,15 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DOCUMENT, ElementRef, inject, viewChild} from '@angular/core';
+import {Component, DOCUMENT, ElementRef, inject, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
-import {WorkbenchPart} from '../workbench-part.model';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {OnAttach, OnDetach} from '../../portal/wb-component-portal';
 import {registerFocusTracker, WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service';
+import {rootEffect} from '../../common/root-effect';
+import {asyncScheduler} from 'rxjs';
+import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 
 /**
  * Acts as a placeholder for a part's content that Angular fills based on the current router state of the associated part outlet.
@@ -31,7 +33,7 @@ import {registerFocusTracker, WorkbenchFocusTracker} from '../../focus/workbench
 })
 export class PartSlotComponent implements OnAttach, OnDetach {
 
-  protected readonly part = inject(WorkbenchPart);
+  protected readonly part = inject(ɵWorkbenchPart);
   protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
@@ -40,9 +42,20 @@ export class PartSlotComponent implements OnAttach, OnDetach {
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
+  private _activeElementBeforeDetach: HTMLElement | undefined;
 
   constructor() {
     registerFocusTracker(inject(ElementRef) as ElementRef<HTMLElement>, this.part.id);
+
+    rootEffect(onCleanup => {
+      const attached = this.part.slot.portal.attached();
+      if (!attached) {
+        untracked(() => {
+          const unset = asyncScheduler.schedule(() => this.focusTracker.unsetActiveElement(this.part.id));
+          onCleanup(() => unset.unsubscribe());
+        });
+      }
+    });
   }
 
   public focus(): void {
@@ -57,6 +70,11 @@ export class PartSlotComponent implements OnAttach, OnDetach {
   public onAttach(): void {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
+
+    if (this._activeElementBeforeDetach) {
+      this._activeElementBeforeDetach?.focus();
+      this._activeElementBeforeDetach = undefined;
+    }
   }
 
   /**
@@ -66,6 +84,10 @@ export class PartSlotComponent implements OnAttach, OnDetach {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
 
-    setTimeout(() => this.focusTracker.unsetActiveElement(this.part.id));
+    const activeElement = this._document.activeElement;
+    if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+      this._activeElementBeforeDetach = activeElement;
+    }
+    // setTimeout(() => this.focusTracker.unsetActiveElement(this.part.id));
   }
 }

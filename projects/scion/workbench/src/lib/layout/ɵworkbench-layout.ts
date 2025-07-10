@@ -1142,12 +1142,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const part = this.part({viewId: view.id});
 
     // Remove view.
-    const v = part.views.find(v => v === view);
-    console.log('>>> v', v);
-
-    console.log('>>> view remove before', part.views.map(v => v.id));
     part.views.splice(part.views.indexOf(view), 1);
-    console.log('>>> view remove after', part.views.map(v => v.id));
 
     // Remove outlet.
     if (options.removeOutlet ?? true) {
@@ -1170,16 +1165,22 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       }
     }
 
-    // Remove the part when removing its last view, but only if the part has no navigation and is not a structural part.
-    if (!part.views.length && !part.navigation && !part.structural) {
-      this.__removePart(part);
-    }
+    if (!part.views.length) {
+      // Remove the part when removing its last view, but only if the part has no navigation and is not a structural part.
+      if (!part.navigation && !part.structural) {
+        this.__removePart(part);
+      }
+      // Remove the part when removing its last view, but only if has been navigated.
+      else if (part.navigation) {
+        this.__activatePart(part);
+      }
 
-    // Close activity when removing its last view, but only if having no navigated parts.
-    const activity = this.activity({partId: part.id}, {orElse: null});
-    if (activity && !this.views({grid: activity.id}).length && !this.parts({grid: activity.id}).some(part => part.navigation)) {
-      const stack = this.activityStack({activityId: activity.id});
-      delete stack.activeActivityId;
+      // Close activity when removing its last view, but only if having no navigated parts.
+      const activity = this.activity({partId: part.id}, {orElse: null});
+      if (activity && !this.views({grid: activity.id}).length && !this.parts({grid: activity.id}).some(part => part.navigation)) {
+        const stack = this.activityStack({activityId: activity.id});
+        delete stack.activeActivityId;
+      }
     }
   }
 

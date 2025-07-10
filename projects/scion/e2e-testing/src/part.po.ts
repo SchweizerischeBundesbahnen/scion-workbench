@@ -35,7 +35,7 @@ export class PartPO {
   /**
    * Locates the content displayed in the part.
    */
-  public readonly content: PartSlotPO;
+  public readonly slot: PartSlotPO;
 
   /**
    * Handle to resize this part.
@@ -45,7 +45,7 @@ export class PartPO {
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
     this.activeView = new ViewPO(this.locator.locator('wb-view-slot'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
-    this.content = new PartSlotPO(this.locator.locator('wb-part-slot'));
+    this.slot = new PartSlotPO(this.locator.locator('wb-part-slot'));
     this.sash = new PartSashPO(this.locator);
   }
 

@@ -822,7 +822,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.C'}).views.map(view => view.id)).toEqual(['view.4']);
   });
 
-  it('should remove non-structural part when removing its last view', () => {
+  fit('should remove non-structural part when removing its last view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
@@ -4276,6 +4276,30 @@ describe('WorkbenchLayout', () => {
         .removeView('view.1', {force: true});
 
       expect(workbenchLayout.part({partId: 'part.activity-2-bottom'}, {orElse: null})).toBeNull();
+    });
+
+    it('should activate part if navigated and removing its last view', () => {
+      let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right'})
+        .addView('view.1', {partId: 'part.right'})
+        .addView('view.2', {partId: 'part.right'})
+        .navigatePart('part.right', ['path/to/part'])
+        .activatePart('part.left')
+        .activateView('view.1');
+
+      expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.left');
+
+      // Remove view.1.
+      workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
+      expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.left');
+
+      // Remove view.2.
+      workbenchLayout = workbenchLayout.removeView('view.2', {force: true});
+      expect(workbenchLayout.activePart({grid: 'main'}).id).toEqual('part.right');
+
+      // Expect part not to be removed.
+      expect(workbenchLayout.hasPart('part.right')).toBeTrue();
     });
 
     it('should have metadata as configured', () => {

@@ -403,7 +403,7 @@ test.describe('Navigational State', () => {
         .navigateView('view.100', ['test-layout']),
       );
 
-      const layoutPage = new LayoutPagePO(appPO, {viewId: 'view.100'});
+      const layoutPage = new LayoutPagePO(appPO.view({viewId: 'view.100'}));
       const partPage = new PartPagePO(appPO, {partId: 'part.testee'});
       await expect.poll(() => partPage.getNavigationState()).toEqual({});
 

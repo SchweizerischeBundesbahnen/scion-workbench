@@ -27,7 +27,7 @@ export class FocusTestPerspectivePO {
   }
 
   public async clickPart(locator: RequireOne<{partId: PartId}>): Promise<void> {
-    await this._appPO.part({partId: locator.partId}).content.locator.click({position: {x: 10, y: 10}});
+    await this._appPO.part({partId: locator.partId}).slot.locator.click({position: {x: 10, y: 10}});
   }
 
   public async clickPartBar(locator: RequireOne<{partId: PartId}>): Promise<void> {

@@ -9,13 +9,13 @@
  */
 
 import {Locator} from '@playwright/test';
-import {ExpectationResult} from './custom-matchers.definition';
 import {retryOnError} from '../helper/testing.util';
+import {MatcherReturnType} from 'playwright/types/test';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toHaveBoundingBox}.
  */
-export async function toHaveBoundingBox(locator: Locator, expected: ExpectedBoundingBox): Promise<ExpectationResult> {
+export async function toHaveBoundingBox(locator: Locator, expected: ExpectedBoundingBox): Promise<MatcherReturnType> {
   try {
     // Retry assertion to behave like a Playwright web-first assertion, i.e., wait and retry until the expected condition is met.
     await retryOnError(() => assertBoundingBox(expected, locator));

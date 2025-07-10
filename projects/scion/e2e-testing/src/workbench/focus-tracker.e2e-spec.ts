@@ -16,6 +16,7 @@ import {LayoutPagePO} from './page-object/layout-page/layout-page.po';
 import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
+import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 
 test.describe.only('Focus Tracker', () => {
 
@@ -42,7 +43,7 @@ test.describe.only('Focus Tracker', () => {
       await appPO.activityItem({activityId: 'activity.1'}).click();
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1a');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
-      await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).not.toBeVisible();
@@ -55,7 +56,7 @@ test.describe.only('Focus Tracker', () => {
       await appPO.activityItem({activityId: 'activity.2'}).click();
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
       await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
-      await expect(appPO.part({partId: 'part.activity-2'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-2'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -327,7 +328,7 @@ test.describe.only('Focus Tracker', () => {
       await appPO.activityItem({activityId: 'activity.1'}).click();
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1a');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
-      await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).not.toBeVisible();
@@ -340,7 +341,7 @@ test.describe.only('Focus Tracker', () => {
       await appPO.activityItem({activityId: 'activity.2'}).click();
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
       await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
-      await expect(appPO.part({partId: 'part.activity-2'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-2'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -354,7 +355,7 @@ test.describe.only('Focus Tracker', () => {
       await testPerspective.clickPartBar({partId: 'part.activity-1a'});
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1a');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
-      await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -369,7 +370,7 @@ test.describe.only('Focus Tracker', () => {
       await testPerspective.clickPart({partId: 'part.activity-1b'});
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1b');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1b');
-      await expect(appPO.part({partId: 'part.activity-1b'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-1b'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -386,7 +387,7 @@ test.describe.only('Focus Tracker', () => {
       await expect.poll(() => appPO.focusOwner()).toEqual('view.101');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1c');
       await expect.poll(() => appPO.activeViewId({partId: 'part.activity-1c'})).toEqual('view.101');
-      await expect(appPO.view({viewId: 'view.101'}).viewport).toBeFocused();
+      await expect(appPO.view({viewId: 'view.101'}).viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -408,7 +409,7 @@ test.describe.only('Focus Tracker', () => {
       await expect.poll(() => appPO.focusOwner()).toEqual('view.103');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1d');
       await expect.poll(() => appPO.activeViewId({partId: 'part.activity-1d'})).toEqual('view.103');
-      await expect(appPO.view({viewId: 'view.103'}).viewport).toBeFocused();
+      await expect(appPO.view({viewId: 'view.103'}).viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -431,7 +432,7 @@ test.describe.only('Focus Tracker', () => {
       await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
       await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1d');
       await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
-      await expect(appPO.part({partId: 'part.activity-2'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.activity-2'}).slot.viewport).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -456,7 +457,7 @@ test.describe.only('Focus Tracker', () => {
       await testPerspective.clickDesktop();
       await expect.poll(() => appPO.focusOwner()).toBeNull();
       await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
-      await expect(appPO.desktop.locator).toBeFocused();
+      await expect(appPO.desktop.locator).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -478,7 +479,7 @@ test.describe.only('Focus Tracker', () => {
       await testPerspective.clickPartBar({partId: 'part.right-1'});
       await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
       await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
-      await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
       await expect.poll(() => logPart.getLog()).toEqual([
         'part.activity-1a',
         'part.activity-2',
@@ -495,7 +496,7 @@ test.describe.only('Focus Tracker', () => {
       await testPerspective.clickPartBar({partId: 'part.right-2'});
       await expect.poll(() => appPO.focusOwner()).toEqual('part.right-2');
       await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-2');
-      await expect(appPO.part({partId: 'part.right-2'}).content.viewport).toBeFocused();
+      await expect(appPO.part({partId: 'part.right-2'}).slot.viewport).toContainFocus();
       await expect.poll(() => logPart.getLog()).toEqual([
         'part.activity-1a',
         'part.activity-2',
@@ -514,7 +515,7 @@ test.describe.only('Focus Tracker', () => {
       await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
       await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
       await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
-      await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+      await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
       await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
       await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
       await expect(appPO.view({viewId: 'view.203'}).tab.state('active')).toBeVisible();
@@ -538,7 +539,7 @@ test.describe.only('Focus Tracker', () => {
       await expect.poll(() => appPO.focusOwner()).toEqual('view.203');
       await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-4');
       await expect.poll(() => appPO.activeViewId({partId: 'part.right-4'})).toEqual('view.203');
-      await expect(appPO.view({viewId: 'view.203'}).viewport).toBeFocused();
+      await expect(appPO.view({viewId: 'view.203'}).viewport).toContainFocus();
       await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
       await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).not.toBeVisible();
       await expect(appPO.view({viewId: 'view.203'}).tab.state('active')).toBeVisible();
@@ -564,7 +565,7 @@ test.describe.only('Focus Tracker', () => {
       await testPerspective.clickDesktop();
       await expect.poll(() => appPO.focusOwner()).toBeNull();
       await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-4');
-      await expect(appPO.desktop.locator).toBeFocused();
+      await expect(appPO.desktop.locator).toContainFocus();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
       await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
@@ -618,7 +619,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.999');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).not.toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).not.toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).not.toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -630,7 +631,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual(['view.201']);
@@ -663,7 +664,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.999');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).not.toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).not.toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).not.toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -675,7 +676,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual(['view.201']);
@@ -703,7 +704,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toBeNull();
-    await expect(appPO.view({viewId: 'view.201'}).viewport).not.toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).not.toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).not.toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -715,7 +716,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -742,7 +743,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('active')).not.toBeVisible();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('focus-within-view')).not.toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -754,7 +755,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.202');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.202');
-    await expect(appPO.view({viewId: 'view.202'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.202'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual(['view.202']);
@@ -797,7 +798,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.202');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.202');
-    await expect(appPO.view({viewId: 'view.202'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.202'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -826,7 +827,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect 'part.right-1' to be active, but not focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toBeNull();
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part 'part.right-1'.
@@ -835,7 +836,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual(['part.right-1']);
   });
 
@@ -859,7 +860,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect 'part.right-1' to be active, but not focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toBeNull();
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part 'part.right-1'.
@@ -868,7 +869,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual(['part.right-1']);
   });
 
@@ -892,7 +893,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect 'part.right-1' to be active, but not focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toBeNull();
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Activate part 'part.right-1' via router.
@@ -901,7 +902,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([
       expect.anything(), // ignore ModifyLayoutPage
       'part.right-1',
@@ -925,7 +926,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect 'part.right-1' to be inactive and not focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-2');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-2');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part 'part.right-1'.
@@ -934,7 +935,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to be active and have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual(['part.right-1']);
   });
 
@@ -955,7 +956,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect 'part.right-1' to be inactive and not focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-2');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-2');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part 'part.right-1'.
@@ -964,7 +965,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to be active and have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual(['part.right-1']);
   });
 
@@ -989,7 +990,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect 'part.right-1' to be inactive and not focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-2');
     await expect.poll(() => appPO.focusOwner()).toBeNull();
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Activate part 'part.right-1' via router.
@@ -998,7 +999,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to be active and have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([
       expect.anything(), // ignore ModifyLayoutPage
       'part.right-1',
@@ -1026,7 +1027,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1038,7 +1039,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1062,7 +1063,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1076,7 +1077,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual('view.202');
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).not.toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).not.toBeVisible();
-    await expect(appPO.view({viewId: 'view.202'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.202'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1092,7 +1093,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('active')).not.toBeVisible();
     await expect(appPO.view({viewId: 'view.202'}).tab.state('focus-within-view')).not.toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1126,7 +1127,7 @@ test.describe.only('Focus Tracker', () => {
 
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1a');
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1150,7 +1151,7 @@ test.describe.only('Focus Tracker', () => {
 
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-2'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-2'}).slot.viewport).toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
     await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1178,7 +1179,7 @@ test.describe.only('Focus Tracker', () => {
 
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1a');
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1206,7 +1207,7 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test('should not focus activity when restoring them after minimization', async ({appPO, page}) => {
+  test.only('should not focus activity on restore after minimization', async ({appPO, page}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1223,7 +1224,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect activity to be opened.
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-1a');
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1249,7 +1250,7 @@ test.describe.only('Focus Tracker', () => {
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).not.toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('focus-within-activity')).not.toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => logPart.getLog()).toEqual([
@@ -1264,7 +1265,7 @@ test.describe.only('Focus Tracker', () => {
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-2'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-2'}).slot.viewport).toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.activity-2');
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
@@ -1291,7 +1292,7 @@ test.describe.only('Focus Tracker', () => {
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('focus-within-activity')).not.toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-2'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-2'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
@@ -1335,7 +1336,7 @@ test.describe.only('Focus Tracker', () => {
     await expect(appPO.activityItem({activityId: 'activity.1'}).state('focus-within-activity')).not.toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.2'}).state('focus-within-activity')).not.toBeVisible();
-    await expect(appPO.part({partId: 'part.activity-1a'}).content.viewport).not.toBeFocused();
+    await expect(appPO.part({partId: 'part.activity-1a'}).slot.viewport).not.toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => appPO.activePartId({grid: 'activity.1'})).toEqual('part.activity-1a');
     await expect.poll(() => appPO.activePartId({grid: 'activity.2'})).toEqual('part.activity-2');
@@ -1370,7 +1371,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect activity to be opened.
     await expect(appPO.activityItem({activityId: 'activity.3'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.3'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.view({viewId: 'view.301'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.301'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.301'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.301'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.301');
@@ -1393,7 +1394,7 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test('should not focus activity (has views) when restoring them after minimization', async ({appPO, page}) => {
+  test('should not focus activity (has views) on restore after minimization', async ({appPO, page}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1410,7 +1411,7 @@ test.describe.only('Focus Tracker', () => {
     // PRECONDITION: Expect activity to be opened.
     await expect(appPO.activityItem({activityId: 'activity.3'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.3'}).state('focus-within-activity')).toBeVisible();
-    await expect(appPO.view({viewId: 'view.301'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.301'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.301'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.301'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.301');
@@ -1432,7 +1433,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect activity not to be focused.
     await expect(appPO.activityItem({activityId: 'activity.3'}).state('active')).toBeVisible();
     await expect(appPO.activityItem({activityId: 'activity.3'}).state('focus-within-activity')).not.toBeVisible();
-    await expect(appPO.view({viewId: 'view.301'}).viewport).not.toBeFocused();
+    await expect(appPO.view({viewId: 'view.301'}).viewport).not.toContainFocus();
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => appPO.activePartId({grid: 'activity.3'})).toEqual('part.activity-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.activity-3'})).toEqual('view.301');
@@ -1453,13 +1454,14 @@ test.describe.only('Focus Tracker', () => {
 
     // TEST: Activate view 'view.201'.
     await testPerspective.clickViewTab({viewId: 'view.201'});
+    await testPerspective.clickViewInput({viewId: 'view.201'});
     await logPart.clearLog();
 
     // PRECONDITION: Expect 'view.201' to be active and focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1470,7 +1472,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1488,13 +1490,14 @@ test.describe.only('Focus Tracker', () => {
 
     // TEST: Activate view 'view.201'.
     await testPerspective.clickViewTab({viewId: 'view.201'});
+    await testPerspective.clickViewInput({viewId: 'view.201'});
     await logPart.clearLog();
 
     // PRECONDITION: Expect 'view.201' to be active and focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1505,7 +1508,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1534,7 +1537,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1574,7 +1577,7 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toBeFocused();
+    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
@@ -1589,6 +1592,98 @@ test.describe.only('Focus Tracker', () => {
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
     await expect.poll(() => logPart.getLog()).toEqual([]);
+  });
+
+  test('should not lose workbench focus of view on re-layout', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .navigateView('view.1', ['test-layout'])
+      .activateView('view.1'),
+    );
+
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect(appPO.view({viewId: 'view.1'}).viewport).toContainFocus();
+
+    // Force a relayout by creating a part on the left.
+    const layoutPage = new LayoutPagePO(appPO.view({viewId: 'view.1'}))
+    await layoutPage.modifyLayout(layout => layout
+      .addPart('part.left', {align: 'left', relativeTo: 'part.main'})
+      .navigatePart('part.left', ['path/to/part']),
+    );
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [],
+            }),
+            child2: new MPart({
+              id: 'part.main',
+              views: [{id: 'view.1'}],
+              activeViewId: 'view.1',
+            }),
+          }),
+          activePartId: 'part.main',
+        },
+      },
+    })
+
+    await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.main');
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect(appPO.view({viewId: 'view.1'}).viewport).toContainFocus();
+    await expect(appPO.view({viewId: 'view.1'}).tab.state('active')).toBeVisible();
+    await expect(appPO.view({viewId: 'view.1'}).tab.state('focus-within-view')).toBeVisible();
+  });
+
+  test('should not lose workbench focus of part on re-layout', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .navigatePart('part.main', ['test-layout'])
+      .activatePart('part.main'),
+    );
+
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+    await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
+
+    // Force a relayout by creating a part on the left.
+    const layoutPage = new LayoutPagePO(appPO.part({partId: 'part.main'}))
+    await layoutPage.modifyLayout(layout => layout
+      .addPart('part.left', {align: 'left', relativeTo: 'part.main'})
+      .navigatePart('part.left', ['path/to/part']),
+    );
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      grids: {
+        main: {
+          root: new MTreeNode({
+            direction: 'row',
+            ratio: .5,
+            child1: new MPart({
+              id: 'part.left',
+              views: [],
+            }),
+            child2: new MPart({
+              id: 'part.main',
+              views: [],
+            }),
+          }),
+          activePartId: 'part.main',
+        },
+      },
+    })
+
+    await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.main');
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+    await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
   });
 
   test('should focus dialog when opening dialog', async ({appPO, workbenchNavigator}) => {
@@ -1734,7 +1829,7 @@ test.describe.only('Focus Tracker', () => {
       'part.right-2',
       dialogId,
     ]);
-    await expect(appPO.dialog({dialogId}).dialog).toBeFocused();
+    await expect(appPO.dialog({dialogId}).dialog).toContainFocus();
   });
 
   test('should focus message box when opening message box', async ({appPO, workbenchNavigator}) => {
@@ -1962,7 +2057,7 @@ test.describe.only('Focus Tracker', () => {
 
     // PRECONDITION: Expect 'part.right-1' to have workbench focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
-    await expect(appPO.part({partId: 'part.right-1'}).content.viewport).toBeFocused();
+    await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click application header.
@@ -1972,5 +2067,30 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
     await expect(appPO.header.settingsMenuButton).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
+  });
+
+  test('should focus part if navigated and removing its last view', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .navigatePart('part.main', ['path/to/part'])
+      .activateView('view.1'),
+    );
+
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect(appPO.view({viewId: 'view.1'}).viewport).toContainFocus();
+
+    // Close view.1.
+    await appPO.view({viewId: 'view.1'}).tab.close();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect(appPO.view({viewId: 'view.2'}).viewport).toContainFocus();
+
+    // Close view.2.
+    await appPO.view({viewId: 'view.2'}).tab.close();
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+    await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
   });
 });

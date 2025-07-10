@@ -141,6 +141,54 @@ test.describe.only('View Activation Instant', () => {
     await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
   });
 
+  test('should not update activation instant of active and focused view when clicking part title', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main', {title: 'Title'})
+      .addView('view.100', {partId: 'part.main'})
+      .navigateView('view.100', ['test-view']),
+    );
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+
+    // Focus view.100
+    await viewPage.view.tab.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.100');
+
+    // Memoize activation instant.
+    const viewActivationInstant = await viewPage.getActivationInstant();
+
+    // Click title of part bar.
+    await appPO.part({partId: 'part.main'}).bar.title.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.100');
+    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+  });
+
+  test('should not update activation instant of active and focused view when clicking part bar', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.100', {partId: 'part.main'})
+      .navigateView('view.100', ['test-view']),
+    );
+
+    const viewPage = new ViewPagePO(appPO, {viewId: 'view.100'});
+
+    // Focus view.100
+    await viewPage.view.tab.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.100');
+
+    // Memoize activation instant.
+    const viewActivationInstant = await viewPage.getActivationInstant();
+
+    // Click part bar.
+    await appPO.part({partId: 'part.main'}).bar.filler.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.100');
+    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+  });
+
   test('should not update activation instant of active and focused view when clicking its content', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 

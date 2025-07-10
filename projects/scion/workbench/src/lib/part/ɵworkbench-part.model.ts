@@ -94,7 +94,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
       untracked(() => {
         if (activeElement === this.id) {
           console.log(`>>> [ɵWorkbenchPart][activateOnFocus][${this.id}] Activate Part [instant=${this.activationInstant()}]`);
-          void this.activate();
+          void this.activate({force: true});
         }
       });
     });
@@ -230,11 +230,11 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public async activate(): Promise<boolean> {
+  public async activate(options?: {force?: true}): Promise<boolean> {
     console.log(`>>> WorkbenchPart.activate [part=${this.id}]`);
 
     assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (this.active() && this._focusTracker.activeElement() === this.id) {
+    if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
       return true;
     }
 
