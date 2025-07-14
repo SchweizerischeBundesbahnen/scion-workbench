@@ -16,13 +16,7 @@ import {DomRect, fromRect} from './helper/testing.util';
  */
 export class ActivityPanelPO {
 
-  /**
-   * Locates the message displayed if the panel has no content to display, i.e., has no navigated parts or views.
-   */
-  public readonly nullContentMessage: Locator;
-
   constructor(public readonly locator: Locator) {
-    this.nullContentMessage = this.locator.locator('wb-null-content');
   }
 
   public async getPanel(): Promise<'left' | 'right' | 'bottom'> {

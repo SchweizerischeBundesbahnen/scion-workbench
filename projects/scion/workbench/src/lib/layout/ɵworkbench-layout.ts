@@ -64,6 +64,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     this._outlets = new Map(Objects.entries(coerceOutlets(config?.outlets)));
     this._navigationStates = new Map(Objects.entries(config?.navigationStates ?? {}));
     this.perspectiveId = config?.perspectiveId;
+    this.assertGrids();
     this.assertActivities();
   }
 
@@ -710,12 +711,12 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
         cssClass: extras.cssClass ? Arrays.coerce(extras.cssClass) : undefined,
       }),
       activePartId: id,
+      referencePartId: id,
     };
 
     const activityStack = this.activityStack({dockTo});
     activityStack.activities.push({
       id: activityId,
-      referencePartId: id,
       icon: extras.icon,
       label: extras.label,
       tooltip: extras.tooltip ?? extras.label,
@@ -905,15 +906,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __removePart(part: MPart): void {
-    // Remove activity if this part is the reference part of the activity.
+    const {gridName, grid} = this.grid({partId: part.id});
+
+    // Remove activity if this part is the reference part of an activity.
     const activity = this.activity({partId: part.id}, {orElse: null});
-    if (activity?.referencePartId === part.id) {
+    if (activity && part.id === grid.referencePartId) {
       this.__removeActivity(activity);
       return;
     }
 
     // The last part is never removed.
-    const {gridName, grid} = this.grid({partId: part.id});
     const parts = this.parts({grid: gridName});
     if (parts.length === 1) {
       return;
@@ -1005,11 +1007,10 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._navigationStates.set(newPartId, this._navigationStates.get(part.id)!);
       this._navigationStates.delete(part.id);
     }
-    const activity = this.activity({partId: part.id}, {orElse: null});
-    if (activity?.referencePartId === part.id) {
-      activity.referencePartId = newPartId;
-    }
     const {grid} = this.grid({partId: part.id});
+    if (grid.referencePartId === part.id) {
+      grid.referencePartId = newPartId;
+    }
     if (grid.activePartId === part.id) {
       grid.activePartId = newPartId;
     }
@@ -1362,6 +1363,22 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Asserts integrity of grids.
+   */
+  private assertGrids(): void {
+    Objects.entries(this.grids).forEach(([gridName, grid]) => {
+      // Assert active part to exist.
+      if (!this.part({partId: grid.activePartId, grid: gridName}, {orElse: null})) {
+        throw Error(`[NullActivePartError] Active part "${grid.activePartId}" not found in grid ${gridName}.`);
+      }
+      // Assert reference part to exist.
+      if (grid.referencePartId && !this.part({partId: grid.referencePartId, grid: gridName}, {orElse: null})) {
+        throw Error(`[NullReferencePartError] Reference part "${grid.activePartId}" not found in grid ${gridName}.`);
+      }
+    });
+  }
+
+  /**
    * Asserts each activity to have a grid.
    */
   private assertActivities(): void {
@@ -1381,9 +1398,9 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       }
     });
 
-    // Assert reference part to be contained in the grid.
+    // Assert activity to have reference part.
     mActivities.forEach(activity => {
-      if (!this.part({partId: activity.referencePartId, grid: activity.id}, {orElse: null})) {
+      if (!this.grids[activity.id]!.referencePartId) {
         throw Error(`[NullReferencePartError] Missing reference part for activity ${activity.id}.`);
       }
     });

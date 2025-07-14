@@ -320,4 +320,78 @@ test.describe('Workbench Layout Migration', () => {
       } satisfies Partial<ViewInfo>,
     );
   });
+
+  /**
+   * ## Given layout in version 5:
+   *
+   * Reference Layout:
+   * +-------------------------------+ +-------------------+
+   * | Activity: activity.1          | |     MAIN AREA     |
+   * | Part: part.activity-1         | |                   |
+   * +-------------------------------+ +-------------------+
+   * part.activity.1: [path='test-part']
+   *
+   * User Layout:
+   * +-------------------------------+ +-------------------+ +-------------------------------+
+   * | Activity: activity.1          | |     MAIN AREA     | | Activity: activity.2          |
+   * | Part: part.activity-1         | |                   | | Part: part.activity-2         |
+   * +-------------------------------+ +-------------------+ +-------------------------------+
+   *
+   * part.activity.1: [path='test-part']
+   * part.activity.2: [path='test-part']
+   */
+  test('should migrate workbench layout v5 to the latest version', async ({appPO}) => {
+    await appPO.navigateTo({
+      url: '#',
+      microfrontendSupport: false,
+      localStorage: {
+        'scion.workbench.perspective': 'e2e-layout-migration-v5',
+        'scion.workbench.perspectives.e2e-layout-migration-v5': 'eyJyZWZlcmVuY2VMYXlvdXQiOnsiZ3JpZHMiOnsibWFpbiI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaUxDSmhiSFJsY201aGRHbDJaVWxrSWpvaWJXRnBiaTFoY21WaElpd2lkbWxsZDNNaU9sdGRMQ0p6ZEhKMVkzUjFjbUZzSWpwMGNuVmxmU3dpWVdOMGFYWmxVR0Z5ZEVsa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaWZTOHZOdz09IiwiYWN0aXZpdHkuMSI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1aFkzUnBkbWwwZVMweElpd2lkR2wwYkdVaU9pSkJZM1JwZG1sMGVTSXNJblpwWlhkeklqcGJYU3dpYzNSeWRXTjBkWEpoYkNJNmRISjFaU3dpYm1GMmFXZGhkR2x2YmlJNmV5SnBaQ0k2SWprNVlXWTFaVEF3SW4xOUxDSmhZM1JwZG1WUVlYSjBTV1FpT2lKd1lYSjBMbUZqZEdsMmFYUjVMVEVpZlM4dk53PT0ifSwiYWN0aXZpdHlMYXlvdXQiOiJleUowYjI5c1ltRnljeUk2ZXlKc1pXWjBWRzl3SWpwN0ltRmpkR2wyYVhScFpYTWlPbHQ3SW1sa0lqb2lZV04wYVhacGRIa3VNU0lzSW5KbFptVnlaVzVqWlZCaGNuUkpaQ0k2SW5CaGNuUXVZV04wYVhacGRIa3RNU0lzSW1samIyNGlPaUptYjJ4a1pYSWlMQ0pzWVdKbGJDSTZJa0ZqZEdsMmFYUjVJaXdpZEc5dmJIUnBjQ0k2SWtGamRHbDJhWFI1SW4xZExDSmhZM1JwZG1WQlkzUnBkbWwwZVVsa0lqb2lZV04wYVhacGRIa3VNU0o5TENKc1pXWjBRbTkwZEc5dElqcDdJbUZqZEdsMmFYUnBaWE1pT2x0ZGZTd2ljbWxuYUhSVWIzQWlPbnNpWVdOMGFYWnBkR2xsY3lJNlcxMTlMQ0p5YVdkb2RFSnZkSFJ2YlNJNmV5SmhZM1JwZG1sMGFXVnpJanBiWFgwc0ltSnZkSFJ2YlV4bFpuUWlPbnNpWVdOMGFYWnBkR2xsY3lJNlcxMTlMQ0ppYjNSMGIyMVNhV2RvZENJNmV5SmhZM1JwZG1sMGFXVnpJanBiWFgxOUxDSndZVzVsYkhNaU9uc2liR1ZtZENJNmV5SjNhV1IwYUNJNk16QXdMQ0p5WVhScGJ5STZNQzQxZlN3aWNtbG5hSFFpT25zaWQybGtkR2dpT2pNd01Dd2ljbUYwYVc4aU9qQXVOWDBzSW1KdmRIUnZiU0k2ZXlKb1pXbG5hSFFpT2pJMU1Dd2ljbUYwYVc4aU9qQXVOWDE5ZlM4dk1RPT0iLCJvdXRsZXRzIjoie1wicGFydC5hY3Rpdml0eS0xXCI6W3tcInBhdGhcIjpcInRlc3QtcGFydFwiLFwicGFyYW1ldGVyc1wiOnt9fV19In0sInVzZXJMYXlvdXQiOnsiZ3JpZHMiOnsibWFpbiI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaUxDSmhiSFJsY201aGRHbDJaVWxrSWpvaWJXRnBiaTFoY21WaElpd2lkbWxsZDNNaU9sdGRMQ0p6ZEhKMVkzUjFjbUZzSWpwMGNuVmxmU3dpWVdOMGFYWmxVR0Z5ZEVsa0lqb2ljR0Z5ZEM1dFlXbHVMV0Z5WldFaWZTOHZOdz09IiwiYWN0aXZpdHkuMSI6ImV5SnliMjkwSWpwN0luUjVjR1VpT2lKTlVHRnlkQ0lzSW1sa0lqb2ljR0Z5ZEM1aFkzUnBkbWwwZVMweElpd2lkR2wwYkdVaU9pSkJZM1JwZG1sMGVTSXNJblpwWlhkeklqcGJYU3dpYzNSeWRXTjBkWEpoYkNJNmRISjFaU3dpYm1GMmFXZGhkR2x2YmlJNmV5SnBaQ0k2SWpneE5HUmhNVEE1SW4xOUxDSmhZM1JwZG1WUVlYSjBTV1FpT2lKd1lYSjBMbUZqZEdsMmFYUjVMVEVpZlM4dk53PT0iLCJhY3Rpdml0eS4yIjoiZXlKeWIyOTBJanA3SW5SNWNHVWlPaUpOVUdGeWRDSXNJbWxrSWpvaWNHRnlkQzVoWTNScGRtbDBlUzB5SWl3aWRHbDBiR1VpT2lKQlkzUnBkbWwwZVNBeUlpd2lkbWxsZDNNaU9sdGRMQ0p6ZEhKMVkzUjFjbUZzSWpwMGNuVmxMQ0p1WVhacFoyRjBhVzl1SWpwN0ltbGtJam9pTlRoaU4yRmxObVlpTENKa1lYUmhJanB1ZFd4c2ZYMHNJbUZqZEdsMlpWQmhjblJKWkNJNkluQmhjblF1WVdOMGFYWnBkSGt0TWlKOUx5ODMifSwiYWN0aXZpdHlMYXlvdXQiOiJleUowYjI5c1ltRnljeUk2ZXlKc1pXWjBWRzl3SWpwN0ltRmpkR2wyYVhScFpYTWlPbHQ3SW1sa0lqb2lZV04wYVhacGRIa3VNU0lzSW5KbFptVnlaVzVqWlZCaGNuUkpaQ0k2SW5CaGNuUXVZV04wYVhacGRIa3RNU0lzSW1samIyNGlPaUptYjJ4a1pYSWlMQ0pzWVdKbGJDSTZJa0ZqZEdsMmFYUjVJaXdpZEc5dmJIUnBjQ0k2SWtGamRHbDJhWFI1SW4xZExDSmhZM1JwZG1WQlkzUnBkbWwwZVVsa0lqb2lZV04wYVhacGRIa3VNU0o5TENKc1pXWjBRbTkwZEc5dElqcDdJbUZqZEdsMmFYUnBaWE1pT2x0ZGZTd2ljbWxuYUhSVWIzQWlPbnNpWVdOMGFYWnBkR2xsY3lJNlczc2lhV1FpT2lKaFkzUnBkbWwwZVM0eUlpd2ljbVZtWlhKbGJtTmxVR0Z5ZEVsa0lqb2ljR0Z5ZEM1aFkzUnBkbWwwZVMweUlpd2lhV052YmlJNkltWnZiR1JsY2lJc0lteGhZbVZzSWpvaVFXTjBhWFpwZEhrZ01pSXNJblJ2YjJ4MGFYQWlPaUpCWTNScGRtbDBlU0F5SWl3aVkzTnpRMnhoYzNNaU9tNTFiR3g5WFN3aVlXTjBhWFpsUVdOMGFYWnBkSGxKWkNJNkltRmpkR2wyYVhSNUxqSWlmU3dpY21sbmFIUkNiM1IwYjIwaU9uc2lZV04wYVhacGRHbGxjeUk2VzExOUxDSmliM1IwYjIxTVpXWjBJanA3SW1GamRHbDJhWFJwWlhNaU9sdGRmU3dpWW05MGRHOXRVbWxuYUhRaU9uc2lZV04wYVhacGRHbGxjeUk2VzExOWZTd2ljR0Z1Wld4eklqcDdJbXhsWm5RaU9uc2lkMmxrZEdnaU9qTXdNQ3dpY21GMGFXOGlPakF1Tlgwc0luSnBaMmgwSWpwN0luZHBaSFJvSWpvek1EQXNJbkpoZEdsdklqb3dMalY5TENKaWIzUjBiMjBpT25zaWFHVnBaMmgwSWpveU5UQXNJbkpoZEdsdklqb3dMalY5Zlgwdkx6RT0iLCJvdXRsZXRzIjoie1wicGFydC5hY3Rpdml0eS0xXCI6W3tcInBhdGhcIjpcInRlc3QtcGFydFwiLFwicGFyYW1ldGVyc1wiOnt9fV0sXCJwYXJ0LmFjdGl2aXR5LTJcIjpbe1wicGF0aFwiOlwidGVzdC1wYXJ0XCIsXCJwYXJhbWV0ZXJzXCI6e319XX0ifX0vLzU=',
+      },
+      perspectives: ['e2e-layout-migration-v5'],
+    });
+
+    await expect(appPO.workbenchRoot).toEqualWorkbenchLayout({
+      activityLayout: {
+        toolbars: {
+          leftTop: {
+            activities: [{id: 'activity.1'}],
+            activeActivityId: 'activity.1',
+          },
+          rightTop: {
+            activities: [{id: 'activity.2'}],
+            activeActivityId: 'activity.2',
+          },
+        },
+      },
+      grids: {
+        main: {
+          root: new MPart({
+            id: MAIN_AREA,
+            alternativeId: MAIN_AREA_ALTERNATIVE_ID,
+          }),
+          activePartId: MAIN_AREA,
+        },
+        'activity.1': {
+          root: new MPart({
+            id: 'part.activity-1',
+            views: [],
+          }),
+          activePartId: 'part.activity-1',
+          referencePartId: 'part.activity-1',
+        },
+        'activity.2': {
+          root: new MPart({
+            id: 'part.activity-2',
+            views: [],
+          }),
+          activePartId: 'part.activity-2',
+          referencePartId: 'part.activity-2',
+        },
+      },
+    });
+
+    expect((await appPO.workbench.part({id: 'part.activity-1'})).navigation.path).toEqual('test-part');
+    expect((await appPO.workbench.part({id: 'part.activity-2'})).navigation.path).toEqual('test-part');
+  });
 });

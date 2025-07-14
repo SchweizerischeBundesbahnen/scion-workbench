@@ -22,6 +22,17 @@ import {ActivityId} from '../activity/workbench-activity.model';
 export interface MPartGrid {
   root: MTreeNode | MPart;
   activePartId: PartId;
+  /**
+   * Specifies the reference part of this grid.
+   *
+   * For grids of an activity, the reference part corresponds to the part used to create the activity.
+   *
+   * Characteristics:
+   * - Remains visible if no other parts in the grid are visible.
+   * - Removing the reference part removes the activity.
+   * - Provides the activity title, regardless of visibility or position in the layout.
+   */
+  referencePartId?: PartId;
 }
 
 /**
@@ -54,6 +65,12 @@ export class MTreeNode {
   public ratio!: number;
   public direction!: 'column' | 'row';
   public parent?: MTreeNode;
+  /**
+   * Indicates whether this node is visible.
+   *
+   * NOTE: This property is computed when deserializing the grid: {@link WorkbenchLayoutSerializer.deserializeGrid}.
+   */
+  public visible?: boolean;
 
   constructor(treeNode: Omit<MTreeNode, 'type'>) {
     treeNode.parent && assertType(treeNode.parent, {toBeOneOf: MTreeNode}); // assert not to be an object literal
@@ -91,6 +108,12 @@ export class MPart {
   public activeViewId?: ViewId;
   public structural!: boolean;
   public cssClass?: string[];
+  /**
+   * Indicates whether this part is visible.
+   *
+   * NOTE: This property is computed when deserializing the grid: {@link WorkbenchLayoutSerializer.deserializeGrid}.
+   */
+  public visible?: boolean;
   public navigation?: {
     id: string;
     hint?: string;

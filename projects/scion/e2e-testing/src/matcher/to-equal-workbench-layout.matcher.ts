@@ -14,6 +14,8 @@ import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
 import {ActivityId, PartId, ViewId} from '@scion/workbench';
 import {SASHBOX_SPLITTER_SIZE} from '../workbench/workbench-layout-constants';
+import {Objects} from '../helper/objects.util';
+import {dasherize} from '../helper/dasherize.util';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
@@ -51,19 +53,24 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
     await assertGridElement(expected.grids.mainArea.root, locator.locator('wb-layout wb-grid[data-grid="main"] wb-part[data-partid="part.main-area"] > wb-grid[data-grid="main-area"] > wb-grid-element'), expected.grids);
   }
 
-  // Assert active part of the main area grid.
-  if (expected.grids?.mainArea?.activePartId) {
-    const activePartId = expected.grids.mainArea.activePartId;
-    const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="main-area"][data-partid="${activePartId}"].active`);
-    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main area grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="main-area"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main area grid, but is not.`));
-  }
-  // Assert active part of the main grid.
-  if (expected.grids?.main?.activePartId) {
-    const activePartId = expected.grids.main.activePartId;
-    const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="main"][data-partid="${activePartId}"].active`);
-    await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the main grid, but is not.`));
-    await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="main"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the main grid, but is not.`));
+  for (const [expectedGridName, expectedGrid] of Objects.entries(expected.grids ?? {})) {
+    const gridName = dasherize(expectedGridName);
+
+    // Assert active part of the grid.
+    if (expectedGrid?.activePartId) {
+      const activePartId = expectedGrid.activePartId;
+      const activePartLocator = locator.locator(`wb-layout wb-part[data-grid="${gridName}"][data-partid="${activePartId}"].active`);
+      await throwIfAbsent(activePartLocator, () => Error(`[DOMAssertError] Expected part '${activePartId}' to be the active part in the ${gridName} grid, but is not.`));
+      await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="${gridName}"]:not([data-partid="${activePartId}"]).active`), () => Error(`[DOMAssertError] Expected only part '${activePartId}' to be the active part in the ${gridName} grid, but is not.`));
+    }
+
+    // Assert reference part of the grid.
+    if (expectedGrid?.referencePartId) {
+      const referencePartId = expectedGrid.referencePartId;
+      const referencePartLocator = locator.locator(`wb-layout wb-part[data-grid="${gridName}"][data-partid="${referencePartId}"][data-referencepart]`);
+      await throwIfAbsent(referencePartLocator, () => Error(`[DOMAssertError] Expected part '${referencePartId}' to be the reference part in the ${gridName} grid, but is not.`));
+      await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="${gridName}"]:not([data-partid="${referencePartId}"])[data-referencepart]`), () => Error(`[DOMAssertError] Expected only part '${referencePartId}' to be the reference part in the ${gridName} grid, but is not.`));
+    }
   }
 }
 
@@ -623,6 +630,7 @@ export interface MActivity {
 export interface MPartGrid {
   root: MTreeNode | MPart;
   activePartId?: PartId;
+  referencePartId?: PartId;
 }
 
 /**

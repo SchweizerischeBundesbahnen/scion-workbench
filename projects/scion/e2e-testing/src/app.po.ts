@@ -28,6 +28,7 @@ import {dasherize} from './helper/dasherize.util';
 import {GridPO} from './grid.po';
 import {DesktopPO} from './desktop.po';
 import {ConsoleLogs} from './helper/console-logs';
+import {MAIN_AREA} from './workbench.model';
 
 /**
  * Central point to interact with the testing app in end-to-end tests.
@@ -250,7 +251,7 @@ export class AppPO {
       return this.page.locator('wb-part[data-peripheral] wb-view-tab').locator(locateByCssClass);
     }
     if (locateBy?.peripheral === false) {
-      return this.page.locator('wb-part:not([data-peripheral]) wb-view-tab').locator(locateByCssClass);
+      return this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"] wb-view-tab`).locator(locateByCssClass);
     }
     else {
       return this.page.locator('wb-view-tab').locator(locateByCssClass);
@@ -268,19 +269,19 @@ export class AppPO {
     if (locateBy.viewId !== undefined && locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view-slot[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"].${locateBy.cssClass}`);
-      const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
+      const partLocator = this.page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.viewId !== undefined) {
       const viewLocator = this.page.locator(`wb-view-slot[data-viewid="${locateBy.viewId}"]`);
       const viewTabLocator = this.page.locator(`wb-view-tab[data-viewid="${locateBy.viewId}"]`);
-      const partLocator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
+      const partLocator = this.page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     else if (locateBy.cssClass !== undefined) {
       const viewLocator = this.page.locator(`wb-view-slot.${locateBy.cssClass}`);
       const viewTabLocator = this.page.locator(`wb-view-tab.${locateBy.cssClass}`);
-      const partLocator: Locator = this.page.locator('wb-part:not([data-partid="part.main-area"])', {has: viewTabLocator});
+      const partLocator: Locator = this.page.locator(`wb-part:not([data-partid="${MAIN_AREA}"])`, {has: viewTabLocator});
       return new ViewPO(viewLocator, new ViewTabPO(viewTabLocator, new PartPO(partLocator)));
     }
     throw Error(`[ViewLocateError] Missing required locator. Either 'viewId' or 'cssClass', or both must be set.`);
@@ -379,7 +380,7 @@ export class AppPO {
     await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
-    const activePart = new PartPO(this.page.locator('wb-part:not([data-peripheral]).active'));
+    const activePart = new PartPO(this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"]).active`));
     return new StartPagePO(this, {viewId: await activePart.activeView.getViewId()});
   }
 

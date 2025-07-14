@@ -34,6 +34,7 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-partid]': 'part.id',
     '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,
     '[attr.data-grid]': 'dasherize(part.gridName())',
+    '[attr.data-referencepart]': `part.referencePart() ? '' : undefined`,
     '[class.active]': 'part.active()',
     '[attr.tabindex]': '-1',
   },

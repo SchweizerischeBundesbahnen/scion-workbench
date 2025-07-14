@@ -24,7 +24,6 @@ import {ClassList} from '../common/class-list';
 import {Routing} from '../routing/routing.util';
 import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
-import {WorkbenchLayouts} from '../layout/workbench-layouts.util';
 import {MActivity} from '../activity/workbench-activity.model';
 import {WbComponentPortal} from '../portal/wb-component-portal';
 import {PartSlotComponent} from './part-content/part-slot.component';
@@ -51,6 +50,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   public readonly mPart: WritableSignal<MPart>;
   public readonly gridName: WritableSignal<keyof WorkbenchGrids>;
   public readonly peripheral = signal(false);
+  public readonly referencePart = signal(false);
   public readonly topLeft = signal(false);
   public readonly topRight = signal(false);
   public readonly activity = signal<MActivity | null>(null);
@@ -104,6 +104,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     this.mPart.set(mPart);
     this.gridName.set(gridName);
     this.peripheral.set(layout.isPeripheralPart(this.id));
+    this.referencePart.set(grid.referencePartId === this.id);
     this.active.set(isActive(this.id, layout));
     this.activity.set(layout.activity({partId: this.id}, {orElse: null}));
     this.topLeft.set(isTopLeft(grid.root, mPart));
@@ -140,13 +141,14 @@ export class ɵWorkbenchPart implements WorkbenchPart {
         return this._title() ?? this._layout().part({partId: this.id}).title;
       }
 
-      // If this part is the top-leftmost part, return the activity title set on the layout.
+      // Compute the title based on the activity's reference part if this part is the top-leftmost part.
       if (this.topLeft()) {
-        return this._layout().part({partId: activity.referencePartId}).title;
+        const referencePartId = this._layout().grids[activity.id]!.referencePartId!;
+        return this._layout().part({partId: referencePartId, grid: activity.id}).title;
       }
 
       // If this part is the reference part but not positioned top-leftmost, only return the handle's title, not the activity title set on the layout.
-      if (this.id === activity.referencePartId) {
+      if (this.referencePart()) {
         return this._title();
       }
 
@@ -266,8 +268,8 @@ function isTopLeft(element: MTreeNode | MPart, testee: MPart): boolean {
     return element.id === testee.id;
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
-  return isTopLeft(child1Visible ? element.child1 : element.child2, testee);
+  const {child1, child2} = element;
+  return isTopLeft(child1.visible ? child1 : child2, testee);
 }
 
 /**
@@ -278,13 +280,11 @@ function isTopRight(element: MTreeNode | MPart, testee: MPart): boolean {
     return element.id === testee.id;
   }
 
-  const child1Visible = WorkbenchLayouts.isGridElementVisible(element.child1);
-  const child2Visible = WorkbenchLayouts.isGridElementVisible(element.child2);
-
-  if (child1Visible && child2Visible) {
-    return element.direction === 'column' ? isTopRight(element.child1, testee) : isTopRight(element.child2, testee);
+  const {child1, child2} = element;
+  if (child1.visible && child2.visible) {
+    return element.direction === 'column' ? isTopRight(child1, testee) : isTopRight(child2, testee);
   }
-  return isTopRight(child1Visible ? element.child1 : element.child2, testee);
+  return isTopRight(child1.visible ? child1 : child2, testee);
 }
 
 /**
