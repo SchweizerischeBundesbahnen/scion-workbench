@@ -18,7 +18,6 @@ import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchService} from '../workbench.service';
-import {GridIfVisiblePipe} from '../common/grid-if-visible.pipe';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
@@ -41,7 +40,6 @@ import {MAIN_AREA} from './workbench-layout';
     ActivityPanelComponent,
     GridComponent,
     NgTemplateOutlet,
-    GridIfVisiblePipe,
     RouterOutlet,
     SciViewportComponent,
     ViewDropZoneDirective,

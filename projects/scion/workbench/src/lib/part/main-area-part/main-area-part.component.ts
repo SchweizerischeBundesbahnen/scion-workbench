@@ -15,7 +15,6 @@ import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
-import {GridIfVisiblePipe} from '../../common/grid-if-visible.pipe';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
@@ -57,11 +56,11 @@ import {dasherize} from '../../common/dasherize.util';
     RouterOutlet,
     RouterOutletRootContextDirective,
     SciViewportComponent,
-    GridIfVisiblePipe,
     NgTemplateOutlet,
   ],
   host: {
     '[attr.data-grid]': 'dasherize(part.gridName())',
+    '[class.active]': 'part.active()',
   },
 })
 export class MainAreaPartComponent {

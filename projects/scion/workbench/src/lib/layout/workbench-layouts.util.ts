@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {MPart, MPartGrid, MTreeNode, WorkbenchGrids} from './workbench-grid.model';
-import {MAIN_AREA} from './workbench-layout';
 import {ViewId} from '../view/workbench-view.model';
 import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
 import {UID} from '../common/uid.util';
@@ -22,31 +21,15 @@ import {isActivityId} from './ɵworkbench-layout';
 export const WorkbenchLayouts = {
 
   /**
-   * Recursively collects all parts of a given element and its descendants.
+   * Finds the part matching the given predicate, or `null` if not found.
    */
-  collectParts: (element: MPart | MTreeNode): MPart[] => {
-    const parts = new Array<MPart>();
+  findPart: (element: MPart | MTreeNode, predicate: (part: MPart) => boolean): MPart | null => {
     if (element instanceof MPart) {
-      parts.push(element);
+      return predicate(element) ? element : null;
     }
     else {
-      parts.push(...WorkbenchLayouts.collectParts(element.child1));
-      parts.push(...WorkbenchLayouts.collectParts(element.child2));
+      return WorkbenchLayouts.findPart(element.child1, predicate) ?? WorkbenchLayouts.findPart(element.child2, predicate);
     }
-    return parts;
-  },
-
-  /**
-   * Tests if the given {@link MTreeNode} or {@link MPart} is visible.
-   *
-   * - A part is considered visible if it is the main area part or has at least one view.
-   * - A node is considered visible if it has at least one visible part in its child hierarchy.
-   */
-  isGridElementVisible: (element: MTreeNode | MPart): boolean => {
-    if (element instanceof MPart) {
-      return element.id === MAIN_AREA || element.views.length > 0 || !!element.navigation;
-    }
-    return WorkbenchLayouts.isGridElementVisible(element.child1) || WorkbenchLayouts.isGridElementVisible(element.child2);
   },
 
   /**

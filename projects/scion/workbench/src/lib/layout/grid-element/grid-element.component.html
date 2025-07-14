@@ -1,33 +1,24 @@
-<!-- MPart (leaf) -->
-@if (element() | wbInstanceof:MPart; as part) {
-  <ng-container *wbPortalOutlet="part.id | wbPartPortal; destroyOnDetach: true"/>
-}
+@let element = this.element();
 
-<!-- MTreeNode -->
-@if (element() | wbInstanceof:MTreeNode; as treeNode) {
-  @let children = this.children();
-
-  @switch (children.length) {
-    @case (0) {
-      <!-- Node with no visible children. -->
-      <wb-null-content/>
-    }
-    @case (1) {
-      <!-- Node with a single visible child. -->
-      <wb-grid-element [element]="children[0]!.element"/>
-    }
-    @default {
-      <!-- Node with multiple visible children. -->
-      <sci-sashbox [direction]="treeNode.direction"
-                   [attr.data-nodeid]="treeNode.id"
-                   (sashStart)="onSashStart()"
-                   (sashEnd)="onSashEnd(treeNode, $event)">
-        @for (child of children; track child.element.id) {
-          <ng-template sciSash [size]="child.size" [key]="'sash' + ($index + 1)">
-            <wb-grid-element [element]="child.element" [class]="'sash-' + ($index + 1)"/>
-          </ng-template>
-        }
-      </sci-sashbox>
-    }
-  }
+@if (element.type === 'MPart') {
+  <ng-container *wbPortalOutlet="element.id | wbPartPortal; destroyOnDetach: true"/>
+} @else if (element.child1.visible && element.child2.visible) {
+  @let sashSizes = element.ratio | wbTreeNodeSashSizes;
+  <sci-sashbox [direction]="element.direction"
+               [attr.data-nodeid]="element.id"
+               (sashStart)="onSashStart()"
+               (sashEnd)="onSashEnd(element, $event)">
+    <!-- Child 1 -->
+    <ng-template sciSash [size]="sashSizes[0]" key="sash1">
+      <wb-grid-element [element]="element.child1" class="sash-1"/>
+    </ng-template>
+    <!-- Child 2 -->
+    <ng-template sciSash [size]="sashSizes[1]" key="sash2">
+      <wb-grid-element [element]="element.child2" class="sash-2"/>
+    </ng-template>
+  </sci-sashbox>
+} @else if (element.child1.visible) {
+  <wb-grid-element [element]="element.child1"/>
+} @else if (element.child2.visible) {
+  <wb-grid-element [element]="element.child2"/>
 }

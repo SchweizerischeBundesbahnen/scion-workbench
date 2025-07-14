@@ -94,10 +94,26 @@ export const Perspectives = {
       },
     },
     // Create definitions for perspectives defined via query parameter {@link PERSPECTIVES_QUERY_PARAM}.
-    ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => ({
-      id: perspectiveId,
-      layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
-    })),
+    ...WorkbenchStartupQueryParams.perspectiveIds().map(perspectiveId => {
+      switch (perspectiveId) {
+        case 'e2e-layout-migration-v5': {
+          return {
+            id: perspectiveId,
+            layout: (factory: WorkbenchLayoutFactory) => factory
+              .addPart(MAIN_AREA)
+              .addPart('part.activity-1', {dockTo: 'left-top'}, {icon: 'folder', label: 'Activity', ɵactivityId: 'activity.1'})
+              .navigatePart('part.activity-1', ['test-part'])
+              .activatePart('part.activity-1'),
+          };
+        }
+        default: {
+          return {
+            id: perspectiveId,
+            layout: (factory: WorkbenchLayoutFactory) => factory.addPart(MAIN_AREA),
+          };
+        }
+      }
+    }),
   ] satisfies WorkbenchPerspectiveDefinition[],
 
   /**

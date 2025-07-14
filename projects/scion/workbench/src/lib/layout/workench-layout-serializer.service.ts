@@ -25,7 +25,11 @@ import {WorkbenchLayoutMigrationV2} from './migration/workbench-layout-migration
 import {WorkbenchLayoutMigrationV3} from './migration/workbench-layout-migration-v3.service';
 import {WorkbenchLayoutMigrationV4} from './migration/workbench-layout-migration-v4.service';
 import {WorkbenchLayoutMigrationV5} from './migration/workbench-layout-migration-v5.service';
-import {MWorkbenchLayout} from './workbench-layout';
+import {MAIN_AREA, MWorkbenchLayout} from './workbench-layout';
+import {WorkbenchLayouts} from './workbench-layouts.util';
+import {WorkbenchLayoutMigrationV6} from './migration/workbench-layout-migration-v6.service';
+import {throwError} from '../common/throw-error.util';
+import {Objects} from '../common/objects.util';
 
 /**
  * Serializes and deserializes a base64-encoded JSON into a {@link MPartGrid}.
@@ -40,7 +44,8 @@ export class WorkbenchLayoutSerializer {
     .registerMigration(1, inject(WorkbenchLayoutMigrationV2))
     .registerMigration(2, inject(WorkbenchLayoutMigrationV3))
     .registerMigration(3, inject(WorkbenchLayoutMigrationV4))
-    .registerMigration(4, inject(WorkbenchLayoutMigrationV5));
+    .registerMigration(4, inject(WorkbenchLayoutMigrationV5))
+    .registerMigration(5, inject(WorkbenchLayoutMigrationV6));
 
   /**
    * Migrates a serialized {@link MPartGrid} to the latest version.
@@ -80,31 +85,37 @@ export class WorkbenchLayoutSerializer {
   }
 
   /**
+   * Serializes given grid into a URL-safe base64 string.
+   *
+   * @param grid - Specifies the grid to serialize.
+   * @param flags - Controls how to serialize the grids.
+   */
+  public serializeGrid(grid: MPartGrid, flags?: LayoutSerializationFlags): string {
+    const json = stringify(grid, {
+      exclusions: new Array<string | Exclusion>()
+        .concat('**/parent')
+        .concat('migrated')
+        .concat('**/visible') // computed when deserializing the grid
+        .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
+        .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
+        .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
+        .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
+      sort: flags?.sort,
+    });
+    return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_GRID_VERSION}`);
+  }
+
+  /**
    * Serializes given grids into a URL-safe base64 string.
    *
    * @param grids - Specifies the grids to serialize.
    * @param flags - Controls how to serialize the grids.
    */
   public serializeGrids(grids: WorkbenchGrids, flags?: LayoutSerializationFlags): WorkbenchGrids<string> {
-    const serializedGrids = Object.entries(grids).reduce((acc, [gridName, grid]: [string, ɵMPartGrid | undefined]) => {
-      if (grid === undefined) {
-        return acc;
-      }
-      const json = stringify(grid, {
-        exclusions: new Array<string | Exclusion>()
-          .concat('**/parent')
-          .concat('migrated')
-          .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
-          .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
-          .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
-          .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
-        sort: flags?.sort,
-      });
-      const serialized = window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_GRID_VERSION}`);
-
-      return acc.set(gridName, serialized);
-    }, new Map<string, string>());
-    return Object.fromEntries(serializedGrids) as unknown as WorkbenchGrids<string>;
+    return Objects.entries(grids).reduce((acc, [gridName, grid]) => {
+      acc[gridName] = this.serializeGrid(grid, flags);
+      return acc;
+    }, {} as WorkbenchGrids<string>);
   }
 
   /**
@@ -118,10 +129,18 @@ export class WorkbenchLayoutSerializer {
     // Parse the JSON.
     const grid = JSON.parse(migratedJsonGrid, (key: string, value: unknown) => {
       if (MPart.isMPart(value)) {
-        return new MPart(value); // create a class object from the object literal
+        const mPart = new MPart(value); // create a class object from the object literal
+        // Compute part visibility.
+        mPart.visible = value.id === MAIN_AREA || value.views.length > 0 || !!value.navigation;
+        return mPart;
       }
       if (MTreeNode.isMTreeNode(value)) {
-        return new MTreeNode(value); // create a class object from the object literal
+        const mTreeNode = new MTreeNode(value); // create a class object from the object literal
+        // Compute node visibility.
+        const child1Visible = value.child1.visible ?? throwError(`[GridDeserializeError] Missing required property 'visible' [elementId=${value.child1.id}]`);
+        const child2Visible = value.child2.visible ?? throwError(`[GridDeserializeError] Missing required property 'visible' [elementId=${value.child2.id}]`);
+        mTreeNode.visible = child1Visible || child2Visible;
+        return mTreeNode;
       }
       return value;
     }) as MPartGrid;
@@ -135,6 +154,19 @@ export class WorkbenchLayoutSerializer {
         linkParentNodes(node.child2, node);
       }
     })(grid.root, undefined);
+
+    // If the grid is not visible, mark the reference part, if any, and its parent nodes as visible.
+    if (!grid.root.visible) {
+      const referencePart = WorkbenchLayouts.findPart(grid.root, part => part.id === grid.referencePartId);
+      if (referencePart) {
+        referencePart.visible = true;
+        let parent = referencePart.parent;
+        while (parent) {
+          parent.visible = true;
+          parent = parent.parent;
+        }
+      }
+    }
 
     return (gridVersion < WORKBENCH_GRID_VERSION) ? {...grid, migrated: true} : grid;
   }
@@ -198,7 +230,7 @@ export class WorkbenchLayoutSerializer {
  *
  * @see WorkbenchMigrator
  */
-export const WORKBENCH_LAYOUT_VERSION = 5;
+export const WORKBENCH_LAYOUT_VERSION = 6;
 
 /**
  * Represents the current version of the workbench grid model.

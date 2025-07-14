@@ -3787,10 +3787,13 @@ test.describe('Activity Layout', () => {
       .activatePart('part.activity-1-top'),
     );
 
-    const activityPanel = appPO.activityPanel('left');
+    // Expect top part to show "null content".
+    const topPart = appPO.part({partId: 'part.activity-1-top'});
+    await expectPart(topPart).toDisplayComponent(NullContentPagePO.selector);
 
-    // Expect hint to show for activity.
-    await expect(activityPanel.nullContentMessage).toBeVisible();
+    // Expect bottom part not to be attached.
+    const bottomPart = appPO.part({partId: 'part.activity-1-bottom'});
+    await expectPart(bottomPart).not.toBeAttached();
   });
 
   test('should show "null content" hint if both activities in panel are empty (have no navigated parts or views)', async ({appPO, workbenchNavigator}) => {
