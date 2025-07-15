@@ -1,5 +1,6 @@
 :host {
   display: grid;
+  overflow: hidden; // Prevent content (e.g., part bar) from overflowing this element.
 
   > sci-sashbox {
     // Unset stacking context formed by <sci-sashbox> so that sash splitters can overlap microfrontends (iframes).
