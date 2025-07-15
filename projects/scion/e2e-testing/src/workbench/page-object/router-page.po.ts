@@ -42,7 +42,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
     const navigationId = await this._appPO.getCurrentNavigationId();
     await this.locator.locator('button.e2e-router-navigate').click();
 
-    if (!(extras?.waitForNavigation ?? true)) {
+    if (!(extras?.noWaitAfter ?? true)) {
       return;
     }
 
@@ -137,7 +137,7 @@ export class RouterPagePO implements WorkbenchViewPagePO {
 
 export interface RouterPageOptions {
   viewContextActive?: boolean;
-  waitForNavigation?: false;
+  noWaitAfter?: false;
 }
 
 export interface RouterLinkPageOptions {

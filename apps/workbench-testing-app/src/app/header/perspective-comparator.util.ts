@@ -21,6 +21,12 @@ export function comparePerspectives(a: WorkbenchPerspective, b: WorkbenchPerspec
   if (isMicrofrontendPerspective(b) && !isMicrofrontendPerspective(a)) {
     return -1;
   }
+  if (isTestPerspective(a) && !isTestPerspective(b)) {
+    return 1;
+  }
+  if (isTestPerspective(b) && !isTestPerspective(a)) {
+    return -1;
+  }
   return getLabel(a).localeCompare(getLabel(b));
 }
 
@@ -30,4 +36,8 @@ function isMicrofrontendPerspective(perspective: WorkbenchPerspective): boolean 
 
 function getLabel(perspective: WorkbenchPerspective): string {
   return (perspective.data[PerspectiveData.menuItemLabel] ?? '') as string;
+}
+
+function isTestPerspective(perspective: WorkbenchPerspective): boolean {
+  return (perspective.data[PerspectiveData.menuGroup]) === 'test-perspectives';
 }

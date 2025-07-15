@@ -29,6 +29,7 @@ import {fromEvent} from 'rxjs';
 import {ɵWorkbenchRouter} from './routing/ɵworkbench-router.service';
 import {subscribeIn} from '@scion/toolkit/operators';
 import {filter} from 'rxjs/operators';
+import {WorkbenchFocusTracker} from './focus/workbench-focus-tracker.service';
 
 /**
  * Main entry point component of the SCION Workbench.
@@ -68,6 +69,12 @@ export class WorkbenchComponent {
     this.disableChangeDetectionDuringNavigation();
     this.provideWorkbenchElementReferences();
     this.installMaximizeShortcutListener();
+
+    const focusTracker = inject(WorkbenchFocusTracker);
+    effect(() => {
+      const activeElement = focusTracker.activeElement();
+      console.log('>>> ==== [FocusTracker] active element', activeElement);
+    });
   }
 
   /**

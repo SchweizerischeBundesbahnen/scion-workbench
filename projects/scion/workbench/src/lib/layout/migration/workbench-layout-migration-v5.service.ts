@@ -14,7 +14,7 @@ import {MWorkbenchLayoutV4} from './model/workbench-layout-migration-v4.model';
 import {MWorkbenchLayoutV5} from './model/workbench-layout-migration-v5.model';
 import {ɵWorkbenchLayoutFactory} from '../ɵworkbench-layout.factory';
 import {UID} from '../../common/uid.util';
-import {WorkbenchLayoutSerializer} from '../workench-layout-serializer.service';
+import {WorkbenchLayoutSerializer} from '../workbench-layout-serializer.service';
 
 /**
  * Migrates the workbench layout from version 4 to version 5.

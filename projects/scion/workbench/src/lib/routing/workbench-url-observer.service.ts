@@ -64,6 +64,7 @@ export class WorkbenchUrlObserver {
 
   /** Invoked at the beginning of each navigation */
   private onNavigationStart(event: NavigationStart): void {
+    console.log('>>> onNavigationStart');
     const context = this.createWorkbenchNavigationContext(event.url);
     this._logger.debug(() => 'onNavigationStart', LoggerNames.ROUTING, event, `NavigationContext [parts=${context.layout.parts().map(part => part.id)}, layoutDiff=${context.layoutDiff}, outletDiff=${context.outletDiff}]`);
     this._workbenchRouter.setCurrentNavigationContext(context);
@@ -74,11 +75,14 @@ export class WorkbenchUrlObserver {
 
   /** Invoked upon successful navigation */
   private onNavigationEnd(event: NavigationEnd): void {
+    console.log('>>> onNavigationEnd');
     this._logger.debug(() => 'onNavigationEnd', LoggerNames.ROUTING, event);
     this.unregisterRemovedOutletAuxiliaryRoutes();
     this.unregisterRemovedWorkbenchParts();
     this.unregisterRemovedWorkbenchViews();
+    console.log('>>> onNavigationEnd:beforeApplyLayout');
     this.applyWorkbenchLayout();
+    console.log('>>> onNavigationEnd:afterApplyLayout');
     this.migrateURL();
     this._workbenchRouter.getCurrentNavigationContext().runPostNavigationActions();
     this._workbenchRouter.setCurrentNavigationContext(null);

@@ -123,6 +123,11 @@ export abstract class WorkbenchView {
   public abstract readonly active: Signal<boolean>;
 
   /**
+   * Indicates whether this view has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
+
+  /**
    * The position of this view in the tabbar.
    */
   public abstract readonly position: Signal<number>;

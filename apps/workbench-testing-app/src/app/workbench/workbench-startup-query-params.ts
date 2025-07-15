@@ -43,11 +43,6 @@ export const WorkbenchStartupQueryParams = {
   STANDALONE_QUERY_PARAM: 'standalone',
 
   /**
-   * Query param to register perspectives. Multiple perspectives are separated by semicolon.
-   */
-  PERSPECTIVES_QUERY_PARAM: 'perspectives',
-
-  /**
    * Query param to read provided design tokens.
    */
   DESIGN_TOKENS: 'designTokens',
@@ -110,13 +105,6 @@ export const WorkbenchStartupQueryParams = {
    */
   standalone: (): boolean => {
     return booleanAttribute(new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.STANDALONE_QUERY_PARAM));
-  },
-
-  /**
-   * Reads perspectives to register from query params.
-   */
-  perspectiveIds: (): string[] => {
-    return new URL(window.location.href).searchParams.get(WorkbenchStartupQueryParams.PERSPECTIVES_QUERY_PARAM)?.split(';').filter(Boolean) ?? [];
   },
 
   /**

@@ -7,12 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ExpectationResult} from './custom-matchers.definition';
+import {MatcherReturnType} from 'playwright/types/test';
 
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualIgnoreOrder}.
  */
-export function toEqualIgnoreOrder(actual: unknown, expected: Array<any>): ExpectationResult {
+export function toEqualIgnoreOrder(actual: unknown, expected: Array<any>): MatcherReturnType {
   if (Array.isArray(actual) && actual.length === expected.length && includeSameElements(actual, expected)) {
     return {
       pass: true,

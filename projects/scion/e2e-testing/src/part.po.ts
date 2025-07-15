@@ -15,6 +15,7 @@ import {PartSashPO} from './part-sash.po';
 import {PartBarPO} from './part-bar.po';
 import {PartId} from '@scion/workbench';
 import {DomRect, fromRect, getCssClasses} from './helper/testing.util';
+import {PartSlotPO} from './part-slot.po';
 
 /**
  * Handle for interacting with a workbench part.
@@ -32,6 +33,11 @@ export class PartPO {
   public readonly activeView: ViewPO;
 
   /**
+   * Locates the content displayed in the part.
+   */
+  public readonly slot: PartSlotPO;
+
+  /**
    * Handle to resize this part.
    */
   public readonly sash: PartSashPO;
@@ -39,6 +45,7 @@ export class PartPO {
   constructor(public readonly locator: Locator) {
     this.bar = new PartBarPO(this.locator.locator('wb-part-bar'), this);
     this.activeView = new ViewPO(this.locator.locator('wb-view-slot'), new ViewTabPO(this.locator.locator('wb-view-tab.active'), this));
+    this.slot = new PartSlotPO(this.locator.locator('wb-part-slot'));
     this.sash = new PartSashPO(this.locator);
   }
 
@@ -76,7 +83,7 @@ export class PartPO {
    * Gets the bounding box of this part (inclusive partbar) or its content (exclusive partbar). Defaults to the bounding box of the part.
    */
   public async getBoundingBox(selector: 'part' | 'content' = 'part'): Promise<DomRect> {
-    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-content').boundingBox());
+    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > div.e2e-content').boundingBox());
   }
 
   public getCssClasses(): Promise<string[]> {

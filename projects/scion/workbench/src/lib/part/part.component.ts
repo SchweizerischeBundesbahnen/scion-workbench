@@ -9,17 +9,16 @@
  */
 
 import {ChangeDetectorRef, Component, DestroyRef, effect, ElementRef, inject, Injector, OnInit, untracked} from '@angular/core';
-import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {ViewDragService} from '../view-dnd/view-drag.service';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {Logger, LoggerNames} from '../logging';
 import {PartBarComponent} from './part-bar/part-bar.component';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
-import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID} from '../workbench-id';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {dasherize} from '../common/dasherize.util';
+import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 @Component({
   selector: 'wb-part',
@@ -34,9 +33,13 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-partid]': 'part.id',
     '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,
     '[attr.data-grid]': 'dasherize(part.gridName())',
+    '[attr.data-focus]': `focusTracker.activeElement() === part.id ? '' : null`,
+    '[attr.data-active]': `part.active() ? '' : null`,
+    '[attr.data-activation-instant]': `part.activationInstant()`,
     '[attr.data-referencepart]': `part.referencePart() ? '' : undefined`,
-    '[class.active]': 'part.active()',
     '[attr.tabindex]': '-1',
+    // TODO remove and migrate tests to data-active
+    '[class.active]': 'part.active()',
   },
 })
 export class PartComponent implements OnInit {
@@ -49,10 +52,10 @@ export class PartComponent implements OnInit {
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly canDrop = inject(ViewDragService).canDrop(inject(ɵWorkbenchPart));
   protected readonly dasherize = dasherize;
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   constructor() {
     this.installComponentLifecycleLogger();
-    this.activatePartOnFocusIn();
     this.constructInactiveViewComponents();
     this.addHostCssClasses();
   }
@@ -99,22 +102,6 @@ export class PartComponent implements OnInit {
           inactiveView.slot.portal.construct(this._injector);
         }));
     });
-  }
-
-  /**
-   * Activates this part when it gains focus.
-   */
-  private activatePartOnFocusIn(): void {
-    const host = inject(ElementRef).nativeElement as HTMLElement;
-
-    toObservable(this.part.active)
-      .pipe(
-        switchMap(active => active ? EMPTY : merge(fromEvent<FocusEvent>(host, 'focusin', {once: true}), fromEvent(host, 'sci-microfrontend-focusin', {once: true}))),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => {
-        void this.part.activate();
-      });
   }
 
   private addHostCssClasses(): void {

@@ -19,7 +19,7 @@ import {MessageBoxPO} from './message-box.po';
 import {NotificationPO} from './notification.po';
 import {AppHeaderPO} from './app-header.po';
 import {DialogPO} from './dialog.po';
-import {ActivityId, PartId, ViewId} from '@scion/workbench';
+import {ActivityId, PartId, PopupId, ViewId} from '@scion/workbench';
 import {WorkbenchAccessor} from './workbench-accessor';
 import {ActivityItemPO} from './activity-item.po';
 import {ActivityPanelPO} from './activity-panel.po';
@@ -28,6 +28,7 @@ import {dasherize} from './helper/dasherize.util';
 import {GridPO} from './grid.po';
 import {DesktopPO} from './desktop.po';
 import {ConsoleLogs} from './helper/console-logs';
+import {DialogId} from '@scion/workbench-client';
 import {MAIN_AREA} from './workbench.model';
 
 /**
@@ -80,7 +81,7 @@ export class AppPO {
   constructor(public readonly page: Page) {
     this.header = new AppHeaderPO(this.page.locator('app-header'));
     this.workbenchRoot = this.page.locator('wb-workbench');
-    this.desktop = new DesktopPO(this.page);
+    this.desktop = new DesktopPO(this.page.locator('sci-viewport.e2e-desktop'));
     this.notifications = this.page.locator('wb-notification');
     this.dialogs = this.page.locator('wb-dialog');
     this.dropPlaceholder = this.page.locator('div.e2e-drop-placeholder');
@@ -107,31 +108,28 @@ export class AppPO {
 
     this._workbenchStartupQueryParams = new URLSearchParams();
     if (options?.appConfig) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.APP_CONFIG_QUERY_PARAM, options.appConfig);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.APP_CONFIG_QUERY_PARAM, options.appConfig);
     }
     if (options?.launcher) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options.launcher);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LAUNCHER, options.launcher);
     }
     if (!(options?.microfrontendSupport ?? true)) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, String(true));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.STANDALONE, String(true));
     }
     if (options?.confirmStartup) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, String(true));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.CONFIRM_STARTUP, String(true));
     }
     if (options?.simulateSlowCapabilityLookup) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, String(true));
-    }
-    if (options?.perspectives?.length) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, options.perspectives.join(';'));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, String(true));
     }
     if (options?.designTokens) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DESIGN_TOKENS, JSON.stringify(options.designTokens));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.DESIGN_TOKENS, JSON.stringify(options.designTokens));
     }
     if (options?.dialogModalityScope) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options.dialogModalityScope);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options.dialogModalityScope);
     }
     if (options?.mainAreaInitialPartId) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
     }
 
     const featureQueryParams = new URLSearchParams();
@@ -213,10 +211,28 @@ export class AppPO {
   }
 
   /**
-   * Handle for interacting with the currently active workbench part in the specified grid.
+   * Handle for interacting with the active workbench part in the specified grid.
    */
   public activePart(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): PartPO {
-    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"].active`));
+    return new PartPO(this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"][data-active]`));
+  }
+
+  /**
+   * Returns the id of the active workbench part in the specified grid, or `null` if not found.
+   *
+   * TODO [focus-tracker]: Why do we need a new method?
+   */
+  public async activePartId(locateBy: {grid: 'main' | 'mainArea' | ActivityId}): Promise<PartId | null> {
+    return (await this.page.locator(`wb-part[data-grid="${dasherize(locateBy.grid)}"][data-active]`).getAttribute('data-partid')) as PartId | null;
+  }
+
+  /**
+   * Returns the id of the active workbench view in the specified part, or `null` if not found.
+   *
+   * TODO [focus-tracker]: Why do we need a new method? 'activeView' similar to 'activePart', returning the handle.
+   */
+  public async activeViewId(locateBy: {partId: PartId}): Promise<ViewId | null> {
+    return (await this.page.locator(`wb-part[data-partid="${locateBy.partId}"] wb-view-slot[data-active]`).getAttribute('data-viewid')) as ViewId | null;
   }
 
   /**
@@ -328,9 +344,15 @@ export class AppPO {
   /**
    * Handle to the specified popup.
    */
-  public popup(locateBy?: {cssClass?: string | string[]}): PopupPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    return new PopupPO(this.page.locator(['wb-popup'].concat(cssClasses).join('.')));
+  public popup(locateBy?: {popupId?: PopupId; cssClass?: string | string[]}): PopupPO {
+    let locator = this.page.locator('wb-popup');
+    if (locateBy?.popupId) {
+      locator = locator.locator(`:scope[data-popupid="${locateBy.popupId}"]`);
+    }
+    if (locateBy?.cssClass) {
+      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).join('.')}`);
+    }
+    return new PopupPO(locator);
   }
 
   /**
@@ -359,16 +381,25 @@ export class AppPO {
   /**
    * Handle to the specified message box.
    */
-  public messagebox(locateBy?: {cssClass?: string | string[]; nth?: number}): MessageBoxPO {
-    return new MessageBoxPO(this.dialog(locateBy));
+  public messagebox(locateBy?: {dialogId?: DialogId; cssClass?: string | string[]; nth?: number}): MessageBoxPO {
+    return new MessageBoxPO(this.dialog({
+      dialogId: locateBy?.dialogId,
+      cssClass: locateBy?.cssClass,
+      nth: locateBy?.nth,
+    }));
   }
 
   /**
    * Handle to the specified dialog.
    */
-  public dialog(locateBy?: {cssClass?: string | string[]; nth?: number}): DialogPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
-    const locator = this.page.locator(['wb-dialog'].concat(cssClasses).join('.'));
+  public dialog(locateBy?: {dialogId?: DialogId; cssClass?: string | string[]; nth?: number}): DialogPO {
+    let locator = this.page.locator('wb-dialog');
+    if (locateBy?.dialogId) {
+      locator = locator.locator(`:scope[data-dialogid="${locateBy.dialogId}"]`);
+    }
+    if (locateBy?.cssClass) {
+      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).join('.')}`);
+    }
     return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
 
@@ -380,8 +411,11 @@ export class AppPO {
     await this.header.clickSettingMenuItem({cssClass: 'e2e-open-start-page'});
     // Wait until opened the start page to get its view id.
     await waitForCondition(async () => (await this.getCurrentNavigationId()) !== navigationId);
-    const activePart = new PartPO(this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"]).active`));
-    return new StartPagePO(this, {viewId: await activePart.activeView.getViewId()});
+    const focusOwner = await waitUntilStable(() => this.focusOwner());
+    if (!focusOwner?.startsWith('view.')) {
+      throw Error(`[ViewLocateError] Expected view to have focus, but was ${focusOwner}.`);
+    }
+    return new StartPagePO(this, {viewId: focusOwner as ViewId});
   }
 
   /**
@@ -438,6 +472,45 @@ export class AppPO {
   }
 
   /**
+   * Returns the id of the focused workbench element, or `null` if no workbench element has the focus.
+   *
+   * Note that the focused workbench element does not necessarily correspond to the active DOM element.
+   */
+  public async focusOwner(): Promise<PartId | ViewId | DialogId | PopupId | null> {
+    const locator = this.page.locator('[data-focus]');
+    if (await locator.count() === 0) {
+      return null;
+    }
+
+    const tagName = await locator.evaluate((element: HTMLElement) => element.tagName);
+    switch (tagName) {
+      case 'WB-PART':
+        return await locator.getAttribute('data-partid') as PartId | null;
+      case 'WB-VIEW-SLOT':
+        return await locator.getAttribute('data-viewid') as ViewId | null;
+      case 'WB-DIALOG':
+        return await locator.getAttribute('data-dialogid') as DialogId | null;
+      case 'WB-POPUP':
+        return await locator.getAttribute('data-popupid') as PopupId | null;
+      default:
+        throw Error(`[PageObjectError] Unkown focused element: ${tagName}`);
+    }
+  }
+
+  /**
+   * Returns the activation instant of the specified workbench element.
+   */
+  public async activationInstant(elementId: PartId | ViewId): Promise<number> {
+    if (elementId.startsWith('part.')) {
+      return Number.parseInt((await this.page.locator(`wb-part[data-partid="${elementId}"]`).getAttribute('data-activation-instant'))!);
+    }
+    if (elementId.startsWith('view.')) {
+      return Number.parseInt((await this.page.locator(`wb-view-slot[data-viewid="${elementId}"]`).getAttribute('data-activation-instant'))!);
+    }
+    throw Error(`[PageObjectError] Workbench element with id "${elementId}" not found.`);
+  }
+
+  /**
    * Sets given design token on the HTML root element.
    */
   public async setDesignToken(name: `--sci-${string}`, value: string): Promise<void> {
@@ -477,14 +550,14 @@ export class AppPO {
   /**
    * Indicates if the specified dialog is blocked by a dialog.
    */
-  public async isDialogBlocked(dialogId: string | Promise<string>): Promise<boolean> {
+  public async isDialogBlocked(dialogId: DialogId | Promise<string>): Promise<boolean> {
     return (await this.page.locator(`.e2e-glasspane[data-dialogid="${await dialogId}"]`).count()) > 0;
   }
 
   /**
    * Indicates if the specified popup is blocked by a dialog.
    */
-  public async isPopupBlocked(popupId: string | Promise<string>): Promise<boolean> {
+  public async isPopupBlocked(popupId: PopupId | Promise<string>): Promise<boolean> {
     return (await this.page.locator(`.e2e-glasspane[data-popupid="${await popupId}"]`).count()) > 0;
   }
 }
@@ -528,10 +601,6 @@ export interface Options {
    */
   simulateSlowCapabilityLookup?: boolean;
   /**
-   * Specifies perspectives to be registered in the testing app. Separate multiple perspectives by semicolon.
-   */
-  perspectives?: string[];
-  /**
    * Controls the scope of application-modal workbench dialogs. Defaults to `workbench`.
    */
   dialogModalityScope?: 'workbench' | 'viewport';
@@ -562,7 +631,7 @@ export interface Options {
 /**
  * Query params to instrument the workbench startup.
  */
-export enum WorkenchStartupQueryParams {
+export enum WorkbenchStartupQueryParams {
 
   /**
    * Query param to bootstrap the app with a specific app config.

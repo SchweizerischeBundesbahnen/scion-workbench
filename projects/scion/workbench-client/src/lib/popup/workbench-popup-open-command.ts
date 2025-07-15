@@ -10,6 +10,7 @@
 
 import {CloseStrategy} from './workbench-popup.config';
 import {ViewId} from '../view/workbench-view';
+import {PopupId} from './workbench-popup';
 
 /**
  * Command object for instructing the Workbench to open the microfrontend of given popup capability in a popup.
@@ -18,7 +19,7 @@ import {ViewId} from '../view/workbench-view';
  * @ignore
  */
 export interface ɵWorkbenchPopupCommand {
-  popupId: string;
+  popupId: PopupId;
   align?: 'east' | 'west' | 'north' | 'south';
   closeStrategy?: CloseStrategy;
   cssClass?: string | string[];

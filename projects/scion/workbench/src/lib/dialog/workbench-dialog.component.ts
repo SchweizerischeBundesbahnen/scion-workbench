@@ -25,6 +25,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {synchronizeCssClasses} from '../common/css-class.util';
+import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Renders the workbench dialog.
@@ -56,6 +57,9 @@ import {synchronizeCssClasses} from '../common/css-class.util';
     configureDialogGlassPane(),
   ],
   host: {
+    '[attr.data-dialogid]': 'dialog.id',
+    '[attr.data-focus]': `focusTracker.activeElement() === dialog.id ? '' : null`,
+    '[class.justified]': '!dialog.padding()',
     '[style.--ɵdialog-transform-translate-x]': 'transformTranslateX()',
     '[style.--ɵdialog-transform-translate-y]': 'transformTranslateY()',
     '[style.--ɵdialog-min-height]': 'dialog.size.minHeight() ?? headerHeight()',
@@ -64,8 +68,6 @@ import {synchronizeCssClasses} from '../common/css-class.util';
     '[style.--ɵdialog-min-width]': 'dialog.size.minWidth() ?? \'100px\'',
     '[style.--ɵdialog-width]': 'dialog.size.width()',
     '[style.--ɵdialog-max-width]': 'dialog.size.maxWidth()',
-    '[class.justified]': '!dialog.padding()',
-    '[attr.data-dialogid]': 'dialog.id',
   },
 })
 export class WorkbenchDialogComponent {
@@ -78,6 +80,7 @@ export class WorkbenchDialogComponent {
   private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   protected headerHeight = signal<string | undefined>(undefined);
   protected transformTranslateX = signal(0);
@@ -88,6 +91,8 @@ export class WorkbenchDialogComponent {
     this.addHostCssClasses();
     this.trackFocus();
     this.autoFocus();
+
+    registerFocusTracker(inject(ElementRef) as ElementRef<HTMLElement>, this.dialog.id);
   }
 
   private setDialogOffset(): void {

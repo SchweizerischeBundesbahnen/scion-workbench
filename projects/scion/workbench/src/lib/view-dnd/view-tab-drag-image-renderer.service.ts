@@ -215,6 +215,7 @@ class DragImageWorkbenchView implements WorkbenchView {
   public readonly closable: Signal<boolean>;
   public readonly destroyed = false;
   public readonly active = signal(true).asReadonly();
+  public readonly focused = signal(true).asReadonly();
   public readonly blocked = false;
   public readonly cssClass = signal([]).asReadonly();
   public readonly urlSegments: Signal<UrlSegment[]>;

@@ -99,7 +99,9 @@ export class WorkbenchLayoutSerializer {
         .concat(flags?.excludeTreeNodeId ? ({path: '**/id', predicate: context => context.at(-1) instanceof MTreeNode}) : [])
         .concat(flags?.excludeViewMarkedForRemoval ? '**/views/*/markedForRemoval' : [])
         .concat(flags?.excludeViewNavigationId ? '**/views/*/navigation/id' : [])
-        .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : []),
+        .concat(flags?.excludePartNavigationId ? ({path: '**/navigation/id', predicate: context => context.at(-2) instanceof MPart}) : [])
+        .concat(flags?.excludeViewActivationInstant ? '**/views/*/activationInstant' : [])
+        .concat(flags?.excludePartActivationInstant ? ({path: '**/activationInstant', predicate: context => context.at(-1) instanceof MPart}) : []),
       sort: flags?.sort,
     });
     return window.btoa(`${json}${VERSION_SEPARATOR}${WORKBENCH_GRID_VERSION}`);
@@ -287,6 +289,14 @@ export interface LayoutSerializationFlags {
    * Excludes the part navigation id from the serialization.
    */
   excludePartNavigationId?: true;
+  /**
+   * Excludes the view activation instant from the serialization.
+   */
+  excludeViewActivationInstant?: true;
+  /**
+   * Excludes the part activation instant from the serialization.
+   */
+  excludePartActivationInstant?: true;
   /**
    * Assigns each view a stable id based on its position in the grid.
    *

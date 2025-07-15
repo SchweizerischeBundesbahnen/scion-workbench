@@ -114,6 +114,7 @@ export class MPart {
    * NOTE: This property is computed when deserializing the grid: {@link WorkbenchLayoutSerializer.deserializeGrid}.
    */
   public visible?: boolean;
+  public activationInstant?: number;
   public navigation?: {
     id: string;
     hint?: string;
@@ -144,6 +145,7 @@ export interface MView {
   alternativeId?: string;
   cssClass?: string[];
   markedForRemoval?: true;
+  activationInstant?: number;
   navigation?: {
     id: string;
     hint?: string;

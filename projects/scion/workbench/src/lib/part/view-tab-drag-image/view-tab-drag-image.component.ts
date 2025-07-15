@@ -39,10 +39,11 @@ import {PartId} from '../workbench-part.model';
   ],
   host: {
     '[class.view-drag]': 'true',
-    '[class.active]': 'true',
+    '[class.active]': 'true', // TODO [focus-track] still required?
     '[class.can-drop]': 'canDrop()',
     '[class.drag-over-tabbar]': 'isDragOverTabbar()',
     '[class.drag-over-peripheral-tabbar]': 'isDragOverPeripheralTabbar()',
+    '[attr.data-active]': 'true',
   },
 })
 export class ViewTabDragImageComponent {

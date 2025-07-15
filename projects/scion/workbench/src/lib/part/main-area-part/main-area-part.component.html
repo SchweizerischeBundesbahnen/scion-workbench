@@ -11,14 +11,15 @@
            [attr.data-grid]="'main-area'"
            class="e2e-content"/>
 } @else {
-  <sci-viewport class="desktop e2e-part-content e2e-content"
+  <sci-viewport class="desktop e2e-part-content e2e-content e2e-desktop"
                 wbViewDropZone
                 [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
                 [wbViewDropZoneAttributes]="{
                   'data-desktop': '',
                   'data-partid': part.id,
                 }"
-                (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
+                (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
+                #desktop_element>
     @if (part.navigation()) {
       <router-outlet [name]="part.id" wbRouterOutletRootContext/>
     } @else if (desktop()) {

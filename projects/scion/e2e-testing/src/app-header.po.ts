@@ -16,7 +16,11 @@ import {SciToggleButtonPO} from './@scion/components.internal/toggle-button.po';
  */
 export class AppHeaderPO {
 
+  // TODO [focus-tracker] Why public?
+  public readonly settingsMenuButton: Locator;
+
   constructor(private readonly _locator: Locator) {
+    this.settingsMenuButton = this._locator.locator('button.e2e-settings-menu-button');
   }
 
   /**
@@ -57,6 +61,20 @@ export class AppHeaderPO {
   }
 
   /**
+   * Displays test perspectives in the perspective switcher.
+   */
+  public async showTestPerspectives(): Promise<void> {
+    await this.clickSettingMenuItem({cssClass: 'e2e-show-test-perspectives'}, {check: true});
+  }
+
+  /**
+   * Enables focus highlighting.
+   */
+  public async highlightFocus(): Promise<void> {
+    await this.clickSettingMenuItem({cssClass: 'e2e-highlight-focus'}, {check: true});
+  }
+
+  /**
    * Clicks specified setting in settings menu.
    */
   public async clickSettingMenuItem(locateBy: {cssClass: string}, options?: {check?: boolean}): Promise<void> {
@@ -66,7 +84,7 @@ export class AppHeaderPO {
 
     // Open the menu only if not yet opened.
     if (!await menu.isVisible()) {
-      await this._locator.locator('button.e2e-settings-menu-button').click();
+      await this.settingsMenuButton.click();
       // Wait until the menu is opened.
       await menu.waitFor({state: 'visible'});
     }

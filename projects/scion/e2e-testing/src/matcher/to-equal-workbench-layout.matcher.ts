@@ -9,7 +9,7 @@
  */
 
 import {Locator} from '@playwright/test';
-import {ExpectationResult} from './custom-matchers.definition';
+import {MatcherReturnType} from 'playwright/types/test';
 import {MAIN_AREA} from '../workbench.model';
 import {retryOnError} from '../helper/testing.util';
 import {ActivityId, PartId, ViewId} from '@scion/workbench';
@@ -20,7 +20,7 @@ import {dasherize} from '../helper/dasherize.util';
 /**
  * Provides the implementation of {@link CustomMatchers#toEqualWorkbenchLayout}.
  */
-export async function toEqualWorkbenchLayout(locator: Locator, expected: ExpectedWorkbenchLayout): Promise<ExpectationResult> {
+export async function toEqualWorkbenchLayout(locator: Locator, expected: ExpectedWorkbenchLayout): Promise<MatcherReturnType> {
   try {
     // Retry assertion to behave like a Playwright web-first assertion, i.e., wait and retry until the expected condition is met.
     await retryOnError(() => assertWorkbenchLayout(expected, locator));

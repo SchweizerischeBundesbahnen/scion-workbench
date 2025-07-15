@@ -11,7 +11,7 @@
 import {inject, Injectable} from '@angular/core';
 import {WorkbenchStorage} from '../storage/workbench-storage';
 import {Logger} from '../logging';
-import {WorkbenchLayoutSerializer} from './workench-layout-serializer.service';
+import {WorkbenchLayoutSerializer} from './workbench-layout-serializer.service';
 import {MWorkbenchLayout} from './workbench-layout';
 
 /**

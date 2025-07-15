@@ -13,6 +13,7 @@ import {toEqualIgnoreOrder} from './to-equal-ignore-order.matcher';
 import {ExpectedWorkbenchLayout, toEqualWorkbenchLayout} from './to-equal-workbench-layout.matcher';
 import {toBeBetween} from './to-be-between.matcher';
 import {ExpectedBoundingBox, toHaveBoundingBox} from './to-have-bounding-box.matcher';
+import {toContainFocus} from './to-contain-focus.matcher';
 
 /**
  * Extends the Playwright expect API with project specific custom matchers.
@@ -57,6 +58,11 @@ declare global {
        * Expects the specified locator to have the expected bounding box.
        */
       toHaveBoundingBox(expected: ExpectedBoundingBox): Promise<R>;
+
+      /**
+       * Expects the specified locator or any of its direct or indirect child elements to be focused.
+       */
+      toContainFocus(): Promise<boolean>;
     }
   }
 }
@@ -77,14 +83,7 @@ export namespace CustomMatchers {
       toEqualWorkbenchLayout,
       toHaveBoundingBox,
       toBeBetween,
+      toContainFocus,
     });
   }
-}
-
-/**
- * Represents the result of a matcher.
- */
-export interface ExpectationResult {
-  pass: boolean;
-  message: () => string;
 }

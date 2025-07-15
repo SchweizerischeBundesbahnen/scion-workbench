@@ -28,4 +28,13 @@ export class ActivityItemPO {
   public getTooltip(): Promise<string | null> {
     return this.locator.getAttribute('title');
   }
+
+  public state(state: 'active' | 'focus-within-activity'): Locator {
+    switch (state) {
+      case 'active':
+        return this.button.locator(':scope[data-active]');
+      case 'focus-within-activity':
+        return this.button.locator(':scope[data-focus-within-activity]');
+    }
+  }
 }

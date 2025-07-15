@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, DestroyRef, effect, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
+import {Component, DestroyRef, DOCUMENT, ElementRef, inject, Provider, untracked, viewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewMenuService} from '../part/view-context-menu/view-menu.service';
@@ -21,6 +21,9 @@ import {WorkbenchView} from './workbench-view.model';
 import {OnAttach, OnDetach} from '../portal/wb-component-portal';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-context.directive';
+import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
+import {rootEffect} from '../common/root-effect';
+import {asyncScheduler} from 'rxjs';
 
 /**
  * Acts as a placeholder for a view's content that Angular fills based on the current router state of the associated view outlet.
@@ -40,6 +43,9 @@ import {RouterOutletRootContextDirective} from '../routing/router-outlet-root-co
   ],
   host: {
     '[attr.data-viewid]': 'view.id',
+    '[attr.data-focus]': `focusTracker.activeElement() === view.id ? '' : null`,
+    '[attr.data-active]': `view.active() ? '' : null`,
+    '[attr.data-activation-instant]': `view.activationInstant()`,
     '[class.view-drag]': 'viewDragService.dragging()',
   },
   providers: [
@@ -50,17 +56,37 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
 
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly viewDragService = inject(ViewDragService);
+  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
+  private readonly _document = inject(DOCUMENT);
   private readonly _viewport = viewChild.required(SciViewportComponent);
 
   private _scrollTop = 0;
   private _scrollLeft = 0;
+  private _activeElementBeforeDetach: HTMLElement | undefined;
 
   constructor() {
     this.installComponentLifecycleLogger();
     this.installMenuAccelerators();
-    this.installOnActivateView();
     this.addHostCssClasses();
+    registerFocusTracker(this._host, this.view.id);
+
+    rootEffect(onCleanup => {
+      const attached = this.view.slot.portal.attached();
+      if (!attached) {
+        untracked(() => {
+          const unset = asyncScheduler.schedule(() => this.focusTracker.unsetActiveElement(this.view.id));
+          onCleanup(() => unset.unsubscribe());
+        });
+      }
+    });
+  }
+
+  public focus(): void {
+    if (!this._host.contains(this._document.activeElement)) {
+      this._viewport().focus();
+    }
   }
 
   /**
@@ -69,6 +95,9 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   public onAttach(): void {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
+
+    this._activeElementBeforeDetach?.focus();
+    this._activeElementBeforeDetach = undefined;
   }
 
   /**
@@ -77,25 +106,15 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   public onDetach(): void {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
-  }
 
-  private onActivateView(): void {
-    // Gain focus only if in the active part.
-    if (this.view.part().active()) {
-      this._viewport().focus();
+    const activeElement = this._document.activeElement;
+    if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+      this._activeElementBeforeDetach = activeElement;
     }
   }
 
   private installMenuAccelerators(): void {
     inject(ViewMenuService).installMenuAccelerators(inject(ElementRef), this.view);
-  }
-
-  private installOnActivateView(): void {
-    effect(() => {
-      if (this.view.active()) {
-        untracked(() => this.onActivateView());
-      }
-    });
   }
 
   private addHostCssClasses(): void {

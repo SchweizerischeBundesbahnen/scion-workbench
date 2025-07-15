@@ -15,9 +15,9 @@ import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContex
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import {UUID} from '@scion/toolkit/uuid';
 import {setStyle} from '../../common/dom.util';
 import {Microfrontends} from '../common/microfrontend.util';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchMessageBoxCapability}.
@@ -41,14 +41,15 @@ export class MicrofrontendMessageBoxComponent {
   public readonly capability = input.required<WorkbenchMessageBoxCapability>();
   public readonly params = input.required<Map<string, unknown>>();
 
+  private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _outletRouter = inject(OutletRouter);
   private readonly _logger = inject(Logger);
   private readonly _routerOutletElement = viewChild.required<ElementRef<SciRouterOutletElement>>('router_outlet');
 
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
-  protected readonly outletName = UUID.randomUUID();
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
+  protected readonly dialog = inject(ɵWorkbenchDialog);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendMessageBoxComponent.', LoggerNames.MICROFRONTEND);
@@ -57,7 +58,7 @@ export class MicrofrontendMessageBoxComponent {
     this.propagateWorkbenchTheme();
     this.installNavigator();
 
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.outletName})); // Clear the outlet.
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.dialog.id})); // Clear the outlet.
   }
 
   private installNavigator(): void {
@@ -76,7 +77,7 @@ export class MicrofrontendMessageBoxComponent {
         await Microfrontends.waitForContext(this._routerOutletElement, ɵMESSAGE_BOX_CONTEXT, {injector});
 
         void this._outletRouter.navigate(capability.properties.path, {
-          outlet: this.outletName,
+          outlet: this.dialog.id,
           relativeTo: application.baseUrl,
           params: params,
           pushStateToSessionHistoryStack: false,
@@ -84,6 +85,13 @@ export class MicrofrontendMessageBoxComponent {
         });
       });
     });
+  }
+
+  protected onFocusWithin(event: Event): void {
+    const {detail: focusWithin} = event as CustomEvent<boolean>;
+    if (focusWithin) {
+      this._host.dispatchEvent(new CustomEvent('sci-microfrontend-focusin', {bubbles: true}));
+    }
   }
 
   /**
