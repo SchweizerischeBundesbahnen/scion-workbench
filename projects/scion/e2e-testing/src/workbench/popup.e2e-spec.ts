@@ -972,7 +972,7 @@ test.describe('Workbench Popup', () => {
     });
   });
 
-  test.describe('stick popup to view bounds', () => {
+  test.describe('stick popup to view or part bounds', () => {
 
     test('should stick popup anchor to bottom view bounds when scrolling up', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
@@ -989,7 +989,7 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginTop('2000');
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       // Capture view bounds
@@ -1024,22 +1024,22 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginBottom('2000');
 
-      // Capture view bounds
+      // Capture view bounds.
       const viewBoundingBox = await testPage.view.getBoundingBox();
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       while (await testPage.view.getScrollPosition('vertical') < 1) {
         // Move scrollbar down
         await testPage.view.scrollbars.vertical.scroll(25);
 
-        // Expect popup anchor not to exceed top view bounds
+        // Expect popup anchor not to exceed top view bounds.
         const {y} = await popup.getAnchorPosition();
         expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
       }
 
-      // Expect popup anchor to stick to top view bounds
+      // Expect popup anchor to stick to top view bounds.
       const {y} = await popup.getAnchorPosition();
       expect(y).toBeCloseTo(viewBoundingBox.top, 0);
     });
@@ -1061,22 +1061,22 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginLeft('2000');
 
-      // Capture view bounds
+      // Capture view bounds.
       const viewBoundingBox = await testPage.view.getBoundingBox();
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       while (await testPage.view.getScrollPosition('horizontal') > 0) {
-        // Move scrollbar left
+        // Move scrollbar left.
         await testPage.view.scrollbars.horizontal.scroll(-25);
 
-        // Expect popup anchor not to exceed right view bounds
+        // Expect popup anchor not to exceed right view bounds.
         const {x} = await popup.getAnchorPosition();
         expect(x).toBeLessThanOrEqual(viewBoundingBox.right + 1);
       }
 
-      // Expect popup anchor to stick to right view bounds
+      // Expect popup anchor to stick to right view bounds.
       const {x} = await popup.getAnchorPosition();
       expect(x).toBeCloseTo(viewBoundingBox.right, 0);
     });
@@ -1098,32 +1098,31 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginRight('2000');
 
-      // Capture view bounds
+      // Capture view bounds.
       const viewBoundingBox = await testPage.view.getBoundingBox();
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       while (await testPage.view.getScrollPosition('horizontal') < 1) {
-        // Move scrollbar right
+        // Move scrollbar right.
         await testPage.view.scrollbars.horizontal.scroll(25);
 
-        // Expect popup anchor not to exceed left view bounds
+        // Expect popup anchor not to exceed left view bounds.
         const {x} = await popup.getAnchorPosition();
         expect(x).toBeGreaterThanOrEqual(viewBoundingBox.left - 1);
       }
 
-      // Expect popup anchor to stick to left view bounds
+      // Expect popup anchor to stick to left view bounds.
       const {x} = await popup.getAnchorPosition();
       expect(x).toBeCloseTo(viewBoundingBox.left, 0);
     });
 
-    test('should stick popup anchor to bottom view bounds when moving bottom sash up', async ({appPO, workbenchNavigator}) => {
+    test('should stick popup anchor to bottom part bounds when moving bottom sash up', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
         .addPart('part.middle')
-        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3})
         .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
         .addPart('part.bottom', {align: 'bottom', ratio: .1})
         .addView('testee', {partId: 'part.middle'})
@@ -1134,34 +1133,81 @@ test.describe('Workbench Popup', () => {
 
       const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
-      while ((await testPage.view.getBoundingBox()).height > 0) {
-        // Move bottom sash up
+      while ((await testPage.view.part.getBoundingBox()).height > 0) {
+        // Move bottom sash up.
         await testPage.view.part.sash.drag('bottom', -50);
 
         const {y} = await popup.getAnchorPosition();
-        const viewBoundingBox = await testPage.view.getBoundingBox();
+        const partBoundingBox = await testPage.view.part.getBoundingBox();
 
-        // Expect popup anchor not to exceed bottom view bounds
-        expect(y).toBeLessThanOrEqual(viewBoundingBox.bottom + 1);
+        // Expect popup anchor not to exceed bottom part bounds.
+        expect(y).toBeLessThanOrEqual(partBoundingBox.bottom + 1);
 
-        // Expect popup anchor not to exceed top view bounds
-        expect(y).toBeGreaterThanOrEqual(viewBoundingBox.top - 1);
+        // Expect popup anchor not to exceed top part bounds.
+        expect(y).toBeGreaterThanOrEqual(partBoundingBox.top - 1);
       }
 
       const {y} = await popup.getAnchorPosition();
-      const viewBoundingBox = await testPage.view.getBoundingBox();
+      const partBoundingBox = await testPage.view.part.getBoundingBox();
 
-      // Expect popup anchor to stick to top view bounds
-      expect(y).toBeCloseTo(viewBoundingBox.top, 0);
+      // Expect popup anchor to stick to top part bounds.
+      expect(y).toBeCloseTo(partBoundingBox.top, 0);
 
-      // Expect popup anchor to stick to bottom view bounds
-      expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+      // Expect popup anchor to stick to bottom part bounds.
+      expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
     });
 
-    test('should stick popup anchor to bottom view bounds when moving top sash down', async ({appPO, workbenchNavigator}) => {
+    /**
+     * This test adds a hidden part (no navigation, no views) to create a layout where one grid-element directly succeeds another grid-element without an intermediate sci-sashbox.
+     * If the grid element were not set to overflow `hidden`, the popup would stick below the bottom part bounds.
+     */
+    test('should stick popup anchor to bottom part bounds when moving bottom sash up (grid-element directly succeeding another grid-element)', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.middle')
+        .addPart('part.left', {relativeTo: 'part.middle', align: 'left', ratio: .3}) // Add hidden part.
+        .addPart('part.right', {relativeTo: 'part.middle', align: 'right', ratio: .3})
+        .addPart('part.bottom', {align: 'bottom', ratio: .1})
+        .addView('testee', {partId: 'part.middle'})
+        .addView('right', {partId: 'part.right'})
+        .addView('bottom', {partId: 'part.bottom'})
+        .navigateView('testee', ['test-pages/popup-position-test-page'], {cssClass: 'testee'}),
+      );
+
+      const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
+
+      // Open popup.
+      const popup = await testPage.open();
+
+      while ((await testPage.view.part.getBoundingBox()).height > 0) {
+        // Move bottom sash up.
+        await testPage.view.part.sash.drag('bottom', -50);
+
+        const {y} = await popup.getAnchorPosition();
+        const partBoundingBox = await testPage.view.part.getBoundingBox();
+
+        // Expect popup anchor not to exceed bottom part bounds.
+        expect(y).toBeLessThanOrEqual(partBoundingBox.bottom + 1);
+
+        // Expect popup anchor not to exceed top part bounds.
+        expect(y).toBeGreaterThanOrEqual(partBoundingBox.top - 1);
+      }
+
+      const {y} = await popup.getAnchorPosition();
+      const partBoundingBox = await testPage.view.part.getBoundingBox();
+
+      // Expect popup anchor to stick to top part bounds.
+      expect(y).toBeCloseTo(partBoundingBox.top, 0);
+
+      // Expect popup anchor to stick to bottom part bounds.
+      expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
+    });
+
+    test('should stick popup anchor to bottom part bounds when moving top sash down', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
@@ -1178,30 +1224,30 @@ test.describe('Workbench Popup', () => {
 
       const testPage = new PopupPositionTestPagePO(appPO, {cssClass: 'testee'});
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
-      while ((await testPage.view.getBoundingBox()).height > 0) {
+      while ((await testPage.view.part.getBoundingBox()).height > 0) {
         // Drag top sash down
         await testPage.view.part.sash.drag('top', 50);
 
         const {y} = await popup.getAnchorPosition();
 
-        // Expect popup anchor not to exceed top part bounds
+        // Expect popup anchor not to exceed top part bounds.
         const partBoundingBox = await testPage.view.part.getBoundingBox();
         expect(y).toBeGreaterThanOrEqual(partBoundingBox.top - 1);
 
-        // Expect popup anchor not to exceed bottom part bounds
+        // Expect popup anchor not to exceed bottom part bounds.
         expect(y).toBeLessThanOrEqual(partBoundingBox.bottom + 1);
       }
 
       const {y} = await popup.getAnchorPosition();
       const partBoundingBox = await testPage.view.part.getBoundingBox();
 
-      // Expect popup anchor to stick to top part bounds
+      // Expect popup anchor to stick to top part bounds.
       expect(y).toBeCloseTo(partBoundingBox.top, 0);
 
-      // Expect popup anchor to stick to bottom part bounds
+      // Expect popup anchor to stick to bottom part bounds.
       expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
     });
 
@@ -1224,30 +1270,30 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginLeft('400');
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       while ((await testPage.view.getBoundingBox()).width > 0) {
-        // Move right sash to the left
+        // Move right sash to the left.
         await testPage.view.part.sash.drag('right', -50);
 
         const {x} = await popup.getAnchorPosition();
 
-        // Expect popup anchor not to exceed right view bounds
+        // Expect popup anchor not to exceed right view bounds.
         const viewBoundingBox = await testPage.view.getBoundingBox();
         expect(x).toBeLessThanOrEqual(viewBoundingBox.right + 1);
 
-        // Expect popup anchor not to exceed left view bounds
+        // Expect popup anchor not to exceed left view bounds.
         expect(x).toBeGreaterThanOrEqual(viewBoundingBox.left - 1);
       }
 
       const {x} = await popup.getAnchorPosition();
       const viewBoundingBox = await testPage.view.getBoundingBox();
 
-      // Expect popup anchor to stick to right view bounds
+      // Expect popup anchor to stick to right view bounds.
       expect(x).toBeCloseTo(viewBoundingBox.right, 0);
 
-      // Expect popup anchor to stick to left view bounds
+      // Expect popup anchor to stick to left view bounds.
       expect(x).toBeCloseTo(viewBoundingBox.left, 0);
     });
 
@@ -1270,30 +1316,30 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginLeft('400');
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       while ((await testPage.view.getBoundingBox()).width > 0) {
-        // Move left sash to the right
+        // Move left sash to the right.
         await testPage.view.part.sash.drag('left', 50);
 
         const {x} = await popup.getAnchorPosition();
         const viewBoundingBox = await testPage.view.getBoundingBox();
 
-        // Expect popup anchor not to exceed right view bounds
+        // Expect popup anchor not to exceed right view bounds.
         expect(x).toBeLessThanOrEqual(viewBoundingBox.right + 1);
 
-        // Expect popup anchor not to exceed left view bounds
+        // Expect popup anchor not to exceed left view bounds.
         expect(x).toBeGreaterThanOrEqual(viewBoundingBox.left - 1);
       }
 
       const {x} = await popup.getAnchorPosition();
       const viewBoundingBox = await testPage.view.getBoundingBox();
 
-      // Expect popup anchor to stick to right view bounds
+      // Expect popup anchor to stick to right view bounds.
       expect(x).toBeCloseTo(viewBoundingBox.right, 0);
 
-      // Expect popup anchor to stick to left view bounds
+      // Expect popup anchor to stick to left view bounds.
       expect(x).toBeCloseTo(viewBoundingBox.left, 0);
     });
 
@@ -1314,14 +1360,14 @@ test.describe('Workbench Popup', () => {
 
       await testPage.enterMarginLeft('2000');
 
-      // Open popup
+      // Open popup.
       const popup = await testPage.open();
 
       await test.step('move right sash to the left', async () => {
-        // Move right sash to the left
+        // Move right sash to the left.
         await testPage.view.part.sash.drag('right', -500);
 
-        // Expect popup anchor to stick to right view bounds
+        // Expect popup anchor to stick to right view bounds.
         const {x} = await popup.getAnchorPosition();
         const viewBoundingBox = await testPage.view.getBoundingBox();
         expect(x).toBeCloseTo(viewBoundingBox.right, 0);
@@ -1331,27 +1377,27 @@ test.describe('Workbench Popup', () => {
         const viewBoundingBox = await testPage.view.getBoundingBox();
 
         while (await testPage.view.getScrollPosition('horizontal') > 0) {
-          // Move scrollbar left
+          // Move scrollbar left.
           await testPage.view.scrollbars.horizontal.scroll(-50);
 
-          // Expect popup anchor to stick to right view bounds
+          // Expect popup anchor to stick to right view bounds.
           const {x} = await popup.getAnchorPosition();
           expect(x).toBeCloseTo(viewBoundingBox.right, 0);
         }
       });
 
       await test.step('move right sash to the right', async () => {
-        // Move right sash to the right
+        // Move right sash to the right.
         await testPage.view.part.sash.drag('right', 500);
 
-        // Expect popup anchor to stick to right view bounds
+        // Expect popup anchor to stick to right view bounds.
         const {x} = await popup.getAnchorPosition();
         const viewBoundingBox = await testPage.view.getBoundingBox();
         expect(x).toBeCloseTo(viewBoundingBox.right, 0);
       });
     });
 
-    test('should stick popup anchor to bottom view bounds if anchor scrolled out of viewport and moving bottom sash down', async ({appPO, workbenchNavigator}) => {
+    test('should stick popup anchor to bottom part bounds if anchor scrolled out of viewport and moving bottom sash down', async ({appPO, workbenchNavigator}) => {
       await appPO.navigateTo({microfrontendSupport: false});
 
       await workbenchNavigator.createPerspective(factory => factory
@@ -1373,36 +1419,36 @@ test.describe('Workbench Popup', () => {
       const popup = await testPage.open();
 
       await test.step('move bottom sash up', async () => {
-        // Move bottom sash up
+        // Move bottom sash up.
         await testPage.view.part.sash.drag('bottom', -500);
 
-        // Expect popup anchor to stick to bottom view bounds
+        // Expect popup anchor to stick to bottom part bounds.
         const {y} = await popup.getAnchorPosition();
-        const viewBoundingBox = await testPage.view.getBoundingBox();
-        expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+        const partBoundingBox = await testPage.view.part.getBoundingBox();
+        expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
       });
 
       await test.step('scroll up', async () => {
-        const viewBoundingBox = await testPage.view.getBoundingBox();
+        const partBoundingBox = await testPage.view.part.getBoundingBox();
 
         while (await testPage.view.getScrollPosition('vertical') > 0) {
-          // Move scrollbar up
+          // Move scrollbar up.
           await testPage.view.scrollbars.vertical.scroll(-50);
 
-          // Expect popup anchor to stick to bottom view bounds
+          // Expect popup anchor to stick to bottom part bounds.
           const {y} = await popup.getAnchorPosition();
-          expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+          expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
         }
       });
 
       await test.step('move bottom sash down', async () => {
-        // Move top sash up
+        // Move top sash up.
         await testPage.view.part.sash.drag('bottom', 500);
 
-        // Expect popup anchor to stick to bottom view bounds
+        // Expect popup anchor to stick to bottom part bounds.
         const {y} = await popup.getAnchorPosition();
-        const viewBoundingBox = await testPage.view.getBoundingBox();
-        expect(y).toBeCloseTo(viewBoundingBox.bottom, 0);
+        const partBoundingBox = await testPage.view.getBoundingBox();
+        expect(y).toBeCloseTo(partBoundingBox.bottom, 0);
       });
     });
   });
