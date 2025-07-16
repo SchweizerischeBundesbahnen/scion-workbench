@@ -80,12 +80,7 @@ export class ViewTabComponent {
 
   @HostListener('click')
   protected onClick(): void {
-    if (this.view().active()) {
-      this.view().focus();
-    }
-    else {
-      void this.view().activate();
-    }
+    void this.view().activate();
   }
 
   protected onClose(event: MouseEvent): void {

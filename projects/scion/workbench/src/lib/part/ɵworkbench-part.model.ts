@@ -85,18 +85,10 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   }
 
   private activateOnFocus(): void {
-    const focusTracker = inject(WorkbenchFocusTracker);
-
-    // Activate on Focus-In
     effect(() => {
-      const activeElement = focusTracker.activeElement();
-
-      untracked(() => {
-        if (activeElement === this.id) {
-          console.log(`>>> [ɵWorkbenchPart][activateOnFocus][${this.id}] Activate Part [instant=${this.activationInstant()}]`);
-          void this.activate({force: true});
-        }
-      });
+      if (this.focused()) {
+        untracked(() => void this.activate({force: true}));
+      }
     });
   }
 
@@ -108,7 +100,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     // Focus on actication.
     afterRenderEffect(() => {
       const activationInstant = this.activationInstant();
-      console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] Part Activation Instant [instant=${this.activationInstant()}]`);
 
       untracked(() => {
         if (!activationInstant) {
@@ -123,12 +114,10 @@ export class ɵWorkbenchPart implements WorkbenchPart {
 
         // Do not activate if other view or part is activated later on (e.g., when restoring layout after minimize)
         if (partRegistry.objects().find(part => part.activationInstant() > activationInstant) || viewRegistry.objects().find(view => view.activationInstant() > activationInstant)) {
-          console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] Other Object has newer instant => NOOP`);
           return;
         }
 
-        if (this._focusTracker.activeElement() !== this.id) {
-          console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] DOIT`);
+        if (!this.focused()) { // required wegen microfrontend to not steal focus as protected content not child of view component.
           this.focus();
         }
       });
@@ -233,8 +222,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    * Note: This instruction runs asynchronously via URL routing.
    */
   public async activate(options?: {force?: true}): Promise<boolean> {
-    console.log(`>>> WorkbenchPart.activate [part=${this.id}]`);
-
     assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
     if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
       return true;

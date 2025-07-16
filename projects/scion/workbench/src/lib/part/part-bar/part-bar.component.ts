@@ -60,8 +60,8 @@ export class PartBarComponent {
 
   // tabbar should never gain focus (not steal focus for content), but focus the content to activate the workbench element.
   protected onNonFocusable(event: Event): void {
+    void (this.part.activeView() ?? this.part).activate();
     event.preventDefault();
-    (this.part.activeView() ?? this.part).focus(); // when clicking on an non-active part.
   }
 
   protected onMinimize(): void {

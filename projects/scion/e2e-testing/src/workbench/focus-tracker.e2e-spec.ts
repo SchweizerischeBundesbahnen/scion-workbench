@@ -17,10 +17,9 @@ import {DialogOpenerPagePO} from './page-object/dialog-opener-page.po';
 import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
+import {firstValueFrom, timer} from 'rxjs';
 
 test.describe.only('Focus Tracker', () => {
-
-  test.describe.configure({mode: 'serial'});
 
   test('should focus parts and views when clicking contained content (playbook)', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false});
@@ -836,6 +835,7 @@ test.describe.only('Focus Tracker', () => {
     // Expect part 'part.right-1' to have focus.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-1');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-1');
+    await firstValueFrom(timer(500));
     await expect(appPO.part({partId: 'part.right-1'}).slot.viewport).toContainFocus();
     await expect.poll(() => logPart.getLog()).toEqual(['part.right-1']);
   });
@@ -1006,45 +1006,6 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test('should retain workbench focus when clicking tab of focused view', async ({appPO, workbenchNavigator}) => {
-    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
-
-    // Switch to test perspective.
-    const testPerspective = new FocusTestPerspectivePO(appPO);
-    await testPerspective.switchTo();
-
-    // Open log activity.
-    const logPart = await testPerspective.openLogActivity();
-
-    // Activate 'view.201'.
-    await workbenchNavigator.modifyLayout(layout => layout
-      .activatePart('part.right-3')
-      .activateView('view.201'),
-    );
-    await logPart.clearLog();
-
-    // PRECONDITION: Expect 'view.201' to be active and focused.
-    await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
-    await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
-    await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
-    await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
-    await expect.poll(() => logPart.getLog()).toEqual([]);
-
-    // TEST: Click view 'view.201'.
-    await testPerspective.clickViewTab({viewId: 'view.201'});
-
-    // Expect view 'view.201' to have focus and no focus change.
-    await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
-    await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
-    await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
-    await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
-    await expect.poll(() => logPart.getLog()).toEqual([]);
-  });
-
   test('should switch focus when switching tabs', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
@@ -1207,7 +1168,7 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test.only('should not focus activity on restore after minimization', async ({appPO, page}) => {
+  test('should not focus activity on restore after minimization', async ({appPO, page}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1442,7 +1403,7 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test('should not lose workbench focus when clicking part title', async ({appPO}) => {
+  test('should not lose workbench view focus when clicking view tab of already focused view', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1453,7 +1414,6 @@ test.describe.only('Focus Tracker', () => {
     const logPart = await testPerspective.openLogActivity();
 
     // TEST: Activate view 'view.201'.
-    await testPerspective.clickViewTab({viewId: 'view.201'});
     await testPerspective.clickViewInput({viewId: 'view.201'});
     await logPart.clearLog();
 
@@ -1461,9 +1421,44 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
+    await expect.poll(() => logPart.getLog()).toEqual([]);
+
+    // TEST: Click view tab 'view.201'.
+    await testPerspective.clickViewTab({viewId: 'view.201'});
+
+    await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
+    await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
+    await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
+    await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(appPO.view({viewId: 'view.201'}).tab.locator).toContainFocus();
+    await expect.poll(() => logPart.getLog()).toEqual([]);
+  });
+
+  test('should not lose workbench view focus when clicking part title of already focused view', async ({appPO}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Switch to test perspective.
+    const testPerspective = new FocusTestPerspectivePO(appPO);
+    await testPerspective.switchTo();
+
+    // Open log activity.
+    const logPart = await testPerspective.openLogActivity();
+
+    // TEST: Activate view 'view.201'.
+    await testPerspective.clickViewInput({viewId: 'view.201'});
+    await logPart.clearLog();
+
+    // PRECONDITION: Expect 'view.201' to be active and focused.
+    await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
+    await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
+    await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
+    await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click title of part bar.
@@ -1472,13 +1467,13 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
   });
 
-  test('should not lose workbench focus when clicking part bar', async ({appPO}) => {
+  test('should not lose workbench view focus when clicking part bar of already focused view', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1489,7 +1484,6 @@ test.describe.only('Focus Tracker', () => {
     const logPart = await testPerspective.openLogActivity();
 
     // TEST: Activate view 'view.201'.
-    await testPerspective.clickViewTab({viewId: 'view.201'});
     await testPerspective.clickViewInput({viewId: 'view.201'});
     await logPart.clearLog();
 
@@ -1497,9 +1491,9 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part bar.
@@ -1508,13 +1502,13 @@ test.describe.only('Focus Tracker', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
   });
 
-  test('should not lose workbench focus when clicking part action', async ({appPO, workbenchNavigator}) => {
+  test('should not lose workbench view focus when clicking part action of already focused view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1530,31 +1524,32 @@ test.describe.only('Focus Tracker', () => {
     const logPart = await testPerspective.openLogActivity();
 
     // TEST: Activate view 'view.201'.
-    await testPerspective.clickViewTab({viewId: 'view.201'});
+    await testPerspective.clickViewInput({viewId: 'view.201'});
     await logPart.clearLog();
 
     // PRECONDITION: Expect 'view.201' to be active and focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part action.
-    await appPO.part({partId: 'part.right-3'}).bar.action({cssClass: 'testee'}).locator.click();
+    const partAction = appPO.part({partId: 'part.right-3'}).bar.action({cssClass: 'testee'});
+    await partAction.locator.click();
 
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.part({partId: 'part.right-3'}).bar.action({cssClass: 'testee'}).locator.locator('button')).toBeFocused();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(partAction.locator).toContainFocus(); // part action should still be focused
     await expect.poll(() => logPart.getLog()).toEqual([]);
   });
 
-  test('should not lose workbench focus when clicking view menu', async ({appPO, workbenchNavigator}) => {
+  test('should not lose workbench view focus when clicking view menu of already focused view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
 
     // Switch to test perspective.
@@ -1570,16 +1565,16 @@ test.describe.only('Focus Tracker', () => {
     const logPart = await testPerspective.openLogActivity();
 
     // TEST: Activate view 'view.201'.
-    await testPerspective.clickViewTab({viewId: 'view.201'});
+    await testPerspective.clickViewInput({viewId: 'view.201'});
     await logPart.clearLog();
 
     // PRECONDITION: Expect 'view.201' to be active and focused.
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right-3');
     await expect.poll(() => appPO.activeViewId({partId: 'part.right-3'})).toEqual('view.201');
     await expect.poll(() => appPO.focusOwner()).toEqual('view.201');
-    await expect(appPO.view({viewId: 'view.201'}).viewport).toContainFocus();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('active')).toBeVisible();
     await expect(appPO.view({viewId: 'view.201'}).tab.state('focus-within-view')).toBeVisible();
+    await expect(testPerspective.viewInput({viewId: 'view.201'})).toBeFocused();
     await expect.poll(() => logPart.getLog()).toEqual([]);
 
     // TEST: Click part action.

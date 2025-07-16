@@ -104,18 +104,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   private activateOnFocus(): void {
-    const focusTracker = inject(WorkbenchFocusTracker);
-
-    // Activate on Focus-In
     effect(() => {
-      const activeElement = focusTracker.activeElement();
-
-      untracked(() => {
-        if (activeElement === this.id) {
-          console.log(`>>> [ɵWorkbenchView][activateOnFocus][${this.id}] Activate View [instant=${this.activationInstant()}]`);
-          void this.activate({force: true});
-        }
-      });
+      if (this.focused()) {
+        untracked(() => void this.activate({force: true}));
+      }
     });
   }
 
@@ -129,15 +121,12 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     // Focus on actication.
     afterRenderEffect(() => {
       const activationInstant = this.activationInstant();
-      console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] View Activation Instant!! [instant=${this.activationInstant()}]`);
 
       untracked(() => {
         if (!activationInstant) {
-          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] e1`);
           return;
         }
         if (!this.active()) {
-          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] e2`);
           return;
         }
 
@@ -146,27 +135,20 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         }
 
         if (popupRegistry.objects().some(popup => popup.context.view?.id === this.id)) {
-          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] BLOCKED BY POPUP => NOOP`);
           return;
         }
         if (dialogRegistry.dialogs().some(dialog => dialog.context.view?.id === this.id)) {
-          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] BLOCKED BY DIALOG => NOOP`);
           return;
         }
 
         // Do not activate if other view or part is activated later on (e.g., when restoring layout after minimize)
         if (partRegistry.objects().find(part => part.activationInstant() > activationInstant) || viewRegistry.objects().find(view => view.activationInstant() > activationInstant)) {
-          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] Other Object has newer instant => NOOP`);
           return;
         }
 
-        if (this._focusTracker.activeElement() !== this.id) { // required wegen microfrontend to not steal focus as protected content not child of view component.
-          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] DOIT`);
+        if (!this.focused()) {
           this.focus();
         }
-        // else {
-        //   console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] ALREADY ACTIVE ELEMNET`);
-        // }
       });
     });
   }

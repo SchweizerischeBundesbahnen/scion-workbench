@@ -36,13 +36,11 @@ class ɵWorkbenchFocusTracker implements WorkbenchFocusTracker {
   public activeElement = signal<WorkbenchElementId | null>(null);
 
   public setActiveElement(element: WorkbenchElementId | null): void {
-    console.log('>>> ɵWorkbenchFocusTracker.setActiveElement', element);
     this.activeElement.set(element);
   }
 
   public unsetActiveElement(element: WorkbenchElementId | null): void {
     if (this.activeElement() === element) {
-      console.log('>>> ɵWorkbenchFocusTracker.unsetActiveElement', element);
       this.activeElement.set(null);
     }
   }
@@ -70,7 +68,6 @@ export function registerFocusTracker(target: ElementRef<Element> | Element, elem
       takeUntilDestroyed(injector.get(DestroyRef)),
     )
     .subscribe(() => {
-      console.log('>>>> [FocusTracker] onfocusin', elementFn());
       focusTracker.setActiveElement(elementFn());
     });
 

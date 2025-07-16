@@ -84,7 +84,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   }
 
   public focus(): void {
-    console.log(`>>> [ViewSlotComponent.focus][viewId=${this.view.id}] Active Element: `, this._document.activeElement);
     if (!this._host.contains(this._document.activeElement)) {
       this._viewport().focus();
     }
@@ -97,8 +96,10 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
 
-    this._activeElementBeforeDetach?.focus();
-    this._activeElementBeforeDetach = undefined;
+    if (this.view.focused()) {
+      this._activeElementBeforeDetach?.focus();
+      this._activeElementBeforeDetach = undefined;
+    }
   }
 
   /**
@@ -108,9 +109,11 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
 
-    const activeElement = this._document.activeElement;
-    if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
-      this._activeElementBeforeDetach = activeElement;
+    if (this.view.focused()) {
+      const activeElement = this._document.activeElement;
+      if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+        this._activeElementBeforeDetach = activeElement;
+      }
     }
   }
 

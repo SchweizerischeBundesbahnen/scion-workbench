@@ -71,8 +71,10 @@ export class PartSlotComponent implements OnAttach, OnDetach {
     this._viewport().scrollTop = this._scrollTop;
     this._viewport().scrollLeft = this._scrollLeft;
 
-    this._activeElementBeforeDetach?.focus();
-    this._activeElementBeforeDetach = undefined;
+    if (this.part.focused()) {
+      this._activeElementBeforeDetach?.focus();
+      this._activeElementBeforeDetach = undefined;
+    }
   }
 
   /**
@@ -82,10 +84,11 @@ export class PartSlotComponent implements OnAttach, OnDetach {
     this._scrollTop = this._viewport().scrollTop;
     this._scrollLeft = this._viewport().scrollLeft;
 
-    const activeElement = this._document.activeElement;
-    if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
-      this._activeElementBeforeDetach = activeElement;
+    if (this.part.focused()) {
+      const activeElement = this._document.activeElement;
+      if (this._host.contains(activeElement) && activeElement instanceof HTMLElement) {
+        this._activeElementBeforeDetach = activeElement;
+      }
     }
-    // setTimeout(() => this.focusTracker.unsetActiveElement(this.part.id));
   }
 }
