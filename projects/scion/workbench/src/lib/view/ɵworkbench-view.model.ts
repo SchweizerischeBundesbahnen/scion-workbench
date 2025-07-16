@@ -160,10 +160,10 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
           return;
         }
 
-        // if (focusTracker.activeElement() !== this.id) {
-        console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] DOIT`);
-        this.focus();
-        // }
+        if (this._focusTracker.activeElement() !== this.id) { // required wegen microfrontend to not steal focus as protected content not child of view component.
+          console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] DOIT`);
+          this.focus();
+        }
         // else {
         //   console.log(`>>> [ɵWorkbenchView][focusOnActivate][${this.id}] ALREADY ACTIVE ELEMNET`);
         // }

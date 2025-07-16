@@ -41,11 +41,6 @@ export const POPUP_ID_PREFIX = 'popup.';
 export const DIALOG_ID_PREFIX = 'dialog.';
 
 /**
- * Represents the id prefix of message boxes.
- */
-export const MESSAGE_BOX_ID_PREFIX = 'messagebox.';
-
-/**
  * Format of a part outlet name.
  */
 export type PartOutlet = `${typeof PART_ID_PREFIX}${string}`;
@@ -66,14 +61,9 @@ export type PopupOutlet = `${typeof POPUP_ID_PREFIX}${string}`;
 export type DialogOutlet = `${typeof DIALOG_ID_PREFIX}${string}`;
 
 /**
- * Format of a messagebox outlet name.
- */
-export type MessageBoxOutlet = `${typeof MESSAGE_BOX_ID_PREFIX}${string}`;
-
-/**
  * Union of workbench outlets.
  */
-export type WorkbenchOutlet = PartOutlet | ViewOutlet | PopupOutlet | DialogOutlet | MessageBoxOutlet;
+export type WorkbenchOutlet = PartOutlet | ViewOutlet | PopupOutlet | DialogOutlet;
 
 /**
  * Name of the query parameter that contains the layout of the main area.

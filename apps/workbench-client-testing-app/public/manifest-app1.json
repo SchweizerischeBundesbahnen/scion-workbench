@@ -84,5 +84,17 @@
     }
   ],
   "intentions": [
+    {
+      "type": "messagebox",
+      "qualifier": {
+        "*": "*"
+      }
+    },
+    {
+      "type": "popup",
+      "qualifier": {
+        "*": "*"
+      }
+    }
   ]
 }

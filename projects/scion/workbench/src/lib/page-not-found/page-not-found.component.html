@@ -19,8 +19,6 @@
     <button (click)="workbenchService.resetPerspective()">{{('%workbench.reset_perspective.action' | wbText)()}}</button>
   } @else if (Routing.isDialogOutlet(outlet)) {
     <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
-  } @else if (Routing.isMessageBoxOutlet(outlet)) {
-    <button (click)="dialog!.close()">{{('%workbench.close.action' | wbText)()}}</button>
   } @else if (Routing.isPopupOutlet(outlet)) {
     <button (click)="popup!.close()">{{('%workbench.close.action' | wbText)()}}</button>
   }

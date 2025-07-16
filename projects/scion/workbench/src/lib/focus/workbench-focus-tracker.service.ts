@@ -14,7 +14,7 @@ import {EMPTY, fromEvent, merge, switchMap} from 'rxjs';
 import {Disposable} from '../common/disposable';
 import {coerceElement} from '@angular/cdk/coercion';
 import {WorkbenchElementId} from '../workbench-elements';
-import {finalize} from 'rxjs/operators';
+import {finalize, startWith} from 'rxjs/operators';
 
 /**
  * Provides the active workbench element, i.e., the element that has the focus.
@@ -64,6 +64,7 @@ export function registerFocusTracker(target: ElementRef<Element> | Element, elem
 
   const subscription = toObservable(focusTracker.activeElement, {injector})
     .pipe(
+      startWith(undefined), // immediate subscription to focusin; microfrontend focustracker e2e tests (host popup)
       switchMap(activeElement => activeElement === elementFn() ? EMPTY : merge(fromEvent<FocusEvent>(coerceElement(target), 'focusin', {once: true}), fromEvent(coerceElement(target), 'sci-microfrontend-focusin', {once: true}))),
       finalize(() => setTimeout(() => focusTracker.unsetActiveElement(elementFn()))), // TODO[focus-tracker] Test test to fail if not setTimeout
       takeUntilDestroyed(injector.get(DestroyRef)),

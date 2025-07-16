@@ -1194,6 +1194,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const activationInstant = options?.activationInstant ?? this._instantProvider.next();
     part.activeViewId = view.id;
     view.activationInstant = activationInstant;
+    console.log(`>>> [WorkbenchLayout.__activateView] updating ViewActivationInstant [viewId=${view.id}, instant=${view.activationInstant}]`);
 
     // Activate the part.
     if (options?.activatePart) {
@@ -1231,7 +1232,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     // Activate part.
     this.grid({partId: part.id}).grid.activePartId = part.id;
     part.activationInstant = options?.activationInstant ?? this._instantProvider.next();
-    console.log(`>>> [WorkbenchLayout] updating activationInstant [partId=${part.id}, instant=${part.activationInstant}]`);
+    console.log(`>>> [WorkbenchLayout.__activatePart] updating PartActivationInstant [partId=${part.id}, instant=${part.activationInstant}]`);
 
     // Activate activity.
     const activity = this.activity({partId: part.id}, {orElse: null});

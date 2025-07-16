@@ -55,9 +55,8 @@ test.describe.only('Focus Tracker', () => {
 
     // Expect view to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(viewId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      viewId,
-    ]);
+    await expect.poll(() => logPart.getLog()).toEqual([viewId]);
+    await expect(appPO.view({viewId}).locator).toContainFocus();
 
     // TEST: Focus element outside the view.
     await testPerspective.clickPartInput({partId: 'part.right-2'});
@@ -132,9 +131,8 @@ test.describe.only('Focus Tracker', () => {
 
     // Expect dialog to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      dialogId,
-    ]);
+    await expect.poll(() => logPart.getLog()).toEqual([dialogId]);
+    await expect(appPO.dialog({dialogId}).locator).toContainFocus();
 
     // TEST: Focus element outside the dialog.
     await testPerspective.clickPartInput({partId: 'part.right-2'});
@@ -200,10 +198,8 @@ test.describe.only('Focus Tracker', () => {
 
     // Expect dialog to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      dialogId,
-    ]);
-    await expect(focusTestPage.firstField).toBeFocused();
+    await expect.poll(() => logPart.getLog()).toEqual([dialogId]);
+    await expect(appPO.dialog({dialogId}).locator).toContainFocus();
 
     // TEST: Focus element outside the dialog
     await testPerspective.clickPartInput({partId: 'part.right-2'});
@@ -240,7 +236,7 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test('should focus message box when opening microfrontend message box', async ({appPO, microfrontendNavigator}) => {
+  test('should focus messagebox when opening microfrontend messagebox', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
     await microfrontendNavigator.registerCapability('app1', {
@@ -259,42 +255,40 @@ test.describe.only('Focus Tracker', () => {
     // Open log activity.
     const logPart = await testPerspective.openLogActivity({clearLog: true});
 
-    // Open microfrontend message box opener view.
+    // Open microfrontend messagebox opener view.
     const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
     const messageBoxOpenerViewId = await messageBoxOpener.view.tab.getViewId();
     await logPart.clearLog();
 
-    // PRECONDITION: Expect microfrontend message box opener view to have workbench focus.
+    // PRECONDITION: Expect microfrontend messagebox opener view to have workbench focus.
     await expect.poll(() => logPart.getLog()).toEqual([]);
     await expect.poll(() => appPO.focusOwner()).toEqual(messageBoxOpenerViewId);
 
-    // TEST: Open message box.
+    // TEST: Open messagebox.
     await messageBoxOpener.open({component: 'testee'}, {cssClass: 'testee'});
     const dialogId = await appPO.dialog({cssClass: 'testee'}).getDialogId();
     const focusTestPage = new FocusTestPagePO(appPO, {id: dialogId});
     await focusTestPage.waitUntilAttached();
 
-    // Expect message box to have focus.
+    // Expect messagebox to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      dialogId,
-    ]);
-    await expect(appPO.messagebox({dialogId}).action('ok')).toBeFocused();
+    await expect.poll(() => logPart.getLog()).toEqual([dialogId]);
+    await expect(appPO.dialog({dialogId}).locator).toContainFocus();
 
-    // TEST: Focus element outside the message box.
+    // TEST: Focus element outside the messagebox.
     await testPerspective.clickPartInput({partId: 'part.right-2'});
 
-    // Expect dialog to have focus.
+    // Expect messagebox not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-2');
     await expect.poll(() => logPart.getLog()).toEqual([
       dialogId,
       'part.right-2',
     ]);
 
-    // TEST: Focus element in the message box.
+    // TEST: Focus element in the messagebox.
     await focusTestPage.firstField.click();
 
-    // Expect message box to have focus.
+    // Expect messagebox to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([
       dialogId,
@@ -303,10 +297,10 @@ test.describe.only('Focus Tracker', () => {
     ]);
     await expect(focusTestPage.firstField).toBeFocused();
 
-    // TEST: Close the message box.
+    // TEST: Close the messagebox.
     await appPO.messagebox({dialogId}).clickActionButton('ok');
 
-    // Expect message box not to have focus.
+    // Expect messagebox not to have focus.
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => logPart.getLog()).toEqual([
       dialogId,
@@ -316,10 +310,10 @@ test.describe.only('Focus Tracker', () => {
     ]);
   });
 
-  test('should focus message box when opening microfrontend host message box', async ({appPO, microfrontendNavigator}) => {
+  test('should focus messagebox when opening microfrontend host messagebox', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});
 
-    // TODO [#271]: Register message box capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
+    // TODO [#271]: Register messagebox capability in the host app via RegisterWorkbenchCapabilityPagePO when implemented
     await microfrontendNavigator.registerIntention('app1', {type: 'messagebox', qualifier: {component: 'host-messagebox', variant: 'focus-page'}});
 
     // Switch to test perspective.
@@ -329,41 +323,39 @@ test.describe.only('Focus Tracker', () => {
     // Open log activity.
     const logPart = await testPerspective.openLogActivity({clearLog: true});
 
-    // Open microfrontend message box opener view.
+    // Open microfrontend messagebox opener view.
     const messageBoxOpener = await microfrontendNavigator.openInNewTab(MessageBoxOpenerPagePO, 'app1');
     const messageBoxOpenerViewId = await messageBoxOpener.view.tab.getViewId();
     await logPart.clearLog();
 
-    // PRECONDITION: Expect microfrontend message box opener view to have workbench focus.
+    // PRECONDITION: Expect microfrontend messagebox opener view to have workbench focus.
     await expect.poll(() => logPart.getLog()).toEqual([]);
     await expect.poll(() => appPO.focusOwner()).toEqual(messageBoxOpenerViewId);
 
-    // TEST: Open message box.
+    // TEST: Open messagebox.
     await messageBoxOpener.open({component: 'host-messagebox', variant: 'focus-page'}, {cssClass: 'testee'});
     const dialogId = await appPO.dialog({cssClass: 'testee'}).getDialogId();
     const focusTestPage = new WorkbenchFocusTestPagePO(appPO.dialog({dialogId}));
 
-    // Expect message box to have focus.
+    // Expect messagebox to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      dialogId,
-    ]);
-    await expect(appPO.messagebox({dialogId}).action('ok')).toBeFocused();
+    await expect.poll(() => logPart.getLog()).toEqual([dialogId]);
+    await expect(appPO.messagebox({dialogId}).locator).toContainFocus();
 
-    // TEST: Focus element outside the message box.
+    // TEST: Focus element outside the messagebox.
     await testPerspective.clickPartInput({partId: 'part.right-2'});
 
-    // Expect message box not to have focus.
+    // Expect messagebox not to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right-2');
     await expect.poll(() => logPart.getLog()).toEqual([
       dialogId,
       'part.right-2',
     ]);
 
-    // TEST: Focus element in the message box.
+    // TEST: Focus element in the messagebox.
     await focusTestPage.firstField.click();
 
-    // Expect message box to have focus.
+    // Expect messagebox to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(dialogId);
     await expect.poll(() => logPart.getLog()).toEqual([
       dialogId,
@@ -372,10 +364,10 @@ test.describe.only('Focus Tracker', () => {
     ]);
     await expect(focusTestPage.firstField).toBeFocused();
 
-    // TEST: Close the message box.
+    // TEST: Close the messagebox.
     await appPO.messagebox({dialogId}).clickActionButton('ok');
 
-    // Expect message box not to have focus.
+    // Expect messagebox not to have focus.
     await expect.poll(() => appPO.focusOwner()).toBeNull();
     await expect.poll(() => logPart.getLog()).toEqual([
       dialogId,
@@ -424,9 +416,8 @@ test.describe.only('Focus Tracker', () => {
 
     // Expect popup to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      popupId,
-    ]);
+    await expect.poll(() => logPart.getLog()).toEqual([popupId]);
+    await expect(appPO.popup({popupId}).locator).toContainFocus();
 
     // TEST: Focus element outside the popup.
     await testPerspective.clickPartInput({partId: 'part.right-2'});
@@ -496,10 +487,8 @@ test.describe.only('Focus Tracker', () => {
 
     // Expect popup to have focus.
     await expect.poll(() => appPO.focusOwner()).toEqual(popupId);
-    await expect.poll(() => logPart.getLog()).toEqual([
-      popupId,
-    ]);
-    await expect(appPO.popup({popupId}).locator).toBeFocused();
+    await expect.poll(() => logPart.getLog()).toEqual([popupId]);
+    await expect(appPO.popup({popupId}).locator).toContainFocus();
 
     // TEST: Focus element outside the popup
     await testPerspective.clickPartInput({partId: 'part.right-2'});

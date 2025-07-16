@@ -51,7 +51,6 @@ export default class PageNotFoundComponent {
       view: Routing.isViewOutlet(this.outlet) || undefined,
       part: Routing.isPartOutlet(this.outlet) || undefined,
       dialog: Routing.isDialogOutlet(this.outlet) || undefined,
-      messagebox: Routing.isMessageBoxOutlet(this.outlet) || undefined,
       popup: Routing.isPopupOutlet(this.outlet) || undefined,
     });
     return outlets.get(this.outlet)?.map(segment => `${segment}`).join('/') ?? '';

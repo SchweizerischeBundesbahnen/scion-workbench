@@ -21,7 +21,7 @@ import {provideNotificationIntentHandler} from './microfrontend-notification/mic
 import {MicrofrontendViewIntentHandler} from './microfrontend-view/microfrontend-view-intent-handler.interceptor';
 import {MicrofrontendPopupIntentHandler} from './microfrontend-popup/microfrontend-popup-intent-handler.interceptor';
 import {WorkbenchHostManifestInterceptor} from './initialization/workbench-host-manifest-interceptor.service';
-import {CanMatchFn, Route} from '@angular/router';
+import {Route} from '@angular/router';
 import {MicrofrontendViewComponent} from './microfrontend-view/microfrontend-view.component';
 import {MicrofrontendViewRoutes} from './microfrontend-view/microfrontend-view-routes';
 import {MicrofrontendViewCapabilityValidator} from './microfrontend-view/microfrontend-view-capability-validator.interceptor';
@@ -31,9 +31,7 @@ import {MicrofrontendDialogIntentHandler} from './microfrontend-dialog/microfron
 import {MicrofrontendDialogCapabilityValidator} from './microfrontend-dialog/microfrontend-dialog-capability-validator.interceptor';
 import {MicrofrontendMessageBoxIntentHandler} from './microfrontend-message-box/microfrontend-message-box-intent-handler.interceptor';
 import {MicrofrontendMessageBoxCapabilityValidator} from './microfrontend-message-box/microfrontend-message-box-capability-validator.interceptor';
-import {canMatchWorkbenchView} from '../routing/workbench-route-guards';
-import {WORKBENCH_OUTLET} from '../routing/workbench-auxiliary-route-installer.service';
-import {Routing} from '../routing/routing.util';
+import {canMatchWorkbenchDialog, canMatchWorkbenchView} from '../routing/workbench-route-guards';
 import {TEXT_MESSAGE_BOX_CAPABILITY_ROUTE} from './microfrontend-host-message-box/text-message/text-message.component';
 import {MicrofrontendPerspectiveCapabilityValidator} from './microfrontend-perspective/microfrontend-perspective-capability-validator.interceptor';
 import {providePerspectiveInstaller} from './microfrontend-perspective/microfrontend-perspective-installer.service';
@@ -159,20 +157,10 @@ function provideBuiltInTextMessageBoxCapabilityRoute(): EnvironmentProviders {
       useValue: {
         path: TEXT_MESSAGE_BOX_CAPABILITY_ROUTE,
         loadComponent: () => import('./microfrontend-host-message-box/text-message/text-message.component'),
-        canMatch: [canMatchWorkbenchMessageBox()],
+        canMatch: [canMatchWorkbenchDialog(true)],
       } satisfies Route,
     },
   ]);
-}
-
-/**
- * Matches the route if target of a workbench message box.
- */
-function canMatchWorkbenchMessageBox(): CanMatchFn {
-  return () => {
-    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
-    return Routing.isMessageBoxOutlet(outlet);
-  };
 }
 
 /**

@@ -10,7 +10,7 @@
 
 import {ActivatedRoute, ActivatedRouteSnapshot, ActivationEnd, ActivationStart, ChildrenOutletContexts, Event, NavigationStart, OutletContext, PRIMARY_OUTLET, Router, RouterEvent, UrlSegment, UrlSegmentGroup, UrlTree} from '@angular/router';
 import {Commands} from '../routing/routing.model';
-import {DIALOG_ID_PREFIX, DialogOutlet, MESSAGE_BOX_ID_PREFIX, MessageBoxOutlet, PART_ID_PREFIX, PartOutlet, POPUP_ID_PREFIX, PopupOutlet, VIEW_ID_PREFIX, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
+import {DIALOG_ID_PREFIX, DialogOutlet, PART_ID_PREFIX, PartOutlet, POPUP_ID_PREFIX, PopupOutlet, VIEW_ID_PREFIX, ViewOutlet, WorkbenchOutlet} from '../workbench.constants';
 import {inject} from '@angular/core';
 import {EMPTY, iif, MonoTypeOperatorFunction, Observable, of, OperatorFunction, pairwise, race, switchMap} from 'rxjs';
 import {filter, map, startWith, take} from 'rxjs/operators';
@@ -103,7 +103,7 @@ export const Routing = {
    * Tests if the given outlet matches the format of a workbench outlet.
    */
   isWorkbenchOutlet: (outlet: string | undefined | null): outlet is WorkbenchOutlet => {
-    return Routing.isPartOutlet(outlet) || Routing.isViewOutlet(outlet) || Routing.isPopupOutlet(outlet) || Routing.isDialogOutlet(outlet) || Routing.isMessageBoxOutlet(outlet);
+    return Routing.isPartOutlet(outlet) || Routing.isViewOutlet(outlet) || Routing.isPopupOutlet(outlet) || Routing.isDialogOutlet(outlet);
   },
 
   /**
@@ -132,13 +132,6 @@ export const Routing = {
    */
   isDialogOutlet: (outlet: string | undefined | null): outlet is DialogOutlet => {
     return outlet?.startsWith(DIALOG_ID_PREFIX) ?? false;
-  },
-
-  /**
-   * Tests if the given outlet matches the format of a message box outlet.
-   */
-  isMessageBoxOutlet: (outlet: string | undefined | null): outlet is MessageBoxOutlet => {
-    return outlet?.startsWith(MESSAGE_BOX_ID_PREFIX) ?? false;
   },
 
   /**
@@ -253,9 +246,8 @@ function parseOutlets(url: UrlTree, selector: {view: true}): Map<ViewOutlet, Url
 function parseOutlets(url: UrlTree, selector: {part: true}): Map<PartOutlet, UrlSegment[]>;
 function parseOutlets(url: UrlTree, selector: {dialog: true}): Map<DialogOutlet, UrlSegment[]>;
 function parseOutlets(url: UrlTree, selector: {popup: true}): Map<PopupOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {messagebox: true}): Map<MessageBoxOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
-function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true; messagebox?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
+function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]>;
+function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?: true; popup?: true}): Map<WorkbenchOutlet, UrlSegment[]> {
   const outlets = new Map<WorkbenchOutlet, UrlSegment[]>();
   Object.entries(url.root.children).forEach(([outlet, segmentGroup]) => {
     if (selector.view && Routing.isViewOutlet(outlet)) {
@@ -268,9 +260,6 @@ function parseOutlets(url: UrlTree, selector: {view?: true; part?: true; dialog?
       outlets.set(outlet, segmentGroup.segments);
     }
     if (selector.popup && Routing.isPopupOutlet(outlet)) {
-      outlets.set(outlet, segmentGroup.segments);
-    }
-    if (selector.messagebox && Routing.isMessageBoxOutlet(outlet)) {
       outlets.set(outlet, segmentGroup.segments);
     }
   });

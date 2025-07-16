@@ -114,6 +114,18 @@ export function canMatchWorkbenchPart(condition: string | boolean): CanMatchFn {
 }
 
 /**
+ * Configures a route to only or never match workbench dialogs.
+ *
+ * @see canMatchWorkbenchOutlet
+ */
+export function canMatchWorkbenchDialog(condition: boolean): CanMatchFn {
+  return (): boolean => {
+    const outlet = inject(WORKBENCH_OUTLET, {optional: true});
+    return Routing.isDialogOutlet(outlet) === condition;
+  };
+}
+
+/**
  * Configures a route to only or never match workbench outlets.
  *
  * A workbench outlet can be a part, view, dialog, popup, or messagebox.

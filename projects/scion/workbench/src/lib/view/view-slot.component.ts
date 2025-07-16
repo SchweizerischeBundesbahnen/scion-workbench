@@ -84,6 +84,7 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
   }
 
   public focus(): void {
+    console.log(`>>> [ViewSlotComponent.focus][viewId=${this.view.id}] Active Element: `, this._document.activeElement);
     if (!this._host.contains(this._document.activeElement)) {
       this._viewport().focus();
     }

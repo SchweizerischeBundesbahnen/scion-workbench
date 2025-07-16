@@ -114,9 +114,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
         if (!activationInstant) {
           return;
         }
-        // if (!this.slot.portal.attached()) {
-        //   return;
-        // }
+        if (!this.slot.portal.attached()) {
+          return; // view attached to not steal view the focus
+        }
         if (!this.active()) {
           return;
         }
@@ -127,10 +127,10 @@ export class ɵWorkbenchPart implements WorkbenchPart {
           return;
         }
 
-        // if (focusTracker.activeElement() !== this.id) {
-        console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] DOIT`);
-        this.focus();
-        // }
+        if (this._focusTracker.activeElement() !== this.id) {
+          console.log(`>>> [ɵWorkbenchPart][focusOnActivate][${this.id}] DOIT`);
+          this.focus();
+        }
       });
     });
   }
