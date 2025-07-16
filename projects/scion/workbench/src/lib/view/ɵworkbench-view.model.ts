@@ -118,9 +118,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
     const dialogRegistry = inject(WorkbenchDialogRegistry);
     const popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
 
-    // Focus on actication.
+    // Focus on activation.
     afterRenderEffect(() => {
       const activationInstant = this.activationInstant();
+
+      if (!this.slot.portal.attached()) {
+        return;
+      }
 
       untracked(() => {
         if (!activationInstant) {

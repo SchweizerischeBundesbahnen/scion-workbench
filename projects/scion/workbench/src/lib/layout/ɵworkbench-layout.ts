@@ -823,6 +823,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       if (minimize) {
         activityStack.minimizedActivityId = activityStack.activeActivityId;
         activityStack.activeActivityId = undefined;
+
+        // Clear activation instants for minimized activities, preventing focusing on maximization.
+        activityStack.activities.forEach(activity => {
+          this.parts({grid: activity.id}).forEach(part => {
+            delete part.activationInstant;
+          });
+          this.views({grid: activity.id}).forEach(view => {
+            delete view.activationInstant;
+          });
+        });
       }
       else {
         activityStack.activeActivityId = activityStack.minimizedActivityId;

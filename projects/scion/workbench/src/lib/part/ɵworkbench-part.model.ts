@@ -101,12 +101,13 @@ export class ɵWorkbenchPart implements WorkbenchPart {
     afterRenderEffect(() => {
       const activationInstant = this.activationInstant();
 
+      if (!this.slot.portal.attached()) {
+        return;
+      }
+
       untracked(() => {
         if (!activationInstant) {
           return;
-        }
-        if (!this.slot.portal.attached()) {
-          return; // view attached to not steal view the focus
         }
         if (!this.active()) {
           return;
