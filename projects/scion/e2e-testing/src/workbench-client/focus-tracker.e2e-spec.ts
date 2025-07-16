@@ -18,7 +18,7 @@ import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {RouterPagePO} from './page-object/router-page.po';
 
-test.describe.only('Focus Tracker', () => {
+test.describe('Focus Tracker', () => {
 
   test('should focus view when opening microfrontend view', async ({appPO, microfrontendNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: true});

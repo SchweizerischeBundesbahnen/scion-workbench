@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {ViewPagePO} from './page-object/view-page.po';
 
-test.describe.only('View Activation Instant', () => {
+test.describe('View Activation Instant', () => {
 
   test('should update activation instant of inactive view when clicking its tab', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});

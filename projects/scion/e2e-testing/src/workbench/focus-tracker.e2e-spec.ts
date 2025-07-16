@@ -19,7 +19,7 @@ import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {firstValueFrom, timer} from 'rxjs';
 
-test.describe.only('Focus Tracker', () => {
+test.describe('Focus Tracker', () => {
 
   test('should focus parts and views when clicking contained content (playbook)', async ({appPO}) => {
     await appPO.navigateTo({microfrontendSupport: false});

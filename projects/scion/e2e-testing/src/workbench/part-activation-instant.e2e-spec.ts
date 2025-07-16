@@ -12,7 +12,7 @@ import {expect} from '@playwright/test';
 import {test} from '../fixtures';
 import {PartPagePO} from './page-object/part-page.po';
 
-test.describe.only('Part Activation Instant', () => {
+test.describe('Part Activation Instant', () => {
 
   test('should update activation instant of inactive part when clicking it', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
