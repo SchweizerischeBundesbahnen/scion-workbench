@@ -11,7 +11,7 @@
 import {afterRenderEffect, Component, computed, effect, ElementRef, inject, input, NgZone, OnDestroy, signal, untracked, viewChild, viewChildren} from '@angular/core';
 import {ViewTabComponent} from '../view-tab/view-tab.component';
 import {map, mergeMap, takeUntil} from 'rxjs/operators';
-import {from, fromEvent, merge, Observable, OperatorFunction, Subject, timer} from 'rxjs';
+import {from, fromEvent, merge, Observable, OperatorFunction, Subject} from 'rxjs';
 import {ConstrainFn, ViewTabDragImageRenderer} from '../../view-dnd/view-tab-drag-image-renderer.service';
 import {ViewDragData, ViewDragService, ViewMoveEvent} from '../../view-dnd/view-drag.service';
 import {getCssTranslation, setCssClass, setCssVariable, unsetCssClass, unsetCssVariable} from '../../common/dom.util';
@@ -240,11 +240,9 @@ export class ViewTabBarComponent implements OnDestroy {
     }
 
     // Activate the adjacent tab, only if the drag operation is not canceled.
-    // The drag event does not provide information about cancelation. Therefore, we wait for a macrotask, canceling it when receiving `dragend`, i.e., the drag operation has been canceled.
-    if (this.dragSourceViewTab()?.view().active) {
-      timer(0)
-        .pipe(takeUntil(fromEvent(window, 'dragend')))
-        .subscribe(() => void this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab()!.view().id), {skipLocationChange: true}));
+    const canceled = !event.x && !event.y && !event.screenX && !event.screenY;
+    if (this.dragSourceViewTab()?.view().active && !canceled) {
+      void this._router.navigate(layout => layout.activateAdjacentView(this.dragSourceViewTab()!.view().id), {skipLocationChange: true});
     }
 
     // Clean up drag state.

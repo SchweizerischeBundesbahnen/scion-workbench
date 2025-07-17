@@ -146,9 +146,7 @@ export class ViewTabComponent {
       activityId: this._layout().activity({viewId: view.id}, {orElse: null})?.id,
     });
 
-    if (!view.active()) {
-      void view.activate();
-    }
+    void view.activate();
   }
 
   @HostListener('dragend')
