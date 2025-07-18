@@ -9,9 +9,8 @@
  */
 
 import {Component, DoCheck, DOCUMENT, effect, inject, NgZone, Renderer2, Signal} from '@angular/core';
-import {filter, map} from 'rxjs/operators';
+import {filter, map, scan} from 'rxjs/operators';
 import {NavigationCancel, NavigationEnd, NavigationError, Router, RouterOutlet} from '@angular/router';
-import {UUID} from '@scion/toolkit/uuid';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {WORKBENCH_ID, WorkbenchService, WorkbenchStartup} from '@scion/workbench';
 import {HeaderComponent} from './header/header.component';
@@ -77,7 +76,8 @@ export class AppComponent implements DoCheck {
     const navigationId$ = inject(Router).events
       .pipe(
         filter(event => event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError),
-        map(() => UUID.randomUUID()),
+        scan(navigationId => navigationId + 1, 0),
+        map(navigationId => `${navigationId}`),
       );
     return toSignal(navigationId$, {initialValue: undefined});
   }

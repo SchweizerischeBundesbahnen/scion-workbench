@@ -28,11 +28,11 @@ test.describe('View Activation Instant', () => {
     const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
     const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
 
-    // Memoize activation instant of 'view.1'.
+    // Capture activation instant of 'view.1'.
     await viewPage1.view.tab.click();
     const view1ActivationInstant = await viewPage1.getActivationInstant();
 
-    // Memoize activation instant of 'view.2'.
+    // Capture activation instant of 'view.2'.
     await viewPage2.view.tab.click();
     const view2ActivationInstant = await viewPage2.getActivationInstant();
 
@@ -71,7 +71,7 @@ test.describe('View Activation Instant', () => {
     await viewPage2.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
 
-    // Memoize activation instants.
+    // Capture activation instants.
     const view1ActivationInstant = await viewPage1.getActivationInstant();
     const view2ActivationInstant = await viewPage2.getActivationInstant();
 
@@ -110,7 +110,7 @@ test.describe('View Activation Instant', () => {
     await viewPage2.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
 
-    // Memoize activation instants.
+    // Capture activation instants.
     const view1ActivationInstant = await viewPage1.getActivationInstant();
     const view2ActivationInstant = await viewPage2.getActivationInstant();
 
@@ -140,13 +140,21 @@ test.describe('View Activation Instant', () => {
     await viewPage.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
-    // Memoize activation instant.
+    // Capture activation instant.
     const viewActivationInstant = await viewPage.getActivationInstant();
+    const navigationId = await appPO.getCurrentNavigationId();
 
     // Click tab of 'view.1'.
     await viewPage.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
     await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.getCurrentNavigationId()).toEqual(navigationId);
+
+    // Click tab of 'view.1' again.
+    await viewPage.view.tab.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.getCurrentNavigationId()).toEqual(navigationId);
   });
 
   test('should not update activation instant of active and focused view when clicking part title', async ({appPO, workbenchNavigator}) => {
@@ -164,7 +172,7 @@ test.describe('View Activation Instant', () => {
     await viewPage.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
-    // Memoize activation instant.
+    // Capture activation instant.
     const viewActivationInstant = await viewPage.getActivationInstant();
 
     // Click title of part bar.
@@ -188,7 +196,7 @@ test.describe('View Activation Instant', () => {
     await viewPage.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
-    // Memoize activation instant.
+    // Capture activation instant.
     const viewActivationInstant = await viewPage.getActivationInstant();
 
     // Click part bar.
@@ -212,7 +220,7 @@ test.describe('View Activation Instant', () => {
     await viewPage.view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
-    // Memoize activation instant.
+    // Capture activation instant.
     const viewActivationInstant = await viewPage.getActivationInstant();
 
     // Click content of 'view.1'.

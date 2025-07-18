@@ -37,7 +37,6 @@ import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './workbench-view-menu-item.regi
 import {Translatable} from '../text/workbench-text-provider.model';
 import {ViewSlotComponent} from './view-slot.component';
 import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
-import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WORKBENCH_POPUP_REGISTRY} from '../popup/workbench-popup.registry';
 
 export class ɵWorkbenchView implements WorkbenchView, Blockable {
@@ -106,15 +105,13 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   private activateOnFocus(): void {
     effect(() => {
       if (this.focused()) {
-        untracked(() => void this.activate({force: true}));
+        untracked(() => void this.activate({force: !this._layout().isLatestActivationInstant(this.activationInstant())}));
       }
     });
   }
 
   private focusOnActivate(): void {
     // const focusTracker = inject(WorkbenchFocusTracker);
-    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
     const dialogRegistry = inject(WorkbenchDialogRegistry);
     const popupRegistry = inject(WORKBENCH_POPUP_REGISTRY);
 
@@ -146,7 +143,7 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
         }
 
         // Do not activate if other view or part is activated later on (e.g., when restoring layout after minimize)
-        if (partRegistry.objects().find(part => part.activationInstant() > activationInstant) || viewRegistry.objects().find(view => view.activationInstant() > activationInstant)) {
+        if (!this._layout().isLatestActivationInstant(activationInstant)) {
           return;
         }
 
@@ -295,9 +292,9 @@ export class ɵWorkbenchView implements WorkbenchView, Blockable {
   }
 
   /** @inheritDoc */
-  public async activate(options?: {force?: true; skipLocationChange?: boolean}): Promise<boolean> {
+  public async activate(options?: {force?: boolean; skipLocationChange?: boolean}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchView.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (!options?.force && this.active() && this.part().active() && this._focusTracker.activeElement() === this.id) {
+    if (!options?.force && this.active() && this.part().active() && this.focused()) {
       return true;
     }
 

@@ -18,6 +18,7 @@ import {MessageBoxOpenerPagePO} from './page-object/message-box-opener-page.po';
 import {PopupOpenerPagePO} from './page-object/popup-opener-page.po';
 import {MPart, MTreeNode} from '../matcher/to-equal-workbench-layout.matcher';
 import {firstValueFrom, timer} from 'rxjs';
+import {FocusTestPagePO} from './page-object/test-pages/focus-test-page.po';
 
 test.describe('Focus Tracker', () => {
 
@@ -2161,5 +2162,315 @@ test.describe('Focus Tracker', () => {
     );
 
     await expect.poll(() => appPO.focusOwner()).toBeNull();
+  });
+
+  test.describe('View Activation Navigation', () => {
+
+    test('should perform single navigation when clicking on a view tab', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right'})
+        .addView('view.1', {partId: 'part.left'})
+        .addView('view.2', {partId: 'part.right'})
+        .activatePart('part.left')
+        .activateView('view.1')
+        .activateView('view.2'),
+      );
+
+      // Focus view 'view.1'.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+
+      // PRECONDITION: Expect 'view.1' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click tab of 'view.2'.
+      await appPO.view({viewId: 'view.2'}).tab.click();
+
+      // Expect 'view.2' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.2'}).viewport).toContainFocus();
+
+      // Expect single navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId + 1);
+    });
+
+    test('should not perform navigation when clicking on view tab of already focused view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main')
+        .addView('view.1', {partId: 'part.main'})
+        .activatePart('part.main')
+        .activateView('view.1'),
+      );
+
+      // Focus view 'view.1'.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+
+      // PRECONDITION: Expect 'view.1' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click tab of 'view.1'.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+
+      // Expect 'view.1' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+      await expect.poll(() => appPO.view({viewId: 'view.1'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.1'}).tab.locator).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+
+      // Click tab of 'view.1' again.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+
+      // Expect 'view.1' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+      await expect.poll(() => appPO.view({viewId: 'view.1'}).tab.isActive()).toBe(true);
+      await expect(appPO.view({viewId: 'view.1'}).tab.locator).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+    });
+
+    test('should perform single navigation when clicking on view content', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left')
+        .addPart('part.right', {align: 'right'})
+        .addView('view.1', {partId: 'part.left'})
+        .addView('view.2', {partId: 'part.right'})
+        .navigateView('view.2', ['test-pages/focus-test-page'])
+        .activatePart('part.left')
+        .activateView('view.1')
+        .activateView('view.2'),
+      );
+
+      // Focus view 'view.1'.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+
+      // PRECONDITION: Expect 'view.1' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click content of 'view.2'.
+      const viewPage2 = new FocusTestPagePO(appPO.view({viewId: 'view.2'}));
+      await viewPage2.clickField('first-field');
+
+      // Expect 'view.2' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+      await expect.poll(() => appPO.view({viewId: 'view.2'}).tab.isActive()).toBe(true);
+      await expect(viewPage2.firstField).toContainFocus();
+
+      // Expect single navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId + 1);
+    });
+
+    test('should not perform navigation when clicking on view content of already focused view', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main')
+        .addView('view.1', {partId: 'part.main'})
+        .navigateView('view.1', ['test-pages/focus-test-page'])
+        .activatePart('part.main')
+        .activateView('view.1'),
+      );
+
+      // Focus view 'view.1'.
+      await appPO.view({viewId: 'view.1'}).tab.click();
+
+      // PRECONDITION: Expect 'view.1' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click content of 'view.1'.
+      const viewPage = new FocusTestPagePO(appPO.view({viewId: 'view.1'}));
+      await viewPage.clickField('first-field');
+
+      // Expect 'view.1' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+      await expect.poll(() => appPO.view({viewId: 'view.1'}).tab.isActive()).toBe(true);
+      await expect(viewPage.firstField).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+
+      // Focus another element of 'view.1'.
+      await viewPage.clickField('middle-field');
+
+      // Expect 'view.1' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+      await expect.poll(() => appPO.view({viewId: 'view.1'}).tab.isActive()).toBe(true);
+      await expect(viewPage.middleField).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+    });
+  });
+
+  test.describe('Part Activation Navigation', () => {
+
+    test('should perform single navigation when clicking on part title', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left', {title: 'left'})
+        .addPart('part.right', {align: 'right'}, {title: 'right'})
+        .navigatePart('part.left', ['test-part'])
+        .navigatePart('part.right', ['test-part'])
+        .activatePart('part.left'),
+      );
+
+      // Focus part 'part.left'.
+      await appPO.part({partId: 'part.left'}).bar.title.click();
+
+      // PRECONDITION: Expect 'part.left' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.left');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click on title of 'part.right'.
+      await appPO.part({partId: 'part.right'}).bar.title.click();
+
+      // Expect 'part.right' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
+      await expect.poll(() => appPO.part({partId: 'part.right'}).isActive()).toBe(true);
+      await expect(appPO.part({partId: 'part.right'}).slot.viewport).toContainFocus();
+
+      // Expect single navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId + 1);
+    });
+
+    test('should not perform navigation when clicking on title of already focused part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main', {title: 'main'})
+        .navigatePart('part.main', ['test-part'])
+        .activatePart('part.main'),
+      );
+
+      // Focus part 'part.main'.
+      await appPO.part({partId: 'part.main'}).bar.title.click();
+
+      // PRECONDITION: Expect 'part.main' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click on title of 'part.main'.
+      await appPO.part({partId: 'part.main'}).bar.title.click();
+
+      // Expect 'part.main' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+      await expect.poll(() => appPO.part({partId: 'part.main'}).isActive()).toBe(true);
+      await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+
+      // Click on title of 'part.main' again.
+      await appPO.part({partId: 'part.main'}).bar.title.click();
+
+      // Expect 'view.1' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+      await expect.poll(() => appPO.part({partId: 'part.main'}).isActive()).toBe(true);
+      await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+    });
+
+    test('should perform single navigation when clicking on part content', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.left', {title: 'left'})
+        .addPart('part.right', {align: 'right'}, {title: 'right'})
+        .navigatePart('part.left', ['test-pages/focus-test-page'])
+        .navigatePart('part.right', ['test-pages/focus-test-page'])
+        .activatePart('part.left'),
+      );
+
+      // Focus part 'part.left'.
+      await appPO.part({partId: 'part.left'}).bar.title.click();
+
+      // PRECONDITION: Expect 'part.left' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.left');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click content of 'part.right'.
+      const partPageRight = new FocusTestPagePO(appPO.part({partId: 'part.right'}));
+      await partPageRight.clickField('first-field');
+
+      // Expect 'part.right' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
+      await expect.poll(() => appPO.part({partId: 'part.right'}).isActive()).toBe(true);
+      await expect(partPageRight.firstField).toContainFocus();
+
+      // Expect single navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId + 1);
+    });
+
+    test('should not perform navigation when clicking on part content of already focused part', async ({appPO, workbenchNavigator}) => {
+      await appPO.navigateTo({microfrontendSupport: false});
+
+      await workbenchNavigator.createPerspective(factory => factory
+        .addPart('part.main', {title: 'main'})
+        .navigatePart('part.main', ['test-pages/focus-test-page'])
+        .activatePart('part.main'),
+      );
+
+      // Focus part 'part.main'.
+      await appPO.part({partId: 'part.main'}).bar.title.click();
+
+      // PRECONDITION: Expect 'part.main' to be focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+
+      // Capture the current navigation id.
+      const navigationId = await appPO.getCurrentNavigationId();
+
+      // Click content of 'part.main'.
+      const partPage = new FocusTestPagePO(appPO.part({partId: 'part.main'}));
+      await partPage.clickField('first-field');
+
+      // Expect 'part.main' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+      await expect.poll(() => appPO.part({partId: 'part.main'}).isActive()).toBe(true);
+      await expect(partPage.firstField).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+
+      // Focus another element of 'part.main'.
+      await partPage.clickField('middle-field');
+
+      // Expect 'part.main' to be active and focused.
+      await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+      await expect.poll(() => appPO.part({partId: 'part.main'}).isActive()).toBe(true);
+      await expect(partPage.middleField).toContainFocus();
+
+      // Expect no navigation to be performed.
+      await expect.poll(() => appPO.getCurrentNavigationId()).toBe(navigationId);
+    });
   });
 });

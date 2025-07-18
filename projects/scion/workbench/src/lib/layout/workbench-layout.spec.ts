@@ -3193,6 +3193,55 @@ describe('WorkbenchLayout', () => {
     expect(() => TestBed.inject(ɵWorkbenchLayoutFactory).create({grids})).toThrowError(/NullReferencePartError/);
   });
 
+  it('should check an activation instant to be the most recent activation instant for any view or part', () => {
+    let layout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.right'})
+      .activatePart('part.left')
+      .activatePart('part.right')
+      .activateView('view.1')
+      .activateView('view.2');
+
+    layout = layout.activateView('view.1');
+
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeTrue();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeFalse();
+
+    layout = layout.activateView('view.2');
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeTrue();
+
+    layout = layout.activatePart('part.left');
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeTrue();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeFalse();
+
+    layout = layout.activatePart('part.right');
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeTrue();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeFalse();
+
+    layout = layout.activateView('view.1', {activatePart: true});
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeTrue();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeTrue();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeFalse();
+
+    layout = layout.activateView('view.2', {activatePart: true});
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeTrue();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeTrue();
+  });
+
   describe('Activity (Docked Parts)', () => {
 
     it('should activate activities', async () => {

@@ -86,6 +86,10 @@ export class PartPO {
     return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > div.e2e-content').boundingBox());
   }
 
+  public async isActive(): Promise<boolean> {
+    return (await this.locator.getAttribute('data-active')) !== null;
+  }
+
   public getCssClasses(): Promise<string[]> {
     return getCssClasses(this.locator);
   }

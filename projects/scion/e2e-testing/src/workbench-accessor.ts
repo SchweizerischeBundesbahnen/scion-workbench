@@ -50,6 +50,7 @@ export class WorkbenchAccessor {
           navigation: {
             path: view.navigation()?.path.join('/'),
             hint: view.navigation()?.hint,
+            state: view.navigation()?.state,
           },
         }));
     }, findBy);
@@ -77,6 +78,7 @@ export class WorkbenchAccessor {
           navigation: {
             path: part.navigation()?.path.join('/'),
             hint: part.navigation()?.hint,
+            state: part.navigation()?.state,
           },
         }));
     }, findBy);
@@ -115,16 +117,17 @@ export interface E2EWorkbenchView {
   id: ViewId;
   alternativeId: string | undefined;
   partId: PartId;
-  navigation: E2EWorkbenchViewNavigation;
+  navigation: E2EWorkbenchNavigation;
 }
 
 export interface E2EWorkbenchPart {
   id: PartId;
   alternativeId: string | undefined;
-  navigation: E2EWorkbenchViewNavigation;
+  navigation: E2EWorkbenchNavigation;
 }
 
-export interface E2EWorkbenchViewNavigation {
+export interface E2EWorkbenchNavigation {
   path?: string;
   hint?: string;
+  state?: Record<string, unknown>;
 }

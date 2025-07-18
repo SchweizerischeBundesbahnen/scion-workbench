@@ -30,7 +30,6 @@ import {MAIN_AREA} from '../layout/workbench-layout';
 import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
-import {WORKBENCH_PART_REGISTRY} from './workbench-part.registry';
 import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 export class ɵWorkbenchPart implements WorkbenchPart {
@@ -40,7 +39,6 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private readonly _rootOutletContexts = inject(ChildrenOutletContexts);
   private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
-  // private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _title = signal<string | undefined>(undefined);
   private readonly _titleComputed = this.computeTitle();
 
@@ -87,16 +85,12 @@ export class ɵWorkbenchPart implements WorkbenchPart {
   private activateOnFocus(): void {
     effect(() => {
       if (this.focused()) {
-        untracked(() => void this.activate({force: true}));
+        untracked(() => void this.activate({force: !this._layout().isLatestActivationInstant(this.activationInstant())}));
       }
     });
   }
 
   private focusOnActivate(): void {
-    // const focusTracker = inject(WorkbenchFocusTracker);
-    const viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
-    const partRegistry = inject(WORKBENCH_PART_REGISTRY);
-
     // Focus on actication.
     afterRenderEffect(() => {
       const activationInstant = this.activationInstant();
@@ -114,7 +108,7 @@ export class ɵWorkbenchPart implements WorkbenchPart {
         }
 
         // Do not activate if other view or part is activated later on (e.g., when restoring layout after minimize)
-        if (partRegistry.objects().find(part => part.activationInstant() > activationInstant) || viewRegistry.objects().find(view => view.activationInstant() > activationInstant)) {
+        if (!this._layout().isLatestActivationInstant(activationInstant)) {
           return;
         }
 
@@ -222,9 +216,9 @@ export class ɵWorkbenchPart implements WorkbenchPart {
    *
    * Note: This instruction runs asynchronously via URL routing.
    */
-  public async activate(options?: {force?: true}): Promise<boolean> {
+  public async activate(options?: {force?: boolean}): Promise<boolean> {
     assertNotInReactiveContext(this.activate, 'Call WorkbenchPart.activate() in a non-reactive (non-tracking) context, such as within the untracked() function.');
-    if (!options?.force && this.active() && this._focusTracker.activeElement() === this.id) {
+    if (!options?.force && this.active() && this.focused()) {
       return true;
     }
 

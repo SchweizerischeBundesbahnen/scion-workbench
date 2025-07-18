@@ -445,14 +445,12 @@ export class AppPO {
   }
 
   /**
-   * Returns a unique id set after a navigation has been performed.
-   *
-   * This identifier should be used to detect when the current navigation has completed.
+   * Returns a unique id that increments with each navigation event.
    *
    * This flag is set in `app.component.ts` in the 'workbench-testing-app'.
    */
-  public getCurrentNavigationId(): Promise<string | undefined> {
-    return this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ?? undefined);
+  public getCurrentNavigationId(): Promise<number> {
+    return this.page.locator('app-root').getAttribute('data-navigationid').then(value => value ? Number.parseInt(value) : 0);
   }
 
   /**

@@ -28,7 +28,7 @@ test.describe('Part Activation Instant', () => {
     const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
     const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
 
-    // Memoize activation instants.
+    // Capture activation instants.
     const leftPartActivationInstant = await appPO.activationInstant('part.left', {orElse: 0});
     const rightPartActivationInstant = await appPO.activationInstant('part.right', {orElse: 0});
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.left');
@@ -60,7 +60,7 @@ test.describe('Part Activation Instant', () => {
     const mainPartPage = new PartPagePO(appPO, {partId: 'part.main'});
     const activityPartPage = new PartPagePO(appPO, {partId: 'part.activity'});
 
-    // Memoize activation instants.
+    // Capture activation instants.
     const mainPartActivationInstant = await appPO.activationInstant('part.main', {orElse: 0});
     const activityPartActivationInstant = await appPO.activationInstant('part.activity', {orElse: 0});
     await expect.poll(() => appPO.focusOwner()).toBeNull();
@@ -94,7 +94,7 @@ test.describe('Part Activation Instant', () => {
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
     await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
 
-    // Memoize activation instant.
+    // Capture activation instant.
     const partActivationInstant = await partPage.getActivationInstant();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
 
@@ -115,7 +115,7 @@ test.describe('Part Activation Instant', () => {
       .navigatePart('part.main', ['test-part']),
     );
 
-    // Memoize activation instant.
+    // Capture activation instant.
     const partActivationInstant = await appPO.activationInstant('part.main', {orElse: 0});
 
     // Activate view.1.

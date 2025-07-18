@@ -656,6 +656,13 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     return part.views[viewIndex + 1] ?? part.views[viewIndex - 1];
   }
 
+  /**
+   * Checks if the provided activation instant is the most recent activation instant for any view or part.
+   */
+  public isLatestActivationInstant(activationInstant: number): boolean {
+    return !this.parts().some(part => (part.activationInstant ?? 0) > activationInstant) && !this.views().some(view => (view.activationInstant ?? 0) > activationInstant);
+  }
+
   /** @inheritDoc */
   public modify(modifyFn: (layout: ɵWorkbenchLayout) => ɵWorkbenchLayout): ɵWorkbenchLayout {
     return modifyFn(this.workingCopy());
