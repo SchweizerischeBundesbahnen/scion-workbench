@@ -67,7 +67,7 @@ export default class RegisterPartActionPageComponent {
       if (canMatchPartIds && !Arrays.coerce(canMatchPartIds).includes(part.id)) {
         return false;
       }
-      if (canMatchViewIds && (!part.activeViewId() || !Arrays.coerce(canMatchViewIds).includes(part.activeViewId()!))) {
+      if (canMatchViewIds && (!part.activeView() || !Arrays.coerce(canMatchViewIds).includes(part.activeView()!.id))) {
         return false;
       }
       if (canMatchGrid && canMatchGrid !== (part.peripheral() ? 'main' : 'mainArea')) {

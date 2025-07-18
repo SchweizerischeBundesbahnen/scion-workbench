@@ -36,16 +36,17 @@ import {provideViewContext} from '../view/view-context-provider';
 import {boundingClientRect} from '@scion/components/dimension';
 import {Translatable} from '../text/workbench-text-provider.model';
 import {DialogId} from '../workbench-elements';
+import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /** @inheritDoc */
 export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Blockable, Blocking {
 
   private readonly _dialogEnvironmentInjector = inject(EnvironmentInjector);
-
   private readonly _overlayRef: OverlayRef;
   private readonly _portal: ComponentPortal<WorkbenchDialogComponent>;
   private readonly _workbenchDialogRegistry = inject(WorkbenchDialogRegistry);
   private readonly _workbenchConfig = inject(WorkbenchConfig);
+  private readonly _focusTracker = inject(WorkbenchFocusTracker);
   private readonly _destroyRef = new ɵDestroyRef();
   private readonly _blink$ = new Subject<void>();
   private readonly _attached: Signal<boolean>;
@@ -66,6 +67,7 @@ export class ɵWorkbenchDialog<R = unknown> implements WorkbenchDialog<R>, Block
    */
   public readonly blockedBy$ = new BehaviorSubject<ɵWorkbenchDialog | null>(null);
   public readonly size: WorkbenchDialogSize = new ɵWorkbenchDialogSize();
+  public readonly focused = computed(() => this._focusTracker.activeElement() === this.id);
   public readonly blinking$ = new BehaviorSubject(false);
   public readonly context = {
     view: inject(ɵWorkbenchView, {optional: true}),

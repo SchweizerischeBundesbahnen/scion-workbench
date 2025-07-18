@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {assertNotInReactiveContext, ElementRef, EnvironmentInjector, inject, Injector, StaticProvider, Type, ViewContainerRef} from '@angular/core';
+import {assertNotInReactiveContext, computed, ElementRef, EnvironmentInjector, inject, Injector, Signal, StaticProvider, Type, ViewContainerRef} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {PopupOrigin} from './popup.origin';
 import {Arrays} from '@scion/toolkit/util';
@@ -21,6 +21,7 @@ import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {PopupId} from '../workbench-elements';
 import {ɵDestroyRef} from '../common/ɵdestroy-ref';
+import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Configures the content to be displayed in a popup.
@@ -196,6 +197,11 @@ export abstract class Popup<T = unknown, R = unknown> {
   public abstract readonly cssClasses: string[];
 
   /**
+   * Indicates whether this popup has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
+
+  /**
    * Sets a result that will be passed to the popup opener when the popup is closed on focus loss {@link CloseStrategy#onFocusLost}.
    */
   public abstract setResult(result?: R): void;
@@ -213,11 +219,13 @@ export class ɵPopup<T = unknown, R = unknown> implements Popup<T, R>, Blockable
 
   private readonly _popupEnvironmentInjector = inject(EnvironmentInjector);
   private readonly _destroyRef = new ɵDestroyRef();
+  private readonly _focusTracker = inject(WorkbenchFocusTracker);
   public readonly context = {
     view: inject(ɵWorkbenchView, {optional: true}),
   };
 
   public readonly cssClasses: string[];
+  public readonly focused = computed(() => this._focusTracker.activeElement() === this.id);
 
   /**
    * Indicates whether this popup is blocked by dialog(s) that overlay it.

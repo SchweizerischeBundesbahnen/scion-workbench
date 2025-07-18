@@ -25,7 +25,6 @@ import {synchronizeCssClasses} from '../../common/css-class.util';
 import {TextPipe} from '../../text/text.pipe';
 import {IconComponent} from '../../icon/icon.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service';
 
 /**
  * IMPORTANT: HTML and CSS also used by {@link ViewTabDragImageComponent}.
@@ -48,7 +47,7 @@ import {WorkbenchFocusTracker} from '../../focus/workbench-focus-tracker.service
     '[class.e2e-dirty]': 'view().dirty()',
     '[attr.data-viewid]': 'view().id',
     '[attr.data-active]': `view().active() ? '' : null`,
-    '[attr.data-focus-within-view]': `focusTracker.activeElement() === view().id ? '' : null`,
+    '[attr.data-focus-within-view]': `view().focused() ? '' : null`,
     '[attr.draggable]': 'true',
     '[attr.tabindex]': '-1', // make the view focusable to install view menu accelerators
     '[style.--sci-workbench-tab-title-offset-right]': 'viewTitleOffsetRight()',
@@ -70,7 +69,6 @@ export class ViewTabComponent {
   protected readonly viewTabContentPortal: Signal<ComponentPortal<unknown>>;
   protected readonly viewDragService = inject(ViewDragService);
   protected readonly viewTitleOffsetRight = computed(() => this.view().closable() ? '1.5rem' : undefined); // offset for the title to not overlap the close button
-  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   constructor() {
     this.addHostCssClasses();

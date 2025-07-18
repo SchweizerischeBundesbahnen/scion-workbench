@@ -262,16 +262,23 @@ export class AppPO {
    * @param locateBy.peripheral - Controls whether to locate views located in the peripheral area.
    */
   public views(locateBy?: {peripheral?: boolean; cssClass?: string}): Locator {
-    const locateByCssClass = locateBy?.cssClass ? `:scope.${locateBy.cssClass}` : ':scope';
-    if (locateBy?.peripheral === true) {
-      return this.page.locator('wb-part[data-peripheral] wb-view-tab').locator(locateByCssClass);
+    let locator = ((): Locator => {
+      if (locateBy?.peripheral === true) {
+        return this.page.locator('wb-part[data-peripheral] wb-view-tab');
+      }
+      else if (locateBy?.peripheral === false) {
+        return this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"] wb-view-tab`);
+      }
+      else {
+        return this.page.locator('wb-view-tab');
+      }
+    })();
+
+    const cssClasses = coerceArray(locateBy?.cssClass);
+    if (cssClasses.length) {
+      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
     }
-    if (locateBy?.peripheral === false) {
-      return this.page.locator(`wb-part:not([data-peripheral]):not([data-partid="${MAIN_AREA}"] wb-view-tab`).locator(locateByCssClass);
-    }
-    else {
-      return this.page.locator('wb-view-tab').locator(locateByCssClass);
-    }
+    return locator;
   }
 
   /**
@@ -349,8 +356,9 @@ export class AppPO {
     if (locateBy?.popupId) {
       locator = locator.locator(`:scope[data-popupid="${locateBy.popupId}"]`);
     }
-    if (locateBy?.cssClass) {
-      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).map(escapeCssClass).join('.')}`);
+    const cssClasses = coerceArray(locateBy?.cssClass);
+    if (cssClasses.length) {
+      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
     }
     return new PopupPO(locator);
   }
@@ -397,8 +405,9 @@ export class AppPO {
     if (locateBy?.dialogId) {
       locator = locator.locator(`:scope[data-dialogid="${locateBy.dialogId}"]`);
     }
-    if (locateBy?.cssClass) {
-      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).map(escapeCssClass).join('.')}`);
+    const cssClasses = coerceArray(locateBy?.cssClass);
+    if (cssClasses.length) {
+      locator = locator.locator(`:scope.${cssClasses.map(escapeCssClass).join('.')}`);
     }
     return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }

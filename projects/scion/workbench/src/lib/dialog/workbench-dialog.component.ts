@@ -25,7 +25,7 @@ import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneO
 import {filter, map, startWith, takeUntil} from 'rxjs/operators';
 import {fromMutation$} from '@scion/toolkit/observable';
 import {synchronizeCssClasses} from '../common/css-class.util';
-import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
+import {registerFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Renders the workbench dialog.
@@ -58,7 +58,7 @@ import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-fo
   ],
   host: {
     '[attr.data-dialogid]': 'dialog.id',
-    '[attr.data-focus]': `focusTracker.activeElement() === dialog.id ? '' : null`,
+    '[attr.data-focus]': `dialog.focused() ? '' : null`,
     '[class.justified]': '!dialog.padding()',
     '[style.--ɵdialog-transform-translate-x]': 'transformTranslateX()',
     '[style.--ɵdialog-transform-translate-y]': 'transformTranslateY()',
@@ -80,7 +80,6 @@ export class WorkbenchDialogComponent {
   private readonly _activeElement$ = new BehaviorSubject<HTMLElement | undefined>(undefined);
 
   protected readonly dialog = inject(ɵWorkbenchDialog);
-  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   protected headerHeight = signal<string | undefined>(undefined);
   protected transformTranslateX = signal(0);

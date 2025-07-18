@@ -18,7 +18,6 @@ import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.
 import {WORKBENCH_ID} from '../workbench-id';
 import {synchronizeCssClasses} from '../common/css-class.util';
 import {dasherize} from '../common/dasherize.util';
-import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 @Component({
   selector: 'wb-part',
@@ -33,7 +32,7 @@ import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
     '[attr.data-partid]': 'part.id',
     '[attr.data-peripheral]': `part.peripheral() ? '' : undefined`,
     '[attr.data-grid]': 'dasherize(part.gridName())',
-    '[attr.data-focus]': `focusTracker.activeElement() === part.id ? '' : null`,
+    '[attr.data-focus]': `part.focused() ? '' : null`,
     '[attr.data-active]': `part.active() ? '' : null`,
     '[attr.data-activation-instant]': `part.activationInstant() || undefined`,
     '[attr.data-referencepart]': `part.referencePart() ? '' : undefined`,
@@ -52,7 +51,6 @@ export class PartComponent implements OnInit {
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly canDrop = inject(ViewDragService).canDrop(inject(ɵWorkbenchPart));
   protected readonly dasherize = dasherize;
-  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   constructor() {
     this.installComponentLifecycleLogger();

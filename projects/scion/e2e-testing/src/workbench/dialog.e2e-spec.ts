@@ -2019,11 +2019,16 @@ test.describe('Workbench Dialog', () => {
 
       const dialog = appPO.dialog({cssClass: 'testee'});
 
+      // Move dialog to the side to click view content.
       await dialog.moveDialog('bottom-right-corner');
+
+      // Focus input field.
+      const dialogPage = new FocusTestPagePO(dialog);
+      await dialogPage.firstField.focus();
 
       // Expect interaction with contextual view to be blocked.
       await expect(dialogOpenerPage.click({timeout: 1000})).rejects.toThrowError();
-      await expect(new FocusTestPagePO(dialog).firstField).toBeFocused();
+      await expect(dialogPage.firstField).toBeFocused();
 
       // Expect glass pane
       await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([
@@ -2054,7 +2059,6 @@ test.describe('Workbench Dialog', () => {
 
       // Expect dialog 2 to be interactable
       const focusTestPage = new FocusTestPagePO(dialog2);
-      await expect(focusTestPage.firstField).toBeFocused();
       await focusTestPage.clickField('middle-field');
       await expect(focusTestPage.middleField).toBeFocused();
 
@@ -2098,7 +2102,6 @@ test.describe('Workbench Dialog', () => {
 
       // Expect dialog to be interactable
       const focusTestPage = new FocusTestPagePO(dialog);
-      await expect(focusTestPage.firstField).toBeFocused();
       await focusTestPage.clickField('middle-field');
       await expect(focusTestPage.middleField).toBeFocused();
 

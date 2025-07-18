@@ -219,7 +219,7 @@ test.describe('View Tabbar', () => {
     });
   });
 
-  test('should activate the view to the left of the view that is dragged out of the tab bar', async ({appPO, workbenchNavigator}) => {
+  test('should activate the view to the right of the view that is dragged out of the tab bar', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
@@ -242,7 +242,7 @@ test.describe('View Tabbar', () => {
           root: new MPart({
             id: 'part.part',
             views: [{id: 'view.1'}, {id: 'view.2'}, {id: 'view.4'}],
-            activeViewId: 'view.2',
+            activeViewId: 'view.4',
           }),
           activePartId: 'part.part',
         },

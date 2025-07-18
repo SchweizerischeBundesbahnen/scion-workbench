@@ -43,7 +43,7 @@ import {asyncScheduler} from 'rxjs';
   ],
   host: {
     '[attr.data-viewid]': 'view.id',
-    '[attr.data-focus]': `focusTracker.activeElement() === view.id ? '' : null`,
+    '[attr.data-focus]': `view.focused() ? '' : null`,
     '[attr.data-active]': `view.active() ? '' : null`,
     '[attr.data-activation-instant]': `view.activationInstant() || undefined`,
     '[class.view-drag]': 'viewDragService.dragging()',
@@ -56,7 +56,6 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
 
   protected readonly view = inject(ɵWorkbenchView);
   protected readonly viewDragService = inject(ViewDragService);
-  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
@@ -72,11 +71,12 @@ export class ViewSlotComponent implements OnAttach, OnDetach {
     this.addHostCssClasses();
     registerFocusTracker(this._host, this.view.id);
 
+    const focusTracker = inject(WorkbenchFocusTracker);
     rootEffect(onCleanup => {
       const attached = this.view.slot.portal.attached();
       if (!attached) {
         untracked(() => {
-          const unset = asyncScheduler.schedule(() => this.focusTracker.unsetActiveElement(this.view.id));
+          const unset = asyncScheduler.schedule(() => focusTracker.unsetActiveElement(this.view.id));
           onCleanup(() => unset.unsubscribe());
         });
       }

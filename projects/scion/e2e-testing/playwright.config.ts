@@ -15,6 +15,7 @@ const runInCI = !!process.env.CI;
 const runHeadless = !!process.env.HEADLESS;
 
 export default defineConfig({
+  forbidOnly: runInCI,
   fullyParallel: true,
   webServer: runInCI ? [
     {

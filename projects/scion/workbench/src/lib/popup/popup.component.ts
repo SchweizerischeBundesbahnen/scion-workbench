@@ -14,7 +14,7 @@ import {CdkPortalOutlet, ComponentPortal} from '@angular/cdk/portal';
 import {CdkTrapFocus} from '@angular/cdk/a11y';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {GLASS_PANE_BLOCKABLE, GLASS_PANE_OPTIONS, GlassPaneDirective, GlassPaneOptions} from '../glass-pane/glass-pane.directive';
-import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
+import {registerFocusTracker} from '../focus/workbench-focus-tracker.service';
 
 /**
  * Displays the configured popup component in the popup overlay.
@@ -39,7 +39,7 @@ import {registerFocusTracker, WorkbenchFocusTracker} from '../focus/workbench-fo
   ],
   host: {
     '[attr.data-popupid]': 'popup.id',
-    '[attr.data-focus]': `focusTracker.activeElement() === popup.id ? '' : null`,
+    '[attr.data-focus]': `popup.focused() ? '' : null`,
   },
 })
 export class PopupComponent {
@@ -48,7 +48,6 @@ export class PopupComponent {
 
   protected readonly popup = inject(ɵPopup);
   protected readonly portal = new ComponentPortal(this.popup.component, this.popup.viewContainerRef, inject(Injector));
-  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   @HostBinding('style.width')
   protected get popupWidth(): string | undefined {

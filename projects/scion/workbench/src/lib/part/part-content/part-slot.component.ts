@@ -34,7 +34,6 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 export class PartSlotComponent implements OnAttach, OnDetach {
 
   protected readonly part = inject(ɵWorkbenchPart);
-  protected readonly focusTracker = inject(WorkbenchFocusTracker);
 
   private readonly _host = inject(ElementRef).nativeElement as HTMLElement;
   private readonly _document = inject(DOCUMENT);
@@ -47,11 +46,12 @@ export class PartSlotComponent implements OnAttach, OnDetach {
   constructor() {
     registerFocusTracker(inject(ElementRef) as ElementRef<HTMLElement>, this.part.id);
 
+    const focusTracker = inject(WorkbenchFocusTracker);
     rootEffect(onCleanup => {
       const attached = this.part.slot.portal.attached();
       if (!attached) {
         untracked(() => {
-          const unset = asyncScheduler.schedule(() => this.focusTracker.unsetActiveElement(this.part.id));
+          const unset = asyncScheduler.schedule(() => focusTracker.unsetActiveElement(this.part.id));
           onCleanup(() => unset.unsubscribe());
         });
       }

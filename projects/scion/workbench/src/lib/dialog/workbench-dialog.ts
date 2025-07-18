@@ -60,6 +60,11 @@ export abstract class WorkbenchDialog<R = unknown> {
   public abstract set cssClass(cssClass: string | string[]);
 
   /**
+   * Indicates whether this dialog has the focus.
+   */
+  public abstract readonly focused: Signal<boolean>;
+
+  /**
    * Closes the dialog. Optionally, pass a result or an error to the dialog opener.
    */
   public abstract close(result?: R | Error): void;
