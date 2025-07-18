@@ -561,7 +561,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
-   * Activates the preceding view if it exists, or the subsequent view otherwise.
+   * Activates the view to the right if it exists, or the view to the left otherwise.
    *
    * @param id - The id of the view to activate its adjacent view.
    * @param options - Controls view activation.
@@ -601,6 +601,17 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
   }
 
   /**
+   * Clears the activation instants of parts and views in this layout.
+   *
+   * @return a copy of this layout with the activation instants cleared.
+   */
+  public clearActivationInstants(): ɵWorkbenchLayout {
+    const workingCopy = this.workingCopy();
+    workingCopy.__clearActivationInstants();
+    return workingCopy;
+  }
+
+  /**
    * Finds a {@link MTreeNode} based on the specified filter. If not found, by default, throws an error unless setting the `orElseNull` option.
    *
    * @param findBy - Defines the search scope.
@@ -631,6 +642,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     const workingCopy = this.workingCopy();
     workingCopy.__setTreeNodeSplitRatio(nodeId, ratio);
     return workingCopy;
+  }
+
+  /**
+   * Gets the view to the right of the given view, or the view to the left if not found, or `undefined` otherwise.
+   *
+   * @param view - The view for which to find its adjacent view.
+   * @return The adjacent view, or `undefined` if the reference view is the last view of the part.
+   */
+  private adjacentView(view: MView): MView | undefined {
+    const part = this.part({viewId: view.id});
+    const viewIndex = part.views.indexOf(view);
+    return part.views[viewIndex + 1] ?? part.views[viewIndex - 1];
   }
 
   /** @inheritDoc */
@@ -1144,6 +1167,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
     }
 
     const part = this.part({viewId: view.id});
+    const adjacentView = this.adjacentView(view);
 
     // Remove view.
     part.views.splice(part.views.indexOf(view), 1);
@@ -1158,11 +1182,16 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this._navigationStates.delete(view.id);
     }
 
-    // Activate the last used view if this view was active.
+    // Activate the last used view or the adjacent view.
     if (part.activeViewId === view.id) {
-      const [lastUsedView] = [...part.views].sort((view1, view2) => (view2.activationInstant ?? 0) - (view1.activationInstant ?? 0));
-      if (lastUsedView) {
-        this.__activateView(lastUsedView);
+      // Activate the last used view.
+      if (part.views.some(view => view.activationInstant)) {
+        const [lastUsedView] = [...part.views].sort((view1, view2) => (view2.activationInstant ?? 0) - (view1.activationInstant ?? 0));
+        this.__activateView(lastUsedView!);
+      }
+      // Activate the views adjacent view.
+      else if (adjacentView) {
+        this.__activateView(adjacentView);
       }
       else {
         delete part.activeViewId;
@@ -1208,12 +1237,18 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
    */
   private __activateAdjacentView(view: MView, options?: {activatePart?: boolean}): void {
-    const part = this.part({viewId: view.id});
-    const viewIndex = part.views.indexOf(view);
-    const adjacentView = part.views[viewIndex - 1] ?? part.views[viewIndex + 1];
-    if (adjacentView) { // no adjacent view if it is the last view of the partove
+    const adjacentView = this.adjacentView(view);
+    if (adjacentView) { // no adjacent view if it is the last view of the part
       this.__activateView(adjacentView, {activatePart: options?.activatePart});
     }
+  }
+
+  /**
+   * Note: This method name begins with underscores, indicating that it does not operate on a working copy, but modifies this layout instead.
+   */
+  private __clearActivationInstants(): void {
+    this.parts().forEach(part => delete part.activationInstant);
+    this.views().forEach(view => delete view.activationInstant);
   }
 
   /**

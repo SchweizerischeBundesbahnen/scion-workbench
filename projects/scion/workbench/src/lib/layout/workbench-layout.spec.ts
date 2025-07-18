@@ -822,7 +822,7 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.C'}).views.map(view => view.id)).toEqual(['view.4']);
   });
 
-  fit('should remove non-structural part when removing its last view', () => {
+  it('should remove non-structural part when removing its last view', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
     const workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
@@ -1420,42 +1420,108 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.C'}).views.map(view => view.id)).toEqual(['view.3']);
   });
 
-  it('should activate the most recently activated view when removing a view', () => {
-    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
-
+  it('should activate the last activated view when removing a view', () => {
     let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
-      .addPart(MAIN_AREA)
-      .addView('view.1', {partId: 'part.initial'})
-      .addView('view.5', {partId: 'part.initial'})
-      .addView('view.2', {partId: 'part.initial'})
-      .addView('view.3', {partId: 'part.initial'})
-      .addView('view.4', {partId: 'part.initial'})
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.5', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
+      .addView('view.4', {partId: 'part.main'})
       .activateView('view.3')
       .activateView('view.5')
       .activateView('view.2')
       .activateView('view.4')
       .activateView('view.1');
 
-    expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.1');
-    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.1', 'view.5', 'view.2', 'view.3', 'view.4']);
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.1', 'view.5', 'view.2', 'view.3', 'view.4']);
 
-    workbenchLayout = workbenchLayout
-      .activateView('view.1')
-      .removeView('view.1', {force: true});
-    expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.4');
-    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.5', 'view.2', 'view.3', 'view.4']);
+    // Remove 'view.1'.
+    workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.4');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.5', 'view.2', 'view.3', 'view.4']);
 
+    // Remove 'view.4'.
     workbenchLayout = workbenchLayout.removeView('view.4', {force: true});
-    expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.2');
-    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.5', 'view.2', 'view.3']);
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.5', 'view.2', 'view.3']);
 
+    // Remove 'view.2'.
     workbenchLayout = workbenchLayout.removeView('view.2', {force: true});
-    expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.5');
-    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.5', 'view.3']);
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.5');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.5', 'view.3']);
 
+    // Remove 'view.5'.
     workbenchLayout = workbenchLayout.removeView('view.5', {force: true});
-    expect(workbenchLayout.part({partId: 'part.initial'}).activeViewId).toEqual('view.3');
-    expect(workbenchLayout.part({partId: 'part.initial'}).views.map(view => view.id)).toEqual(['view.3']);
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.3']);
+  });
+
+  it('should activate view to the right when removing view if all views of the part have the same activation instant', () => {
+    let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
+      .addView('view.4', {partId: 'part.main'})
+      .activateView('view.2')
+      .clearActivationInstants();
+
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.2');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.1', 'view.2', 'view.3', 'view.4']);
+
+    // Remove 'view.2'.
+    workbenchLayout = workbenchLayout.removeView('view.2', {force: true});
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.3');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.1', 'view.3', 'view.4']);
+
+    // Remove 'view.3'.
+    workbenchLayout = workbenchLayout.removeView('view.3', {force: true});
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.4');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.1', 'view.4']);
+
+    // Remove 'view.4'.
+    workbenchLayout = workbenchLayout.removeView('view.4', {force: true});
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'part.main'}).views.map(view => view.id)).toEqual(['view.1']);
+
+    // Remove 'view.1'.
+    workbenchLayout = workbenchLayout.removeView('view.1', {force: true});
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toBeUndefined();
+    expect(workbenchLayout.part({partId: 'part.main'}).views).toEqual([]);
+  });
+
+  it('should clear activation instants', () => {
+    let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.left'})
+      .addView('view.3', {partId: 'part.right'})
+      .addView('view.4', {partId: 'part.right'})
+      .activateView('view.1')
+      .activateView('view.2')
+      .activateView('view.3')
+      .activateView('view.4')
+      .activatePart('part.left')
+      .activatePart('part.right');
+
+    expect(workbenchLayout.part({partId: 'part.left'}).activationInstant).toBeGreaterThan(0);
+    expect(workbenchLayout.part({partId: 'part.right'}).activationInstant).toBeGreaterThan(0);
+    expect(workbenchLayout.view({viewId: 'view.1'}).activationInstant).toBeGreaterThan(0);
+    expect(workbenchLayout.view({viewId: 'view.2'}).activationInstant).toBeGreaterThan(0);
+    expect(workbenchLayout.view({viewId: 'view.3'}).activationInstant).toBeGreaterThan(0);
+    expect(workbenchLayout.view({viewId: 'view.4'}).activationInstant).toBeGreaterThan(0);
+
+    // Clear activation instants.
+    workbenchLayout = workbenchLayout.clearActivationInstants();
+    expect(workbenchLayout.part({partId: 'part.left'}).activationInstant).toBeUndefined();
+    expect(workbenchLayout.part({partId: 'part.right'}).activationInstant).toBeUndefined();
+    expect(workbenchLayout.view({viewId: 'view.1'}).activationInstant).toBeUndefined();
+    expect(workbenchLayout.view({viewId: 'view.2'}).activationInstant).toBeUndefined();
+    expect(workbenchLayout.view({viewId: 'view.3'}).activationInstant).toBeUndefined();
+    expect(workbenchLayout.view({viewId: 'view.4'}).activationInstant).toBeUndefined();
   });
 
   /**
@@ -1465,7 +1531,7 @@ describe('WorkbenchLayout', () => {
    * | A | B | C | D | E |
    * *---+---+---+---+---+
    */
-  it('should activate the most recently activated part when removing a part', () => {
+  it('should activate the last activated part when removing a part', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.A'});
 
     let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
@@ -2198,7 +2264,7 @@ describe('WorkbenchLayout', () => {
     // Activate adjacent view
     workbenchLayout = workbenchLayout.activateAdjacentView('view.2');
     expect(workbenchLayout.activePart({grid: 'mainArea'}).id).toEqual('part.initial');
-    expect(workbenchLayout.part({partId: 'part.part'}).activeViewId).toEqual('view.1');
+    expect(workbenchLayout.part({partId: 'part.part'}).activeViewId).toEqual('view.3');
 
     // Activate adjacent view
     workbenchLayout = workbenchLayout.activateAdjacentView('view.3');
@@ -2209,11 +2275,6 @@ describe('WorkbenchLayout', () => {
     workbenchLayout = workbenchLayout.activateAdjacentView('view.1');
     expect(workbenchLayout.activePart({grid: 'mainArea'}).id).toEqual('part.initial');
     expect(workbenchLayout.part({partId: 'part.part'}).activeViewId).toEqual('view.2');
-
-    // Activate adjacent view
-    workbenchLayout = workbenchLayout.activateAdjacentView('view.2', {activatePart: true});
-    expect(workbenchLayout.activePart({grid: 'mainArea'}).id).toEqual('part.part');
-    expect(workbenchLayout.part({partId: 'part.part'}).activeViewId).toEqual('view.1');
   });
 
   it('should allow activating a part', () => {

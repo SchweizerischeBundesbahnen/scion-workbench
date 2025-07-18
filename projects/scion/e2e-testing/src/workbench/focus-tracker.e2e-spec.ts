@@ -1599,6 +1599,10 @@ test.describe('Focus Tracker', () => {
       .activateView('view.1'),
     );
 
+    // Focus 'view.1'.
+    await appPO.view({viewId: 'view.1'}).tab.click();
+
+    // PRECONDITION: Expect 'view.1' to be active and focused.
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
     await expect(appPO.view({viewId: 'view.1'}).viewport).toContainFocus();
 
@@ -1646,6 +1650,10 @@ test.describe('Focus Tracker', () => {
       .activatePart('part.main'),
     );
 
+    // Focus 'part.main'.
+    await appPO.part({partId: 'part.main'}).bar.filler.click();
+
+    // PRECONDITION: Expect 'part.main' to be active and focused.
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
     await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
 
@@ -2075,6 +2083,10 @@ test.describe('Focus Tracker', () => {
       .activateView('view.1'),
     );
 
+    // Focus 'view.1'.
+    await appPO.view({viewId: 'view.1'}).tab.click();
+
+    // PRECONDITION: Expect 'view.1' to be active and focused.
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
     await expect(appPO.view({viewId: 'view.1'}).viewport).toContainFocus();
 
@@ -2087,5 +2099,67 @@ test.describe('Focus Tracker', () => {
     await appPO.view({viewId: 'view.2'}).tab.close();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
     await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
+  });
+
+  test('should focus tab when start dragging active but not focused tab', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .activateView('view.1'),
+    );
+
+    // PRECONDITION: Expect 'view.2' to be inactive and not focused.
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
+    await expect.poll(() => appPO.view({viewId: 'view.1'}).tab.isActive()).toBe(true);
+
+    // Start dragging 'view.1'.
+    const dragHandle = await appPO.view({viewId: 'view.1'}).tab.startDrag();
+    await dragHandle.dragTo({deltaX: 200, deltaY: 0});
+
+    // Expect 'view.1' to be active and focused.
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => appPO.view({viewId: 'view.1'}).tab.isActive()).toBe(true);
+  });
+
+  test('should focus tab when start dragging inactive tab', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .activateView('view.1'),
+    );
+
+    // PRECONDITION: Expect 'view.2' to be inactive and not focused.
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
+    await expect.poll(() => appPO.view({viewId: 'view.2'}).tab.isActive()).toBe(false);
+
+    // Start dragging 'view.2'.
+    const dragHandle = await appPO.view({viewId: 'view.2'}).tab.startDrag();
+    await dragHandle.dragTo({deltaX: 200, deltaY: 0});
+
+    // Expect 'view.2' to be active and focused.
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => appPO.view({viewId: 'view.2'}).tab.isActive()).toBe(true);
+  });
+
+  test('should not focus parts and views contained the initial perspective layout', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.right'})
+      .activatePart('part.right')
+      .activateView('view.1')
+      .activateView('view.2'),
+    );
+
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
   });
 });

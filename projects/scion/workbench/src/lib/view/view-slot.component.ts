@@ -45,7 +45,7 @@ import {asyncScheduler} from 'rxjs';
     '[attr.data-viewid]': 'view.id',
     '[attr.data-focus]': `focusTracker.activeElement() === view.id ? '' : null`,
     '[attr.data-active]': `view.active() ? '' : null`,
-    '[attr.data-activation-instant]': `view.activationInstant()`,
+    '[attr.data-activation-instant]': `view.activationInstant() || undefined`,
     '[class.view-drag]': 'viewDragService.dragging()',
   },
   providers: [

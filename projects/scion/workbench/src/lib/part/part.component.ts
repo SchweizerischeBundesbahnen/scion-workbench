@@ -35,7 +35,7 @@ import {WorkbenchFocusTracker} from '../focus/workbench-focus-tracker.service';
     '[attr.data-grid]': 'dasherize(part.gridName())',
     '[attr.data-focus]': `focusTracker.activeElement() === part.id ? '' : null`,
     '[attr.data-active]': `part.active() ? '' : null`,
-    '[attr.data-activation-instant]': `part.activationInstant()`,
+    '[attr.data-activation-instant]': `part.activationInstant() || undefined`,
     '[attr.data-referencepart]': `part.referencePart() ? '' : undefined`,
     '[attr.tabindex]': '-1',
     // TODO remove and migrate tests to data-active

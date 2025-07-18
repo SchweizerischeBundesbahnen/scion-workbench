@@ -132,17 +132,19 @@ export class ɵWorkbenchPerspective implements WorkbenchPerspective {
    * Creates the initial layout of this perspective as defined in the perspective definition.
    */
   private async createInitialLayout(): Promise<ɵWorkbenchLayout> {
-    const initialLayout = await runInInjectionContext(this._perspectiveEnvironmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory)) as ɵWorkbenchLayout;
-    return this.ensureActiveView(initialLayout);
-  }
+    let initialLayout = await runInInjectionContext(this._perspectiveEnvironmentInjector, () => this._initialLayoutFn(this._workbenchLayoutFactory)) as ɵWorkbenchLayout;
 
-  /**
-   * Activates the first view of each part if not specified.
-   */
-  private ensureActiveView(layout: ɵWorkbenchLayout): ɵWorkbenchLayout {
-    return layout.parts()
-      .filter(part => part.views.length)
-      .reduce((acc, part) => part.activeViewId ? acc : acc.activateView(part.views[0]!.id), layout);
+    // Ensure each part to have an active view.
+    initialLayout.parts()
+      .filter(part => part.views.length && !part.activeViewId)
+      .forEach(part => {
+        initialLayout = initialLayout.activateView(part.views[0]!.id);
+      });
+
+    // Clear activation instants.
+    initialLayout = initialLayout.clearActivationInstants();
+
+    return initialLayout;
   }
 
   /**

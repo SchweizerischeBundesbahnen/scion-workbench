@@ -29,8 +29,8 @@ test.describe('Part Activation Instant', () => {
     const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
 
     // Memoize activation instants.
-    const leftPartActivationInstant = await appPO.activationInstant('part.left');
-    const rightPartActivationInstant = await appPO.activationInstant('part.right');
+    const leftPartActivationInstant = await appPO.activationInstant('part.left', {orElse: 0});
+    const rightPartActivationInstant = await appPO.activationInstant('part.right', {orElse: 0});
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.left');
 
     // Click part.right.
@@ -61,9 +61,9 @@ test.describe('Part Activation Instant', () => {
     const activityPartPage = new PartPagePO(appPO, {partId: 'part.activity'});
 
     // Memoize activation instants.
-    const mainPartActivationInstant = await appPO.activationInstant('part.main');
-    const activityPartActivationInstant = await appPO.activationInstant('part.activity');
-    await expect.poll(() => appPO.focusOwner()).toEqual('part.activity');
+    const mainPartActivationInstant = await appPO.activationInstant('part.main', {orElse: 0});
+    const activityPartActivationInstant = await appPO.activationInstant('part.activity', {orElse: 0});
+    await expect.poll(() => appPO.focusOwner()).toBeNull();
 
     // Click part.main.
     await mainPartPage.locator.click();
@@ -76,13 +76,7 @@ test.describe('Part Activation Instant', () => {
     await expect.poll(() => activityPartPage.getActivationInstant()).toBeGreaterThan(activityPartActivationInstant);
   });
 
-  // Add following tests.
-  // should have zero timestamp when adding part, except for the first part (unit tests)
-  // should have zero timestamp when adding view, except for the first view of a perspective (unit tests)
-  // should update activation instant of active part when activating a view
-  // should update activation instant of inactive part when activating a view
-
-  test('should not update activation instant of active and focused view when clicking it', async ({appPO, workbenchNavigator}) => {
+  test('should not update activation instant of active and focused part when clicking it', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
     await workbenchNavigator.createPerspective(factory => factory
@@ -92,6 +86,13 @@ test.describe('Part Activation Instant', () => {
     );
 
     const partPage = new PartPagePO(appPO, {partId: 'part.main'});
+
+    // Focus 'part.main'.
+    await appPO.part({partId: 'part.main'}).bar.filler.click();
+
+    // PRECONDITION: Expect 'part.main' to be active and focused.
+    await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
+    await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
 
     // Memoize activation instant.
     const partActivationInstant = await partPage.getActivationInstant();
@@ -108,29 +109,29 @@ test.describe('Part Activation Instant', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
-      .addView('view.101', {partId: 'part.main'})
-      .addView('view.102', {partId: 'part.main'})
-      .addView('view.103', {partId: 'part.main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
       .navigatePart('part.main', ['test-part']),
     );
 
     // Memoize activation instant.
-    const partActivationInstant = await appPO.activationInstant('part.main');
+    const partActivationInstant = await appPO.activationInstant('part.main', {orElse: 0});
 
-    // Activate view.101.
-    await appPO.view({viewId: 'view.101'}).tab.click();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.101');
-    await expect.poll(() => appPO.activationInstant('part.main')).toEqual(partActivationInstant);
+    // Activate view.1.
+    await appPO.view({viewId: 'view.1'}).tab.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => appPO.activationInstant('part.main', {orElse: 0})).toEqual(partActivationInstant);
 
-    // Activate view.102.
-    await appPO.view({viewId: 'view.102'}).tab.click();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.102');
-    await expect.poll(() => appPO.activationInstant('part.main')).toEqual(partActivationInstant);
+    // Activate view.2.
+    await appPO.view({viewId: 'view.2'}).tab.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => appPO.activationInstant('part.main', {orElse: 0})).toEqual(partActivationInstant);
 
-    // Activate view.103.
-    await appPO.view({viewId: 'view.103'}).tab.click();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.103');
-    await expect.poll(() => appPO.activationInstant('part.main')).toEqual(partActivationInstant);
+    // Activate view.3.
+    await appPO.view({viewId: 'view.3'}).tab.click();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.3');
+    await expect.poll(() => appPO.activationInstant('part.main', {orElse: 0})).toEqual(partActivationInstant);
   });
 
   test('should update activation instant of part when closing its last view', async ({appPO, workbenchNavigator}) => {
@@ -138,30 +139,67 @@ test.describe('Part Activation Instant', () => {
 
     await workbenchNavigator.createPerspective(factory => factory
       .addPart('part.main')
-      .addView('view.101', {partId: 'part.main'})
-      .addView('view.102', {partId: 'part.main'})
-      .addView('view.103', {partId: 'part.main'})
+      .addView('view.1', {partId: 'part.main'})
+      .addView('view.2', {partId: 'part.main'})
+      .addView('view.3', {partId: 'part.main'})
       .navigatePart('part.main', ['test-part'])
-      .activateView('view.101')
-      .activateView('view.102')
-      .activateView('view.103'),
+      .activateView('view.1')
+      .activateView('view.2')
+      .activateView('view.3'),
     );
 
-    const partActivationInstant = await appPO.activationInstant('part.main');
+    const partActivationInstant = await appPO.activationInstant('part.main', {orElse: 0});
 
-    // Close view.103.
-    await appPO.view({viewId: 'view.103'}).tab.close();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.102');
-    await expect.poll(() => appPO.activationInstant('part.main')).toEqual(partActivationInstant);
+    // Close view.3.
+    await appPO.view({viewId: 'view.3'}).tab.close();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
+    await expect.poll(() => appPO.activationInstant('part.main', {orElse: 0})).toEqual(partActivationInstant);
 
-    // Close view.102.
-    await appPO.view({viewId: 'view.102'}).tab.close();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.101');
-    await expect.poll(() => appPO.activationInstant('part.main')).toEqual(partActivationInstant);
+    // Close view.2.
+    await appPO.view({viewId: 'view.2'}).tab.close();
+    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
+    await expect.poll(() => appPO.activationInstant('part.main', {orElse: 0})).toEqual(partActivationInstant);
 
-    // Close view.101.
-    await appPO.view({viewId: 'view.101'}).tab.close();
+    // Close view.1.
+    await appPO.view({viewId: 'view.1'}).tab.close();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
-    await expect.poll(() => appPO.activationInstant('part.main')).toBeGreaterThan(partActivationInstant);
+    await expect.poll(() => appPO.activationInstant('part.main', {orElse: 0})).toBeGreaterThan(partActivationInstant);
+  });
+
+  test('should not set activation instant on parts of the initial perspective layout (explicit activation)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.right'})
+      .activatePart('part.right')
+      .activateView('view.1')
+      .activateView('view.2'),
+    );
+
+    await expect.poll(() => appPO.activationInstant('part.left', {orElse: null})).toBeNull();
+    await expect.poll(() => appPO.activationInstant('part.right', {orElse: null})).toBeNull();
+  });
+
+  test('should not set activation instant on parts of the initial perspective layout (auto activation)', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart('part.left')
+      .addPart('part.right', {align: 'right'})
+      .addView('view.1', {partId: 'part.left'})
+      .addView('view.2', {partId: 'part.right'}),
+    );
+
+    await expect.poll(() => appPO.activationInstant('part.left', {orElse: null})).toBeNull();
+    await expect.poll(() => appPO.activationInstant('part.right', {orElse: null})).toBeNull();
   });
 });
+
+// Add following tests.
+// should have zero timestamp when adding part, except for the first part (unit tests)
+// should have zero timestamp when adding view, except for the first view of a perspective (unit tests)
+// should update activation instant of active part when activating a view
+// should update activation instant of inactive part when activating a view

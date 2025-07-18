@@ -19,7 +19,7 @@ import {waitForCondition} from '../helper/testing.util';
 
 test.describe('View Tabbar', () => {
 
-  test('should activate the most recent view when closing a view', async ({appPO, workbenchNavigator}) => {
+  test('should activate the last used view when closing a view', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
     const routerPage = await workbenchNavigator.openInNewTab(RouterPagePO);
 

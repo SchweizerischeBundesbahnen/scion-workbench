@@ -350,7 +350,7 @@ export class AppPO {
       locator = locator.locator(`:scope[data-popupid="${locateBy.popupId}"]`);
     }
     if (locateBy?.cssClass) {
-      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).join('.')}`);
+      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).map(escapeCssClass).join('.')}`);
     }
     return new PopupPO(locator);
   }
@@ -373,7 +373,7 @@ export class AppPO {
    * Handle to the specified notification.
    */
   public notification(locateBy?: {cssClass?: string | string[]; nth?: number}): NotificationPO {
-    const cssClasses = coerceArray(locateBy?.cssClass).map(cssClass => cssClass.replace(/\./g, '\\.'));
+    const cssClasses = coerceArray(locateBy?.cssClass).map(escapeCssClass);
     const locator = this.page.locator(['wb-notification'].concat(cssClasses).join('.'));
     return new NotificationPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
@@ -398,7 +398,7 @@ export class AppPO {
       locator = locator.locator(`:scope[data-dialogid="${locateBy.dialogId}"]`);
     }
     if (locateBy?.cssClass) {
-      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).join('.')}`);
+      locator = locator.locator(`:scope.${coerceArray(locateBy.cssClass).map(escapeCssClass).join('.')}`);
     }
     return new DialogPO(locateBy?.nth !== undefined ? locator.nth(locateBy.nth) : locator);
   }
@@ -498,16 +498,30 @@ export class AppPO {
   }
 
   /**
-   * Returns the activation instant of the specified workbench element.
+   * Returns the activation instant of the specified workbench element, or `null` if unset.
    */
-  public async activationInstant(elementId: PartId | ViewId): Promise<number> {
-    if (elementId.startsWith('part.')) {
-      return Number.parseInt((await this.page.locator(`wb-part[data-partid="${elementId}"]`).getAttribute('data-activation-instant'))!);
+  public async activationInstant(elementId: PartId | ViewId): Promise<number>;
+  public async activationInstant(elementId: PartId | ViewId, options: {orElse: null}): Promise<number | null>;
+  public async activationInstant(elementId: PartId | ViewId, options: {orElse: 0}): Promise<number | 0>;
+  public async activationInstant(elementId: PartId | ViewId, options?: {orElse: null | 0}): Promise<number | null | 0> {
+    const locator = (() => {
+      if (elementId.startsWith('part.')) {
+        return this.page.locator(`wb-part[data-partid="${elementId}"]`);
+      }
+      if (elementId.startsWith('view.')) {
+        return this.page.locator(`wb-view-slot[data-viewid="${elementId}"]`);
+      }
+      throw Error(`[PageObjectError] Workbench element with id "${elementId}" not found.`);
+    })();
+
+    const activationInstant = await locator.getAttribute('data-activation-instant');
+    if (activationInstant) {
+      return Number.parseInt(activationInstant);
     }
-    if (elementId.startsWith('view.')) {
-      return Number.parseInt((await this.page.locator(`wb-view-slot[data-viewid="${elementId}"]`).getAttribute('data-activation-instant'))!);
+    if (options?.orElse !== undefined) {
+      return options.orElse;
     }
-    throw Error(`[PageObjectError] Workbench element with id "${elementId}" not found.`);
+    throw Error(`[NullActivationInstantError] No activation instant found for '${elementId}'.`);
   }
 
   /**
@@ -685,4 +699,11 @@ export enum WorkbenchStartupQueryParams {
    * Query param to control the identity of the initial part in the main area.
    */
   MAIN_AREA_INITIAL_PART_ID = 'mainAreaInitialPartId',
+}
+
+/**
+ * Escapes the CSS class to support passing a workbench element id (such as a view id) as CSS class.
+ */
+function escapeCssClass(cssClass: string): string {
+  return cssClass.replace(/\./g, '\\.');
 }

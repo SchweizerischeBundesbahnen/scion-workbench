@@ -158,14 +158,6 @@ describe('WorkbenchPart', () => {
         },
       },
     });
-
-    // Activate left part again.
-    const layout = TestBed.inject(WorkbenchService).layout();
-    await leftPart.activate();
-    await waitUntilStable();
-
-    // Expect layout not to change.
-    expect(TestBed.inject(WorkbenchService).layout()).toEqual(layout);
   });
 
   it('should activate activity using `Part.activate()`', async () => {
