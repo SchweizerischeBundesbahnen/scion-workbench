@@ -1249,7 +1249,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
       this.__activateView(adjacentView, {activatePart: options?.activatePart});
     }
     else {
-      // TODO Add Unit Test
+      // TODO [dwie] Find better solution
       // is `undefined` if it is the last view of the part
       const part = this.part({viewId: view.id});
       delete part.activeViewId;

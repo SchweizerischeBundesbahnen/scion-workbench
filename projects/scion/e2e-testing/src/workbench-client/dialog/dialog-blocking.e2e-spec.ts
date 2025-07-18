@@ -30,9 +30,13 @@ test.describe('Workbench Dialog Blocking', () => {
     const dialog = appPO.dialog({cssClass: 'testee'});
     await dialog.moveDialog('bottom-right-corner');
 
+    // Focus input field.
+    const dialogPage = new FocusTestPagePO(dialog);
+    await dialogPage.firstField.focus();
+
     // Expect interaction with contextual view to be blocked.
     await expect(inputFieldTestPage.clickInputField({timeout: 1000})).rejects.toThrowError();
-    await expect(new FocusTestPagePO(dialog).firstField).toBeFocused();
+    await expect(dialogPage.firstField).toBeFocused();
 
     // Expect glass panes
     await expect.poll(() => dialog.getGlassPaneBoundingBoxes()).toEqual(new Set([

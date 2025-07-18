@@ -2277,6 +2277,22 @@ describe('WorkbenchLayout', () => {
     expect(workbenchLayout.part({partId: 'part.part'}).activeViewId).toEqual('view.2');
   });
 
+  it('should unset active view when activating adjacent view but no adjacent view exists', () => {
+    TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
+
+    let workbenchLayout = TestBed.inject(ɵWorkbenchLayoutFactory)
+      .addPart('part.main')
+      .addView('view.1', {partId: 'part.main'})
+      .activateView('view.1');
+
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toEqual('view.1');
+
+    // Activate adjacent view
+    workbenchLayout = workbenchLayout.activateAdjacentView('view.1');
+    expect(workbenchLayout.activePart({grid: 'mainArea'}).id).toEqual('part.initial');
+    expect(workbenchLayout.part({partId: 'part.main'}).activeViewId).toBeUndefined();
+  });
+
   it('should allow activating a part', () => {
     TestBed.overrideProvider(MAIN_AREA_INITIAL_PART_ID, {useValue: 'part.initial'});
 
