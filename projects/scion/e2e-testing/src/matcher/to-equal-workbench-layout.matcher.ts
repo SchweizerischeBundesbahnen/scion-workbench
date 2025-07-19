@@ -67,9 +67,9 @@ async function assertWorkbenchLayout(expected: ExpectedWorkbenchLayout, locator:
     // Assert reference part of the grid.
     if (expectedGrid?.referencePartId) {
       const referencePartId = expectedGrid.referencePartId;
-      const referencePartLocator = locator.locator(`wb-layout wb-part[data-grid="${gridName}"][data-partid="${referencePartId}"][data-referencepart]`);
+      const referencePartLocator = locator.locator(`wb-layout wb-part[data-grid="${gridName}"][data-partid="${referencePartId}"][data-reference-part]`);
       await throwIfAbsent(referencePartLocator, () => Error(`[DOMAssertError] Expected part '${referencePartId}' to be the reference part in the ${gridName} grid, but is not.`));
-      await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="${gridName}"]:not([data-partid="${referencePartId}"])[data-referencepart]`), () => Error(`[DOMAssertError] Expected only part '${referencePartId}' to be the reference part in the ${gridName} grid, but is not.`));
+      await throwIfPresent(locator.locator(`wb-layout wb-part[data-grid="${gridName}"]:not([data-partid="${referencePartId}"])[data-reference-part]`), () => Error(`[DOMAssertError] Expected only part '${referencePartId}' to be the reference part in the ${gridName} grid, but is not.`));
     }
   }
 }

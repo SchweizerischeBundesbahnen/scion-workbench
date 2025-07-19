@@ -21,6 +21,7 @@
                 (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
                 #desktop_element>
     @if (part.navigation()) {
+      <!-- TODO [dwie] Change to part slot analog to part.component -->
       <router-outlet [name]="part.id" wbRouterOutletRootContext/>
     } @else if (desktop()) {
       <ng-container *ngTemplateOutlet="desktop()!"/>

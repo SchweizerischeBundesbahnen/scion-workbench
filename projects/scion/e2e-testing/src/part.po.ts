@@ -83,7 +83,7 @@ export class PartPO {
    * Gets the bounding box of this part (inclusive partbar) or its content (exclusive partbar). Defaults to the bounding box of the part.
    */
   public async getBoundingBox(selector: 'part' | 'content' = 'part'): Promise<DomRect> {
-    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > div.e2e-content').boundingBox());
+    return fromRect(await this.locator.locator(selector === 'part' ? ':scope' : ':scope > .e2e-content').boundingBox());
   }
 
   public async isActive(): Promise<boolean> {

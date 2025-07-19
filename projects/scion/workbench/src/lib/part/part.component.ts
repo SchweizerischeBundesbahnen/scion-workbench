@@ -35,7 +35,7 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-focus]': `part.focused() ? '' : null`,
     '[attr.data-active]': `part.active() ? '' : null`,
     '[attr.data-activation-instant]': `part.activationInstant() || undefined`,
-    '[attr.data-referencepart]': `part.referencePart() ? '' : undefined`,
+    '[attr.data-reference-part]': `part.referencePart() ? '' : undefined`,
     '[attr.tabindex]': '-1',
     // TODO remove and migrate tests to data-active
     '[class.active]': 'part.active()',
