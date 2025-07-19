@@ -37,7 +37,7 @@ import {dasherize} from '../common/dasherize.util';
     '[attr.data-activation-instant]': `part.activationInstant() || undefined`,
     '[attr.data-reference-part]': `part.referencePart() ? '' : undefined`,
     '[attr.tabindex]': '-1',
-    // TODO remove and migrate tests to data-active
+    // TODO [dwie] remove and migrate tests to data-active
     '[class.active]': 'part.active()',
   },
 })

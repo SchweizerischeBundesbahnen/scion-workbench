@@ -22,6 +22,7 @@
                 #desktop_element>
     @if (part.navigation()) {
       <!-- TODO [dwie] Change to part slot analog to part.component -->
+      <!-- TODO [dwie] Change PartPo bounding box from .e2e-part-content to div.e2e-part-content -->
       <router-outlet [name]="part.id" wbRouterOutletRootContext/>
     } @else if (desktop()) {
       <ng-container *ngTemplateOutlet="desktop()!"/>

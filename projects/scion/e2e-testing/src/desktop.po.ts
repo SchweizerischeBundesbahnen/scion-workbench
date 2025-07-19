@@ -15,7 +15,6 @@ import {Locator} from '@playwright/test';
  */
 export class DesktopPO {
 
-  // TODO [focus-tracker] Why no page anymore?
   constructor(public readonly locator: Locator) {
   }
 
@@ -29,11 +28,11 @@ export class DesktopPO {
     }
 
     const dropZoneId = await dropZone.getAttribute('data-id');
-    const dropPlaceholder = this.locator.locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
+    const dropPlaceholder = this.locator.page().locator(`div.e2e-drop-placeholder[data-dropzoneid="${dropZoneId}"]`);
     if (!await dropPlaceholder.isVisible()) {
       return null;
     }
 
-    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | null;
+    return await dropZone.getAttribute('data-region') as 'north' | 'east' | 'south' | 'west' | 'center' | null;
   }
 }
