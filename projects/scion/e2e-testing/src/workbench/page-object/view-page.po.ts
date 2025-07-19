@@ -38,10 +38,6 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
-  public async getActivationInstant(): Promise<number> {
-    return Number.parseInt(await this.locator.locator('span.e2e-activation-instant').innerText());
-  }
-
   public async getParams(): Promise<Params> {
     if (await this.locator.locator('sci-accordion.e2e-params').isHidden()) {
       return {};

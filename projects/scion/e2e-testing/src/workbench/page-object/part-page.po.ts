@@ -103,10 +103,6 @@ export class PartPagePO {
   public async registerPartActions(partAction: WorkbenchPartActionDescriptor | WorkbenchPartActionDescriptor[]): Promise<void> {
     await this.locator.locator('input.e2e-part-actions').fill(JSON.stringify(coerceArray(partAction)));
   }
-
-  public async getActivationInstant(): Promise<number> {
-    return Number.parseInt(await this.locator.locator('span.e2e-activation-instant').innerText());
-  }
 }
 
 interface WorkbenchPartActionDescriptor {

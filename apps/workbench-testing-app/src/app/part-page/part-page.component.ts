@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Component, computed, DOCUMENT, inject, Signal} from '@angular/core';
-import {PartId, WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
+import {Component, computed, inject, Signal} from '@angular/core';
+import {WorkbenchPart, WorkbenchPartActionDirective} from '@scion/workbench';
 import {AppendParamDataTypePipe} from '../common/append-param-data-type.pipe';
 import {AsyncPipe} from '@angular/common';
 import {FormsModule, NonNullableFormBuilder, ReactiveFormsModule} from '@angular/forms';
@@ -24,9 +24,6 @@ import {Arrays} from '@scion/toolkit/util';
 import {MultiValueInputComponent} from '../multi-value-input/multi-value-input.component';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
 import {parseTypedString} from '../common/parse-typed-value.util';
-import {fromMutation$} from '@scion/toolkit/observable';
-import {map, startWith, switchMap} from 'rxjs/operators';
-import {animationFrameScheduler, Observable, timer} from 'rxjs';
 
 @Component({
   selector: 'app-part-page',
@@ -55,7 +52,6 @@ export default class PartPageComponent {
   protected readonly route = inject(ActivatedRoute);
   protected readonly uuid = UUID.randomUUID();
   protected readonly partActions: Signal<WorkbenchPartActionDescriptor[]>;
-  protected readonly activationInstant: Signal<number | null>;
   protected readonly titleList = `title-list-${UUID.randomUUID()}`;
   protected readonly form = this._formBuilder.group({
     partActions: this._formBuilder.control(''),
@@ -65,7 +61,6 @@ export default class PartPageComponent {
   constructor() {
     this.installCssClassUpdater();
     this.partActions = this.computePartActions();
-    this.activationInstant = this.computeActivationInstant();
   }
 
   protected onPartTitleChange(title: string): void {
@@ -82,21 +77,6 @@ export default class PartPageComponent {
         return [];
       }
     });
-  }
-
-  private computeActivationInstant(): Signal<number | null> {
-    const document = inject(DOCUMENT);
-
-    return toSignal(timer(0, animationFrameScheduler).pipe(switchMap(() => partActivationInstant$(this.part.id))), {initialValue: null});
-
-    function partActivationInstant$(partId: PartId): Observable<number | null> {
-      const partElement = document.querySelector(`wb-part[data-partid="${partId}"]`)!;
-      return fromMutation$(partElement, {attributeFilter: ['data-activation-instant'], subtree: false})
-        .pipe(
-          startWith(null),
-          map(() => partElement.getAttribute('data-activation-instant') as number | null),
-        );
-    }
   }
 
   private installCssClassUpdater(): void {

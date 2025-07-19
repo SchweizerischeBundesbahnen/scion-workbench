@@ -10,7 +10,6 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {ViewPagePO} from './page-object/view-page.po';
 
 test.describe('View Activation Instant', () => {
 
@@ -25,26 +24,26 @@ test.describe('View Activation Instant', () => {
       .navigateView('view.2', ['test-view']),
     );
 
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const view1 = appPO.view({viewId: 'view.1'});
+    const view2 = appPO.view({viewId: 'view.2'});
 
     // Capture activation instant of 'view.1'.
-    await viewPage1.view.tab.click();
-    const view1ActivationInstant = await viewPage1.getActivationInstant();
+    await view1.tab.click();
+    const view1ActivationInstant = await appPO.activationInstant('view.1');
 
     // Capture activation instant of 'view.2'.
-    await viewPage2.view.tab.click();
-    const view2ActivationInstant = await viewPage2.getActivationInstant();
+    await view2.tab.click();
+    const view2ActivationInstant = await appPO.activationInstant('view.2');
 
     // Click tab of 'view.1'.
-    await viewPage1.view.tab.click();
+    await view1.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage1.getActivationInstant()).toBeGreaterThan(view1ActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toBeGreaterThan(view1ActivationInstant);
 
     // Click tab of 'view.2'.
-    await viewPage2.view.tab.click();
+    await view2.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
-    await expect.poll(() => viewPage2.getActivationInstant()).toBeGreaterThan(view2ActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.2')).toBeGreaterThan(view2ActivationInstant);
   });
 
   test('should update activation instant of active but not focused view when clicking its tab', async ({appPO, workbenchNavigator}) => {
@@ -60,30 +59,30 @@ test.describe('View Activation Instant', () => {
       .activatePart('part.activity'),
     );
 
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
+    const view1 = appPO.view({viewId: 'view.1'});
+    const view2 = appPO.view({viewId: 'view.2'});
 
     // Focus 'view.1'.
-    await viewPage1.view.tab.click();
+    await view1.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
     // Focus 'view.2'.
-    await viewPage2.view.tab.click();
+    await view2.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
 
     // Capture activation instants.
-    const view1ActivationInstant = await viewPage1.getActivationInstant();
-    const view2ActivationInstant = await viewPage2.getActivationInstant();
+    const view1ActivationInstant = await appPO.activationInstant('view.1');
+    const view2ActivationInstant = await appPO.activationInstant('view.2');
 
     // Click tab of 'view.1'.
-    await viewPage1.view.tab.click();
+    await view1.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage1.getActivationInstant()).toBeGreaterThan(view1ActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toBeGreaterThan(view1ActivationInstant);
 
     // Click tab of 'view.2'.
-    await viewPage2.view.tab.click();
+    await view2.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
-    await expect.poll(() => viewPage2.getActivationInstant()).toBeGreaterThan(view2ActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.2')).toBeGreaterThan(view2ActivationInstant);
   });
 
   test('should update activation instant of active but not focused view when clicking its content', async ({appPO, workbenchNavigator}) => {
@@ -99,30 +98,20 @@ test.describe('View Activation Instant', () => {
       .activatePart('part.activity'),
     );
 
-    const viewPage1 = new ViewPagePO(appPO, {viewId: 'view.1'});
-    const viewPage2 = new ViewPagePO(appPO, {viewId: 'view.2'});
-
-    // Focus 'view.1'.
-    await viewPage1.view.tab.click();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-
-    // Focus 'view.2'.
-    await viewPage2.view.tab.click();
-    await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
-
     // Capture activation instants.
-    const view1ActivationInstant = await viewPage1.getActivationInstant();
-    const view2ActivationInstant = await viewPage2.getActivationInstant();
+    const view1ActivationInstant = await appPO.activationInstant('view.1', {orElse: 0});
+    const view2ActivationInstant = await appPO.activationInstant('view.2', {orElse: 0});
 
     // Click content of 'view.1'.
-    await viewPage1.view.locator.click();
+    const view = appPO.view({viewId: 'view.1'});
+    await view.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage1.getActivationInstant()).toBeGreaterThan(view1ActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toBeGreaterThan(view1ActivationInstant);
 
     // Click content of 'view.2'.
-    await viewPage2.view.locator.click();
+    await appPO.view({viewId: 'view.2'}).locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.2');
-    await expect.poll(() => viewPage2.getActivationInstant()).toBeGreaterThan(view2ActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.2')).toBeGreaterThan(view2ActivationInstant);
   });
 
   test('should not update activation instant of active and focused view when clicking its tab', async ({appPO, workbenchNavigator}) => {
@@ -134,26 +123,25 @@ test.describe('View Activation Instant', () => {
       .navigateView('view.1', ['test-view']),
     );
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
-
     // Focus 'view.1'.
-    await viewPage.view.tab.click();
+    const view = appPO.view({viewId: 'view.1'});
+    await view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
     // Capture activation instant.
-    const viewActivationInstant = await viewPage.getActivationInstant();
+    const viewActivationInstant = await appPO.activationInstant('view.1');
     const navigationId = await appPO.getCurrentNavigationId();
 
     // Click tab of 'view.1'.
-    await viewPage.view.tab.click();
+    await view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toEqual(viewActivationInstant);
     await expect.poll(() => appPO.getCurrentNavigationId()).toEqual(navigationId);
 
     // Click tab of 'view.1' again.
-    await viewPage.view.tab.click();
+    await view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toEqual(viewActivationInstant);
     await expect.poll(() => appPO.getCurrentNavigationId()).toEqual(navigationId);
   });
 
@@ -166,19 +154,18 @@ test.describe('View Activation Instant', () => {
       .navigateView('view.1', ['test-view']),
     );
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
-
     // Focus 'view.1'.
-    await viewPage.view.tab.click();
+    const view = appPO.view({viewId: 'view.1'});
+    await view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
     // Capture activation instant.
-    const viewActivationInstant = await viewPage.getActivationInstant();
+    const viewActivationInstant = await appPO.activationInstant('view.1');
 
     // Click title of part bar.
     await appPO.part({partId: 'part.main'}).bar.title.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toEqual(viewActivationInstant);
   });
 
   test('should not update activation instant of active and focused view when clicking part bar', async ({appPO, workbenchNavigator}) => {
@@ -190,19 +177,18 @@ test.describe('View Activation Instant', () => {
       .navigateView('view.1', ['test-view']),
     );
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
-
     // Focus 'view.1'.
-    await viewPage.view.tab.click();
+    const view = appPO.view({viewId: 'view.1'});
+    await view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
     // Capture activation instant.
-    const viewActivationInstant = await viewPage.getActivationInstant();
+    const viewActivationInstant = await appPO.activationInstant('view.1');
 
     // Click part bar.
     await appPO.part({partId: 'part.main'}).bar.filler.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toEqual(viewActivationInstant);
   });
 
   test('should not update activation instant of active and focused view when clicking its content', async ({appPO, workbenchNavigator}) => {
@@ -214,19 +200,18 @@ test.describe('View Activation Instant', () => {
       .navigateView('view.1', ['test-view']),
     );
 
-    const viewPage = new ViewPagePO(appPO, {viewId: 'view.1'});
-
     // Focus 'view.1'.
-    await viewPage.view.tab.click();
+    const view = appPO.view({viewId: 'view.1'});
+    await view.tab.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
 
     // Capture activation instant.
-    const viewActivationInstant = await viewPage.getActivationInstant();
+    const viewActivationInstant = await appPO.activationInstant('view.1');
 
     // Click content of 'view.1'.
-    await viewPage.view.locator.click();
+    await view.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('view.1');
-    await expect.poll(() => viewPage.getActivationInstant()).toEqual(viewActivationInstant);
+    await expect.poll(() => appPO.activationInstant('view.1')).toEqual(viewActivationInstant);
   });
 
   test('should not set activation instant on views of the initial perspective layout (explicit activation)', async ({appPO, workbenchNavigator}) => {

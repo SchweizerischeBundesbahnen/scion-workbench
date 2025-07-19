@@ -24,10 +24,6 @@
   <sci-form-field label="Instantiation ID" title="Unique identifier of this component instance">
     <span class="e2e-component-instance-id">{{uuid}}</span>
   </sci-form-field>
-
-  <sci-form-field label="Activation Instant">
-    <span class="e2e-activation-instant">{{activationInstant()}}</span>
-  </sci-form-field>
 </section>
 
 @if (route.params | async | appNullIfEmpty; as params) {

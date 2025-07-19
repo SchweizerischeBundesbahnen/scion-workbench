@@ -3218,10 +3218,15 @@ describe('WorkbenchLayout', () => {
       .activatePart('part.left')
       .activatePart('part.right')
       .activateView('view.1')
-      .activateView('view.2');
+      .activateView('view.2')
+      .clearActivationInstants();
+
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeFalse();
+    expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.2'}).activationInstant!)).toBeFalse();
 
     layout = layout.activateView('view.1');
-
     expect(layout.isLatestActivationInstant(layout.part({partId: 'part.left'}).activationInstant!)).toBeFalse();
     expect(layout.isLatestActivationInstant(layout.part({partId: 'part.right'}).activationInstant!)).toBeFalse();
     expect(layout.isLatestActivationInstant(layout.view({viewId: 'view.1'}).activationInstant!)).toBeTrue();

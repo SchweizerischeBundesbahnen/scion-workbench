@@ -660,7 +660,7 @@ export class ɵWorkbenchLayout implements WorkbenchLayout {
    * Checks if the provided activation instant is the most recent activation instant for any view or part.
    */
   public isLatestActivationInstant(activationInstant: number): boolean {
-    return !this.parts().some(part => (part.activationInstant ?? 0) > activationInstant) && !this.views().some(view => (view.activationInstant ?? 0) > activationInstant);
+    return activationInstant > 0 && !this.parts().some(part => (part.activationInstant ?? 0) > activationInstant) && !this.views().some(view => (view.activationInstant ?? 0) > activationInstant);
   }
 
   /** @inheritDoc */

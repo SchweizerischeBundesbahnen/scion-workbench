@@ -10,7 +10,6 @@
 
 import {expect} from '@playwright/test';
 import {test} from '../fixtures';
-import {PartPagePO} from './page-object/part-page.po';
 
 test.describe('Part Activation Instant', () => {
 
@@ -25,8 +24,8 @@ test.describe('Part Activation Instant', () => {
       .activatePart('part.left'),
     );
 
-    const leftPartPage = new PartPagePO(appPO, {partId: 'part.left'});
-    const rightPartPage = new PartPagePO(appPO, {partId: 'part.right'});
+    const leftPart = appPO.part({partId: 'part.left'});
+    const rightPart = appPO.part({partId: 'part.right'});
 
     // Capture activation instants.
     const leftPartActivationInstant = await appPO.activationInstant('part.left', {orElse: 0});
@@ -34,15 +33,15 @@ test.describe('Part Activation Instant', () => {
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.left');
 
     // Click part.right.
-    await rightPartPage.locator.click();
+    await rightPart.slot.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.right');
-    await expect.poll(() => rightPartPage.getActivationInstant()).toBeGreaterThan(rightPartActivationInstant);
+    await expect.poll(() => appPO.activationInstant('part.right')).toBeGreaterThan(rightPartActivationInstant);
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.right');
 
     // Click part.left.
-    await leftPartPage.locator.click();
+    await leftPart.slot.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.left');
-    await expect.poll(() => leftPartPage.getActivationInstant()).toBeGreaterThan(leftPartActivationInstant);
+    await expect.poll(() => appPO.activationInstant('part.left')).toBeGreaterThan(leftPartActivationInstant);
     await expect.poll(() => appPO.activePartId({grid: 'main'})).toEqual('part.left');
   });
 
@@ -57,8 +56,8 @@ test.describe('Part Activation Instant', () => {
       .activatePart('part.activity'),
     );
 
-    const mainPartPage = new PartPagePO(appPO, {partId: 'part.main'});
-    const activityPartPage = new PartPagePO(appPO, {partId: 'part.activity'});
+    const mainPart = appPO.part({partId: 'part.main'});
+    const activityPart = appPO.part({partId: 'part.activity'});
 
     // Capture activation instants.
     const mainPartActivationInstant = await appPO.activationInstant('part.main', {orElse: 0});
@@ -66,14 +65,14 @@ test.describe('Part Activation Instant', () => {
     await expect.poll(() => appPO.focusOwner()).toBeNull();
 
     // Click part.main.
-    await mainPartPage.locator.click();
+    await mainPart.slot.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
-    await expect.poll(() => mainPartPage.getActivationInstant()).toBeGreaterThan(mainPartActivationInstant);
+    await expect.poll(() => appPO.activationInstant('part.main')).toBeGreaterThan(mainPartActivationInstant);
 
     // Click part.activity.
-    await activityPartPage.locator.click();
+    await activityPart.slot.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.activity');
-    await expect.poll(() => activityPartPage.getActivationInstant()).toBeGreaterThan(activityPartActivationInstant);
+    await expect.poll(() => appPO.activationInstant('part.activity')).toBeGreaterThan(activityPartActivationInstant);
   });
 
   test('should not update activation instant of active and focused part when clicking it', async ({appPO, workbenchNavigator}) => {
@@ -85,9 +84,9 @@ test.describe('Part Activation Instant', () => {
       .activatePart('part.main'),
     );
 
-    const partPage = new PartPagePO(appPO, {partId: 'part.main'});
+    const mainPart = appPO.part({partId: 'part.main'});
 
-    // Focus 'part.main'.
+    // Focus part.main.
     await appPO.part({partId: 'part.main'}).bar.filler.click();
 
     // PRECONDITION: Expect 'part.main' to be active and focused.
@@ -95,13 +94,13 @@ test.describe('Part Activation Instant', () => {
     await expect(appPO.part({partId: 'part.main'}).slot.viewport).toContainFocus();
 
     // Capture activation instant.
-    const partActivationInstant = await partPage.getActivationInstant();
+    const mainPartActivationInstant = await appPO.activationInstant('part.main');
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
 
     // Click part.
-    await partPage.locator.click();
+    await mainPart.slot.locator.click();
     await expect.poll(() => appPO.focusOwner()).toEqual('part.main');
-    await expect.poll(() => partPage.getActivationInstant()).toEqual(partActivationInstant);
+    await expect.poll(() => appPO.activationInstant('part.main')).toEqual(mainPartActivationInstant);
   });
 
   test('should not update activation instant of part when switching view tabs', async ({appPO, workbenchNavigator}) => {
