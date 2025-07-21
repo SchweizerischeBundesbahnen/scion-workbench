@@ -20,9 +20,6 @@ import {GridComponent} from '../../layout/grid/grid.component';
 import {dasherize} from '../../common/dasherize.util';
 import {WorkbenchPortalOutletDirective} from '../../portal/workbench-portal-outlet.directive';
 import {WorkbenchDesktop} from '../../desktop/workbench-desktop.model';
-import {RouterOutlet} from '@angular/router';
-import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
-import {SciViewportComponent} from '@scion/components/viewport';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -53,9 +50,6 @@ import {SciViewportComponent} from '@scion/components/viewport';
     GridComponent,
     ViewDropZoneDirective,
     WorkbenchPortalOutletDirective,
-    RouterOutlet,
-    RouterOutletRootContextDirective,
-    SciViewportComponent,
   ],
   host: {
     '[attr.data-grid]': 'dasherize(part.gridName())',

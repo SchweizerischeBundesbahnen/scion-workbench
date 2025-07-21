@@ -20,9 +20,7 @@
        (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
        class="desktop e2e-part-content e2e-content">
     @if (part.navigation()) {
-      <sci-viewport>
-        <router-outlet [name]="part.id" wbRouterOutletRootContext/>
-      </sci-viewport>
+      <ng-container *wbPortalOutlet="part.slot.portal; destroyOnDetach: false"/>
     } @else {
       <ng-container *wbPortalOutlet="desktop.slot.portal; destroyOnDetach: false"/>
     }
