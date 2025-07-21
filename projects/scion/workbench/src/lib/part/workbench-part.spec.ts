@@ -1103,5 +1103,131 @@ describe('WorkbenchPart', () => {
       // Expect scroll position to be restored.
       expect(viewportPartRight.scrollTop).toBe(scrollTop);
     });
+
+    it('should retain scroll position of navigated main area part when changing the layout', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart(MAIN_AREA)
+              .navigatePart(MAIN_AREA, ['path/to/part']),
+          }),
+          provideRouter([
+            {path: 'path/to/part', loadComponent: () => TestPartComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-part',
+        template: '<div style="height: 2000px">Content</div>',
+      })
+      class TestPartComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      const mainAreaPart = TestBed.inject(ɵWorkbenchService).getPart(MAIN_AREA)!;
+      const mainAreaViewport = mainAreaPart.getComponent<TestPartComponent>()!.viewport;
+
+      // Scroll main area to the bottom.
+      mainAreaViewport.scrollTop = 2000;
+      const scrollTop = mainAreaViewport.scrollTop;
+
+      // Expect main area to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Change layout by adding a part to the left.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+        .addPart('part.left', {align: 'left'})
+        .navigatePart('part.left', ['path/to/part']),
+      );
+      await waitUntilStable();
+
+      // Assert layout.
+      expect(fixture).toEqualWorkbenchLayout({
+        grids: {
+          main: {
+            root: new MTreeNode({
+              child1: new MPart({id: 'part.left'}),
+              child2: new MPart({id: MAIN_AREA}),
+              direction: 'row',
+              ratio: .5,
+            }),
+            activePartId: MAIN_AREA,
+          },
+        },
+      });
+
+      // Expect scroll position to be restored.
+      expect(mainAreaViewport.scrollTop).toBe(scrollTop);
+    });
+
+    it('should retain scroll position of navigated main area part if not displayed', async () => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideWorkbenchForTest({
+            layout: factory => factory
+              .addPart(MAIN_AREA)
+              .navigatePart(MAIN_AREA, ['path/to/part']),
+            mainAreaInitialPartId: 'part.initial',
+          }),
+          provideRouter([
+            {path: 'path/to/part', loadComponent: () => TestPartComponent},
+          ]),
+        ],
+      });
+
+      @Component({
+        selector: 'spec-part',
+        template: '<div style="height: 2000px">Content</div>',
+      })
+      class TestPartComponent {
+        public viewport = inject(SciViewportComponent);
+      }
+
+      const fixture = styleFixture(TestBed.createComponent(WorkbenchComponent));
+      await waitUntilWorkbenchStarted();
+
+      const mainAreaPart = TestBed.inject(ɵWorkbenchService).getPart(MAIN_AREA)!;
+      const mainAreaViewport = mainAreaPart.getComponent<TestPartComponent>()!.viewport;
+
+      // Scroll main area to the bottom.
+      mainAreaViewport.scrollTop = 2000;
+      const scrollTop = mainAreaViewport.scrollTop;
+
+      // Expect main area to be scrolled.
+      expect(scrollTop).toBeGreaterThan(0);
+
+      // Open view in main area.
+      await TestBed.inject(WorkbenchRouter).navigate(layout => layout
+        .addView('view.1', {partId: 'part.initial'})
+        .activateView('view.1'),
+      );
+      await waitUntilStable();
+
+      // Assert layout.
+      expect(fixture).toEqualWorkbenchLayout({
+        grids: {
+          main: {
+            root: new MPart({id: MAIN_AREA}),
+            activePartId: MAIN_AREA,
+          },
+          mainArea: {
+            root: new MPart({id: 'part.initial', views: [{id: 'view.1'}], activeViewId: 'view.1'}),
+            activePartId: 'part.initial',
+          },
+        },
+      });
+      expect(mainAreaViewport.scrollTop).toBe(0);
+
+      // Close view.
+      await TestBed.inject(WORKBENCH_VIEW_REGISTRY).get('view.1').close();
+
+      // Expect scroll position to be restored.
+      expect(mainAreaViewport.scrollTop).toBe(scrollTop);
+    });
   });
 });

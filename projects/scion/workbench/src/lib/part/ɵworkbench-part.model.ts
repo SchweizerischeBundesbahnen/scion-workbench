@@ -26,7 +26,7 @@ import {WorkbenchRouteData} from '../routing/workbench-route-data';
 import {MPart, MTreeNode, WorkbenchGrids} from '../layout/workbench-grid.model';
 import {MActivity} from '../activity/workbench-activity.model';
 import {WbComponentPortal} from '../portal/wb-component-portal';
-import {PartSlotComponent} from './part-content/part-slot.component';
+import {PartSlotComponent} from './part-slot/part-slot.component';
 import {MAIN_AREA} from '../layout/workbench-layout';
 import {MainAreaPartComponent} from './main-area-part/main-area-part.component';
 import {PartComponent} from './part.component';

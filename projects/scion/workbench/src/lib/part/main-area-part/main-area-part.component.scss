@@ -7,13 +7,8 @@
   }
 
   > div.desktop {
-    flex: 1 1 0;
+    flex: auto;
     display: grid;
-    overflow: hidden;
     position: relative; // positioning context for slot content
-
-    > sci-viewport > router-outlet {
-      position: absolute; // out of document flow
-    }
   }
 }

@@ -655,6 +655,74 @@ test.describe('Workbench Part', () => {
     await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
   });
 
+  test('should detach navigated main area part on layout change', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false});
+
+    // Create layout with a main area.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .navigatePart(MAIN_AREA, ['test-part']),
+    );
+
+    const part = appPO.part({partId: MAIN_AREA});
+    const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+
+    // Expect main area part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const componentInstanceId = await partPage.getComponentInstanceId();
+
+    // Add part to the left, forcing detaching the main area part during re-layout.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addPart('part.left', {align: 'left'})
+      .navigatePart('part.left', ['test-part']),
+    );
+
+    // Expect main area part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Expect the component not to be constructed anew.
+    await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
+  });
+
+  test('should detach navigated main area part if not displayed', async ({appPO, workbenchNavigator}) => {
+    await appPO.navigateTo({microfrontendSupport: false, mainAreaInitialPartId: 'part.initial'});
+
+    // Create layout with a main area.
+    await workbenchNavigator.createPerspective(factory => factory
+      .addPart(MAIN_AREA)
+      .navigatePart(MAIN_AREA, ['test-part']),
+    );
+
+    const part = appPO.part({partId: MAIN_AREA});
+    const partPage = new PartPagePO(appPO, {partId: MAIN_AREA});
+
+    // Expect main area part to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Capture component instance id.
+    const componentInstanceId = await partPage.getComponentInstanceId();
+
+    // Open view in main area.
+    await workbenchNavigator.modifyLayout(layout => layout
+      .addView('view.1', {partId: 'part.initial'})
+      .navigateView('view.1', ['path/to/view']),
+    );
+
+    // Expect main area content not to display.
+    await expectPart(part).not.toDisplayComponent();
+
+    // Close the view.
+    await appPO.view({viewId: 'view.1'}).tab.close();
+
+    // Expect main area content to display.
+    await expectPart(part).toDisplayComponent(PartPagePO.selector);
+
+    // Expect the component not to be constructed anew.
+    await expect.poll(() => partPage.getComponentInstanceId()).toEqual(componentInstanceId);
+  });
+
   test('should detach part in activity if the main area is maximized', async ({appPO, workbenchNavigator}) => {
     await appPO.navigateTo({microfrontendSupport: false});
 
