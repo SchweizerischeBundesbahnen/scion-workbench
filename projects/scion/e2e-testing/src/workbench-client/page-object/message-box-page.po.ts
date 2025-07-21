@@ -33,7 +33,7 @@ export class MessageBoxPagePO implements MicrofrontendMessageBoxPagePO {
     this.locator = this.outlet.frameLocator.locator('app-message-box-page');
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('input.e2e-component-instance-id').innerText();
   }
 

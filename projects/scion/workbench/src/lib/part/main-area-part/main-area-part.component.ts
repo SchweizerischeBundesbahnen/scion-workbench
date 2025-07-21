@@ -13,17 +13,16 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
-import {RouterOutlet} from '@angular/router';
-import {SciViewportComponent} from '@scion/components/viewport';
 import {WORKBENCH_ID} from '../../workbench-id';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
-import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
-import {Logger} from '../../logging';
 import {MAIN_AREA} from '../../layout/workbench-layout';
-import {DESKTOP} from '../../workbench-element-references';
-import {NgTemplateOutlet} from '@angular/common';
 import {GridComponent} from '../../layout/grid/grid.component';
 import {dasherize} from '../../common/dasherize.util';
+import {WorkbenchPortalOutletDirective} from '../../portal/workbench-portal-outlet.directive';
+import {WorkbenchDesktop} from '../../desktop/workbench-desktop.model';
+import {RouterOutlet} from '@angular/router';
+import {RouterOutletRootContextDirective} from '../../routing/router-outlet-root-context.directive';
+import {SciViewportComponent} from '@scion/components/viewport';
 
 /**
  * Renders the layout of the {@link MAIN_AREA} part.
@@ -53,10 +52,10 @@ import {dasherize} from '../../common/dasherize.util';
   imports: [
     GridComponent,
     ViewDropZoneDirective,
+    WorkbenchPortalOutletDirective,
     RouterOutlet,
     RouterOutletRootContextDirective,
     SciViewportComponent,
-    NgTemplateOutlet,
   ],
   host: {
     '[attr.data-grid]': 'dasherize(part.gridName())',
@@ -68,11 +67,10 @@ export class MainAreaPartComponent {
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _layout = inject(WorkbenchLayoutService).layout;
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _logger = inject(Logger);
 
   protected readonly part = inject(ɵWorkbenchPart);
   protected readonly mainAreaGrid = computed(() => this._layout().grids.mainArea);
-  protected readonly desktop = inject(DESKTOP);
+  protected readonly desktop = inject(WorkbenchDesktop);
   protected readonly dasherize = dasherize;
   protected readonly canDrop = inject(ViewDragService).canDrop(computed(() => this._layout().grids.mainArea));
 
@@ -93,63 +91,5 @@ export class MainAreaPartComponent {
       }),
       dragData: event.dragData,
     });
-  }
-
-  protected onLegacyStartPageActivate(): void {
-    this._logger.warn('[Deprecation] The configuration for displaying a start page in the workbench has changed. The main area must now be navigated. Previously, no navigation was required and the component associated with the empty-path route was used as the start page. Legacy support will be removed in version 21.', `
-
-      // Example for navigating the main area:
-      
-      import {bootstrapApplication} from '@angular/platform-browser';
-      import {provideRouter} from '@angular/router';
-      import {MAIN_AREA, provideWorkbench} from '@scion/workbench';
-      
-      bootstrapApplication(AppComponent, {
-        providers: [
-          provideWorkbench({
-            layout: factory => factory
-              .addPart(MAIN_AREA)
-              .navigatePart(MAIN_AREA, ['path/to/desktop'])
-          }),
-          provideRouter([
-            {
-              path: 'path/to/desktop',
-              component: DesktopComponent,
-            }
-          ])
-        ]
-      });
-
-      // Example for navigating the main area to the empty-path route:
-      
-      import {bootstrapApplication} from '@angular/platform-browser';
-      import {provideRouter} from '@angular/router';
-      import {canMatchWorkbenchPart, MAIN_AREA, provideWorkbench} from '@scion/workbench';
-      
-      bootstrapApplication(AppComponent, {
-        providers: [
-          provideWorkbench({
-            layout: factory => factory
-              .addPart(MAIN_AREA)
-              .navigatePart(MAIN_AREA, [], {hint: 'desktop'}) // pass hint to match a specific empty-path route
-          }),
-          provideRouter([
-            {
-              path: '',
-              component: DesktopComponent,
-              canMatch: [canMatchWorkbenchPart('desktop')] // only match if navigating with the specified hint
-            }
-          ])
-        ],
-      });
-
-      Alternatively, or for layouts without a main area, provide a desktop using an '<ng-template>' with the 'wbDesktop' directive. The template content is used as the desktop content.
-
-      <wb-workbench>
-        <ng-template wbDesktop>
-          Welcome
-        </ng-template>
-      </wb-workbench>
-    `);
   }
 }

@@ -18,10 +18,9 @@
     flex: auto;
     display: grid;
 
-    sci-viewport.desktop {
-      > router-outlet {
-        position: absolute;
-      }
+    div.desktop {
+      display: grid;
+      position: relative; // positioning context for slot content
     }
 
     sci-sashbox {

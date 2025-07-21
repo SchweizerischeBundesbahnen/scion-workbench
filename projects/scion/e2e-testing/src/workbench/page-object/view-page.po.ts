@@ -34,7 +34,7 @@ export class ViewPagePO implements WorkbenchViewPagePO {
     this.viewId = this.locator.locator('span.e2e-view-id');
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 

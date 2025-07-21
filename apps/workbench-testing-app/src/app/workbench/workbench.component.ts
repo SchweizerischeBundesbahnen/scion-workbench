@@ -17,6 +17,8 @@ import {SciMaterialIconDirective} from '@scion/components.internal/material-icon
 import {ViewMoveDialogTestPageComponent} from '../test-pages/view-move-dialog-test-page/view-move-dialog-test-page.component';
 import {ViewInfoDialogComponent} from '../view-info-dialog/view-info-dialog.component';
 import StartPageComponent from '../start-page/start-page.component';
+import {WorkbenchStartupQueryParams} from './workbench-startup-query-params';
+import {DesktopPageComponent} from '../desktop/desktop-page.component';
 
 @Component({
   selector: 'app-workbench',
@@ -30,17 +32,16 @@ import StartPageComponent from '../start-page/start-page.component';
     WorkbenchViewMenuItemDirective,
     WorkbenchDesktopDirective,
     StartPageComponent,
+    DesktopPageComponent,
   ],
 })
 export class WorkbenchComponent implements OnDestroy {
 
-  private readonly _wbRouter = inject(WorkbenchRouter);
+  private readonly _workbenchRouter = inject(WorkbenchRouter);
   private readonly _dialogService = inject(WorkbenchDialogService);
 
   protected readonly workbenchService = inject(WorkbenchService);
-
-  /** @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support. */
-  protected useLegacyStartPage = this.readQueryParamFlag('useLegacyStartPage');
+  protected readonly desktop = this.readQueryParamFlag<'legacyStartPage' | 'desktop-page'>(WorkbenchStartupQueryParams.DESKTOP);
 
   constructor() {
     console.debug('[WorkbenchComponent#construct]');
@@ -73,10 +74,10 @@ export class WorkbenchComponent implements OnDestroy {
    * If enabled, installs the handler to automatically open the start view when the user closes the last view.
    */
   private installStickyViewTab(): void {
-    const stickyViewTab = this.readQueryParamFlag('stickyViewTab');
+    const stickyViewTab = this.readQueryParamFlag('stickyViewTab', {transform: booleanAttribute});
     effect(() => {
       if (stickyViewTab() && !this.workbenchService.views().length) {
-        untracked(() => void this._wbRouter.navigate(['/start-page']));
+        untracked(() => void this._workbenchRouter.navigate(['/start-page']));
       }
     });
   }
@@ -84,9 +85,11 @@ export class WorkbenchComponent implements OnDestroy {
   /**
    * Reads specified flag from query parameters.
    */
-  private readQueryParamFlag(param: string): Signal<boolean> {
+  private readQueryParamFlag<T = string>(param: string): Signal<T | null>;
+  private readQueryParamFlag<T>(param: string, options: {transform: (value: string | null) => T}): Signal<T>;
+  private readQueryParamFlag<T>(param: string, options?: {transform: (value: string | null) => T}): Signal<T | string | null> {
     const route = inject(ActivatedRoute);
-    const flag$ = route.queryParamMap.pipe(map(params => booleanAttribute(params.get(param))));
+    const flag$ = route.queryParamMap.pipe(map(params => options ? options.transform(params.get(param)) : params.get(param)));
     return toSignal(flag$, {requireSync: true});
   }
 

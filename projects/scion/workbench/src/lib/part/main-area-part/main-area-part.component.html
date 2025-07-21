@@ -11,20 +11,20 @@
            [attr.data-grid]="'main-area'"
            class="e2e-content"/>
 } @else {
-  <sci-viewport class="desktop e2e-part-content e2e-content"
-                wbViewDropZone
-                [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
-                [wbViewDropZoneAttributes]="{
-                  'data-desktop': '',
-                  'data-partid': part.id,
-                }"
-                (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
+  <div wbViewDropZone
+       [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
+       [wbViewDropZoneAttributes]="{
+         'data-desktop': '',
+         'data-partid': part.id,
+       }"
+       (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
+       class="desktop e2e-part-content e2e-content">
     @if (part.navigation()) {
-      <router-outlet [name]="part.id" wbRouterOutletRootContext/>
-    } @else if (desktop()) {
-      <ng-container *ngTemplateOutlet="desktop()!"/>
+      <sci-viewport>
+        <router-outlet [name]="part.id" wbRouterOutletRootContext/>
+      </sci-viewport>
     } @else {
-      <router-outlet (activate)="onLegacyStartPageActivate()"/>
+      <ng-container *wbPortalOutlet="desktop.slot.portal; destroyOnDetach: false"/>
     }
-  </sci-viewport>
+  </div>
 }

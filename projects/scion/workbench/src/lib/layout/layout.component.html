@@ -213,16 +213,12 @@
              }"
              [attr.data-grid]="'main'"/>
   } @else {
-    <sci-viewport class="desktop e2e-desktop"
-                  wbViewDropZone
-                  [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
-                  [wbViewDropZoneAttributes]="{'data-desktop': ''}"
-                  (wbViewDropZoneDrop)="onDesktopViewDrop($event)">
-      @if (desktop()) {
-        <ng-container *ngTemplateOutlet="desktop()!"/>
-      } @else {
-        <router-outlet (activate)="onLegacyStartPageActivate()"/>
-      }
-    </sci-viewport>
+    <div wbViewDropZone
+         [wbViewDropZoneRegions]="canDrop() && {center: true, north: false, south: false, west: false, east: false}"
+         [wbViewDropZoneAttributes]="{'data-desktop': ''}"
+         (wbViewDropZoneDrop)="onDesktopViewDrop($event)"
+         class="desktop">
+      <ng-container *wbPortalOutlet="desktop.slot.portal; destroyOnDetach: false"/>
+    </div>
   }
 </ng-template>
