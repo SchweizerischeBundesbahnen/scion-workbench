@@ -1,0 +1,8 @@
+<sci-viewport>
+  @let template = desktop.template();
+  @if (template) {
+    <ng-container *ngTemplateOutlet="template"/>
+  } @else {
+    <router-outlet (activate)="onLegacyDesktopActivate()"/>
+  }
+</sci-viewport>

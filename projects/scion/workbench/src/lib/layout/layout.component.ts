@@ -18,16 +18,14 @@ import {ɵWorkbenchRouter} from '../routing/ɵworkbench-router.service';
 import {ɵWorkbenchLayout} from './ɵworkbench-layout';
 import {NgTemplateOutlet} from '@angular/common';
 import {WorkbenchService} from '../workbench.service';
-import {RouterOutlet} from '@angular/router';
-import {SciViewportComponent} from '@scion/components/viewport';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
-import {DESKTOP} from '../workbench-element-references';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {Logger} from '../logging';
 import {WORKBENCH_ID} from '../workbench-id';
 import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.service';
 import {MAIN_AREA} from './workbench-layout';
+import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';
+import {WorkbenchDesktop} from '../desktop/workbench-desktop.model';
 
 @Component({
   selector: 'wb-layout',
@@ -40,9 +38,8 @@ import {MAIN_AREA} from './workbench-layout';
     ActivityPanelComponent,
     GridComponent,
     NgTemplateOutlet,
-    RouterOutlet,
-    SciViewportComponent,
     ViewDropZoneDirective,
+    WorkbenchPortalOutletDirective,
   ],
   host: {
     '[@.disabled]': 'perspectiveService.switchingPerspective() || perspectiveService.resettingPerspective()',
@@ -56,10 +53,9 @@ export class LayoutComponent {
   private readonly _workbenchRouter = inject(ɵWorkbenchRouter);
   private readonly _workbenchId = inject(WORKBENCH_ID);
   private readonly _viewDragService = inject(ViewDragService);
-  private readonly _logger = inject(Logger);
   private readonly _panels = computed(() => this.layout().activityLayout.panels);
 
-  protected readonly desktop = inject(DESKTOP);
+  protected readonly desktop = inject(WorkbenchDesktop);
   protected readonly toolbars = computed(() => this.layout().activityLayout.toolbars);
 
   protected readonly leftActivityPanel = computed(() => this.toolbars().leftTop.activeActivityId || this.toolbars().leftBottom.activeActivityId ? this._panels().left : null);
@@ -122,18 +118,5 @@ export class LayoutComponent {
       }),
       dragData: event.dragData,
     });
-  }
-
-  protected onLegacyStartPageActivate(): void {
-    this._logger.warn('[Deprecation] The configuration for displaying a start page in the workbench has changed. Provide a desktop using an `<ng-template>` with the `wbDesktop` directive. The template content is used as the desktop content. Previously, the component associated with the empty-path route was used as the start page. Legacy support will be removed in version 21.', `
-    
-    Example:
-    <wb-workbench>
-      <ng-template wbDesktop>
-        Welcome
-      </ng-template>
-    </wb-workbench>
-    `,
-    );
   }
 }

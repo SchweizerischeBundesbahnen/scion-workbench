@@ -41,7 +41,7 @@ export class DialogPagePO implements MicrofrontendDialogPagePO {
     await this.locator.locator('input.e2e-title').fill(title);
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('input.e2e-component-instance-id').innerText();
   }
 

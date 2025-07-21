@@ -37,7 +37,7 @@ export class PopupPagePO implements MicrofrontendPopupPagePO {
     this._hasFocusLocator = this.outlet.frameLocator.locator('app-root').locator('.e2e-has-focus');
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 

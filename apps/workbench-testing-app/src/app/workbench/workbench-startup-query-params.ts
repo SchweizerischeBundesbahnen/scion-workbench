@@ -76,11 +76,13 @@ export const WorkbenchStartupQueryParams = {
   MAIN_AREA_INITIAL_PART_ID: 'mainAreaInitialPartId',
 
   /**
-   * Query param to control if to use the legacy start page (via empty-path route) instead of the desktop.
+   * Query param to control which desktop component to display. Defaults to {@link StartPageComponent}.
    *
-   * @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support.
+   * Available desktops:
+   * - 'legacyStartPage': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
+   * - 'desktop-page': Displays the 'DesktopPageComponent'.
    */
-  USE_LEGACY_START_PAGE: 'useLegacyStartPage',
+  DESKTOP: 'desktop',
 
   /**
    * Reads the query param to bootstrap the app with a specific app config.

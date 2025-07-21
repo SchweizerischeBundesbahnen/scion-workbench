@@ -9,7 +9,7 @@
  */
 
 import {DestroyRef, Directive, inject, TemplateRef} from '@angular/core';
-import {DESKTOP} from '../workbench-element-references';
+import {WorkbenchDesktop} from './workbench-desktop.model';
 
 /**
  * Directive to add a desktop to the workbench.
@@ -47,15 +47,15 @@ export class WorkbenchDesktopDirective {
 
   constructor() {
     const template = inject(TemplateRef) as TemplateRef<void>;
-    const desktop = inject(DESKTOP);
+    const desktop = inject(WorkbenchDesktop);
 
-    // Register the desktop.
-    desktop.set(template);
+    // Register the desktop template.
+    desktop.template.set(template);
 
-    // Unregister the desktop when destroyed, but only if no other desktop has been registered in the meantime.
+    // Unregister the desktop template when destroyed, but only if no other template has been registered in the meantime.
     inject(DestroyRef).onDestroy(() => {
-      if (desktop() === template) {
-        desktop.set(undefined);
+      if (desktop.template() === template) {
+        desktop.template.set(undefined);
       }
     });
   }

@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {InjectionToken, signal, TemplateRef, ViewContainerRef, WritableSignal} from '@angular/core';
+import {InjectionToken, signal, ViewContainerRef, WritableSignal} from '@angular/core';
 
 /**
  * DI token to inject the DOM location where to attach iframes.
@@ -30,14 +30,6 @@ export const VIEW_DROP_ZONE_OVERLAY_HOST = new InjectionToken<WritableSignal<Vie
  * DI token to inject the DOM location of the {@link WorkbenchComponent} HTML element.
  */
 export const WORKBENCH_ELEMENT_REF = new InjectionToken<WritableSignal<ViewContainerRef | undefined>>('WORKBENCH_ELEMENT_REF', {
-  providedIn: 'root',
-  factory: () => signal(undefined),
-});
-
-/**
- * DI token to inject the template for the desktop, if any.
- */
-export const DESKTOP = new InjectionToken<WritableSignal<TemplateRef<void> | undefined>>('DESKTOP', {
   providedIn: 'root',
   factory: () => signal(undefined),
 });

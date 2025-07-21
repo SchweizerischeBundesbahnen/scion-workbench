@@ -29,7 +29,7 @@ export class PopupPagePO implements WorkbenchPopupPagePO {
     this.input = this.locator.locator('output.e2e-input');
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 

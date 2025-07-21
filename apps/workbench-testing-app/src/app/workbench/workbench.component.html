@@ -1,8 +1,18 @@
 <wb-workbench>
-  @if (!useLegacyStartPage()) {
-    <ng-template wbDesktop>
-      <app-start-page/>
-    </ng-template>
+  @switch (desktop()) {
+    @case ('legacyStartPage') {
+      <!-- No longer required with the removal of legacy start page support. -->
+    }
+    @case ('desktop-page') {
+      <ng-template wbDesktop>
+        <app-desktop-page/>
+      </ng-template>
+    }
+    @default {
+      <ng-template wbDesktop>
+        <app-start-page/>
+      </ng-template>
+    }
   }
 
   <ng-template wbPartAction [canMatch]="isNotPeripheralPart" align="start" cssClass="e2e-open-new-tab" let-part>

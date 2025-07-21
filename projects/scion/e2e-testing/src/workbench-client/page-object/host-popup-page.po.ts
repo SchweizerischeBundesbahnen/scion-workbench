@@ -33,7 +33,7 @@ export class HostPopupPagePO implements WorkbenchPopupPagePO {
     this.locator = this.popup.locator.locator('app-host-popup-page');
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 

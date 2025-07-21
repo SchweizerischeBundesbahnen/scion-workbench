@@ -42,11 +42,11 @@ export class ViewPagePO implements MicrofrontendViewPagePO {
     this.path = this.locator.locator('span.e2e-path');
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
-  public async getAppInstanceId(): Promise<string> {
+  public getAppInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-app-instance-id').innerText();
   }
 

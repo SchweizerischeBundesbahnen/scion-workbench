@@ -80,7 +80,7 @@ export class AppPO {
   constructor(public readonly page: Page) {
     this.header = new AppHeaderPO(this.page.locator('app-header'));
     this.workbenchRoot = this.page.locator('wb-workbench');
-    this.desktop = new DesktopPO(this.page);
+    this.desktop = new DesktopPO(this.page.locator('wb-desktop-slot'));
     this.notifications = this.page.locator('wb-notification');
     this.dialogs = this.page.locator('wb-dialog');
     this.dropPlaceholder = this.page.locator('div.e2e-drop-placeholder');
@@ -107,39 +107,39 @@ export class AppPO {
 
     this._workbenchStartupQueryParams = new URLSearchParams();
     if (options?.appConfig) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.APP_CONFIG_QUERY_PARAM, options.appConfig);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.APP_CONFIG_QUERY_PARAM, options.appConfig);
     }
     if (options?.launcher) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.LAUNCHER, options.launcher);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.LAUNCHER, options.launcher);
     }
     if (!(options?.microfrontendSupport ?? true)) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.STANDALONE, String(true));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.STANDALONE, String(true));
     }
     if (options?.confirmStartup) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.CONFIRM_STARTUP, String(true));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.CONFIRM_STARTUP, String(true));
     }
     if (options?.simulateSlowCapabilityLookup) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, String(true));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.SIMULATE_SLOW_CAPABILITY_LOOKUP, String(true));
     }
     if (options?.perspectives?.length) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.PERSPECTIVES, options.perspectives.join(';'));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.PERSPECTIVES, options.perspectives.join(';'));
     }
     if (options?.designTokens) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DESIGN_TOKENS, JSON.stringify(options.designTokens));
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.DESIGN_TOKENS, JSON.stringify(options.designTokens));
     }
     if (options?.dialogModalityScope) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options.dialogModalityScope);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.DIALOG_MODALITY_SCOPE, options.dialogModalityScope);
     }
     if (options?.mainAreaInitialPartId) {
-      this._workbenchStartupQueryParams.append(WorkenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
+      this._workbenchStartupQueryParams.append(WorkbenchStartupQueryParams.MAIN_AREA_INITIAL_PART_ID, options.mainAreaInitialPartId);
     }
 
     const featureQueryParams = new URLSearchParams();
     if (options?.stickyViewTab) {
       featureQueryParams.append('stickyViewTab', String(true));
     }
-    if (options?.useLegacyStartPage) {
-      featureQueryParams.append('useLegacyStartPage', String(true));
+    if (options?.desktop) {
+      featureQueryParams.append(WorkbenchStartupQueryParams.DESKTOP, options.desktop);
     }
 
     // Perform navigation.
@@ -548,11 +548,13 @@ export interface Options {
    */
   designTokens?: {[name: string]: string};
   /**
-   * Controls if to use the legacy start page (via empty-path route) instead of the desktop.
+   * Specifies the component to display as desktop. Defaults to `StartPageComponent`.
    *
-   * @deprecated since version 19.0.0-beta.2. No longer required with the removal of legacy start page support.
+   * Available desktops:
+   * - 'legacyStartPage': Displays the start page using a primary router-outlet. No longer required with the removal of legacy start page support.
+   * - 'desktop-page': Displays the 'DesktopPageComponent'.
    */
-  useLegacyStartPage?: boolean;
+  desktop?: 'legacyStartPage' | 'desktop-page';
   /**
    * Wait until the workbench completed startup.
    */
@@ -562,7 +564,7 @@ export interface Options {
 /**
  * Query params to instrument the workbench startup.
  */
-export enum WorkenchStartupQueryParams {
+export enum WorkbenchStartupQueryParams {
 
   /**
    * Query param to bootstrap the app with a specific app config.
@@ -611,6 +613,11 @@ export enum WorkenchStartupQueryParams {
    * Query param to set the scope for application-modal dialogs.
    */
   DIALOG_MODALITY_SCOPE = 'dialogModalityScope',
+
+  /**
+   * Specifies the component to display as desktop.
+   */
+  DESKTOP = 'desktop',
 
   /**
    * Query param to control the identity of the initial part in the main area.

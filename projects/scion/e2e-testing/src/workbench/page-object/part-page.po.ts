@@ -32,7 +32,7 @@ export class PartPagePO {
     this.locator = this.part.locator.locator(PartPagePO.selector);
   }
 
-  public async getComponentInstanceId(): Promise<string> {
+  public getComponentInstanceId(): Promise<string> {
     return this.locator.locator('span.e2e-component-instance-id').innerText();
   }
 
