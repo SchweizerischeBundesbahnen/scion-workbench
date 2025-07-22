@@ -11,7 +11,7 @@
 import {InjectionToken} from '@angular/core';
 import {ɵWorkbenchPart} from './ɵworkbench-part.model';
 import {WorkbenchObjectRegistry} from '../registry/workbench-object-registry';
-import {PartId} from './workbench-part.model';
+import {PartId} from '../workbench.identifiers';
 
 /**
  * Registry for {@link WorkbenchPart} model objects.

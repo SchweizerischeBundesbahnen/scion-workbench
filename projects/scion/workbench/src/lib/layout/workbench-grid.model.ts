@@ -9,10 +9,8 @@
  */
 
 import {assertType} from '../common/asserts.util';
-import {ViewId} from '../view/workbench-view.model';
 import {NavigationData} from '../routing/routing.model';
-import {PartId} from '../part/workbench-part.model';
-import {ActivityId} from '../activity/workbench-activity.model';
+import {ActivityId, PartId, ViewId} from '../workbench.identifiers';
 
 /**
  * Represents the arrangement of parts as grid.

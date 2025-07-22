@@ -18,6 +18,7 @@ import {WorkbenchView} from '../view/workbench-view.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {WorkbenchDialog} from '../dialog/workbench-dialog';
 import {Popup} from '../popup/popup.config';
+import {isDialogOutlet, isPartOutlet, isPopupOutlet, isViewOutlet} from '../workbench.identifiers';
 
 @Component({
   selector: 'wb-page-not-found',
@@ -33,7 +34,10 @@ export default class PageNotFoundComponent {
   private readonly _router = inject(Router);
 
   protected readonly isDevMode = isDevMode();
-  protected readonly Routing = Routing;
+  protected readonly isViewOutlet = isViewOutlet;
+  protected readonly isPartOutlet = isPartOutlet;
+  protected readonly isDialogOutlet = isDialogOutlet;
+  protected readonly isPopupOutlet = isPopupOutlet;
   protected readonly workbenchService = inject(WorkbenchService);
 
   protected readonly outlet = inject(WORKBENCH_OUTLET);
@@ -48,11 +52,10 @@ export default class PageNotFoundComponent {
 
     const urlTree = this._router.parseUrl(this._router.url);
     const outlets = Routing.parseOutlets(urlTree, {
-      view: Routing.isViewOutlet(this.outlet) || undefined,
-      part: Routing.isPartOutlet(this.outlet) || undefined,
-      dialog: Routing.isDialogOutlet(this.outlet) || undefined,
-      messagebox: Routing.isMessageBoxOutlet(this.outlet) || undefined,
-      popup: Routing.isPopupOutlet(this.outlet) || undefined,
+      view: isViewOutlet(this.outlet) || undefined,
+      part: isPartOutlet(this.outlet) || undefined,
+      dialog: isDialogOutlet(this.outlet) || undefined,
+      popup: isPopupOutlet(this.outlet) || undefined,
     });
     return outlets.get(this.outlet)?.map(segment => `${segment}`).join('/') ?? '';
   });

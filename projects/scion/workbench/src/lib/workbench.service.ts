@@ -10,12 +10,13 @@
 
 import {Disposable} from './common/disposable';
 import {WorkbenchPartActionFn, WorkbenchTheme, WorkbenchViewMenuItemFn} from './workbench.model';
-import {ViewId, WorkbenchView} from './view/workbench-view.model';
+import {WorkbenchView} from './view/workbench-view.model';
 import {WorkbenchPerspective, WorkbenchPerspectiveDefinition} from './perspective/workbench-perspective.model';
-import {PartId, WorkbenchPart} from './part/workbench-part.model';
+import {WorkbenchPart} from './part/workbench-part.model';
 import {Injectable, Signal, WritableSignal} from '@angular/core';
 import {ɵWorkbenchService} from './ɵworkbench.service';
 import {WorkbenchLayout} from './layout/workbench-layout';
+import {PartId, ViewId} from './workbench.identifiers';
 
 /**
  * The central class of the SCION Workbench.

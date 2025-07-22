@@ -10,6 +10,7 @@
 
 import {WorkbenchPopupCapability} from './workbench-popup-capability';
 import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
+import {PopupId} from '../workbench.identifiers';
 
 /**
  * Context when displaying a microfrontend in a popup.
@@ -20,7 +21,7 @@ import {WorkbenchPopupReferrer} from './workbench-popup-referrer';
  * @ignore
  */
 export interface ɵPopupContext {
-  popupId: string;
+  popupId: PopupId;
   params: Map<string, any>;
   capability: WorkbenchPopupCapability;
   closeOnFocusLost: boolean;

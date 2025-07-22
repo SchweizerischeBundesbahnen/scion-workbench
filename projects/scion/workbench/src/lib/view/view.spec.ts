@@ -13,7 +13,7 @@ import {booleanAttribute, Component, DebugElement, DestroyRef, Directive, effect
 import {ActivatedRoute, provideRouter} from '@angular/router';
 import {WORKBENCH_VIEW_REGISTRY} from './workbench-view.registry';
 import {WorkbenchRouter} from '../routing/workbench-router.service';
-import {ViewId, WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
+import {WorkbenchView, WorkbenchViewNavigation} from './workbench-view.model';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';
 import {expect} from '../testing/jasmine/matcher/custom-matchers.definition';
 import {styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../testing/testing.util';
@@ -42,7 +42,7 @@ import {NavigationData, NavigationState} from '../routing/routing.model';
 import {NullContentComponent} from '../null-content/null-content.component';
 import {SciViewportComponent} from '@scion/components/viewport';
 import {MPart, MTreeNode, toEqualWorkbenchLayoutCustomMatcher} from '../testing/jasmine/matcher/to-equal-workbench-layout.matcher';
-import {PartId} from '../part/workbench-part.model';
+import {PartId, ViewId} from '../workbench.identifiers';
 
 describe('View', () => {
 

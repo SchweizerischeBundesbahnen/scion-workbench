@@ -8,12 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {MPart, MPartGrid, MTreeNode, WorkbenchGrids} from './workbench-grid.model';
-import {ViewId} from '../view/workbench-view.model';
-import {ACTIVITY_ID_PREFIX, PART_ID_PREFIX, VIEW_ID_PREFIX} from '../workbench.constants';
-import {UID} from '../common/uid.util';
-import {PartId} from '../part/workbench-part.model';
-import {ActivityId} from '../activity/workbench-activity.model';
-import {isActivityId} from './ɵworkbench-layout';
+import {ActivityId, isActivityId} from '../workbench.identifiers';
 
 /**
  * Provides helper functions for operating on a workbench layout.
@@ -40,21 +35,6 @@ export const WorkbenchLayouts = {
   isGridEmpty: (grid: MPartGrid | undefined): boolean => {
     return !grid || (grid.root instanceof MPart && !grid.root.views.length && !grid.root.navigation && !grid.root.structural);
   },
-
-  /**
-   * Computes a unique view id.
-   */
-  computeViewId: (): ViewId => `${VIEW_ID_PREFIX}${UID.randomUID()}`,
-
-  /**
-   * Computes a unique part id.
-   */
-  computePartId: (): PartId => `${PART_ID_PREFIX}${UID.randomUID()}`,
-
-  /**
-   * Computes a unique activity id.
-   */
-  computeActivityId: (): ActivityId => `${ACTIVITY_ID_PREFIX}${UID.randomUID()}`,
 
   /**
    * Picks grids related to activities from the given grids, optionally filtering and/or transforming them.

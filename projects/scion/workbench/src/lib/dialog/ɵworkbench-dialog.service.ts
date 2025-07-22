@@ -19,7 +19,7 @@ import {filter} from 'rxjs/operators';
 import {ComponentType} from '@angular/cdk/portal';
 import {WorkbenchDialogService} from './workbench-dialog.service';
 import {provideViewContext} from '../view/view-context-provider';
-import {UUID} from '@scion/toolkit/uuid';
+import {computeDialogId} from '../workbench.identifiers';
 
 /** @inheritDoc */
 @Injectable({providedIn: 'root'})
@@ -74,7 +74,7 @@ export class ɵWorkbenchDialogService implements WorkbenchDialogService {
    */
   private createDialog<R>(component: ComponentType<unknown>, options: WorkbenchDialogOptions & {contextualView: ɵWorkbenchView | null}): ɵWorkbenchDialog<R> {
     // Construct the handle in an injection context that shares the dialog's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const dialogId = UUID.randomUUID();
+    const dialogId = computeDialogId();
     const dialogEnvironmentInjector = createEnvironmentInjector([provideViewContext(options.contextualView)], this._environmentInjector, `Workbench Dialog ${dialogId}`);
     return runInInjectionContext(dialogEnvironmentInjector, () => new ɵWorkbenchDialog<R>(dialogId, component, options));
   }

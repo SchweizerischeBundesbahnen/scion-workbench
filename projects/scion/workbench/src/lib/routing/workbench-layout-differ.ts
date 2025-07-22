@@ -10,8 +10,7 @@
 
 import {inject, Injectable, IterableChanges, IterableDiffer, IterableDiffers} from '@angular/core';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
-import {ViewId} from '../view/workbench-view.model';
-import {PartId} from '../part/workbench-part.model';
+import {PartId, ViewId} from '../workbench.identifiers';
 
 /**
  * Stateful differ for finding added/removed workbench layout elements.

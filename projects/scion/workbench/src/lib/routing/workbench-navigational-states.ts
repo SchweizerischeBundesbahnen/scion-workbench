@@ -10,7 +10,7 @@
 
 import {Navigation} from '@angular/router';
 import {NavigationStates} from './routing.model';
-import {ActivityId} from '../activity/workbench-activity.model';
+import {ActivityId} from '../workbench.identifiers';
 
 /**
  * Provides methods to associate {@link WorkbenchNavigationalState} with a navigation.

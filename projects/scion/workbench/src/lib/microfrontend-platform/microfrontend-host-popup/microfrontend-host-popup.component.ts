@@ -15,11 +15,8 @@ import {Commands} from '../../routing/routing.model';
 import {Router, RouterOutlet} from '@angular/router';
 import {Popup, ɵPopup} from '../../popup/popup.config';
 import {NgTemplateOutlet} from '@angular/common';
-import {Defined} from '@scion/toolkit/util';
-import {POPUP_ID_PREFIX} from '../../workbench.constants';
 import {Microfrontends} from '../common/microfrontend.util';
 import {ANGULAR_ROUTER_MUTEX} from '../../executor/single-task-executor';
-import {Objects} from '../../common/objects.util';
 
 /**
  * Displays the microfrontend of a popup capability provided by the host inside a workbench popup.
@@ -43,40 +40,36 @@ export class MicrofrontendHostPopupComponent {
   /** Mutex to serialize Angular Router navigation requests, preventing the cancellation of previously initiated asynchronous navigations. */
   private readonly _angularRouterMutex = inject(ANGULAR_ROUTER_MUTEX);
 
-  protected readonly outletName: string;
+  protected readonly popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
   protected readonly outletInjector: Injector;
 
   constructor() {
-    const popup = inject(ɵPopup) as ɵPopup<ɵPopupContext>;
-
-    const popupContext = popup.input!;
+    const popupContext = this.popup.input!;
     const capability = popupContext.capability;
-    const path = Defined.orElseThrow(capability.properties.path, () => Error(`[PopupProviderError] Missing required path for popup capability [application="${capability.metadata!.appSymbolicName}", capability=${Objects.toMatrixNotation(capability.qualifier)}]`));
     const params = popupContext.params;
-    this.outletName = POPUP_ID_PREFIX.concat(popup.id);
     this.outletInjector = Injector.create({
       parent: this._injector,
       providers: [provideWorkbenchPopupHandle(popupContext)],
     });
 
     // Perform navigation in the named router outlet.
-    void this.navigate(path, {outletName: this.outletName, params}).then(success => {
+    void this.navigate(capability.properties.path, {params}).then(success => {
       if (!success) {
-        popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
+        this.popup.close(Error('[PopupNavigateError] Navigation canceled, most likely by a route guard or a parallel navigation.'));
       }
     });
 
-    inject(DestroyRef).onDestroy(() => void this.navigate(null, {outletName: this.outletName})); // Remove the outlet from the URL
+    inject(DestroyRef).onDestroy(() => void this.navigate(null)); // Remove the outlet from the URL
   }
 
   /**
    * Performs navigation in the specified outlet, substituting path params if any. To clear navigation, pass `null` as the path.
    */
-  private navigate(path: string | null, extras: {outletName: string; params?: Map<string, any>}): Promise<boolean> {
-    path = Microfrontends.substituteNamedParameters(path, extras.params);
+  private navigate(path: string | null, extras?: {params?: Map<string, any>}): Promise<boolean> {
+    path = Microfrontends.substituteNamedParameters(path, extras?.params);
 
     const outletCommands: Commands | null = (path !== null ? runInInjectionContext(this._injector, () => Routing.pathToCommands(path)) : null);
-    const commands: Commands = [{outlets: {[extras.outletName]: outletCommands}}];
+    const commands: Commands = [{outlets: {[this.popup.id]: outletCommands}}];
     return this._angularRouterMutex.submit(() => this._router.navigate(commands, {skipLocationChange: true, queryParamsHandling: 'preserve'}));
   }
 }

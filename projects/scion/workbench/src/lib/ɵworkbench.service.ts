@@ -23,9 +23,8 @@ import {ɵWorkbenchPerspective} from './perspective/ɵworkbench-perspective.mode
 import {WORKBENCH_PERSPECTIVE_REGISTRY} from './perspective/workbench-perspective.registry';
 import {WORKBENCH_PART_ACTION_REGISTRY} from './part/workbench-part-action.registry';
 import {WorkbenchThemeSwitcher} from './theme/workbench-theme-switcher.service';
-import {ViewId} from './view/workbench-view.model';
+import {PartId, ViewId} from './workbench.identifiers';
 import {WorkbenchLayoutService} from './layout/workbench-layout.service';
-import {PartId} from './part/workbench-part.model';
 import {WORKBENCH_VIEW_MENU_ITEM_REGISTRY} from './view/workbench-view-menu-item.registry';
 
 @Injectable({providedIn: 'root'})

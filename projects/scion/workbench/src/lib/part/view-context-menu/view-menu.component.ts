@@ -14,7 +14,7 @@ import {WorkbenchMenuItem} from '../../workbench.model';
 import {ɵWorkbenchView} from '../../view/ɵworkbench-view.model';
 import {KeyValuePipe, NgClass} from '@angular/common';
 import {WbFormatAcceleratorPipe} from './accelerator-format.pipe';
-import {ViewId} from '../../view/workbench-view.model';
+import {ViewId} from '../../workbench.identifiers';
 import {Maps} from '@scion/toolkit/util';
 import {MenuItemComponent} from './menu-item/menu-item.component';
 

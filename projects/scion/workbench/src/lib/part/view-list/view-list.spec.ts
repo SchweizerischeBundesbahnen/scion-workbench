@@ -13,8 +13,7 @@ import {styleFixture, waitUntilWorkbenchStarted} from '../../testing/testing.uti
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {WorkbenchService} from '../../workbench.service';
-import {PartId} from '../workbench-part.model';
-import {ViewId} from '../../view/workbench-view.model';
+import {PartId, ViewId} from '../../workbench.identifiers';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {asyncScheduler, of} from 'rxjs';
 import {observeOn} from 'rxjs/operators';

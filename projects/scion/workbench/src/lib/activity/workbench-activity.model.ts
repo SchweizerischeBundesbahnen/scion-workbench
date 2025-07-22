@@ -8,17 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ACTIVITY_ID_PREFIX} from '../workbench.constants';
+import {ActivityId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
-
-/**
- * Format of an activity identifier.
- *
- * Each activity is assigned a unique identifier (e.g., `activity.9fdf7ab4`, `activity.c6485225`, etc.).
- *
- * @docs-private Not public API, intended for internal use only.
- */
-export type ActivityId = `${typeof ACTIVITY_ID_PREFIX}${string}`;
 
 /**
  * Defines the arrangement of docked parts (also referred to as activities) in the workbench.

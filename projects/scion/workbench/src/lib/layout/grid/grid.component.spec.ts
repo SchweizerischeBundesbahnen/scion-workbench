@@ -21,7 +21,7 @@ import {toHaveComponentStateCustomMatcher} from '../../testing/jasmine/matcher/t
 import {enterComponentState, TestComponent, withComponentContent, withComponentStateInputElement} from '../../testing/test.component';
 import {segments, styleFixture, waitUntilStable, waitUntilWorkbenchStarted} from '../../testing/testing.util';
 import {WORKBENCH_PART_REGISTRY} from '../../part/workbench-part.registry';
-import {WORKBENCH_ID} from '../../workbench-id';
+import {WORKBENCH_ID} from '../../workbench.identifiers';
 import {provideWorkbenchForTest} from '../../testing/workbench.provider';
 import {WorkbenchComponent} from '../../workbench.component';
 import {firstValueFrom, ReplaySubject, Subject} from 'rxjs';

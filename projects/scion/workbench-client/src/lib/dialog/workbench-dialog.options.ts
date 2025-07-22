@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ViewId} from '../view/workbench-view';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Configures the dialog to display a microfrontend in a workbench dialog using {@link WorkbenchDialogService}.

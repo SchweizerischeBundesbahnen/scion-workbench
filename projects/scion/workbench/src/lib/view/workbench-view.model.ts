@@ -13,7 +13,7 @@ import {CanCloseFn, CanCloseRef, WorkbenchMenuItem} from '../workbench.model';
 import {WorkbenchPart} from '../part/workbench-part.model';
 import {NavigationData, NavigationState} from '../routing/routing.model';
 import {Signal} from '@angular/core';
-import {ViewOutlet} from '../workbench.constants';
+import {ViewId} from '../workbench.identifiers';
 import {Translatable} from '../text/workbench-text-provider.model';
 
 /**
@@ -235,15 +235,6 @@ export abstract class WorkbenchView {
    */
   public abstract canClose(canClose: CanCloseFn): CanCloseRef;
 }
-
-/**
- * Format of a view identifier.
- *
- * Each view is assigned a unique identifier (e.g., `view.d4de99fb`, `view.cad347dd`, etc.).
- * A view can also have an alternative id, a meaningful but not necessarily unique name. A view can
- * be identified either by its unique or alternative id.
- */
-export type ViewId = ViewOutlet;
 
 /**
  * Provides navigation details of a workbench view.

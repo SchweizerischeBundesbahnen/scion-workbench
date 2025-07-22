@@ -20,7 +20,7 @@ import {distinctUntilChanged, map} from 'rxjs/operators';
 import {WORKBENCH_PART_REGISTRY} from '../workbench-part.registry';
 import {IconComponent} from '../../icon/icon.component';
 import {TextPipe} from '../../text/text.pipe';
-import {PartId} from '../workbench-part.model';
+import {PartId} from '../../workbench.identifiers';
 
 /**
  * @see ViewTabComponent

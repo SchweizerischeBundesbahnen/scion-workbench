@@ -10,7 +10,8 @@
 
 import {Component, EnvironmentProviders, inject, InjectionToken, makeEnvironmentProviders} from '@angular/core';
 import {ComponentFixture} from '@angular/core/testing';
-import {ViewId, WorkbenchView} from '../view/workbench-view.model';
+import {WorkbenchView} from '../view/workbench-view.model';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Component that can be used in unit tests.

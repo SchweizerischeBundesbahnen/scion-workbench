@@ -9,9 +9,7 @@ import {WORKBENCH_PART_REGISTRY} from '../part/workbench-part.registry';
 import {UUID} from '@scion/toolkit/uuid';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
 import {WorkbenchComponent} from '../workbench.component';
-import {WORKBENCH_ID} from '../workbench-id';
-import {ViewId} from '../view/workbench-view.model';
-import {ActivityId} from '../activity/workbench-activity.model';
+import {ActivityId, ViewId, WORKBENCH_ID} from '../workbench.identifiers';
 
 describe('ViewDragService', () => {
 

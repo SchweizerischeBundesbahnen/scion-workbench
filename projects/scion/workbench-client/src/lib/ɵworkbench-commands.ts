@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {ViewId} from './view/workbench-view';
+import {DialogId, PopupId, ViewId} from './workbench.identifiers';
 
 /**
  * Defines command endpoints for the communication between SCION Workbench and SCION Workbench Client.
@@ -88,25 +88,25 @@ export const ɵWorkbenchCommands = {
   /**
    * Computes the topic for observing the popup origin.
    */
-  popupOriginTopic: (popupId: string) => `ɵworkbench/popups/${popupId}/origin`,
+  popupOriginTopic: (popupId: PopupId) => `ɵworkbench/popups/${popupId}/origin`,
 
   /**
    * Computes the topic via which a popup can be closed.
    */
-  popupCloseTopic: (popupId: string) => `ɵworkbench/popups/${popupId}/close`,
+  popupCloseTopic: (popupId: PopupId) => `ɵworkbench/popups/${popupId}/close`,
 
   /**
    * Computes the topic via which to set a result
    */
-  popupResultTopic: (popupId: string) => `ɵworkbench/popups/${popupId}/result`,
+  popupResultTopic: (popupId: PopupId) => `ɵworkbench/popups/${popupId}/result`,
 
   /**
    * Computes the topic via which the title of a dialog can be set.
    */
-  dialogTitleTopic: (dialogId: string) => `ɵworkbench/dialogs/${dialogId}/title`,
+  dialogTitleTopic: (dialogId: DialogId) => `ɵworkbench/dialogs/${dialogId}/title`,
 
   /**
    * Computes the topic via which a dialog can be closed.
    */
-  dialogCloseTopic: (dialogId: string) => `ɵworkbench/dialogs/${dialogId}/close`,
+  dialogCloseTopic: (dialogId: DialogId) => `ɵworkbench/dialogs/${dialogId}/close`,
 } as const;

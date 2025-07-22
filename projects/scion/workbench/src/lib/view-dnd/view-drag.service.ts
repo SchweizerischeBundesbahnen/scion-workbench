@@ -14,17 +14,16 @@ import {filter, map} from 'rxjs/operators';
 import {Arrays} from '@scion/toolkit/util';
 import {WorkbenchBroadcastChannel} from '../communication/workbench-broadcast-channel';
 import {observeIn, subscribeIn} from '@scion/toolkit/operators';
-import {ViewId, WorkbenchViewNavigation} from '../view/workbench-view.model';
+import {WorkbenchViewNavigation} from '../view/workbench-view.model';
 import {ClassListMap} from '../common/class-list';
 import {toSignal} from '@angular/core/rxjs-interop';
-import {PartId} from '../part/workbench-part.model';
 import {Translatable} from '../text/workbench-text-provider.model';
-import {ActivityId, MActivity} from '../activity/workbench-activity.model';
+import {MActivity} from '../activity/workbench-activity.model';
 import {MPartGrid} from '../layout/workbench-grid.model';
 import {WorkbenchLayoutService} from '../layout/workbench-layout.service';
-import {isActivityId, ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
+import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {ɵWorkbenchPart} from '../part/ɵworkbench-part.model';
-import {WORKBENCH_ID} from '../workbench-id';
+import {ActivityId, isActivityId, PartId, ViewId, WORKBENCH_ID} from '../workbench.identifiers';
 
 /**
  * Coordinates cross application drag and drop of views.

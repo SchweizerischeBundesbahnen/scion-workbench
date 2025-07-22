@@ -9,7 +9,7 @@
  */
 
 import {Injector} from '@angular/core';
-import {ViewId} from '../view/workbench-view.model';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Controls how to open a dialog.

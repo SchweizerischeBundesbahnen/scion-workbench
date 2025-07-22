@@ -24,10 +24,10 @@ import {ɵWorkbenchView} from '../view/ɵworkbench-view.model';
 import {BottomLeftPoint, BottomRightPoint, Point, PopupOrigin, TopLeftPoint, TopRightPoint} from './popup.origin';
 import {takeUntilDestroyed, toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {provideViewContext} from '../view/view-context-provider';
-import {UUID} from '@scion/toolkit/uuid';
 import {boundingClientRect} from '@scion/components/dimension';
 import {clamp} from '../common/math.util';
 import {coerceElement} from '@angular/cdk/coercion';
+import {computePopupId} from '../workbench.identifiers';
 
 const NORTH: ConnectedPosition = {originX: 'center', originY: 'top', overlayX: 'center', overlayY: 'bottom', panelClass: 'wb-north'};
 const SOUTH: ConnectedPosition = {originX: 'center', originY: 'bottom', overlayX: 'center', overlayY: 'top', panelClass: 'wb-south'};
@@ -177,7 +177,7 @@ export class PopupService {
    */
   private createPopup<R>(config: PopupConfig, context: {view: ɵWorkbenchView | null}): ɵPopup<R> {
     // Construct the handle in an injection context that shares the popup's lifecycle, allowing for automatic cleanup of effects and RxJS interop functions.
-    const popupId = config.id ?? UUID.randomUUID();
+    const popupId = config.id ?? computePopupId();
     const popupEnvironmentInjector = createEnvironmentInjector([provideViewContext(context.view)], this._environmentInjector, `Workbench Popup ${popupId}`);
     return runInInjectionContext(popupEnvironmentInjector, () => new ɵPopup<R>(popupId, config));
   }

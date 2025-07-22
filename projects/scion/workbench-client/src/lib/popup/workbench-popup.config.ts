@@ -11,7 +11,7 @@
 import {Observable} from 'rxjs';
 import {Dictionary} from '@scion/toolkit/util';
 import {PopupOrigin} from './popup.origin';
-import {ViewId} from '../view/workbench-view';
+import {ViewId} from '../workbench.identifiers';
 
 /**
  * Configures the popup to display a microfrontend in a workbench popup using {@link WorkbenchPopupService}.

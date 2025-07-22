@@ -22,6 +22,7 @@ import {PopupOrigin} from '../../popup/popup.origin';
 import {WORKBENCH_VIEW_REGISTRY} from '../../view/workbench-view.registry';
 import {MicrofrontendHostPopupComponent} from '../microfrontend-host-popup/microfrontend-host-popup.component';
 import {MicrofrontendWorkbenchView} from '../microfrontend-view/microfrontend-workbench-view.model';
+import {PopupId} from '../../workbench.identifiers';
 
 /**
  * Handles popup intents, instructing the workbench to open a popup with the microfrontend declared on the resolved capability.
@@ -37,7 +38,7 @@ export class MicrofrontendPopupIntentHandler implements IntentInterceptor {
   private readonly _popupService = inject(PopupService);
   private readonly _viewRegistry = inject(WORKBENCH_VIEW_REGISTRY);
   private readonly _logger = inject(Logger);
-  private readonly _openedPopups = new Set<string>();
+  private readonly _openedPopups = new Set<PopupId>();
 
   /**
    * Popup intents are handled in this interceptor and then swallowed.

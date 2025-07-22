@@ -9,13 +9,11 @@
  */
 
 import {NavigationExtras, UrlSegment} from '@angular/router';
-import {ViewId} from '../view/workbench-view.model';
 import {ɵWorkbenchLayout} from '../layout/ɵworkbench-layout';
 import {WorkbenchLayoutDiff} from './workbench-layout-differ';
 import {WorkbenchLayout} from '../layout/workbench-layout';
 import {WorkbenchOutletDiff} from './workbench-outlet-differ';
-import {WorkbenchOutlet} from '../workbench.constants';
-import {PartId} from '../part/workbench-part.model';
+import {PartId, ViewId, WorkbenchOutlet} from '../workbench.identifiers';
 
 /**
  * Options to control the navigation.

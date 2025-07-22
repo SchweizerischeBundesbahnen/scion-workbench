@@ -12,7 +12,7 @@ import {Component, computed, inject, input, Signal} from '@angular/core';
 import {ɵWorkbenchRouter} from '../../routing/ɵworkbench-router.service';
 import {GridComponent} from '../../layout/grid/grid.component';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
-import {ActivityId} from '../workbench-activity.model';
+import {ActivityId} from '../../workbench.identifiers';
 import {NgTemplateOutlet} from '@angular/common';
 import {SciSashboxComponent, SciSashDirective} from '@scion/components/sashbox';
 import {Objects} from '@scion/toolkit/util';

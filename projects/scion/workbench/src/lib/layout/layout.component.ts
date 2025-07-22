@@ -21,7 +21,7 @@ import {WorkbenchService} from '../workbench.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../view-dnd/view-drop-zone.directive';
 import {GridDropTargets} from '../view-dnd/grid-drop-targets.util';
 import {ViewDragService} from '../view-dnd/view-drag.service';
-import {WORKBENCH_ID} from '../workbench-id';
+import {WORKBENCH_ID} from '../workbench.identifiers';
 import {WorkbenchPerspectiveService} from '../perspective/workbench-perspective.service';
 import {MAIN_AREA} from './workbench-layout';
 import {WorkbenchPortalOutletDirective} from '../portal/workbench-portal-outlet.directive';

@@ -15,9 +15,9 @@ import {WorkbenchMessageBoxCapability, ɵMESSAGE_BOX_CONTEXT, ɵMessageBoxContex
 import {NgComponentOutlet} from '@angular/common';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {MicrofrontendSplashComponent} from '../microfrontend-splash/microfrontend-splash.component';
-import {UUID} from '@scion/toolkit/uuid';
 import {setStyle} from '../../common/dom.util';
 import {Microfrontends} from '../common/microfrontend.util';
+import {ɵWorkbenchDialog} from '../../dialog/ɵworkbench-dialog';
 
 /**
  * Displays the microfrontend of a given {@link WorkbenchMessageBoxCapability}.
@@ -47,8 +47,8 @@ export class MicrofrontendMessageBoxComponent {
 
   /** Splash to display until the microfrontend signals readiness. */
   protected readonly splash = inject(MicrofrontendPlatformConfig).splash ?? MicrofrontendSplashComponent;
-  protected readonly outletName = UUID.randomUUID();
   protected readonly workbenchLayoutService = inject(WorkbenchLayoutService);
+  protected readonly dialog = inject(ɵWorkbenchDialog);
 
   constructor() {
     this._logger.debug(() => 'Constructing MicrofrontendMessageBoxComponent.', LoggerNames.MICROFRONTEND);
@@ -57,7 +57,7 @@ export class MicrofrontendMessageBoxComponent {
     this.propagateWorkbenchTheme();
     this.installNavigator();
 
-    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.outletName})); // Clear the outlet.
+    inject(DestroyRef).onDestroy(() => void this._outletRouter.navigate(null, {outlet: this.dialog.id})); // Clear the outlet.
   }
 
   private installNavigator(): void {
@@ -76,7 +76,7 @@ export class MicrofrontendMessageBoxComponent {
         await Microfrontends.waitForContext(this._routerOutletElement, ɵMESSAGE_BOX_CONTEXT, {injector});
 
         void this._outletRouter.navigate(capability.properties.path, {
-          outlet: this.outletName,
+          outlet: this.dialog.id,
           relativeTo: application.baseUrl,
           params: params,
           pushStateToSessionHistoryStack: false,

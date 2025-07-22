@@ -13,7 +13,7 @@ import {ɵWorkbenchPart} from '../ɵworkbench-part.model';
 import {WorkbenchLayoutService} from '../../layout/workbench-layout.service';
 import {ViewDragService} from '../../view-dnd/view-drag.service';
 import {ViewDropZoneDirective, WbViewDropEvent} from '../../view-dnd/view-drop-zone.directive';
-import {WORKBENCH_ID} from '../../workbench-id';
+import {WORKBENCH_ID} from '../../workbench.identifiers';
 import {GridDropTargets} from '../../view-dnd/grid-drop-targets.util';
 import {MAIN_AREA} from '../../layout/workbench-layout';
 import {GridComponent} from '../../layout/grid/grid.component';

@@ -17,7 +17,7 @@ import {WorkbenchRouter} from './workbench-router.service';
 import {ɵWorkbenchRouter} from './ɵworkbench-router.service';
 import {provideWorkbenchForTest} from '../testing/workbench.provider';
 import {canMatchWorkbenchView} from './workbench-route-guards';
-import {ViewId} from '../view/workbench-view.model';
+import {ViewId} from '../workbench.identifiers';
 import {WorkbenchComponent} from '../workbench.component';
 import {By} from '@angular/platform-browser';
 import {Component, inject, OnDestroy} from '@angular/core';
